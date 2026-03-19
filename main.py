@@ -85,6 +85,7 @@ def main():
     parser.add_argument('--planner_max_steps', type=int, default=3, help='Maximum planner steps per query.')
     parser.add_argument('--causal_enabled', type=str, default='true', help='Enable causal extraction and causal-aware retrieval.')
     parser.add_argument('--causal_query_only', type=str, default='true', help='Only use causal retrieval for causal queries.')
+    parser.add_argument('--causal_gate_mode', choices=['hard', 'soft'], default='hard', help='Causal gate mode: hard keeps routed gating, soft uses a rule-based intent score.')
     parser.add_argument('--causal_seed_top_k', type=int, default=20, help='How many fact seeds to use for the causal retriever.')
     parser.add_argument('--causal_confidence_threshold', type=float, default=0.5, help='Minimum confidence for causal edges.')
     parser.add_argument('--causal_damping', type=float, default=0.7, help='Damping factor for causal graph propagation.')
@@ -161,6 +162,7 @@ def main():
         planner_max_steps=args.planner_max_steps,
         causal_enabled=causal_enabled,
         causal_query_only=causal_query_only,
+        causal_gate_mode=args.causal_gate_mode,
         causal_seed_top_k=args.causal_seed_top_k,
         causal_confidence_threshold=args.causal_confidence_threshold,
         causal_damping=args.causal_damping,

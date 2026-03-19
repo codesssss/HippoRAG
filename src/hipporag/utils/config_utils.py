@@ -189,6 +189,10 @@ class BaseConfig:
         default=True,
         metadata={"help": "Only run the causal retriever for queries routed as causal."}
     )
+    causal_gate_mode: Literal["hard", "soft"] = field(
+        default="hard",
+        metadata={"help": "Causal gate mode: hard keeps the existing routed gate, soft attenuates causal usage by a rule-based intent score."}
+    )
     causal_seed_top_k: int = field(
         default=20,
         metadata={"help": "How many proposition seeds to use for causal graph retrieval."}

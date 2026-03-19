@@ -1,5 +1,8 @@
+from types import SimpleNamespace
+
 import numpy as np
 
+from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.utils.causal_utils import (
     derive_composed_structure_edges,
     derive_directed_structure_edge,
@@ -7,6 +10,7 @@ from src.hipporag.utils.causal_utils import (
     run_personalized_pagerank,
     sanitize_causal_relations,
     score_candidate_docs_by_structure,
+    score_query_causal_intent,
 )
 from src.hipporag.utils.misc_utils import compute_fact_id
 
@@ -40,6 +44,34 @@ def test_route_query_type_distinguishes_causal_queries():
     assert route_query_type("What does smoking cause?") == "effect"
     assert route_query_type("How can vaccines prevent infection?") == "prevention"
     assert route_query_type("Who directed the film?") == "non_causal"
+
+
+def test_score_query_causal_intent_uses_strong_weak_and_non_causal_buckets():
+    assert score_query_causal_intent("Why did the bridge collapse?") == 1.0
+    assert score_query_causal_intent("What happened after the CEO resigned?") == 0.6
+    assert score_query_causal_intent("Who is the director of the film?") == 0.0
+    assert score_query_causal_intent("Name the film starring actor X.") == 0.1
+
+
+def test_blend_causal_retrieval_scores_applies_soft_gate_scaling():
+    dummy = SimpleNamespace(
+        global_config=SimpleNamespace(
+            causal_blend_dense_weight=0.35,
+            causal_blend_fact_weight=0.15,
+            causal_blend_graph_weight=0.50,
+            causal_gate_mode="soft",
+        )
+    )
+    _, _, trace = HippoRAG.blend_causal_retrieval_scores(
+        dummy,
+        dense_doc_scores={0: 1.0},
+        fact_doc_scores={0: 0.5},
+        causal_doc_scores={1: 1.0},
+        route_causal_intent_score=0.6,
+    )
+
+    assert trace["causal_weight_before_attenuation"] == 0.3
+    assert trace["causal_weight_after_attenuation"] == 0.06
 
 
 def test_run_personalized_pagerank_prefers_reverse_chain_when_seeded_downstream():
@@ -152,6 +184,8 @@ if __name__ == "__main__":
     test_compute_fact_id_is_stable_for_normalized_triples()
     test_sanitize_causal_relations_filters_invalid_and_dedups()
     test_route_query_type_distinguishes_causal_queries()
+    test_score_query_causal_intent_uses_strong_weak_and_non_causal_buckets()
+    test_blend_causal_retrieval_scores_applies_soft_gate_scaling()
     test_run_personalized_pagerank_prefers_reverse_chain_when_seeded_downstream()
     test_derive_directed_structure_edge_handles_forward_and_reverse_predicates()
     test_derive_composed_structure_edges_builds_bridge_edge_from_fact_chain()

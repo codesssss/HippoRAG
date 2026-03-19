@@ -161,6 +161,7 @@ def build_config(args, corpus_len: int) -> BaseConfig:
         planner_max_steps=args.planner_max_steps,
         causal_enabled=string_to_bool(args.causal_enabled),
         causal_query_only=string_to_bool(args.causal_query_only),
+        causal_gate_mode=args.causal_gate_mode,
         causal_seed_top_k=args.causal_seed_top_k,
         causal_confidence_threshold=args.causal_confidence_threshold,
         causal_damping=args.causal_damping,
@@ -202,6 +203,7 @@ def main():
     parser.add_argument("--embedding_batch_size", type=int, default=8)
     parser.add_argument("--causal_enabled", type=str, default="true")
     parser.add_argument("--causal_query_only", type=str, default="true")
+    parser.add_argument("--causal_gate_mode", choices=["hard", "soft"], default="hard")
     parser.add_argument("--causal_seed_top_k", type=int, default=20)
     parser.add_argument("--causal_confidence_threshold", type=float, default=0.5)
     parser.add_argument("--causal_damping", type=float, default=0.7)
@@ -268,6 +270,7 @@ def main():
         "config": {
             "causal_enabled": config.causal_enabled,
             "causal_query_only": config.causal_query_only,
+            "causal_gate_mode": config.causal_gate_mode,
             "causal_seed_top_k": config.causal_seed_top_k,
             "causal_confidence_threshold": config.causal_confidence_threshold,
             "causal_damping": config.causal_damping,

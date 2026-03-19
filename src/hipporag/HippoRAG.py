@@ -37,8 +37,9 @@ from .utils.causal_utils import (
     derive_composed_structure_edges,
     derive_directed_structure_edge,
     filter_adjacency_by_relation,
-    score_candidate_docs_by_structure,
     route_query_type,
+    score_candidate_docs_by_structure,
+    score_query_causal_intent,
     run_personalized_pagerank,
 )
 from .utils.misc_utils import *
@@ -461,13 +462,18 @@ class HippoRAG:
 
             self.rerank_time += rerank_end - rerank_start
             query_type = self._route_query_type(query)
-            use_causal_path = (
-                self.global_config.causal_enabled
-                and (
-                    (self.global_config.causal_query_only and query_type != "non_causal")
-                    or not self.global_config.causal_query_only
+            route_causal_intent_score = self._score_query_causal_intent(query)
+            causal_gate_mode = getattr(self.global_config, "causal_gate_mode", "hard")
+            if causal_gate_mode == "soft":
+                use_causal_path = self.global_config.causal_enabled and route_causal_intent_score > 0.0
+            else:
+                use_causal_path = (
+                    self.global_config.causal_enabled
+                    and (
+                        (self.global_config.causal_query_only and query_type != "non_causal")
+                        or not self.global_config.causal_query_only
+                    )
                 )
-            )
             rerank_attempts = rerank_log.get("attempts", [])
             structure_trace = {
                 "requested": bool(self.global_config.structure_rerank_enabled),
@@ -475,7 +481,17 @@ class HippoRAG:
                 "applied": False,
                 "noop_reason": None,
                 "query_type": query_type,
+                "route_query_type": query_type,
+                "route_causal_intent_score": float(route_causal_intent_score),
+                "causal_gate_mode": causal_gate_mode,
                 "use_causal_path": bool(use_causal_path),
+                "causal_doc_count": 0,
+                "causal_doc_top1_score": 0.0,
+                "causal_doc_top2_score": 0.0,
+                "causal_doc_non_empty": False,
+                "causal_weight_before_attenuation": 0.0,
+                "causal_weight_after_attenuation": 0.0,
+                "causal_blend_mode": "soft_gate" if causal_gate_mode == "soft" else "hard_gate",
                 "top_k_fact_count": len(top_k_facts),
                 "rerank_attempt_count": len(rerank_attempts),
                 "rerank_parse_failure_count": sum(1 for attempt in rerank_attempts if not attempt.get("parse_succeeded", False)),
@@ -551,11 +567,19 @@ class HippoRAG:
                     query_type=query_type,
                     preferred_fact_indices=top_k_fact_indices,
                 )
-                sorted_doc_ids, sorted_doc_scores = self.blend_causal_retrieval_scores(
+                structure_trace["causal_doc_count"] = int(len(causal_doc_ids))
+                structure_trace["causal_doc_non_empty"] = bool(len(causal_doc_ids) > 0)
+                if len(causal_doc_scores) > 0:
+                    structure_trace["causal_doc_top1_score"] = float(causal_doc_scores[0])
+                if len(causal_doc_scores) > 1:
+                    structure_trace["causal_doc_top2_score"] = float(causal_doc_scores[1])
+                sorted_doc_ids, sorted_doc_scores, causal_blend_trace = self.blend_causal_retrieval_scores(
                     dense_doc_scores=dense_score_by_doc_id,
                     fact_doc_scores=self._build_score_by_doc_id(fact_doc_ids, fact_doc_scores),
                     causal_doc_scores=self._build_score_by_doc_id(causal_doc_ids, causal_doc_scores),
+                    route_causal_intent_score=route_causal_intent_score,
                 )
+                structure_trace.update(causal_blend_trace)
                 if len(sorted_doc_ids) == 0:
                     sorted_doc_ids, sorted_doc_scores = dense_doc_ids, dense_doc_scores
                 elif structure_rerank_eligible:
@@ -1637,6 +1661,9 @@ class HippoRAG:
     def _route_query_type(self, query: str) -> str:
         return route_query_type(query)
 
+    def _score_query_causal_intent(self, query: str) -> float:
+        return score_query_causal_intent(query)
+
     def _collect_structure_seed_entities(self,
                                          query_fact_scores: np.ndarray,
                                          top_k_fact_indices: List[int],
@@ -1885,23 +1912,34 @@ class HippoRAG:
     def blend_causal_retrieval_scores(self,
                                       dense_doc_scores: Dict[int, float],
                                       fact_doc_scores: Dict[int, float],
-                                      causal_doc_scores: Dict[int, float]) -> Tuple[np.ndarray, np.ndarray]:
+                                      causal_doc_scores: Dict[int, float],
+                                      route_causal_intent_score: float = 1.0) -> Tuple[np.ndarray, np.ndarray, Dict[str, float]]:
         all_doc_ids = set(dense_doc_scores) | set(fact_doc_scores) | set(causal_doc_scores)
         if not all_doc_ids:
-            return np.array([], dtype=int), np.array([], dtype=float)
+            return np.array([], dtype=int), np.array([], dtype=float), {
+                "causal_weight_before_attenuation": 0.0,
+                "causal_weight_after_attenuation": 0.0,
+            }
 
         dense_weight = self.global_config.causal_blend_dense_weight if dense_doc_scores else 0.0
         fact_weight = self.global_config.causal_blend_fact_weight if fact_doc_scores else 0.0
         causal_weight = self.global_config.causal_blend_graph_weight if causal_doc_scores else 0.0
+        if getattr(self.global_config, "causal_gate_mode", "hard") == "soft" and causal_weight > 0:
+            causal_weight *= max(0.0, min(1.0, float(route_causal_intent_score)))
+        causal_weight_before_attenuation = float(causal_weight)
 
         # Sparse causal hits are often brittle; attenuate them instead of forcing
         # the full causal weight on top of an otherwise strong dense/fact ranking.
         if causal_weight > 0:
             causal_weight *= min(1.0, len(causal_doc_scores) / 5.0)
+        causal_weight_after_attenuation = float(causal_weight)
 
         total_weight = dense_weight + fact_weight + causal_weight
         if total_weight <= 0:
-            return np.array([], dtype=int), np.array([], dtype=float)
+            return np.array([], dtype=int), np.array([], dtype=float), {
+                "causal_weight_before_attenuation": causal_weight_before_attenuation,
+                "causal_weight_after_attenuation": causal_weight_after_attenuation,
+            }
 
         dense_weight /= total_weight
         fact_weight /= total_weight
@@ -1920,7 +1958,10 @@ class HippoRAG:
         sorted_doc_scores = np.array([score for _, score in sorted_items], dtype=float)
         if len(sorted_doc_scores) > 1:
             sorted_doc_scores = min_max_normalize(sorted_doc_scores)
-        return sorted_doc_ids, sorted_doc_scores
+        return sorted_doc_ids, sorted_doc_scores, {
+            "causal_weight_before_attenuation": causal_weight_before_attenuation,
+            "causal_weight_after_attenuation": causal_weight_after_attenuation,
+        }
 
     def get_query_embeddings(self, queries: List[str] | List[QuerySolution]):
         """

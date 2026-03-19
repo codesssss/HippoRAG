@@ -11,6 +11,59 @@ CAUSAL_RELATION_TYPES = ("causes", "enables", "prevents")
 CausalQueryType = Literal["cause", "effect", "prevention", "non_causal"]
 STRUCTURE_RELATION_TYPES = CAUSAL_RELATION_TYPES + ("state_transition",)
 
+PREVENTION_PATTERNS = (
+    r"\bprevent\b",
+    r"\bprevents\b",
+    r"\bavoid\b",
+    r"\bstop\b",
+    r"\binhibit\b",
+    r"\breduce risk\b",
+)
+EFFECT_PATTERNS = (
+    r"\bwhat (?:does|did|can|could|will|would)\b.+?\b(?:cause|causes|lead to|leads to|result in|results in|enable|enables)\b",
+    r"\bwhat (?:was|were|is|are)\b.+?\bcaused by\b",
+    r"\bcaused by\b",
+    r"\bresults? from\b",
+    r"\beffects? of\b",
+    r"\bconsequences? of\b",
+    r"\beffect\b",
+    r"\beffects\b",
+    r"\bconsequence\b",
+    r"\bwhat happens if\b",
+)
+CAUSE_PATTERNS = (
+    r"\bwhy\b",
+    r"\bwhat caused\b",
+    r"\bwhat causes\b",
+    r"\bwhat leads to\b",
+    r"\bwhat results in\b",
+    r"\breason\b",
+    r"\breason for\b",
+    r"\bbecause\b",
+    r"\bdue to\b",
+    r"\bstems? from\b",
+)
+WEAK_DIRECTION_PATTERNS = (
+    r"\bafter\b",
+    r"\bfollowing\b",
+    r"\bresulted\b",
+    r"\bresulting\b",
+    r"\bled to\b",
+    r"\bleads to\b",
+    r"\bconsequence\b",
+    r"\bconsequences\b",
+    r"\boutcome\b",
+    r"\boutcomes\b",
+    r"\bimpact\b",
+)
+NON_CAUSAL_FACT_PATTERNS = (
+    r"^\s*who is\b",
+    r"^\s*where is\b",
+    r"^\s*when was\b",
+    r"^\s*how many\b",
+    r"^\s*what is the capital\b",
+)
+
 
 def canonicalize_relation_type(relation_type: str) -> str | None:
     normalized = str(relation_type).strip().lower().replace("-", "_").replace(" ", "_")
@@ -70,46 +123,28 @@ def sanitize_causal_relations(raw_relations: Sequence[dict],
 def route_query_type(query: str) -> CausalQueryType:
     text = re.sub(r"\s+", " ", query.lower()).strip()
 
-    prevention_patterns = (
-        r"\bprevent\b",
-        r"\bprevents\b",
-        r"\bavoid\b",
-        r"\bstop\b",
-        r"\binhibit\b",
-        r"\breduce risk\b",
-    )
-    effect_patterns = (
-        r"\bwhat (?:does|did|can|could|will|would)\b.+?\b(?:cause|causes|lead to|leads to|result in|results in|enable|enables)\b",
-        r"\bwhat (?:was|were|is|are)\b.+?\bcaused by\b",
-        r"\bcaused by\b",
-        r"\bresults? from\b",
-        r"\beffects? of\b",
-        r"\bconsequences? of\b",
-        r"\beffect\b",
-        r"\beffects\b",
-        r"\bconsequence\b",
-        r"\bwhat happens if\b",
-    )
-    cause_patterns = (
-        r"\bwhy\b",
-        r"\bwhat caused\b",
-        r"\bwhat causes\b",
-        r"\bwhat leads to\b",
-        r"\bwhat results in\b",
-        r"\breason\b",
-        r"\breason for\b",
-        r"\bbecause\b",
-        r"\bdue to\b",
-        r"\bstems? from\b",
-    )
-
-    if any(re.search(pattern, text) for pattern in prevention_patterns):
+    if any(re.search(pattern, text) for pattern in PREVENTION_PATTERNS):
         return "prevention"
-    if any(re.search(pattern, text) for pattern in effect_patterns):
+    if any(re.search(pattern, text) for pattern in EFFECT_PATTERNS):
         return "effect"
-    if any(re.search(pattern, text) for pattern in cause_patterns):
+    if any(re.search(pattern, text) for pattern in CAUSE_PATTERNS):
         return "cause"
     return "non_causal"
+
+
+def score_query_causal_intent(query: str) -> float:
+    text = re.sub(r"\s+", " ", query.lower()).strip()
+
+    if any(re.search(pattern, text) for pattern in PREVENTION_PATTERNS + EFFECT_PATTERNS + CAUSE_PATTERNS):
+        return 1.0
+
+    if any(re.search(pattern, text) for pattern in WEAK_DIRECTION_PATTERNS):
+        return 0.6
+
+    if any(re.search(pattern, text) for pattern in NON_CAUSAL_FACT_PATTERNS):
+        return 0.0
+
+    return 0.1
 
 
 def normalize_structure_text(text: str) -> str:

@@ -85,6 +85,11 @@ def summarize_structure_traces(examples: list[dict]) -> dict:
     repair_failure_examples = 0
     non_empty_fallback_examples = 0
     final_facts_empty_examples = 0
+    use_causal_path_count = 0
+    causal_doc_non_empty_count = 0
+    route_causal_intent_scores = []
+    causal_doc_counts_when_used = []
+    causal_weights_after_attenuation_when_used = []
 
     for example in examples:
         trace = example.get("retrieval_trace") or {}
@@ -126,6 +131,16 @@ def summarize_structure_traces(examples: list[dict]) -> dict:
             non_empty_fallback_examples += 1
         if int(trace.get("rerank_final_facts_empty_count", 0)) > 0:
             final_facts_empty_examples += 1
+        if trace.get("use_causal_path"):
+            use_causal_path_count += 1
+            causal_doc_counts_when_used.append(float(trace.get("causal_doc_count", 0)))
+            causal_weights_after_attenuation_when_used.append(
+                float(trace.get("causal_weight_after_attenuation", 0.0))
+            )
+        if trace.get("causal_doc_non_empty"):
+            causal_doc_non_empty_count += 1
+        if "route_causal_intent_score" in trace:
+            route_causal_intent_scores.append(float(trace.get("route_causal_intent_score", 0.0)))
 
     def _avg(values: list[float]) -> float:
         return float(sum(values) / len(values)) if values else 0.0
@@ -147,6 +162,13 @@ def summarize_structure_traces(examples: list[dict]) -> dict:
         "repair_failure_example_count": repair_failure_examples,
         "non_empty_fallback_example_count": non_empty_fallback_examples,
         "final_facts_empty_example_count": final_facts_empty_examples,
+        "use_causal_path_count": use_causal_path_count,
+        "use_causal_path_rate": (use_causal_path_count / len(examples)) if examples else 0.0,
+        "causal_doc_non_empty_count": causal_doc_non_empty_count,
+        "causal_doc_non_empty_rate": (causal_doc_non_empty_count / len(examples)) if examples else 0.0,
+        "avg_route_causal_intent_score": _avg(route_causal_intent_scores),
+        "avg_causal_doc_count_when_used": _avg(causal_doc_counts_when_used),
+        "avg_causal_weight_after_attenuation_when_used": _avg(causal_weights_after_attenuation_when_used),
         "facts_empty_stage_counts": facts_empty_stage_counts,
         "noop_reason_counts": noop_reason_counts,
         "fallback_reason_counts": fallback_reason_counts,
@@ -302,6 +324,7 @@ def run_single(label: str,
         "config": {
             "causal_enabled": config.causal_enabled,
             "causal_query_only": config.causal_query_only,
+            "causal_gate_mode": config.causal_gate_mode,
             "structure_rerank_enabled": config.structure_rerank_enabled,
             "structure_rerank_top_n": config.structure_rerank_top_n,
             "structure_rerank_bonus_weight": config.structure_rerank_bonus_weight,
@@ -357,6 +380,7 @@ def main():
     parser.add_argument("--embedding_batch_size", type=int, default=8)
     parser.add_argument("--causal_enabled", type=str, default="true")
     parser.add_argument("--causal_query_only", type=str, default="true")
+    parser.add_argument("--causal_gate_mode", choices=["hard", "soft"], default="hard")
     parser.add_argument("--causal_seed_top_k", type=int, default=20)
     parser.add_argument("--causal_confidence_threshold", type=float, default=0.5)
     parser.add_argument("--causal_damping", type=float, default=0.7)
