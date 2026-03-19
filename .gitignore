@@ -21,3 +21,8 @@ data/
 clear_outputs_and_logs.sh
 # Ignore the env file
 .env
+.ace-tool/
+.venv/
+.venv-hipporag/
+nohup.out
+src/hipporag.egg-info/

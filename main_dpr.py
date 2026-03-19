@@ -74,6 +74,7 @@ def main():
     parser.add_argument('--llm_base_url', type=str, default='https://api.openai.com/v1', help='LLM base URL')
     parser.add_argument('--llm_name', type=str, default='gpt-4o-mini', help='LLM name')
     parser.add_argument('--embedding_name', type=str, default='nvidia/NV-Embed-v2', help='embedding model name')
+    parser.add_argument('--embedding_base_url', type=str, default=None, help='Embedding base URL')
     parser.add_argument('--force_index_from_scratch', type=str, default='false',
                         help='If set to True, will ignore all existing storage files and graph data and will rebuild from scratch.')
     parser.add_argument('--force_openie_from_scratch', type=str, default='false', help='If set to False, will try to first reuse openie results for the corpus if they exist.')
@@ -115,6 +116,7 @@ def main():
         save_dir=save_dir,
         llm_base_url=llm_base_url,
         llm_name=llm_name,
+        embedding_base_url=args.embedding_base_url,
         dataset=dataset_name,
         embedding_model_name=args.embedding_name,
         force_index_from_scratch=force_index_from_scratch,  # ignore previously stored index, set it to False if you want to use the previously stored index and embeddings

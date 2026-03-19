@@ -21,16 +21,17 @@ one_shot_ircot_demo = (
 
 
 rag_qa_system = (
-    'As an advanced reading comprehension assistant, your task is to analyze text passages and corresponding questions meticulously. '
-    'Your response start after "Thought: ", where you will methodically break down the reasoning process, illustrating how you arrive at conclusions. '
-    'Conclude with "Answer: " to present a concise, definitive response, devoid of additional elaborations.'
+    'As an advanced reading comprehension assistant, analyze the passages and answer the question using only the provided evidence. '
+    'Start your response after "Thought: " with brief reasoning. '
+    'Your final line must be exactly in the format "Answer: <short answer>". '
+    'Do not add any text after that final Answer line.'
 )
 
 one_shot_rag_qa_input = (
     f"{one_shot_rag_qa_docs}"
     "\n\nQuestion: "
     "When was Neville A. Stanton's employer founded?"
-    '\nThought: '
+    '\nThought: Keep the reasoning brief and end with exactly one final line in the format "Answer: <short answer>".'
 )
 
 one_shot_rag_qa_output = (
@@ -43,5 +44,5 @@ prompt_template = [
     {"role": "system", "content": rag_qa_system},
     {"role": "user", "content": one_shot_rag_qa_input},
     {"role": "assistant", "content": one_shot_rag_qa_output},
-    {"role": "user", "content": "${prompt_user}"}
+    {"role": "user", "content": "${prompt_user} Keep the reasoning brief and end with exactly one final line in the format \"Answer: <short answer>\"."}
 ]

@@ -286,6 +286,33 @@ PROMPT_JSON_TEMPLATE = {
         },
         "required": ["triples"]
     },
+    "causal_relations": {
+        "type": "object",
+        "properties": {
+            "causal_relations": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "source_fact_id": {"type": "string"},
+                        "target_fact_id": {"type": "string"},
+                        "relation_type": {
+                            "type": "string",
+                            "enum": ["causes", "enables", "prevents"],
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0,
+                        },
+                    },
+                    "required": ["source_fact_id", "target_fact_id", "relation_type", "confidence"],
+                },
+                "minItems": 0,
+            }
+        },
+        "required": ["causal_relations"],
+    },
     "fact": {
         "type": "object",
         "properties": {
@@ -357,6 +384,17 @@ class TriplesModel(pydantic.BaseModel):
     """
     triples: List[Tuple[str, str, str]]
 
+
+class CausalRelationModel(pydantic.BaseModel):
+    source_fact_id: str
+    target_fact_id: str
+    relation_type: str
+    confidence: float = pydantic.Field(..., ge=0.0, le=1.0)
+
+
+class CausalRelationsModel(pydantic.BaseModel):
+    causal_relations: List[CausalRelationModel]
+
 class FactModel(pydantic.BaseModel):
     """
     For fact extraction, the structure is:
@@ -410,6 +448,7 @@ class QaCotModel(pydantic.BaseModel):
 MODEL_TEMPLATES: Dict[str, Type[pydantic.BaseModel]] = {
     "ner": NerModel,
     "triples": TriplesModel,
+    "causal_relations": CausalRelationsModel,
     "fact": FactModel,
     "json": ArbitraryJsonModel,
     "qa_cot": QaCotModel,

@@ -1,6 +1,8 @@
 import json
+import hashlib
 import os
 import logging
+import ast
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import Union, Optional, List, Set, Dict, Any, Tuple, Literal
@@ -27,14 +29,36 @@ from .evaluation.retrieval_eval import RetrievalRecall
 from .evaluation.qa_eval import QAExactMatch, QAF1Score
 from .prompts.linking import get_query_instruction
 from .prompts.prompt_template_manager import PromptTemplateManager
+from .planner import HippoRAGMyopicPlanner
 from .rerank import DSPyFilter
+from .utils.causal_utils import (
+    aggregate_doc_scores,
+    canonicalize_relation_type,
+    derive_composed_structure_edges,
+    derive_directed_structure_edge,
+    filter_adjacency_by_relation,
+    score_candidate_docs_by_structure,
+    route_query_type,
+    run_personalized_pagerank,
+)
 from .utils.misc_utils import *
-from .utils.misc_utils import NerRawOutput, TripleRawOutput
+from .utils.misc_utils import CausalRawOutput, NerRawOutput, TripleRawOutput, compute_fact_id
 from .utils.embed_utils import retrieve_knn
 from .utils.typing import Triple
 from .utils.config_utils import BaseConfig
 
 logger = logging.getLogger(__name__)
+
+
+def _safe_parse_fact_content(content: str):
+    try:
+        parsed = json.loads(content)
+    except json.JSONDecodeError:
+        parsed = ast.literal_eval(content)
+
+    if isinstance(parsed, (list, tuple)) and len(parsed) == 3:
+        return tuple(str(item) for item in parsed)
+    raise ValueError(f"Invalid fact content: {content}")
 
 class HippoRAG:
 
@@ -162,6 +186,16 @@ class HippoRAG:
         self.all_retrieval_time = 0
 
         self.ent_node_to_chunk_ids = None
+        self.fact_id_to_doc_idxs = defaultdict(set)
+        self.fact_id_to_fact_idx = {}
+        self.causal_graph_out = {}
+        self.causal_graph_in = {}
+        self.structure_graph_out = {}
+        self.fact_id_to_entities = {}
+        self.fact_id_to_triple = {}
+        self.doc_idx_to_structure_entities = defaultdict(set)
+        self.doc_idx_to_structure_edges = defaultdict(list)
+        self.retrieval_planner = HippoRAGMyopicPlanner(self)
 
 
     def initialize_graph(self):
@@ -207,8 +241,14 @@ class HippoRAG:
         new_openie_rows = {k : chunks[k] for k in chunk_keys_to_process}
 
         if len(chunk_keys_to_process) > 0:
-            new_ner_results_dict, new_triple_results_dict = self.openie.batch_openie(new_openie_rows)
-            self.merge_openie_results(all_openie_info, new_openie_rows, new_ner_results_dict, new_triple_results_dict)
+            new_ner_results_dict, new_triple_results_dict, new_causal_results_dict = self.openie.batch_openie(new_openie_rows)
+            self.merge_openie_results(
+                all_openie_info,
+                new_openie_rows,
+                new_ner_results_dict,
+                new_triple_results_dict,
+                new_causal_results_dict,
+            )
 
         if self.global_config.save_openie:
             self.save_openie_results(all_openie_info)
@@ -239,15 +279,21 @@ class HippoRAG:
         new_openie_rows = {k : chunk_to_rows[k] for k in chunk_keys_to_process}
 
         if len(chunk_keys_to_process) > 0:
-            new_ner_results_dict, new_triple_results_dict = self.openie.batch_openie(new_openie_rows)
-            self.merge_openie_results(all_openie_info, new_openie_rows, new_ner_results_dict, new_triple_results_dict)
+            new_ner_results_dict, new_triple_results_dict, new_causal_results_dict = self.openie.batch_openie(new_openie_rows)
+            self.merge_openie_results(
+                all_openie_info,
+                new_openie_rows,
+                new_ner_results_dict,
+                new_triple_results_dict,
+                new_causal_results_dict,
+            )
 
         if self.global_config.save_openie:
             self.save_openie_results(all_openie_info)
 
-        ner_results_dict, triple_results_dict = reformat_openie_results(all_openie_info)
+        ner_results_dict, triple_results_dict, causal_results_dict = reformat_openie_results(all_openie_info)
 
-        assert len(chunk_to_rows) == len(ner_results_dict) == len(triple_results_dict), f"len(chunk_to_rows): {len(chunk_to_rows)}, len(ner_results_dict): {len(ner_results_dict)}, len(triple_results_dict): {len(triple_results_dict)}"
+        assert len(chunk_to_rows) == len(ner_results_dict) == len(triple_results_dict) == len(causal_results_dict), f"len(chunk_to_rows): {len(chunk_to_rows)}, len(ner_results_dict): {len(ner_results_dict)}, len(triple_results_dict): {len(triple_results_dict)}, len(causal_results_dict): {len(causal_results_dict)}"
 
         # prepare data_store
         chunk_ids = list(chunk_to_rows.keys())
@@ -411,23 +457,156 @@ class HippoRAG:
             query_fact_scores = self.get_fact_scores(query)
             top_k_fact_indices, top_k_facts, rerank_log = self.rerank_facts(query, query_fact_scores)
             rerank_end = time.time()
+            structure_rerank_eligible = bool(top_k_facts) and not rerank_log.get("used_fallback", False)
 
             self.rerank_time += rerank_end - rerank_start
+            query_type = self._route_query_type(query)
+            use_causal_path = (
+                self.global_config.causal_enabled
+                and (
+                    (self.global_config.causal_query_only and query_type != "non_causal")
+                    or not self.global_config.causal_query_only
+                )
+            )
+            rerank_attempts = rerank_log.get("attempts", [])
+            structure_trace = {
+                "requested": bool(self.global_config.structure_rerank_enabled),
+                "eligible": bool(structure_rerank_eligible),
+                "applied": False,
+                "noop_reason": None,
+                "query_type": query_type,
+                "use_causal_path": bool(use_causal_path),
+                "top_k_fact_count": len(top_k_facts),
+                "rerank_attempt_count": len(rerank_attempts),
+                "rerank_parse_failure_count": sum(1 for attempt in rerank_attempts if not attempt.get("parse_succeeded", False)),
+                "rerank_parse_failure_events": int(rerank_log.get("parse_failure_count", 0)),
+                "rerank_schema_failure_count": int(rerank_log.get("schema_failure_count", 0)),
+                "rerank_empty_output_count": int(rerank_log.get("empty_output_count", 0)),
+                "rerank_model_semantic_empty_count": int(rerank_log.get("model_semantic_empty_count", 0)),
+                "rerank_repair_failure_count": int(rerank_log.get("repair_failure_count", 0)),
+                "rerank_non_empty_fallback_count": int(rerank_log.get("non_empty_fallback_count", 0)),
+                "rerank_final_facts_empty_count": int(rerank_log.get("final_facts_empty_count", 0)),
+                "rerank_num_candidates": int(rerank_log.get("num_candidates", 0)),
+                "rerank_n_candidates_initial": int(rerank_log.get("n_candidates_initial", rerank_log.get("num_candidates", 0))),
+                "rerank_n_facts_after_rerank_raw": int(rerank_log.get("n_facts_after_rerank_raw", 0)),
+                "rerank_n_facts_after_mapping": int(rerank_log.get("n_facts_after_mapping", 0)),
+                "rerank_n_facts_after_postprocess": int(rerank_log.get("n_facts_after_postprocess", 0)),
+                "rerank_n_facts_final": int(rerank_log.get("n_facts_final", len(top_k_facts))),
+                "rerank_facts_empty_stage": rerank_log.get("facts_empty_stage"),
+                "rerank_candidate_snapshot_hash": rerank_log.get("candidate_snapshot_hash"),
+                "rerank_candidate_id_list": rerank_log.get("candidate_id_list", []),
+                "rerank_candidate_keys_preview": rerank_log.get("candidate_keys_preview", []),
+                "rerank_valid_id_range": rerank_log.get("valid_id_range", []),
+                "rerank_parsed_best_ids": rerank_log.get("parsed_best_ids", []),
+                "rerank_invalid_best_ids": rerank_log.get("invalid_best_ids", []),
+                "rerank_raw_output_preview": rerank_log.get("raw_output_preview"),
+                "rerank_attempt1_status": rerank_log.get("attempt1_status"),
+                "rerank_attempt1_error": rerank_log.get("attempt1_error"),
+                "rerank_attempt1_raw_output_preview": rerank_log.get("attempt1_raw_output_preview"),
+                "rerank_attempt1_finish_reason": rerank_log.get("attempt1_finish_reason"),
+                "rerank_attempt1_truncated": bool(rerank_log.get("attempt1_truncated", False)),
+                "rerank_attempt2_status": rerank_log.get("attempt2_status"),
+                "rerank_attempt2_error": rerank_log.get("attempt2_error"),
+                "rerank_attempt2_raw_output_preview": rerank_log.get("attempt2_raw_output_preview"),
+                "rerank_attempt2_finish_reason": rerank_log.get("attempt2_finish_reason"),
+                "rerank_attempt2_truncated": bool(rerank_log.get("attempt2_truncated", False)),
+                "rerank_truncated_response_count": int(rerank_log.get("truncated_response_count", 0)),
+                "rerank_used_fallback": bool(rerank_log.get("used_fallback", False)),
+                "rerank_fallback_reason": rerank_log.get("fallback_reason"),
+                "rerank_final_failure_reason": rerank_log.get("final_failure_reason"),
+                "rerank_final_non_empty_fallback_applied": bool(rerank_log.get("final_non_empty_fallback_applied", False)),
+                "rerank_final_non_empty_fallback_reason": rerank_log.get("final_non_empty_fallback_reason"),
+                "rerank_mapping_issue_detected": bool(rerank_log.get("mapping_issue_detected", False)),
+                "rerank_mapping_exact_match_count": int(rerank_log.get("mapping_exact_match_count", 0)),
+                "rerank_mapping_normalized_match_count": int(rerank_log.get("mapping_normalized_match_count", 0)),
+                "rerank_mapping_unmapped_count": int(rerank_log.get("mapping_unmapped_count", 0)),
+                "rerank_mapping_duplicate_drop_count": int(rerank_log.get("mapping_duplicate_drop_count", 0)),
+                "rerank_mapping_partial_recovery_applied": bool(rerank_log.get("mapping_partial_recovery_applied", False)),
+                "rerank_mapping_fallback_fill_count": int(rerank_log.get("mapping_fallback_fill_count", 0)),
+                "rerank_mapping_issue_reason_counts": rerank_log.get("mapping_issue_reason_counts", {}),
+            }
+            if not structure_trace["requested"]:
+                structure_trace["noop_reason"] = "disabled"
+            elif not top_k_facts:
+                structure_trace["noop_reason"] = "facts_empty"
+            elif rerank_log.get("used_fallback", False):
+                structure_trace["noop_reason"] = "rerank_fallback"
 
-            if len(top_k_facts) == 0:
-                logger.info('No facts found after reranking, return DPR results')
-                sorted_doc_ids, sorted_doc_scores = self.dense_passage_retrieval(query)
+            if use_causal_path:
+                dense_doc_ids, dense_doc_scores, dense_score_by_doc_id = self._sorted_doc_scores_from_dense(query)
+                if len(top_k_facts) == 0:
+                    fact_doc_ids = np.array([], dtype=int)
+                    fact_doc_scores = np.array([], dtype=float)
+                else:
+                    fact_doc_ids, fact_doc_scores = self.graph_search_with_fact_entities(
+                        query=query,
+                        link_top_k=self.global_config.linking_top_k,
+                        query_fact_scores=query_fact_scores,
+                        top_k_facts=top_k_facts,
+                        top_k_fact_indices=top_k_fact_indices,
+                        passage_node_weight=self.global_config.passage_node_weight,
+                    )
+                causal_doc_ids, causal_doc_scores = self.graph_search_with_causal_facts(
+                    query_fact_scores=query_fact_scores,
+                    query_type=query_type,
+                    preferred_fact_indices=top_k_fact_indices,
+                )
+                sorted_doc_ids, sorted_doc_scores = self.blend_causal_retrieval_scores(
+                    dense_doc_scores=dense_score_by_doc_id,
+                    fact_doc_scores=self._build_score_by_doc_id(fact_doc_ids, fact_doc_scores),
+                    causal_doc_scores=self._build_score_by_doc_id(causal_doc_ids, causal_doc_scores),
+                )
+                if len(sorted_doc_ids) == 0:
+                    sorted_doc_ids, sorted_doc_scores = dense_doc_ids, dense_doc_scores
+                elif structure_rerank_eligible:
+                    sorted_doc_ids, sorted_doc_scores, structure_apply_trace = self._apply_structure_rerank(
+                        sorted_doc_ids=sorted_doc_ids,
+                        sorted_doc_scores=sorted_doc_scores,
+                        query_fact_scores=query_fact_scores,
+                        top_k_fact_indices=top_k_fact_indices,
+                        top_k_facts=top_k_facts,
+                    )
+                    structure_trace.update(structure_apply_trace)
+            elif self.global_config.planner_enabled and self.global_config.planner_mode == "myopic":
+                planner_result = self.retrieval_planner.retrieve(
+                    query=query,
+                    num_to_retrieve=num_to_retrieve,
+                    query_fact_scores=query_fact_scores,
+                    top_k_fact_indices=top_k_fact_indices,
+                    top_k_facts=top_k_facts,
+                )
+                sorted_doc_ids, sorted_doc_scores = planner_result.sorted_doc_ids, planner_result.sorted_doc_scores
             else:
-                sorted_doc_ids, sorted_doc_scores = self.graph_search_with_fact_entities(query=query,
-                                                                                         link_top_k=self.global_config.linking_top_k,
-                                                                                         query_fact_scores=query_fact_scores,
-                                                                                         top_k_facts=top_k_facts,
-                                                                                         top_k_fact_indices=top_k_fact_indices,
-                                                                                         passage_node_weight=self.global_config.passage_node_weight)
+                if len(top_k_facts) == 0:
+                    logger.info('No facts found after reranking, return DPR results')
+                    sorted_doc_ids, sorted_doc_scores = self.dense_passage_retrieval(query)
+                else:
+                    sorted_doc_ids, sorted_doc_scores = self.graph_search_with_fact_entities(query=query,
+                                                                                             link_top_k=self.global_config.linking_top_k,
+                                                                                             query_fact_scores=query_fact_scores,
+                                                                                             top_k_facts=top_k_facts,
+                                                                                             top_k_fact_indices=top_k_fact_indices,
+                                                                                             passage_node_weight=self.global_config.passage_node_weight)
+                if structure_rerank_eligible:
+                    sorted_doc_ids, sorted_doc_scores, structure_apply_trace = self._apply_structure_rerank(
+                        sorted_doc_ids=sorted_doc_ids,
+                        sorted_doc_scores=sorted_doc_scores,
+                        query_fact_scores=query_fact_scores,
+                        top_k_fact_indices=top_k_fact_indices,
+                        top_k_facts=top_k_facts,
+                    )
+                    structure_trace.update(structure_apply_trace)
 
             top_k_docs = [self.chunk_embedding_store.get_row(self.passage_node_keys[idx])["content"] for idx in sorted_doc_ids[:num_to_retrieve]]
 
-            retrieval_results.append(QuerySolution(question=query, docs=top_k_docs, doc_scores=sorted_doc_scores[:num_to_retrieve]))
+            retrieval_results.append(
+                QuerySolution(
+                    question=query,
+                    docs=top_k_docs,
+                    doc_scores=sorted_doc_scores[:num_to_retrieve],
+                    retrieval_trace=structure_trace,
+                )
+            )
 
         retrieve_end_time = time.time()  # Record end time
 
@@ -706,7 +885,28 @@ class HippoRAG:
             all_qa_messages.append(
                 self.prompt_template_manager.render(name=f'rag_qa_{prompt_dataset_name}', prompt_user=prompt_user))
 
-        all_qa_results = [self.llm_model.infer(qa_messages) for qa_messages in tqdm(all_qa_messages, desc="QA Reading")]
+        all_qa_results = []
+        for query_solution, qa_messages in tqdm(
+            list(zip(queries, all_qa_messages)),
+            total=len(all_qa_messages),
+            desc="QA Reading",
+        ):
+            try:
+                all_qa_results.append(self.llm_model.infer(qa_messages))
+            except Exception as exc:
+                logger.warning(
+                    "QA LLM call failed for query %r: %s",
+                    query_solution.question[:160],
+                    exc,
+                )
+                all_qa_results.append((
+                    None,
+                    {
+                        "reader_status": "llm_exception",
+                        "reader_error": str(exc),
+                    },
+                    False,
+                ))
 
         all_response_message, all_metadata, all_cache_hit = zip(*all_qa_results)
         all_response_message, all_metadata = list(all_response_message), list(all_metadata)
@@ -715,13 +915,43 @@ class HippoRAG:
         queries_solutions = []
         for query_solution_idx, query_solution in tqdm(enumerate(queries), desc="Extraction Answers from LLM Response"):
             response_content = all_response_message[query_solution_idx]
-            try:
-                pred_ans = response_content.split('Answer:')[1].strip()
-            except Exception as e:
-                logger.warning(f"Error in parsing the answer from the raw LLM QA inference response: {str(e)}!")
-                pred_ans = response_content
+            qa_messages = all_qa_messages[query_solution_idx]
+            prompt_hash = hashlib.sha256(
+                json.dumps(qa_messages, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
+            ).hexdigest()
+            response_hash = hashlib.sha256(str(response_content).encode("utf-8")).hexdigest()
+            pred_ans, parse_info = extract_answer_from_response(response_content)
+            if parse_info["used_fallback"]:
+                logger.warning(
+                    "Error in parsing the answer from the raw LLM QA inference response: %s!",
+                    parse_info["error_type"],
+                )
+            metadata = all_metadata[query_solution_idx]
+            if not isinstance(metadata, dict):
+                metadata = {"raw_metadata": metadata}
+            metadata.setdefault("reader_status", "ok")
+            metadata.setdefault("reader_error", None)
+            metadata["answer_parser_used_fallback"] = bool(parse_info["used_fallback"])
+            metadata["answer_parser_error_type"] = parse_info["error_type"]
+            metadata["answer_parser_response_type"] = parse_info["response_type"]
+            metadata["reader_prompt_hash"] = prompt_hash
+            metadata["reader_response_hash"] = response_hash
+            metadata["reader_cache_hit"] = bool(all_cache_hit[query_solution_idx])
+            metadata["reader_call_made"] = not bool(all_cache_hit[query_solution_idx])
+            all_metadata[query_solution_idx] = metadata
 
             query_solution.answer = pred_ans
+            query_solution.qa_trace = {
+                "reader_status": metadata.get("reader_status"),
+                "reader_error": metadata.get("reader_error"),
+                "reader_prompt_hash": prompt_hash,
+                "reader_response_hash": response_hash,
+                "reader_cache_hit": bool(all_cache_hit[query_solution_idx]),
+                "reader_call_made": not bool(all_cache_hit[query_solution_idx]),
+                "answer_parser_used_fallback": bool(parse_info["used_fallback"]),
+                "answer_parser_error_type": parse_info["error_type"],
+                "answer_parser_response_type": parse_info["response_type"],
+            }
             queries_solutions.append(query_solution)
 
         return queries_solutions, all_response_message, all_metadata
@@ -911,6 +1141,7 @@ class HippoRAG:
             renamed_openie_info = []
             for openie_info in all_openie_info:
                 openie_info['idx'] = compute_mdhash_id(openie_info['passage'], 'chunk-')
+                openie_info.setdefault('extracted_causal_relations', [])
                 renamed_openie_info.append(openie_info)
 
             all_openie_info = renamed_openie_info
@@ -930,7 +1161,8 @@ class HippoRAG:
                              all_openie_info: List[dict],
                              chunks_to_save: Dict[str, dict],
                              ner_results_dict: Dict[str, NerRawOutput],
-                             triple_results_dict: Dict[str, TripleRawOutput]) -> List[dict]:
+                             triple_results_dict: Dict[str, TripleRawOutput],
+                             causal_results_dict: Dict[str, CausalRawOutput]) -> List[dict]:
         """
         Merges OpenIE extraction results with corresponding passage and metadata.
 
@@ -961,12 +1193,16 @@ class HippoRAG:
             try:
                 chunk_openie_info = {'idx': chunk_key, 'passage': passage,
                                  'extracted_entities': ner_results_dict[chunk_key].unique_entities,
-                                 'extracted_triples': triple_results_dict[chunk_key].triples}
+                                 'extracted_triples': triple_results_dict[chunk_key].triples,
+                                 'extracted_causal_relations': [
+                                     relation.to_dict() for relation in causal_results_dict[chunk_key].causal_relations
+                                 ]}
             except Exception as e:
                 logger.error(f"Error processing chunk {chunk_key}: {e}")
                 chunk_openie_info = {'idx': chunk_key, 'passage': passage,
                                  'extracted_entities': [],
-                                 'extracted_triples': []}
+                                 'extracted_triples': [],
+                                 'extracted_causal_relations': []}
             all_openie_info.append(chunk_openie_info)
 
         return all_openie_info
@@ -1161,6 +1397,9 @@ class HippoRAG:
         self.entity_node_keys: List = list(self.entity_embedding_store.get_all_ids()) # a list of phrase node keys
         self.passage_node_keys: List = list(self.chunk_embedding_store.get_all_ids()) # a list of passage node keys
         self.fact_node_keys: List = list(self.fact_embedding_store.get_all_ids())
+        self.passage_node_key_to_doc_idx = {
+            passage_node_key: idx for idx, passage_node_key in enumerate(self.passage_node_keys)
+        }
 
         # Check if the graph has the expected number of nodes
         expected_node_count = len(self.entity_node_keys) + len(self.passage_node_keys)
@@ -1206,10 +1445,14 @@ class HippoRAG:
         self.passage_embeddings = np.array(self.chunk_embedding_store.get_embeddings(self.passage_node_keys))
 
         self.fact_embeddings = np.array(self.fact_embedding_store.get_embeddings(self.fact_node_keys))
+        self.fact_id_to_fact_idx = {
+            fact_id: idx for idx, fact_id in enumerate(self.fact_node_keys)
+        }
 
         all_openie_info, chunk_keys_to_process = self.load_existing_openie([])
 
         self.proc_triples_to_docs = {}
+        self.fact_id_to_doc_idxs = defaultdict(set)
 
         for doc in all_openie_info:
             triples = flatten_facts([doc['extracted_triples']])
@@ -1217,13 +1460,16 @@ class HippoRAG:
                 if len(triple) == 3:
                     proc_triple = tuple(text_processing(list(triple)))
                     self.proc_triples_to_docs[str(proc_triple)] = self.proc_triples_to_docs.get(str(proc_triple), set()).union(set([doc['idx']]))
+                    fact_id = compute_fact_id(proc_triple)
+                    if doc['idx'] in self.passage_node_key_to_doc_idx:
+                        self.fact_id_to_doc_idxs[fact_id].add(self.passage_node_key_to_doc_idx[doc['idx']])
 
         if self.ent_node_to_chunk_ids is None:
-            ner_results_dict, triple_results_dict = reformat_openie_results(all_openie_info)
+            ner_results_dict, triple_results_dict, causal_results_dict = reformat_openie_results(all_openie_info)
 
             # Check if the lengths match
-            if not (len(self.passage_node_keys) == len(ner_results_dict) == len(triple_results_dict)):
-                logger.warning(f"Length mismatch: passage_node_keys={len(self.passage_node_keys)}, ner_results_dict={len(ner_results_dict)}, triple_results_dict={len(triple_results_dict)}")
+            if not (len(self.passage_node_keys) == len(ner_results_dict) == len(triple_results_dict) == len(causal_results_dict)):
+                logger.warning(f"Length mismatch: passage_node_keys={len(self.passage_node_keys)}, ner_results_dict={len(ner_results_dict)}, triple_results_dict={len(triple_results_dict)}, causal_results_dict={len(causal_results_dict)}")
                 
                 # If there are missing keys, create empty entries for them
                 for chunk_id in self.passage_node_keys:
@@ -1241,6 +1487,13 @@ class HippoRAG:
                             metadata={},
                             triples=[]
                         )
+                    if chunk_id not in causal_results_dict:
+                        causal_results_dict[chunk_id] = CausalRawOutput(
+                            chunk_id=chunk_id,
+                            response=None,
+                            metadata={},
+                            causal_relations=[],
+                        )
 
             # prepare data_store
             chunk_triples = [[text_processing(t) for t in triple_results_dict[chunk_id].triples] for chunk_id in self.passage_node_keys]
@@ -1249,7 +1502,425 @@ class HippoRAG:
             self.ent_node_to_chunk_ids = {}
             self.add_fact_edges(self.passage_node_keys, chunk_triples)
 
+        self._prepare_structure_retrieval_objects(all_openie_info)
+        self._prepare_causal_retrieval_objects(all_openie_info)
+
         self.ready_to_retrieve = True
+
+    def _prepare_structure_retrieval_objects(self, all_openie_info: List[dict]):
+        self.structure_graph_out = defaultdict(list)
+        self.fact_id_to_entities = {}
+        self.fact_id_to_triple = {}
+        self.doc_idx_to_structure_entities = defaultdict(set)
+        self.doc_idx_to_structure_edges = defaultdict(list)
+
+        if not self.global_config.structure_rerank_enabled:
+            return
+
+        best_edge_weights: Dict[Tuple[str, str, str], float] = {}
+
+        for doc in all_openie_info:
+            passage_node_key = doc.get("idx")
+            if passage_node_key not in self.passage_node_key_to_doc_idx:
+                continue
+
+            doc_idx = self.passage_node_key_to_doc_idx[passage_node_key]
+            for triple in doc.get("extracted_triples", []):
+                if not isinstance(triple, (list, tuple)) or len(triple) != 3:
+                    continue
+
+                normalized_triple = tuple(text_processing(list(triple)))
+                if not all(normalized_triple):
+                    continue
+
+                fact_id = compute_fact_id(normalized_triple)
+                self.fact_id_to_triple[fact_id] = normalized_triple
+                self.fact_id_to_entities[fact_id] = (normalized_triple[0], normalized_triple[2])
+                self.doc_idx_to_structure_entities[doc_idx].update((normalized_triple[0], normalized_triple[2]))
+
+                edge = derive_directed_structure_edge(*normalized_triple)
+                if edge is None:
+                    continue
+
+                source_entity, target_entity, relation_type, confidence = edge
+                self.doc_idx_to_structure_edges[doc_idx].append((source_entity, target_entity, confidence, relation_type))
+                edge_key = (source_entity, target_entity, relation_type)
+                best_edge_weights[edge_key] = max(best_edge_weights.get(edge_key, 0.0), confidence)
+
+        for doc in all_openie_info:
+            passage_node_key = doc.get("idx")
+            if passage_node_key not in self.passage_node_key_to_doc_idx:
+                continue
+
+            doc_idx = self.passage_node_key_to_doc_idx[passage_node_key]
+            for relation in doc.get("extracted_causal_relations", []):
+                if not isinstance(relation, dict):
+                    continue
+
+                source_fact_id = str(relation.get("source_fact_id", "")).strip()
+                target_fact_id = str(relation.get("target_fact_id", "")).strip()
+                relation_type = canonicalize_relation_type(str(relation.get("relation_type", "")))
+                try:
+                    confidence = float(relation.get("confidence", 0.0))
+                except (TypeError, ValueError):
+                    confidence = 0.0
+
+                if relation_type is None or confidence < self.global_config.causal_confidence_threshold:
+                    continue
+
+                source_triple = self.fact_id_to_triple.get(source_fact_id)
+                target_triple = self.fact_id_to_triple.get(target_fact_id)
+                if source_triple is None or target_triple is None:
+                    continue
+
+                composed_edges = derive_composed_structure_edges(
+                    source_triple=source_triple,
+                    target_triple=target_triple,
+                    relation_type=relation_type,
+                    confidence=confidence,
+                )
+                for source_entity, target_entity, edge_relation, edge_confidence in composed_edges:
+                    self.doc_idx_to_structure_entities[doc_idx].update((source_entity, target_entity))
+                    self.doc_idx_to_structure_edges[doc_idx].append(
+                        (source_entity, target_entity, edge_confidence, edge_relation)
+                    )
+                    edge_key = (source_entity, target_entity, edge_relation)
+                    best_edge_weights[edge_key] = max(best_edge_weights.get(edge_key, 0.0), edge_confidence)
+
+        for (source_entity, target_entity, relation_type), confidence in best_edge_weights.items():
+            self.structure_graph_out[source_entity].append((target_entity, confidence, relation_type))
+
+    def _prepare_causal_retrieval_objects(self, all_openie_info: List[dict]):
+        self.causal_graph_out = defaultdict(list)
+        self.causal_graph_in = defaultdict(list)
+
+        if not self.global_config.causal_enabled or len(self.fact_node_keys) == 0:
+            return
+
+        best_edge_weights: Dict[Tuple[str, str, str], float] = {}
+        for doc in all_openie_info:
+            for relation in doc.get("extracted_causal_relations", []):
+                if not isinstance(relation, dict):
+                    continue
+                source_fact_id = str(relation.get("source_fact_id", ""))
+                target_fact_id = str(relation.get("target_fact_id", ""))
+                relation_type = str(relation.get("relation_type", ""))
+                try:
+                    confidence = float(relation.get("confidence", 0.0))
+                except (TypeError, ValueError):
+                    confidence = 0.0
+
+                if source_fact_id not in self.fact_id_to_fact_idx or target_fact_id not in self.fact_id_to_fact_idx:
+                    continue
+                if confidence < self.global_config.causal_confidence_threshold:
+                    continue
+
+                edge_key = (source_fact_id, target_fact_id, relation_type)
+                best_edge_weights[edge_key] = max(best_edge_weights.get(edge_key, 0.0), confidence)
+
+        for (source_fact_id, target_fact_id, relation_type), confidence in best_edge_weights.items():
+            source_idx = self.fact_id_to_fact_idx[source_fact_id]
+            target_idx = self.fact_id_to_fact_idx[target_fact_id]
+            self.causal_graph_out[source_idx].append((target_idx, confidence, relation_type))
+            self.causal_graph_in[target_idx].append((source_idx, confidence, relation_type))
+
+    def _build_score_by_doc_id(self, sorted_doc_ids: np.ndarray, sorted_doc_scores: np.ndarray) -> Dict[int, float]:
+        return {
+            int(doc_id): float(score)
+            for doc_id, score in zip(sorted_doc_ids.tolist(), sorted_doc_scores.tolist())
+        }
+
+    def _sorted_doc_scores_from_dense(self, query: str) -> Tuple[np.ndarray, np.ndarray, Dict[int, float]]:
+        dense_doc_ids, dense_doc_scores = self.dense_passage_retrieval(query)
+        return dense_doc_ids, dense_doc_scores, self._build_score_by_doc_id(dense_doc_ids, dense_doc_scores)
+
+    def _route_query_type(self, query: str) -> str:
+        return route_query_type(query)
+
+    def _collect_structure_seed_entities(self,
+                                         query_fact_scores: np.ndarray,
+                                         top_k_fact_indices: List[int],
+                                         top_k_facts: List[Tuple[str, str, str]]) -> Set[str]:
+        seed_entities: Set[str] = set()
+        seed_top_k = max(0, min(self.global_config.structure_rerank_seed_top_k, len(self.fact_node_keys)))
+        if seed_top_k == 0:
+            return seed_entities
+
+        ordered_fact_indices: List[int] = []
+        seen_fact_indices: Set[int] = set()
+
+        for fact_idx in top_k_fact_indices:
+            int_fact_idx = int(fact_idx)
+            if 0 <= int_fact_idx < len(self.fact_node_keys) and int_fact_idx not in seen_fact_indices:
+                ordered_fact_indices.append(int_fact_idx)
+                seen_fact_indices.add(int_fact_idx)
+            if len(ordered_fact_indices) >= seed_top_k:
+                break
+
+        for fact_idx in ordered_fact_indices:
+            fact_id = self.fact_node_keys[fact_idx]
+            for entity in self.fact_id_to_entities.get(fact_id, ()):
+                if entity:
+                    seed_entities.add(entity)
+
+        if seed_entities:
+            return seed_entities
+
+        for fact in top_k_facts[:seed_top_k]:
+            if not isinstance(fact, (list, tuple)) or len(fact) != 3:
+                continue
+            normalized_fact = tuple(text_processing(list(fact)))
+            if normalized_fact[0]:
+                seed_entities.add(normalized_fact[0])
+            if normalized_fact[2]:
+                seed_entities.add(normalized_fact[2])
+
+        return seed_entities
+
+    def _apply_structure_rerank(self,
+                                sorted_doc_ids: np.ndarray,
+                                sorted_doc_scores: np.ndarray,
+                                query_fact_scores: np.ndarray,
+                                top_k_fact_indices: List[int],
+                                top_k_facts: List[Tuple[str, str, str]]) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        trace: Dict[str, Any] = {
+            "applied": False,
+            "noop_reason": None,
+            "seed_entity_count": 0,
+            "candidate_doc_count": 0,
+            "scored_doc_count": 0,
+            "total_bridge_edge_count": 0,
+            "score_margin_top2": None,
+            "bonus_weight_used": 0.0,
+            "top5_jaccard": 1.0,
+            "top5_order_changed": False,
+            "num_swaps_top5": 0,
+            "moved_out_of_top5": 0,
+        }
+        if (
+            not self.global_config.structure_rerank_enabled
+            or len(sorted_doc_ids) == 0
+            or len(self.structure_graph_out) == 0
+        ):
+            trace["noop_reason"] = "disabled_or_empty"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        seed_entities = self._collect_structure_seed_entities(
+            query_fact_scores=query_fact_scores,
+            top_k_fact_indices=top_k_fact_indices,
+            top_k_facts=top_k_facts,
+        )
+        trace["seed_entity_count"] = len(seed_entities)
+        if not seed_entities:
+            trace["noop_reason"] = "no_seed_entities"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        top_n = max(0, min(self.global_config.structure_rerank_top_n, len(sorted_doc_ids)))
+        if top_n == 0:
+            trace["noop_reason"] = "top_n_zero"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        rerank_window = min(top_n, max(int(self.global_config.qa_top_k), 1))
+        trace["candidate_doc_count"] = rerank_window
+        if rerank_window <= 1:
+            trace["noop_reason"] = "window_too_small"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        score_margin = float(sorted_doc_scores[0] - sorted_doc_scores[1])
+        trace["score_margin_top2"] = score_margin
+        if score_margin > self.global_config.structure_rerank_margin_threshold:
+            trace["noop_reason"] = "margin_large"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        candidate_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:rerank_window].tolist()]
+        structure_doc_scores, structure_details = score_candidate_docs_by_structure(
+            candidate_doc_ids=candidate_doc_ids,
+            doc_idx_to_entities=self.doc_idx_to_structure_entities,
+            doc_idx_to_edges=self.doc_idx_to_structure_edges,
+            seed_entities=seed_entities,
+            adjacency=self.structure_graph_out,
+            max_hops=self.global_config.structure_rerank_max_hops,
+            return_details=True,
+        )
+        trace["scored_doc_count"] = int(structure_details.get("scored_doc_count", len(structure_doc_scores)))
+        trace["total_bridge_edge_count"] = int(structure_details.get("total_bridge_edges", 0))
+        if len(structure_doc_scores) < self.global_config.structure_rerank_min_edge_support:
+            trace["noop_reason"] = "no_bridge"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        updated_scores = np.array(sorted_doc_scores, dtype=float, copy=True)
+        bonus_weight = max(self.global_config.structure_rerank_bonus_weight, 0.0)
+        trace["bonus_weight_used"] = float(bonus_weight)
+        if bonus_weight <= 0:
+            trace["noop_reason"] = "bonus_non_positive"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        prefix_doc_ids = sorted_doc_ids[:rerank_window]
+        prefix_base_scores = np.array(sorted_doc_scores[:rerank_window], dtype=float, copy=True)
+        prefix_updated_scores = np.array(prefix_base_scores, copy=True)
+        baseline_top_docs = [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()]
+        for rank_idx, doc_id in enumerate(prefix_doc_ids.tolist()):
+            prefix_updated_scores[rank_idx] += bonus_weight * structure_doc_scores.get(int(doc_id), 0.0)
+
+        prefix_order = sorted(
+            range(rerank_window),
+            key=lambda idx: (prefix_updated_scores[idx], prefix_base_scores[idx]),
+            reverse=True,
+        )
+        proposed_doc_ids = np.concatenate((prefix_doc_ids[prefix_order], sorted_doc_ids[rerank_window:]))
+        proposed_doc_scores = np.concatenate((prefix_updated_scores[prefix_order], sorted_doc_scores[rerank_window:]))
+        proposed_top_docs = [int(doc_id) for doc_id in proposed_doc_ids[:5].tolist()]
+        predicted_num_swaps_top5 = sum(
+            1
+            for idx, doc_id in enumerate(baseline_top_docs)
+            if idx >= len(proposed_top_docs) or proposed_top_docs[idx] != doc_id
+        )
+        trace["num_swaps_top5"] = predicted_num_swaps_top5
+        trace["top5_order_changed"] = predicted_num_swaps_top5 > 0
+        if predicted_num_swaps_top5 > self.global_config.structure_rerank_max_top5_swaps:
+            trace["noop_reason"] = "swap_limit"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        reranked_doc_ids = proposed_doc_ids
+        reranked_doc_scores = proposed_doc_scores
+        reranked_top_docs = [int(doc_id) for doc_id in reranked_doc_ids[:5].tolist()]
+        shared_top_docs = set(baseline_top_docs) & set(reranked_top_docs)
+        trace["top5_jaccard"] = (
+            float(len(shared_top_docs) / len(set(baseline_top_docs) | set(reranked_top_docs)))
+            if baseline_top_docs or reranked_top_docs else 1.0
+        )
+        trace["moved_out_of_top5"] = len(set(baseline_top_docs) - set(reranked_top_docs))
+        trace["applied"] = True
+        trace["noop_reason"] = "applied"
+        return reranked_doc_ids, reranked_doc_scores, trace
+
+    def graph_search_with_causal_facts(self,
+                                       query_fact_scores: np.ndarray,
+                                       query_type: str,
+                                       preferred_fact_indices: List[int] | None = None) -> Tuple[np.ndarray, np.ndarray]:
+        if len(query_fact_scores) == 0 or len(self.fact_node_keys) == 0:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
+        seed_top_k = min(self.global_config.causal_seed_top_k, len(query_fact_scores))
+        if seed_top_k <= 0:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
+        candidate_fact_indices: List[int] = []
+        seen_fact_indices = set()
+        if preferred_fact_indices:
+            for fact_idx in preferred_fact_indices:
+                if 0 <= fact_idx < len(query_fact_scores) and fact_idx not in seen_fact_indices:
+                    candidate_fact_indices.append(int(fact_idx))
+                    seen_fact_indices.add(int(fact_idx))
+                if len(candidate_fact_indices) >= seed_top_k:
+                    break
+
+        if len(candidate_fact_indices) < seed_top_k:
+            raw_top_fact_indices = np.argsort(query_fact_scores)[-seed_top_k:][::-1].tolist()
+            for fact_idx in raw_top_fact_indices:
+                if fact_idx not in seen_fact_indices:
+                    candidate_fact_indices.append(int(fact_idx))
+                    seen_fact_indices.add(int(fact_idx))
+                if len(candidate_fact_indices) >= seed_top_k:
+                    break
+
+        reset_prob = np.zeros(len(self.fact_node_keys), dtype=float)
+        reset_prob[candidate_fact_indices] = query_fact_scores[candidate_fact_indices]
+
+        if query_type == "prevention":
+            adjacency_candidates = [
+                filter_adjacency_by_relation(self.causal_graph_out, {"prevents"}),
+                filter_adjacency_by_relation(self.causal_graph_in, {"prevents"}),
+            ]
+        elif query_type == "cause":
+            adjacency_candidates = [
+                filter_adjacency_by_relation(self.causal_graph_in, {"causes", "enables"})
+            ]
+        elif query_type == "effect":
+            adjacency_candidates = [
+                filter_adjacency_by_relation(self.causal_graph_out, {"causes", "enables"})
+            ]
+        else:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
+        combined_doc_scores = np.zeros(len(self.passage_node_keys), dtype=float)
+        found_causal_signal = False
+        for adjacency in adjacency_candidates:
+            if len(adjacency) == 0:
+                continue
+
+            fact_scores = run_personalized_pagerank(
+                num_nodes=len(self.fact_node_keys),
+                adjacency=adjacency,
+                reset_prob=reset_prob,
+                damping=self.global_config.causal_damping,
+            )
+            if fact_scores.size == 0 or np.max(fact_scores) <= 0:
+                continue
+
+            doc_scores = aggregate_doc_scores(
+                num_docs=len(self.passage_node_keys),
+                fact_scores=fact_scores,
+                fact_id_by_index=self.fact_node_keys,
+                fact_id_to_doc_idxs=self.fact_id_to_doc_idxs,
+            )
+            if np.max(doc_scores) <= 0:
+                continue
+
+            combined_doc_scores = np.maximum(combined_doc_scores, doc_scores)
+            found_causal_signal = True
+
+        if not found_causal_signal:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
+        sorted_doc_ids = np.argsort(combined_doc_scores)[::-1]
+        sorted_doc_scores = combined_doc_scores[sorted_doc_ids.tolist()]
+        positive_mask = sorted_doc_scores > 0
+        sorted_doc_ids = sorted_doc_ids[positive_mask]
+        sorted_doc_scores = sorted_doc_scores[positive_mask]
+        if len(sorted_doc_scores) > 1:
+            sorted_doc_scores = min_max_normalize(sorted_doc_scores)
+        return sorted_doc_ids, sorted_doc_scores
+
+    def blend_causal_retrieval_scores(self,
+                                      dense_doc_scores: Dict[int, float],
+                                      fact_doc_scores: Dict[int, float],
+                                      causal_doc_scores: Dict[int, float]) -> Tuple[np.ndarray, np.ndarray]:
+        all_doc_ids = set(dense_doc_scores) | set(fact_doc_scores) | set(causal_doc_scores)
+        if not all_doc_ids:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
+        dense_weight = self.global_config.causal_blend_dense_weight if dense_doc_scores else 0.0
+        fact_weight = self.global_config.causal_blend_fact_weight if fact_doc_scores else 0.0
+        causal_weight = self.global_config.causal_blend_graph_weight if causal_doc_scores else 0.0
+
+        # Sparse causal hits are often brittle; attenuate them instead of forcing
+        # the full causal weight on top of an otherwise strong dense/fact ranking.
+        if causal_weight > 0:
+            causal_weight *= min(1.0, len(causal_doc_scores) / 5.0)
+
+        total_weight = dense_weight + fact_weight + causal_weight
+        if total_weight <= 0:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
+        dense_weight /= total_weight
+        fact_weight /= total_weight
+        causal_weight /= total_weight
+
+        blended_scores = {}
+        for doc_id in all_doc_ids:
+            blended_scores[int(doc_id)] = (
+                dense_weight * dense_doc_scores.get(doc_id, 0.0)
+                + fact_weight * fact_doc_scores.get(doc_id, 0.0)
+                + causal_weight * causal_doc_scores.get(doc_id, 0.0)
+            )
+
+        sorted_items = sorted(blended_scores.items(), key=lambda item: item[1], reverse=True)
+        sorted_doc_ids = np.array([doc_id for doc_id, _ in sorted_items], dtype=int)
+        sorted_doc_scores = np.array([score for _, score in sorted_items], dtype=float)
+        if len(sorted_doc_scores) > 1:
+            sorted_doc_scores = min_max_normalize(sorted_doc_scores)
+        return sorted_doc_ids, sorted_doc_scores
 
     def get_query_embeddings(self, queries: List[str] | List[QuerySolution]):
         """
@@ -1466,11 +2137,15 @@ class HippoRAG:
                     phrase_weights[phrase_id] += weighted_fact_score
                     number_of_occurs[phrase_id] += 1
 
-                phrases_and_ids.add((phrase, phrase_id))
+                    phrases_and_ids.add((phrase, phrase_id))
 
-        phrase_weights /= number_of_occurs
+        valid_phrase_mask = number_of_occurs > 0
+        phrase_weights[valid_phrase_mask] /= number_of_occurs[valid_phrase_mask]
+        phrase_weights[~valid_phrase_mask] = 0.0
 
         for phrase, phrase_id in phrases_and_ids:
+            if phrase_id is None or number_of_occurs[phrase_id] == 0:
+                continue
             if phrase not in phrase_scores:
                 phrase_scores[phrase] = []
 
@@ -1539,7 +2214,28 @@ class HippoRAG:
         # Check if there are any facts to rerank
         if len(query_fact_scores) == 0 or len(self.fact_node_keys) == 0:
             logger.warning("No facts available for reranking. Returning empty lists.")
-            return [], [], {'facts_before_rerank': [], 'facts_after_rerank': []}
+            return [], [], {
+                'facts_before_rerank': [],
+                'facts_after_rerank': [],
+                'num_candidates': 0,
+                'n_candidates_initial': 0,
+                'n_facts_after_rerank_raw': 0,
+                'n_facts_after_mapping': 0,
+                'n_facts_after_postprocess': 0,
+                'n_facts_final': 0,
+                'facts_empty_stage': 'candidates_empty',
+                'used_fallback': False,
+                'fallback_reason': 'candidates_empty',
+                'final_failure_reason': 'candidates_empty',
+                'parse_failure_count': 0,
+                'empty_output_count': 0,
+                'model_semantic_empty_count': 0,
+                'repair_failure_count': 0,
+                'non_empty_fallback_count': 0,
+                'final_facts_empty_count': 1,
+                'final_non_empty_fallback_applied': False,
+                'final_non_empty_fallback_reason': None,
+            }
             
         try:
             # Get the top k facts by score
@@ -1553,7 +2249,7 @@ class HippoRAG:
             # Get the actual fact IDs
             real_candidate_fact_ids = [self.fact_node_keys[idx] for idx in candidate_fact_indices]
             fact_row_dict = self.fact_embedding_store.get_rows(real_candidate_fact_ids)
-            candidate_facts = [eval(fact_row_dict[id]['content']) for id in real_candidate_fact_ids]
+            candidate_facts = [_safe_parse_fact_content(fact_row_dict[id]['content']) for id in real_candidate_fact_ids]
             
             # Rerank the facts
             top_k_fact_indices, top_k_facts, reranker_dict = self.rerank_filter(query,
@@ -1561,13 +2257,39 @@ class HippoRAG:
                                                                                 candidate_fact_indices,
                                                                                 len_after_rerank=link_top_k)
             
-            rerank_log = {'facts_before_rerank': candidate_facts, 'facts_after_rerank': top_k_facts}
+            rerank_log = {
+                'facts_before_rerank': candidate_facts,
+                'facts_after_rerank': top_k_facts,
+                **reranker_dict,
+            }
             
             return top_k_fact_indices, top_k_facts, rerank_log
             
         except Exception as e:
             logger.error(f"Error in rerank_facts: {str(e)}")
-            return [], [], {'facts_before_rerank': [], 'facts_after_rerank': [], 'error': str(e)}
+            return [], [], {
+                'facts_before_rerank': [],
+                'facts_after_rerank': [],
+                'error': str(e),
+                'num_candidates': 0,
+                'n_candidates_initial': 0,
+                'n_facts_after_rerank_raw': 0,
+                'n_facts_after_mapping': 0,
+                'n_facts_after_postprocess': 0,
+                'n_facts_final': 0,
+                'facts_empty_stage': 'rerank_exception',
+                'used_fallback': False,
+                'fallback_reason': 'rerank_exception',
+                'final_failure_reason': 'rerank_exception',
+                'parse_failure_count': 0,
+                'empty_output_count': 0,
+                'model_semantic_empty_count': 0,
+                'repair_failure_count': 0,
+                'non_empty_fallback_count': 0,
+                'final_facts_empty_count': 1,
+                'final_non_empty_fallback_applied': False,
+                'final_non_empty_fallback_reason': None,
+            }
     
     def run_ppr(self,
                 reset_prob: np.ndarray,

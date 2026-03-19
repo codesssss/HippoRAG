@@ -324,7 +324,28 @@ class StandardRAG:
             all_qa_messages.append(
                 self.prompt_template_manager.render(name=f'rag_qa_{prompt_dataset_name}', prompt_user=prompt_user))
 
-        all_qa_results = [self.llm_model.infer(qa_messages) for qa_messages in tqdm(all_qa_messages, desc="QA Reading")]
+        all_qa_results = []
+        for query_solution, qa_messages in tqdm(
+            list(zip(queries, all_qa_messages)),
+            total=len(all_qa_messages),
+            desc="QA Reading",
+        ):
+            try:
+                all_qa_results.append(self.llm_model.infer(qa_messages))
+            except Exception as exc:
+                logger.warning(
+                    "QA LLM call failed for query %r: %s",
+                    query_solution.question[:160],
+                    exc,
+                )
+                all_qa_results.append((
+                    None,
+                    {
+                        "reader_status": "llm_exception",
+                        "reader_error": str(exc),
+                    },
+                    False,
+                ))
 
         all_response_message, all_metadata, all_cache_hit = zip(*all_qa_results)
         all_response_message, all_metadata = list(all_response_message), list(all_metadata)
@@ -333,13 +354,32 @@ class StandardRAG:
         queries_solutions = []
         for query_solution_idx, query_solution in tqdm(enumerate(queries), desc="Extraction Answers from LLM Response"):
             response_content = all_response_message[query_solution_idx]
-            try:
-                pred_ans = response_content.split('Answer:')[1].strip()
-            except Exception as e:
-                logger.warning(f"Error in parsing the answer from the raw LLM QA inference response: {str(e)}!")
-                pred_ans = response_content
+            pred_ans, parse_info = extract_answer_from_response(response_content)
+            if parse_info["used_fallback"]:
+                logger.warning(
+                    "Error in parsing the answer from the raw LLM QA inference response: %s!",
+                    parse_info["error_type"],
+                )
+            metadata = all_metadata[query_solution_idx]
+            if not isinstance(metadata, dict):
+                metadata = {"raw_metadata": metadata}
+            metadata.setdefault("reader_status", "ok")
+            metadata.setdefault("reader_error", None)
+            metadata["answer_parser_used_fallback"] = bool(parse_info["used_fallback"])
+            metadata["answer_parser_error_type"] = parse_info["error_type"]
+            metadata["answer_parser_response_type"] = parse_info["response_type"]
+            all_metadata[query_solution_idx] = metadata
 
             query_solution.answer = pred_ans
+            query_solution.qa_trace = {
+                "reader_status": metadata.get("reader_status"),
+                "reader_error": metadata.get("reader_error"),
+                "reader_cache_hit": bool(all_cache_hit[query_solution_idx]),
+                "reader_call_made": not bool(all_cache_hit[query_solution_idx]),
+                "answer_parser_used_fallback": bool(parse_info["used_fallback"]),
+                "answer_parser_error_type": parse_info["error_type"],
+                "answer_parser_response_type": parse_info["response_type"],
+            }
             queries_solutions.append(query_solution)
 
         return queries_solutions, all_response_message, all_metadata

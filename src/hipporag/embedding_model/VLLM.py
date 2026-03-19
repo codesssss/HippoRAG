@@ -39,7 +39,7 @@ class VLLMEmbeddingModel(BaseEmbeddingModel):
             "input": input_text,
         }
 
-        response = requests.post(self.base_url, headers=headers, json=payload)
+        response = requests.post(self.url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
         return np.array([result["data"][i]["embedding"] for i in range(len(result["data"]))])

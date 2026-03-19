@@ -39,6 +39,7 @@ def cache_response(func):
         model = kwargs.get("model", gen_params.get("model"))
         seed = kwargs.get("seed", gen_params.get("seed"))
         temperature = kwargs.get("temperature", gen_params.get("temperature"))
+        response_format = kwargs.get("response_format", gen_params.get("response_format"))
 
         # build key data, convert to JSON string and hash to generate key_hash
         key_data = {
@@ -46,6 +47,7 @@ def cache_response(func):
             "model": model,
             "seed": seed,
             "temperature": temperature,
+            "response_format": response_format,
         }
         key_str = json.dumps(key_data, sort_keys=True, default=str)
         key_hash = hashlib.sha256(key_str.encode("utf-8")).hexdigest()
@@ -195,5 +197,4 @@ class CacheOpenAI(BaseLLM):
         }
 
         return response_message, metadata
-
 

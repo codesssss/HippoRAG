@@ -110,7 +110,7 @@ class BaseConfig:
         default="openie_openai_gpt",
         metadata={"help": "Class name indicating which information extraction model to use."}
     )
-    openie_mode: Literal["offline", "online"] = field(
+    openie_mode: Literal["offline", "online", "Transformers-offline"] = field(
         default="online",
         metadata={"help": "Mode of the OpenIE model to use."}
     )
@@ -180,6 +180,130 @@ class BaseConfig:
     damping: float = field(
         default=0.5,
         metadata={"help": "Damping factor for ppr algorithm."}
+    )
+    causal_enabled: bool = field(
+        default=True,
+        metadata={"help": "Enable causal extraction and causal-aware retrieval."}
+    )
+    causal_query_only: bool = field(
+        default=True,
+        metadata={"help": "Only run the causal retriever for queries routed as causal."}
+    )
+    causal_seed_top_k: int = field(
+        default=20,
+        metadata={"help": "How many proposition seeds to use for causal graph retrieval."}
+    )
+    causal_confidence_threshold: float = field(
+        default=0.5,
+        metadata={"help": "Minimum confidence required to keep an extracted causal relation."}
+    )
+    causal_damping: float = field(
+        default=0.7,
+        metadata={"help": "Damping factor for causal graph personalized PageRank."}
+    )
+    causal_blend_dense_weight: float = field(
+        default=0.35,
+        metadata={"help": "Dense retrieval weight in causal-aware score blending."}
+    )
+    causal_blend_fact_weight: float = field(
+        default=0.15,
+        metadata={"help": "Original fact-graph retrieval weight in causal-aware score blending."}
+    )
+    causal_blend_graph_weight: float = field(
+        default=0.50,
+        metadata={"help": "Causal graph retrieval weight in causal-aware score blending."}
+    )
+    structure_rerank_enabled: bool = field(
+        default=True,
+        metadata={"help": "Enable lightweight directed-structure reranking over the top candidate documents."}
+    )
+    structure_rerank_top_n: int = field(
+        default=40,
+        metadata={"help": "Only rerank the top-N candidate docs with structure signals."}
+    )
+    structure_rerank_bonus_weight: float = field(
+        default=0.08,
+        metadata={"help": "Small additive bonus weight for structure-based doc reranking."}
+    )
+    structure_rerank_min_edge_support: int = field(
+        default=2,
+        metadata={"help": "Minimum number of candidate docs that must receive structure support before reranking is applied."}
+    )
+    structure_rerank_max_top5_swaps: int = field(
+        default=2,
+        metadata={"help": "Maximum number of top-5 order swaps allowed for structure reranking; larger perturbations are skipped."}
+    )
+    structure_rerank_seed_top_k: int = field(
+        default=4,
+        metadata={"help": "How many top facts to use when deriving structure rerank seed entities."}
+    )
+    structure_rerank_max_hops: int = field(
+        default=2,
+        metadata={"help": "How many directed hops to expand when building structure rerank signals."}
+    )
+    structure_rerank_margin_threshold: float = field(
+        default=0.02,
+        metadata={"help": "Only apply structure reranking when the top doc-score margin is below this threshold."}
+    )
+    rerank_require_non_empty: bool = field(
+        default=True,
+        metadata={"help": "Require reranker to return at least one fact when candidates are non-empty; otherwise keep legacy empty-output behavior."}
+    )
+    planner_enabled: bool = field(
+        default=False,
+        metadata={"help": "Enable planner-based retrieval path instead of the default one-shot retriever."}
+    )
+    planner_mode: Literal["none", "myopic"] = field(
+        default="none",
+        metadata={"help": "Planner mode to use for retrieval."}
+    )
+    planner_max_steps: int = field(
+        default=3,
+        metadata={"help": "Maximum planner steps per query."}
+    )
+    planner_seed_doc_budget: int = field(
+        default=24,
+        metadata={"help": "How many docs a seed action can add into the planner candidate pool."}
+    )
+    planner_entity_doc_budget: int = field(
+        default=10,
+        metadata={"help": "How many docs an entity expansion can add into the planner candidate pool."}
+    )
+    planner_max_entity_actions: int = field(
+        default=6,
+        metadata={"help": "Maximum entity-expansion actions considered by the planner."}
+    )
+    planner_max_inspect_passages: int = field(
+        default=4,
+        metadata={"help": "Maximum inspect-passage actions considered by the planner."}
+    )
+    planner_info_gain_weight: float = field(
+        default=1.0,
+        metadata={"help": "Weight for planner information gain."}
+    )
+    planner_relevance_weight: float = field(
+        default=1.0,
+        metadata={"help": "Weight for planner relevance reward."}
+    )
+    planner_novelty_weight: float = field(
+        default=0.25,
+        metadata={"help": "Weight for planner novelty reward."}
+    )
+    planner_cost_weight: float = field(
+        default=0.35,
+        metadata={"help": "Weight for planner action cost penalty."}
+    )
+    planner_min_action_score: float = field(
+        default=0.1,
+        metadata={"help": "Minimum score required to keep exploring when enough documents are already collected."}
+    )
+    planner_belief_stop_threshold: float = field(
+        default=0.72,
+        metadata={"help": "Stop planning once top belief and evidence count are both sufficient."}
+    )
+    planner_dense_fallback_weight: float = field(
+        default=0.92,
+        metadata={"help": "Score discount applied when dense retrieval is used only as planner fallback."}
     )
     
     

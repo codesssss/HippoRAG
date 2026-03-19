@@ -72,18 +72,42 @@ def main():
     parser.add_argument('--llm_base_url', type=str, default='https://api.openai.com/v1', help='LLM base URL')
     parser.add_argument('--llm_name', type=str, default='gpt-4o-mini', help='LLM name')
     parser.add_argument('--embedding_name', type=str, default='nvidia/NV-Embed-v2', help='embedding model name')
+    parser.add_argument('--embedding_base_url', type=str, default=None, help='Embedding base URL')
+    parser.add_argument('--max_retry_attempts', type=int, default=5, help='Max retry attempts for each LLM API call')
     parser.add_argument('--force_index_from_scratch', type=str, default='false',
                         help='If set to True, will ignore all existing storage files and graph data and will rebuild from scratch.')
     parser.add_argument('--force_openie_from_scratch', type=str, default='false', help='If set to False, will try to first reuse openie results for the corpus if they exist.')
     parser.add_argument('--openie_mode', choices=['online', 'offline'], default='online',
                         help="OpenIE mode, offline denotes using VLLM offline batch mode for indexing, while online denotes")
     parser.add_argument('--save_dir', type=str, default='outputs', help='Save directory')
+    parser.add_argument('--planner_enabled', type=str, default='false', help='Enable planner-based retrieval path.')
+    parser.add_argument('--planner_mode', choices=['none', 'myopic'], default='none', help='Planner mode to use.')
+    parser.add_argument('--planner_max_steps', type=int, default=3, help='Maximum planner steps per query.')
+    parser.add_argument('--causal_enabled', type=str, default='true', help='Enable causal extraction and causal-aware retrieval.')
+    parser.add_argument('--causal_query_only', type=str, default='true', help='Only use causal retrieval for causal queries.')
+    parser.add_argument('--causal_seed_top_k', type=int, default=20, help='How many fact seeds to use for the causal retriever.')
+    parser.add_argument('--causal_confidence_threshold', type=float, default=0.5, help='Minimum confidence for causal edges.')
+    parser.add_argument('--causal_damping', type=float, default=0.7, help='Damping factor for causal graph propagation.')
+    parser.add_argument('--causal_blend_dense_weight', type=float, default=0.35, help='Dense score weight in causal blending.')
+    parser.add_argument('--causal_blend_fact_weight', type=float, default=0.15, help='Original fact-graph score weight in causal blending.')
+    parser.add_argument('--causal_blend_graph_weight', type=float, default=0.50, help='Causal graph score weight in causal blending.')
+    parser.add_argument('--use_local_qwen3', type=str, default='false', help='Use local Qwen3-8B chat server and local embedding server presets.')
     args = parser.parse_args()
 
     dataset_name = args.dataset
     save_dir = args.save_dir
     llm_base_url = args.llm_base_url
     llm_name = args.llm_name
+    embedding_name = args.embedding_name
+    embedding_base_url = args.embedding_base_url
+    use_local_qwen3 = string_to_bool(args.use_local_qwen3)
+
+    if use_local_qwen3:
+        llm_base_url = 'http://localhost:8039/v1'
+        llm_name = 'qwen3-8b'
+        embedding_name = 'VLLM//mnt/nvme/Qwen3-Embedding-8B'
+        embedding_base_url = 'http://localhost:8018/v1/embeddings'
+
     if save_dir == 'outputs':
         save_dir = save_dir + '/' + dataset_name
     else:
@@ -97,6 +121,9 @@ def main():
 
     force_index_from_scratch = string_to_bool(args.force_index_from_scratch)
     force_openie_from_scratch = string_to_bool(args.force_openie_from_scratch)
+    planner_enabled = string_to_bool(args.planner_enabled)
+    causal_enabled = string_to_bool(args.causal_enabled)
+    causal_query_only = string_to_bool(args.causal_query_only)
 
     # Prepare datasets and evaluation
     samples = json.load(open(f"reproduce/dataset/{dataset_name}.json", "r"))
@@ -113,8 +140,9 @@ def main():
         save_dir=save_dir,
         llm_base_url=llm_base_url,
         llm_name=llm_name,
+        embedding_base_url=embedding_base_url,
         dataset=dataset_name,
-        embedding_model_name=args.embedding_name,
+        embedding_model_name=embedding_name,
         force_index_from_scratch=force_index_from_scratch,  # ignore previously stored index, set it to False if you want to use the previously stored index and embeddings
         force_openie_from_scratch=force_openie_from_scratch,
         rerank_dspy_file_path="src/hipporag/prompts/dspy_prompts/filter_llama3.3-70B-Instruct.json",
@@ -125,8 +153,20 @@ def main():
         graph_type="facts_and_sim_passage_node_unidirectional",
         embedding_batch_size=8,
         max_new_tokens=None,
+        max_retry_attempts=args.max_retry_attempts,
         corpus_len=len(corpus),
-        openie_mode=args.openie_mode
+        openie_mode=args.openie_mode,
+        planner_enabled=planner_enabled,
+        planner_mode=args.planner_mode,
+        planner_max_steps=args.planner_max_steps,
+        causal_enabled=causal_enabled,
+        causal_query_only=causal_query_only,
+        causal_seed_top_k=args.causal_seed_top_k,
+        causal_confidence_threshold=args.causal_confidence_threshold,
+        causal_damping=args.causal_damping,
+        causal_blend_dense_weight=args.causal_blend_dense_weight,
+        causal_blend_fact_weight=args.causal_blend_fact_weight,
+        causal_blend_graph_weight=args.causal_blend_graph_weight,
     )
 
     logging.basicConfig(level=logging.INFO)
