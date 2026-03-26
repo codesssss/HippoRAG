@@ -762,7 +762,11 @@ class HippoRAG:
                 "is_causal": False,
                 "score": 0.0,
                 "margin": 0.0,
+                "best_causal_label": "effect",
+                "best_causal_score": 0.0,
+                "standard_score": 1.0,
                 "scores_by_label": {},
+                "route_source": "disabled",
             }
             subgraph_result = {
                 "seed_event_ids": [],
@@ -783,23 +787,14 @@ class HippoRAG:
                     route_info=route_info,
                 )
 
-            sorted_doc_ids, sorted_doc_scores, candidate_injection_trace = self._apply_v2_candidate_injection(
-                sorted_doc_ids=base_sorted_doc_ids,
-                sorted_doc_scores=base_sorted_doc_scores,
-                subgraph_result=subgraph_result,
-            )
-            sorted_doc_ids, sorted_doc_scores, doc_rerank_trace = self._apply_v2_causal_doc_rerank(
-                sorted_doc_ids=sorted_doc_ids,
-                sorted_doc_scores=sorted_doc_scores,
-                subgraph_result=subgraph_result,
-            )
+            sorted_doc_ids, sorted_doc_scores = base_sorted_doc_ids, base_sorted_doc_scores
             top_doc_ids = sorted_doc_ids[:num_to_retrieve]
             top_k_docs = [
                 self.chunk_embedding_store.get_row(self.passage_node_keys[idx])["content"]
                 for idx in top_doc_ids.tolist()
             ]
             serialized_causal_context = subgraph_result.get("serialized_contexts", [])[
-                :max(0, int(getattr(self.global_config, "causal_context_max_items", 6)))
+                :max(0, int(getattr(self.global_config, "causal_context_max_items", 0)))
             ]
             dense_context_doc_ids = [self.passage_node_keys[idx] for idx in dense_sorted_doc_ids[:num_to_retrieve].tolist()]
             base_context_doc_ids = [self.passage_node_keys[idx] for idx in base_sorted_doc_ids[:num_to_retrieve].tolist()]
@@ -815,6 +810,7 @@ class HippoRAG:
                 "blended_top5_doc_ids": [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()],
                 "dense_top5_doc_ids": [int(doc_id) for doc_id in dense_sorted_doc_ids[:5].tolist()],
                 "router_label": route_info.get("label", "standard"),
+                "router_source": route_info.get("route_source", "unknown"),
                 "router_score": float(route_info.get("score", 0.0)),
                 "router_margin": float(route_info.get("margin", 0.0)),
                 "router_best_causal_label": route_info.get("best_causal_label"),
@@ -837,7 +833,7 @@ class HippoRAG:
                 ),
                 "chain_selection_mode": (
                     subgraph_result.get("chain_selection_trace", {}).get("mode")
-                    or getattr(self.global_config, "causal_context_injection_mode", "all")
+                    or "top_k"
                 ),
                 "chain_selection_candidate_count": (
                     subgraph_result.get("chain_selection_trace", {}).get("candidate_chain_count", 0)
@@ -862,63 +858,7 @@ class HippoRAG:
                 "v2_base_retrieval_fact_count": int(base_retrieval_trace.get("fact_count", 0)),
                 "v2_base_retrieval_rerank_used_fallback": bool(base_retrieval_trace.get("rerank_used_fallback", False)),
                 "v2_base_retrieval_rerank_final_failure_reason": base_retrieval_trace.get("rerank_final_failure_reason"),
-                "causal_override_applied": bool(
-                    candidate_injection_trace.get("applied", False) or doc_rerank_trace.get("applied", False)
-                ),
-                "v2_candidate_injection_requested": bool(candidate_injection_trace.get("requested", False)),
-                "v2_candidate_injection_applied": bool(candidate_injection_trace.get("applied", False)),
-                "v2_candidate_injection_noop_reason": candidate_injection_trace.get("noop_reason"),
-                "v2_candidate_injection_graph_mode": candidate_injection_trace.get("graph_mode"),
-                "v2_candidate_injection_seed_top_n": int(candidate_injection_trace.get("seed_top_n", 0)),
-                "v2_candidate_injection_preserve_top_k": int(candidate_injection_trace.get("preserve_top_k", 0)),
-                "v2_candidate_injection_max_docs": int(candidate_injection_trace.get("max_docs", 0)),
-                "v2_candidate_injection_hops": int(candidate_injection_trace.get("hops", 0)),
-                "v2_candidate_injection_blend_weight": float(
-                    candidate_injection_trace.get("blend_weight_used", 0.0)
-                ),
-                "v2_candidate_injection_candidate_seed_chunk_count": int(
-                    candidate_injection_trace.get("candidate_seed_chunk_count", 0)
-                ),
-                "v2_candidate_injection_query_entity_seed_chunk_count": int(
-                    candidate_injection_trace.get("query_entity_seed_chunk_count", 0)
-                ),
-                "v2_candidate_injection_seed_node_count": int(candidate_injection_trace.get("seed_node_count", 0)),
-                "v2_candidate_injection_proposed_doc_count": int(
-                    candidate_injection_trace.get("proposed_doc_count", 0)
-                ),
-                "v2_candidate_injection_rerank_candidate_count": int(
-                    candidate_injection_trace.get("rerank_candidate_count", 0)
-                ),
-                "v2_candidate_injection_injected_doc_count": int(
-                    candidate_injection_trace.get("injected_doc_count", 0)
-                ),
-                "v2_candidate_injection_injected_doc_ids": candidate_injection_trace.get("injected_doc_ids", []),
-                "v2_candidate_injection_injected_chunk_ids": candidate_injection_trace.get("injected_chunk_ids", []),
-                "v2_candidate_injection_injected_doc_scores": candidate_injection_trace.get("injected_doc_scores", {}),
-                "v2_candidate_injection_top5_order_changed": bool(
-                    candidate_injection_trace.get("top5_order_changed", False)
-                ),
-                "v2_candidate_injection_top5_jaccard": float(
-                    candidate_injection_trace.get("top5_jaccard", 1.0)
-                ),
-                "v2_candidate_injection_moved_out_of_top5": int(
-                    candidate_injection_trace.get("moved_out_of_top5", 0)
-                ),
-                "v2_doc_rerank_requested": bool(doc_rerank_trace.get("requested", False)),
-                "v2_doc_rerank_applied": bool(doc_rerank_trace.get("applied", False)),
-                "v2_doc_rerank_noop_reason": doc_rerank_trace.get("noop_reason"),
-                "v2_doc_rerank_top_n": int(doc_rerank_trace.get("top_n_used", 0)),
-                "v2_doc_rerank_rerank_window_count": int(doc_rerank_trace.get("rerank_window_count", 0)),
-                "v2_doc_rerank_boost_weight": float(doc_rerank_trace.get("boost_weight_used", 0.0)),
-                "v2_doc_rerank_protect_top1": bool(doc_rerank_trace.get("protect_top1", False)),
-                "v2_doc_rerank_max_top5_swaps": int(doc_rerank_trace.get("max_top5_swaps", 0)),
-                "v2_doc_rerank_boosted_doc_count": int(doc_rerank_trace.get("boosted_doc_count", 0)),
-                "v2_doc_rerank_boosted_doc_ids": doc_rerank_trace.get("boosted_doc_ids", []),
-                "v2_doc_rerank_boosted_doc_scores": doc_rerank_trace.get("boosted_doc_scores", {}),
-                "v2_doc_rerank_top5_order_changed": bool(doc_rerank_trace.get("top5_order_changed", False)),
-                "v2_doc_rerank_num_swaps_top5": int(doc_rerank_trace.get("num_swaps_top5", 0)),
-                "v2_doc_rerank_top5_jaccard": float(doc_rerank_trace.get("top5_jaccard", 1.0)),
-                "v2_doc_rerank_moved_out_of_top5": int(doc_rerank_trace.get("moved_out_of_top5", 0)),
+                "causal_override_applied": False,
             }
 
             retrieval_results.append(
@@ -1199,14 +1139,14 @@ class HippoRAG:
             causal_context_items = []
             if getattr(self.global_config, "causal_engine_version", "legacy") == "v2":
                 causal_context_items = list(retrieval_trace.get("serialized_causal_context", []))[
-                    :max(0, int(getattr(self.global_config, "causal_context_max_items", 6)))
+                    :max(0, int(getattr(self.global_config, "causal_context_max_items", 0)))
                 ]
                 if causal_context_items:
-                    prompt_user += 'Causal Graph Context:\n'
+                    prompt_user += 'Graph Context:\n'
                     for idx, item in enumerate(causal_context_items, start=1):
                         prompt_user += f'[{idx}] {item}\n'
                     prompt_user += (
-                        '\nIf the causal graph context conflicts with the retrieved Wikipedia passages, '
+                        '\nIf the graph context conflicts with the retrieved Wikipedia passages, '
                         'trust the retrieved Wikipedia passages.\n\n'
                     )
             retrieval_trace["generator_used_causal_context"] = bool(causal_context_items)
@@ -2050,7 +1990,12 @@ class HippoRAG:
         self.v2_base_embedding_model = None
         self.v2_base_query_to_embedding = {"triple": {}, "passage": {}}
 
-        if self._v2_base_retrieval_mode() != "legacy_fact_graph":
+        base_mode = self._v2_base_retrieval_mode()
+        if base_mode == "general_relation_graph":
+            self.v2_base_retrieval_status = "general_relation_graph_pending"
+            return
+
+        if base_mode != "legacy_fact_graph":
             return
 
         logger.info("Preparing legacy fact-graph base retrieval objects for V2.")
@@ -2258,6 +2203,12 @@ class HippoRAG:
             "rerank_final_failure_reason": None,
         }
 
+        if base_mode == "general_relation_graph":
+            trace["used_dense_fallback"] = True
+            trace["route_name"] = "dense_passage_v2_fallback"
+            trace["scores_source"] = "dense_passage_fallback_from_general_relation_graph"
+            return dense_sorted_doc_ids, dense_sorted_doc_scores, trace
+
         if base_mode != "legacy_fact_graph":
             return dense_sorted_doc_ids, dense_sorted_doc_scores, trace
 
@@ -2441,292 +2392,6 @@ class HippoRAG:
         if len(sorted_doc_scores) > 1:
             sorted_doc_scores = min_max_normalize(sorted_doc_scores)
         return sorted_doc_ids, sorted_doc_scores
-
-    def _apply_v2_candidate_injection(self,
-                                      sorted_doc_ids: np.ndarray,
-                                      sorted_doc_scores: np.ndarray,
-                                      subgraph_result: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
-        trace: Dict[str, Any] = {
-            "requested": bool(getattr(self.global_config, "causal_v2_candidate_injection_enabled", False)),
-            "applied": False,
-            "noop_reason": None,
-            "graph_mode": None,
-            "seed_top_n": 0,
-            "preserve_top_k": max(0, int(getattr(self.global_config, "causal_v2_candidate_injection_preserve_top_k", 2))),
-            "max_docs": max(0, int(getattr(self.global_config, "causal_v2_candidate_injection_max_docs", 5))),
-            "hops": max(1, int(getattr(self.global_config, "causal_v2_candidate_injection_hops", 1))),
-            "blend_weight_used": max(float(getattr(self.global_config, "causal_v2_candidate_injection_blend_weight", 0.15)), 0.0),
-            "candidate_seed_chunk_count": 0,
-            "query_entity_seed_chunk_count": 0,
-            "seed_node_count": 0,
-            "proposed_doc_count": 0,
-            "rerank_candidate_count": 0,
-            "injected_doc_count": 0,
-            "injected_doc_ids": [],
-            "injected_chunk_ids": [],
-            "injected_doc_scores": {},
-            "top5_order_changed": False,
-            "top5_jaccard": 1.0,
-            "moved_out_of_top5": 0,
-        }
-        if not trace["requested"] or len(sorted_doc_ids) == 0:
-            trace["noop_reason"] = "disabled_or_empty"
-            return sorted_doc_ids, sorted_doc_scores, trace
-        if self.causal_v2_engine is None:
-            trace["noop_reason"] = "missing_v2_engine"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        proposal_trace = self.causal_v2_engine.propose_candidate_doc_injections(
-            dense_sorted_doc_ids=sorted_doc_ids,
-            dense_sorted_doc_scores=sorted_doc_scores,
-            query_entities=subgraph_result.get("query_entities", []),
-        )
-        trace.update({
-            "graph_mode": proposal_trace.get("graph_mode"),
-            "seed_top_n": int(proposal_trace.get("seed_top_n", 0)),
-            "max_docs": int(proposal_trace.get("max_docs", trace["max_docs"])),
-            "hops": int(proposal_trace.get("hops", trace["hops"])),
-            "candidate_seed_chunk_count": int(proposal_trace.get("candidate_seed_chunk_count", 0)),
-            "query_entity_seed_chunk_count": int(proposal_trace.get("query_entity_seed_chunk_count", 0)),
-            "seed_node_count": int(proposal_trace.get("seed_node_count", 0)),
-            "proposed_doc_count": int(proposal_trace.get("proposed_doc_count", 0)),
-        })
-
-        proposed_doc_ids = [int(doc_id) for doc_id in proposal_trace.get("injected_doc_ids", [])]
-        proposed_doc_scores_raw = {
-            int(doc_id): float(score)
-            for doc_id, score in proposal_trace.get("injected_doc_scores", {}).items()
-        }
-        if not proposed_doc_ids or not proposed_doc_scores_raw:
-            trace["noop_reason"] = proposal_trace.get("noop_reason") or "no_injected_docs"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        blend_weight = float(trace["blend_weight_used"])
-        if blend_weight <= 0.0:
-            trace["noop_reason"] = "blend_weight_non_positive"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        preserve_top_k = max(0, min(int(trace["preserve_top_k"]), len(sorted_doc_ids)))
-        trace["preserve_top_k"] = preserve_top_k
-        prefix_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:preserve_top_k].tolist()]
-        prefix_doc_id_set = set(prefix_doc_ids)
-        dense_score_by_doc_id = self._build_score_by_doc_id(sorted_doc_ids, sorted_doc_scores)
-        rerank_top_n = max(preserve_top_k, min(int(trace["seed_top_n"]), len(sorted_doc_ids)))
-        dense_pool_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[preserve_top_k:rerank_top_n].tolist()]
-        pool_doc_ids: List[int] = []
-        pool_doc_id_set: set[int] = set()
-        for doc_id in dense_pool_doc_ids + proposed_doc_ids:
-            if doc_id in prefix_doc_id_set or doc_id in pool_doc_id_set:
-                continue
-            pool_doc_ids.append(int(doc_id))
-            pool_doc_id_set.add(int(doc_id))
-        trace["rerank_candidate_count"] = len(pool_doc_ids)
-        if not pool_doc_ids:
-            trace["noop_reason"] = "empty_rerank_pool"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        graph_scores = [float(score) for score in proposed_doc_scores_raw.values() if float(score) > 0.0]
-        if not graph_scores:
-            trace["noop_reason"] = "no_positive_graph_scores"
-            return sorted_doc_ids, sorted_doc_scores, trace
-        graph_min = min(graph_scores)
-        graph_max = max(graph_scores)
-
-        pool_rank_index = {doc_id: idx for idx, doc_id in enumerate(pool_doc_ids)}
-
-        def graph_score_norm(doc_id: int) -> float:
-            raw_score = float(proposed_doc_scores_raw.get(int(doc_id), 0.0))
-            if raw_score <= 0.0:
-                return 0.0
-            if graph_max <= graph_min:
-                return 1.0
-            return (raw_score - graph_min) / (graph_max - graph_min)
-
-        reranked_pool_doc_ids = sorted(
-            pool_doc_ids,
-            key=lambda doc_id: (
-                dense_score_by_doc_id.get(int(doc_id), 0.0) + blend_weight * graph_score_norm(int(doc_id)),
-                dense_score_by_doc_id.get(int(doc_id), 0.0),
-                graph_score_norm(int(doc_id)),
-                -pool_rank_index[int(doc_id)],
-            ),
-            reverse=True,
-        )
-
-        remainder_doc_ids = [
-            int(doc_id)
-            for doc_id in sorted_doc_ids.tolist()
-            if int(doc_id) not in prefix_doc_id_set and int(doc_id) not in pool_doc_id_set
-        ]
-        reordered_doc_ids = np.asarray(prefix_doc_ids + reranked_pool_doc_ids + remainder_doc_ids, dtype=int)
-        reordered_doc_scores = np.asarray(
-            [dense_score_by_doc_id.get(doc_id, 0.0) for doc_id in prefix_doc_ids]
-            + [
-                dense_score_by_doc_id.get(doc_id, 0.0) + blend_weight * graph_score_norm(doc_id)
-                for doc_id in reranked_pool_doc_ids
-            ]
-            + [dense_score_by_doc_id.get(doc_id, 0.0) for doc_id in remainder_doc_ids],
-            dtype=float,
-        )
-
-        baseline_top5_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()]
-        updated_top5_doc_ids = [int(doc_id) for doc_id in reordered_doc_ids[:5].tolist()]
-        baseline_top5_set = set(baseline_top5_doc_ids)
-        updated_top5_set = set(updated_top5_doc_ids)
-
-        if np.array_equal(reordered_doc_ids, sorted_doc_ids):
-            trace["noop_reason"] = "no_rank_change_after_rerank"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        original_top_n_doc_id_set = {int(doc_id) for doc_id in sorted_doc_ids[:rerank_top_n].tolist()}
-        injected_doc_ids = [
-            doc_id for doc_id in proposed_doc_ids
-            if doc_id not in original_top_n_doc_id_set and doc_id not in prefix_doc_id_set
-        ]
-
-        trace["applied"] = True
-        trace["injected_doc_count"] = len(injected_doc_ids)
-        trace["injected_doc_ids"] = injected_doc_ids
-        trace["injected_chunk_ids"] = [
-            str(self.passage_node_keys[int(doc_id)]) for doc_id in injected_doc_ids
-        ]
-        trace["injected_doc_scores"] = {
-            int(doc_id): float(proposed_doc_scores_raw.get(int(doc_id), 0.0))
-            for doc_id in injected_doc_ids
-        }
-        trace["top5_order_changed"] = baseline_top5_doc_ids != updated_top5_doc_ids
-        trace["top5_jaccard"] = (
-            len(baseline_top5_set & updated_top5_set) / len(baseline_top5_set | updated_top5_set)
-            if baseline_top5_set or updated_top5_set else 1.0
-        )
-        trace["moved_out_of_top5"] = len(baseline_top5_set - updated_top5_set)
-        return reordered_doc_ids, reordered_doc_scores, trace
-
-    def _apply_v2_causal_doc_rerank(self,
-                                    sorted_doc_ids: np.ndarray,
-                                    sorted_doc_scores: np.ndarray,
-                                    subgraph_result: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
-        trace: Dict[str, Any] = {
-            "requested": bool(getattr(self.global_config, "causal_v2_doc_rerank_enabled", False)),
-            "applied": False,
-            "noop_reason": None,
-            "top_n_used": 0,
-            "rerank_window_count": 0,
-            "boost_weight_used": 0.0,
-            "protect_top1": bool(getattr(self.global_config, "causal_v2_doc_rerank_protect_top1", True)),
-            "max_top5_swaps": int(getattr(self.global_config, "causal_v2_doc_rerank_max_top5_swaps", 2)),
-            "selected_chain_count": int(len(subgraph_result.get("selected_chains", []))),
-            "boosted_doc_count": 0,
-            "boosted_doc_ids": [],
-            "boosted_doc_scores": {},
-            "top5_order_changed": False,
-            "num_swaps_top5": 0,
-            "top5_jaccard": 1.0,
-            "moved_out_of_top5": 0,
-        }
-        if not trace["requested"] or len(sorted_doc_ids) == 0:
-            trace["noop_reason"] = "disabled_or_empty"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        selected_chains = list(subgraph_result.get("selected_chains", []))
-        if not selected_chains:
-            trace["noop_reason"] = "no_selected_chains"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        top_n = max(0, min(int(getattr(self.global_config, "causal_v2_doc_rerank_top_n", 20)), len(sorted_doc_ids)))
-        trace["top_n_used"] = top_n
-        if top_n == 0:
-            trace["noop_reason"] = "top_n_zero"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        boost_weight = max(float(getattr(self.global_config, "causal_v2_doc_rerank_boost_weight", 0.05)), 0.0)
-        trace["boost_weight_used"] = boost_weight
-        if boost_weight <= 0.0:
-            trace["noop_reason"] = "bonus_non_positive"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        causal_doc_scores: Dict[int, float] = {}
-        for chain in selected_chains:
-            chain_score = float(chain.get("score", 0.0))
-            if chain_score <= 0.0:
-                continue
-            for chunk_id in chain.get("chunk_ids", []):
-                doc_idx = self.passage_node_key_to_doc_idx.get(str(chunk_id))
-                if doc_idx is None:
-                    continue
-                causal_doc_scores[doc_idx] = max(causal_doc_scores.get(doc_idx, 0.0), chain_score)
-
-        if not causal_doc_scores:
-            trace["noop_reason"] = "no_mapped_causal_docs"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        candidate_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:top_n].tolist()]
-        candidate_boosts = {
-            doc_id: float(causal_doc_scores[doc_id])
-            for doc_id in candidate_doc_ids
-            if doc_id in causal_doc_scores
-        }
-        trace["boosted_doc_count"] = len(candidate_boosts)
-        trace["boosted_doc_ids"] = [int(doc_id) for doc_id in candidate_boosts.keys()]
-        trace["boosted_doc_scores"] = {int(doc_id): float(score) for doc_id, score in candidate_boosts.items()}
-        if not candidate_boosts:
-            trace["noop_reason"] = "no_overlap_in_top_n"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        prefix_start = 1 if trace["protect_top1"] and len(sorted_doc_ids) > 0 else 0
-        rerank_window_count = max(0, top_n - prefix_start)
-        trace["rerank_window_count"] = rerank_window_count
-        if rerank_window_count <= 1:
-            trace["noop_reason"] = "window_too_small"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        prefix_doc_ids = sorted_doc_ids[prefix_start:top_n]
-        prefix_base_scores = np.array(sorted_doc_scores[prefix_start:top_n], dtype=float, copy=True)
-        prefix_updated_scores = np.array(prefix_base_scores, copy=True)
-        baseline_top_docs = [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()]
-        for rank_idx, doc_id in enumerate(prefix_doc_ids.tolist()):
-            prefix_updated_scores[rank_idx] += boost_weight * candidate_boosts.get(int(doc_id), 0.0)
-
-        prefix_order = sorted(
-            range(rerank_window_count),
-            key=lambda idx: (prefix_updated_scores[idx], prefix_base_scores[idx]),
-            reverse=True,
-        )
-        if prefix_start > 0:
-            proposed_doc_ids = np.concatenate((
-                sorted_doc_ids[:prefix_start],
-                prefix_doc_ids[prefix_order],
-                sorted_doc_ids[top_n:],
-            ))
-            proposed_doc_scores = np.concatenate((
-                sorted_doc_scores[:prefix_start],
-                prefix_updated_scores[prefix_order],
-                sorted_doc_scores[top_n:],
-            ))
-        else:
-            proposed_doc_ids = np.concatenate((prefix_doc_ids[prefix_order], sorted_doc_ids[top_n:]))
-            proposed_doc_scores = np.concatenate((prefix_updated_scores[prefix_order], sorted_doc_scores[top_n:]))
-
-        proposed_top_docs = [int(doc_id) for doc_id in proposed_doc_ids[:5].tolist()]
-        predicted_num_swaps_top5 = sum(
-            1
-            for idx, doc_id in enumerate(baseline_top_docs)
-            if idx >= len(proposed_top_docs) or proposed_top_docs[idx] != doc_id
-        )
-        trace["num_swaps_top5"] = predicted_num_swaps_top5
-        trace["top5_order_changed"] = predicted_num_swaps_top5 > 0
-        if predicted_num_swaps_top5 > trace["max_top5_swaps"]:
-            trace["noop_reason"] = "swap_limit"
-            return sorted_doc_ids, sorted_doc_scores, trace
-
-        shared_top_docs = set(baseline_top_docs) & set(proposed_top_docs)
-        trace["top5_jaccard"] = (
-            float(len(shared_top_docs) / len(set(baseline_top_docs) | set(proposed_top_docs)))
-            if baseline_top_docs or proposed_top_docs else 1.0
-        )
-        trace["moved_out_of_top5"] = len(set(baseline_top_docs) - set(proposed_top_docs))
-        trace["applied"] = True
-        return proposed_doc_ids, proposed_doc_scores, trace
 
     def _compute_causal_blend_weight(self,
                                      causal_doc_scores: Dict[int, float],

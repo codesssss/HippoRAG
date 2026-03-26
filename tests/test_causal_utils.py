@@ -24,11 +24,6 @@ def make_dummy_hipporag(**config_overrides):
         "causal_margin_gate_enabled": False,
         "causal_margin_threshold": 0.02,
         "causal_blend_top_k": 0,
-        "causal_v2_doc_rerank_enabled": False,
-        "causal_v2_doc_rerank_top_n": 20,
-        "causal_v2_doc_rerank_boost_weight": 0.05,
-        "causal_v2_doc_rerank_protect_top1": True,
-        "causal_v2_doc_rerank_max_top5_swaps": 2,
     }
     config.update(config_overrides)
     dummy = SimpleNamespace(
@@ -37,7 +32,6 @@ def make_dummy_hipporag(**config_overrides):
     )
     dummy._rank_doc_score_map = MethodType(HippoRAG._rank_doc_score_map, dummy)
     dummy._compute_causal_blend_weight = MethodType(HippoRAG._compute_causal_blend_weight, dummy)
-    dummy._apply_v2_causal_doc_rerank = MethodType(HippoRAG._apply_v2_causal_doc_rerank, dummy)
     return dummy
 
 
@@ -121,63 +115,6 @@ def test_blend_causal_retrieval_scores_limits_causal_docs_to_top_k():
     assert trace["causal_docs_used_for_blend_count"] == 2
     assert trace["causal_docs_used_for_blend"] == [10, 11]
     assert 12 not in sorted_doc_ids.tolist()
-
-
-def test_v2_causal_doc_rerank_respects_protect_top1():
-    dummy = make_dummy_hipporag(
-        causal_v2_doc_rerank_enabled=True,
-        causal_v2_doc_rerank_top_n=3,
-        causal_v2_doc_rerank_boost_weight=0.5,
-        causal_v2_doc_rerank_protect_top1=True,
-    )
-    sorted_doc_ids = np.array([0, 1, 2, 3], dtype=int)
-    sorted_doc_scores = np.array([1.0, 0.9, 0.8, 0.7], dtype=float)
-    subgraph_result = {
-        "selected_chains": [
-            {"score": 1.0, "chunk_ids": ["doc-2"]},
-        ],
-    }
-
-    reranked_doc_ids, reranked_doc_scores, trace = HippoRAG._apply_v2_causal_doc_rerank(
-        dummy,
-        sorted_doc_ids=sorted_doc_ids,
-        sorted_doc_scores=sorted_doc_scores,
-        subgraph_result=subgraph_result,
-    )
-
-    assert trace["applied"] is True
-    assert reranked_doc_ids.tolist()[0] == 0
-    assert reranked_doc_ids.tolist()[1:3] == [2, 1]
-    assert reranked_doc_scores[1] > reranked_doc_scores[2]
-    assert trace["top5_order_changed"] is True
-
-
-def test_v2_causal_doc_rerank_respects_swap_limit():
-    dummy = make_dummy_hipporag(
-        causal_v2_doc_rerank_enabled=True,
-        causal_v2_doc_rerank_top_n=5,
-        causal_v2_doc_rerank_boost_weight=1.0,
-        causal_v2_doc_rerank_protect_top1=False,
-        causal_v2_doc_rerank_max_top5_swaps=0,
-    )
-    sorted_doc_ids = np.array([0, 1, 2, 3, 4], dtype=int)
-    sorted_doc_scores = np.array([1.0, 0.95, 0.9, 0.85, 0.8], dtype=float)
-    subgraph_result = {
-        "selected_chains": [
-            {"score": 1.0, "chunk_ids": ["doc-4"]},
-        ],
-    }
-
-    reranked_doc_ids, _, trace = HippoRAG._apply_v2_causal_doc_rerank(
-        dummy,
-        sorted_doc_ids=sorted_doc_ids,
-        sorted_doc_scores=sorted_doc_scores,
-        subgraph_result=subgraph_result,
-    )
-
-    assert trace["applied"] is False
-    assert trace["noop_reason"] == "swap_limit"
-    assert reranked_doc_ids.tolist() == sorted_doc_ids.tolist()
 
 
 def test_run_personalized_pagerank_prefers_reverse_chain_when_seeded_downstream():

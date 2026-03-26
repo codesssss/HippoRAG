@@ -204,13 +204,6 @@ def summarize_v2_metrics(config: BaseConfig,
     probe_attempted_count = sum(1 for trace in traces if trace.get("causal_probe_attempted"))
     forced_probe_count = sum(1 for trace in traces if trace.get("causal_probe_forced"))
     subgraph_nonempty_count = sum(1 for trace in traces if trace.get("subgraph_nonempty"))
-    candidate_injection_applied_count = sum(1 for trace in traces if trace.get("v2_candidate_injection_applied"))
-    candidate_injection_requested_count = sum(1 for trace in traces if trace.get("v2_candidate_injection_requested"))
-    candidate_injected_doc_counts = [int(trace.get("v2_candidate_injection_injected_doc_count", 0)) for trace in traces]
-    candidate_injection_noop_reason_counts = Counter(
-        str(trace.get("v2_candidate_injection_noop_reason", "none")) for trace in traces
-    )
-    doc_rerank_applied_count = sum(1 for trace in traces if trace.get("v2_doc_rerank_applied"))
     causal_v2_used_count = sum(1 for trace in traces if trace.get("causal_v2_used"))
     generator_used_count = sum(1 for trace in traces if trace.get("generator_used_causal_context"))
 
@@ -236,12 +229,6 @@ def summarize_v2_metrics(config: BaseConfig,
                 "selected_subgraph_chain_count": trace.get("selected_subgraph_chain_count"),
                 "query_entities": trace.get("query_entities", [])[:6],
                 "selected_chain_scores": trace.get("selected_chain_scores", []),
-                "v2_candidate_injection_applied": trace.get("v2_candidate_injection_applied"),
-                "v2_candidate_injection_noop_reason": trace.get("v2_candidate_injection_noop_reason"),
-                "v2_candidate_injection_injected_doc_ids": trace.get("v2_candidate_injection_injected_doc_ids", []),
-                "v2_candidate_injection_injected_chunk_ids": trace.get("v2_candidate_injection_injected_chunk_ids", []),
-                "v2_doc_rerank_applied": trace.get("v2_doc_rerank_applied"),
-                "v2_doc_rerank_noop_reason": trace.get("v2_doc_rerank_noop_reason"),
                 "serialized_causal_context_preview": trace.get("serialized_causal_context_preview", []),
             })
         if len(causal_examples) >= 5:
@@ -264,17 +251,6 @@ def summarize_v2_metrics(config: BaseConfig,
         "forced_probe_rate": round(forced_probe_count / num_queries, 4),
         "subgraph_nonempty_count": int(subgraph_nonempty_count),
         "subgraph_nonempty_rate": round(subgraph_nonempty_count / num_queries, 4),
-        "candidate_injection_requested_count": int(candidate_injection_requested_count),
-        "candidate_injection_requested_rate": round(candidate_injection_requested_count / num_queries, 4),
-        "candidate_injection_applied_count": int(candidate_injection_applied_count),
-        "candidate_injection_applied_rate": round(candidate_injection_applied_count / num_queries, 4),
-        "avg_candidate_injected_doc_count": round(
-            float(np.mean(candidate_injected_doc_counts)) if candidate_injected_doc_counts else 0.0,
-            4,
-        ),
-        "candidate_injection_noop_reason_counts": dict(sorted(candidate_injection_noop_reason_counts.items())),
-        "doc_rerank_applied_count": int(doc_rerank_applied_count),
-        "doc_rerank_applied_rate": round(doc_rerank_applied_count / num_queries, 4),
         "causal_v2_used_count": int(causal_v2_used_count),
         "causal_v2_used_rate": round(causal_v2_used_count / num_queries, 4),
         "generator_used_causal_context_count": int(generator_used_count),
@@ -327,35 +303,16 @@ def build_config(args, corpus_len: int) -> BaseConfig:
         causal_margin_threshold=args.causal_margin_threshold,
         causal_blend_top_k=args.causal_blend_top_k,
         causal_engine_version=getattr(args, "causal_engine_version", "legacy"),
-        causal_router_type=getattr(args, "causal_router_type", "embedding_anchor"),
-        causal_router_anchor_path=getattr(args, "causal_router_anchor_path", None),
-        causal_router_causal_threshold=getattr(args, "causal_router_causal_threshold", 0.62),
-        causal_router_standard_threshold=getattr(args, "causal_router_standard_threshold", 0.62),
-        causal_router_margin_threshold=getattr(args, "causal_router_margin_threshold", 0.02),
         causal_v2_probe_mode=getattr(args, "causal_v2_probe_mode", "router"),
         causal_v2_graph_mode=getattr(args, "causal_v2_graph_mode", "causal"),
-        causal_context_injection_mode=getattr(args, "causal_context_injection_mode", "all"),
-        causal_context_min_chain_score=getattr(args, "causal_context_min_chain_score", 0.1),
         causal_v2_base_retrieval_mode=getattr(args, "causal_v2_base_retrieval_mode", "dense"),
-        causal_v2_candidate_injection_enabled=string_to_bool(getattr(args, "causal_v2_candidate_injection_enabled", "false")),
-        causal_v2_candidate_injection_top_n=getattr(args, "causal_v2_candidate_injection_top_n", 20),
-        causal_v2_candidate_injection_max_docs=getattr(args, "causal_v2_candidate_injection_max_docs", 5),
-        causal_v2_candidate_injection_preserve_top_k=getattr(args, "causal_v2_candidate_injection_preserve_top_k", 2),
-        causal_v2_candidate_injection_hops=getattr(args, "causal_v2_candidate_injection_hops", 1),
-        causal_v2_candidate_injection_blend_weight=getattr(args, "causal_v2_candidate_injection_blend_weight", 0.15),
-        causal_v2_candidate_injection_require_query_entity_overlap=string_to_bool(getattr(args, "causal_v2_candidate_injection_require_query_entity_overlap", "true")),
-        causal_v2_doc_rerank_enabled=string_to_bool(getattr(args, "causal_v2_doc_rerank_enabled", "false")),
-        causal_v2_doc_rerank_top_n=getattr(args, "causal_v2_doc_rerank_top_n", 20),
-        causal_v2_doc_rerank_boost_weight=getattr(args, "causal_v2_doc_rerank_boost_weight", 0.05),
-        causal_v2_doc_rerank_protect_top1=string_to_bool(getattr(args, "causal_v2_doc_rerank_protect_top1", "true")),
-        causal_v2_doc_rerank_max_top5_swaps=getattr(args, "causal_v2_doc_rerank_max_top5_swaps", 2),
         causal_v2_extraction_max_tokens=getattr(args, "causal_v2_extraction_max_tokens", 768),
         causal_v2_extraction_retry_attempts=getattr(args, "causal_v2_extraction_retry_attempts", 2),
         causal_v2_extraction_workers=getattr(args, "causal_v2_extraction_workers", 4),
         causal_event_top_k=getattr(args, "causal_event_top_k", 8),
         causal_v2_max_hops=getattr(args, "causal_v2_max_hops", 2),
         causal_chain_top_k=getattr(args, "causal_chain_top_k", 6),
-        causal_context_max_items=getattr(args, "causal_context_max_items", 6),
+        causal_context_max_items=getattr(args, "causal_context_max_items", 0),
         causal_er_similarity_threshold=getattr(args, "causal_er_similarity_threshold", 0.92),
         causal_er_text_threshold=getattr(args, "causal_er_text_threshold", 0.55),
         causal_v2_min_edge_confidence=getattr(args, "causal_v2_min_edge_confidence", 0.7),
@@ -405,35 +362,16 @@ def main():
     parser.add_argument("--causal_margin_threshold", type=float, default=0.02)
     parser.add_argument("--causal_blend_top_k", type=int, default=0)
     parser.add_argument("--causal_engine_version", choices=["legacy", "v2"], default="legacy")
-    parser.add_argument("--causal_router_type", choices=["embedding_anchor"], default="embedding_anchor")
-    parser.add_argument("--causal_router_anchor_path", type=str, default=None)
-    parser.add_argument("--causal_router_causal_threshold", type=float, default=0.62)
-    parser.add_argument("--causal_router_standard_threshold", type=float, default=0.62)
-    parser.add_argument("--causal_router_margin_threshold", type=float, default=0.02)
     parser.add_argument("--causal_v2_probe_mode", choices=["router", "always"], default="router")
     parser.add_argument("--causal_v2_graph_mode", choices=["causal", "general"], default="causal")
-    parser.add_argument("--causal_context_injection_mode", choices=["all", "selective"], default="all")
-    parser.add_argument("--causal_context_min_chain_score", type=float, default=0.1)
-    parser.add_argument("--causal_v2_base_retrieval_mode", choices=["dense", "legacy_fact_graph"], default="dense")
-    parser.add_argument("--causal_v2_candidate_injection_enabled", type=str, default="false")
-    parser.add_argument("--causal_v2_candidate_injection_top_n", type=int, default=20)
-    parser.add_argument("--causal_v2_candidate_injection_max_docs", type=int, default=5)
-    parser.add_argument("--causal_v2_candidate_injection_preserve_top_k", type=int, default=2)
-    parser.add_argument("--causal_v2_candidate_injection_hops", type=int, default=1)
-    parser.add_argument("--causal_v2_candidate_injection_blend_weight", type=float, default=0.15)
-    parser.add_argument("--causal_v2_candidate_injection_require_query_entity_overlap", type=str, default="true")
-    parser.add_argument("--causal_v2_doc_rerank_enabled", type=str, default="false")
-    parser.add_argument("--causal_v2_doc_rerank_top_n", type=int, default=20)
-    parser.add_argument("--causal_v2_doc_rerank_boost_weight", type=float, default=0.05)
-    parser.add_argument("--causal_v2_doc_rerank_protect_top1", type=str, default="true")
-    parser.add_argument("--causal_v2_doc_rerank_max_top5_swaps", type=int, default=2)
+    parser.add_argument("--causal_v2_base_retrieval_mode", choices=["dense", "legacy_fact_graph", "general_relation_graph"], default="dense")
     parser.add_argument("--causal_v2_extraction_max_tokens", type=int, default=768)
     parser.add_argument("--causal_v2_extraction_retry_attempts", type=int, default=2)
     parser.add_argument("--causal_v2_extraction_workers", type=int, default=4)
     parser.add_argument("--causal_event_top_k", type=int, default=8)
     parser.add_argument("--causal_v2_max_hops", type=int, default=2)
     parser.add_argument("--causal_chain_top_k", type=int, default=6)
-    parser.add_argument("--causal_context_max_items", type=int, default=6)
+    parser.add_argument("--causal_context_max_items", type=int, default=0)
     parser.add_argument("--causal_er_similarity_threshold", type=float, default=0.92)
     parser.add_argument("--causal_er_text_threshold", type=float, default=0.55)
     parser.add_argument("--causal_v2_min_edge_confidence", type=float, default=0.7)
@@ -513,26 +451,9 @@ def main():
             "causal_margin_threshold": config.causal_margin_threshold,
             "causal_blend_top_k": config.causal_blend_top_k,
             "causal_engine_version": config.causal_engine_version,
-            "causal_router_type": config.causal_router_type,
-            "causal_router_causal_threshold": config.causal_router_causal_threshold,
-            "causal_router_standard_threshold": config.causal_router_standard_threshold,
-            "causal_router_margin_threshold": config.causal_router_margin_threshold,
             "causal_v2_probe_mode": config.causal_v2_probe_mode,
+            "causal_v2_graph_mode": config.causal_v2_graph_mode,
             "causal_v2_base_retrieval_mode": config.causal_v2_base_retrieval_mode,
-            "causal_context_injection_mode": config.causal_context_injection_mode,
-            "causal_context_min_chain_score": config.causal_context_min_chain_score,
-            "causal_v2_candidate_injection_enabled": config.causal_v2_candidate_injection_enabled,
-            "causal_v2_candidate_injection_top_n": config.causal_v2_candidate_injection_top_n,
-            "causal_v2_candidate_injection_max_docs": config.causal_v2_candidate_injection_max_docs,
-            "causal_v2_candidate_injection_preserve_top_k": config.causal_v2_candidate_injection_preserve_top_k,
-            "causal_v2_candidate_injection_hops": config.causal_v2_candidate_injection_hops,
-            "causal_v2_candidate_injection_blend_weight": config.causal_v2_candidate_injection_blend_weight,
-            "causal_v2_candidate_injection_require_query_entity_overlap": config.causal_v2_candidate_injection_require_query_entity_overlap,
-            "causal_v2_doc_rerank_enabled": config.causal_v2_doc_rerank_enabled,
-            "causal_v2_doc_rerank_top_n": config.causal_v2_doc_rerank_top_n,
-            "causal_v2_doc_rerank_boost_weight": config.causal_v2_doc_rerank_boost_weight,
-            "causal_v2_doc_rerank_protect_top1": config.causal_v2_doc_rerank_protect_top1,
-            "causal_v2_doc_rerank_max_top5_swaps": config.causal_v2_doc_rerank_max_top5_swaps,
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
             "causal_v2_extraction_workers": config.causal_v2_extraction_workers,

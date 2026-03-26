@@ -12,7 +12,7 @@ import numpy as np
 from tqdm import tqdm
 
 from .embedding_store import EmbeddingStore
-from .prompts.linking import get_query_instruction
+from .utils.causal_utils import route_query_type
 from .utils.llm_utils import fix_broken_generated_json
 from .utils.logging_utils import get_logger
 from .utils.misc_utils import compute_mdhash_id, text_processing
@@ -188,96 +188,6 @@ class ExtractedChunk:
     parse_error: Optional[str] = None
 
 
-class SemanticIntentRouter:
-    def __init__(self, embedding_model, config) -> None:
-        self.embedding_model = embedding_model
-        self.config = config
-        self.anchor_bank = self._load_anchor_bank()
-        self.anchor_group_to_scores: dict[str, float] = {}
-        self.anchor_ids: list[str] = []
-        self.anchor_labels: list[str] = []
-        self.anchor_texts: list[str] = []
-        for label, texts in self.anchor_bank.items():
-            for idx, text in enumerate(texts):
-                self.anchor_ids.append(f"{label}:{idx}")
-                self.anchor_labels.append(label)
-                self.anchor_texts.append(text)
-        if self.anchor_texts:
-            self.anchor_embeddings = np.asarray(
-                self.embedding_model.batch_encode(
-                    self.anchor_texts,
-                    instruction=get_query_instruction("query_to_passage"),
-                    norm=True,
-                ),
-                dtype=float,
-            )
-        else:
-            self.anchor_embeddings = np.zeros((0, 0), dtype=float)
-
-    def _load_anchor_bank(self) -> dict[str, list[str]]:
-        anchor_path = getattr(self.config, "causal_router_anchor_path", None)
-        if anchor_path:
-            candidate = anchor_path
-        else:
-            candidate = os.path.join(
-                os.path.dirname(__file__),
-                "resources",
-                "causal_router_anchor_bank.json",
-            )
-        with open(candidate, "r", encoding="utf-8") as handle:
-            data = json.load(handle)
-        return {
-            str(label): [str(text) for text in texts]
-            for label, texts in data.items()
-            if isinstance(texts, list)
-        }
-
-    def route(self, query_embedding: np.ndarray) -> dict[str, Any]:
-        if self.anchor_embeddings.size == 0:
-            return {
-                "label": "standard",
-                "is_causal": False,
-                "score": 0.0,
-                "margin": 0.0,
-                "best_causal_label": "effect",
-                "best_causal_score": 0.0,
-                "standard_score": 0.0,
-                "scores_by_label": {},
-            }
-        query_vector = np.asarray(query_embedding, dtype=float).reshape(-1)
-        similarity = np.dot(self.anchor_embeddings, query_vector.T)
-        scores_by_label: dict[str, float] = defaultdict(float)
-        for label, score in zip(self.anchor_labels, similarity.tolist()):
-            if score > scores_by_label[label]:
-                scores_by_label[label] = float(score)
-
-        causal_labels = ("cause", "effect", "prevention")
-        best_causal_label = max(causal_labels, key=lambda label: scores_by_label.get(label, 0.0))
-        best_causal_score = float(scores_by_label.get(best_causal_label, 0.0))
-        standard_score = float(scores_by_label.get("standard", 0.0))
-        margin = best_causal_score - standard_score
-        causal_threshold = float(getattr(self.config, "causal_router_causal_threshold", 0.62))
-        standard_threshold = float(getattr(self.config, "causal_router_standard_threshold", 0.62))
-        margin_threshold = float(getattr(self.config, "causal_router_margin_threshold", 0.02))
-
-        is_causal = bool(
-            best_causal_score >= causal_threshold
-            and margin >= margin_threshold
-            and not (standard_score >= standard_threshold and standard_score > best_causal_score)
-        )
-        label = best_causal_label if is_causal else "standard"
-        return {
-            "label": label,
-            "is_causal": is_causal,
-            "score": best_causal_score if is_causal else standard_score,
-            "margin": margin,
-            "best_causal_label": best_causal_label,
-            "best_causal_score": best_causal_score,
-            "standard_score": standard_score,
-            "scores_by_label": {label: float(score) for label, score in scores_by_label.items()},
-        }
-
-
 class CausalV2Engine:
     def __init__(self, hipporag) -> None:
         self.hipporag = hipporag
@@ -294,7 +204,6 @@ class CausalV2Engine:
         self.edges_path = os.path.join(self.index_dir, "causal_edges.json")
         self.chunk_map_path = os.path.join(self.index_dir, "chunk_to_event_ids.json")
         self.manifest_path = os.path.join(self.index_dir, "manifest.json")
-        self.router = SemanticIntentRouter(hipporag.embedding_model, self.config)
         self.event_nodes: dict[str, dict[str, Any]] = {}
         self.edges: dict[str, dict[str, Any]] = {}
         self.chunk_to_event_ids: dict[str, list[str]] = {}
@@ -820,9 +729,49 @@ class CausalV2Engine:
         self.loaded = True
 
     def route_query(self, query: str, query_embedding: np.ndarray) -> dict[str, Any]:
-        route_info = self.router.route(query_embedding=query_embedding)
-        route_info["query"] = query
-        return route_info
+        del query_embedding
+
+        if self._graph_mode() == "general":
+            return {
+                "query": query,
+                "label": "standard",
+                "is_causal": False,
+                "score": 1.0,
+                "margin": 0.0,
+                "best_causal_label": "general",
+                "best_causal_score": 0.0,
+                "standard_score": 1.0,
+                "scores_by_label": {"standard": 1.0},
+                "route_source": "general_graph_default",
+            }
+
+        query_type = route_query_type(query)
+        if query_type in {"cause", "effect", "prevention"}:
+            return {
+                "query": query,
+                "label": query_type,
+                "is_causal": True,
+                "score": 1.0,
+                "margin": 1.0,
+                "best_causal_label": query_type,
+                "best_causal_score": 1.0,
+                "standard_score": 0.0,
+                "scores_by_label": {query_type: 1.0, "standard": 0.0},
+                "route_source": "rule_router",
+            }
+
+        return {
+            "query": query,
+            "label": "standard",
+            "is_causal": False,
+            "score": 1.0,
+            "margin": 0.0,
+            "best_causal_label": "effect",
+            "best_causal_score": 0.0,
+            "standard_score": 1.0,
+            "scores_by_label": {"standard": 1.0},
+            "route_source": "rule_router",
+        }
 
     def retrieve_subgraph(
         self,
@@ -859,9 +808,8 @@ class CausalV2Engine:
                 "serialized_contexts": [],
                 "causal_context_doc_ids": [],
                 "chain_selection_trace": {
-                    "mode": str(getattr(self.config, "causal_context_injection_mode", "all")).lower(),
+                    "mode": "top_k",
                     "candidate_chain_count": 0,
-                    "entity_overlap_chain_count": 0,
                     "selected_chain_count": 0,
                     "selected_chain_scores": [],
                 },
@@ -908,36 +856,14 @@ class CausalV2Engine:
         query: str,
         chains: Sequence[dict[str, Any]],
     ) -> Tuple[list[dict[str, Any]], list[str], dict[str, Any]]:
-        mode = str(getattr(self.config, "causal_context_injection_mode", "all")).lower()
         chain_top_k = max(1, int(getattr(self.config, "causal_chain_top_k", 6)))
-        min_chain_score = float(getattr(self.config, "causal_context_min_chain_score", 0.1))
         query_entities = self._extract_query_entities(query)
-
-        if mode != "selective":
-            selected_chains = list(chains[:chain_top_k])
-            return selected_chains, query_entities, {
-                "mode": mode,
-                "candidate_chain_count": int(len(chains)),
-                "entity_overlap_chain_count": int(len(chains)),
-                "selected_chain_count": int(len(selected_chains)),
-                "selected_chain_scores": [float(chain["score"]) for chain in selected_chains],
-            }
-
-        overlap_chains = [
-            chain for chain in chains
-            if self._chain_overlaps_query_entities(query_entities, chain.get("serialized", ""))
-        ]
-        selected_chains: list[dict[str, Any]] = []
-        if overlap_chains and float(overlap_chains[0].get("score", 0.0)) >= min_chain_score:
-            selected_chains = [overlap_chains[0]]
-
+        selected_chains = list(chains[:chain_top_k])
         return selected_chains, query_entities, {
-            "mode": mode,
+            "mode": "top_k",
             "candidate_chain_count": int(len(chains)),
-            "entity_overlap_chain_count": int(len(overlap_chains)),
             "selected_chain_count": int(len(selected_chains)),
             "selected_chain_scores": [float(chain["score"]) for chain in selected_chains],
-            "min_chain_score": min_chain_score,
         }
 
     def _extract_query_entities(self, query: str) -> list[str]:
@@ -985,32 +911,6 @@ class CausalV2Engine:
         if len(normalized) <= 2:
             return None
         return cleaned
-
-    def _chain_overlaps_query_entities(self, query_entities: Sequence[str], chain_text: str) -> bool:
-        if not query_entities:
-            return False
-        normalized_chain = _normalize_text(chain_text)
-        for entity in query_entities:
-            normalized_entity = _normalize_text(entity)
-            if len(normalized_entity) <= 2:
-                continue
-            if normalized_entity in normalized_chain:
-                return True
-        return False
-
-    def _chunk_overlaps_query_entities(self, query_entities: Sequence[str], chunk_text: str) -> bool:
-        if not query_entities:
-            return False
-        normalized_chunk = _normalize_text(chunk_text)
-        if not normalized_chunk:
-            return False
-        for entity in query_entities:
-            normalized_entity = _normalize_text(entity)
-            if len(normalized_entity) <= 2:
-                continue
-            if normalized_entity in normalized_chunk:
-                return True
-        return False
 
     def _collect_chains(
         self,
@@ -1127,119 +1027,3 @@ class CausalV2Engine:
             "score": float(score),
             "serialized": serialized,
         }
-
-    def propose_candidate_doc_injections(
-        self,
-        dense_sorted_doc_ids: np.ndarray,
-        dense_sorted_doc_scores: np.ndarray,
-        query_entities: Optional[Sequence[str]] = None,
-    ) -> dict[str, Any]:
-        trace: dict[str, Any] = {
-            "graph_mode": self._graph_mode(),
-            "seed_top_n": 0,
-            "max_docs": max(0, int(getattr(self.config, "causal_v2_candidate_injection_max_docs", 5))),
-            "hops": max(1, int(getattr(self.config, "causal_v2_candidate_injection_hops", 1))),
-            "used_query_entity_overlap_gate": bool(getattr(self.config, "causal_v2_candidate_injection_require_query_entity_overlap", True)),
-            "candidate_seed_chunk_count": 0,
-            "query_entity_seed_chunk_count": 0,
-            "seed_node_count": 0,
-            "proposed_doc_count": 0,
-            "injected_doc_ids": [],
-            "injected_chunk_ids": [],
-            "injected_doc_scores": {},
-            "noop_reason": None,
-        }
-        if self._graph_mode() != "general":
-            trace["noop_reason"] = "graph_mode_not_general"
-            return trace
-        if not self.loaded:
-            self.load()
-        if len(dense_sorted_doc_ids) == 0 or not self.event_ids:
-            trace["noop_reason"] = "empty_dense_or_graph"
-            return trace
-
-        seed_top_n = max(0, min(int(getattr(self.config, "causal_v2_candidate_injection_top_n", 20)), len(dense_sorted_doc_ids)))
-        trace["seed_top_n"] = seed_top_n
-        if seed_top_n == 0:
-            trace["noop_reason"] = "seed_top_n_zero"
-            return trace
-
-        dense_doc_id_list = [int(doc_id) for doc_id in dense_sorted_doc_ids.tolist()]
-        dense_score_by_doc_id = {
-            int(doc_id): float(score)
-            for doc_id, score in zip(dense_sorted_doc_ids.tolist(), dense_sorted_doc_scores.tolist())
-        }
-        seed_doc_ids = dense_doc_id_list[:seed_top_n]
-        seed_chunk_ids = [self.hipporag.passage_node_keys[doc_id] for doc_id in seed_doc_ids]
-        trace["candidate_seed_chunk_count"] = len(seed_chunk_ids)
-
-        require_query_overlap = bool(getattr(self.config, "causal_v2_candidate_injection_require_query_entity_overlap", True))
-        normalized_query_entities = [str(entity) for entity in (query_entities or []) if str(entity).strip()]
-        seed_doc_chunk_pairs = list(zip(seed_doc_ids, seed_chunk_ids))
-        if require_query_overlap:
-            if not normalized_query_entities:
-                trace["noop_reason"] = "no_query_entities"
-                return trace
-            filtered_seed_doc_chunk_pairs: list[tuple[int, str]] = []
-            for doc_id, chunk_id in seed_doc_chunk_pairs:
-                chunk_row = self.hipporag.chunk_embedding_store.get_row(str(chunk_id))
-                chunk_text = str(chunk_row.get("content", ""))
-                if self._chunk_overlaps_query_entities(normalized_query_entities, chunk_text):
-                    filtered_seed_doc_chunk_pairs.append((int(doc_id), str(chunk_id)))
-            trace["query_entity_seed_chunk_count"] = len(filtered_seed_doc_chunk_pairs)
-            if not filtered_seed_doc_chunk_pairs:
-                trace["noop_reason"] = "no_query_overlap_seed_docs"
-                return trace
-            seed_doc_chunk_pairs = filtered_seed_doc_chunk_pairs
-        else:
-            trace["query_entity_seed_chunk_count"] = len(seed_doc_chunk_pairs)
-
-        seed_chunk_id_set = {chunk_id for _, chunk_id in seed_doc_chunk_pairs}
-
-        frontier: list[tuple[str, int, float]] = []
-        seen_state: set[tuple[str, int]] = set()
-        for doc_id, chunk_id in seed_doc_chunk_pairs:
-            seed_weight = max(dense_score_by_doc_id.get(doc_id, 0.0), 1e-3)
-            for event_id in self.chunk_to_event_ids.get(str(chunk_id), []):
-                state = (event_id, 0)
-                if state in seen_state:
-                    continue
-                seen_state.add(state)
-                frontier.append((event_id, 0, seed_weight))
-        trace["seed_node_count"] = len(frontier)
-        if not frontier:
-            trace["noop_reason"] = "no_seed_nodes"
-            return trace
-
-        proposed_scores: dict[int, float] = {}
-        max_hops = trace["hops"]
-        while frontier:
-            current_event_id, depth, current_score = frontier.pop(0)
-            if depth >= max_hops:
-                continue
-            for edge, next_event_id in self._neighbors_for_route(current_event_id, "general"):
-                next_score = current_score * max(float(edge.get("confidence", 0.0)), 1e-3) * (1.0 / (depth + 1.0))
-                next_node = self.event_nodes.get(next_event_id, {})
-                for chunk_id in next_node.get("chunk_ids", []):
-                    chunk_id = str(chunk_id)
-                    if chunk_id in seed_chunk_id_set:
-                        continue
-                    doc_idx = self.hipporag.passage_node_key_to_doc_idx.get(chunk_id)
-                    if doc_idx is None:
-                        continue
-                    proposed_scores[doc_idx] = max(proposed_scores.get(doc_idx, 0.0), float(next_score))
-                next_state = (next_event_id, depth + 1)
-                if next_state not in seen_state:
-                    seen_state.add(next_state)
-                    frontier.append((next_event_id, depth + 1, next_score))
-
-        trace["proposed_doc_count"] = len(proposed_scores)
-        if not proposed_scores:
-            trace["noop_reason"] = "no_proposed_docs"
-            return trace
-
-        ranked_injected = sorted(proposed_scores.items(), key=lambda item: item[1], reverse=True)[: trace["max_docs"]]
-        trace["injected_doc_ids"] = [int(doc_id) for doc_id, _ in ranked_injected]
-        trace["injected_chunk_ids"] = [str(self.hipporag.passage_node_keys[int(doc_id)]) for doc_id, _ in ranked_injected]
-        trace["injected_doc_scores"] = {int(doc_id): float(score) for doc_id, score in ranked_injected}
-        return trace
