@@ -92,6 +92,42 @@ def main():
     parser.add_argument('--causal_blend_dense_weight', type=float, default=0.35, help='Dense score weight in causal blending.')
     parser.add_argument('--causal_blend_fact_weight', type=float, default=0.15, help='Original fact-graph score weight in causal blending.')
     parser.add_argument('--causal_blend_graph_weight', type=float, default=0.50, help='Causal graph score weight in causal blending.')
+    parser.add_argument('--causal_margin_gate_enabled', type=str, default='false', help='Only blend causal scores when the baseline ranking margin is small.')
+    parser.add_argument('--causal_margin_threshold', type=float, default=0.02, help='Normalized top1-top2 baseline margin above which causal blending is disabled.')
+    parser.add_argument('--causal_blend_top_k', type=int, default=0, help='Only let top-K causal documents contribute causal scores; 0 keeps all causal docs.')
+    parser.add_argument('--causal_engine_version', choices=['legacy', 'v2'], default='legacy', help='Choose the legacy causal graph path or the V2 schema-extraction + serialized subgraph path.')
+    parser.add_argument('--causal_router_type', choices=['embedding_anchor'], default='embedding_anchor', help='Semantic router backend for causal V2.')
+    parser.add_argument('--causal_router_anchor_path', type=str, default=None, help='Optional JSON anchor bank path for the causal V2 semantic router.')
+    parser.add_argument('--causal_router_causal_threshold', type=float, default=0.62, help='Minimum causal-anchor similarity for causal V2 routing.')
+    parser.add_argument('--causal_router_standard_threshold', type=float, default=0.62, help='Minimum standard-anchor similarity for staying on the standard path in causal V2.')
+    parser.add_argument('--causal_router_margin_threshold', type=float, default=0.02, help='Minimum causal-vs-standard routing margin for causal V2.')
+    parser.add_argument('--causal_v2_probe_mode', choices=['router', 'always'], default='router', help='V2 subgraph probing mode: router only probes routed causal queries, always probes every query.')
+    parser.add_argument('--causal_v2_graph_mode', choices=['causal', 'general'], default='causal', help='V2 graph mode: causal keeps cause/enable/prevent extraction, general uses a minimal relation graph for multi-hop retrieval.')
+    parser.add_argument('--causal_context_injection_mode', choices=['all', 'selective'], default='all', help='V2 causal context injection mode: all keeps top-K chains, selective applies query-overlap filtering and top-1 gating.')
+    parser.add_argument('--causal_context_min_chain_score', type=float, default=0.1, help='Minimum chain score required for V2 causal context injection in selective mode.')
+    parser.add_argument('--causal_v2_base_retrieval_mode', choices=['dense', 'legacy_fact_graph'], default='dense', help='Base ranking used before V2 graph candidate injection.')
+    parser.add_argument('--causal_v2_candidate_injection_enabled', type=str, default='false', help='Enable V2 retrieval candidate injection from dense top-N docs through the V2 graph.')
+    parser.add_argument('--causal_v2_candidate_injection_top_n', type=int, default=20, help='Dense top-N seed window for V2 candidate injection.')
+    parser.add_argument('--causal_v2_candidate_injection_max_docs', type=int, default=5, help='Maximum number of newly injected docs inserted by V2 candidate injection.')
+    parser.add_argument('--causal_v2_candidate_injection_preserve_top_k', type=int, default=2, help='Keep the dense top-K docs fixed ahead of injected docs during V2 candidate injection.')
+    parser.add_argument('--causal_v2_candidate_injection_hops', type=int, default=1, help='Graph hops used by V2 candidate injection.')
+    parser.add_argument('--causal_v2_candidate_injection_blend_weight', type=float, default=0.15, help='Small graph-score blend weight used when reranking the expanded V2 candidate pool.')
+    parser.add_argument('--causal_v2_candidate_injection_require_query_entity_overlap', type=str, default='true', help='Only expand V2 candidate injection from dense seed docs that overlap extracted query entities.')
+    parser.add_argument('--causal_v2_doc_rerank_enabled', type=str, default='false', help='Enable conservative V2 document reranking using selected causal chains.')
+    parser.add_argument('--causal_v2_doc_rerank_top_n', type=int, default=20, help='Only rerank the top-N dense documents with V2 causal bonuses.')
+    parser.add_argument('--causal_v2_doc_rerank_boost_weight', type=float, default=0.05, help='Small additive bonus weight for V2 causal document reranking.')
+    parser.add_argument('--causal_v2_doc_rerank_protect_top1', type=str, default='true', help='Keep the dense top-1 document fixed during V2 causal document reranking.')
+    parser.add_argument('--causal_v2_doc_rerank_max_top5_swaps', type=int, default=2, help='Maximum top-5 order changes allowed during V2 causal document reranking.')
+    parser.add_argument('--causal_v2_extraction_max_tokens', type=int, default=768, help='Max completion tokens for schema-constrained causal V2 extraction.')
+    parser.add_argument('--causal_v2_extraction_retry_attempts', type=int, default=2, help='Retry attempts for causal V2 extraction parsing.')
+    parser.add_argument('--causal_v2_extraction_workers', type=int, default=4, help='Parallel worker count for causal V2 extraction.')
+    parser.add_argument('--causal_event_top_k', type=int, default=8, help='Top-K event seeds for causal V2 subgraph retrieval.')
+    parser.add_argument('--causal_v2_max_hops', type=int, default=2, help='Maximum directed hops for causal V2 subgraph expansion.')
+    parser.add_argument('--causal_chain_top_k', type=int, default=6, help='Maximum number of causal chains serialized into the reader prompt.')
+    parser.add_argument('--causal_context_max_items', type=int, default=6, help='Maximum number of causal context items injected into the reader prompt.')
+    parser.add_argument('--causal_er_similarity_threshold', type=float, default=0.92, help='Embedding similarity threshold for causal V2 event resolution.')
+    parser.add_argument('--causal_er_text_threshold', type=float, default=0.55, help='Text similarity threshold for causal V2 event resolution.')
+    parser.add_argument('--causal_v2_min_edge_confidence', type=float, default=0.7, help='Minimum edge confidence kept in the causal V2 graph.')
     parser.add_argument('--use_local_qwen3', type=str, default='false', help='Use local Qwen3-8B chat server and local embedding server presets.')
     args = parser.parse_args()
 
@@ -125,6 +161,7 @@ def main():
     planner_enabled = string_to_bool(args.planner_enabled)
     causal_enabled = string_to_bool(args.causal_enabled)
     causal_query_only = string_to_bool(args.causal_query_only)
+    causal_margin_gate_enabled = string_to_bool(args.causal_margin_gate_enabled)
 
     # Prepare datasets and evaluation
     samples = json.load(open(f"reproduce/dataset/{dataset_name}.json", "r"))
@@ -169,6 +206,42 @@ def main():
         causal_blend_dense_weight=args.causal_blend_dense_weight,
         causal_blend_fact_weight=args.causal_blend_fact_weight,
         causal_blend_graph_weight=args.causal_blend_graph_weight,
+        causal_margin_gate_enabled=causal_margin_gate_enabled,
+        causal_margin_threshold=args.causal_margin_threshold,
+        causal_blend_top_k=args.causal_blend_top_k,
+        causal_engine_version=args.causal_engine_version,
+        causal_router_type=args.causal_router_type,
+        causal_router_anchor_path=args.causal_router_anchor_path,
+        causal_router_causal_threshold=args.causal_router_causal_threshold,
+        causal_router_standard_threshold=args.causal_router_standard_threshold,
+        causal_router_margin_threshold=args.causal_router_margin_threshold,
+        causal_v2_probe_mode=args.causal_v2_probe_mode,
+        causal_v2_graph_mode=args.causal_v2_graph_mode,
+        causal_context_injection_mode=args.causal_context_injection_mode,
+        causal_context_min_chain_score=args.causal_context_min_chain_score,
+        causal_v2_base_retrieval_mode=args.causal_v2_base_retrieval_mode,
+        causal_v2_candidate_injection_enabled=string_to_bool(args.causal_v2_candidate_injection_enabled),
+        causal_v2_candidate_injection_top_n=args.causal_v2_candidate_injection_top_n,
+        causal_v2_candidate_injection_max_docs=args.causal_v2_candidate_injection_max_docs,
+        causal_v2_candidate_injection_preserve_top_k=args.causal_v2_candidate_injection_preserve_top_k,
+        causal_v2_candidate_injection_hops=args.causal_v2_candidate_injection_hops,
+        causal_v2_candidate_injection_blend_weight=args.causal_v2_candidate_injection_blend_weight,
+        causal_v2_candidate_injection_require_query_entity_overlap=string_to_bool(args.causal_v2_candidate_injection_require_query_entity_overlap),
+        causal_v2_doc_rerank_enabled=string_to_bool(args.causal_v2_doc_rerank_enabled),
+        causal_v2_doc_rerank_top_n=args.causal_v2_doc_rerank_top_n,
+        causal_v2_doc_rerank_boost_weight=args.causal_v2_doc_rerank_boost_weight,
+        causal_v2_doc_rerank_protect_top1=string_to_bool(args.causal_v2_doc_rerank_protect_top1),
+        causal_v2_doc_rerank_max_top5_swaps=args.causal_v2_doc_rerank_max_top5_swaps,
+        causal_v2_extraction_max_tokens=args.causal_v2_extraction_max_tokens,
+        causal_v2_extraction_retry_attempts=args.causal_v2_extraction_retry_attempts,
+        causal_v2_extraction_workers=args.causal_v2_extraction_workers,
+        causal_event_top_k=args.causal_event_top_k,
+        causal_v2_max_hops=args.causal_v2_max_hops,
+        causal_chain_top_k=args.causal_chain_top_k,
+        causal_context_max_items=args.causal_context_max_items,
+        causal_er_similarity_threshold=args.causal_er_similarity_threshold,
+        causal_er_text_threshold=args.causal_er_text_threshold,
+        causal_v2_min_edge_confidence=args.causal_v2_min_edge_confidence,
     )
 
     logging.basicConfig(level=logging.INFO)

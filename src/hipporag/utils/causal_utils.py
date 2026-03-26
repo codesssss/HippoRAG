@@ -15,7 +15,7 @@ PREVENTION_PATTERNS = (
     r"\bprevent\b",
     r"\bprevents\b",
     r"\bavoid\b",
-    r"\bstop\b",
+    r"\bstop(?:s|ped|ping)?\b.+?\bfrom\b",
     r"\binhibit\b",
     r"\breduce risk\b",
 )

@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import os
+from collections import Counter
 from pathlib import Path
 from typing import Dict, List
 
@@ -71,6 +72,18 @@ def subset_by_indices(values: List, indices: List[int]) -> List:
     return [values[idx] for idx in indices]
 
 
+def is_causal_query_solution(config: BaseConfig, query_solution: QuerySolution) -> bool:
+    if getattr(config, "causal_engine_version", "legacy") == "v2":
+        trace = query_solution.retrieval_trace or {}
+        return trace.get("router_label") in {"cause", "effect", "prevention", "causal"}
+    return route_query_type(query_solution.question) != "non_causal"
+
+
+def has_nonempty_v2_subgraph(query_solution: QuerySolution) -> bool:
+    trace = query_solution.retrieval_trace or {}
+    return bool(trace.get("subgraph_nonempty", False))
+
+
 def compute_slice_metrics(config: BaseConfig,
                           query_solutions: List[QuerySolution],
                           gold_docs: List[List[str]],
@@ -99,7 +112,10 @@ def compute_slice_metrics(config: BaseConfig,
         aggregation_fn=np.max,
     )
 
-    causal_indices = [idx for idx, query in enumerate(queries) if route_query_type(query) != "non_causal"]
+    causal_indices = [
+        idx for idx, query_solution in enumerate(query_solutions)
+        if is_causal_query_solution(config, query_solution)
+    ]
     if causal_indices:
         causal_retrieval_metrics, _ = retrieval.calculate_metric_scores(
             gold_docs=subset_by_indices(gold_docs, causal_indices),
@@ -119,6 +135,30 @@ def compute_slice_metrics(config: BaseConfig,
     else:
         causal_retrieval_metrics, causal_em_metrics, causal_f1_metrics = {}, {}, {}
 
+    nonempty_subgraph_indices = [
+        idx for idx, query_solution in enumerate(query_solutions)
+        if getattr(config, "causal_engine_version", "legacy") == "v2"
+        and has_nonempty_v2_subgraph(query_solution)
+    ]
+    if nonempty_subgraph_indices:
+        subgraph_retrieval_metrics, _ = retrieval.calculate_metric_scores(
+            gold_docs=subset_by_indices(gold_docs, nonempty_subgraph_indices),
+            retrieved_docs=subset_by_indices(retrieved_docs, nonempty_subgraph_indices),
+            k_list=[1, 2, 5, 10, 20, 30, 50, 100, 150, 200],
+        )
+        subgraph_em_metrics, _ = qa_em.calculate_metric_scores(
+            gold_answers=subset_by_indices(gold_answers, nonempty_subgraph_indices),
+            predicted_answers=subset_by_indices(predicted_answers, nonempty_subgraph_indices),
+            aggregation_fn=np.max,
+        )
+        subgraph_f1_metrics, _ = qa_f1.calculate_metric_scores(
+            gold_answers=subset_by_indices(gold_answers, nonempty_subgraph_indices),
+            predicted_answers=subset_by_indices(predicted_answers, nonempty_subgraph_indices),
+            aggregation_fn=np.max,
+        )
+    else:
+        subgraph_retrieval_metrics, subgraph_em_metrics, subgraph_f1_metrics = {}, {}, {}
+
     return {
         "overall": {
             **retrieval_metrics,
@@ -132,6 +172,121 @@ def compute_slice_metrics(config: BaseConfig,
             **causal_f1_metrics,
             "num_queries": len(causal_indices),
         },
+        "nonempty_subgraph_slice": {
+            **subgraph_retrieval_metrics,
+            **subgraph_em_metrics,
+            **subgraph_f1_metrics,
+            "num_queries": len(nonempty_subgraph_indices),
+        },
+    }
+
+
+def summarize_v2_metrics(config: BaseConfig,
+                         hipporag: HippoRAG,
+                         query_solutions: List[QuerySolution]) -> Dict[str, object]:
+    if getattr(config, "causal_engine_version", "legacy") != "v2":
+        return {}
+
+    traces = [query_solution.retrieval_trace or {} for query_solution in query_solutions]
+    router_label_counts = Counter(str(trace.get("router_label", "unknown")) for trace in traces)
+    chain_counts = [int(trace.get("subgraph_chain_count", 0)) for trace in traces]
+    selected_chain_counts = [int(trace.get("selected_subgraph_chain_count", 0)) for trace in traces]
+    seed_counts = [len(trace.get("event_seed_ids", [])) for trace in traces]
+    query_entity_counts = [len(trace.get("query_entities", [])) for trace in traces]
+    serialized_counts = [len(trace.get("serialized_causal_context", [])) for trace in traces]
+    causal_doc_counts = [int(trace.get("causal_doc_count", 0)) for trace in traces]
+    base_retrieval_mode_counts = Counter(str(trace.get("v2_base_retrieval_mode", "dense")) for trace in traces)
+    base_retrieval_status_counts = Counter(str(trace.get("v2_base_retrieval_status", "unknown")) for trace in traces)
+    base_retrieval_route_counts = Counter(str(trace.get("baseline_route_name", "unknown")) for trace in traces)
+    base_retrieval_fact_counts = [int(trace.get("v2_base_retrieval_fact_count", 0)) for trace in traces]
+    base_retrieval_dense_fallback_count = sum(1 for trace in traces if trace.get("v2_base_retrieval_used_dense_fallback"))
+    use_causal_path_count = sum(1 for trace in traces if trace.get("use_causal_path"))
+    probe_attempted_count = sum(1 for trace in traces if trace.get("causal_probe_attempted"))
+    forced_probe_count = sum(1 for trace in traces if trace.get("causal_probe_forced"))
+    subgraph_nonempty_count = sum(1 for trace in traces if trace.get("subgraph_nonempty"))
+    candidate_injection_applied_count = sum(1 for trace in traces if trace.get("v2_candidate_injection_applied"))
+    candidate_injection_requested_count = sum(1 for trace in traces if trace.get("v2_candidate_injection_requested"))
+    candidate_injected_doc_counts = [int(trace.get("v2_candidate_injection_injected_doc_count", 0)) for trace in traces]
+    candidate_injection_noop_reason_counts = Counter(
+        str(trace.get("v2_candidate_injection_noop_reason", "none")) for trace in traces
+    )
+    doc_rerank_applied_count = sum(1 for trace in traces if trace.get("v2_doc_rerank_applied"))
+    causal_v2_used_count = sum(1 for trace in traces if trace.get("causal_v2_used"))
+    generator_used_count = sum(1 for trace in traces if trace.get("generator_used_causal_context"))
+
+    manifest_stats = {}
+    engine = getattr(hipporag, "causal_v2_engine", None)
+    if engine is not None:
+        manifest_stats = engine.read_manifest()
+
+    num_queries = max(1, len(traces))
+    causal_examples = []
+    for query_solution in query_solutions:
+        trace = query_solution.retrieval_trace or {}
+        if trace.get("causal_v2_used") or trace.get("causal_probe_attempted"):
+            causal_examples.append({
+                "question": query_solution.question,
+                "router_label": trace.get("router_label"),
+                "probe_route_label": trace.get("probe_route_label"),
+                "router_score": trace.get("router_score"),
+                "router_margin": trace.get("router_margin"),
+                "causal_probe_forced": trace.get("causal_probe_forced"),
+                "subgraph_nonempty": trace.get("subgraph_nonempty"),
+                "subgraph_chain_count": trace.get("subgraph_chain_count"),
+                "selected_subgraph_chain_count": trace.get("selected_subgraph_chain_count"),
+                "query_entities": trace.get("query_entities", [])[:6],
+                "selected_chain_scores": trace.get("selected_chain_scores", []),
+                "v2_candidate_injection_applied": trace.get("v2_candidate_injection_applied"),
+                "v2_candidate_injection_noop_reason": trace.get("v2_candidate_injection_noop_reason"),
+                "v2_candidate_injection_injected_doc_ids": trace.get("v2_candidate_injection_injected_doc_ids", []),
+                "v2_candidate_injection_injected_chunk_ids": trace.get("v2_candidate_injection_injected_chunk_ids", []),
+                "v2_doc_rerank_applied": trace.get("v2_doc_rerank_applied"),
+                "v2_doc_rerank_noop_reason": trace.get("v2_doc_rerank_noop_reason"),
+                "serialized_causal_context_preview": trace.get("serialized_causal_context_preview", []),
+            })
+        if len(causal_examples) >= 5:
+            break
+
+    return {
+        "index_manifest": manifest_stats,
+        "router_label_counts": dict(sorted(router_label_counts.items())),
+        "base_retrieval_mode_counts": dict(sorted(base_retrieval_mode_counts.items())),
+        "base_retrieval_status_counts": dict(sorted(base_retrieval_status_counts.items())),
+        "base_retrieval_route_counts": dict(sorted(base_retrieval_route_counts.items())),
+        "base_retrieval_dense_fallback_count": int(base_retrieval_dense_fallback_count),
+        "base_retrieval_dense_fallback_rate": round(base_retrieval_dense_fallback_count / num_queries, 4),
+        "avg_base_retrieval_fact_count": round(float(np.mean(base_retrieval_fact_counts)) if base_retrieval_fact_counts else 0.0, 4),
+        "use_causal_path_count": int(use_causal_path_count),
+        "use_causal_path_rate": round(use_causal_path_count / num_queries, 4),
+        "probe_attempted_count": int(probe_attempted_count),
+        "probe_attempted_rate": round(probe_attempted_count / num_queries, 4),
+        "forced_probe_count": int(forced_probe_count),
+        "forced_probe_rate": round(forced_probe_count / num_queries, 4),
+        "subgraph_nonempty_count": int(subgraph_nonempty_count),
+        "subgraph_nonempty_rate": round(subgraph_nonempty_count / num_queries, 4),
+        "candidate_injection_requested_count": int(candidate_injection_requested_count),
+        "candidate_injection_requested_rate": round(candidate_injection_requested_count / num_queries, 4),
+        "candidate_injection_applied_count": int(candidate_injection_applied_count),
+        "candidate_injection_applied_rate": round(candidate_injection_applied_count / num_queries, 4),
+        "avg_candidate_injected_doc_count": round(
+            float(np.mean(candidate_injected_doc_counts)) if candidate_injected_doc_counts else 0.0,
+            4,
+        ),
+        "candidate_injection_noop_reason_counts": dict(sorted(candidate_injection_noop_reason_counts.items())),
+        "doc_rerank_applied_count": int(doc_rerank_applied_count),
+        "doc_rerank_applied_rate": round(doc_rerank_applied_count / num_queries, 4),
+        "causal_v2_used_count": int(causal_v2_used_count),
+        "causal_v2_used_rate": round(causal_v2_used_count / num_queries, 4),
+        "generator_used_causal_context_count": int(generator_used_count),
+        "generator_used_causal_context_rate": round(generator_used_count / num_queries, 4),
+        "avg_subgraph_chain_count": round(float(np.mean(chain_counts)) if chain_counts else 0.0, 4),
+        "avg_selected_chain_count": round(float(np.mean(selected_chain_counts)) if selected_chain_counts else 0.0, 4),
+        "max_subgraph_chain_count": int(max(chain_counts) if chain_counts else 0),
+        "avg_seed_event_count": round(float(np.mean(seed_counts)) if seed_counts else 0.0, 4),
+        "avg_query_entity_count": round(float(np.mean(query_entity_counts)) if query_entity_counts else 0.0, 4),
+        "avg_serialized_context_count": round(float(np.mean(serialized_counts)) if serialized_counts else 0.0, 4),
+        "avg_causal_doc_count": round(float(np.mean(causal_doc_counts)) if causal_doc_counts else 0.0, 4),
+        "causal_examples_preview": causal_examples,
     }
 
 
@@ -168,6 +323,42 @@ def build_config(args, corpus_len: int) -> BaseConfig:
         causal_blend_dense_weight=args.causal_blend_dense_weight,
         causal_blend_fact_weight=args.causal_blend_fact_weight,
         causal_blend_graph_weight=args.causal_blend_graph_weight,
+        causal_margin_gate_enabled=string_to_bool(args.causal_margin_gate_enabled),
+        causal_margin_threshold=args.causal_margin_threshold,
+        causal_blend_top_k=args.causal_blend_top_k,
+        causal_engine_version=getattr(args, "causal_engine_version", "legacy"),
+        causal_router_type=getattr(args, "causal_router_type", "embedding_anchor"),
+        causal_router_anchor_path=getattr(args, "causal_router_anchor_path", None),
+        causal_router_causal_threshold=getattr(args, "causal_router_causal_threshold", 0.62),
+        causal_router_standard_threshold=getattr(args, "causal_router_standard_threshold", 0.62),
+        causal_router_margin_threshold=getattr(args, "causal_router_margin_threshold", 0.02),
+        causal_v2_probe_mode=getattr(args, "causal_v2_probe_mode", "router"),
+        causal_v2_graph_mode=getattr(args, "causal_v2_graph_mode", "causal"),
+        causal_context_injection_mode=getattr(args, "causal_context_injection_mode", "all"),
+        causal_context_min_chain_score=getattr(args, "causal_context_min_chain_score", 0.1),
+        causal_v2_base_retrieval_mode=getattr(args, "causal_v2_base_retrieval_mode", "dense"),
+        causal_v2_candidate_injection_enabled=string_to_bool(getattr(args, "causal_v2_candidate_injection_enabled", "false")),
+        causal_v2_candidate_injection_top_n=getattr(args, "causal_v2_candidate_injection_top_n", 20),
+        causal_v2_candidate_injection_max_docs=getattr(args, "causal_v2_candidate_injection_max_docs", 5),
+        causal_v2_candidate_injection_preserve_top_k=getattr(args, "causal_v2_candidate_injection_preserve_top_k", 2),
+        causal_v2_candidate_injection_hops=getattr(args, "causal_v2_candidate_injection_hops", 1),
+        causal_v2_candidate_injection_blend_weight=getattr(args, "causal_v2_candidate_injection_blend_weight", 0.15),
+        causal_v2_candidate_injection_require_query_entity_overlap=string_to_bool(getattr(args, "causal_v2_candidate_injection_require_query_entity_overlap", "true")),
+        causal_v2_doc_rerank_enabled=string_to_bool(getattr(args, "causal_v2_doc_rerank_enabled", "false")),
+        causal_v2_doc_rerank_top_n=getattr(args, "causal_v2_doc_rerank_top_n", 20),
+        causal_v2_doc_rerank_boost_weight=getattr(args, "causal_v2_doc_rerank_boost_weight", 0.05),
+        causal_v2_doc_rerank_protect_top1=string_to_bool(getattr(args, "causal_v2_doc_rerank_protect_top1", "true")),
+        causal_v2_doc_rerank_max_top5_swaps=getattr(args, "causal_v2_doc_rerank_max_top5_swaps", 2),
+        causal_v2_extraction_max_tokens=getattr(args, "causal_v2_extraction_max_tokens", 768),
+        causal_v2_extraction_retry_attempts=getattr(args, "causal_v2_extraction_retry_attempts", 2),
+        causal_v2_extraction_workers=getattr(args, "causal_v2_extraction_workers", 4),
+        causal_event_top_k=getattr(args, "causal_event_top_k", 8),
+        causal_v2_max_hops=getattr(args, "causal_v2_max_hops", 2),
+        causal_chain_top_k=getattr(args, "causal_chain_top_k", 6),
+        causal_context_max_items=getattr(args, "causal_context_max_items", 6),
+        causal_er_similarity_threshold=getattr(args, "causal_er_similarity_threshold", 0.92),
+        causal_er_text_threshold=getattr(args, "causal_er_text_threshold", 0.55),
+        causal_v2_min_edge_confidence=getattr(args, "causal_v2_min_edge_confidence", 0.7),
         structure_rerank_enabled=string_to_bool(args.structure_rerank_enabled),
         structure_rerank_top_n=args.structure_rerank_top_n,
         structure_rerank_bonus_weight=args.structure_rerank_bonus_weight,
@@ -210,6 +401,42 @@ def main():
     parser.add_argument("--causal_blend_dense_weight", type=float, default=0.35)
     parser.add_argument("--causal_blend_fact_weight", type=float, default=0.15)
     parser.add_argument("--causal_blend_graph_weight", type=float, default=0.50)
+    parser.add_argument("--causal_margin_gate_enabled", type=str, default="false")
+    parser.add_argument("--causal_margin_threshold", type=float, default=0.02)
+    parser.add_argument("--causal_blend_top_k", type=int, default=0)
+    parser.add_argument("--causal_engine_version", choices=["legacy", "v2"], default="legacy")
+    parser.add_argument("--causal_router_type", choices=["embedding_anchor"], default="embedding_anchor")
+    parser.add_argument("--causal_router_anchor_path", type=str, default=None)
+    parser.add_argument("--causal_router_causal_threshold", type=float, default=0.62)
+    parser.add_argument("--causal_router_standard_threshold", type=float, default=0.62)
+    parser.add_argument("--causal_router_margin_threshold", type=float, default=0.02)
+    parser.add_argument("--causal_v2_probe_mode", choices=["router", "always"], default="router")
+    parser.add_argument("--causal_v2_graph_mode", choices=["causal", "general"], default="causal")
+    parser.add_argument("--causal_context_injection_mode", choices=["all", "selective"], default="all")
+    parser.add_argument("--causal_context_min_chain_score", type=float, default=0.1)
+    parser.add_argument("--causal_v2_base_retrieval_mode", choices=["dense", "legacy_fact_graph"], default="dense")
+    parser.add_argument("--causal_v2_candidate_injection_enabled", type=str, default="false")
+    parser.add_argument("--causal_v2_candidate_injection_top_n", type=int, default=20)
+    parser.add_argument("--causal_v2_candidate_injection_max_docs", type=int, default=5)
+    parser.add_argument("--causal_v2_candidate_injection_preserve_top_k", type=int, default=2)
+    parser.add_argument("--causal_v2_candidate_injection_hops", type=int, default=1)
+    parser.add_argument("--causal_v2_candidate_injection_blend_weight", type=float, default=0.15)
+    parser.add_argument("--causal_v2_candidate_injection_require_query_entity_overlap", type=str, default="true")
+    parser.add_argument("--causal_v2_doc_rerank_enabled", type=str, default="false")
+    parser.add_argument("--causal_v2_doc_rerank_top_n", type=int, default=20)
+    parser.add_argument("--causal_v2_doc_rerank_boost_weight", type=float, default=0.05)
+    parser.add_argument("--causal_v2_doc_rerank_protect_top1", type=str, default="true")
+    parser.add_argument("--causal_v2_doc_rerank_max_top5_swaps", type=int, default=2)
+    parser.add_argument("--causal_v2_extraction_max_tokens", type=int, default=768)
+    parser.add_argument("--causal_v2_extraction_retry_attempts", type=int, default=2)
+    parser.add_argument("--causal_v2_extraction_workers", type=int, default=4)
+    parser.add_argument("--causal_event_top_k", type=int, default=8)
+    parser.add_argument("--causal_v2_max_hops", type=int, default=2)
+    parser.add_argument("--causal_chain_top_k", type=int, default=6)
+    parser.add_argument("--causal_context_max_items", type=int, default=6)
+    parser.add_argument("--causal_er_similarity_threshold", type=float, default=0.92)
+    parser.add_argument("--causal_er_text_threshold", type=float, default=0.55)
+    parser.add_argument("--causal_v2_min_edge_confidence", type=float, default=0.7)
     parser.add_argument("--structure_rerank_enabled", type=str, default="true")
     parser.add_argument("--structure_rerank_top_n", type=int, default=40)
     parser.add_argument("--structure_rerank_bonus_weight", type=float, default=0.08)
@@ -260,6 +487,11 @@ def main():
         gold_docs=gold_docs,
         gold_answers=gold_answers,
     )
+    v2_metrics = summarize_v2_metrics(
+        config=config,
+        hipporag=hipporag,
+        query_solutions=query_solutions,
+    )
     result = {
         "dataset": dataset_name,
         "limit": len(samples),
@@ -277,6 +509,40 @@ def main():
             "causal_blend_dense_weight": config.causal_blend_dense_weight,
             "causal_blend_fact_weight": config.causal_blend_fact_weight,
             "causal_blend_graph_weight": config.causal_blend_graph_weight,
+            "causal_margin_gate_enabled": config.causal_margin_gate_enabled,
+            "causal_margin_threshold": config.causal_margin_threshold,
+            "causal_blend_top_k": config.causal_blend_top_k,
+            "causal_engine_version": config.causal_engine_version,
+            "causal_router_type": config.causal_router_type,
+            "causal_router_causal_threshold": config.causal_router_causal_threshold,
+            "causal_router_standard_threshold": config.causal_router_standard_threshold,
+            "causal_router_margin_threshold": config.causal_router_margin_threshold,
+            "causal_v2_probe_mode": config.causal_v2_probe_mode,
+            "causal_v2_base_retrieval_mode": config.causal_v2_base_retrieval_mode,
+            "causal_context_injection_mode": config.causal_context_injection_mode,
+            "causal_context_min_chain_score": config.causal_context_min_chain_score,
+            "causal_v2_candidate_injection_enabled": config.causal_v2_candidate_injection_enabled,
+            "causal_v2_candidate_injection_top_n": config.causal_v2_candidate_injection_top_n,
+            "causal_v2_candidate_injection_max_docs": config.causal_v2_candidate_injection_max_docs,
+            "causal_v2_candidate_injection_preserve_top_k": config.causal_v2_candidate_injection_preserve_top_k,
+            "causal_v2_candidate_injection_hops": config.causal_v2_candidate_injection_hops,
+            "causal_v2_candidate_injection_blend_weight": config.causal_v2_candidate_injection_blend_weight,
+            "causal_v2_candidate_injection_require_query_entity_overlap": config.causal_v2_candidate_injection_require_query_entity_overlap,
+            "causal_v2_doc_rerank_enabled": config.causal_v2_doc_rerank_enabled,
+            "causal_v2_doc_rerank_top_n": config.causal_v2_doc_rerank_top_n,
+            "causal_v2_doc_rerank_boost_weight": config.causal_v2_doc_rerank_boost_weight,
+            "causal_v2_doc_rerank_protect_top1": config.causal_v2_doc_rerank_protect_top1,
+            "causal_v2_doc_rerank_max_top5_swaps": config.causal_v2_doc_rerank_max_top5_swaps,
+            "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
+            "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
+            "causal_v2_extraction_workers": config.causal_v2_extraction_workers,
+            "causal_event_top_k": config.causal_event_top_k,
+            "causal_v2_max_hops": config.causal_v2_max_hops,
+            "causal_chain_top_k": config.causal_chain_top_k,
+            "causal_context_max_items": config.causal_context_max_items,
+            "causal_er_similarity_threshold": config.causal_er_similarity_threshold,
+            "causal_er_text_threshold": config.causal_er_text_threshold,
+            "causal_v2_min_edge_confidence": config.causal_v2_min_edge_confidence,
             "structure_rerank_enabled": config.structure_rerank_enabled,
             "structure_rerank_top_n": config.structure_rerank_top_n,
             "structure_rerank_bonus_weight": config.structure_rerank_bonus_weight,
@@ -292,13 +558,20 @@ def main():
         },
         "overall_recomputed": slice_metrics["overall"],
         "causal_slice": slice_metrics["causal_slice"],
+        "nonempty_subgraph_slice": slice_metrics["nonempty_subgraph_slice"],
+        "v2_metrics": v2_metrics,
         "examples": [
             {
                 "question": query_solution.question,
-                "query_type": route_query_type(query_solution.question),
+                "query_type": (
+                    (query_solution.retrieval_trace or {}).get("router_label")
+                    if getattr(config, "causal_engine_version", "legacy") == "v2"
+                    else route_query_type(query_solution.question)
+                ),
                 "answer": query_solution.answer,
                 "gold_answers": query_solution.gold_answers,
                 "docs": query_solution.docs[:3],
+                "retrieval_trace": query_solution.retrieval_trace or {},
             }
             for query_solution in query_solutions
         ],
@@ -319,6 +592,8 @@ def main():
         "output_json": str(output_json),
         "overall_recomputed": result["overall_recomputed"],
         "causal_slice": result["causal_slice"],
+        "nonempty_subgraph_slice": result["nonempty_subgraph_slice"],
+        "v2_metrics": result["v2_metrics"],
     }, indent=2, ensure_ascii=False))
 
 

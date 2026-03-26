@@ -1,4 +1,4 @@
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 
 import numpy as np
 
@@ -13,6 +13,32 @@ from src.hipporag.utils.causal_utils import (
     score_query_causal_intent,
 )
 from src.hipporag.utils.misc_utils import compute_fact_id
+
+
+def make_dummy_hipporag(**config_overrides):
+    config = {
+        "causal_blend_dense_weight": 0.35,
+        "causal_blend_fact_weight": 0.15,
+        "causal_blend_graph_weight": 0.50,
+        "causal_gate_mode": "soft",
+        "causal_margin_gate_enabled": False,
+        "causal_margin_threshold": 0.02,
+        "causal_blend_top_k": 0,
+        "causal_v2_doc_rerank_enabled": False,
+        "causal_v2_doc_rerank_top_n": 20,
+        "causal_v2_doc_rerank_boost_weight": 0.05,
+        "causal_v2_doc_rerank_protect_top1": True,
+        "causal_v2_doc_rerank_max_top5_swaps": 2,
+    }
+    config.update(config_overrides)
+    dummy = SimpleNamespace(
+        global_config=SimpleNamespace(**config),
+        passage_node_key_to_doc_idx={f"doc-{idx}": idx for idx in range(20)},
+    )
+    dummy._rank_doc_score_map = MethodType(HippoRAG._rank_doc_score_map, dummy)
+    dummy._compute_causal_blend_weight = MethodType(HippoRAG._compute_causal_blend_weight, dummy)
+    dummy._apply_v2_causal_doc_rerank = MethodType(HippoRAG._apply_v2_causal_doc_rerank, dummy)
+    return dummy
 
 
 def test_compute_fact_id_is_stable_for_normalized_triples():
@@ -43,6 +69,7 @@ def test_route_query_type_distinguishes_causal_queries():
     assert route_query_type("What leads to flooding downtown?") == "cause"
     assert route_query_type("What does smoking cause?") == "effect"
     assert route_query_type("How can vaccines prevent infection?") == "prevention"
+    assert route_query_type("In what month was the flight born with a stop in New York?") == "non_causal"
     assert route_query_type("Who directed the film?") == "non_causal"
 
 
@@ -54,24 +81,103 @@ def test_score_query_causal_intent_uses_strong_weak_and_non_causal_buckets():
 
 
 def test_blend_causal_retrieval_scores_applies_soft_gate_scaling():
-    dummy = SimpleNamespace(
-        global_config=SimpleNamespace(
-            causal_blend_dense_weight=0.35,
-            causal_blend_fact_weight=0.15,
-            causal_blend_graph_weight=0.50,
-            causal_gate_mode="soft",
-        )
-    )
+    dummy = make_dummy_hipporag()
     _, _, trace = HippoRAG.blend_causal_retrieval_scores(
         dummy,
-        dense_doc_scores={0: 1.0},
-        fact_doc_scores={0: 0.5},
+        baseline_doc_scores={0: 1.0},
         causal_doc_scores={1: 1.0},
         route_causal_intent_score=0.6,
     )
 
     assert trace["causal_weight_before_attenuation"] == 0.3
     assert trace["causal_weight_after_attenuation"] == 0.06
+
+
+def test_blend_causal_retrieval_scores_respects_margin_gate():
+    dummy = make_dummy_hipporag(causal_margin_gate_enabled=True, causal_margin_threshold=0.2)
+    sorted_doc_ids, _, trace = HippoRAG.blend_causal_retrieval_scores(
+        dummy,
+        baseline_doc_scores={0: 1.0, 1: 0.2},
+        causal_doc_scores={2: 1.0},
+        route_causal_intent_score=1.0,
+    )
+
+    assert trace["margin_gate_applied"] is True
+    assert trace["use_causal_for_blend"] is False
+    assert trace["causal_docs_used_for_blend_count"] == 0
+    assert trace["causal_weight_after_attenuation"] == 0.0
+    assert sorted_doc_ids.tolist()[:2] == [0, 1]
+
+
+def test_blend_causal_retrieval_scores_limits_causal_docs_to_top_k():
+    dummy = make_dummy_hipporag(causal_blend_top_k=2)
+    sorted_doc_ids, _, trace = HippoRAG.blend_causal_retrieval_scores(
+        dummy,
+        baseline_doc_scores={0: 1.0},
+        causal_doc_scores={10: 0.9, 11: 0.8, 12: 0.7},
+        route_causal_intent_score=1.0,
+    )
+
+    assert trace["causal_docs_used_for_blend_count"] == 2
+    assert trace["causal_docs_used_for_blend"] == [10, 11]
+    assert 12 not in sorted_doc_ids.tolist()
+
+
+def test_v2_causal_doc_rerank_respects_protect_top1():
+    dummy = make_dummy_hipporag(
+        causal_v2_doc_rerank_enabled=True,
+        causal_v2_doc_rerank_top_n=3,
+        causal_v2_doc_rerank_boost_weight=0.5,
+        causal_v2_doc_rerank_protect_top1=True,
+    )
+    sorted_doc_ids = np.array([0, 1, 2, 3], dtype=int)
+    sorted_doc_scores = np.array([1.0, 0.9, 0.8, 0.7], dtype=float)
+    subgraph_result = {
+        "selected_chains": [
+            {"score": 1.0, "chunk_ids": ["doc-2"]},
+        ],
+    }
+
+    reranked_doc_ids, reranked_doc_scores, trace = HippoRAG._apply_v2_causal_doc_rerank(
+        dummy,
+        sorted_doc_ids=sorted_doc_ids,
+        sorted_doc_scores=sorted_doc_scores,
+        subgraph_result=subgraph_result,
+    )
+
+    assert trace["applied"] is True
+    assert reranked_doc_ids.tolist()[0] == 0
+    assert reranked_doc_ids.tolist()[1:3] == [2, 1]
+    assert reranked_doc_scores[1] > reranked_doc_scores[2]
+    assert trace["top5_order_changed"] is True
+
+
+def test_v2_causal_doc_rerank_respects_swap_limit():
+    dummy = make_dummy_hipporag(
+        causal_v2_doc_rerank_enabled=True,
+        causal_v2_doc_rerank_top_n=5,
+        causal_v2_doc_rerank_boost_weight=1.0,
+        causal_v2_doc_rerank_protect_top1=False,
+        causal_v2_doc_rerank_max_top5_swaps=0,
+    )
+    sorted_doc_ids = np.array([0, 1, 2, 3, 4], dtype=int)
+    sorted_doc_scores = np.array([1.0, 0.95, 0.9, 0.85, 0.8], dtype=float)
+    subgraph_result = {
+        "selected_chains": [
+            {"score": 1.0, "chunk_ids": ["doc-4"]},
+        ],
+    }
+
+    reranked_doc_ids, _, trace = HippoRAG._apply_v2_causal_doc_rerank(
+        dummy,
+        sorted_doc_ids=sorted_doc_ids,
+        sorted_doc_scores=sorted_doc_scores,
+        subgraph_result=subgraph_result,
+    )
+
+    assert trace["applied"] is False
+    assert trace["noop_reason"] == "swap_limit"
+    assert reranked_doc_ids.tolist() == sorted_doc_ids.tolist()
 
 
 def test_run_personalized_pagerank_prefers_reverse_chain_when_seeded_downstream():
@@ -85,6 +191,64 @@ def test_run_personalized_pagerank_prefers_reverse_chain_when_seeded_downstream(
 
     assert scores[1] > scores[0]
     assert scores[1] > 0
+
+
+def test_graph_search_with_causal_facts_soft_non_causal_uses_weak_bidirectional_path():
+    dummy = SimpleNamespace(
+        global_config=SimpleNamespace(
+            causal_seed_top_k=2,
+            causal_damping=0.7,
+            causal_gate_mode="soft",
+        ),
+        fact_node_keys=["fact-a", "fact-b"],
+        passage_node_keys=["doc-a", "doc-b"],
+        causal_graph_out={0: [(1, 1.0, "causes")]},
+        causal_graph_in={1: [(0, 1.0, "causes")]},
+        fact_id_to_doc_idxs={"fact-a": [0], "fact-b": [1]},
+    )
+
+    sorted_doc_ids, sorted_doc_scores, trace = HippoRAG.graph_search_with_causal_facts(
+        dummy,
+        query_fact_scores=np.array([1.0, 0.0], dtype=float),
+        query_type="non_causal",
+        preferred_fact_indices=[0],
+        return_trace=True,
+    )
+
+    assert trace["mode"] == "soft_non_causal_weak"
+    assert trace["status"] == "ok"
+    assert trace["seeds_with_route_edge_count"] == 2
+    assert sorted_doc_ids.tolist()[0] == 0
+    assert 1 in sorted_doc_ids.tolist()
+    assert sorted_doc_scores[0] > 0
+
+
+def test_graph_search_with_causal_facts_hard_non_causal_still_returns_empty():
+    dummy = SimpleNamespace(
+        global_config=SimpleNamespace(
+            causal_seed_top_k=2,
+            causal_damping=0.7,
+            causal_gate_mode="hard",
+        ),
+        fact_node_keys=["fact-a", "fact-b"],
+        passage_node_keys=["doc-a", "doc-b"],
+        causal_graph_out={0: [(1, 1.0, "causes")]},
+        causal_graph_in={1: [(0, 1.0, "causes")]},
+        fact_id_to_doc_idxs={"fact-a": [0], "fact-b": [1]},
+    )
+
+    sorted_doc_ids, sorted_doc_scores, trace = HippoRAG.graph_search_with_causal_facts(
+        dummy,
+        query_fact_scores=np.array([1.0, 0.0], dtype=float),
+        query_type="non_causal",
+        preferred_fact_indices=[0],
+        return_trace=True,
+    )
+
+    assert trace["mode"] is None
+    assert trace["status"] == "non_causal_query_type"
+    assert sorted_doc_ids.size == 0
+    assert sorted_doc_scores.size == 0
 
 
 def test_derive_directed_structure_edge_handles_forward_and_reverse_predicates():
@@ -186,7 +350,13 @@ if __name__ == "__main__":
     test_route_query_type_distinguishes_causal_queries()
     test_score_query_causal_intent_uses_strong_weak_and_non_causal_buckets()
     test_blend_causal_retrieval_scores_applies_soft_gate_scaling()
+    test_blend_causal_retrieval_scores_respects_margin_gate()
+    test_blend_causal_retrieval_scores_limits_causal_docs_to_top_k()
+    test_v2_causal_doc_rerank_respects_protect_top1()
+    test_v2_causal_doc_rerank_respects_swap_limit()
     test_run_personalized_pagerank_prefers_reverse_chain_when_seeded_downstream()
+    test_graph_search_with_causal_facts_soft_non_causal_uses_weak_bidirectional_path()
+    test_graph_search_with_causal_facts_hard_non_causal_still_returns_empty()
     test_derive_directed_structure_edge_handles_forward_and_reverse_predicates()
     test_derive_composed_structure_edges_builds_bridge_edge_from_fact_chain()
     test_score_candidate_docs_by_structure_prefers_bridge_doc()

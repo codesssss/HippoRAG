@@ -11,7 +11,7 @@ from .utils.misc_utils import compute_mdhash_id, NerRawOutput, TripleRawOutput
 logger = logging.getLogger(__name__)
 
 class EmbeddingStore:
-    def __init__(self, embedding_model, db_filename, batch_size, namespace):
+    def __init__(self, embedding_model, db_filename, batch_size, namespace, create_if_missing: bool = True):
         """
         Initializes the class with necessary configurations and sets up the working directory.
 
@@ -33,6 +33,8 @@ class EmbeddingStore:
         self.namespace = namespace
 
         if not os.path.exists(db_filename):
+            if not create_if_missing:
+                raise FileNotFoundError(f"Embedding store directory does not exist: {db_filename}")
             logger.info(f"Creating working directory: {db_filename}")
             os.makedirs(db_filename, exist_ok=True)
 

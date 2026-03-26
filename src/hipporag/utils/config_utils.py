@@ -217,6 +217,154 @@ class BaseConfig:
         default=0.50,
         metadata={"help": "Causal graph retrieval weight in causal-aware score blending."}
     )
+    causal_margin_gate_enabled: bool = field(
+        default=False,
+        metadata={"help": "Only allow causal score blending when the non-causal baseline ranking is uncertain."}
+    )
+    causal_margin_threshold: float = field(
+        default=0.02,
+        metadata={"help": "Minimum normalized baseline top1-top2 margin that disables causal blending when margin gating is enabled."}
+    )
+    causal_blend_top_k: int = field(
+        default=0,
+        metadata={"help": "Only allow the top-K causal documents to contribute causal scores. Set to 0 to keep all causal docs."}
+    )
+    causal_engine_version: Literal["legacy", "v2"] = field(
+        default="legacy",
+        metadata={"help": "Which causal engine to use. `legacy` keeps the old OpenIE+graph pipeline, `v2` uses schema extraction + semantic routing + serialized subgraph context."}
+    )
+    causal_router_type: Literal["embedding_anchor"] = field(
+        default="embedding_anchor",
+        metadata={"help": "Semantic router backend for causal V2."}
+    )
+    causal_router_anchor_path: Optional[str] = field(
+        default=None,
+        metadata={"help": "Optional path to a JSON anchor bank for the causal V2 semantic router."}
+    )
+    causal_router_causal_threshold: float = field(
+        default=0.62,
+        metadata={"help": "Minimum causal-anchor similarity required for causal V2 routing."}
+    )
+    causal_router_standard_threshold: float = field(
+        default=0.62,
+        metadata={"help": "Minimum standard-anchor similarity that keeps a query on the standard path when the causal margin is weak."}
+    )
+    causal_router_margin_threshold: float = field(
+        default=0.02,
+        metadata={"help": "Minimum causal-vs-standard similarity margin required to route a query into the causal V2 path."}
+    )
+    causal_v2_probe_mode: Literal["router", "always"] = field(
+        default="router",
+        metadata={"help": "V2 subgraph probing mode. `router` only probes routed causal queries, `always` probes every query while keeping router scores for analysis."}
+    )
+    causal_v2_graph_mode: Literal["causal", "general"] = field(
+        default="causal",
+        metadata={"help": "V2 graph mode. `causal` keeps cause/enable/prevent extraction, `general` uses a minimal schema-constrained relation graph for multi-hop retrieval."}
+    )
+    causal_context_injection_mode: Literal["all", "selective"] = field(
+        default="all",
+        metadata={"help": "How V2 serialized causal chains are injected. `all` keeps the current top-K behavior, `selective` applies query-entity overlap filtering and top-1 gating."}
+    )
+    causal_context_min_chain_score: float = field(
+        default=0.1,
+        metadata={"help": "Minimum chain score required for V2 causal context injection in selective mode."}
+    )
+    causal_v2_base_retrieval_mode: Literal["dense", "legacy_fact_graph"] = field(
+        default="dense",
+        metadata={"help": "Base ranking used before V2 graph candidate injection. `dense` keeps the current passage-only ranking, `legacy_fact_graph` reuses the original HippoRAG fact-graph retrieval when legacy artifacts are available."}
+    )
+    causal_v2_legacy_preferred_embedding_name: str = field(
+        default="nvidia/NV-Embed-v2",
+        metadata={"help": "Preferred legacy embedding workspace to reuse when `causal_v2_base_retrieval_mode=legacy_fact_graph`. V2 will try to keep graph and fact/entity embeddings aligned to this workspace when available."}
+    )
+    causal_v2_candidate_injection_enabled: bool = field(
+        default=False,
+        metadata={"help": "Enable V2 retrieval candidate injection by expanding dense top-N documents through the V2 graph and inserting newly discovered documents into the candidate pool."}
+    )
+    causal_v2_candidate_injection_top_n: int = field(
+        default=20,
+        metadata={"help": "Use the dense top-N documents as the seed candidate set for V2 candidate injection."}
+    )
+    causal_v2_candidate_injection_max_docs: int = field(
+        default=5,
+        metadata={"help": "Maximum number of newly injected documents to insert into the reranked candidate list."}
+    )
+    causal_v2_candidate_injection_preserve_top_k: int = field(
+        default=2,
+        metadata={"help": "Keep the dense top-K documents fixed ahead of injected documents during V2 candidate injection."}
+    )
+    causal_v2_candidate_injection_hops: int = field(
+        default=1,
+        metadata={"help": "Maximum graph hops used when proposing new documents for V2 candidate injection."}
+    )
+    causal_v2_candidate_injection_blend_weight: float = field(
+        default=0.15,
+        metadata={"help": "Small graph-score blend weight used when reranking the expanded V2 candidate pool."}
+    )
+    causal_v2_candidate_injection_require_query_entity_overlap: bool = field(
+        default=True,
+        metadata={"help": "Only allow V2 candidate injection to expand from dense seed documents that overlap extracted query entities."}
+    )
+    causal_v2_doc_rerank_enabled: bool = field(
+        default=False,
+        metadata={"help": "Enable conservative V2 retrieval reranking using selected causal chains as small document bonuses."}
+    )
+    causal_v2_doc_rerank_top_n: int = field(
+        default=20,
+        metadata={"help": "Only rerank the top-N dense documents with V2 causal document bonuses."}
+    )
+    causal_v2_doc_rerank_boost_weight: float = field(
+        default=0.05,
+        metadata={"help": "Small additive bonus weight for V2 causal document reranking."}
+    )
+    causal_v2_doc_rerank_protect_top1: bool = field(
+        default=True,
+        metadata={"help": "Keep the dense top-1 document fixed during V2 causal document reranking."}
+    )
+    causal_v2_doc_rerank_max_top5_swaps: int = field(
+        default=2,
+        metadata={"help": "Maximum number of top-5 order changes allowed for V2 causal document reranking."}
+    )
+    causal_v2_extraction_max_tokens: int = field(
+        default=768,
+        metadata={"help": "Maximum completion tokens for causal V2 schema-constrained extraction."}
+    )
+    causal_v2_extraction_retry_attempts: int = field(
+        default=2,
+        metadata={"help": "How many times to retry causal V2 extraction when schema parsing fails."}
+    )
+    causal_v2_extraction_workers: int = field(
+        default=4,
+        metadata={"help": "Parallel worker count for causal V2 extraction."}
+    )
+    causal_event_top_k: int = field(
+        default=8,
+        metadata={"help": "Top-K canonical event seeds to retrieve for causal V2 subgraph retrieval."}
+    )
+    causal_v2_max_hops: int = field(
+        default=2,
+        metadata={"help": "Maximum directed hops when expanding causal V2 subgraphs."}
+    )
+    causal_chain_top_k: int = field(
+        default=6,
+        metadata={"help": "Maximum number of serialized causal chains to pass to the generator."}
+    )
+    causal_context_max_items: int = field(
+        default=6,
+        metadata={"help": "Maximum number of causal context items injected into the generator prompt."}
+    )
+    causal_er_similarity_threshold: float = field(
+        default=0.92,
+        metadata={"help": "Embedding similarity threshold used by causal V2 event resolution."}
+    )
+    causal_er_text_threshold: float = field(
+        default=0.55,
+        metadata={"help": "Textual similarity threshold used by causal V2 event resolution."}
+    )
+    causal_v2_min_edge_confidence: float = field(
+        default=0.7,
+        metadata={"help": "Minimum edge confidence kept in the causal V2 graph."}
+    )
     structure_rerank_enabled: bool = field(
         default=True,
         metadata={"help": "Enable lightweight directed-structure reranking over the top candidate documents."}

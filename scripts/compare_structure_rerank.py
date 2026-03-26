@@ -90,6 +90,13 @@ def summarize_structure_traces(examples: list[dict]) -> dict:
     route_causal_intent_scores = []
     causal_doc_counts_when_used = []
     causal_weights_after_attenuation_when_used = []
+    margin_gate_applied_count = 0
+    use_causal_for_blend_count = 0
+    causal_override_applied_count = 0
+    causal_blend_top5_set_changed_count = 0
+    causal_blend_top5_order_changed_count = 0
+    baseline_margins = []
+    causal_docs_used_for_blend_counts = []
 
     for example in examples:
         trace = example.get("retrieval_trace") or {}
@@ -141,6 +148,20 @@ def summarize_structure_traces(examples: list[dict]) -> dict:
             causal_doc_non_empty_count += 1
         if "route_causal_intent_score" in trace:
             route_causal_intent_scores.append(float(trace.get("route_causal_intent_score", 0.0)))
+        if trace.get("margin_gate_applied"):
+            margin_gate_applied_count += 1
+        if trace.get("use_causal_for_blend"):
+            use_causal_for_blend_count += 1
+        if trace.get("causal_override_applied"):
+            causal_override_applied_count += 1
+        if trace.get("causal_blend_top5_set_changed"):
+            causal_blend_top5_set_changed_count += 1
+        if trace.get("causal_blend_top5_order_changed"):
+            causal_blend_top5_order_changed_count += 1
+        if "baseline_margin_top1_top2" in trace:
+            baseline_margins.append(float(trace.get("baseline_margin_top1_top2", 0.0)))
+        if "causal_docs_used_for_blend_count" in trace:
+            causal_docs_used_for_blend_counts.append(float(trace.get("causal_docs_used_for_blend_count", 0)))
 
     def _avg(values: list[float]) -> float:
         return float(sum(values) / len(values)) if values else 0.0
@@ -169,6 +190,18 @@ def summarize_structure_traces(examples: list[dict]) -> dict:
         "avg_route_causal_intent_score": _avg(route_causal_intent_scores),
         "avg_causal_doc_count_when_used": _avg(causal_doc_counts_when_used),
         "avg_causal_weight_after_attenuation_when_used": _avg(causal_weights_after_attenuation_when_used),
+        "margin_gate_applied_count": margin_gate_applied_count,
+        "margin_gate_applied_rate": (margin_gate_applied_count / len(examples)) if examples else 0.0,
+        "use_causal_for_blend_count": use_causal_for_blend_count,
+        "use_causal_for_blend_rate": (use_causal_for_blend_count / len(examples)) if examples else 0.0,
+        "causal_override_applied_count": causal_override_applied_count,
+        "causal_override_applied_rate": (causal_override_applied_count / len(examples)) if examples else 0.0,
+        "causal_blend_top5_set_changed_count": causal_blend_top5_set_changed_count,
+        "causal_blend_top5_set_changed_rate": (causal_blend_top5_set_changed_count / len(examples)) if examples else 0.0,
+        "causal_blend_top5_order_changed_count": causal_blend_top5_order_changed_count,
+        "causal_blend_top5_order_changed_rate": (causal_blend_top5_order_changed_count / len(examples)) if examples else 0.0,
+        "avg_baseline_margin_top1_top2": _avg(baseline_margins),
+        "avg_causal_docs_used_for_blend_count": _avg(causal_docs_used_for_blend_counts),
         "facts_empty_stage_counts": facts_empty_stage_counts,
         "noop_reason_counts": noop_reason_counts,
         "fallback_reason_counts": fallback_reason_counts,
@@ -325,6 +358,9 @@ def run_single(label: str,
             "causal_enabled": config.causal_enabled,
             "causal_query_only": config.causal_query_only,
             "causal_gate_mode": config.causal_gate_mode,
+            "causal_margin_gate_enabled": config.causal_margin_gate_enabled,
+            "causal_margin_threshold": config.causal_margin_threshold,
+            "causal_blend_top_k": config.causal_blend_top_k,
             "structure_rerank_enabled": config.structure_rerank_enabled,
             "structure_rerank_top_n": config.structure_rerank_top_n,
             "structure_rerank_bonus_weight": config.structure_rerank_bonus_weight,
@@ -387,6 +423,9 @@ def main():
     parser.add_argument("--causal_blend_dense_weight", type=float, default=0.35)
     parser.add_argument("--causal_blend_fact_weight", type=float, default=0.15)
     parser.add_argument("--causal_blend_graph_weight", type=float, default=0.50)
+    parser.add_argument("--causal_margin_gate_enabled", type=str, default="false")
+    parser.add_argument("--causal_margin_threshold", type=float, default=0.02)
+    parser.add_argument("--causal_blend_top_k", type=int, default=0)
     parser.add_argument("--structure_rerank_top_n", type=int, default=40)
     parser.add_argument("--structure_rerank_bonus_weight", type=float, default=0.08)
     parser.add_argument("--structure_rerank_min_edge_support", type=int, default=2)

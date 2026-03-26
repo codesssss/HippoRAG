@@ -22,6 +22,7 @@ import time
 from .llm import _get_llm_class, BaseLLM
 from .embedding_model import _get_embedding_model_class, BaseEmbeddingModel
 from .embedding_store import EmbeddingStore
+from .causal_v2 import CausalV2Engine
 from .information_extraction import OpenIE
 from .information_extraction.openie_vllm_offline import VLLMOfflineOpenIE
 from .information_extraction.openie_transformers_offline import TransformersOfflineOpenIE
@@ -158,12 +159,16 @@ class HippoRAG:
 
         self.graph = self.initialize_graph()
 
-        if self.global_config.openie_mode == 'offline':
-            self.embedding_model = None
-        else:
+        requires_embedding_model = (
+            self.global_config.openie_mode != 'offline'
+            or getattr(self.global_config, "causal_engine_version", "legacy") == "v2"
+        )
+        if requires_embedding_model:
             self.embedding_model: BaseEmbeddingModel = _get_embedding_model_class(
                 embedding_model_name=self.global_config.embedding_model_name)(global_config=self.global_config,
                                                                               embedding_model_name=self.global_config.embedding_model_name)
+        else:
+            self.embedding_model = None
         self.chunk_embedding_store = EmbeddingStore(self.embedding_model,
                                                     os.path.join(self.working_dir, "chunk_embeddings"),
                                                     self.global_config.embedding_batch_size, 'chunk')
@@ -181,6 +186,7 @@ class HippoRAG:
         self.rerank_filter = DSPyFilter(self)
 
         self.ready_to_retrieve = False
+        self.ready_to_retrieve_v2 = False
 
         self.ppr_time = 0
         self.rerank_time = 0
@@ -197,6 +203,17 @@ class HippoRAG:
         self.doc_idx_to_structure_entities = defaultdict(set)
         self.doc_idx_to_structure_edges = defaultdict(list)
         self.retrieval_planner = HippoRAGMyopicPlanner(self)
+        self.causal_v2_engine = None
+        self.v2_base_retrieval_available = False
+        self.v2_base_retrieval_status = "dense_only"
+        self.v2_base_retrieval_asset_dir = None
+        self.v2_base_fact_embedding_store = None
+        self.v2_base_entity_embedding_store = None
+        self.v2_base_embedding_name = None
+        self.v2_base_embedding_model = None
+        self.v2_base_query_to_embedding = {"triple": {}, "passage": {}}
+        if getattr(self.global_config, "causal_engine_version", "legacy") == "v2":
+            self.causal_v2_engine = CausalV2Engine(self)
 
 
     def initialize_graph(self):
@@ -267,6 +284,24 @@ class HippoRAG:
         """
 
         logger.info(f"Indexing Documents")
+
+        if getattr(self.global_config, "causal_engine_version", "legacy") == "v2":
+            logger.info("Using causal engine V2 indexing path.")
+            self.chunk_embedding_store.insert_strings(docs)
+            if self.causal_v2_engine is None:
+                self.causal_v2_engine = CausalV2Engine(self)
+
+            # Allow V2 base retrieval experiments to reuse legacy assets without paying
+            # the cost of building the V2 causal graph when graph features are disabled.
+            if self.global_config.causal_enabled:
+                chunk_to_rows = self.chunk_embedding_store.get_all_id_to_rows()
+                self.causal_v2_engine.index(chunk_to_rows)
+            else:
+                logger.info("Skipping causal V2 graph indexing because causal features are disabled.")
+
+            self.ready_to_retrieve = False
+            self.ready_to_retrieve_v2 = False
+            return
 
         logger.info(f"Performing OpenIE")
 
@@ -438,6 +473,13 @@ class HippoRAG:
         -----
         - Long queries with no relevant facts after reranking will default to results from dense passage retrieval.
         """
+        if getattr(self.global_config, "causal_engine_version", "legacy") == "v2":
+            return self.retrieve_v2(
+                queries=queries,
+                num_to_retrieve=num_to_retrieve,
+                gold_docs=gold_docs,
+            )
+
         retrieve_start_time = time.time()  # Record start time
 
         if num_to_retrieve is None:
@@ -489,6 +531,32 @@ class HippoRAG:
                 "causal_doc_top1_score": 0.0,
                 "causal_doc_top2_score": 0.0,
                 "causal_doc_non_empty": False,
+                "baseline_top5_doc_ids": [],
+                "blended_top5_doc_ids": [],
+                "baseline_route_name": None,
+                "baseline_scores_source": "legacy_path",
+                "baseline_margin_top1_top2": 0.0,
+                "margin_gate_enabled": bool(getattr(self.global_config, "causal_margin_gate_enabled", False)),
+                "margin_gate_applied": False,
+                "use_causal_for_blend": False,
+                "causal_override_applied": False,
+                "causal_blend_top_k": int(getattr(self.global_config, "causal_blend_top_k", 0)),
+                "causal_docs_used_for_blend": [],
+                "causal_docs_used_for_blend_count": 0,
+                "causal_docs_used_for_blend_mean_score": 0.0,
+                "causal_docs_used_for_blend_max_score": 0.0,
+                "causal_doc_count_nonzero": 0,
+                "causal_search_status": None,
+                "causal_search_mode": None,
+                "causal_seed_preferred_fact_indices": [],
+                "causal_seed_candidate_fact_indices": [],
+                "causal_seed_fact_ids": [],
+                "causal_seed_debug": [],
+                "causal_seed_with_any_edge_count": 0,
+                "causal_seed_with_route_edge_count": 0,
+                "causal_adjacency_candidate_sizes": [],
+                "causal_blend_top5_set_changed": False,
+                "causal_blend_top5_order_changed": False,
                 "causal_weight_before_attenuation": 0.0,
                 "causal_weight_after_attenuation": 0.0,
                 "causal_blend_mode": "soft_gate" if causal_gate_mode == "soft" else "hard_gate",
@@ -549,39 +617,50 @@ class HippoRAG:
                 structure_trace["noop_reason"] = "rerank_fallback"
 
             if use_causal_path:
-                dense_doc_ids, dense_doc_scores, dense_score_by_doc_id = self._sorted_doc_scores_from_dense(query)
-                if len(top_k_facts) == 0:
-                    fact_doc_ids = np.array([], dtype=int)
-                    fact_doc_scores = np.array([], dtype=float)
-                else:
-                    fact_doc_ids, fact_doc_scores = self.graph_search_with_fact_entities(
-                        query=query,
-                        link_top_k=self.global_config.linking_top_k,
-                        query_fact_scores=query_fact_scores,
-                        top_k_facts=top_k_facts,
-                        top_k_fact_indices=top_k_fact_indices,
-                        passage_node_weight=self.global_config.passage_node_weight,
-                    )
-                causal_doc_ids, causal_doc_scores = self.graph_search_with_causal_facts(
+                baseline_doc_ids, baseline_doc_scores, baseline_route_name = self._baseline_retrieval_without_causal(
+                    query=query,
+                    query_fact_scores=query_fact_scores,
+                    top_k_facts=top_k_facts,
+                    top_k_fact_indices=top_k_fact_indices,
+                )
+                baseline_score_by_doc_id = self._build_score_by_doc_id(baseline_doc_ids, baseline_doc_scores)
+                structure_trace["baseline_route_name"] = baseline_route_name
+                structure_trace["baseline_scores_source"] = "baseline_without_causal"
+                causal_doc_ids, causal_doc_scores, causal_search_trace = self.graph_search_with_causal_facts(
                     query_fact_scores=query_fact_scores,
                     query_type=query_type,
                     preferred_fact_indices=top_k_fact_indices,
+                    return_trace=True,
                 )
+                structure_trace["causal_search_status"] = causal_search_trace.get("status")
+                structure_trace["causal_search_mode"] = causal_search_trace.get("mode")
+                structure_trace["causal_seed_preferred_fact_indices"] = causal_search_trace.get("preferred_fact_indices", [])
+                structure_trace["causal_seed_candidate_fact_indices"] = causal_search_trace.get("candidate_fact_indices", [])
+                structure_trace["causal_seed_fact_ids"] = causal_search_trace.get("seed_fact_ids", [])
+                structure_trace["causal_seed_debug"] = causal_search_trace.get("seed_debug", [])
+                structure_trace["causal_seed_with_any_edge_count"] = int(causal_search_trace.get("seeds_with_any_edge_count", 0))
+                structure_trace["causal_seed_with_route_edge_count"] = int(causal_search_trace.get("seeds_with_route_edge_count", 0))
+                structure_trace["causal_adjacency_candidate_sizes"] = causal_search_trace.get("adjacency_candidate_sizes", [])
+                causal_score_by_doc_id = {
+                    int(doc_id): float(score)
+                    for doc_id, score in zip(causal_doc_ids.tolist(), causal_doc_scores.tolist())
+                    if float(score) > 0.0
+                }
                 structure_trace["causal_doc_count"] = int(len(causal_doc_ids))
-                structure_trace["causal_doc_non_empty"] = bool(len(causal_doc_ids) > 0)
+                structure_trace["causal_doc_count_nonzero"] = int(len(causal_score_by_doc_id))
+                structure_trace["causal_doc_non_empty"] = bool(len(causal_score_by_doc_id) > 0)
                 if len(causal_doc_scores) > 0:
                     structure_trace["causal_doc_top1_score"] = float(causal_doc_scores[0])
                 if len(causal_doc_scores) > 1:
                     structure_trace["causal_doc_top2_score"] = float(causal_doc_scores[1])
                 sorted_doc_ids, sorted_doc_scores, causal_blend_trace = self.blend_causal_retrieval_scores(
-                    dense_doc_scores=dense_score_by_doc_id,
-                    fact_doc_scores=self._build_score_by_doc_id(fact_doc_ids, fact_doc_scores),
-                    causal_doc_scores=self._build_score_by_doc_id(causal_doc_ids, causal_doc_scores),
+                    baseline_doc_scores=baseline_score_by_doc_id,
+                    causal_doc_scores=causal_score_by_doc_id,
                     route_causal_intent_score=route_causal_intent_score,
                 )
                 structure_trace.update(causal_blend_trace)
                 if len(sorted_doc_ids) == 0:
-                    sorted_doc_ids, sorted_doc_scores = dense_doc_ids, dense_doc_scores
+                    sorted_doc_ids, sorted_doc_scores = baseline_doc_ids, baseline_doc_scores
                 elif structure_rerank_eligible:
                     sorted_doc_ids, sorted_doc_scores, structure_apply_trace = self._apply_structure_rerank(
                         sorted_doc_ids=sorted_doc_ids,
@@ -600,17 +679,17 @@ class HippoRAG:
                     top_k_facts=top_k_facts,
                 )
                 sorted_doc_ids, sorted_doc_scores = planner_result.sorted_doc_ids, planner_result.sorted_doc_scores
+                structure_trace["baseline_route_name"] = "planner_myopic"
+                structure_trace["baseline_scores_source"] = "planner_myopic"
             else:
-                if len(top_k_facts) == 0:
-                    logger.info('No facts found after reranking, return DPR results')
-                    sorted_doc_ids, sorted_doc_scores = self.dense_passage_retrieval(query)
-                else:
-                    sorted_doc_ids, sorted_doc_scores = self.graph_search_with_fact_entities(query=query,
-                                                                                             link_top_k=self.global_config.linking_top_k,
-                                                                                             query_fact_scores=query_fact_scores,
-                                                                                             top_k_facts=top_k_facts,
-                                                                                             top_k_fact_indices=top_k_fact_indices,
-                                                                                             passage_node_weight=self.global_config.passage_node_weight)
+                sorted_doc_ids, sorted_doc_scores, baseline_route_name = self._baseline_retrieval_without_causal(
+                    query=query,
+                    query_fact_scores=query_fact_scores,
+                    top_k_facts=top_k_facts,
+                    top_k_fact_indices=top_k_fact_indices,
+                )
+                structure_trace["baseline_route_name"] = baseline_route_name
+                structure_trace["baseline_scores_source"] = "baseline_without_causal"
                 if structure_rerank_eligible:
                     sorted_doc_ids, sorted_doc_scores, structure_apply_trace = self._apply_structure_rerank(
                         sorted_doc_ids=sorted_doc_ids,
@@ -650,6 +729,222 @@ class HippoRAG:
             return retrieval_results, overall_retrieval_result
         else:
             return retrieval_results
+
+    def retrieve_v2(self,
+                    queries: List[str],
+                    num_to_retrieve: int = None,
+                    gold_docs: List[List[str]] = None) -> List[QuerySolution] | Tuple[List[QuerySolution], Dict]:
+        retrieve_start_time = time.time()
+
+        if num_to_retrieve is None:
+            num_to_retrieve = self.global_config.retrieval_top_k
+
+        if gold_docs is not None:
+            retrieval_recall_evaluator = RetrievalRecall(global_config=self.global_config)
+
+        if not self.ready_to_retrieve_v2:
+            self._prepare_retrieval_objects_v2()
+
+        self._get_passage_query_embeddings(queries)
+
+        retrieval_results = []
+
+        for query in tqdm(queries, desc="Retrieving"):
+            dense_sorted_doc_ids, dense_sorted_doc_scores = self.dense_passage_retrieval(query)
+            base_sorted_doc_ids, base_sorted_doc_scores, base_retrieval_trace = self._get_v2_base_retrieval(
+                query=query,
+                dense_sorted_doc_ids=dense_sorted_doc_ids,
+                dense_sorted_doc_scores=dense_sorted_doc_scores,
+            )
+
+            route_info = {
+                "label": "standard",
+                "is_causal": False,
+                "score": 0.0,
+                "margin": 0.0,
+                "scores_by_label": {},
+            }
+            subgraph_result = {
+                "seed_event_ids": [],
+                "seed_event_texts": [],
+                "query_entities": [],
+                "chains": [],
+                "selected_chains": [],
+                "serialized_contexts": [],
+                "causal_context_doc_ids": [],
+                "chain_selection_trace": {},
+            }
+            if self.global_config.causal_enabled and self.causal_v2_engine is not None:
+                query_embedding = np.asarray(self.query_to_embedding["passage"][query], dtype=float).reshape(-1)
+                route_info = self.causal_v2_engine.route_query(query=query, query_embedding=query_embedding)
+                subgraph_result = self.causal_v2_engine.retrieve_subgraph(
+                    query=query,
+                    query_embedding=query_embedding,
+                    route_info=route_info,
+                )
+
+            sorted_doc_ids, sorted_doc_scores, candidate_injection_trace = self._apply_v2_candidate_injection(
+                sorted_doc_ids=base_sorted_doc_ids,
+                sorted_doc_scores=base_sorted_doc_scores,
+                subgraph_result=subgraph_result,
+            )
+            sorted_doc_ids, sorted_doc_scores, doc_rerank_trace = self._apply_v2_causal_doc_rerank(
+                sorted_doc_ids=sorted_doc_ids,
+                sorted_doc_scores=sorted_doc_scores,
+                subgraph_result=subgraph_result,
+            )
+            top_doc_ids = sorted_doc_ids[:num_to_retrieve]
+            top_k_docs = [
+                self.chunk_embedding_store.get_row(self.passage_node_keys[idx])["content"]
+                for idx in top_doc_ids.tolist()
+            ]
+            serialized_causal_context = subgraph_result.get("serialized_contexts", [])[
+                :max(0, int(getattr(self.global_config, "causal_context_max_items", 6)))
+            ]
+            dense_context_doc_ids = [self.passage_node_keys[idx] for idx in dense_sorted_doc_ids[:num_to_retrieve].tolist()]
+            base_context_doc_ids = [self.passage_node_keys[idx] for idx in base_sorted_doc_ids[:num_to_retrieve].tolist()]
+            final_context_doc_ids = [self.passage_node_keys[idx] for idx in top_doc_ids.tolist()]
+            causal_context_doc_ids = [
+                str(chunk_id) for chunk_id in subgraph_result.get("causal_context_doc_ids", [])
+            ]
+            retrieval_trace = {
+                "causal_engine_version": "v2",
+                "baseline_route_name": base_retrieval_trace.get("route_name", "dense_passage_v2"),
+                "baseline_scores_source": base_retrieval_trace.get("scores_source", "dense_passage_only"),
+                "baseline_top5_doc_ids": [int(doc_id) for doc_id in base_sorted_doc_ids[:5].tolist()],
+                "blended_top5_doc_ids": [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()],
+                "dense_top5_doc_ids": [int(doc_id) for doc_id in dense_sorted_doc_ids[:5].tolist()],
+                "router_label": route_info.get("label", "standard"),
+                "router_score": float(route_info.get("score", 0.0)),
+                "router_margin": float(route_info.get("margin", 0.0)),
+                "router_best_causal_label": route_info.get("best_causal_label"),
+                "router_best_causal_score": float(route_info.get("best_causal_score", 0.0)),
+                "router_standard_score": float(route_info.get("standard_score", 0.0)),
+                "router_scores_by_label": route_info.get("scores_by_label", {}),
+                "use_causal_path": bool(route_info.get("is_causal", False)),
+                "causal_probe_attempted": bool(subgraph_result.get("probe_attempted", False)),
+                "causal_probe_forced": bool(subgraph_result.get("probe_forced", False)),
+                "probe_route_label": subgraph_result.get("probe_route_label"),
+                "subgraph_nonempty": bool(serialized_causal_context),
+                "causal_v2_used": bool(serialized_causal_context),
+                "event_seed_ids": subgraph_result.get("seed_event_ids", []),
+                "event_seed_texts": subgraph_result.get("seed_event_texts", []),
+                "query_entities": subgraph_result.get("query_entities", []),
+                "subgraph_chain_count": len(subgraph_result.get("chains", [])),
+                "selected_subgraph_chain_count": len(subgraph_result.get("selected_chains", [])),
+                "selected_chain_scores": (
+                    subgraph_result.get("chain_selection_trace", {}).get("selected_chain_scores", [])
+                ),
+                "chain_selection_mode": (
+                    subgraph_result.get("chain_selection_trace", {}).get("mode")
+                    or getattr(self.global_config, "causal_context_injection_mode", "all")
+                ),
+                "chain_selection_candidate_count": (
+                    subgraph_result.get("chain_selection_trace", {}).get("candidate_chain_count", 0)
+                ),
+                "chain_selection_overlap_count": (
+                    subgraph_result.get("chain_selection_trace", {}).get("entity_overlap_chain_count", 0)
+                ),
+                "serialized_causal_context": serialized_causal_context,
+                "serialized_causal_context_preview": [
+                    str(item)[:240] for item in serialized_causal_context[:2]
+                ],
+                "dense_context_doc_ids": dense_context_doc_ids,
+                "base_context_doc_ids": base_context_doc_ids,
+                "final_context_doc_ids": final_context_doc_ids,
+                "causal_context_doc_ids": causal_context_doc_ids,
+                "generator_used_causal_context": False,
+                "causal_doc_count": len(causal_context_doc_ids),
+                "v2_base_retrieval_mode": base_retrieval_trace.get("mode", "dense"),
+                "v2_base_retrieval_available": bool(base_retrieval_trace.get("available", False)),
+                "v2_base_retrieval_status": base_retrieval_trace.get("status"),
+                "v2_base_retrieval_used_dense_fallback": bool(base_retrieval_trace.get("used_dense_fallback", False)),
+                "v2_base_retrieval_fact_count": int(base_retrieval_trace.get("fact_count", 0)),
+                "v2_base_retrieval_rerank_used_fallback": bool(base_retrieval_trace.get("rerank_used_fallback", False)),
+                "v2_base_retrieval_rerank_final_failure_reason": base_retrieval_trace.get("rerank_final_failure_reason"),
+                "causal_override_applied": bool(
+                    candidate_injection_trace.get("applied", False) or doc_rerank_trace.get("applied", False)
+                ),
+                "v2_candidate_injection_requested": bool(candidate_injection_trace.get("requested", False)),
+                "v2_candidate_injection_applied": bool(candidate_injection_trace.get("applied", False)),
+                "v2_candidate_injection_noop_reason": candidate_injection_trace.get("noop_reason"),
+                "v2_candidate_injection_graph_mode": candidate_injection_trace.get("graph_mode"),
+                "v2_candidate_injection_seed_top_n": int(candidate_injection_trace.get("seed_top_n", 0)),
+                "v2_candidate_injection_preserve_top_k": int(candidate_injection_trace.get("preserve_top_k", 0)),
+                "v2_candidate_injection_max_docs": int(candidate_injection_trace.get("max_docs", 0)),
+                "v2_candidate_injection_hops": int(candidate_injection_trace.get("hops", 0)),
+                "v2_candidate_injection_blend_weight": float(
+                    candidate_injection_trace.get("blend_weight_used", 0.0)
+                ),
+                "v2_candidate_injection_candidate_seed_chunk_count": int(
+                    candidate_injection_trace.get("candidate_seed_chunk_count", 0)
+                ),
+                "v2_candidate_injection_query_entity_seed_chunk_count": int(
+                    candidate_injection_trace.get("query_entity_seed_chunk_count", 0)
+                ),
+                "v2_candidate_injection_seed_node_count": int(candidate_injection_trace.get("seed_node_count", 0)),
+                "v2_candidate_injection_proposed_doc_count": int(
+                    candidate_injection_trace.get("proposed_doc_count", 0)
+                ),
+                "v2_candidate_injection_rerank_candidate_count": int(
+                    candidate_injection_trace.get("rerank_candidate_count", 0)
+                ),
+                "v2_candidate_injection_injected_doc_count": int(
+                    candidate_injection_trace.get("injected_doc_count", 0)
+                ),
+                "v2_candidate_injection_injected_doc_ids": candidate_injection_trace.get("injected_doc_ids", []),
+                "v2_candidate_injection_injected_chunk_ids": candidate_injection_trace.get("injected_chunk_ids", []),
+                "v2_candidate_injection_injected_doc_scores": candidate_injection_trace.get("injected_doc_scores", {}),
+                "v2_candidate_injection_top5_order_changed": bool(
+                    candidate_injection_trace.get("top5_order_changed", False)
+                ),
+                "v2_candidate_injection_top5_jaccard": float(
+                    candidate_injection_trace.get("top5_jaccard", 1.0)
+                ),
+                "v2_candidate_injection_moved_out_of_top5": int(
+                    candidate_injection_trace.get("moved_out_of_top5", 0)
+                ),
+                "v2_doc_rerank_requested": bool(doc_rerank_trace.get("requested", False)),
+                "v2_doc_rerank_applied": bool(doc_rerank_trace.get("applied", False)),
+                "v2_doc_rerank_noop_reason": doc_rerank_trace.get("noop_reason"),
+                "v2_doc_rerank_top_n": int(doc_rerank_trace.get("top_n_used", 0)),
+                "v2_doc_rerank_rerank_window_count": int(doc_rerank_trace.get("rerank_window_count", 0)),
+                "v2_doc_rerank_boost_weight": float(doc_rerank_trace.get("boost_weight_used", 0.0)),
+                "v2_doc_rerank_protect_top1": bool(doc_rerank_trace.get("protect_top1", False)),
+                "v2_doc_rerank_max_top5_swaps": int(doc_rerank_trace.get("max_top5_swaps", 0)),
+                "v2_doc_rerank_boosted_doc_count": int(doc_rerank_trace.get("boosted_doc_count", 0)),
+                "v2_doc_rerank_boosted_doc_ids": doc_rerank_trace.get("boosted_doc_ids", []),
+                "v2_doc_rerank_boosted_doc_scores": doc_rerank_trace.get("boosted_doc_scores", {}),
+                "v2_doc_rerank_top5_order_changed": bool(doc_rerank_trace.get("top5_order_changed", False)),
+                "v2_doc_rerank_num_swaps_top5": int(doc_rerank_trace.get("num_swaps_top5", 0)),
+                "v2_doc_rerank_top5_jaccard": float(doc_rerank_trace.get("top5_jaccard", 1.0)),
+                "v2_doc_rerank_moved_out_of_top5": int(doc_rerank_trace.get("moved_out_of_top5", 0)),
+            }
+
+            retrieval_results.append(
+                QuerySolution(
+                    question=query,
+                    docs=top_k_docs,
+                    doc_scores=sorted_doc_scores[:num_to_retrieve],
+                    retrieval_trace=retrieval_trace,
+                )
+            )
+
+        retrieve_end_time = time.time()
+        self.all_retrieval_time += retrieve_end_time - retrieve_start_time
+        logger.info(f"Total Retrieval Time {self.all_retrieval_time:.2f}s")
+
+        if gold_docs is not None:
+            k_list = [1, 2, 5, 10, 20, 30, 50, 100, 150, 200]
+            overall_retrieval_result, _ = retrieval_recall_evaluator.calculate_metric_scores(
+                gold_docs=gold_docs,
+                retrieved_docs=[retrieval_result.docs for retrieval_result in retrieval_results],
+                k_list=k_list,
+            )
+            logger.info(f"Evaluation results for retrieval: {overall_retrieval_result}")
+            return retrieval_results, overall_retrieval_result
+
+        return retrieval_results
 
     def rag_qa(self,
                queries: List[str|QuerySolution],
@@ -892,10 +1187,30 @@ class HippoRAG:
 
             # obtain the retrieved docs
             retrieved_passages = query_solution.docs[:self.global_config.qa_top_k]
+            retrieval_trace = query_solution.retrieval_trace
+            if retrieval_trace is None:
+                retrieval_trace = {}
+                query_solution.retrieval_trace = retrieval_trace
 
             prompt_user = ''
             for passage in retrieved_passages:
                 prompt_user += f'Wikipedia Title: {passage}\n\n'
+
+            causal_context_items = []
+            if getattr(self.global_config, "causal_engine_version", "legacy") == "v2":
+                causal_context_items = list(retrieval_trace.get("serialized_causal_context", []))[
+                    :max(0, int(getattr(self.global_config, "causal_context_max_items", 6)))
+                ]
+                if causal_context_items:
+                    prompt_user += 'Causal Graph Context:\n'
+                    for idx, item in enumerate(causal_context_items, start=1):
+                        prompt_user += f'[{idx}] {item}\n'
+                    prompt_user += (
+                        '\nIf the causal graph context conflicts with the retrieved Wikipedia passages, '
+                        'trust the retrieved Wikipedia passages.\n\n'
+                    )
+            retrieval_trace["generator_used_causal_context"] = bool(causal_context_items)
+
             prompt_user += 'Question: ' + query_solution.question + '\nThought: '
 
             if self.prompt_template_manager.is_template_name_valid(name=f'rag_qa_{self.global_config.dataset}'):
@@ -958,6 +1273,12 @@ class HippoRAG:
             metadata["answer_parser_used_fallback"] = bool(parse_info["used_fallback"])
             metadata["answer_parser_error_type"] = parse_info["error_type"]
             metadata["answer_parser_response_type"] = parse_info["response_type"]
+            metadata["reader_used_causal_context"] = bool(
+                (query_solution.retrieval_trace or {}).get("generator_used_causal_context", False)
+            )
+            metadata["reader_causal_context_count"] = len(
+                (query_solution.retrieval_trace or {}).get("serialized_causal_context", [])
+            )
             metadata["reader_prompt_hash"] = prompt_hash
             metadata["reader_response_hash"] = response_hash
             metadata["reader_cache_hit"] = bool(all_cache_hit[query_solution_idx])
@@ -972,6 +1293,8 @@ class HippoRAG:
                 "reader_response_hash": response_hash,
                 "reader_cache_hit": bool(all_cache_hit[query_solution_idx]),
                 "reader_call_made": not bool(all_cache_hit[query_solution_idx]),
+                "reader_used_causal_context": bool(metadata.get("reader_used_causal_context", False)),
+                "reader_causal_context_count": int(metadata.get("reader_causal_context_count", 0)),
                 "answer_parser_used_fallback": bool(parse_info["used_fallback"]),
                 "answer_parser_error_type": parse_info["error_type"],
                 "answer_parser_response_type": parse_info["response_type"],
@@ -1413,6 +1736,10 @@ class HippoRAG:
         and alignment with the underlying graph structure.
         """
 
+        if getattr(self.global_config, "causal_engine_version", "legacy") == "v2":
+            self._prepare_retrieval_objects_v2()
+            return
+
         logger.info("Preparing for fast retrieval.")
 
         logger.info("Loading keys.")
@@ -1530,6 +1857,436 @@ class HippoRAG:
         self._prepare_causal_retrieval_objects(all_openie_info)
 
         self.ready_to_retrieve = True
+
+    def _prepare_retrieval_objects_v2(self):
+        logger.info("Preparing for fast retrieval with causal engine V2.")
+
+        self.query_to_embedding = {'triple': {}, 'passage': {}}
+        self.entity_node_keys = []
+        self.fact_node_keys = []
+        self.passage_node_keys = list(self.chunk_embedding_store.get_all_ids())
+        self.passage_node_key_to_doc_idx = {
+            passage_node_key: idx for idx, passage_node_key in enumerate(self.passage_node_keys)
+        }
+
+        if self.passage_node_keys:
+            self.passage_embeddings = np.array(self.chunk_embedding_store.get_embeddings(self.passage_node_keys))
+        else:
+            self.passage_embeddings = np.zeros((0, 0), dtype=float)
+        self.fact_embeddings = np.zeros((0, 0), dtype=float)
+        self.fact_id_to_fact_idx = {}
+        self.fact_id_to_doc_idxs = defaultdict(set)
+        self.causal_graph_out = defaultdict(list)
+        self.causal_graph_in = defaultdict(list)
+        self.structure_graph_out = defaultdict(list)
+        self.fact_id_to_entities = {}
+        self.fact_id_to_triple = {}
+        self.doc_idx_to_structure_entities = defaultdict(set)
+        self.doc_idx_to_structure_edges = defaultdict(list)
+
+        if self.causal_v2_engine is None:
+            self.causal_v2_engine = CausalV2Engine(self)
+        self.causal_v2_engine.load()
+        self._prepare_v2_base_retrieval_objects()
+
+        self.ready_to_retrieve = True
+        self.ready_to_retrieve_v2 = True
+
+    def _v2_base_retrieval_mode(self) -> str:
+        return str(getattr(self.global_config, "causal_v2_base_retrieval_mode", "dense")).lower()
+
+    def _legacy_base_preferred_working_dir(self) -> str:
+        llm_label = self.global_config.llm_name.replace("/", "_")
+        preferred_embedding_name = str(
+            getattr(
+                self.global_config,
+                "causal_v2_legacy_preferred_embedding_name",
+                "nvidia/NV-Embed-v2",
+            )
+        )
+        preferred_embedding_label = preferred_embedding_name.replace("/", "_")
+        return os.path.join(self.global_config.save_dir, f"{llm_label}_{preferred_embedding_label}")
+
+    def _legacy_base_embedding_name_for_asset_dir(self, asset_dir: str) -> str | None:
+        abs_asset_dir = os.path.abspath(asset_dir)
+        if abs_asset_dir == os.path.abspath(self._legacy_base_preferred_working_dir()):
+            return str(
+                getattr(
+                    self.global_config,
+                    "causal_v2_legacy_preferred_embedding_name",
+                    "nvidia/NV-Embed-v2",
+                )
+            )
+        if abs_asset_dir == os.path.abspath(self.working_dir):
+            return str(self.global_config.embedding_model_name)
+
+        llm_prefix = f"{self.global_config.llm_name.replace('/', '_')}_"
+        entry_name = os.path.basename(abs_asset_dir)
+        if not entry_name.startswith(llm_prefix):
+            return None
+
+        embedding_label = entry_name[len(llm_prefix):]
+        if not embedding_label:
+            return None
+        if embedding_label.startswith("VLLM__"):
+            return "VLLM//" + embedding_label[len("VLLM__"):].replace("_", "/")
+        if embedding_label.startswith("VLLM_"):
+            return "VLLM/" + embedding_label[len("VLLM_"):].replace("_", "/")
+        if embedding_label.startswith("Transformers__"):
+            return "Transformers//" + embedding_label[len("Transformers__"):].replace("_", "/")
+        if embedding_label.startswith("Transformers_"):
+            return "Transformers/" + embedding_label[len("Transformers_"):].replace("_", "/")
+        if "NV-Embed-v2" in embedding_label and "_" in embedding_label:
+            vendor, remainder = embedding_label.split("_", 1)
+            return f"{vendor}/{remainder}"
+        return embedding_label
+
+    def _active_query_embedding_cache_for_fact_retrieval(self) -> Dict[str, Dict[str, np.ndarray]]:
+        if (
+            self._v2_base_retrieval_mode() == "legacy_fact_graph"
+            and self.v2_base_retrieval_available
+            and self.v2_base_fact_embedding_store is not None
+        ):
+            return self.v2_base_query_to_embedding
+        return self.query_to_embedding
+
+    def _active_embedding_model_for_fact_retrieval(self) -> BaseEmbeddingModel:
+        if (
+            self._v2_base_retrieval_mode() == "legacy_fact_graph"
+            and self.v2_base_retrieval_available
+            and self.v2_base_embedding_model is not None
+        ):
+            return self.v2_base_embedding_model
+        return self.embedding_model
+
+    def _is_usable_legacy_base_asset_dir(self, candidate_dir: str) -> bool:
+        if not candidate_dir or not os.path.isdir(candidate_dir):
+            return False
+
+        graph_path = os.path.join(candidate_dir, "graph.pickle")
+        entity_store_path = os.path.join(candidate_dir, "entity_embeddings", "vdb_entity.parquet")
+        fact_store_path = os.path.join(candidate_dir, "fact_embeddings", "vdb_fact.parquet")
+        if not (
+            os.path.isfile(graph_path)
+            and os.path.isfile(entity_store_path)
+            and os.path.isfile(fact_store_path)
+        ):
+            return False
+
+        try:
+            reusable_graph = ig.Graph.Read_Pickle(graph_path)
+        except Exception as exc:
+            logger.warning(f"Failed to load reusable legacy graph from {graph_path}: {exc}")
+            return False
+
+        if "name" not in reusable_graph.vs.attribute_names():
+            return False
+        node_names = set(reusable_graph.vs["name"])
+        return set(self.passage_node_keys).issubset(node_names)
+
+    def _select_legacy_base_asset_dir(self) -> str | None:
+        save_dir = str(getattr(self.global_config, "save_dir", ""))
+        if not save_dir or not os.path.isdir(save_dir):
+            return None
+
+        llm_prefix = f"{self.global_config.llm_name.replace('/', '_')}_"
+        preferred_dir = os.path.abspath(self._legacy_base_preferred_working_dir())
+        current_working_dir = os.path.abspath(self.working_dir)
+
+        prioritized_dirs: list[str] = []
+        if preferred_dir == current_working_dir:
+            prioritized_dirs.append(current_working_dir)
+        else:
+            prioritized_dirs.extend([preferred_dir, current_working_dir])
+
+        for candidate_dir in prioritized_dirs:
+            if self._is_usable_legacy_base_asset_dir(candidate_dir):
+                return candidate_dir
+
+        candidate_dirs: list[tuple[int, str]] = []
+        for entry_name in os.listdir(save_dir):
+            entry_path = os.path.join(save_dir, entry_name)
+            if not os.path.isdir(entry_path):
+                continue
+            abs_entry_path = os.path.abspath(entry_path)
+            if abs_entry_path in {preferred_dir, current_working_dir}:
+                continue
+            if not self._is_usable_legacy_base_asset_dir(abs_entry_path):
+                continue
+            priority = 0 if entry_name.startswith(llm_prefix) else 1
+            candidate_dirs.append((priority, abs_entry_path))
+
+        for _, candidate_dir in sorted(candidate_dirs, key=lambda item: (item[0], item[1])):
+            return candidate_dir
+
+        return None
+
+    def _reuse_legacy_graph_from_asset_dir(self, asset_dir: str) -> bool:
+        graph_path = os.path.join(asset_dir, "graph.pickle")
+        try:
+            reusable_graph = ig.Graph.Read_Pickle(graph_path)
+        except Exception as exc:
+            logger.warning(f"Failed to load reusable legacy graph from {graph_path}: {exc}")
+            return False
+
+        if "name" not in reusable_graph.vs.attribute_names():
+            return False
+        node_names = set(reusable_graph.vs["name"])
+        if not set(self.passage_node_keys).issubset(node_names):
+            return False
+
+        self.graph = reusable_graph
+        self.save_igraph()
+        logger.info(f"Reused legacy graph substrate from {graph_path} for V2 base retrieval.")
+        return True
+
+    def _prepare_v2_base_retrieval_objects(self):
+        self.v2_base_retrieval_available = False
+        self.v2_base_retrieval_status = "dense_only"
+        self.v2_base_retrieval_asset_dir = None
+        self.v2_base_fact_embedding_store = None
+        self.v2_base_entity_embedding_store = None
+        self.v2_base_embedding_name = None
+        self.v2_base_embedding_model = None
+        self.v2_base_query_to_embedding = {"triple": {}, "passage": {}}
+
+        if self._v2_base_retrieval_mode() != "legacy_fact_graph":
+            return
+
+        logger.info("Preparing legacy fact-graph base retrieval objects for V2.")
+        all_openie_info, _ = self.load_existing_openie([])
+        if not all_openie_info:
+            self.v2_base_retrieval_status = "missing_openie_results"
+            logger.warning("V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.")
+            return
+
+        if not self.passage_node_keys:
+            self.v2_base_retrieval_status = "empty_passages"
+            logger.warning("V2 legacy fact-graph base retrieval requested, but no passages are indexed. Falling back to dense ranking.")
+            return
+
+        ner_results_dict, triple_results_dict, _ = reformat_openie_results(all_openie_info)
+        for chunk_id in self.passage_node_keys:
+            if chunk_id not in ner_results_dict:
+                ner_results_dict[chunk_id] = NerRawOutput(
+                    chunk_id=chunk_id,
+                    response=None,
+                    metadata={},
+                    unique_entities=[],
+                )
+            if chunk_id not in triple_results_dict:
+                triple_results_dict[chunk_id] = TripleRawOutput(
+                    chunk_id=chunk_id,
+                    response=None,
+                    metadata={},
+                    triples=[],
+                )
+
+        chunk_triples = [
+            [text_processing(t) for t in triple_results_dict[chunk_id].triples]
+            for chunk_id in self.passage_node_keys
+        ]
+        entity_nodes, chunk_triple_entities = extract_entity_nodes(chunk_triples)
+        facts = flatten_facts(chunk_triples)
+
+        legacy_asset_dir = self._select_legacy_base_asset_dir()
+        fact_store_for_v2 = self.fact_embedding_store
+        entity_store_for_v2 = self.entity_embedding_store
+        reused_graph = False
+        if legacy_asset_dir is not None:
+            reused_graph = self._reuse_legacy_graph_from_asset_dir(legacy_asset_dir)
+            if reused_graph:
+                self.v2_base_retrieval_asset_dir = legacy_asset_dir
+                self.v2_base_embedding_name = self._legacy_base_embedding_name_for_asset_dir(legacy_asset_dir)
+                if self.v2_base_embedding_name is None:
+                    self.v2_base_retrieval_status = "legacy_embedding_name_unresolved"
+                    logger.warning(
+                        f"Unable to infer legacy embedding model name for V2 base retrieval assets at {legacy_asset_dir}."
+                    )
+                    return
+                if self.v2_base_embedding_name == self.global_config.embedding_model_name:
+                    self.v2_base_embedding_model = self.embedding_model
+                else:
+                    legacy_config = BaseConfig(**asdict(self.global_config))
+                    legacy_config.embedding_model_name = self.v2_base_embedding_name
+                    self.v2_base_embedding_model = _get_embedding_model_class(
+                        embedding_model_name=self.v2_base_embedding_name
+                    )(
+                        global_config=legacy_config,
+                        embedding_model_name=self.v2_base_embedding_name,
+                    )
+                entity_store_for_v2 = EmbeddingStore(
+                    None,
+                    os.path.join(legacy_asset_dir, "entity_embeddings"),
+                    self.global_config.embedding_batch_size,
+                    "entity",
+                    create_if_missing=False,
+                )
+                fact_store_for_v2 = EmbeddingStore(
+                    None,
+                    os.path.join(legacy_asset_dir, "fact_embeddings"),
+                    self.global_config.embedding_batch_size,
+                    "fact",
+                    create_if_missing=False,
+                )
+                self.v2_base_entity_embedding_store = entity_store_for_v2
+                self.v2_base_fact_embedding_store = fact_store_for_v2
+            else:
+                legacy_asset_dir = None
+
+        if legacy_asset_dir is None and facts:
+            logger.info("Encoding legacy fact nodes for V2 base retrieval.")
+            self.fact_embedding_store.insert_strings([str(fact) for fact in facts])
+            fact_store_for_v2 = self.fact_embedding_store
+            self.v2_base_fact_embedding_store = self.fact_embedding_store
+
+        if reused_graph and "name" in self.graph.vs.attribute_names():
+            self.entity_node_keys = [
+                str(node_name)
+                for node_name in self.graph.vs["name"]
+                if str(node_name).startswith("entity-")
+            ]
+        else:
+            if entity_nodes:
+                logger.info("Encoding legacy entity nodes for V2 base retrieval.")
+                self.entity_embedding_store.insert_strings(entity_nodes)
+            self.entity_node_keys = list(self.entity_embedding_store.get_all_ids())
+            entity_store_for_v2 = self.entity_embedding_store
+            self.v2_base_entity_embedding_store = self.entity_embedding_store
+        self.fact_node_keys = list(fact_store_for_v2.get_all_ids())
+        if not self.entity_node_keys or not self.fact_node_keys:
+            self.entity_embeddings = np.zeros((0, 0), dtype=float)
+            self.fact_embeddings = np.zeros((0, 0), dtype=float)
+            self.fact_id_to_fact_idx = {}
+            self.v2_base_retrieval_status = "missing_entities_or_facts"
+            logger.warning("V2 legacy fact-graph base retrieval requested, but legacy entities/facts are empty after preparation. Falling back to dense ranking.")
+            return
+
+        self.node_to_node_stats = {}
+        self.ent_node_to_chunk_ids = {}
+        self.add_fact_edges(self.passage_node_keys, chunk_triples)
+
+        required_node_keys = set(self.entity_node_keys) | set(self.passage_node_keys)
+        graph_has_required_nodes = (
+            self.graph.vcount() > 0
+            and self.graph.ecount() > 0
+            and "name" in self.graph.vs.attribute_names()
+            and required_node_keys.issubset(set(self.graph.vs["name"]))
+        )
+
+        if not graph_has_required_nodes:
+            logger.info("Rebuilding legacy graph substrate for V2 base retrieval.")
+            self.graph = ig.Graph(directed=self.global_config.is_directed_graph)
+            self.node_to_node_stats = {}
+            self.ent_node_to_chunk_ids = {}
+            self.add_fact_edges(self.passage_node_keys, chunk_triples)
+            num_new_chunks = self.add_passage_edges(self.passage_node_keys, chunk_triple_entities)
+            if num_new_chunks > 0 and self.entity_node_keys:
+                self.add_synonymy_edges()
+            self.augment_graph()
+            self.save_igraph()
+
+        expected_node_count = len(self.entity_node_keys) + len(self.passage_node_keys)
+        actual_node_count = self.graph.vcount()
+        if expected_node_count != actual_node_count:
+            logger.warning(
+                f"V2 legacy base graph node count mismatch: expected {expected_node_count}, got {actual_node_count}. Attempting to repair graph nodes."
+            )
+            self.add_new_nodes()
+            self.save_igraph()
+
+        igraph_name_to_idx = {node["name"]: idx for idx, node in enumerate(self.graph.vs)}
+        missing_entity_nodes = [node_key for node_key in self.entity_node_keys if node_key not in igraph_name_to_idx]
+        missing_passage_nodes = [node_key for node_key in self.passage_node_keys if node_key not in igraph_name_to_idx]
+        if missing_entity_nodes or missing_passage_nodes:
+            logger.warning(
+                f"V2 legacy base graph is still missing nodes after repair: {len(missing_entity_nodes)} entity nodes, {len(missing_passage_nodes)} passage nodes."
+            )
+            self.v2_base_retrieval_status = "graph_missing_nodes"
+            return
+
+        self.node_name_to_vertex_idx = igraph_name_to_idx
+        self.entity_node_idxs = [igraph_name_to_idx[node_key] for node_key in self.entity_node_keys]
+        self.passage_node_idxs = [igraph_name_to_idx[node_key] for node_key in self.passage_node_keys]
+        if entity_store_for_v2.get_all_ids():
+            available_entity_key_set = set(entity_store_for_v2.get_all_ids())
+            entity_keys_with_embeddings = [node_key for node_key in self.entity_node_keys if node_key in available_entity_key_set]
+            if entity_keys_with_embeddings:
+                self.entity_embeddings = np.array(entity_store_for_v2.get_embeddings(entity_keys_with_embeddings))
+            else:
+                self.entity_embeddings = np.zeros((0, 0), dtype=float)
+        else:
+            self.entity_embeddings = np.zeros((0, 0), dtype=float)
+        self.fact_embeddings = np.array(fact_store_for_v2.get_embeddings(self.fact_node_keys))
+        self.fact_id_to_fact_idx = {
+            fact_id: idx for idx, fact_id in enumerate(self.fact_node_keys)
+        }
+
+        self.proc_triples_to_docs = {}
+        self.fact_id_to_doc_idxs = defaultdict(set)
+        for doc in all_openie_info:
+            triples = flatten_facts([doc["extracted_triples"]])
+            for triple in triples:
+                if len(triple) != 3:
+                    continue
+                proc_triple = tuple(text_processing(list(triple)))
+                self.proc_triples_to_docs[str(proc_triple)] = self.proc_triples_to_docs.get(
+                    str(proc_triple), set()
+                ).union(set([doc["idx"]]))
+                fact_id = compute_fact_id(proc_triple)
+                if doc["idx"] in self.passage_node_key_to_doc_idx:
+                    self.fact_id_to_doc_idxs[fact_id].add(self.passage_node_key_to_doc_idx[doc["idx"]])
+
+        self.v2_base_retrieval_available = True
+        self.v2_base_retrieval_status = "ready"
+        logger.info("V2 legacy fact-graph base retrieval objects are ready.")
+
+    def _get_v2_base_retrieval(self,
+                               query: str,
+                               dense_sorted_doc_ids: np.ndarray,
+                               dense_sorted_doc_scores: np.ndarray) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        base_mode = self._v2_base_retrieval_mode()
+        trace: Dict[str, Any] = {
+            "mode": base_mode,
+            "available": bool(self.v2_base_retrieval_available),
+            "status": self.v2_base_retrieval_status,
+            "route_name": "dense_passage_v2",
+            "scores_source": "dense_passage_only",
+            "used_dense_fallback": False,
+            "fact_count": 0,
+            "rerank_used_fallback": False,
+            "rerank_final_failure_reason": None,
+        }
+
+        if base_mode != "legacy_fact_graph":
+            return dense_sorted_doc_ids, dense_sorted_doc_scores, trace
+
+        if not self.v2_base_retrieval_available:
+            trace["used_dense_fallback"] = True
+            trace["route_name"] = "dense_passage_v2_fallback"
+            trace["scores_source"] = "dense_passage_fallback_from_legacy_fact_graph"
+            return dense_sorted_doc_ids, dense_sorted_doc_scores, trace
+
+        query_fact_scores = self.get_fact_scores(query)
+        top_k_fact_indices, top_k_facts, rerank_log = self.rerank_facts(query, query_fact_scores)
+        sorted_doc_ids, sorted_doc_scores, baseline_route_name = self._baseline_retrieval_without_causal(
+            query=query,
+            query_fact_scores=query_fact_scores,
+            top_k_facts=top_k_facts,
+            top_k_fact_indices=top_k_fact_indices,
+        )
+        trace["route_name"] = f"{baseline_route_name}_v2"
+        trace["scores_source"] = (
+            "legacy_fact_graph_v2"
+            if baseline_route_name == "fact_graph"
+            else "dense_fallback_from_legacy_fact_graph_v2"
+        )
+        trace["used_dense_fallback"] = (baseline_route_name != "fact_graph")
+        trace["fact_count"] = len(top_k_facts)
+        trace["rerank_used_fallback"] = bool(rerank_log.get("used_fallback", False))
+        trace["rerank_final_failure_reason"] = rerank_log.get("final_failure_reason")
+        trace["asset_dir"] = self.v2_base_retrieval_asset_dir
+        return sorted_doc_ids, sorted_doc_scores, trace
 
     def _prepare_structure_retrieval_objects(self, all_openie_info: List[dict]):
         self.structure_graph_out = defaultdict(list)
@@ -1652,6 +2409,340 @@ class HippoRAG:
         return {
             int(doc_id): float(score)
             for doc_id, score in zip(sorted_doc_ids.tolist(), sorted_doc_scores.tolist())
+        }
+
+    def _baseline_retrieval_without_causal(self,
+                                           query: str,
+                                           query_fact_scores: np.ndarray,
+                                           top_k_facts: List[Tuple],
+                                           top_k_fact_indices: List[str]) -> Tuple[np.ndarray, np.ndarray, str]:
+        if len(top_k_facts) == 0:
+            logger.info('No facts found after reranking, return DPR results')
+            sorted_doc_ids, sorted_doc_scores = self.dense_passage_retrieval(query)
+            return sorted_doc_ids, sorted_doc_scores, "dense_fallback"
+
+        sorted_doc_ids, sorted_doc_scores = self.graph_search_with_fact_entities(
+            query=query,
+            link_top_k=self.global_config.linking_top_k,
+            query_fact_scores=query_fact_scores,
+            top_k_facts=top_k_facts,
+            top_k_fact_indices=top_k_fact_indices,
+            passage_node_weight=self.global_config.passage_node_weight,
+        )
+        return sorted_doc_ids, sorted_doc_scores, "fact_graph"
+
+    def _rank_doc_score_map(self, doc_score_map: Dict[int, float]) -> Tuple[np.ndarray, np.ndarray]:
+        if not doc_score_map:
+            return np.array([], dtype=int), np.array([], dtype=float)
+
+        sorted_items = sorted(doc_score_map.items(), key=lambda item: item[1], reverse=True)
+        sorted_doc_ids = np.array([int(doc_id) for doc_id, _ in sorted_items], dtype=int)
+        sorted_doc_scores = np.array([float(score) for _, score in sorted_items], dtype=float)
+        if len(sorted_doc_scores) > 1:
+            sorted_doc_scores = min_max_normalize(sorted_doc_scores)
+        return sorted_doc_ids, sorted_doc_scores
+
+    def _apply_v2_candidate_injection(self,
+                                      sorted_doc_ids: np.ndarray,
+                                      sorted_doc_scores: np.ndarray,
+                                      subgraph_result: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        trace: Dict[str, Any] = {
+            "requested": bool(getattr(self.global_config, "causal_v2_candidate_injection_enabled", False)),
+            "applied": False,
+            "noop_reason": None,
+            "graph_mode": None,
+            "seed_top_n": 0,
+            "preserve_top_k": max(0, int(getattr(self.global_config, "causal_v2_candidate_injection_preserve_top_k", 2))),
+            "max_docs": max(0, int(getattr(self.global_config, "causal_v2_candidate_injection_max_docs", 5))),
+            "hops": max(1, int(getattr(self.global_config, "causal_v2_candidate_injection_hops", 1))),
+            "blend_weight_used": max(float(getattr(self.global_config, "causal_v2_candidate_injection_blend_weight", 0.15)), 0.0),
+            "candidate_seed_chunk_count": 0,
+            "query_entity_seed_chunk_count": 0,
+            "seed_node_count": 0,
+            "proposed_doc_count": 0,
+            "rerank_candidate_count": 0,
+            "injected_doc_count": 0,
+            "injected_doc_ids": [],
+            "injected_chunk_ids": [],
+            "injected_doc_scores": {},
+            "top5_order_changed": False,
+            "top5_jaccard": 1.0,
+            "moved_out_of_top5": 0,
+        }
+        if not trace["requested"] or len(sorted_doc_ids) == 0:
+            trace["noop_reason"] = "disabled_or_empty"
+            return sorted_doc_ids, sorted_doc_scores, trace
+        if self.causal_v2_engine is None:
+            trace["noop_reason"] = "missing_v2_engine"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        proposal_trace = self.causal_v2_engine.propose_candidate_doc_injections(
+            dense_sorted_doc_ids=sorted_doc_ids,
+            dense_sorted_doc_scores=sorted_doc_scores,
+            query_entities=subgraph_result.get("query_entities", []),
+        )
+        trace.update({
+            "graph_mode": proposal_trace.get("graph_mode"),
+            "seed_top_n": int(proposal_trace.get("seed_top_n", 0)),
+            "max_docs": int(proposal_trace.get("max_docs", trace["max_docs"])),
+            "hops": int(proposal_trace.get("hops", trace["hops"])),
+            "candidate_seed_chunk_count": int(proposal_trace.get("candidate_seed_chunk_count", 0)),
+            "query_entity_seed_chunk_count": int(proposal_trace.get("query_entity_seed_chunk_count", 0)),
+            "seed_node_count": int(proposal_trace.get("seed_node_count", 0)),
+            "proposed_doc_count": int(proposal_trace.get("proposed_doc_count", 0)),
+        })
+
+        proposed_doc_ids = [int(doc_id) for doc_id in proposal_trace.get("injected_doc_ids", [])]
+        proposed_doc_scores_raw = {
+            int(doc_id): float(score)
+            for doc_id, score in proposal_trace.get("injected_doc_scores", {}).items()
+        }
+        if not proposed_doc_ids or not proposed_doc_scores_raw:
+            trace["noop_reason"] = proposal_trace.get("noop_reason") or "no_injected_docs"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        blend_weight = float(trace["blend_weight_used"])
+        if blend_weight <= 0.0:
+            trace["noop_reason"] = "blend_weight_non_positive"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        preserve_top_k = max(0, min(int(trace["preserve_top_k"]), len(sorted_doc_ids)))
+        trace["preserve_top_k"] = preserve_top_k
+        prefix_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:preserve_top_k].tolist()]
+        prefix_doc_id_set = set(prefix_doc_ids)
+        dense_score_by_doc_id = self._build_score_by_doc_id(sorted_doc_ids, sorted_doc_scores)
+        rerank_top_n = max(preserve_top_k, min(int(trace["seed_top_n"]), len(sorted_doc_ids)))
+        dense_pool_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[preserve_top_k:rerank_top_n].tolist()]
+        pool_doc_ids: List[int] = []
+        pool_doc_id_set: set[int] = set()
+        for doc_id in dense_pool_doc_ids + proposed_doc_ids:
+            if doc_id in prefix_doc_id_set or doc_id in pool_doc_id_set:
+                continue
+            pool_doc_ids.append(int(doc_id))
+            pool_doc_id_set.add(int(doc_id))
+        trace["rerank_candidate_count"] = len(pool_doc_ids)
+        if not pool_doc_ids:
+            trace["noop_reason"] = "empty_rerank_pool"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        graph_scores = [float(score) for score in proposed_doc_scores_raw.values() if float(score) > 0.0]
+        if not graph_scores:
+            trace["noop_reason"] = "no_positive_graph_scores"
+            return sorted_doc_ids, sorted_doc_scores, trace
+        graph_min = min(graph_scores)
+        graph_max = max(graph_scores)
+
+        pool_rank_index = {doc_id: idx for idx, doc_id in enumerate(pool_doc_ids)}
+
+        def graph_score_norm(doc_id: int) -> float:
+            raw_score = float(proposed_doc_scores_raw.get(int(doc_id), 0.0))
+            if raw_score <= 0.0:
+                return 0.0
+            if graph_max <= graph_min:
+                return 1.0
+            return (raw_score - graph_min) / (graph_max - graph_min)
+
+        reranked_pool_doc_ids = sorted(
+            pool_doc_ids,
+            key=lambda doc_id: (
+                dense_score_by_doc_id.get(int(doc_id), 0.0) + blend_weight * graph_score_norm(int(doc_id)),
+                dense_score_by_doc_id.get(int(doc_id), 0.0),
+                graph_score_norm(int(doc_id)),
+                -pool_rank_index[int(doc_id)],
+            ),
+            reverse=True,
+        )
+
+        remainder_doc_ids = [
+            int(doc_id)
+            for doc_id in sorted_doc_ids.tolist()
+            if int(doc_id) not in prefix_doc_id_set and int(doc_id) not in pool_doc_id_set
+        ]
+        reordered_doc_ids = np.asarray(prefix_doc_ids + reranked_pool_doc_ids + remainder_doc_ids, dtype=int)
+        reordered_doc_scores = np.asarray(
+            [dense_score_by_doc_id.get(doc_id, 0.0) for doc_id in prefix_doc_ids]
+            + [
+                dense_score_by_doc_id.get(doc_id, 0.0) + blend_weight * graph_score_norm(doc_id)
+                for doc_id in reranked_pool_doc_ids
+            ]
+            + [dense_score_by_doc_id.get(doc_id, 0.0) for doc_id in remainder_doc_ids],
+            dtype=float,
+        )
+
+        baseline_top5_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()]
+        updated_top5_doc_ids = [int(doc_id) for doc_id in reordered_doc_ids[:5].tolist()]
+        baseline_top5_set = set(baseline_top5_doc_ids)
+        updated_top5_set = set(updated_top5_doc_ids)
+
+        if np.array_equal(reordered_doc_ids, sorted_doc_ids):
+            trace["noop_reason"] = "no_rank_change_after_rerank"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        original_top_n_doc_id_set = {int(doc_id) for doc_id in sorted_doc_ids[:rerank_top_n].tolist()}
+        injected_doc_ids = [
+            doc_id for doc_id in proposed_doc_ids
+            if doc_id not in original_top_n_doc_id_set and doc_id not in prefix_doc_id_set
+        ]
+
+        trace["applied"] = True
+        trace["injected_doc_count"] = len(injected_doc_ids)
+        trace["injected_doc_ids"] = injected_doc_ids
+        trace["injected_chunk_ids"] = [
+            str(self.passage_node_keys[int(doc_id)]) for doc_id in injected_doc_ids
+        ]
+        trace["injected_doc_scores"] = {
+            int(doc_id): float(proposed_doc_scores_raw.get(int(doc_id), 0.0))
+            for doc_id in injected_doc_ids
+        }
+        trace["top5_order_changed"] = baseline_top5_doc_ids != updated_top5_doc_ids
+        trace["top5_jaccard"] = (
+            len(baseline_top5_set & updated_top5_set) / len(baseline_top5_set | updated_top5_set)
+            if baseline_top5_set or updated_top5_set else 1.0
+        )
+        trace["moved_out_of_top5"] = len(baseline_top5_set - updated_top5_set)
+        return reordered_doc_ids, reordered_doc_scores, trace
+
+    def _apply_v2_causal_doc_rerank(self,
+                                    sorted_doc_ids: np.ndarray,
+                                    sorted_doc_scores: np.ndarray,
+                                    subgraph_result: Dict[str, Any]) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        trace: Dict[str, Any] = {
+            "requested": bool(getattr(self.global_config, "causal_v2_doc_rerank_enabled", False)),
+            "applied": False,
+            "noop_reason": None,
+            "top_n_used": 0,
+            "rerank_window_count": 0,
+            "boost_weight_used": 0.0,
+            "protect_top1": bool(getattr(self.global_config, "causal_v2_doc_rerank_protect_top1", True)),
+            "max_top5_swaps": int(getattr(self.global_config, "causal_v2_doc_rerank_max_top5_swaps", 2)),
+            "selected_chain_count": int(len(subgraph_result.get("selected_chains", []))),
+            "boosted_doc_count": 0,
+            "boosted_doc_ids": [],
+            "boosted_doc_scores": {},
+            "top5_order_changed": False,
+            "num_swaps_top5": 0,
+            "top5_jaccard": 1.0,
+            "moved_out_of_top5": 0,
+        }
+        if not trace["requested"] or len(sorted_doc_ids) == 0:
+            trace["noop_reason"] = "disabled_or_empty"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        selected_chains = list(subgraph_result.get("selected_chains", []))
+        if not selected_chains:
+            trace["noop_reason"] = "no_selected_chains"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        top_n = max(0, min(int(getattr(self.global_config, "causal_v2_doc_rerank_top_n", 20)), len(sorted_doc_ids)))
+        trace["top_n_used"] = top_n
+        if top_n == 0:
+            trace["noop_reason"] = "top_n_zero"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        boost_weight = max(float(getattr(self.global_config, "causal_v2_doc_rerank_boost_weight", 0.05)), 0.0)
+        trace["boost_weight_used"] = boost_weight
+        if boost_weight <= 0.0:
+            trace["noop_reason"] = "bonus_non_positive"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        causal_doc_scores: Dict[int, float] = {}
+        for chain in selected_chains:
+            chain_score = float(chain.get("score", 0.0))
+            if chain_score <= 0.0:
+                continue
+            for chunk_id in chain.get("chunk_ids", []):
+                doc_idx = self.passage_node_key_to_doc_idx.get(str(chunk_id))
+                if doc_idx is None:
+                    continue
+                causal_doc_scores[doc_idx] = max(causal_doc_scores.get(doc_idx, 0.0), chain_score)
+
+        if not causal_doc_scores:
+            trace["noop_reason"] = "no_mapped_causal_docs"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        candidate_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:top_n].tolist()]
+        candidate_boosts = {
+            doc_id: float(causal_doc_scores[doc_id])
+            for doc_id in candidate_doc_ids
+            if doc_id in causal_doc_scores
+        }
+        trace["boosted_doc_count"] = len(candidate_boosts)
+        trace["boosted_doc_ids"] = [int(doc_id) for doc_id in candidate_boosts.keys()]
+        trace["boosted_doc_scores"] = {int(doc_id): float(score) for doc_id, score in candidate_boosts.items()}
+        if not candidate_boosts:
+            trace["noop_reason"] = "no_overlap_in_top_n"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        prefix_start = 1 if trace["protect_top1"] and len(sorted_doc_ids) > 0 else 0
+        rerank_window_count = max(0, top_n - prefix_start)
+        trace["rerank_window_count"] = rerank_window_count
+        if rerank_window_count <= 1:
+            trace["noop_reason"] = "window_too_small"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        prefix_doc_ids = sorted_doc_ids[prefix_start:top_n]
+        prefix_base_scores = np.array(sorted_doc_scores[prefix_start:top_n], dtype=float, copy=True)
+        prefix_updated_scores = np.array(prefix_base_scores, copy=True)
+        baseline_top_docs = [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()]
+        for rank_idx, doc_id in enumerate(prefix_doc_ids.tolist()):
+            prefix_updated_scores[rank_idx] += boost_weight * candidate_boosts.get(int(doc_id), 0.0)
+
+        prefix_order = sorted(
+            range(rerank_window_count),
+            key=lambda idx: (prefix_updated_scores[idx], prefix_base_scores[idx]),
+            reverse=True,
+        )
+        if prefix_start > 0:
+            proposed_doc_ids = np.concatenate((
+                sorted_doc_ids[:prefix_start],
+                prefix_doc_ids[prefix_order],
+                sorted_doc_ids[top_n:],
+            ))
+            proposed_doc_scores = np.concatenate((
+                sorted_doc_scores[:prefix_start],
+                prefix_updated_scores[prefix_order],
+                sorted_doc_scores[top_n:],
+            ))
+        else:
+            proposed_doc_ids = np.concatenate((prefix_doc_ids[prefix_order], sorted_doc_ids[top_n:]))
+            proposed_doc_scores = np.concatenate((prefix_updated_scores[prefix_order], sorted_doc_scores[top_n:]))
+
+        proposed_top_docs = [int(doc_id) for doc_id in proposed_doc_ids[:5].tolist()]
+        predicted_num_swaps_top5 = sum(
+            1
+            for idx, doc_id in enumerate(baseline_top_docs)
+            if idx >= len(proposed_top_docs) or proposed_top_docs[idx] != doc_id
+        )
+        trace["num_swaps_top5"] = predicted_num_swaps_top5
+        trace["top5_order_changed"] = predicted_num_swaps_top5 > 0
+        if predicted_num_swaps_top5 > trace["max_top5_swaps"]:
+            trace["noop_reason"] = "swap_limit"
+            return sorted_doc_ids, sorted_doc_scores, trace
+
+        shared_top_docs = set(baseline_top_docs) & set(proposed_top_docs)
+        trace["top5_jaccard"] = (
+            float(len(shared_top_docs) / len(set(baseline_top_docs) | set(proposed_top_docs)))
+            if baseline_top_docs or proposed_top_docs else 1.0
+        )
+        trace["moved_out_of_top5"] = len(set(baseline_top_docs) - set(proposed_top_docs))
+        trace["applied"] = True
+        return proposed_doc_ids, proposed_doc_scores, trace
+
+    def _compute_causal_blend_weight(self,
+                                     causal_doc_scores: Dict[int, float],
+                                     route_causal_intent_score: float = 1.0) -> Dict[str, float]:
+        causal_weight = self.global_config.causal_blend_graph_weight if causal_doc_scores else 0.0
+        if getattr(self.global_config, "causal_gate_mode", "hard") == "soft" and causal_weight > 0:
+            causal_weight *= max(0.0, min(1.0, float(route_causal_intent_score)))
+        causal_weight_before_attenuation = float(causal_weight)
+
+        if causal_weight > 0:
+            causal_weight *= min(1.0, len(causal_doc_scores) / 5.0)
+        causal_weight_after_attenuation = float(causal_weight)
+
+        return {
+            "causal_weight_before_attenuation": causal_weight_before_attenuation,
+            "causal_weight_after_attenuation": causal_weight_after_attenuation,
         }
 
     def _sorted_doc_scores_from_dense(self, query: str) -> Tuple[np.ndarray, np.ndarray, Dict[int, float]]:
@@ -1824,18 +2915,56 @@ class HippoRAG:
     def graph_search_with_causal_facts(self,
                                        query_fact_scores: np.ndarray,
                                        query_type: str,
-                                       preferred_fact_indices: List[int] | None = None) -> Tuple[np.ndarray, np.ndarray]:
+                                       preferred_fact_indices: List[int] | None = None,
+                                       return_trace: bool = False) -> Tuple[np.ndarray, np.ndarray] | Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        query_fact_scores = np.asarray(query_fact_scores, dtype=float).reshape(-1)
+        trace: Dict[str, Any] = {
+            "status": None,
+            "mode": None,
+            "preferred_fact_indices": [],
+            "candidate_fact_indices": [],
+            "seed_fact_ids": [],
+            "seed_debug": [],
+            "seeds_with_any_edge_count": 0,
+            "seeds_with_route_edge_count": 0,
+            "adjacency_candidate_sizes": [],
+        }
+
+        def _empty_result(status: str) -> Tuple[np.ndarray, np.ndarray] | Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+            trace["status"] = status
+            empty = (np.array([], dtype=int), np.array([], dtype=float))
+            if return_trace:
+                return empty[0], empty[1], trace
+            return empty
+
+        def _iter_fact_indices(values):
+            if values is None:
+                return
+            for value in values:
+                if isinstance(value, (list, tuple, np.ndarray)):
+                    yield from _iter_fact_indices(value)
+                else:
+                    yield value
+
         if len(query_fact_scores) == 0 or len(self.fact_node_keys) == 0:
-            return np.array([], dtype=int), np.array([], dtype=float)
+            return _empty_result("empty_query_fact_scores")
 
         seed_top_k = min(self.global_config.causal_seed_top_k, len(query_fact_scores))
         if seed_top_k <= 0:
-            return np.array([], dtype=int), np.array([], dtype=float)
+            return _empty_result("seed_top_k_non_positive")
 
         candidate_fact_indices: List[int] = []
         seen_fact_indices = set()
         if preferred_fact_indices:
-            for fact_idx in preferred_fact_indices:
+            flattened_preferred_fact_indices: List[int] = []
+            for raw_fact_idx in _iter_fact_indices(preferred_fact_indices):
+                try:
+                    fact_idx = int(raw_fact_idx)
+                except (TypeError, ValueError):
+                    continue
+                flattened_preferred_fact_indices.append(fact_idx)
+            trace["preferred_fact_indices"] = flattened_preferred_fact_indices[:seed_top_k]
+            for fact_idx in flattened_preferred_fact_indices:
                 if 0 <= fact_idx < len(query_fact_scores) and fact_idx not in seen_fact_indices:
                     candidate_fact_indices.append(int(fact_idx))
                     seen_fact_indices.add(int(fact_idx))
@@ -1850,25 +2979,77 @@ class HippoRAG:
                     seen_fact_indices.add(int(fact_idx))
                 if len(candidate_fact_indices) >= seed_top_k:
                     break
+        trace["candidate_fact_indices"] = [int(fact_idx) for fact_idx in candidate_fact_indices]
+
+        if not candidate_fact_indices:
+            return _empty_result("no_candidate_fact_indices")
 
         reset_prob = np.zeros(len(self.fact_node_keys), dtype=float)
         reset_prob[candidate_fact_indices] = query_fact_scores[candidate_fact_indices]
 
+        route_out_relations: set[str] = set()
+        route_in_relations: set[str] = set()
         if query_type == "prevention":
+            trace["mode"] = "directed_prevention"
+            route_out_relations = {"prevents"}
+            route_in_relations = {"prevents"}
             adjacency_candidates = [
-                filter_adjacency_by_relation(self.causal_graph_out, {"prevents"}),
-                filter_adjacency_by_relation(self.causal_graph_in, {"prevents"}),
+                filter_adjacency_by_relation(self.causal_graph_out, route_out_relations),
+                filter_adjacency_by_relation(self.causal_graph_in, route_in_relations),
             ]
         elif query_type == "cause":
+            trace["mode"] = "directed_cause"
+            route_in_relations = {"causes", "enables"}
             adjacency_candidates = [
-                filter_adjacency_by_relation(self.causal_graph_in, {"causes", "enables"})
+                filter_adjacency_by_relation(self.causal_graph_in, route_in_relations)
             ]
         elif query_type == "effect":
+            trace["mode"] = "directed_effect"
+            route_out_relations = {"causes", "enables"}
             adjacency_candidates = [
-                filter_adjacency_by_relation(self.causal_graph_out, {"causes", "enables"})
+                filter_adjacency_by_relation(self.causal_graph_out, route_out_relations)
+            ]
+        elif query_type == "non_causal" and getattr(self.global_config, "causal_gate_mode", "hard") == "soft":
+            trace["mode"] = "soft_non_causal_weak"
+            route_out_relations = {"causes", "enables", "prevents"}
+            route_in_relations = {"causes", "enables", "prevents"}
+            adjacency_candidates = [
+                filter_adjacency_by_relation(self.causal_graph_out, route_out_relations),
+                filter_adjacency_by_relation(self.causal_graph_in, route_in_relations),
             ]
         else:
-            return np.array([], dtype=int), np.array([], dtype=float)
+            return _empty_result("non_causal_query_type")
+
+        trace["adjacency_candidate_sizes"] = [int(len(adjacency)) for adjacency in adjacency_candidates]
+        if not any(trace["adjacency_candidate_sizes"]):
+            return _empty_result("empty_route_adjacency")
+
+        seed_debug = []
+        seeds_with_any_edge_count = 0
+        seeds_with_route_edge_count = 0
+        for fact_idx in candidate_fact_indices:
+            fact_id = str(self.fact_node_keys[fact_idx])
+            out_edges = self.causal_graph_out.get(fact_idx, [])
+            in_edges = self.causal_graph_in.get(fact_idx, [])
+            route_out_edge_count = sum(1 for _, _, relation_type in out_edges if relation_type in route_out_relations)
+            route_in_edge_count = sum(1 for _, _, relation_type in in_edges if relation_type in route_in_relations)
+            if out_edges or in_edges:
+                seeds_with_any_edge_count += 1
+            if route_out_edge_count > 0 or route_in_edge_count > 0:
+                seeds_with_route_edge_count += 1
+            seed_debug.append({
+                "fact_idx": int(fact_idx),
+                "fact_id": fact_id,
+                "query_score": float(query_fact_scores[fact_idx]),
+                "total_out_edges": int(len(out_edges)),
+                "total_in_edges": int(len(in_edges)),
+                "route_out_edges": int(route_out_edge_count),
+                "route_in_edges": int(route_in_edge_count),
+            })
+        trace["seed_fact_ids"] = [entry["fact_id"] for entry in seed_debug]
+        trace["seed_debug"] = seed_debug
+        trace["seeds_with_any_edge_count"] = seeds_with_any_edge_count
+        trace["seeds_with_route_edge_count"] = seeds_with_route_edge_count
 
         combined_doc_scores = np.zeros(len(self.passage_node_keys), dtype=float)
         found_causal_signal = False
@@ -1898,7 +3079,7 @@ class HippoRAG:
             found_causal_signal = True
 
         if not found_causal_signal:
-            return np.array([], dtype=int), np.array([], dtype=float)
+            return _empty_result("no_positive_doc_scores")
 
         sorted_doc_ids = np.argsort(combined_doc_scores)[::-1]
         sorted_doc_scores = combined_doc_scores[sorted_doc_ids.tolist()]
@@ -1907,60 +3088,92 @@ class HippoRAG:
         sorted_doc_scores = sorted_doc_scores[positive_mask]
         if len(sorted_doc_scores) > 1:
             sorted_doc_scores = min_max_normalize(sorted_doc_scores)
+        trace["status"] = "ok"
+        if return_trace:
+            return sorted_doc_ids, sorted_doc_scores, trace
         return sorted_doc_ids, sorted_doc_scores
 
     def blend_causal_retrieval_scores(self,
-                                      dense_doc_scores: Dict[int, float],
-                                      fact_doc_scores: Dict[int, float],
+                                      baseline_doc_scores: Dict[int, float],
                                       causal_doc_scores: Dict[int, float],
-                                      route_causal_intent_score: float = 1.0) -> Tuple[np.ndarray, np.ndarray, Dict[str, float]]:
-        all_doc_ids = set(dense_doc_scores) | set(fact_doc_scores) | set(causal_doc_scores)
-        if not all_doc_ids:
-            return np.array([], dtype=int), np.array([], dtype=float), {
-                "causal_weight_before_attenuation": 0.0,
-                "causal_weight_after_attenuation": 0.0,
+                                      route_causal_intent_score: float = 1.0) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        baseline_doc_ids, baseline_doc_scores_arr = self._rank_doc_score_map(baseline_doc_scores)
+        baseline_top5_doc_ids = [int(doc_id) for doc_id in baseline_doc_ids[:5].tolist()]
+        baseline_margin_top1_top2 = 0.0
+        if len(baseline_doc_scores_arr) >= 2:
+            baseline_margin_top1_top2 = float(baseline_doc_scores_arr[0] - baseline_doc_scores_arr[1])
+        elif len(baseline_doc_scores_arr) == 1:
+            baseline_margin_top1_top2 = float(baseline_doc_scores_arr[0])
+
+        causal_blend_top_k = max(0, int(getattr(self.global_config, "causal_blend_top_k", 0)))
+        truncated_causal_doc_scores = dict(causal_doc_scores)
+        if causal_blend_top_k > 0 and len(truncated_causal_doc_scores) > causal_blend_top_k:
+            top_items = sorted(
+                truncated_causal_doc_scores.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )[:causal_blend_top_k]
+            truncated_causal_doc_scores = {
+                int(doc_id): float(score)
+                for doc_id, score in top_items
             }
 
-        dense_weight = self.global_config.causal_blend_dense_weight if dense_doc_scores else 0.0
-        fact_weight = self.global_config.causal_blend_fact_weight if fact_doc_scores else 0.0
-        causal_weight = self.global_config.causal_blend_graph_weight if causal_doc_scores else 0.0
-        if getattr(self.global_config, "causal_gate_mode", "hard") == "soft" and causal_weight > 0:
-            causal_weight *= max(0.0, min(1.0, float(route_causal_intent_score)))
-        causal_weight_before_attenuation = float(causal_weight)
+        used_causal_items = sorted(
+            truncated_causal_doc_scores.items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+        use_causal_for_blend = bool(used_causal_items)
+        margin_gate_applied = False
+        if (
+            use_causal_for_blend
+            and bool(getattr(self.global_config, "causal_margin_gate_enabled", False))
+            and baseline_margin_top1_top2 >= float(getattr(self.global_config, "causal_margin_threshold", 0.02))
+        ):
+            use_causal_for_blend = False
+            margin_gate_applied = True
 
-        # Sparse causal hits are often brittle; attenuate them instead of forcing
-        # the full causal weight on top of an otherwise strong dense/fact ranking.
-        if causal_weight > 0:
-            causal_weight *= min(1.0, len(causal_doc_scores) / 5.0)
-        causal_weight_after_attenuation = float(causal_weight)
+        active_causal_doc_scores = truncated_causal_doc_scores if use_causal_for_blend else {}
+        active_causal_items = sorted(active_causal_doc_scores.items(), key=lambda item: item[1], reverse=True)
+        causal_weight_trace = self._compute_causal_blend_weight(
+            active_causal_doc_scores,
+            route_causal_intent_score=route_causal_intent_score,
+        )
+        blended_scores_by_doc_id = dict(baseline_doc_scores)
+        if active_causal_items and causal_weight_trace["causal_weight_after_attenuation"] > 0:
+            for doc_id, score in active_causal_items:
+                blended_scores_by_doc_id[int(doc_id)] = (
+                    blended_scores_by_doc_id.get(int(doc_id), 0.0)
+                    + causal_weight_trace["causal_weight_after_attenuation"] * float(score)
+                )
+            sorted_doc_ids, sorted_doc_scores = self._rank_doc_score_map(blended_scores_by_doc_id)
+            causal_override_applied = True
+        else:
+            sorted_doc_ids, sorted_doc_scores = baseline_doc_ids, baseline_doc_scores_arr
+            causal_override_applied = False
+        blended_top5_doc_ids = [int(doc_id) for doc_id in sorted_doc_ids[:5].tolist()]
 
-        total_weight = dense_weight + fact_weight + causal_weight
-        if total_weight <= 0:
-            return np.array([], dtype=int), np.array([], dtype=float), {
-                "causal_weight_before_attenuation": causal_weight_before_attenuation,
-                "causal_weight_after_attenuation": causal_weight_after_attenuation,
-            }
-
-        dense_weight /= total_weight
-        fact_weight /= total_weight
-        causal_weight /= total_weight
-
-        blended_scores = {}
-        for doc_id in all_doc_ids:
-            blended_scores[int(doc_id)] = (
-                dense_weight * dense_doc_scores.get(doc_id, 0.0)
-                + fact_weight * fact_doc_scores.get(doc_id, 0.0)
-                + causal_weight * causal_doc_scores.get(doc_id, 0.0)
-            )
-
-        sorted_items = sorted(blended_scores.items(), key=lambda item: item[1], reverse=True)
-        sorted_doc_ids = np.array([doc_id for doc_id, _ in sorted_items], dtype=int)
-        sorted_doc_scores = np.array([score for _, score in sorted_items], dtype=float)
-        if len(sorted_doc_scores) > 1:
-            sorted_doc_scores = min_max_normalize(sorted_doc_scores)
         return sorted_doc_ids, sorted_doc_scores, {
-            "causal_weight_before_attenuation": causal_weight_before_attenuation,
-            "causal_weight_after_attenuation": causal_weight_after_attenuation,
+            "baseline_top5_doc_ids": baseline_top5_doc_ids,
+            "blended_top5_doc_ids": blended_top5_doc_ids,
+            "baseline_margin_top1_top2": baseline_margin_top1_top2,
+            "margin_gate_applied": margin_gate_applied,
+            "use_causal_for_blend": use_causal_for_blend,
+            "causal_override_applied": causal_override_applied,
+            "causal_blend_top_k": causal_blend_top_k,
+            "causal_docs_used_for_blend": [int(doc_id) for doc_id, _ in active_causal_items[:10]],
+            "causal_docs_used_for_blend_count": len(active_causal_items),
+            "causal_docs_used_for_blend_mean_score": (
+                float(sum(score for _, score in active_causal_items) / len(active_causal_items))
+                if active_causal_items else 0.0
+            ),
+            "causal_docs_used_for_blend_max_score": (
+                float(max(score for _, score in active_causal_items))
+                if active_causal_items else 0.0
+            ),
+            "causal_blend_top5_set_changed": set(baseline_top5_doc_ids) != set(blended_top5_doc_ids),
+            "causal_blend_top5_order_changed": baseline_top5_doc_ids != blended_top5_doc_ids,
+            **causal_weight_trace,
         }
 
     def get_query_embeddings(self, queries: List[str] | List[QuerySolution]):
@@ -1999,6 +3212,23 @@ class HippoRAG:
             for query, embedding in zip(all_query_strings, query_embeddings_for_passage):
                 self.query_to_embedding['passage'][query] = embedding
 
+    def _get_passage_query_embeddings(self, queries: List[str] | List[QuerySolution]):
+        all_query_strings = []
+        for query in queries:
+            query_text = query.question if isinstance(query, QuerySolution) else query
+            if query_text not in self.query_to_embedding['passage']:
+                all_query_strings.append(query_text)
+
+        if len(all_query_strings) > 0:
+            logger.info(f"Encoding {len(all_query_strings)} queries for query_to_passage.")
+            query_embeddings_for_passage = self.embedding_model.batch_encode(
+                all_query_strings,
+                instruction=get_query_instruction('query_to_passage'),
+                norm=True,
+            )
+            for query, embedding in zip(all_query_strings, query_embeddings_for_passage):
+                self.query_to_embedding['passage'][query] = embedding
+
     def get_fact_scores(self, query: str) -> np.ndarray:
         """
         Retrieves and computes normalized similarity scores between the given query and pre-stored fact embeddings.
@@ -2019,11 +3249,17 @@ class HippoRAG:
             If no embedding is found for the provided query in the stored query
             embeddings dictionary.
         """
-        query_embedding = self.query_to_embedding['triple'].get(query, None)
+        query_embedding_cache = self._active_query_embedding_cache_for_fact_retrieval()
+        query_embedding = query_embedding_cache['triple'].get(query, None)
         if query_embedding is None:
-            query_embedding = self.embedding_model.batch_encode(query,
-                                                                instruction=get_query_instruction('query_to_fact'),
-                                                                norm=True)
+            query_embedding = self._active_embedding_model_for_fact_retrieval().batch_encode(
+                [query],
+                instruction=get_query_instruction('query_to_fact'),
+                norm=True,
+            )
+            query_embedding = query_embedding[0]
+            query_embedding_cache['triple'][query] = query_embedding
+        query_embedding = np.asarray(query_embedding, dtype=float).reshape(-1)
 
         # Check if there are any facts
         if len(self.fact_embeddings) == 0:
@@ -2032,7 +3268,7 @@ class HippoRAG:
             
         try:
             query_fact_scores = np.dot(self.fact_embeddings, query_embedding.T) # shape: (#facts, )
-            query_fact_scores = np.squeeze(query_fact_scores) if query_fact_scores.ndim == 2 else query_fact_scores
+            query_fact_scores = np.asarray(query_fact_scores, dtype=float).reshape(-1)
             query_fact_scores = min_max_normalize(query_fact_scores)
             return query_fact_scores
         except Exception as e:
@@ -2251,6 +3487,7 @@ class HippoRAG:
         """
         # load args
         link_top_k: int = self.global_config.linking_top_k
+        query_fact_scores = np.asarray(query_fact_scores, dtype=float).reshape(-1)
         
         # Check if there are any facts to rerank
         if len(query_fact_scores) == 0 or len(self.fact_node_keys) == 0:
@@ -2289,7 +3526,8 @@ class HippoRAG:
                 
             # Get the actual fact IDs
             real_candidate_fact_ids = [self.fact_node_keys[idx] for idx in candidate_fact_indices]
-            fact_row_dict = self.fact_embedding_store.get_rows(real_candidate_fact_ids)
+            fact_store = self.v2_base_fact_embedding_store or self.fact_embedding_store
+            fact_row_dict = fact_store.get_rows(real_candidate_fact_ids)
             candidate_facts = [_safe_parse_fact_content(fact_row_dict[id]['content']) for id in real_candidate_fact_ids]
             
             # Rerank the facts
