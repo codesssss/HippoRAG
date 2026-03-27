@@ -43,17 +43,16 @@ These have been experimentally disproven on 2Wiki/HotpotQA. They were removed in
 
 5. **Causal-only extraction (cause/enable/prevent)** - These three relation types do not cover the bridge relations in multi-hop QA (director_of, parent_of, born_in, etc.).
 
+6. **General relation graph PPR** (commit `74dee61`) - Built V2 general extraction graph (8 typed relations, 19.5k entities, 12.6k edges) and ran PPR-based retrieval. Initial result was catastrophic (Recall@5 0.603 vs baseline 0.845). Applied 3-patch fix: (A) seed cap to 12 + reset budget entity=0.6/passage=0.4, (B) degree-aware hub decay `1/sqrt(log2(deg_s+1)*log2(deg_t+1))`, (C) related_to weight sweep 0.0/0.1/0.3. Best result: Recall@5=0.695, Recall@2=0.610. Still 0.150 below legacy baseline. Root causes: V2 entity resolution too noisy (many near-duplicate entities), entity-passage edge topology fundamentally different from legacy fact-graph's curated triples.
+
 ## Active Development Direction
 
-**General relation graph PPR**: Use the V2 general extraction (8 typed relations) to build an igraph for PPR-based retrieval. This is the one remaining "algorithm innovation" direction not yet proven negative.
+No "algorithm innovation" directions remain viable. All six V2 ideas have been experimentally disproven. The validated best path is the aligned legacy_fact_graph retrieval (engineering improvement, not algorithm change).
 
-Key constraints for implementation:
-- Hybrid seed generation (NER overlap + dense doc entities + embedding top-K), not raw query-to-entity embedding
-- Anti-hub weight decay (`1/log2(chunk_count+1)`), hub entities like "William the Silent" (degree 642) will corrupt PPR otherwise
-- `related_to` edge downweighting (47.7% of edges are `related_to`, too fuzzy for full weight)
-- Accept undirected PPR for v1 (existing `run_ppr()` uses `directed=False`)
-
-Step 0 index cache: `outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/causal_v2/`
+Potential future directions (not yet attempted):
+- Better entity resolution in V2 extraction (stricter dedup may improve graph quality)
+- Hybrid retrieval: legacy PPR + dense reranker fusion
+- Upstream improvements: better passage chunking, improved fact extraction prompts
 
 ## Code Structure
 
