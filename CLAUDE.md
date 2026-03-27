@@ -17,6 +17,21 @@ causal_context_max_items = 0
 
 This uses the original HippoRAG fact-graph PPR retrieval with properly aligned embedding assets. No V2 "algorithm enhancements" are active.
 
+## Hardware & Model Services
+
+**Server**: 8x NVIDIA H100 80GB HBM3, Intel Xeon Platinum 8480+ (224 cores), 2TB RAM
+
+| Service | Model | Port | GPU | Serving |
+|---|---|---|---|---|
+| LLM (QA reader + extraction) | Qwen3-8B (`/mnt/nvme/Qwen3-8B`) | `http://localhost:8039/v1` | GPU 0,2 (TP=2) | VLLM, served-model-name=`qwen3-8b` |
+| Embedding (dense passage) | Qwen3-Embedding-8B (`/mnt/nvme/Qwen3-Embedding-8B`) | `http://localhost:8018/v1/embeddings` | GPU 6 (TP=1) | VLLM, served-model-name=`/mnt/nvme/Qwen3-Embedding-8B` |
+| Embedding (legacy fact PPR) | NV-Embed-v2 | Local (transformers) | Auto-loaded on demand | HF cache: `/mnt/nvme/hf/models--nvidia--NV-Embed-v2` |
+
+Other services on this machine (not HippoRAG, do not touch):
+- `qwen3-8b-train` on port 8043 (GPU 3,4 TP=2) — R-HAN training
+- `qwen3-32b-judge` on port 8045 (GPU 5,7 TP=2) — R-HAN judge
+- Ollama on port 11434 (llama2, deepseek-r1)
+
 ## Embedding Models
 
 Two embedding models are in use. Do NOT mix their embedding spaces.
