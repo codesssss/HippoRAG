@@ -99,6 +99,8 @@ def main():
     parser.add_argument('--causal_v2_probe_mode', choices=['router', 'always'], default='router', help='V2 subgraph probing mode: router uses lightweight rule routing for causal-mode graphs, always probes every query.')
     parser.add_argument('--causal_v2_graph_mode', choices=['causal', 'general'], default='causal', help='V2 graph mode: causal keeps cause/enable/prevent extraction, general uses a minimal relation graph for multi-hop retrieval.')
     parser.add_argument('--causal_v2_base_retrieval_mode', choices=['dense', 'legacy_fact_graph', 'general_relation_graph'], default='dense', help='Base ranking used before V2 graph reasoning.')
+    parser.add_argument('--general_graph_related_to_weight', type=float, default=0.3, help='Downweight factor applied to `related_to` edges in the V2 general relation retrieval graph.')
+    parser.add_argument('--general_graph_seed_top_k', type=int, default=10, help='Maximum number of embedding-based entity seeds for the V2 general relation retrieval graph.')
     parser.add_argument('--causal_v2_extraction_max_tokens', type=int, default=768, help='Max completion tokens for schema-constrained causal V2 extraction.')
     parser.add_argument('--causal_v2_extraction_retry_attempts', type=int, default=2, help='Retry attempts for causal V2 extraction parsing.')
     parser.add_argument('--causal_v2_extraction_workers', type=int, default=4, help='Parallel worker count for causal V2 extraction.')
@@ -194,6 +196,8 @@ def main():
         causal_v2_probe_mode=args.causal_v2_probe_mode,
         causal_v2_graph_mode=args.causal_v2_graph_mode,
         causal_v2_base_retrieval_mode=args.causal_v2_base_retrieval_mode,
+        general_graph_related_to_weight=args.general_graph_related_to_weight,
+        general_graph_seed_top_k=args.general_graph_seed_top_k,
         causal_v2_extraction_max_tokens=args.causal_v2_extraction_max_tokens,
         causal_v2_extraction_retry_attempts=args.causal_v2_extraction_retry_attempts,
         causal_v2_extraction_workers=args.causal_v2_extraction_workers,

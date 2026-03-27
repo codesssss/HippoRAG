@@ -87,13 +87,9 @@ def has_nonempty_v2_subgraph(query_solution: QuerySolution) -> bool:
 def compute_slice_metrics(config: BaseConfig,
                           query_solutions: List[QuerySolution],
                           gold_docs: List[List[str]],
-                          gold_answers: List[List[str]]) -> Dict[str, Dict[str, float]]:
-    queries = [query_solution.question for query_solution in query_solutions]
-    predicted_answers = [query_solution.answer for query_solution in query_solutions]
+                          gold_answers: List[List[str]] | None) -> Dict[str, Dict[str, float]]:
     retrieved_docs = [query_solution.docs for query_solution in query_solutions]
 
-    qa_em = QAExactMatch(global_config=config)
-    qa_f1 = QAF1Score(global_config=config)
     retrieval = RetrievalRecall(global_config=config)
 
     retrieval_metrics, _ = retrieval.calculate_metric_scores(
@@ -101,16 +97,23 @@ def compute_slice_metrics(config: BaseConfig,
         retrieved_docs=retrieved_docs,
         k_list=[1, 2, 5, 10, 20, 30, 50, 100, 150, 200],
     )
-    em_metrics, _ = qa_em.calculate_metric_scores(
-        gold_answers=gold_answers,
-        predicted_answers=predicted_answers,
-        aggregation_fn=np.max,
-    )
-    f1_metrics, _ = qa_f1.calculate_metric_scores(
-        gold_answers=gold_answers,
-        predicted_answers=predicted_answers,
-        aggregation_fn=np.max,
-    )
+    em_metrics: Dict[str, float] = {}
+    f1_metrics: Dict[str, float] = {}
+    predicted_answers = []
+    if gold_answers is not None:
+        predicted_answers = [query_solution.answer for query_solution in query_solutions]
+        qa_em = QAExactMatch(global_config=config)
+        qa_f1 = QAF1Score(global_config=config)
+        em_metrics, _ = qa_em.calculate_metric_scores(
+            gold_answers=gold_answers,
+            predicted_answers=predicted_answers,
+            aggregation_fn=np.max,
+        )
+        f1_metrics, _ = qa_f1.calculate_metric_scores(
+            gold_answers=gold_answers,
+            predicted_answers=predicted_answers,
+            aggregation_fn=np.max,
+        )
 
     causal_indices = [
         idx for idx, query_solution in enumerate(query_solutions)
@@ -122,16 +125,21 @@ def compute_slice_metrics(config: BaseConfig,
             retrieved_docs=subset_by_indices(retrieved_docs, causal_indices),
             k_list=[1, 2, 5, 10, 20, 30, 50, 100, 150, 200],
         )
-        causal_em_metrics, _ = qa_em.calculate_metric_scores(
-            gold_answers=subset_by_indices(gold_answers, causal_indices),
-            predicted_answers=subset_by_indices(predicted_answers, causal_indices),
-            aggregation_fn=np.max,
-        )
-        causal_f1_metrics, _ = qa_f1.calculate_metric_scores(
-            gold_answers=subset_by_indices(gold_answers, causal_indices),
-            predicted_answers=subset_by_indices(predicted_answers, causal_indices),
-            aggregation_fn=np.max,
-        )
+        if gold_answers is not None:
+            qa_em = QAExactMatch(global_config=config)
+            qa_f1 = QAF1Score(global_config=config)
+            causal_em_metrics, _ = qa_em.calculate_metric_scores(
+                gold_answers=subset_by_indices(gold_answers, causal_indices),
+                predicted_answers=subset_by_indices(predicted_answers, causal_indices),
+                aggregation_fn=np.max,
+            )
+            causal_f1_metrics, _ = qa_f1.calculate_metric_scores(
+                gold_answers=subset_by_indices(gold_answers, causal_indices),
+                predicted_answers=subset_by_indices(predicted_answers, causal_indices),
+                aggregation_fn=np.max,
+            )
+        else:
+            causal_em_metrics, causal_f1_metrics = {}, {}
     else:
         causal_retrieval_metrics, causal_em_metrics, causal_f1_metrics = {}, {}, {}
 
@@ -146,16 +154,21 @@ def compute_slice_metrics(config: BaseConfig,
             retrieved_docs=subset_by_indices(retrieved_docs, nonempty_subgraph_indices),
             k_list=[1, 2, 5, 10, 20, 30, 50, 100, 150, 200],
         )
-        subgraph_em_metrics, _ = qa_em.calculate_metric_scores(
-            gold_answers=subset_by_indices(gold_answers, nonempty_subgraph_indices),
-            predicted_answers=subset_by_indices(predicted_answers, nonempty_subgraph_indices),
-            aggregation_fn=np.max,
-        )
-        subgraph_f1_metrics, _ = qa_f1.calculate_metric_scores(
-            gold_answers=subset_by_indices(gold_answers, nonempty_subgraph_indices),
-            predicted_answers=subset_by_indices(predicted_answers, nonempty_subgraph_indices),
-            aggregation_fn=np.max,
-        )
+        if gold_answers is not None:
+            qa_em = QAExactMatch(global_config=config)
+            qa_f1 = QAF1Score(global_config=config)
+            subgraph_em_metrics, _ = qa_em.calculate_metric_scores(
+                gold_answers=subset_by_indices(gold_answers, nonempty_subgraph_indices),
+                predicted_answers=subset_by_indices(predicted_answers, nonempty_subgraph_indices),
+                aggregation_fn=np.max,
+            )
+            subgraph_f1_metrics, _ = qa_f1.calculate_metric_scores(
+                gold_answers=subset_by_indices(gold_answers, nonempty_subgraph_indices),
+                predicted_answers=subset_by_indices(predicted_answers, nonempty_subgraph_indices),
+                aggregation_fn=np.max,
+            )
+        else:
+            subgraph_em_metrics, subgraph_f1_metrics = {}, {}
     else:
         subgraph_retrieval_metrics, subgraph_em_metrics, subgraph_f1_metrics = {}, {}, {}
 
@@ -164,7 +177,7 @@ def compute_slice_metrics(config: BaseConfig,
             **retrieval_metrics,
             **em_metrics,
             **f1_metrics,
-            "num_queries": len(queries),
+            "num_queries": len(query_solutions),
         },
         "causal_slice": {
             **causal_retrieval_metrics,
@@ -306,6 +319,8 @@ def build_config(args, corpus_len: int) -> BaseConfig:
         causal_v2_probe_mode=getattr(args, "causal_v2_probe_mode", "router"),
         causal_v2_graph_mode=getattr(args, "causal_v2_graph_mode", "causal"),
         causal_v2_base_retrieval_mode=getattr(args, "causal_v2_base_retrieval_mode", "dense"),
+        general_graph_related_to_weight=getattr(args, "general_graph_related_to_weight", 0.3),
+        general_graph_seed_top_k=getattr(args, "general_graph_seed_top_k", 10),
         causal_v2_extraction_max_tokens=getattr(args, "causal_v2_extraction_max_tokens", 768),
         causal_v2_extraction_retry_attempts=getattr(args, "causal_v2_extraction_retry_attempts", 2),
         causal_v2_extraction_workers=getattr(args, "causal_v2_extraction_workers", 4),
@@ -365,6 +380,8 @@ def main():
     parser.add_argument("--causal_v2_probe_mode", choices=["router", "always"], default="router")
     parser.add_argument("--causal_v2_graph_mode", choices=["causal", "general"], default="causal")
     parser.add_argument("--causal_v2_base_retrieval_mode", choices=["dense", "legacy_fact_graph", "general_relation_graph"], default="dense")
+    parser.add_argument("--general_graph_related_to_weight", type=float, default=0.3)
+    parser.add_argument("--general_graph_seed_top_k", type=int, default=10)
     parser.add_argument("--causal_v2_extraction_max_tokens", type=int, default=768)
     parser.add_argument("--causal_v2_extraction_retry_attempts", type=int, default=2)
     parser.add_argument("--causal_v2_extraction_workers", type=int, default=4)
@@ -384,6 +401,7 @@ def main():
     parser.add_argument("--structure_rerank_max_hops", type=int, default=2)
     parser.add_argument("--structure_rerank_margin_threshold", type=float, default=0.02)
     parser.add_argument("--rerank_require_non_empty", type=str, default="true")
+    parser.add_argument("--retrieval_only", type=str, default="false")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -407,23 +425,35 @@ def main():
     queries = [sample["question"] for sample in samples]
     gold_answers = get_gold_answers(samples)
     gold_docs = get_gold_docs(samples, dataset_name, corpus=corpus)
+    retrieval_only = string_to_bool(args.retrieval_only)
 
     config = build_config(args, corpus_len=len(corpus))
     logging.basicConfig(level=logging.INFO)
 
     hipporag = HippoRAG(global_config=config)
     hipporag.index(docs)
-    query_solutions, responses, metadata, overall_retrieval_result, overall_qa_results = hipporag.rag_qa(
-        queries=queries,
-        gold_docs=gold_docs,
-        gold_answers=gold_answers,
-    )
+    if retrieval_only:
+        query_solutions, overall_retrieval_result = hipporag.retrieve(
+            queries=queries,
+            gold_docs=gold_docs,
+        )
+        responses = []
+        metadata = []
+        overall_qa_results = {}
+        effective_gold_answers = None
+    else:
+        query_solutions, responses, metadata, overall_retrieval_result, overall_qa_results = hipporag.rag_qa(
+            queries=queries,
+            gold_docs=gold_docs,
+            gold_answers=gold_answers,
+        )
+        effective_gold_answers = gold_answers
 
     slice_metrics = compute_slice_metrics(
         config=config,
         query_solutions=query_solutions,
         gold_docs=gold_docs,
-        gold_answers=gold_answers,
+        gold_answers=effective_gold_answers,
     )
     v2_metrics = summarize_v2_metrics(
         config=config,
@@ -454,6 +484,9 @@ def main():
             "causal_v2_probe_mode": config.causal_v2_probe_mode,
             "causal_v2_graph_mode": config.causal_v2_graph_mode,
             "causal_v2_base_retrieval_mode": config.causal_v2_base_retrieval_mode,
+            "general_graph_related_to_weight": config.general_graph_related_to_weight,
+            "general_graph_seed_top_k": config.general_graph_seed_top_k,
+            "retrieval_only": retrieval_only,
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
             "causal_v2_extraction_workers": config.causal_v2_extraction_workers,
@@ -489,8 +522,8 @@ def main():
                     if getattr(config, "causal_engine_version", "legacy") == "v2"
                     else route_query_type(query_solution.question)
                 ),
-                "answer": query_solution.answer,
-                "gold_answers": query_solution.gold_answers,
+                "answer": query_solution.answer if not retrieval_only else None,
+                "gold_answers": query_solution.gold_answers if not retrieval_only else None,
                 "docs": query_solution.docs[:3],
                 "retrieval_trace": query_solution.retrieval_trace or {},
             }

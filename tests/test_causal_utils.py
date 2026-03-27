@@ -281,20 +281,11 @@ def test_score_candidate_docs_by_structure_requires_explicit_bridge_edge():
     assert scores == {}
 
 
+def _run_all_tests() -> None:
+    for name, value in sorted(globals().items()):
+        if name.startswith("test_") and callable(value):
+            value()
+
+
 if __name__ == "__main__":
-    test_compute_fact_id_is_stable_for_normalized_triples()
-    test_sanitize_causal_relations_filters_invalid_and_dedups()
-    test_route_query_type_distinguishes_causal_queries()
-    test_score_query_causal_intent_uses_strong_weak_and_non_causal_buckets()
-    test_blend_causal_retrieval_scores_applies_soft_gate_scaling()
-    test_blend_causal_retrieval_scores_respects_margin_gate()
-    test_blend_causal_retrieval_scores_limits_causal_docs_to_top_k()
-    test_v2_causal_doc_rerank_respects_protect_top1()
-    test_v2_causal_doc_rerank_respects_swap_limit()
-    test_run_personalized_pagerank_prefers_reverse_chain_when_seeded_downstream()
-    test_graph_search_with_causal_facts_soft_non_causal_uses_weak_bidirectional_path()
-    test_graph_search_with_causal_facts_hard_non_causal_still_returns_empty()
-    test_derive_directed_structure_edge_handles_forward_and_reverse_predicates()
-    test_derive_composed_structure_edges_builds_bridge_edge_from_fact_chain()
-    test_score_candidate_docs_by_structure_prefers_bridge_doc()
-    test_score_candidate_docs_by_structure_requires_explicit_bridge_edge()
+    _run_all_tests()

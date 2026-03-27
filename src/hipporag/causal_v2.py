@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+import igraph as ig
 import numpy as np
 from tqdm import tqdm
 
@@ -727,6 +728,93 @@ class CausalV2Engine:
         else:
             self.event_embeddings = np.zeros((0, 0), dtype=float)
         self.loaded = True
+
+    def build_retrieval_igraph(
+        self,
+        passage_node_keys: Sequence[str],
+    ) -> tuple[ig.Graph, dict[str, int], dict[str, int], list[int]]:
+        manifest = self.read_manifest()
+        manifest_graph_mode = str(manifest.get("graph_mode", "")).lower()
+        if manifest_graph_mode != "general":
+            message = (
+                "Refusing to build general relation retrieval graph from a non-general V2 index. "
+                f"manifest.graph_mode={manifest_graph_mode or 'missing'}"
+            )
+            logger.error(message)
+            raise ValueError(message)
+
+        if not self.loaded:
+            self.load()
+
+        entity_ids = sorted(self.event_nodes.keys())
+        entity_vertex_names = [f"v2entity-{entity_id}" for entity_id in entity_ids]
+        graph = ig.Graph(directed=False)
+        graph.add_vertices(len(entity_vertex_names) + len(passage_node_keys))
+        graph.vs["name"] = entity_vertex_names + [str(passage_key) for passage_key in passage_node_keys]
+
+        entity_id_to_vertex_idx = {
+            entity_id: idx for idx, entity_id in enumerate(entity_ids)
+        }
+        passage_offset = len(entity_ids)
+        passage_key_to_vertex_idx = {
+            str(passage_key): passage_offset + idx
+            for idx, passage_key in enumerate(passage_node_keys)
+        }
+        passage_vertex_idxs = [
+            passage_key_to_vertex_idx[str(passage_key)]
+            for passage_key in passage_node_keys
+        ]
+
+        edge_pairs: list[tuple[int, int]] = []
+        edge_weights: list[float] = []
+        related_to_weight = float(getattr(self.config, "general_graph_related_to_weight", 0.3))
+
+        # Patch B: Pre-compute entity degrees for degree-aware hub decay
+        entity_degree: dict[str, int] = {}
+        for edge in self.edges.values():
+            s = str(edge["source_event_id"])
+            t = str(edge["target_event_id"])
+            entity_degree[s] = entity_degree.get(s, 0) + 1
+            entity_degree[t] = entity_degree.get(t, 0) + 1
+        for eid, enode in self.event_nodes.items():
+            entity_degree[eid] = entity_degree.get(eid, 0) + len(enode.get("chunk_ids", []))
+
+        for edge in self.edges.values():
+            source_event_id = str(edge["source_event_id"])
+            target_event_id = str(edge["target_event_id"])
+            if source_event_id not in entity_id_to_vertex_idx or target_event_id not in entity_id_to_vertex_idx:
+                continue
+            type_weight = related_to_weight if str(edge.get("relation_type")) == "related_to" else 1.0
+            # Patch B: Symmetric degree-aware hub decay
+            deg_s = max(entity_degree.get(source_event_id, 1), 1)
+            deg_t = max(entity_degree.get(target_event_id, 1), 1)
+            hub_decay = 1.0 / np.sqrt(np.log2(deg_s + 1) * np.log2(deg_t + 1))
+            edge_pairs.append((
+                entity_id_to_vertex_idx[source_event_id],
+                entity_id_to_vertex_idx[target_event_id],
+            ))
+            edge_weights.append(float(edge.get("confidence", 0.0)) * type_weight * hub_decay)
+
+        for event_id, event_node in self.event_nodes.items():
+            if event_id not in entity_id_to_vertex_idx:
+                continue
+            chunk_ids = [str(chunk_id) for chunk_id in event_node.get("chunk_ids", [])]
+            chunk_count = max(len(chunk_ids), 1)
+            passage_weight = 1.0 / float(np.log2(chunk_count + 1))
+            for chunk_id in chunk_ids:
+                passage_vertex_idx = passage_key_to_vertex_idx.get(chunk_id)
+                if passage_vertex_idx is None:
+                    continue
+                edge_pairs.append((entity_id_to_vertex_idx[event_id], passage_vertex_idx))
+                edge_weights.append(passage_weight)
+
+        if edge_pairs:
+            graph.add_edges(edge_pairs)
+            graph.es["weight"] = edge_weights
+        else:
+            graph.es["weight"] = []
+
+        return graph, entity_id_to_vertex_idx, passage_key_to_vertex_idx, passage_vertex_idxs
 
     def route_query(self, query: str, query_embedding: np.ndarray) -> dict[str, Any]:
         del query_embedding

@@ -243,11 +243,19 @@ class BaseConfig:
     )
     causal_v2_base_retrieval_mode: Literal["dense", "legacy_fact_graph", "general_relation_graph"] = field(
         default="dense",
-        metadata={"help": "Base ranking used before V2 graph reasoning. `dense` keeps the current passage-only ranking, `legacy_fact_graph` reuses original HippoRAG fact-graph retrieval, and `general_relation_graph` is reserved for the future general-graph PPR path."}
+        metadata={"help": "Base ranking used before V2 graph reasoning. `dense` keeps the current passage-only ranking, `legacy_fact_graph` reuses original HippoRAG fact-graph retrieval, and `general_relation_graph` runs PPR over the V2 general relation graph."}
     )
     causal_v2_legacy_preferred_embedding_name: str = field(
         default="nvidia/NV-Embed-v2",
         metadata={"help": "Preferred legacy embedding workspace to reuse when `causal_v2_base_retrieval_mode=legacy_fact_graph`. V2 will try to keep graph and fact/entity embeddings aligned to this workspace when available."}
+    )
+    general_graph_related_to_weight: float = field(
+        default=0.3,
+        metadata={"help": "Downweight factor applied to `related_to` edges when building the V2 general relation retrieval graph."}
+    )
+    general_graph_seed_top_k: int = field(
+        default=10,
+        metadata={"help": "Maximum number of embedding-similarity entity seeds used by the V2 general relation retrieval graph."}
     )
     causal_v2_extraction_max_tokens: int = field(
         default=768,

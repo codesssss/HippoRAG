@@ -66,6 +66,8 @@ def make_dummy_config(**overrides):
         "force_index_from_scratch": False,
         "causal_v2_probe_mode": "router",
         "causal_v2_graph_mode": "causal",
+        "general_graph_related_to_weight": 0.3,
+        "general_graph_seed_top_k": 10,
         "causal_v2_extraction_max_tokens": 128,
         "causal_v2_extraction_retry_attempts": 1,
         "causal_v2_extraction_workers": 1,
@@ -76,6 +78,8 @@ def make_dummy_config(**overrides):
         "causal_er_similarity_threshold": 0.8,
         "causal_er_text_threshold": 0.4,
         "causal_v2_min_edge_confidence": 0.7,
+        "passage_node_weight": 0.05,
+        "damping": 0.5,
     }
     values.update(overrides)
     return SimpleNamespace(**values)
@@ -384,3 +388,73 @@ def test_extract_query_entities_keeps_title_case_mentions():
     assert "Coulson Wallop" in query_entities
     assert "Wallop" in query_entities
     assert "Oxford" in query_entities
+
+
+def test_build_retrieval_igraph_general_mode_builds_weighted_entity_and_passage_edges():
+    with TemporaryDirectory() as tmp_dir:
+        engine = make_dummy_engine(tmp_dir, causal_v2_graph_mode="general", general_graph_related_to_weight=0.3)
+        with open(engine.manifest_path, "w", encoding="utf-8") as handle:
+            json.dump({"graph_mode": "general"}, handle)
+
+        engine.loaded = True
+        engine.event_nodes = {
+            "e1": {"canonical_text": "Entity One", "chunk_ids": ["chunk-1", "chunk-2"]},
+            "e2": {"canonical_text": "Entity Two", "chunk_ids": ["chunk-1"]},
+            "e3": {"canonical_text": "Entity Three", "chunk_ids": ["chunk-2"]},
+        }
+        engine.edges = {
+            "edge-12": {
+                "edge_id": "edge-12",
+                "source_event_id": "e1",
+                "target_event_id": "e2",
+                "relation_type": "parent_of",
+                "confidence": 0.8,
+            },
+            "edge-23": {
+                "edge_id": "edge-23",
+                "source_event_id": "e2",
+                "target_event_id": "e3",
+                "relation_type": "related_to",
+                "confidence": 0.6,
+            },
+            "edge-13": {
+                "edge_id": "edge-13",
+                "source_event_id": "e1",
+                "target_event_id": "e3",
+                "relation_type": "born_in",
+                "confidence": 0.5,
+            },
+        }
+
+        graph, entity_map, passage_map, passage_idxs = engine.build_retrieval_igraph(["chunk-1", "chunk-2"])
+
+    assert graph.vcount() == 5
+    assert graph.ecount() == 7
+    assert entity_map == {"e1": 0, "e2": 1, "e3": 2}
+    assert passage_map == {"chunk-1": 3, "chunk-2": 4}
+    assert passage_idxs == [3, 4]
+
+    typed_weight = graph.es[graph.get_eid(entity_map["e1"], entity_map["e2"])]["weight"]
+    related_weight = graph.es[graph.get_eid(entity_map["e2"], entity_map["e3"])]["weight"]
+    anti_hub_weight = graph.es[graph.get_eid(entity_map["e1"], passage_map["chunk-1"])]["weight"]
+    singleton_weight = graph.es[graph.get_eid(entity_map["e2"], passage_map["chunk-1"])]["weight"]
+
+    # Patch B: entity degrees = edge_count + chunk_count
+    # e1: 2 edges + 2 chunks = 4, e2: 2 edges + 1 chunk = 3, e3: 2 edges + 1 chunk = 3
+    # hub_decay(s,t) = 1/sqrt(log2(deg_s+1)*log2(deg_t+1))
+    decay_e1_e2 = 1.0 / np.sqrt(np.log2(5) * np.log2(4))  # deg 4, 3
+    decay_e2_e3 = 1.0 / np.sqrt(np.log2(4) * np.log2(4))  # deg 3, 3
+    assert np.isclose(typed_weight, 0.8 * decay_e1_e2)      # parent_of, confidence=0.8
+    assert np.isclose(related_weight, 0.6 * 0.3 * decay_e2_e3)  # related_to, confidence=0.6
+    assert np.isclose(anti_hub_weight, 1.0 / np.log2(3))    # entity-passage unchanged
+    assert np.isclose(singleton_weight, 1.0)                 # single-chunk entity
+
+
+def _run_all_tests() -> None:
+    for name, value in sorted(globals().items()):
+        if name.startswith("test_") and callable(value):
+            value()
+
+
+if __name__ == "__main__":
+    _run_all_tests()

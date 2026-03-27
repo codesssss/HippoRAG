@@ -5,7 +5,7 @@ import logging
 import ast
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
-from typing import Union, Optional, List, Set, Dict, Any, Tuple, Literal
+from typing import Union, Optional, List, Set, Dict, Any, Tuple, Literal, Sequence
 import numpy as np
 import importlib
 from collections import defaultdict
@@ -212,6 +212,10 @@ class HippoRAG:
         self.v2_base_embedding_name = None
         self.v2_base_embedding_model = None
         self.v2_base_query_to_embedding = {"triple": {}, "passage": {}}
+        self.v2_general_graph = None
+        self.v2_entity_to_vertex_idx = {}
+        self.v2_passage_to_vertex_idx = {}
+        self.v2_passage_vertex_idxs = []
         if getattr(self.global_config, "causal_engine_version", "legacy") == "v2":
             self.causal_v2_engine = CausalV2Engine(self)
 
@@ -293,7 +297,11 @@ class HippoRAG:
 
             # Allow V2 base retrieval experiments to reuse legacy assets without paying
             # the cost of building the V2 causal graph when graph features are disabled.
-            if self.global_config.causal_enabled:
+            need_v2_index = bool(self.global_config.causal_enabled) or (
+                str(getattr(self.global_config, "causal_v2_base_retrieval_mode", "dense")).lower()
+                == "general_relation_graph"
+            )
+            if need_v2_index:
                 chunk_to_rows = self.chunk_embedding_store.get_all_id_to_rows()
                 self.causal_v2_engine.index(chunk_to_rows)
             else:
@@ -1989,10 +1997,44 @@ class HippoRAG:
         self.v2_base_embedding_name = None
         self.v2_base_embedding_model = None
         self.v2_base_query_to_embedding = {"triple": {}, "passage": {}}
+        self.v2_general_graph = None
+        self.v2_entity_to_vertex_idx = {}
+        self.v2_passage_to_vertex_idx = {}
+        self.v2_passage_vertex_idxs = []
 
         base_mode = self._v2_base_retrieval_mode()
         if base_mode == "general_relation_graph":
-            self.v2_base_retrieval_status = "general_relation_graph_pending"
+            if self.causal_v2_engine is None:
+                self.v2_base_retrieval_status = "general_relation_graph_missing_engine"
+                return
+            try:
+                (
+                    self.v2_general_graph,
+                    self.v2_entity_to_vertex_idx,
+                    self.v2_passage_to_vertex_idx,
+                    self.v2_passage_vertex_idxs,
+                ) = self.causal_v2_engine.build_retrieval_igraph(self.passage_node_keys)
+            except ValueError as exc:
+                self.v2_base_retrieval_status = "general_relation_graph_wrong_mode"
+                logger.warning(str(exc))
+                self.v2_general_graph = None
+                self.v2_entity_to_vertex_idx = {}
+                self.v2_passage_to_vertex_idx = {}
+                self.v2_passage_vertex_idxs = []
+                return
+            except Exception as exc:  # pylint: disable=broad-except
+                self.v2_base_retrieval_status = "general_relation_graph_build_failed"
+                logger.warning(f"Failed to build V2 general relation retrieval graph: {exc}")
+                self.v2_general_graph = None
+                self.v2_entity_to_vertex_idx = {}
+                self.v2_passage_to_vertex_idx = {}
+                self.v2_passage_vertex_idxs = []
+                return
+
+            self.v2_base_retrieval_available = self.v2_general_graph is not None
+            self.v2_base_retrieval_status = (
+                "ready" if self.v2_base_retrieval_available else "general_relation_graph_empty"
+            )
             return
 
         if base_mode != "legacy_fact_graph":
@@ -2186,6 +2228,186 @@ class HippoRAG:
         self.v2_base_retrieval_status = "ready"
         logger.info("V2 legacy fact-graph base retrieval objects are ready.")
 
+    def _general_graph_entity_hub_decay(self, entity_id: str) -> float:
+        if self.causal_v2_engine is None:
+            return 1.0
+        event_node = self.causal_v2_engine.event_nodes.get(str(entity_id), {})
+        chunk_count = max(len(event_node.get("chunk_ids", [])), 1)
+        return 1.0 / float(np.log2(chunk_count + 1))
+
+    def _event_matches_query_entities(
+        self,
+        event_text: str,
+        normalized_query_entities: Sequence[str],
+    ) -> bool:
+        normalized_event_text = text_processing(event_text)
+        if not normalized_event_text:
+            return False
+
+        for normalized_query_entity in normalized_query_entities:
+            if not normalized_query_entity:
+                continue
+            if (
+                normalized_query_entity in normalized_event_text
+                or normalized_event_text in normalized_query_entity
+            ):
+                return True
+        return False
+
+    def _get_general_graph_entity_seeds(
+        self,
+        query: str,
+        dense_sorted_doc_ids: np.ndarray,
+        dense_sorted_doc_scores: np.ndarray,
+    ) -> Dict[str, float]:
+        if self.causal_v2_engine is None or not self.causal_v2_engine.loaded:
+            return {}
+
+        entity_weights: Dict[str, float] = defaultdict(float)
+        event_ids = list(self.causal_v2_engine.event_ids)
+        if not event_ids:
+            return {}
+
+        max_entity_seeds = 12
+        min_entity_seeds_for_embedding_fallback = 5
+        dense_seed_top_n = min(10, len(dense_sorted_doc_ids))
+
+        query_entities = self.causal_v2_engine._extract_query_entities(query)
+        normalized_query_entities = list({
+            text_processing(str(query_entity))
+            for query_entity in query_entities
+            if text_processing(str(query_entity))
+        })
+        normalized_event_texts = {
+            event_id: self.causal_v2_engine.event_nodes[event_id].get("canonical_text", "")
+            for event_id in event_ids
+        }
+
+        for event_id in event_ids:
+            if self._event_matches_query_entities(
+                normalized_event_texts.get(event_id, ""),
+                normalized_query_entities,
+            ):
+                entity_weights[event_id] += 1.0 * self._general_graph_entity_hub_decay(event_id)
+
+        if dense_seed_top_n > 0 and normalized_query_entities:
+            dense_seed_scores = np.asarray(dense_sorted_doc_scores[:dense_seed_top_n], dtype=float)
+            normalized_dense_scores = min_max_normalize(dense_seed_scores)
+            for rank, doc_id in enumerate(dense_sorted_doc_ids[:dense_seed_top_n].tolist()):
+                dense_weight = float(normalized_dense_scores[rank]) * 0.5
+                if dense_weight <= 0.0:
+                    continue
+                chunk_id = str(self.passage_node_keys[int(doc_id)])
+                for event_id in self.causal_v2_engine.chunk_to_event_ids.get(chunk_id, []):
+                    if not self._event_matches_query_entities(
+                        normalized_event_texts.get(str(event_id), ""),
+                        normalized_query_entities,
+                    ):
+                        continue
+                    entity_weights[str(event_id)] += dense_weight * self._general_graph_entity_hub_decay(str(event_id))
+
+        filtered = {
+            str(eid): float(weight)
+            for eid, weight in entity_weights.items()
+            if float(weight) > 0.0
+        }
+        if len(filtered) > max_entity_seeds:
+            sorted_seeds = sorted(filtered.items(), key=lambda item: item[1], reverse=True)
+            filtered = dict(sorted_seeds[:max_entity_seeds])
+
+        if (
+            len(filtered) < min_entity_seeds_for_embedding_fallback
+            and self.causal_v2_engine.event_embeddings.size > 0
+        ):
+            query_embedding = np.asarray(self.query_to_embedding["passage"][query], dtype=float).reshape(-1)
+            event_scores = np.dot(self.causal_v2_engine.event_embeddings, query_embedding.T)
+            embedding_top_k = min(
+                max(0, int(getattr(self.global_config, "general_graph_seed_top_k", 10))),
+                len(event_ids),
+            )
+            if embedding_top_k > 0:
+                top_indices = np.argsort(event_scores)[::-1][:embedding_top_k]
+                top_scores = np.asarray([event_scores[idx] for idx in top_indices.tolist()], dtype=float)
+                normalized_top_scores = min_max_normalize(top_scores)
+                for rank, event_idx in enumerate(top_indices.tolist()):
+                    if len(filtered) >= min_entity_seeds_for_embedding_fallback:
+                        break
+                    event_id = str(event_ids[event_idx])
+                    if event_id in filtered:
+                        continue
+                    embedding_weight = float(normalized_top_scores[rank]) * 0.3
+                    if embedding_weight <= 0.0:
+                        continue
+                    filtered[event_id] = embedding_weight * self._general_graph_entity_hub_decay(event_id)
+
+        return filtered
+
+    def _retrieve_via_general_relation_graph(
+        self,
+        query: str,
+        dense_sorted_doc_ids: np.ndarray,
+        dense_sorted_doc_scores: np.ndarray,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        if self.v2_general_graph is None:
+            return dense_sorted_doc_ids, dense_sorted_doc_scores
+
+        node_weights = np.zeros(self.v2_general_graph.vcount(), dtype=float)
+        entity_weights = self._get_general_graph_entity_seeds(
+            query=query,
+            dense_sorted_doc_ids=dense_sorted_doc_ids,
+            dense_sorted_doc_scores=dense_sorted_doc_scores,
+        )
+
+        for entity_id, weight in entity_weights.items():
+            vertex_idx = self.v2_entity_to_vertex_idx.get(str(entity_id))
+            if vertex_idx is not None:
+                node_weights[int(vertex_idx)] = float(weight)
+
+        if len(dense_sorted_doc_scores) > 0:
+            passage_reset_top_n = min(20, len(dense_sorted_doc_ids))
+            normalized_dense_scores = min_max_normalize(
+                np.asarray(dense_sorted_doc_scores[:passage_reset_top_n], dtype=float)
+            )
+            for rank, doc_id in enumerate(dense_sorted_doc_ids[:passage_reset_top_n].tolist()):
+                passage_key = str(self.passage_node_keys[int(doc_id)])
+                passage_vertex_idx = self.v2_passage_to_vertex_idx.get(passage_key)
+                if passage_vertex_idx is None:
+                    continue
+                node_weights[int(passage_vertex_idx)] = float(normalized_dense_scores[rank]) * float(
+                    self.global_config.passage_node_weight
+                )
+
+        if np.sum(node_weights) <= 0.0:
+            return dense_sorted_doc_ids, dense_sorted_doc_scores
+
+        # Keep entity and passage reset mass explicitly bounded so added entity
+        # seeds do not wash out dense passage priors.
+        entity_vertex_set = set(self.v2_entity_to_vertex_idx.values())
+        entity_mask = np.array([i in entity_vertex_set for i in range(len(node_weights))], dtype=bool)
+        entity_total = np.sum(node_weights[entity_mask])
+        passage_total = np.sum(node_weights[~entity_mask])
+        if entity_total > 0 and passage_total > 0:
+            node_weights[entity_mask] *= 0.6 / entity_total
+            node_weights[~entity_mask] *= 0.4 / passage_total
+        elif entity_total > 0:
+            node_weights[entity_mask] *= 1.0 / entity_total
+        elif passage_total > 0:
+            node_weights[~entity_mask] *= 1.0 / passage_total
+
+        damping = self.global_config.damping if self.global_config.damping is not None else 0.5
+        ppr_scores = self.v2_general_graph.personalized_pagerank(
+            vertices=range(self.v2_general_graph.vcount()),
+            damping=damping,
+            directed=False,
+            weights="weight",
+            reset=node_weights,
+            implementation="prpack",
+        )
+        doc_scores = np.asarray([ppr_scores[idx] for idx in self.v2_passage_vertex_idxs], dtype=float)
+        sorted_doc_ids = np.argsort(doc_scores)[::-1]
+        sorted_doc_scores = doc_scores[sorted_doc_ids]
+        return sorted_doc_ids, sorted_doc_scores
+
     def _get_v2_base_retrieval(self,
                                query: str,
                                dense_sorted_doc_ids: np.ndarray,
@@ -2204,10 +2426,20 @@ class HippoRAG:
         }
 
         if base_mode == "general_relation_graph":
-            trace["used_dense_fallback"] = True
-            trace["route_name"] = "dense_passage_v2_fallback"
-            trace["scores_source"] = "dense_passage_fallback_from_general_relation_graph"
-            return dense_sorted_doc_ids, dense_sorted_doc_scores, trace
+            if self.v2_general_graph is None:
+                trace["used_dense_fallback"] = True
+                trace["route_name"] = "dense_passage_v2_fallback_from_general"
+                trace["scores_source"] = "dense_passage_fallback_from_general_relation_graph"
+                return dense_sorted_doc_ids, dense_sorted_doc_scores, trace
+
+            sorted_doc_ids, sorted_doc_scores = self._retrieve_via_general_relation_graph(
+                query=query,
+                dense_sorted_doc_ids=dense_sorted_doc_ids,
+                dense_sorted_doc_scores=dense_sorted_doc_scores,
+            )
+            trace["route_name"] = "general_relation_graph_v2"
+            trace["scores_source"] = "general_relation_graph_ppr"
+            return sorted_doc_ids, sorted_doc_scores, trace
 
         if base_mode != "legacy_fact_graph":
             return dense_sorted_doc_ids, dense_sorted_doc_scores, trace
