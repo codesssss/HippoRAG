@@ -4,6 +4,23 @@
 
 HippoRAG is a multi-hop QA retrieval system. The current work is on branch `planner-hipporag-integration`, focused on improving retrieval accuracy (Recall@K, EM, F1) on multi-hop QA benchmarks (2WikiMultiHopQA, HotpotQA).
 
+## Current Research Memory
+
+For the active EMNLP paper direction, use the files under `research_memory/emnlp_expand_then_compose/` as the canonical source of truth before proposing new ideas or experiments.
+
+Read order:
+1. `research_memory/emnlp_expand_then_compose/00_north_star.md`
+2. `research_memory/emnlp_expand_then_compose/01_claim_ledger.md`
+3. `research_memory/emnlp_expand_then_compose/04_result_registry.md`
+4. `research_memory/emnlp_expand_then_compose/03_experiment_board.md`
+5. `research_memory/emnlp_expand_then_compose/02_decision_log.md`
+
+Rules:
+- Do not reframe the current paper as causal retrieval.
+- Do not reframe the current paper as pointwise reranking.
+- If the main framing changes, update the decision log first.
+- If a claim becomes supported or contradicted, update the claim ledger.
+
 ## Current Best Configuration
 
 The validated best config on 2Wiki-100 (EM=0.46, F1=0.5188, Recall@5=0.845):
@@ -28,8 +45,8 @@ This uses the original HippoRAG fact-graph PPR retrieval with properly aligned e
 | Embedding (legacy fact PPR) | NV-Embed-v2 | Local (transformers) | Auto-loaded on demand | HF cache: `/mnt/nvme/hf/models--nvidia--NV-Embed-v2` |
 
 Other services on this machine (not HippoRAG, do not touch):
-- `qwen3-8b-train` on port 8043 (GPU 3,4 TP=2) — R-HAN training
-- `qwen3-32b-judge` on port 8045 (GPU 5,7 TP=2) — R-HAN judge
+- `qwen3-8b-train` on port 8043 (GPU 3,4 TP=2) - R-HAN training
+- `qwen3-32b-judge` on port 8045 (GPU 5,7 TP=2) - R-HAN judge
 - Ollama on port 11434 (llama2, deepseek-r1)
 
 ## Embedding Models
@@ -62,12 +79,17 @@ These have been experimentally disproven on 2Wiki/HotpotQA. They were removed in
 
 ## Active Development Direction
 
-No "algorithm innovation" directions remain viable. All six V2 ideas have been experimentally disproven. The validated best path is the aligned legacy_fact_graph retrieval (engineering improvement, not algorithm change).
+For the retrieval backbone, the aligned `legacy_fact_graph` path remains the strongest validated base retriever.
 
-Potential future directions (not yet attempted):
-- Better entity resolution in V2 extraction (stricter dedup may improve graph quality)
-- Hybrid retrieval: legacy PPR + dense reranker fusion
-- Upstream improvements: better passage chunking, improved fact extraction prompts
+The current research direction is not another causal or general-graph retrieval variant. The active EMNLP direction is evidence composition over a widened candidate pool:
+
+- Core framing: hard multi-hop failures come from incomplete evidence sets, not only from bad pointwise scores
+- Working story: `Expand-then-Compose`
+- Immediate method target: simple setwise or bridge-aware evidence selection from a larger top-K pool
+- Main analysis dataset: `2WikiMultihopQA`
+- Cross-dataset ceiling checks: `HotpotQA`, `MuSiQue`
+
+Retrieval-side negative results remain important, but now serve as motivation for the pivot rather than an unfinished algorithm branch.
 
 ## Code Structure
 

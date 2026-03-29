@@ -1,0 +1,427 @@
+{
+  "reports": [
+    {
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/oracle_select_sweep_1000_reorder20.json",
+      "dataset": "2wikimultihopqa",
+      "overall_recomputed": {
+        "Recall@1": 0.399,
+        "Recall@2": 0.6475,
+        "Recall@5": 0.7865,
+        "Recall@10": 0.8273,
+        "Recall@20": 0.853,
+        "Recall@30": 0.8658,
+        "Recall@50": 0.882,
+        "Recall@100": 0.9058,
+        "Recall@150": 0.918,
+        "Recall@200": 0.9297,
+        "ExactMatch": 0.436,
+        "F1": 0.49164333642464436,
+        "num_queries": 1000
+      },
+      "oracle_select_qa": {
+        "baseline_EM": 0.436,
+        "baseline_F1": 0.4916,
+        "support_depth": {
+          "2-doc": {
+            "count": 765,
+            "fully_supported": 726,
+            "never_supported": 39,
+            "median_depth": 3.0,
+            "mean_depth": 12.8,
+            "p90_depth": 27.0,
+            "max_depth": 200
+          },
+          "4-doc": {
+            "count": 235,
+            "fully_supported": 77,
+            "never_supported": 158,
+            "median_depth": 64.0,
+            "mean_depth": 76.9,
+            "p90_depth": 166.0,
+            "max_depth": 200
+          }
+        },
+        "sweep": {
+          "K=20": {
+            "pool_k": 20,
+            "oracle_select_EM": 0.498,
+            "oracle_select_F1": 0.5643,
+            "EM_delta": 0.062,
+            "F1_delta": 0.0727,
+            "full_support_in_pool_rate": 0.659,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 765,
+                "avg_gold_found_in_pool": 1.833,
+                "full_support_rate": 0.8327,
+                "EM": 0.5542,
+                "F1": 0.6284
+              },
+              "4-doc": {
+                "count": 235,
+                "avg_gold_found_in_pool": 2.587,
+                "full_support_rate": 0.0936,
+                "EM": 0.3149,
+                "F1": 0.3556
+              }
+            }
+          },
+          "K=30": {
+            "pool_k": 30,
+            "oracle_select_EM": 0.512,
+            "oracle_select_F1": 0.5812,
+            "EM_delta": 0.076,
+            "F1_delta": 0.0896,
+            "full_support_in_pool_rate": 0.682,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 765,
+                "avg_gold_found_in_pool": 1.859,
+                "full_support_rate": 0.8588,
+                "EM": 0.5699,
+                "F1": 0.647
+              },
+              "4-doc": {
+                "count": 235,
+                "avg_gold_found_in_pool": 2.634,
+                "full_support_rate": 0.1064,
+                "EM": 0.3234,
+                "F1": 0.367
+              }
+            }
+          },
+          "K=50": {
+            "pool_k": 50,
+            "oracle_select_EM": 0.531,
+            "oracle_select_F1": 0.602,
+            "EM_delta": 0.095,
+            "F1_delta": 0.1104,
+            "full_support_in_pool_rate": 0.708,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 765,
+                "avg_gold_found_in_pool": 1.885,
+                "full_support_rate": 0.885,
+                "EM": 0.5843,
+                "F1": 0.6647
+              },
+              "4-doc": {
+                "count": 235,
+                "avg_gold_found_in_pool": 2.74,
+                "full_support_rate": 0.1319,
+                "EM": 0.3574,
+                "F1": 0.398
+              }
+            }
+          },
+          "K=100": {
+            "pool_k": 100,
+            "oracle_select_EM": 0.56,
+            "oracle_select_F1": 0.6318,
+            "EM_delta": 0.124,
+            "F1_delta": 0.1402,
+            "full_support_in_pool_rate": 0.752,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 765,
+                "avg_gold_found_in_pool": 1.919,
+                "full_support_rate": 0.919,
+                "EM": 0.6039,
+                "F1": 0.687
+              },
+              "4-doc": {
+                "count": 235,
+                "avg_gold_found_in_pool": 2.923,
+                "full_support_rate": 0.2085,
+                "EM": 0.417,
+                "F1": 0.4521
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "report": "outputs_step0_general_hotpotqa/eval_reports/oracle_select_sweep_1000_reorder20.json",
+      "dataset": "hotpotqa",
+      "overall_recomputed": {
+        "Recall@1": 0.3765,
+        "Recall@2": 0.6345,
+        "Recall@5": 0.8835,
+        "Recall@10": 0.96,
+        "Recall@20": 0.974,
+        "Recall@30": 0.9815,
+        "Recall@50": 0.9865,
+        "Recall@100": 0.993,
+        "Recall@150": 0.9945,
+        "Recall@200": 0.996,
+        "ExactMatch": 0.563,
+        "F1": 0.675963661332143,
+        "num_queries": 1000
+      },
+      "oracle_select_qa": {
+        "baseline_EM": 0.563,
+        "baseline_F1": 0.676,
+        "support_depth": {
+          "2-doc": {
+            "count": 1000,
+            "fully_supported": 992,
+            "never_supported": 8,
+            "median_depth": 3.0,
+            "mean_depth": 6.2,
+            "p90_depth": 9.0,
+            "max_depth": 187
+          }
+        },
+        "sweep": {
+          "K=20": {
+            "pool_k": 20,
+            "oracle_select_EM": 0.631,
+            "oracle_select_F1": 0.7548,
+            "EM_delta": 0.068,
+            "F1_delta": 0.0788,
+            "full_support_in_pool_rate": 0.95,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 1000,
+                "avg_gold_found_in_pool": 1.948,
+                "full_support_rate": 0.95,
+                "EM": 0.631,
+                "F1": 0.7548
+              }
+            }
+          },
+          "K=30": {
+            "pool_k": 30,
+            "oracle_select_EM": 0.637,
+            "oracle_select_F1": 0.7606,
+            "EM_delta": 0.074,
+            "F1_delta": 0.0846,
+            "full_support_in_pool_rate": 0.963,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 1000,
+                "avg_gold_found_in_pool": 1.963,
+                "full_support_rate": 0.963,
+                "EM": 0.637,
+                "F1": 0.7606
+              }
+            }
+          },
+          "K=50": {
+            "pool_k": 50,
+            "oracle_select_EM": 0.642,
+            "oracle_select_F1": 0.7658,
+            "EM_delta": 0.079,
+            "F1_delta": 0.0898,
+            "full_support_in_pool_rate": 0.973,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 1000,
+                "avg_gold_found_in_pool": 1.973,
+                "full_support_rate": 0.973,
+                "EM": 0.642,
+                "F1": 0.7658
+              }
+            }
+          },
+          "K=100": {
+            "pool_k": 100,
+            "oracle_select_EM": 0.645,
+            "oracle_select_F1": 0.7707,
+            "EM_delta": 0.082,
+            "F1_delta": 0.0947,
+            "full_support_in_pool_rate": 0.986,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 1000,
+                "avg_gold_found_in_pool": 1.986,
+                "full_support_rate": 0.986,
+                "EM": 0.645,
+                "F1": 0.7707
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "report": "outputs_step0_general_musique/eval_reports/oracle_select_sweep_1000.json",
+      "dataset": "musique",
+      "overall_recomputed": {
+        "Recall@1": 0.2711,
+        "Recall@2": 0.4184,
+        "Recall@5": 0.6177,
+        "Recall@10": 0.7295,
+        "Recall@20": 0.7924,
+        "Recall@30": 0.829,
+        "Recall@50": 0.8616,
+        "Recall@100": 0.9038,
+        "Recall@150": 0.9229,
+        "Recall@200": 0.9365,
+        "ExactMatch": 0.257,
+        "F1": 0.34270624636745606,
+        "num_queries": 1000
+      },
+      "oracle_select_qa": {
+        "baseline_EM": 0.257,
+        "baseline_F1": 0.3427,
+        "support_depth": {
+          "2-doc": {
+            "count": 518,
+            "fully_supported": 475,
+            "never_supported": 43,
+            "median_depth": 5.0,
+            "mean_depth": 18.0,
+            "p90_depth": 48.6,
+            "max_depth": 191
+          },
+          "3-doc": {
+            "count": 316,
+            "fully_supported": 266,
+            "never_supported": 50,
+            "median_depth": 18.0,
+            "mean_depth": 39.4,
+            "p90_depth": 116.0,
+            "max_depth": 193
+          },
+          "4-doc": {
+            "count": 166,
+            "fully_supported": 91,
+            "never_supported": 75,
+            "median_depth": 55.0,
+            "mean_depth": 69.2,
+            "p90_depth": 152.0,
+            "max_depth": 199
+          }
+        },
+        "sweep": {
+          "K=20": {
+            "pool_k": 20,
+            "oracle_select_EM": 0.363,
+            "oracle_select_F1": 0.4612,
+            "EM_delta": 0.106,
+            "F1_delta": 0.1185,
+            "full_support_in_pool_rate": 0.531,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 518,
+                "avg_gold_found_in_pool": 1.72,
+                "full_support_rate": 0.722,
+                "EM": 0.4151,
+                "F1": 0.5168
+              },
+              "3-doc": {
+                "count": 316,
+                "avg_gold_found_in_pool": 2.361,
+                "full_support_rate": 0.4494,
+                "EM": 0.3576,
+                "F1": 0.456
+              },
+              "4-doc": {
+                "count": 166,
+                "avg_gold_found_in_pool": 2.367,
+                "full_support_rate": 0.0904,
+                "EM": 0.2108,
+                "F1": 0.2974
+              }
+            }
+          },
+          "K=30": {
+            "pool_k": 30,
+            "oracle_select_EM": 0.379,
+            "oracle_select_F1": 0.4807,
+            "EM_delta": 0.122,
+            "F1_delta": 0.138,
+            "full_support_in_pool_rate": 0.591,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 518,
+                "avg_gold_found_in_pool": 1.778,
+                "full_support_rate": 0.778,
+                "EM": 0.4344,
+                "F1": 0.5398
+              },
+              "3-doc": {
+                "count": 316,
+                "avg_gold_found_in_pool": 2.468,
+                "full_support_rate": 0.519,
+                "EM": 0.3734,
+                "F1": 0.4698
+              },
+              "4-doc": {
+                "count": 166,
+                "avg_gold_found_in_pool": 2.614,
+                "full_support_rate": 0.1446,
+                "EM": 0.2169,
+                "F1": 0.317
+              }
+            }
+          },
+          "K=50": {
+            "pool_k": 50,
+            "oracle_select_EM": 0.403,
+            "oracle_select_F1": 0.5071,
+            "EM_delta": 0.146,
+            "F1_delta": 0.1644,
+            "full_support_in_pool_rate": 0.661,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 518,
+                "avg_gold_found_in_pool": 1.828,
+                "full_support_rate": 0.8282,
+                "EM": 0.4537,
+                "F1": 0.5649
+              },
+              "3-doc": {
+                "count": 316,
+                "avg_gold_found_in_pool": 2.566,
+                "full_support_rate": 0.6076,
+                "EM": 0.3987,
+                "F1": 0.4999
+              },
+              "4-doc": {
+                "count": 166,
+                "avg_gold_found_in_pool": 2.837,
+                "full_support_rate": 0.241,
+                "EM": 0.253,
+                "F1": 0.3401
+              }
+            }
+          },
+          "K=100": {
+            "pool_k": 100,
+            "oracle_select_EM": 0.436,
+            "oracle_select_F1": 0.5401,
+            "EM_delta": 0.179,
+            "F1_delta": 0.1974,
+            "full_support_in_pool_rate": 0.757,
+            "bucket_breakdown": {
+              "2-doc": {
+                "count": 518,
+                "avg_gold_found_in_pool": 1.878,
+                "full_support_rate": 0.8784,
+                "EM": 0.4846,
+                "F1": 0.5942
+              },
+              "3-doc": {
+                "count": 316,
+                "avg_gold_found_in_pool": 2.718,
+                "full_support_rate": 0.7405,
+                "EM": 0.4304,
+                "F1": 0.5344
+              },
+              "4-doc": {
+                "count": 166,
+                "avg_gold_found_in_pool": 3.157,
+                "full_support_rate": 0.4096,
+                "EM": 0.2952,
+                "F1": 0.3823
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

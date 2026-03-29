@@ -26,7 +26,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import numpy as np
 import os
+import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -48,6 +50,11 @@ def _normalize_relation(text: str) -> str:
     return " ".join(str(text).strip().lower().split())
 
 
+def _normalize_mention_text(text: str) -> str:
+    text = re.sub(r"'s\b", "", str(text), flags=re.IGNORECASE)
+    return _normalize_node(text)
+
+
 def _load_json(path: str | Path) -> Any:
     return json.loads(Path(path).read_text())
 
@@ -63,14 +70,55 @@ def _build_chunk_id_to_title(corpus: list[dict]) -> tuple[dict[str, str], dict[s
     return chunk_id_to_title, chunk_id_to_doc
 
 
-def _extract_dense_titles(example: dict, chunk_id_to_title: dict[str, str]) -> list[str]:
+def _extract_titles(example: dict, chunk_id_to_title: dict[str, str], doc_id_key: str = "base_context_doc_ids") -> list[str]:
+    direct_doc_ids = example.get("retrieved_doc_ids") or []
     trace = example.get("retrieval_trace") or {}
-    dense_doc_ids = trace.get("dense_context_doc_ids") or []
+    doc_ids = direct_doc_ids or trace.get(doc_id_key) or []
     titles: list[str] = []
-    for doc_id in dense_doc_ids:
+    for doc_id in doc_ids:
         if doc_id in chunk_id_to_title:
             titles.append(chunk_id_to_title[doc_id])
     return titles
+
+
+def _title_surface_forms(title: str) -> list[str]:
+    forms = [str(title).strip()]
+    if "(" in title:
+        forms.append(title.split("(", 1)[0].strip())
+    if "," in title:
+        forms.append(title.split(",", 1)[0].strip())
+
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for form in forms:
+        norm = _normalize_mention_text(form)
+        if norm and norm not in seen:
+            seen.add(norm)
+            deduped.append(form)
+    return deduped
+
+
+def _is_title_anchored_in_question(question: str, title: str) -> bool:
+    question_norm = _normalize_mention_text(question)
+    if not question_norm:
+        return False
+
+    for form in _title_surface_forms(title):
+        form_norm = _normalize_mention_text(form)
+        if form_norm and form_norm in question_norm:
+            return True
+    return False
+
+
+def _split_anchor_bridge_titles(question: str, gold_titles: list[str]) -> tuple[list[str], list[str]]:
+    anchor_titles: list[str] = []
+    bridge_titles: list[str] = []
+    for title in gold_titles:
+        if _is_title_anchored_in_question(question, title):
+            anchor_titles.append(title)
+        else:
+            bridge_titles.append(title)
+    return sorted(anchor_titles), sorted(bridge_titles)
 
 
 def _build_evidence_graph(sample: dict) -> tuple[dict[str, list[tuple[str, str]]], dict[str, Counter], list[dict]]:
@@ -154,6 +202,33 @@ def _support_recall(retrieved_titles: list[str], gold_titles: list[str], k: int)
 
 def _full_support(retrieved_titles: list[str], gold_titles: list[str], k: int) -> float:
     return 1.0 if set(gold_titles).issubset(set(retrieved_titles[:k])) else 0.0
+
+
+def _subset_recall(retrieved_titles: list[str], target_titles: list[str], k: int) -> float:
+    if not target_titles:
+        return 0.0
+    retrieved_set = set(retrieved_titles[:k])
+    return len(retrieved_set & set(target_titles)) / len(set(target_titles))
+
+
+def _first_hit_depth(retrieved_titles: list[str], title: str) -> int | None:
+    for rank, retrieved_title in enumerate(retrieved_titles, 1):
+        if retrieved_title == title:
+            return rank
+    return None
+
+
+def _depth_summary(depths: list[int | None]) -> dict[str, Any]:
+    finite = [depth for depth in depths if depth is not None]
+    return {
+        "count": len(depths),
+        "found": len(finite),
+        "missing": len(depths) - len(finite),
+        "median_depth": round(float(np.median(finite)), 1) if finite else None,
+        "mean_depth": round(float(np.mean(finite)), 1) if finite else None,
+        "p90_depth": round(float(np.percentile(finite, 90)), 1) if finite else None,
+        "max_depth": int(max(finite)) if finite else None,
+    }
 
 
 def _oracle_recall_inject_one(retrieved_titles: list[str], gold_titles: list[str], k: int) -> float:
@@ -240,8 +315,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--top_ks",
-        default="2,5",
-        help="Comma-separated top-k values to analyze. Default: 2,5",
+        default="1,2,5,10,20",
+        help="Comma-separated top-k values to analyze. Default: 1,2,5,10,20",
+    )
+    parser.add_argument(
+        "--doc_id_key",
+        default="base_context_doc_ids",
+        help="Key in retrieval_trace to use for retrieved doc IDs. Default: base_context_doc_ids",
     )
     parser.add_argument(
         "--output_json",
@@ -299,6 +379,19 @@ def main() -> None:
         "two_hop_bridge_count_top5": 0,
     }
 
+    role_metric_sums: dict[str, dict[str, float]] = {
+        "anchor_recall": {f"Recall@{k}": 0.0 for k in top_ks},
+        "anchor_full_support": {f"FullSupport@{k}": 0.0 for k in top_ks},
+        "bridge_recall": {f"Recall@{k}": 0.0 for k in top_ks},
+        "bridge_full_support": {f"FullSupport@{k}": 0.0 for k in top_ks},
+    }
+    role_query_counts = {"anchor": 0, "bridge": 0}
+    role_depths = {"anchor": [], "bridge": []}
+
+    # Breakdown by gold doc count (2-doc vs 4-doc queries)
+    bucket_counts: dict[int, int] = defaultdict(int)
+    bucket_metrics: dict[int, dict[str, dict[str, float]]] = {}
+
     per_query_rows: list[dict[str, Any]] = []
 
     for idx, (sample, example) in enumerate(zip(samples, examples)):
@@ -309,7 +402,13 @@ def main() -> None:
             )
 
         gold_titles = sorted({item[0] for item in sample.get("supporting_facts", [])})
-        retrieved_titles = _extract_dense_titles(example, chunk_id_to_title)
+        retrieved_titles = _extract_titles(example, chunk_id_to_title, args.doc_id_key)
+        anchor_titles, bridge_titles = _split_anchor_bridge_titles(sample["question"], gold_titles)
+
+        for title in anchor_titles:
+            role_depths["anchor"].append(_first_hit_depth(retrieved_titles, title))
+        for title in bridge_titles:
+            role_depths["bridge"].append(_first_hit_depth(retrieved_titles, title))
 
         adjacency, surface_forms, triples = _build_evidence_graph(sample)
         relation_counts.update(
@@ -358,12 +457,37 @@ def main() -> None:
             metrics["oracle_bridgeable_full_support"][f"FullSupport@{k}"] += _oracle_full_support_inject_bridgeable(
                 retrieved_titles, gold_titles, bridgeable_missing_titles, k
             )
+            if anchor_titles:
+                role_metric_sums["anchor_recall"][f"Recall@{k}"] += _subset_recall(retrieved_titles, anchor_titles, k)
+                role_metric_sums["anchor_full_support"][f"FullSupport@{k}"] += _full_support(retrieved_titles, anchor_titles, k)
+            if bridge_titles:
+                role_metric_sums["bridge_recall"][f"Recall@{k}"] += _subset_recall(retrieved_titles, bridge_titles, k)
+                role_metric_sums["bridge_full_support"][f"FullSupport@{k}"] += _full_support(retrieved_titles, bridge_titles, k)
+
+        if anchor_titles:
+            role_query_counts["anchor"] += 1
+        if bridge_titles:
+            role_query_counts["bridge"] += 1
+
+        # Breakdown by gold doc count
+        n_gold = len(set(gold_titles))
+        bucket_counts[n_gold] += 1
+        if n_gold not in bucket_metrics:
+            bucket_metrics[n_gold] = {
+                "baseline_recall": {f"Recall@{k}": 0.0 for k in top_ks},
+                "baseline_full_support": {f"FullSupport@{k}": 0.0 for k in top_ks},
+            }
+        for k in top_ks:
+            bucket_metrics[n_gold]["baseline_recall"][f"Recall@{k}"] += _support_recall(retrieved_titles, gold_titles, k)
+            bucket_metrics[n_gold]["baseline_full_support"][f"FullSupport@{k}"] += _full_support(retrieved_titles, gold_titles, k)
 
         per_query_rows.append(
             {
                 "idx": idx,
                 "question": sample["question"],
                 "gold_support_titles": gold_titles,
+                "anchor_support_titles": anchor_titles,
+                "bridge_support_titles": bridge_titles,
                 "retrieved_top5_titles": retrieved_titles[:5],
                 "found_support_top5": found_top5,
                 "missing_support_top5": missing_top5,
@@ -377,12 +501,34 @@ def main() -> None:
         for key in list(family.keys()):
             family[key] = round(family[key] / max(1, num_queries), 4)
 
+    role_metrics: dict[str, dict[str, float]] = {}
+    for family_name, family_values in role_metric_sums.items():
+        role = "anchor" if family_name.startswith("anchor_") else "bridge"
+        denom = max(1, role_query_counts[role])
+        role_metrics[family_name] = {
+            key: round(value / denom, 4)
+            for key, value in family_values.items()
+        }
+
+    # Average bucket metrics
+    for n_gold, bm in bucket_metrics.items():
+        n = max(1, bucket_counts[n_gold])
+        for family in bm.values():
+            for key in list(family.keys()):
+                family[key] = round(family[key] / n, 4)
+
     summary = {
         "report": str(Path(args.report)),
         "dataset_path": str(Path(args.dataset_path)),
         "corpus_path": str(Path(args.corpus_path)),
         "num_queries": num_queries,
         "metrics": metrics,
+        "role_metrics": role_metrics,
+        "role_query_counts": role_query_counts,
+        "role_depth_summary": {
+            "anchor": _depth_summary(role_depths["anchor"]),
+            "bridge": _depth_summary(role_depths["bridge"]),
+        },
         "feasibility": {
             **feasibility,
             "bridgeable_missing_doc_rate_top5": round(
@@ -393,6 +539,14 @@ def main() -> None:
                 feasibility["queries_with_bridgeable_missing_support_top5"] / max(1, feasibility["queries_with_partial_support_top5"]),
                 4,
             ),
+        },
+        "doc_id_key": args.doc_id_key,
+        "breakdown_by_gold_doc_count": {
+            str(n_gold): {
+                "count": bucket_counts[n_gold],
+                **bucket_metrics[n_gold],
+            }
+            for n_gold in sorted(bucket_metrics.keys())
         },
         "relation_inventory": {
             "relation_counts": dict(relation_counts.most_common()),
@@ -436,6 +590,36 @@ def main() -> None:
             lines.append(f"- `{key}`: {value:.4f}")
         lines.append("")
 
+    lines.extend(["## Anchor vs Bridge Recall", ""])
+    lines.append(f"- `anchor_query_count`: {role_query_counts['anchor']}")
+    lines.append(f"- `bridge_query_count`: {role_query_counts['bridge']}")
+    lines.append("")
+    for metric_family, metric_values in role_metrics.items():
+        lines.append(f"### {metric_family}")
+        lines.append("")
+        for key, value in metric_values.items():
+            lines.append(f"- `{key}`: {value:.4f}")
+        lines.append("")
+    lines.extend(
+        [
+            "## Anchor vs Bridge Depth",
+            "",
+            f"- `anchor_depth`: {json.dumps(summary['role_depth_summary']['anchor'], ensure_ascii=False)}",
+            f"- `bridge_depth`: {json.dumps(summary['role_depth_summary']['bridge'], ensure_ascii=False)}",
+            "",
+        ]
+    )
+
+    lines.extend(["## Breakdown by Gold Doc Count", ""])
+    for n_gold in sorted(bucket_metrics.keys()):
+        lines.append(f"### {n_gold}-doc queries (n={bucket_counts[n_gold]})")
+        lines.append("")
+        for family_name, family_values in bucket_metrics[n_gold].items():
+            lines.append(f"**{family_name}**:")
+            for key, value in family_values.items():
+                lines.append(f"- `{key}`: {value:.4f}")
+            lines.append("")
+
     lines.extend(
         [
             "## Feasibility",
@@ -468,6 +652,8 @@ def main() -> None:
             "output_json": str(output_json),
             "output_md": str(output_md),
             "metrics": metrics,
+            "role_metrics": role_metrics,
+            "role_depth_summary": summary["role_depth_summary"],
             "feasibility": summary["feasibility"],
             "top_relations": relation_counts.most_common(10),
             "top_bridge_relation_paths": bridge_relation_path_counts.most_common(10),

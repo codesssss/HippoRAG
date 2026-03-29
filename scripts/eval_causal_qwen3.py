@@ -13,7 +13,7 @@ from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
 from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
 from src.hipporag.utils.causal_utils import route_query_type
 from src.hipporag.utils.config_utils import BaseConfig
-from src.hipporag.utils.misc_utils import QuerySolution, string_to_bool
+from src.hipporag.utils.misc_utils import QuerySolution, compute_mdhash_id, string_to_bool
 
 
 def get_gold_docs(samples: List, dataset_name: str = None, corpus: List | None = None) -> List:
@@ -66,6 +66,18 @@ def get_gold_answers(samples):
             gold_ans.update(sample['answer_aliases'])
         gold_answers.append(list(gold_ans))
     return gold_answers
+
+
+def build_doc_text_to_chunk_id(corpus: List[dict]) -> Dict[str, str]:
+    doc_text_to_chunk_id: Dict[str, str] = {}
+    for row in corpus:
+        doc_text = f"{row['title']}\n{row['text']}"
+        doc_text_to_chunk_id[doc_text] = compute_mdhash_id(doc_text, prefix="chunk-")
+    return doc_text_to_chunk_id
+
+
+def serialize_retrieved_doc_ids(retrieved_docs: List[str], doc_text_to_chunk_id: Dict[str, str]) -> List[str | None]:
+    return [doc_text_to_chunk_id.get(doc_text) for doc_text in retrieved_docs]
 
 
 def subset_by_indices(values: List, indices: List[int]) -> List:
@@ -402,6 +414,22 @@ def main():
     parser.add_argument("--structure_rerank_margin_threshold", type=float, default=0.02)
     parser.add_argument("--rerank_require_non_empty", type=str, default="true")
     parser.add_argument("--retrieval_only", type=str, default="false")
+    parser.add_argument("--gold_doc_reader", type=str, default="false",
+                        help="Skip retrieval, feed gold docs directly to reader. Tests reader ceiling.")
+    parser.add_argument("--oracle_reorder_k", type=int, default=0,
+                        help="Move gold docs found within top-K to front. Tests reranker ceiling. 0=disabled.")
+    parser.add_argument("--oracle_select_k", type=str, default="0",
+                        help="Oracle select: comma-separated K values (e.g. '20,30,50,100'). From top-K pool, prioritize gold docs in reader's top-5. 0=disabled.")
+    parser.add_argument("--cross_encoder_rerank", type=str, default="false",
+                        help="Apply cross-encoder rerank on baseline top-K docs. Eval-time only.")
+    parser.add_argument("--ce_model", type=str, default="/mnt/nvme/bge-reranker-v2-m3",
+                        help="Cross-encoder model path or HF name for FlagEmbedding.")
+    parser.add_argument("--ce_alpha", type=float, default=0.7,
+                        help="Hybrid weight: alpha * ppr_norm + (1-alpha) * ce_norm. 1.0 = pure PPR.")
+    parser.add_argument("--ce_window", type=int, default=20,
+                        help="Number of top docs to rerank with cross-encoder.")
+    parser.add_argument("--ce_device", type=str, default="cuda:1",
+                        help="Device for cross-encoder model.")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -422,32 +450,363 @@ def main():
         samples = samples[:args.limit]
 
     docs = [f"{doc['title']}\n{doc['text']}" for doc in corpus]
+    doc_text_to_chunk_id = build_doc_text_to_chunk_id(corpus)
     queries = [sample["question"] for sample in samples]
     gold_answers = get_gold_answers(samples)
     gold_docs = get_gold_docs(samples, dataset_name, corpus=corpus)
     retrieval_only = string_to_bool(args.retrieval_only)
+    gold_doc_reader = string_to_bool(args.gold_doc_reader)
+    oracle_reorder_k = int(args.oracle_reorder_k)
+    oracle_select_ks = [int(x) for x in args.oracle_select_k.split(",") if int(x) > 0]
 
     config = build_config(args, corpus_len=len(corpus))
     logging.basicConfig(level=logging.INFO)
 
-    hipporag = HippoRAG(global_config=config)
-    hipporag.index(docs)
-    if retrieval_only:
-        query_solutions, overall_retrieval_result = hipporag.retrieve(
-            queries=queries,
-            gold_docs=gold_docs,
-        )
-        responses = []
-        metadata = []
-        overall_qa_results = {}
-        effective_gold_answers = None
-    else:
-        query_solutions, responses, metadata, overall_retrieval_result, overall_qa_results = hipporag.rag_qa(
-            queries=queries,
+    oracle_reorder_qa_results = None
+
+    if gold_doc_reader:
+        # Exp2: Gold-doc reader — skip retrieval, feed gold docs to reader
+        hipporag = HippoRAG(global_config=config)
+        hipporag.index(docs)
+        gold_query_solutions = [
+            QuerySolution(
+                question=query,
+                docs=gold_docs[q_idx],
+                doc_scores=np.ones(len(gold_docs[q_idx])),
+            )
+            for q_idx, query in enumerate(queries)
+        ]
+        # rag_qa accepts QuerySolution list directly — skips retrieve()
+        query_solutions, responses, metadata, _, overall_qa_results = hipporag.rag_qa(
+            queries=gold_query_solutions,
             gold_docs=gold_docs,
             gold_answers=gold_answers,
         )
+        overall_retrieval_result = {"note": "gold_doc_reader mode — retrieval metrics are N/A (oracle-by-construction)"}
         effective_gold_answers = gold_answers
+    else:
+        hipporag = HippoRAG(global_config=config)
+        hipporag.index(docs)
+        if retrieval_only:
+            query_solutions, overall_retrieval_result = hipporag.retrieve(
+                queries=queries,
+                gold_docs=gold_docs,
+            )
+            responses = []
+            metadata = []
+            overall_qa_results = {}
+            effective_gold_answers = None
+        else:
+            query_solutions, responses, metadata, overall_retrieval_result, overall_qa_results = hipporag.rag_qa(
+                queries=queries,
+                gold_docs=gold_docs,
+                gold_answers=gold_answers,
+            )
+            effective_gold_answers = gold_answers
+
+        # Exp3: Oracle reorder within top-K
+        if oracle_reorder_k > 0 and not retrieval_only:
+            qa_em = QAExactMatch(global_config=config)
+            qa_f1 = QAF1Score(global_config=config)
+            reordered_solutions = []
+            full_support_in_topk_count = 0
+            for q_idx, qs in enumerate(query_solutions):
+                gold_set = set(gold_docs[q_idx])
+                top_k_docs = qs.docs[:oracle_reorder_k]
+                gold_in_topk = [d for d in top_k_docs if d in gold_set]
+                non_gold_in_topk = [d for d in top_k_docs if d not in gold_set]
+                rest = qs.docs[oracle_reorder_k:]
+                reordered_docs = gold_in_topk + non_gold_in_topk + rest
+                if gold_set.issubset(set(top_k_docs)):
+                    full_support_in_topk_count += 1
+                reordered_qs = QuerySolution(
+                    question=qs.question,
+                    docs=reordered_docs,
+                    doc_scores=qs.doc_scores,
+                    gold_docs=gold_docs[q_idx],
+                )
+                reordered_solutions.append(reordered_qs)
+            # Run QA on reordered docs via rag_qa (skips retrieve since input is QuerySolution)
+            reordered_solutions, _, _, _, reorder_qa_results = hipporag.rag_qa(
+                queries=reordered_solutions,
+                gold_docs=gold_docs,
+                gold_answers=gold_answers,
+            )
+            reordered_answers = [qs.answer for qs in reordered_solutions]
+            reorder_em = reorder_qa_results.get("ExactMatch", 0.0)
+            reorder_f1 = reorder_qa_results.get("F1", 0.0)
+            baseline_em = overall_qa_results.get("ExactMatch", 0.0) if overall_qa_results else 0.0
+            oracle_reorder_qa_results = {
+                "oracle_reorder_k": oracle_reorder_k,
+                "oracle_reorder_EM": round(float(reorder_em), 4),
+                "oracle_reorder_F1": round(float(reorder_f1), 4),
+                "baseline_EM": round(float(baseline_em), 4),
+                "EM_delta": round(float(reorder_em) - float(baseline_em), 4),
+                "full_support_in_top_k_rate": round(full_support_in_topk_count / max(1, len(queries)), 4),
+                "full_support_in_top_k_count": full_support_in_topk_count,
+            }
+
+    # Exp4: Oracle select sweep — ceiling curve across multiple K values
+    oracle_select_qa_results = None
+    if oracle_select_ks and not retrieval_only and not gold_doc_reader:
+        qa_top = config.qa_top_k  # typically 5
+        logger = logging.getLogger(__name__)
+        baseline_em = overall_qa_results.get("ExactMatch", 0.0) if overall_qa_results else 0.0
+        baseline_f1 = overall_qa_results.get("F1", 0.0) if overall_qa_results else 0.0
+
+        # --- Minimal full-support depth per query ---
+        # Smallest K such that all gold docs are in docs[:K]
+        per_query_support_depth = []
+        for q_idx, qs in enumerate(query_solutions):
+            gold_set = set(gold_docs[q_idx])
+            found = set()
+            depth = None
+            for rank, d in enumerate(qs.docs, 1):
+                if d in gold_set:
+                    found.add(d)
+                if found == gold_set:
+                    depth = rank
+                    break
+            per_query_support_depth.append(depth)  # None = never fully supported
+
+        # Bucket support depth stats
+        depth_by_bucket: dict[int, list] = {}
+        for q_idx in range(len(query_solutions)):
+            n_gold = len(set(gold_docs[q_idx]))
+            if n_gold not in depth_by_bucket:
+                depth_by_bucket[n_gold] = []
+            depth_by_bucket[n_gold].append(per_query_support_depth[q_idx])
+
+        support_depth_summary = {}
+        for n_gold in sorted(depth_by_bucket.keys()):
+            depths = depth_by_bucket[n_gold]
+            finite = [d for d in depths if d is not None]
+            support_depth_summary[f"{n_gold}-doc"] = {
+                "count": len(depths),
+                "fully_supported": len(finite),
+                "never_supported": len(depths) - len(finite),
+                "median_depth": round(float(np.median(finite)), 1) if finite else None,
+                "mean_depth": round(float(np.mean(finite)), 1) if finite else None,
+                "p90_depth": round(float(np.percentile(finite, 90)), 1) if finite else None,
+                "max_depth": int(max(finite)) if finite else None,
+            }
+        logger.info("Minimal full-support depth:")
+        for bk, bv in support_depth_summary.items():
+            logger.info(f"  {bk}: supported={bv['fully_supported']}/{bv['count']}, "
+                         f"median={bv['median_depth']}, mean={bv['mean_depth']}, p90={bv['p90_depth']}")
+
+        # --- Oracle select sweep over K values ---
+        sweep_results = {}
+        for sel_k in sorted(oracle_select_ks):
+            logger.info(f"Oracle select: pool={sel_k}, reader sees top-{qa_top}")
+            selected_solutions = []
+            bucket_stats: dict[int, dict] = {}
+
+            for q_idx, qs in enumerate(query_solutions):
+                pool = qs.docs[:sel_k]
+                gold_set = set(gold_docs[q_idx])
+                n_gold = len(gold_set)
+
+                gold_in_pool = [d for d in pool if d in gold_set]
+                non_gold_in_pool = [d for d in pool if d not in gold_set]
+                selected_docs = (gold_in_pool + non_gold_in_pool)[:max(sel_k, qa_top)]
+                rest = qs.docs[sel_k:]
+                all_docs = selected_docs + rest
+
+                selected_qs = QuerySolution(
+                    question=qs.question,
+                    docs=all_docs,
+                    doc_scores=qs.doc_scores,
+                    gold_docs=gold_docs[q_idx],
+                )
+                selected_solutions.append(selected_qs)
+
+                if n_gold not in bucket_stats:
+                    bucket_stats[n_gold] = {"count": 0, "gold_found_sum": 0, "fs_sum": 0}
+                bucket_stats[n_gold]["count"] += 1
+                bucket_stats[n_gold]["gold_found_sum"] += len(gold_in_pool)
+                if gold_set.issubset(set(pool)):
+                    bucket_stats[n_gold]["fs_sum"] += 1
+
+            # Run QA on oracle-selected docs
+            selected_solutions, _, _, _, select_qa_results = hipporag.rag_qa(
+                queries=selected_solutions,
+                gold_docs=gold_docs,
+                gold_answers=gold_answers,
+            )
+            select_em = select_qa_results.get("ExactMatch", 0.0)
+            select_f1 = select_qa_results.get("F1", 0.0)
+
+            # Per-bucket EM/F1 breakdown
+            qa_em_metric = QAExactMatch(global_config=config)
+            qa_f1_metric = QAF1Score(global_config=config)
+            sel_answers = [qs.answer or "" for qs in selected_solutions]
+            _, per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, sel_answers)
+            _, per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, sel_answers)
+            bucket_em: dict[int, list] = {}
+            bucket_f1: dict[int, list] = {}
+            for q_idx in range(len(selected_solutions)):
+                n_gold = len(set(gold_docs[q_idx]))
+                if n_gold not in bucket_em:
+                    bucket_em[n_gold] = []
+                    bucket_f1[n_gold] = []
+                bucket_em[n_gold].append(per_query_em[q_idx]["ExactMatch"])
+                bucket_f1[n_gold].append(per_query_f1[q_idx]["F1"])
+
+            bucket_breakdown = {}
+            for n_gold in sorted(bucket_stats.keys()):
+                bs = bucket_stats[n_gold]
+                bucket_breakdown[f"{n_gold}-doc"] = {
+                    "count": bs["count"],
+                    "avg_gold_found_in_pool": round(bs["gold_found_sum"] / max(1, bs["count"]), 3),
+                    "full_support_rate": round(bs["fs_sum"] / max(1, bs["count"]), 4),
+                    "EM": round(float(np.mean(bucket_em.get(n_gold, [0]))), 4),
+                    "F1": round(float(np.mean(bucket_f1.get(n_gold, [0]))), 4),
+                }
+
+            total_fs = sum(bs["fs_sum"] for bs in bucket_stats.values())
+            sweep_results[f"K={sel_k}"] = {
+                "pool_k": sel_k,
+                "oracle_select_EM": round(float(select_em), 4),
+                "oracle_select_F1": round(float(select_f1), 4),
+                "EM_delta": round(float(select_em) - float(baseline_em), 4),
+                "F1_delta": round(float(select_f1) - float(baseline_f1), 4),
+                "full_support_in_pool_rate": round(total_fs / max(1, len(queries)), 4),
+                "bucket_breakdown": bucket_breakdown,
+            }
+            logger.info(f"Oracle select@{sel_k}: EM={select_em:.4f} (delta={float(select_em)-float(baseline_em):+.4f}), "
+                         f"F1={select_f1:.4f}, FS_in_pool={total_fs}/{len(queries)}")
+            for bk, bv in bucket_breakdown.items():
+                logger.info(f"  {bk}: count={bv['count']}, FS={bv['full_support_rate']}, EM={bv['EM']}, F1={bv['F1']}")
+
+        oracle_select_qa_results = {
+            "baseline_EM": round(float(baseline_em), 4),
+            "baseline_F1": round(float(baseline_f1), 4),
+            "support_depth": support_depth_summary,
+            "sweep": sweep_results,
+        }
+
+    # Cross-encoder rerank on baseline final top-K
+    cross_encoder_rerank_results = None
+    cross_encoder_rerank = string_to_bool(args.cross_encoder_rerank) if not gold_doc_reader else False
+    if cross_encoder_rerank and not retrieval_only and query_solutions:
+        from FlagEmbedding import FlagReranker
+
+        ce_window = int(args.ce_window)
+        ce_alpha = float(args.ce_alpha)
+        ce_model_name = args.ce_model
+        ce_device = args.ce_device
+
+        logger = logging.getLogger(__name__)
+        logger.info(f"Loading cross-encoder model: {ce_model_name} on {ce_device}")
+        ce_reranker = FlagReranker(ce_model_name, use_fp16=True, device=ce_device)
+
+        reranked_solutions = []
+        for q_idx, qs in enumerate(query_solutions):
+            window = min(ce_window, len(qs.docs))
+            window_docs = qs.docs[:window]
+            window_scores = qs.doc_scores[:window] if qs.doc_scores is not None and len(qs.doc_scores) >= window else np.ones(window)
+            rest_docs = qs.docs[window:]
+            rest_scores = qs.doc_scores[window:] if qs.doc_scores is not None and len(qs.doc_scores) > window else np.array([])
+
+            # Cross-encoder scoring
+            pairs = [[qs.question, doc] for doc in window_docs]
+            ce_scores = ce_reranker.compute_score(pairs)
+            if isinstance(ce_scores, (int, float)):
+                ce_scores = [ce_scores]
+            ce_scores = np.array(ce_scores, dtype=float)
+
+            # Min-max normalize both score arrays within window
+            ppr_arr = np.array(window_scores, dtype=float)
+            ppr_range = ppr_arr.max() - ppr_arr.min()
+            ppr_norm = (ppr_arr - ppr_arr.min()) / (ppr_range + 1e-9) if ppr_range > 0 else np.ones_like(ppr_arr)
+            ce_range = ce_scores.max() - ce_scores.min()
+            ce_norm = (ce_scores - ce_scores.min()) / (ce_range + 1e-9) if ce_range > 0 else np.ones_like(ce_scores)
+
+            combined = ce_alpha * ppr_norm + (1 - ce_alpha) * ce_norm
+            reorder_idx = np.argsort(-combined)
+
+            reranked_docs = [window_docs[i] for i in reorder_idx] + list(rest_docs)
+            reranked_scores = np.concatenate([combined[reorder_idx], rest_scores]) if len(rest_scores) > 0 else combined[reorder_idx]
+
+            reranked_qs = QuerySolution(
+                question=qs.question,
+                docs=reranked_docs,
+                doc_scores=reranked_scores,
+                gold_docs=gold_docs[q_idx],
+            )
+            reranked_solutions.append(reranked_qs)
+
+        # Run QA on reranked docs
+        logger.info("Running QA on cross-encoder reranked docs...")
+        reranked_solutions, _, _, _, ce_qa_results = hipporag.rag_qa(
+            queries=reranked_solutions,
+            gold_docs=gold_docs,
+            gold_answers=gold_answers,
+        )
+
+        # Compute retrieval metrics on reranked order
+        retrieval_recall = RetrievalRecall(global_config=config)
+        ce_retrieval_metrics = {}
+        for k in [1, 2, 5, 10, 20]:
+            recalls = []
+            for q_idx, qs in enumerate(reranked_solutions):
+                gold_set = set(gold_docs[q_idx])
+                top_k_set = set(qs.docs[:k])
+                recalls.append(len(gold_set & top_k_set) / max(1, len(gold_set)))
+            ce_retrieval_metrics[f"Recall@{k}"] = round(float(np.mean(recalls)), 4)
+
+        ce_em = ce_qa_results.get("ExactMatch", 0.0)
+        ce_f1 = ce_qa_results.get("F1", 0.0)
+        baseline_em = overall_qa_results.get("ExactMatch", 0.0) if overall_qa_results else 0.0
+        baseline_f1 = overall_qa_results.get("F1", 0.0) if overall_qa_results else 0.0
+
+        # Per-bucket breakdown (2-doc vs 4-doc)
+        # Compute per-query EM/F1 via the list API
+        qa_em_metric = QAExactMatch(global_config=config)
+        qa_f1_metric = QAF1Score(global_config=config)
+        bl_answers = [qs.answer or "" for qs in query_solutions]
+        ce_answers = [qs.answer or "" for qs in reranked_solutions]
+        _, bl_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, bl_answers)
+        _, bl_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, bl_answers)
+        _, ce_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, ce_answers)
+        _, ce_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, ce_answers)
+
+        bucket_results = {}
+        for q_idx in range(len(queries)):
+            n_gold = len(set(gold_docs[q_idx]))
+            if n_gold not in bucket_results:
+                bucket_results[n_gold] = {"baseline_em": [], "ce_em": [], "baseline_f1": [], "ce_f1": [], "count": 0}
+            bucket_results[n_gold]["count"] += 1
+            bucket_results[n_gold]["baseline_em"].append(bl_per_query_em[q_idx]["ExactMatch"])
+            bucket_results[n_gold]["ce_em"].append(ce_per_query_em[q_idx]["ExactMatch"])
+            bucket_results[n_gold]["baseline_f1"].append(bl_per_query_f1[q_idx]["F1"])
+            bucket_results[n_gold]["ce_f1"].append(ce_per_query_f1[q_idx]["F1"])
+
+        bucket_summary = {}
+        for n_gold, data in sorted(bucket_results.items()):
+            bucket_summary[f"{n_gold}_doc"] = {
+                "count": data["count"],
+                "baseline_EM": round(float(np.mean(data["baseline_em"])), 4),
+                "ce_rerank_EM": round(float(np.mean(data["ce_em"])), 4),
+                "EM_delta": round(float(np.mean(data["ce_em"])) - float(np.mean(data["baseline_em"])), 4),
+                "baseline_F1": round(float(np.mean(data["baseline_f1"])), 4),
+                "ce_rerank_F1": round(float(np.mean(data["ce_f1"])), 4),
+            }
+
+        cross_encoder_rerank_results = {
+            "ce_model": ce_model_name,
+            "ce_alpha": ce_alpha,
+            "ce_window": ce_window,
+            "ce_rerank_EM": round(float(ce_em), 4),
+            "ce_rerank_F1": round(float(ce_f1), 4),
+            "baseline_EM": round(float(baseline_em), 4),
+            "baseline_F1": round(float(baseline_f1), 4),
+            "EM_delta": round(float(ce_em) - float(baseline_em), 4),
+            "F1_delta": round(float(ce_f1) - float(baseline_f1), 4),
+            "ce_retrieval_metrics": ce_retrieval_metrics,
+            "per_bucket": bucket_summary,
+        }
 
     slice_metrics = compute_slice_metrics(
         config=config,
@@ -487,6 +846,10 @@ def main():
             "general_graph_related_to_weight": config.general_graph_related_to_weight,
             "general_graph_seed_top_k": config.general_graph_seed_top_k,
             "retrieval_only": retrieval_only,
+            "gold_doc_reader": gold_doc_reader,
+            "oracle_reorder_k": oracle_reorder_k,
+            "oracle_select_ks": oracle_select_ks,
+            "cross_encoder_rerank": cross_encoder_rerank,
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
             "causal_v2_extraction_workers": config.causal_v2_extraction_workers,
@@ -514,6 +877,9 @@ def main():
         "causal_slice": slice_metrics["causal_slice"],
         "nonempty_subgraph_slice": slice_metrics["nonempty_subgraph_slice"],
         "v2_metrics": v2_metrics,
+        **({"oracle_reorder_qa": oracle_reorder_qa_results} if oracle_reorder_qa_results else {}),
+        **({"oracle_select_qa": oracle_select_qa_results} if oracle_select_qa_results else {}),
+        **({"cross_encoder_rerank_qa": cross_encoder_rerank_results} if cross_encoder_rerank_results else {}),
         "examples": [
             {
                 "question": query_solution.question,
@@ -525,6 +891,7 @@ def main():
                 "answer": query_solution.answer if not retrieval_only else None,
                 "gold_answers": query_solution.gold_answers if not retrieval_only else None,
                 "docs": query_solution.docs[:3],
+                "retrieved_doc_ids": serialize_retrieved_doc_ids(query_solution.docs, doc_text_to_chunk_id),
                 "retrieval_trace": query_solution.retrieval_trace or {},
             }
             for query_solution in query_solutions
@@ -542,13 +909,20 @@ def main():
 
     output_json.write_text(json.dumps(result, indent=2, ensure_ascii=False))
 
-    print(json.dumps({
+    print_result = {
         "output_json": str(output_json),
         "overall_recomputed": result["overall_recomputed"],
         "causal_slice": result["causal_slice"],
         "nonempty_subgraph_slice": result["nonempty_subgraph_slice"],
         "v2_metrics": result["v2_metrics"],
-    }, indent=2, ensure_ascii=False))
+    }
+    if oracle_reorder_qa_results:
+        print_result["oracle_reorder_qa"] = oracle_reorder_qa_results
+    if cross_encoder_rerank_results:
+        print_result["cross_encoder_rerank_qa"] = cross_encoder_rerank_results
+    if gold_doc_reader:
+        print_result["mode"] = "gold_doc_reader"
+    print(json.dumps(print_result, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
