@@ -154,16 +154,33 @@ def build_training_rows(query_solutions: Sequence[QuerySolution],
                         pool_k: int,
                         qa_top_k: int,
                         anchor_count: int,
-                        structure_max_hops: int) -> tuple[list[dict], dict]:
+                        structure_max_hops: int,
+                        training_focus: str) -> tuple[list[dict], dict]:
     text_to_hash_id = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
     rows: list[dict] = []
     positive_rows = 0
     state_count = 0
     query_with_positive_state = 0
+    skipped_easy_queries = 0
+    skipped_queries_without_promotable_gold = 0
 
     for q_idx, qs in enumerate(query_solutions):
         pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
         pool_docs = list(qs.docs[:pool_limit])
+        gold_set = set(gold_docs[q_idx])
+        full_support_in_topk = gold_set.issubset(set(pool_docs[:qa_top_k]))
+        if training_focus in {"missing_topk", "promote_missing_only"} and full_support_in_topk:
+            skipped_easy_queries += 1
+            continue
+        promotable_gold_positions = {
+            pos
+            for pos in range(pool_limit)
+            if pool_docs[pos] in gold_set and pos >= qa_top_k
+        }
+        if training_focus == "promote_missing_only" and not promotable_gold_positions:
+            skipped_queries_without_promotable_gold += 1
+            continue
+
         if qs.doc_scores is not None and len(qs.doc_scores) >= pool_limit:
             pool_scores = np.asarray(qs.doc_scores[:pool_limit], dtype=float)
         else:
@@ -179,12 +196,14 @@ def build_training_rows(query_solutions: Sequence[QuerySolution],
             )
 
         selected_positions = list(range(min(max(anchor_count, 0), min(pool_limit, qa_top_k))))
-        gold_set = set(gold_docs[q_idx])
         query_had_positive_state = False
 
         while len(selected_positions) < min(pool_limit, qa_top_k):
             remaining_positions = [pos for pos in range(pool_limit) if pos not in selected_positions]
-            positive_positions = [pos for pos in remaining_positions if pool_docs[pos] in gold_set]
+            if training_focus == "promote_missing_only":
+                positive_positions = [pos for pos in remaining_positions if pos in promotable_gold_positions]
+            else:
+                positive_positions = [pos for pos in remaining_positions if pool_docs[pos] in gold_set]
             if not positive_positions:
                 break
 
@@ -216,7 +235,10 @@ def build_training_rows(query_solutions: Sequence[QuerySolution],
                     **row,
                 })
 
-            oracle_next = choose_oracle_next_position(pool_docs, gold_set, remaining_positions)
+            if training_focus == "promote_missing_only":
+                oracle_next = min(positive_positions)
+            else:
+                oracle_next = choose_oracle_next_position(pool_docs, gold_set, remaining_positions)
             if oracle_next is None:
                 break
             selected_positions.append(oracle_next)
@@ -230,6 +252,9 @@ def build_training_rows(query_solutions: Sequence[QuerySolution],
         "positive_rate": round(float(positive_rows / max(1, len(rows))), 6),
         "state_count": int(state_count),
         "queries_with_positive_state": int(query_with_positive_state),
+        "training_focus": training_focus,
+        "skipped_easy_queries": int(skipped_easy_queries),
+        "skipped_queries_without_promotable_gold": int(skipped_queries_without_promotable_gold),
     }
     return rows, summary
 
@@ -335,6 +360,7 @@ def main():
     parser.add_argument("--output_json", type=str, default="")
     parser.add_argument("--model_path", type=str, default="")
     parser.add_argument("--model_type", choices=["logistic_regression", "hist_gbdt"], default="logistic_regression")
+    parser.add_argument("--training_focus", choices=["all", "missing_topk", "promote_missing_only"], default="missing_topk")
     parser.add_argument("--setwise_pool_k", type=int, default=100)
     parser.add_argument("--setwise_anchor_count", type=int, default=1)
     parser.add_argument("--setwise_structure_max_hops", type=int, default=2)
@@ -411,6 +437,7 @@ def main():
         qa_top_k=int(args.qa_top_k),
         anchor_count=int(args.setwise_anchor_count),
         structure_max_hops=int(args.setwise_structure_max_hops),
+        training_focus=args.training_focus,
     )
     if not train_rows:
         raise ValueError("No training rows were generated; check the retrieval pool and split sizes")
@@ -437,6 +464,7 @@ def main():
         "qa_top_k": int(args.qa_top_k),
         "anchor_count": int(args.setwise_anchor_count),
         "structure_max_hops": int(args.setwise_structure_max_hops),
+        "training_focus": args.training_focus,
         "split_seed": int(args.split_seed),
         "train_indices": train_indices,
         "eval_indices": eval_indices,
@@ -526,6 +554,7 @@ def main():
             "qa_top_k": int(args.qa_top_k),
             "anchor_count": int(args.setwise_anchor_count),
             "structure_max_hops": int(args.setwise_structure_max_hops),
+            "training_focus": args.training_focus,
         },
         "training": {
             **train_row_summary,
