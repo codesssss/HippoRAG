@@ -4,6 +4,16 @@ Last updated: 2026-03-29
 
 This file stores concrete results only. Every result must have a file path.
 
+## Non-Oracle Pilot Summary
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/05_non_oracle_bridge_greedy.md`
+
+Key status:
+- The minimal non-oracle method is now implemented.
+- `2Wiki` pilot already shows a positive signal.
+- `MuSiQue` pilot is running but not complete yet.
+
 ## 2WikiMultihopQA-1000
 
 Reports:
@@ -52,6 +62,17 @@ Interpretation:
 - This is the strongest evidence for the structural bottleneck story.
 - Easy queries saturate early; hard queries require much deeper support pools.
 - The bridge bottleneck is visible directly in recall and depth asymmetry.
+
+Non-oracle pilot:
+- report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_greedy_pilot_20_v2.json`
+- setup: `limit=20`, `pool_k=100`, selector `bridge_greedy`
+- baseline `EM/F1 = 0.5000 / 0.5000`
+- selector `EM/F1 = 0.6000 / 0.6375`
+- delta `EM/F1 = +0.1000 / +0.1375`
+- baseline `Recall@5 = 0.7125`, selector `Recall@5 = 0.8125`
+- baseline `Recall@20 = 0.8125`, selector `Recall@20 = 0.9500`
+- `2-doc EM delta = +0.0667`
+- `4-doc EM delta = +0.2000`
 
 ## HotpotQA-1000
 
@@ -132,4 +153,3 @@ Takeaways:
 - `2Wiki` is the main mechanism dataset: it has the bridge diagnosis and the sharp `2-doc` vs `4-doc` split.
 - `MuSiQue` is the main hard-generalization dataset: support depth grows from `2-doc` to `4-doc`, and oracle gains keep growing with larger pools.
 - `HotpotQA` is the shallow contrast dataset: nearly all support is already near the top, so larger pools still help but much less.
-

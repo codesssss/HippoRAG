@@ -4,14 +4,18 @@ import logging
 import os
 from collections import Counter
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Sequence, Set, Tuple
 
 import numpy as np
 
 from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
 from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
-from src.hipporag.utils.causal_utils import route_query_type
+from src.hipporag.utils.causal_utils import (
+    normalize_structure_text,
+    route_query_type,
+    score_candidate_docs_by_structure,
+)
 from src.hipporag.utils.config_utils import BaseConfig
 from src.hipporag.utils.misc_utils import QuerySolution, compute_mdhash_id, string_to_bool
 
@@ -82,6 +86,356 @@ def serialize_retrieved_doc_ids(retrieved_docs: List[str], doc_text_to_chunk_id:
 
 def subset_by_indices(values: List, indices: List[int]) -> List:
     return [values[idx] for idx in indices]
+
+
+def min_max_normalize_array(values: np.ndarray) -> np.ndarray:
+    if values.size == 0:
+        return np.zeros(0, dtype=float)
+
+    values = np.asarray(values, dtype=float)
+    min_value = float(np.min(values))
+    max_value = float(np.max(values))
+    if max_value <= min_value:
+        return np.ones_like(values, dtype=float) if max_value > 0 else np.zeros_like(values, dtype=float)
+    return (values - min_value) / (max_value - min_value)
+
+
+def normalize_entity_set(entities: Sequence[str] | Set[str] | None) -> Set[str]:
+    normalized_entities: Set[str] = set()
+    for entity in entities or []:
+        normalized = normalize_structure_text(str(entity))
+        if normalized:
+            normalized_entities.add(normalized)
+    return normalized_entities
+
+
+def collect_query_seed_entities(hipporag: HippoRAG, query: str) -> Set[str]:
+    try:
+        query_fact_scores = hipporag.get_fact_scores(query)
+        top_k_fact_indices, top_k_facts, _ = hipporag.rerank_facts(query, query_fact_scores)
+        if hasattr(hipporag, "_collect_structure_seed_entities"):
+            return normalize_entity_set(
+                hipporag._collect_structure_seed_entities(
+                    query_fact_scores=query_fact_scores,
+                    top_k_fact_indices=top_k_fact_indices,
+                    top_k_facts=top_k_facts,
+                )
+            )
+    except Exception as exc:
+        logging.getLogger(__name__).warning(
+            "Failed to derive structure seed entities for query %r: %s",
+            query[:160],
+            exc,
+        )
+    return set()
+
+
+def collect_lexical_query_seed_entities(query: str,
+                                        pool_doc_ids: Sequence[int | None],
+                                        doc_idx_to_entities: Dict[int, Set[str]],
+                                        max_seed_entities: int = 8) -> Set[str]:
+    normalized_query = normalize_structure_text(query)
+    if not normalized_query:
+        return set()
+
+    query_tokens = {token for token in normalized_query.split() if len(token) > 1}
+    scored_entities: List[Tuple[float, int, str]] = []
+    seen_entities: Set[str] = set()
+    for doc_id in pool_doc_ids:
+        if doc_id is None:
+            continue
+        for entity in doc_idx_to_entities.get(int(doc_id), set()):
+            normalized_entity = normalize_structure_text(entity)
+            if not normalized_entity or normalized_entity in seen_entities:
+                continue
+            if len(normalized_entity) < 3:
+                continue
+            entity_tokens = {token for token in normalized_entity.split() if len(token) > 1}
+            if not entity_tokens:
+                continue
+            overlap = len(entity_tokens & query_tokens)
+            substring_match = (
+                (len(normalized_entity) >= 4 and normalized_entity in normalized_query)
+                or normalized_query in normalized_entity
+            )
+            if overlap <= 0 and not substring_match:
+                continue
+            score = 0.0
+            if substring_match:
+                score += 2.0
+            score += overlap / max(1, len(entity_tokens))
+            score += overlap / max(1, len(query_tokens))
+            scored_entities.append((score, len(normalized_entity), normalized_entity))
+            seen_entities.add(normalized_entity)
+
+    scored_entities.sort(key=lambda item: (-item[0], -item[1], item[2]))
+    return {entity for _, _, entity in scored_entities[:max_seed_entities]}
+
+
+def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
+                                   pool_doc_scores: np.ndarray,
+                                   doc_idx_to_entities: Dict[int, Set[str]],
+                                   doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                   adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                   qa_top_k: int,
+                                   initial_seed_entities: Sequence[str] | Set[str] | None = None,
+                                   anchor_count: int = 2,
+                                   structure_max_hops: int = 2,
+                                   base_weight: float = 0.25,
+                                   structure_weight: float = 0.60,
+                                   novelty_weight: float = 0.15) -> Tuple[List[int], Dict[str, object]]:
+    candidate_count = len(pool_doc_ids)
+    if candidate_count == 0 or qa_top_k <= 0:
+        return [], {
+            "selection_steps": [],
+            "anchor_positions": [],
+            "seed_entity_count_initial": 0,
+            "covered_entity_count_final": 0,
+            "candidate_count": candidate_count,
+        }
+
+    normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
+    target_k = min(candidate_count, qa_top_k)
+    selected_positions: List[int] = []
+    remaining_positions = list(range(candidate_count))
+    covered_entities = normalize_entity_set(initial_seed_entities)
+    selection_steps: List[Dict[str, object]] = []
+
+    actual_anchor_count = min(max(anchor_count, 0), target_k)
+    anchor_positions = remaining_positions[:actual_anchor_count]
+    for anchor_pos in anchor_positions:
+        selected_positions.append(anchor_pos)
+        doc_id = pool_doc_ids[anchor_pos]
+        if doc_id is not None:
+            covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+        selection_steps.append({
+            "step": len(selection_steps) + 1,
+            "mode": "anchor",
+            "pool_position": int(anchor_pos),
+            "doc_id": int(doc_id) if doc_id is not None else None,
+            "base_score": round(float(normalized_base_scores[anchor_pos]), 4),
+            "structure_score": 0.0,
+            "novelty_score": 0.0,
+            "combined_score": round(float(normalized_base_scores[anchor_pos]), 4),
+        })
+
+    remaining_positions = [pos for pos in remaining_positions if pos not in set(selected_positions)]
+
+    while len(selected_positions) < target_k and remaining_positions:
+        candidate_doc_ids = [
+            int(pool_doc_ids[pos])
+            for pos in remaining_positions
+            if pool_doc_ids[pos] is not None
+        ]
+        structure_scores = (
+            score_candidate_docs_by_structure(
+                candidate_doc_ids=candidate_doc_ids,
+                doc_idx_to_entities=doc_idx_to_entities,
+                doc_idx_to_edges=doc_idx_to_edges,
+                seed_entities=covered_entities,
+                adjacency=adjacency,
+                max_hops=structure_max_hops,
+            )
+            if candidate_doc_ids and covered_entities
+            else {}
+        )
+
+        best_pos = remaining_positions[0]
+        best_combined = float("-inf")
+        best_detail: Dict[str, object] = {}
+        for pos in remaining_positions:
+            doc_id = pool_doc_ids[pos]
+            doc_entities = (
+                normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set()))
+                if doc_id is not None
+                else set()
+            )
+            novelty_score = (
+                len(doc_entities - covered_entities) / max(1, len(doc_entities))
+                if doc_entities
+                else 0.0
+            )
+            structure_score = (
+                float(structure_scores.get(int(doc_id), 0.0))
+                if doc_id is not None
+                else 0.0
+            )
+            base_score = float(normalized_base_scores[pos]) if pos < len(normalized_base_scores) else 0.0
+            combined_score = (
+                base_weight * base_score
+                + structure_weight * structure_score
+                + novelty_weight * novelty_score
+            )
+            if combined_score > best_combined + 1e-9 or (
+                abs(combined_score - best_combined) <= 1e-9 and pos < best_pos
+            ):
+                best_pos = pos
+                best_combined = combined_score
+                best_detail = {
+                    "base_score": round(base_score, 4),
+                    "structure_score": round(structure_score, 4),
+                    "novelty_score": round(float(novelty_score), 4),
+                    "combined_score": round(float(combined_score), 4),
+                }
+
+        selected_positions.append(best_pos)
+        remaining_positions.remove(best_pos)
+        chosen_doc_id = pool_doc_ids[best_pos]
+        if chosen_doc_id is not None:
+            covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(chosen_doc_id), set())))
+        selection_steps.append({
+            "step": len(selection_steps) + 1,
+            "mode": "greedy",
+            "pool_position": int(best_pos),
+            "doc_id": int(chosen_doc_id) if chosen_doc_id is not None else None,
+            **best_detail,
+        })
+
+    return selected_positions, {
+        "selection_steps": selection_steps,
+        "anchor_positions": [int(pos) for pos in anchor_positions],
+        "seed_entity_count_initial": len(normalize_entity_set(initial_seed_entities)),
+        "covered_entity_count_final": len(covered_entities),
+        "candidate_count": candidate_count,
+    }
+
+
+def apply_setwise_selector(hipporag: HippoRAG,
+                           query_solutions: List[QuerySolution],
+                           doc_text_to_chunk_id: Dict[str, str],
+                           pool_k: int,
+                           qa_top_k: int,
+                           selector_name: str,
+                           anchor_count: int,
+                           structure_max_hops: int,
+                           base_weight: float,
+                           structure_weight: float,
+                           novelty_weight: float) -> Tuple[List[QuerySolution], Dict[str, object]]:
+    logger = logging.getLogger(__name__)
+    selector_name = str(selector_name).strip().lower()
+    if selector_name != "bridge_greedy":
+        raise ValueError(f"Unsupported setwise selector: {selector_name}")
+
+    selected_solutions: List[QuerySolution] = []
+    mapped_pool_doc_counts: List[int] = []
+    seed_entity_counts: List[int] = []
+    selected_structured_doc_counts: List[int] = []
+    selector_examples: List[Dict[str, object]] = []
+
+    chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
+
+    for qs in query_solutions:
+        pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
+        pool_docs = list(qs.docs[:pool_limit])
+        if qs.doc_scores is not None and len(qs.doc_scores) >= pool_limit:
+            pool_scores = np.asarray(qs.doc_scores[:pool_limit], dtype=float)
+            tail_scores = np.asarray(qs.doc_scores[pool_limit:], dtype=float) if len(qs.doc_scores) > pool_limit else np.array([], dtype=float)
+        else:
+            pool_scores = np.linspace(pool_limit, 1, pool_limit, dtype=float)
+            tail_scores = np.array([], dtype=float)
+
+        pool_doc_ids: List[int | None] = []
+        for doc_text in pool_docs:
+            chunk_id = doc_text_to_chunk_id.get(doc_text) or chunk_text_to_hash.get(doc_text)
+            mapped_doc_id = hipporag.passage_node_key_to_doc_idx.get(chunk_id) if chunk_id is not None else None
+            pool_doc_ids.append(int(mapped_doc_id) if mapped_doc_id is not None else None)
+
+        seed_entities = collect_query_seed_entities(hipporag, qs.question)
+        if not seed_entities:
+            seed_entities = collect_lexical_query_seed_entities(
+                query=qs.question,
+                pool_doc_ids=pool_doc_ids,
+                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+            )
+        selected_positions, selector_trace = select_bridge_greedy_positions(
+            pool_doc_ids=pool_doc_ids,
+            pool_doc_scores=pool_scores,
+            doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+            doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+            adjacency=hipporag.structure_graph_out,
+            qa_top_k=qa_top_k,
+            initial_seed_entities=seed_entities,
+            anchor_count=anchor_count,
+            structure_max_hops=structure_max_hops,
+            base_weight=base_weight,
+            structure_weight=structure_weight,
+            novelty_weight=novelty_weight,
+        )
+
+        selected_position_set = set(selected_positions)
+        reordered_pool_positions = selected_positions + [
+            pos for pos in range(pool_limit)
+            if pos not in selected_position_set
+        ]
+        reordered_docs = [pool_docs[pos] for pos in reordered_pool_positions] + list(qs.docs[pool_limit:])
+        reordered_scores = np.concatenate(
+            [
+                np.asarray([pool_scores[pos] for pos in reordered_pool_positions], dtype=float),
+                tail_scores,
+            ]
+        )
+
+        retrieval_trace = dict(qs.retrieval_trace or {})
+        retrieval_trace["setwise_selector"] = selector_name
+        retrieval_trace["setwise_selector_trace"] = {
+            "pool_k": int(pool_limit),
+            "anchor_count": int(min(max(anchor_count, 0), min(pool_limit, qa_top_k))),
+            "seed_entities_preview": sorted(seed_entities)[:12],
+            "selected_pool_positions": [int(pos) for pos in selected_positions],
+            "selected_doc_ids": [
+                int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
+                for pos in selected_positions
+            ],
+            "selected_titles": [pool_docs[pos].split("\n", 1)[0] for pos in selected_positions],
+            **selector_trace,
+        }
+
+        selected_qs = QuerySolution(
+            question=qs.question,
+            docs=reordered_docs,
+            doc_scores=reordered_scores,
+            gold_answers=qs.gold_answers,
+            gold_docs=qs.gold_docs,
+            retrieval_trace=retrieval_trace,
+            qa_trace=qs.qa_trace,
+        )
+        selected_solutions.append(selected_qs)
+
+        mapped_pool_doc_counts.append(sum(doc_id is not None for doc_id in pool_doc_ids))
+        seed_entity_counts.append(len(seed_entities))
+        selected_structured_doc_counts.append(sum(
+            1
+            for pos in selected_positions
+            if pool_doc_ids[pos] is not None
+            and bool(hipporag.doc_idx_to_structure_entities.get(int(pool_doc_ids[pos]), set()))
+        ))
+        if len(selector_examples) < 5:
+            selector_examples.append({
+                "question": qs.question,
+                "selected_titles": [pool_docs[pos].split("\n", 1)[0] for pos in selected_positions],
+                "seed_entities_preview": sorted(seed_entities)[:8],
+                "selection_steps": selector_trace["selection_steps"],
+            })
+
+    summary = {
+        "selector": selector_name,
+        "avg_mapped_pool_doc_count": round(float(np.mean(mapped_pool_doc_counts)) if mapped_pool_doc_counts else 0.0, 4),
+        "avg_seed_entity_count": round(float(np.mean(seed_entity_counts)) if seed_entity_counts else 0.0, 4),
+        "avg_selected_structured_doc_count": round(
+            float(np.mean(selected_structured_doc_counts)) if selected_structured_doc_counts else 0.0,
+            4,
+        ),
+        "examples_preview": selector_examples,
+    }
+    logger.info(
+        "Applied %s selector over pool@%d for %d queries (avg mapped pool docs=%.2f, avg seed entities=%.2f)",
+        selector_name,
+        pool_k,
+        len(query_solutions),
+        float(np.mean(mapped_pool_doc_counts)) if mapped_pool_doc_counts else 0.0,
+        float(np.mean(seed_entity_counts)) if seed_entity_counts else 0.0,
+    )
+    return selected_solutions, summary
 
 
 def is_causal_query_solution(config: BaseConfig, query_solution: QuerySolution) -> bool:
@@ -430,6 +784,20 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy"], default="none",
+                        help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
+    parser.add_argument("--setwise_pool_k", type=int, default=20,
+                        help="Candidate pool size used by the setwise selector.")
+    parser.add_argument("--setwise_anchor_count", type=int, default=2,
+                        help="Number of top-ranked anchor docs preserved before greedy bridge completion.")
+    parser.add_argument("--setwise_structure_max_hops", type=int, default=2,
+                        help="Directed structure expansion depth used by the setwise selector.")
+    parser.add_argument("--setwise_base_weight", type=float, default=0.25,
+                        help="Weight assigned to baseline retrieval score inside setwise selection.")
+    parser.add_argument("--setwise_structure_weight", type=float, default=0.60,
+                        help="Weight assigned to structure bridge score inside setwise selection.")
+    parser.add_argument("--setwise_novelty_weight", type=float, default=0.15,
+                        help="Weight assigned to entity novelty inside setwise selection.")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -463,6 +831,7 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     oracle_reorder_qa_results = None
+    setwise_selector_results = None
 
     if gold_doc_reader:
         # Exp2: Gold-doc reader — skip retrieval, feed gold docs to reader
@@ -686,6 +1055,106 @@ def main():
             "sweep": sweep_results,
         }
 
+    setwise_selector = args.setwise_selector.lower() if not gold_doc_reader else "none"
+    if setwise_selector != "none" and not retrieval_only and query_solutions:
+        logger = logging.getLogger(__name__)
+        selected_solutions, selector_summary = apply_setwise_selector(
+            hipporag=hipporag,
+            query_solutions=query_solutions,
+            doc_text_to_chunk_id=doc_text_to_chunk_id,
+            pool_k=int(args.setwise_pool_k),
+            qa_top_k=int(config.qa_top_k),
+            selector_name=setwise_selector,
+            anchor_count=int(args.setwise_anchor_count),
+            structure_max_hops=int(args.setwise_structure_max_hops),
+            base_weight=float(args.setwise_base_weight),
+            structure_weight=float(args.setwise_structure_weight),
+            novelty_weight=float(args.setwise_novelty_weight),
+        )
+        selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
+            queries=selected_solutions,
+            gold_docs=gold_docs,
+            gold_answers=gold_answers,
+        )
+
+        qa_em_metric = QAExactMatch(global_config=config)
+        qa_f1_metric = QAF1Score(global_config=config)
+        bl_answers = [qs.answer or "" for qs in query_solutions]
+        selector_answers = [qs.answer or "" for qs in selected_solutions]
+        _, bl_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, bl_answers)
+        _, bl_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, bl_answers)
+        _, selector_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, selector_answers)
+        _, selector_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, selector_answers)
+
+        bucket_results = {}
+        for q_idx in range(len(queries)):
+            n_gold = len(set(gold_docs[q_idx]))
+            if n_gold not in bucket_results:
+                bucket_results[n_gold] = {
+                    "baseline_em": [],
+                    "selector_em": [],
+                    "baseline_f1": [],
+                    "selector_f1": [],
+                    "count": 0,
+                }
+            bucket_results[n_gold]["count"] += 1
+            bucket_results[n_gold]["baseline_em"].append(bl_per_query_em[q_idx]["ExactMatch"])
+            bucket_results[n_gold]["selector_em"].append(selector_per_query_em[q_idx]["ExactMatch"])
+            bucket_results[n_gold]["baseline_f1"].append(bl_per_query_f1[q_idx]["F1"])
+            bucket_results[n_gold]["selector_f1"].append(selector_per_query_f1[q_idx]["F1"])
+
+        bucket_summary = {}
+        for n_gold, data in sorted(bucket_results.items()):
+            bucket_summary[f"{n_gold}_doc"] = {
+                "count": data["count"],
+                "baseline_EM": round(float(np.mean(data["baseline_em"])), 4),
+                "selector_EM": round(float(np.mean(data["selector_em"])), 4),
+                "EM_delta": round(float(np.mean(data["selector_em"])) - float(np.mean(data["baseline_em"])), 4),
+                "baseline_F1": round(float(np.mean(data["baseline_f1"])), 4),
+                "selector_F1": round(float(np.mean(data["selector_f1"])), 4),
+                "F1_delta": round(float(np.mean(data["selector_f1"])) - float(np.mean(data["baseline_f1"])), 4),
+            }
+
+        selector_retrieval_metrics = {}
+        for k in [1, 2, 5, 10, 20]:
+            recalls = []
+            for q_idx, qs in enumerate(selected_solutions):
+                gold_set = set(gold_docs[q_idx])
+                top_k_set = set(qs.docs[:k])
+                recalls.append(len(gold_set & top_k_set) / max(1, len(gold_set)))
+            selector_retrieval_metrics[f"Recall@{k}"] = round(float(np.mean(recalls)), 4)
+
+        selector_em = selector_qa_results.get("ExactMatch", 0.0)
+        selector_f1 = selector_qa_results.get("F1", 0.0)
+        baseline_em = overall_qa_results.get("ExactMatch", 0.0) if overall_qa_results else 0.0
+        baseline_f1 = overall_qa_results.get("F1", 0.0) if overall_qa_results else 0.0
+        setwise_selector_results = {
+            "selector": setwise_selector,
+            "pool_k": int(args.setwise_pool_k),
+            "anchor_count": int(args.setwise_anchor_count),
+            "structure_max_hops": int(args.setwise_structure_max_hops),
+            "base_weight": float(args.setwise_base_weight),
+            "structure_weight": float(args.setwise_structure_weight),
+            "novelty_weight": float(args.setwise_novelty_weight),
+            "selector_EM": round(float(selector_em), 4),
+            "selector_F1": round(float(selector_f1), 4),
+            "baseline_EM": round(float(baseline_em), 4),
+            "baseline_F1": round(float(baseline_f1), 4),
+            "EM_delta": round(float(selector_em) - float(baseline_em), 4),
+            "F1_delta": round(float(selector_f1) - float(baseline_f1), 4),
+            "selector_retrieval_metrics": selector_retrieval_metrics,
+            "per_bucket": bucket_summary,
+            "selector_summary": selector_summary,
+        }
+        logger.info(
+            "Setwise selector %s@%d: EM=%.4f (delta=%+.4f), F1=%.4f",
+            setwise_selector,
+            int(args.setwise_pool_k),
+            float(selector_em),
+            float(selector_em) - float(baseline_em),
+            float(selector_f1),
+        )
+
     # Cross-encoder rerank on baseline final top-K
     cross_encoder_rerank_results = None
     cross_encoder_rerank = string_to_bool(args.cross_encoder_rerank) if not gold_doc_reader else False
@@ -850,6 +1319,13 @@ def main():
             "oracle_reorder_k": oracle_reorder_k,
             "oracle_select_ks": oracle_select_ks,
             "cross_encoder_rerank": cross_encoder_rerank,
+            "setwise_selector": setwise_selector,
+            "setwise_pool_k": int(args.setwise_pool_k),
+            "setwise_anchor_count": int(args.setwise_anchor_count),
+            "setwise_structure_max_hops": int(args.setwise_structure_max_hops),
+            "setwise_base_weight": float(args.setwise_base_weight),
+            "setwise_structure_weight": float(args.setwise_structure_weight),
+            "setwise_novelty_weight": float(args.setwise_novelty_weight),
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
             "causal_v2_extraction_workers": config.causal_v2_extraction_workers,
@@ -879,6 +1355,7 @@ def main():
         "v2_metrics": v2_metrics,
         **({"oracle_reorder_qa": oracle_reorder_qa_results} if oracle_reorder_qa_results else {}),
         **({"oracle_select_qa": oracle_select_qa_results} if oracle_select_qa_results else {}),
+        **({"setwise_selector_qa": setwise_selector_results} if setwise_selector_results else {}),
         **({"cross_encoder_rerank_qa": cross_encoder_rerank_results} if cross_encoder_rerank_results else {}),
         "examples": [
             {
@@ -918,6 +1395,8 @@ def main():
     }
     if oracle_reorder_qa_results:
         print_result["oracle_reorder_qa"] = oracle_reorder_qa_results
+    if setwise_selector_results:
+        print_result["setwise_selector_qa"] = setwise_selector_results
     if cross_encoder_rerank_results:
         print_result["cross_encoder_rerank_qa"] = cross_encoder_rerank_results
     if gold_doc_reader:

@@ -10,6 +10,7 @@ Last updated: 2026-03-29
 - `2Wiki bridge analysis script`: `scripts/analyze_2wiki_oracle_ceiling.py`
 - `Cross-dataset summary script`: `scripts/compile_oracle_select_summary.py`
 - `Cross-dataset summary output`: `research_memory/emnlp_expand_then_compose/oracle_select_cross_dataset_summary_20260329_resume.md`
+- `Non-oracle pilot note`: `research_memory/emnlp_expand_then_compose/05_non_oracle_bridge_greedy.md`
 
 ## Done
 
@@ -26,15 +27,20 @@ Last updated: 2026-03-29
 - Ran `2Wiki` bridge vs anchor analysis and saved report files
 - Created `scripts/compile_oracle_select_summary.py`
 - Compiled the cross-dataset summary markdown/json
+- Implemented a minimal non-oracle setwise selector: `bridge_greedy`
+- Fixed missing structure-object preparation in the current `v2 + general_relation_graph` path
+- Validated selector logic with targeted tests
+- Ran `2Wiki` non-oracle pilot (`limit=20`, `pool_k=100`) with positive QA and recall gains
 
 ## Running
 
-- None
+- `MuSiQue` non-oracle pilot: `limit=20`, `pool_k=100`, selector `bridge_greedy`
+- Note: first run is building the missing `causal_v2` cache for `outputs_step0_general_musique`
 
 ## Next Wave
 
-1. Build one simple non-oracle heuristic baseline for `Expand-then-Compose`
-2. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select
+1. Finish the `MuSiQue` non-oracle pilot and check whether gains generalize
+2. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs bridge-greedy
 3. Turn support-depth and ceiling curves into paper figures
 4. Optional: run a lighter bridge-style analysis on `MuSiQue` if reviewer risk feels high
 
@@ -51,7 +57,7 @@ Method implementation order should be:
 
 ## Blockers
 
-- The paper story is still ceiling-heavy until a non-oracle baseline lands
+- `MuSiQue` non-oracle validation is slow because the first run must build a missing `causal_v2` cache
 
 ## Do Not Drift
 
@@ -59,4 +65,3 @@ Method implementation order should be:
 - Do not re-open reader-side graph context
 - Do not re-open causal-only framing
 - Do not pitch this as a generic reranking paper
-

@@ -1836,6 +1836,8 @@ class HippoRAG:
             self.causal_v2_engine = CausalV2Engine(self)
         self.causal_v2_engine.load()
         self._prepare_v2_base_retrieval_objects()
+        all_openie_info, _ = self.load_existing_openie([])
+        self._prepare_structure_retrieval_objects(all_openie_info)
 
         self.ready_to_retrieve = True
         self.ready_to_retrieve_v2 = True
