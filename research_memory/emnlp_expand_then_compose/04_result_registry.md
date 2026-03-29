@@ -11,8 +11,9 @@ Summary note:
 
 Key status:
 - The minimal non-oracle method is now implemented.
-- `2Wiki` pilot already shows a positive signal.
-- `MuSiQue` pilot is running but not complete yet.
+- There is a positive small-sample signal on `2Wiki` under the earlier `general_relation_graph` path.
+- On the canonical `legacy_fact_graph` backbone, the current heuristic is not yet robust.
+- The failed `seed union + title dedup` tweak has been recorded and reverted.
 
 ## 2WikiMultihopQA-1000
 
@@ -73,6 +74,24 @@ Non-oracle pilot:
 - baseline `Recall@20 = 0.8125`, selector `Recall@20 = 0.9500`
 - `2-doc EM delta = +0.0667`
 - `4-doc EM delta = +0.2000`
+
+Canonical-backbone non-oracle pilot:
+- report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_greedy_pilot_20_legacy.json`
+- setup: `limit=20`, `pool_k=100`, selector `bridge_greedy`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.5000 / 0.5523`
+- selector `EM/F1 = 0.5500 / 0.5774`
+- delta `EM/F1 = +0.0500 / +0.0251`
+- baseline `Recall@5 = 0.8375`, selector `Recall@5 = 0.8250`
+- baseline `Recall@20 = 0.8875`, selector `Recall@20 = 0.8875`
+- `2-doc EM delta = +0.1333`
+- `4-doc EM delta = -0.2000`
+
+Failed micro-tweak:
+- report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_greedy_pilot_20_legacy_seedunion_dedup.json`
+- tweak: union `fact seeds` with `lexical seeds` and add title dedup
+- delta `EM/F1 = -0.0500 / -0.0647`
+- `4-doc EM delta = -0.4000`
+- status: reverted from code
 
 ## HotpotQA-1000
 
@@ -142,6 +161,18 @@ Bucket breakdown at `K=100`:
 Interpretation:
 - This is the main cross-dataset generalization result for the hard-query story.
 - Support depth increases monotonically with query composition difficulty, and the oracle headroom exceeds both `2Wiki` and `HotpotQA`.
+
+Canonical-backbone non-oracle pilot:
+- report path: `outputs_step0_general_musique/eval_reports/setwise_bridge_greedy_pilot_20_legacy.json`
+- setup: `limit=20`, `pool_k=100`, selector `bridge_greedy`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.3000 / 0.3250`
+- selector `EM/F1 = 0.1500 / 0.1559`
+- delta `EM/F1 = -0.1500 / -0.1691`
+- baseline `Recall@5 = 0.5417`, selector `Recall@5 = 0.4333`
+- baseline `Recall@20 = 0.6917`, selector `Recall@20 = 0.6917`
+- `2-doc EM delta = -0.2727`
+- `3-doc EM delta = 0.0000`
+- `4-doc EM delta = 0.0000`
 
 ## Cross-Dataset Summary
 

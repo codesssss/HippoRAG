@@ -31,15 +31,17 @@ Last updated: 2026-03-29
 - Fixed missing structure-object preparation in the current `v2 + general_relation_graph` path
 - Validated selector logic with targeted tests
 - Ran `2Wiki` non-oracle pilot (`limit=20`, `pool_k=100`) with positive QA and recall gains
+- Ran `2Wiki` non-oracle pilot on the canonical `legacy_fact_graph` backbone
+- Ran `MuSiQue` non-oracle pilot on the canonical `legacy_fact_graph` backbone
+- Tried one cheap selector tweak (`seed union + title dedup`) and reverted it after it hurt `2Wiki`
 
 ## Running
 
-- `MuSiQue` non-oracle pilot: `limit=20`, `pool_k=100`, selector `bridge_greedy`
-- Note: first run is building the missing `causal_v2` cache for `outputs_step0_general_musique`
+- None
 
 ## Next Wave
 
-1. Finish the `MuSiQue` non-oracle pilot and check whether gains generalize
+1. Redesign the non-oracle selector so it targets hard-case chain completion rather than generic novelty
 2. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs bridge-greedy
 3. Turn support-depth and ceiling curves into paper figures
 4. Optional: run a lighter bridge-style analysis on `MuSiQue` if reviewer risk feels high
@@ -57,7 +59,8 @@ Method implementation order should be:
 
 ## Blockers
 
-- `MuSiQue` non-oracle validation is slow because the first run must build a missing `causal_v2` cache
+- The current non-oracle heuristic is not robust on the canonical backbone
+- It helps some easy `2-doc` cases but does not yet improve hard `4-doc` composition
 
 ## Do Not Drift
 
