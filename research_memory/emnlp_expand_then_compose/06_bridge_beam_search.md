@@ -94,6 +94,34 @@ Immediate interpretation:
   - is `beam` less bad than matched `greedy` on `MuSiQue`, which would support a "search helps under the same score" claim
   - or is the score itself the dominant problem on this dataset
 
+## MuSiQue Matched Greedy-vs-Beam Check
+
+Greedy report file:
+- `outputs_step0_general_musique/eval_reports/setwise_bridge_greedy_pilot_100_legacy.json`
+
+Matched comparison:
+
+| Method | EM | Delta EM | F1 | Delta F1 | Recall@5 | Recall@20 |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline | 0.2600 | — | 0.3466 | — | 0.6150 | 0.7858 |
+| Bridge-Greedy | 0.1800 | -0.0800 | 0.2426 | -0.1040 | 0.4925 | 0.7933 |
+| Bridge-Beam | 0.1800 | -0.0800 | 0.2498 | -0.0968 | 0.4950 | 0.7933 |
+
+Bucket comparison:
+
+| Bucket | Greedy Delta EM | Beam Delta EM | Greedy Delta F1 | Beam Delta F1 |
+|---|---:|---:|---:|---:|
+| `2-doc` | -0.1250 | -0.1458 | -0.1351 | -0.1410 |
+| `3-doc` | -0.0667 | -0.0667 | -0.1122 | -0.1122 |
+| `4-doc` | +0.0000 | +0.0455 | -0.0250 | +0.0205 |
+
+Interpretation:
+- On `MuSiQue`, `beam` is slightly better than matched `greedy`, but only marginally.
+- The dominant failure is not search anymore; it is the local bridge-aware score, which knocks down `Recall@5` for easy and medium cases.
+- This means the current evidence-set selector story is:
+  - strong and paper-usable on `2Wiki`
+  - mechanistically suggestive but not practically robust on `MuSiQue`
+
 ## Interpretation
 
 What this means:
@@ -145,14 +173,15 @@ Current decision:
 - keep `bridge_greedy` as the immediate search-ablation / control
 - freeze the learned selector as pilot-only evidence unless later runs become much stronger
 - treat `MuSiQue` as an active stress test, not as solved evidence
+- treat `MuSiQue greedy=beam<baseline` as evidence that score calibration, not search depth, is the next bottleneck
 
 ## Immediate Next Step
 
 Run:
-- `MuSiQue bridge_greedy@100` on the same canonical backbone and score weights
+- retune the selector toward anchor preservation on `MuSiQue`
 
 Decision rule:
-- if `beam` still beats matched `greedy`, keep the search claim but narrow it to:
-  - search helps under a fixed bridge-aware score on hard cases
-  - cross-dataset score calibration remains open
-- if matched `greedy` is better than `beam`, demote `beam` to a failed search variant and focus the paper on diagnosis plus a more conservative selector
+- keep the search claim narrow:
+  - on `2Wiki`, beam search helps under a fixed bridge-aware score
+  - on `MuSiQue`, the score family itself is the limiting factor
+- next method iteration should preserve anchors / shallow relevance more aggressively before adding bridge exploration

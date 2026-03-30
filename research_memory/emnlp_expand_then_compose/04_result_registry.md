@@ -210,6 +210,24 @@ Interpretation:
 - It helps the hardest `4-doc` bucket but hurts `2-doc` and `3-doc` enough to become destructive overall.
 - This currently supports a narrow hard-case mechanism story, not a broad robustness claim.
 
+Canonical-backbone matched greedy control:
+- report path: `outputs_step0_general_musique/eval_reports/setwise_bridge_greedy_pilot_100_legacy.json`
+- setup: `limit=100`, `pool_k=100`, selector `bridge_greedy`, anchor `2`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.2600 / 0.3466`
+- selector `EM/F1 = 0.1800 / 0.2426`
+- delta `EM/F1 = -0.0800 / -0.1040`
+- baseline `Recall@5 / Recall@20 = 0.6150 / 0.7858`
+- greedy `Recall@5 / Recall@20 = 0.4925 / 0.7933`
+- `2-doc EM delta = -0.1250`
+- `3-doc EM delta = -0.0667`
+- `4-doc EM delta = +0.0000`
+
+Matched beam vs greedy reading:
+- `beam` and `greedy` have the same `EM = 0.1800`
+- `beam` is slightly better on `F1` (`0.2498` vs `0.2426`)
+- `beam` is better on the `4-doc` bucket (`+0.0455` vs `+0.0000`)
+- therefore the main MuSiQue failure is not search alone; the score family itself is miscalibrated for shallow cases
+
 ## Cross-Dataset Summary
 
 Summary files:
