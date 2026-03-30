@@ -14,8 +14,8 @@ Key status:
 - The minimal non-oracle method is now implemented.
 - There is a positive small-sample signal on `2Wiki` under the earlier `general_relation_graph` path.
 - On the canonical `legacy_fact_graph` backbone, `bridge_beam` now gives a stronger positive `2Wiki` signal than `bridge_greedy`.
-- `MuSiQue bridge_beam@100` is now a negative overall result despite a positive `4-doc` bucket signal.
-- The main remaining question is whether `beam` still beats matched `greedy` on `MuSiQue`, or whether the score itself is the limiting factor.
+- The original `MuSiQue bridge_beam@100` failure has been partially rescued by a stronger reserved prefix plus non-anchor title dedup.
+- The same shared selector config is still negative on shallow `HotpotQA`, so current robustness claims must stay narrow.
 - The failed `seed union + title dedup` tweak has been recorded and reverted.
 
 ## 2WikiMultihopQA-1000
@@ -143,6 +143,21 @@ Interpretation:
 - Cross-dataset oracle ceiling generalizes.
 - However, this dataset is all `2-doc`, so it acts as a shallow contrast case rather than a hard structural analysis dataset.
 
+Canonical-backbone shared-config boundary check:
+- report path: `outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve3_dedup.json`
+- setup: `limit=100`, `pool_k=100`, selector `bridge_beam`, anchor `2`, `reserve_top_m=3`, `non_anchor_title_dedup=true`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.5900 / 0.7114`
+- selector `EM/F1 = 0.5500 / 0.6610`
+- delta `EM/F1 = -0.0400 / -0.0504`
+- baseline `Recall@5 / Recall@20 = 0.9150 / 0.9650`
+- selector `Recall@5 / Recall@20 = 0.8600 / 0.9700`
+- `2-doc EM delta = -0.0400`
+
+Interpretation:
+- The same selector settings that help hard datasets do not transfer cleanly to shallow `HotpotQA`.
+- `Recall@20` ticks up slightly, but `Recall@5` and QA both drop, so the issue is still evidence composition quality near the top of the set.
+- This should be treated as a boundary condition for the current method, not as a cross-dataset success.
+
 ## MuSiQue-1000
 
 Report:
@@ -228,6 +243,23 @@ Matched beam vs greedy reading:
 - `beam` is better on the `4-doc` bucket (`+0.0455` vs `+0.0000`)
 - therefore the main MuSiQue failure is not search alone; the score family itself is miscalibrated for shallow cases
 
+Canonical-backbone reserved-prefix beam rescue:
+- report path: `outputs_step0_general_musique/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve3_dedup.json`
+- setup: `limit=100`, `pool_k=100`, selector `bridge_beam`, anchor `2`, `reserve_top_m=3`, `non_anchor_title_dedup=true`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.2600 / 0.3466`
+- selector `EM/F1 = 0.2700 / 0.3382`
+- delta `EM/F1 = +0.0100 / -0.0084`
+- baseline `Recall@5 / Recall@20 = 0.6150 / 0.7858`
+- selector `Recall@5 / Recall@20 = 0.5508 / 0.7958`
+- `2-doc EM delta = -0.0208`
+- `3-doc EM delta = +0.0333`
+- `4-doc EM delta = +0.0455`
+
+Interpretation:
+- The stronger reserved prefix removes the catastrophic MuSiQue failure.
+- Overall `EM` is now positive, though still modest.
+- The method now looks plausibly usable across hard datasets, but `F1` remains slightly below baseline and should be treated as still stabilizing.
+
 ## Cross-Dataset Summary
 
 Summary files:
@@ -238,3 +270,4 @@ Takeaways:
 - `2Wiki` is the main mechanism dataset: it has the bridge diagnosis and the sharp `2-doc` vs `4-doc` split.
 - `MuSiQue` is the main hard-generalization dataset: support depth grows from `2-doc` to `4-doc`, and oracle gains keep growing with larger pools.
 - `HotpotQA` is the shallow contrast dataset: nearly all support is already near the top, so larger pools still help but much less.
+- The current shared `bridge_beam` selector is not universally safe: it is strong on `2Wiki`, modestly rescued on `MuSiQue`, and negative on shallow `HotpotQA`.

@@ -122,12 +122,77 @@ Interpretation:
   - strong and paper-usable on `2Wiki`
   - mechanistically suggestive but not practically robust on `MuSiQue`
 
+## MuSiQue Reserved-Prefix Rescue
+
+Report file:
+- `outputs_step0_general_musique/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve3_dedup.json`
+
+Updated setup:
+- same canonical backbone and bridge-aware score
+- add `reserve_top_m=3`
+- add `non_anchor_title_dedup=true`
+
+Results:
+
+| Method | EM | Delta EM | F1 | Delta F1 | Recall@5 | Recall@20 |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline | 0.2600 | — | 0.3466 | — | 0.6150 | 0.7858 |
+| Beam + reserve3 + dedup | 0.2700 | +0.0100 | 0.3382 | -0.0084 | 0.5508 | 0.7958 |
+
+Bucket results:
+
+| Bucket | Delta EM | Delta F1 |
+|---|---:|---:|
+| `2-doc` | -0.0208 | -0.0302 |
+| `3-doc` | +0.0333 | -0.0022 |
+| `4-doc` | +0.0455 | +0.0303 |
+
+Interpretation:
+- This rescues the catastrophic MuSiQue failure: overall `EM` is now positive instead of `-0.08`.
+- The main gain comes from preserving shallow relevance while still letting beam help on harder buckets.
+- `2-doc` damage is now small instead of destructive, while `3-doc` and `4-doc` are positive on `EM`.
+- `F1` is still slightly below baseline, so the method is improved but not fully stable yet.
+
+## Hotpot Shared-Config Boundary Check
+
+Report file:
+- `outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve3_dedup.json`
+
+Matched setup:
+- dataset: `hotpotqa`
+- limit: `100`
+- pool: `100`
+- anchor count: `2`
+- reserve top `3`
+- non-anchor title dedup: `true`
+- same canonical `legacy_fact_graph` backbone as above
+
+Results:
+
+| Method | EM | Delta EM | F1 | Delta F1 | Recall@5 | Recall@20 |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline | 0.5900 | — | 0.7114 | — | 0.9150 | 0.9650 |
+| Beam + reserve3 + dedup | 0.5500 | -0.0400 | 0.6610 | -0.0504 | 0.8600 | 0.9700 |
+
+Bucket results:
+
+| Bucket | Delta EM | Delta F1 |
+|---|---:|---:|
+| `2-doc` | -0.0400 | -0.0504 |
+
+Interpretation:
+- This shared configuration does not transfer cleanly to shallow `HotpotQA`.
+- `Recall@20` improves slightly, but `Recall@5` drops by more than five points and QA quality falls with it.
+- So even with a stronger reserved prefix, the current beam selector is still too willing to trade away top-ranked evidence when the dataset is already shallow.
+
 ## Interpretation
 
 What this means:
 - The bridge-aware selector is now clearly useful on the canonical `2Wiki` setting.
 - Search matters on top of scoring: `beam` beats `greedy` under the same local score.
 - The gain is not explained by shallow recall alone.
+- On `MuSiQue`, stronger prefix preservation makes the method usable enough to keep as a hard-dataset stress-test result.
+- On `HotpotQA`, the same shared config is negative, so the current selector is not a universal drop-in replacement.
 
 Why the last point matters:
 - `bridge_greedy` has slightly higher `Recall@5` than `bridge_beam` (`0.8150` vs `0.8075`)
@@ -137,20 +202,24 @@ Why the last point matters:
 Conclusion:
 - `bridge_beam` improves evidence composition, not just top-5 lexical coverage.
 - This is exactly the kind of evidence needed for the `Expand-then-Compose` story.
-- But today this conclusion is solid only on canonical `2Wiki`; `MuSiQue` is currently a robustness failure case.
+- Today the strongest clean claim is still on canonical `2Wiki`.
+- `MuSiQue` is now a partially rescued hard-case stress test rather than a total failure.
+- `HotpotQA` is an explicit shallow boundary condition showing that the shared config still over-explores when top evidence is already concentrated.
 
 ## Paper Positioning
 
 Recommended framing:
 - present `bridge_beam` as the strongest current practical candidate on `2Wiki`
 - present `bridge_greedy` as the search-ablation control
+- present reserved-prefix `bridge_beam` on `MuSiQue` as a robustness-improvement stress test
+- present `HotpotQA` as a boundary-condition check rather than a success case
 - make the claim narrow and defensible:
   - widening the pool is necessary but not sufficient
   - under a fixed bridge-aware score, beam search recovers better evidence sets than greedy selection
 
 What should not be claimed yet:
 - do not claim broad cross-dataset robustness
-- do not claim that the current score generalizes from `2Wiki` to `MuSiQue`
+- do not claim that the current shared score/config generalizes cleanly across datasets
 - do not claim that beam fully solves hard multi-hop retrieval
 
 ## Relation To Oracle Headroom
@@ -172,16 +241,17 @@ Current decision:
 - keep `bridge_beam` as the main `2Wiki` non-oracle selector line
 - keep `bridge_greedy` as the immediate search-ablation / control
 - freeze the learned selector as pilot-only evidence unless later runs become much stronger
-- treat `MuSiQue` as an active stress test, not as solved evidence
-- treat `MuSiQue greedy=beam<baseline` as evidence that score calibration, not search depth, is the next bottleneck
+- treat `MuSiQue reserve3 + dedup` as improved but still not fully stable evidence
+- treat `HotpotQA` as evidence that score calibration and prefix protection remain the next bottlenecks for shallow datasets
 
 ## Immediate Next Step
 
 Run:
-- retune the selector toward anchor preservation on `MuSiQue`
+- retune the selector toward stronger top-prefix preservation or adaptive scoring on shallow datasets
 
 Decision rule:
 - keep the search claim narrow:
   - on `2Wiki`, beam search helps under a fixed bridge-aware score
-  - on `MuSiQue`, the score family itself is the limiting factor
+  - on `MuSiQue`, stronger prefix preservation recovers a modest positive `EM`
+  - on `HotpotQA`, the remaining failure is still over-exploration on shallow cases
 - next method iteration should preserve anchors / shallow relevance more aggressively before adding bridge exploration
