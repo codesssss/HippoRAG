@@ -13,6 +13,7 @@ from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
 from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
 from src.hipporag.utils.causal_utils import (
+    expand_directed_entities,
     normalize_structure_text,
     route_query_type,
     score_candidate_docs_by_structure,
@@ -153,6 +154,13 @@ def resolve_selection_target_k(target_k: int,
     if max_bridge_slots <= 0:
         return int(target_k)
     return int(min(target_k, max(0, reserved_count) + max(0, max_bridge_slots)))
+
+
+def normalize_setwise_score_mode(score_mode: str | None) -> str:
+    normalized = str(score_mode or "bridge").strip().lower()
+    if normalized not in {"bridge", "closure_proxy"}:
+        raise ValueError(f"Unsupported setwise score mode: {score_mode}")
+    return normalized
 
 
 def normalize_entity_set(entities: Sequence[str] | Set[str] | None) -> Set[str]:
@@ -492,8 +500,12 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
                             structure_max_hops: int,
                             base_weight: float,
                             structure_weight: float,
-                            novelty_weight: float) -> List[Dict[str, object]]:
+                            novelty_weight: float,
+                            query_entities: Sequence[str] | Set[str] | None = None,
+                            score_mode: str = "bridge") -> List[Dict[str, object]]:
     normalized_covered = normalize_entity_set(covered_entities)
+    normalized_query = normalize_entity_set(query_entities) or set(normalized_covered)
+    normalized_score_mode = normalize_setwise_score_mode(score_mode)
     candidate_doc_ids = [
         int(pool_doc_ids[pos])
         for pos in remaining_positions
@@ -509,6 +521,27 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
             max_hops=structure_max_hops,
         )
         if candidate_doc_ids and normalized_covered
+        else {}
+    )
+    structure_scores_seed = (
+        score_candidate_docs_by_structure(
+            candidate_doc_ids=candidate_doc_ids,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            seed_entities=normalized_query,
+            adjacency=adjacency,
+            max_hops=structure_max_hops,
+        )
+        if candidate_doc_ids and normalized_query
+        else {}
+    )
+    frontier_scores = (
+        expand_directed_entities(
+            normalized_covered,
+            adjacency,
+            max_hops=structure_max_hops,
+        )
+        if normalized_covered
         else {}
     )
 
@@ -530,13 +563,81 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
             if doc_id is not None
             else 0.0
         )
+        structure_seed_score = (
+            float(structure_scores_seed.get(int(doc_id), 0.0))
+            if doc_id is not None
+            else 0.0
+        )
         base_score = float(normalized_base_scores[pos]) if pos < len(normalized_base_scores) else 0.0
         doc_title = ""
         if pool_doc_titles is not None and pos < len(pool_doc_titles):
             doc_title = str(pool_doc_titles[pos]).strip()
+        doc_edges = doc_idx_to_edges.get(int(doc_id), []) if doc_id is not None else []
+        new_entities = doc_entities - normalized_covered
+        frontier_gain_score = min(
+            1.0,
+            float(sum(frontier_scores.get(entity, 0.0) for entity in new_entities)),
+        )
+        query_overlap_gain = (
+            len(new_entities & normalized_query) / max(1.0, min(float(len(normalized_query)), 4.0))
+            if normalized_query
+            else 0.0
+        )
+        query_anchor_score = min(
+            1.0,
+            0.5 * float(query_overlap_gain) + 0.5 * float(structure_seed_score),
+        )
+        path_coherence_score = 0.0
+        for source, target, edge_weight, _ in doc_edges:
+            positive_weight = max(float(edge_weight), 0.0)
+            if positive_weight <= 0.0:
+                continue
+            normalized_source = normalize_structure_text(source)
+            normalized_target = normalize_structure_text(target)
+            if not normalized_source or not normalized_target or normalized_source == normalized_target:
+                continue
+            support_candidates: List[float] = []
+            if normalized_source in normalized_covered and normalized_target in new_entities:
+                support_candidates.append(
+                    max(float(frontier_scores.get(normalized_target, 0.0)),
+                        1.0 if normalized_target in normalized_query else 0.0)
+                )
+            if normalized_target in normalized_covered and normalized_source in new_entities:
+                support_candidates.append(
+                    max(float(frontier_scores.get(normalized_source, 0.0)),
+                        1.0 if normalized_source in normalized_query else 0.0)
+                )
+            if normalized_source in normalized_query and normalized_target in new_entities:
+                support_candidates.append(max(1.0, float(frontier_scores.get(normalized_target, 0.0))))
+            if normalized_target in normalized_query and normalized_source in new_entities:
+                support_candidates.append(max(1.0, float(frontier_scores.get(normalized_source, 0.0))))
+            if support_candidates:
+                path_coherence_score = max(
+                    path_coherence_score,
+                    min(1.0, positive_weight * max(support_candidates)),
+                )
+        redundancy_penalty = (
+            len(doc_entities & normalized_covered) / max(1, len(doc_entities))
+            if doc_entities
+            else 0.0
+        )
+        closure_score = float(np.clip(
+            0.35 * float(structure_score)
+            + 0.25 * float(frontier_gain_score)
+            + 0.20 * float(query_anchor_score)
+            + 0.20 * float(path_coherence_score)
+            - 0.20 * float(redundancy_penalty),
+            0.0,
+            1.0,
+        ))
+        selection_score = (
+            0.60 * float(structure_score) + 0.40 * float(closure_score)
+            if normalized_score_mode == "closure_proxy"
+            else float(structure_score)
+        )
         combined_score = (
             base_weight * base_score
-            + structure_weight * structure_score
+            + structure_weight * selection_score
             + novelty_weight * novelty_score
         )
         scored_candidates.append({
@@ -547,14 +648,24 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
             "new_entity_count": len(doc_entities - normalized_covered),
             "base_score": round(base_score, 4),
             "structure_score": round(structure_score, 4),
+            "structure_score_seed": round(float(structure_seed_score), 4),
             "novelty_score": round(float(novelty_score), 4),
+            "frontier_gain_score": round(float(frontier_gain_score), 4),
+            "query_anchor_score": round(float(query_anchor_score), 4),
+            "path_coherence_score": round(float(path_coherence_score), 4),
+            "redundancy_penalty": round(float(redundancy_penalty), 4),
+            "closure_score": round(float(closure_score), 4),
+            "selection_score": round(float(selection_score), 4),
+            "score_mode": normalized_score_mode,
             "combined_score": round(float(combined_score), 4),
+            "selection_score_raw": float(selection_score),
             "combined_score_raw": float(combined_score),
         })
 
     scored_candidates.sort(
         key=lambda item: (
             -float(item["combined_score_raw"]),
+            -float(item["selection_score_raw"]),
             -int(item["new_entity_count"]),
             int(item["pool_position"]),
         )
@@ -570,12 +681,14 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
                                  adjacency: Dict[str, List[Tuple[str, float, str]]],
                                  qa_top_k: int,
                                  initial_seed_entities: Sequence[str] | Set[str] | None = None,
+                                 query_entities: Sequence[str] | Set[str] | None = None,
                                  anchor_count: int = 2,
                                  reserve_top_m: int = 0,
                                  structure_max_hops: int = 2,
                                  base_weight: float = 0.25,
                                  structure_weight: float = 0.60,
                                  novelty_weight: float = 0.15,
+                                 score_mode: str = "bridge",
                                  max_bridge_slots: int = 0,
                                  gate_mode: str = "none",
                                  gate_min_structure_score: float = 0.15,
@@ -654,10 +767,12 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
         adjacency=adjacency,
         remaining_positions=remaining_positions,
         covered_entities=covered_entities,
+        query_entities=query_entities or initial_seed_entities,
         structure_max_hops=structure_max_hops,
         base_weight=base_weight,
         structure_weight=structure_weight,
         novelty_weight=novelty_weight,
+        score_mode=score_mode,
     )
     scored_candidates = filter_title_dedup_candidates(
         scored_candidates=scored_candidates,
@@ -745,6 +860,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
                                    adjacency: Dict[str, List[Tuple[str, float, str]]],
                                    qa_top_k: int,
                                    initial_seed_entities: Sequence[str] | Set[str] | None = None,
+                                   query_entities: Sequence[str] | Set[str] | None = None,
                                    anchor_count: int = 2,
                                    reserve_top_m: int = 0,
                                    max_bridge_slots: int = 0,
@@ -752,6 +868,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
                                    base_weight: float = 0.25,
                                    structure_weight: float = 0.60,
                                    novelty_weight: float = 0.15,
+                                   score_mode: str = "bridge",
                                    non_anchor_title_dedup: bool = False) -> Tuple[List[int], Dict[str, object]]:
     candidate_count = len(pool_doc_ids)
     if candidate_count == 0 or qa_top_k <= 0:
@@ -820,10 +937,12 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
             adjacency=adjacency,
             remaining_positions=remaining_positions,
             covered_entities=covered_entities,
+            query_entities=query_entities or initial_seed_entities,
             structure_max_hops=structure_max_hops,
             base_weight=base_weight,
             structure_weight=structure_weight,
             novelty_weight=novelty_weight,
+            score_mode=score_mode,
         )
         scored_candidates = filter_title_dedup_candidates(
             scored_candidates=scored_candidates,
@@ -849,6 +968,8 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
             "base_score": float(best_detail["base_score"]),
             "structure_score": float(best_detail["structure_score"]),
             "novelty_score": float(best_detail["novelty_score"]),
+            "closure_score": float(best_detail["closure_score"]),
+            "selection_score": float(best_detail["selection_score"]),
             "combined_score": float(best_detail["combined_score"]),
         })
 
@@ -862,6 +983,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
         "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
         "max_bridge_slots": int(max(0, max_bridge_slots)),
         "selection_target_k": int(selection_target_k),
+        "score_mode": normalize_setwise_score_mode(score_mode),
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
     }
 
@@ -874,6 +996,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  adjacency: Dict[str, List[Tuple[str, float, str]]],
                                  qa_top_k: int,
                                  initial_seed_entities: Sequence[str] | Set[str] | None = None,
+                                 query_entities: Sequence[str] | Set[str] | None = None,
                                  anchor_count: int = 2,
                                  reserve_top_m: int = 0,
                                  max_bridge_slots: int = 0,
@@ -881,6 +1004,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  base_weight: float = 0.25,
                                  structure_weight: float = 0.60,
                                  novelty_weight: float = 0.15,
+                                 score_mode: str = "bridge",
                                  beam_width: int = 4,
                                  beam_expand_per_state: int = 4,
                                  non_anchor_title_dedup: bool = False) -> Tuple[List[int], Dict[str, object]]:
@@ -971,10 +1095,12 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 adjacency=adjacency,
                 remaining_positions=remaining_positions,
                 covered_entities=state["covered_entities"],
+                query_entities=query_entities or initial_seed_entities,
                 structure_max_hops=structure_max_hops,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
+                score_mode=score_mode,
             )
             scored_candidates = filter_title_dedup_candidates(
                 scored_candidates=scored_candidates,
@@ -1007,6 +1133,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                         "base_score": float(candidate["base_score"]),
                         "structure_score": float(candidate["structure_score"]),
                         "novelty_score": float(candidate["novelty_score"]),
+                        "closure_score": float(candidate["closure_score"]),
+                        "selection_score": float(candidate["selection_score"]),
                         "combined_score": float(candidate["combined_score"]),
                     }],
                     "cumulative_score": float(state["cumulative_score"]) + float(candidate["combined_score_raw"]),
@@ -1052,6 +1180,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
         "max_bridge_slots": int(max(0, max_bridge_slots)),
         "selection_target_k": int(selection_target_k),
+        "score_mode": normalize_setwise_score_mode(score_mode),
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         "beam_width": beam_width,
         "beam_expand_per_state": beam_expand_per_state,
@@ -1066,6 +1195,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            pool_k: int,
                            qa_top_k: int,
                            selector_name: str,
+                           score_mode: str,
                            anchor_count: int,
                            reserve_top_m: int,
                            max_bridge_slots: int,
@@ -1082,6 +1212,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            gate_min_combined_margin: float = 0.0) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
+    score_mode = normalize_setwise_score_mode(score_mode)
     if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
@@ -1136,12 +1267,14 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 adjacency=hipporag.structure_graph_out,
                 qa_top_k=qa_top_k,
                 initial_seed_entities=seed_entities,
+                query_entities=seed_entities,
                 anchor_count=anchor_count,
                 reserve_top_m=reserve_top_m,
                 structure_max_hops=structure_max_hops,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
+                score_mode=score_mode,
                 max_bridge_slots=max_bridge_slots,
                 gate_mode=gate_mode,
                 gate_min_structure_score=gate_min_structure_score,
@@ -1165,6 +1298,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     adjacency=hipporag.structure_graph_out,
                     qa_top_k=qa_top_k,
                     initial_seed_entities=seed_entities,
+                    query_entities=seed_entities,
                     anchor_count=anchor_count,
                     reserve_top_m=reserve_top_m,
                     max_bridge_slots=max_bridge_slots,
@@ -1172,6 +1306,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     base_weight=base_weight,
                     structure_weight=structure_weight,
                     novelty_weight=novelty_weight,
+                    score_mode=score_mode,
                     non_anchor_title_dedup=non_anchor_title_dedup,
                 )
             else:
@@ -1198,6 +1333,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     adjacency=hipporag.structure_graph_out,
                     qa_top_k=qa_top_k,
                     initial_seed_entities=seed_entities,
+                    query_entities=seed_entities,
                     anchor_count=anchor_count,
                     reserve_top_m=reserve_top_m,
                     max_bridge_slots=max_bridge_slots,
@@ -1205,6 +1341,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     base_weight=base_weight,
                     structure_weight=structure_weight,
                     novelty_weight=novelty_weight,
+                    score_mode=score_mode,
                     beam_width=beam_width,
                     beam_expand_per_state=beam_expand_per_state,
                     non_anchor_title_dedup=non_anchor_title_dedup,
@@ -1261,6 +1398,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         retrieval_trace["setwise_selector"] = selector_name
         retrieval_trace["setwise_selector_trace"] = {
             "pool_k": int(pool_limit),
+            "score_mode": score_mode,
             "anchor_count": int(min(max(anchor_count, 0), min(pool_limit, qa_top_k))),
             "reserve_top_m": int(min(max(max(anchor_count, 0), max(reserve_top_m, 0)), min(pool_limit, qa_top_k))),
             "max_bridge_slots": int(max(0, max_bridge_slots)),
@@ -1305,6 +1443,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
 
     summary = {
         "selector": selector_name,
+        "score_mode": score_mode,
         "avg_mapped_pool_doc_count": round(float(np.mean(mapped_pool_doc_counts)) if mapped_pool_doc_counts else 0.0, 4),
         "avg_seed_entity_count": round(float(np.mean(seed_entity_counts)) if seed_entity_counts else 0.0, 4),
         "avg_selected_structured_doc_count": round(
@@ -1683,6 +1822,8 @@ def main():
                         help="Device for cross-encoder model.")
     parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "learned_greedy"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
+    parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy"], default="bridge",
+                        help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
                         help="Candidate pool size used by the setwise selector.")
     parser.add_argument("--setwise_anchor_count", type=int, default=2,
@@ -1985,6 +2126,7 @@ def main():
             pool_k=int(args.setwise_pool_k),
             qa_top_k=int(config.qa_top_k),
             selector_name=setwise_selector,
+            score_mode=str(args.setwise_score_mode),
             anchor_count=int(args.setwise_anchor_count),
             reserve_top_m=int(args.setwise_reserve_top_m),
             max_bridge_slots=int(args.setwise_max_bridge_slots),
@@ -2059,6 +2201,7 @@ def main():
         baseline_f1 = overall_qa_results.get("F1", 0.0) if overall_qa_results else 0.0
         setwise_selector_results = {
             "selector": setwise_selector,
+            "score_mode": str(args.setwise_score_mode),
             "pool_k": int(args.setwise_pool_k),
             "anchor_count": int(args.setwise_anchor_count),
             "reserve_top_m": int(max(int(args.setwise_anchor_count), int(args.setwise_reserve_top_m))),
@@ -2085,8 +2228,9 @@ def main():
             "selector_summary": selector_summary,
         }
         logger.info(
-            "Setwise selector %s@%d: EM=%.4f (delta=%+.4f), F1=%.4f",
+            "Setwise selector %s[%s]@%d: EM=%.4f (delta=%+.4f), F1=%.4f",
             setwise_selector,
+            str(args.setwise_score_mode),
             int(args.setwise_pool_k),
             float(selector_em),
             float(selector_em) - float(baseline_em),
@@ -2258,6 +2402,7 @@ def main():
             "oracle_select_ks": oracle_select_ks,
             "cross_encoder_rerank": cross_encoder_rerank,
             "setwise_selector": setwise_selector,
+            "setwise_score_mode": str(args.setwise_score_mode),
             "setwise_pool_k": int(args.setwise_pool_k),
             "setwise_anchor_count": int(args.setwise_anchor_count),
             "setwise_structure_max_hops": int(args.setwise_structure_max_hops),

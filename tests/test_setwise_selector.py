@@ -226,6 +226,50 @@ def test_select_bridge_beam_positions_recovers_two_step_chain_when_greedy_takes_
     assert beam_trace["beam_best_cumulative_score"] > 1.0
 
 
+def test_select_bridge_greedy_positions_closure_proxy_prefers_query_aligned_bridge():
+    common_kwargs = dict(
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.array([1.0, 0.85, 0.84], dtype=float),
+        pool_doc_titles=["Anchor", "Award", "Birth"],
+        doc_idx_to_entities={
+            0: {"person a"},
+            1: {"person a", "award a"},
+            2: {"person a", "birth a"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "award a", 1.0, "related_to")],
+            2: [("person a", "birth a", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("award a", 1.0, "related_to"), ("birth a", 1.0, "related_to")],
+        },
+        qa_top_k=2,
+        initial_seed_entities={"person a"},
+        query_entities={"birth a"},
+        anchor_count=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+
+    bridge_positions, _ = select_bridge_greedy_positions(
+        **common_kwargs,
+        score_mode="bridge",
+    )
+    closure_positions, closure_trace = select_bridge_greedy_positions(
+        **common_kwargs,
+        score_mode="closure_proxy",
+    )
+
+    assert bridge_positions == [0, 1]
+    assert closure_positions == [0, 2]
+    assert closure_trace["score_mode"] == "closure_proxy"
+    assert closure_trace["selection_steps"][1]["doc_id"] == 2
+    assert closure_trace["selection_steps"][1]["closure_score"] > 0.0
+
+
 def test_select_bridge_greedy_positions_reserve_top_m_keeps_prefix_before_bridge_fill():
     selected_positions, trace = select_bridge_greedy_positions(
         pool_doc_ids=[0, 1, 2, 3, 4],

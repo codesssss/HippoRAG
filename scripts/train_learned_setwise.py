@@ -487,6 +487,7 @@ def main():
         pool_k=int(args.setwise_pool_k),
         qa_top_k=int(args.qa_top_k),
         selector_name="learned_greedy",
+        score_mode="bridge",
         anchor_count=int(args.setwise_anchor_count),
         reserve_top_m=0,
         max_bridge_slots=0,
