@@ -12,6 +12,7 @@ from eval_causal_qwen3 import (
     LEARNED_SETWISE_FEATURE_NAMES,
     collect_lexical_query_seed_entities,
     compute_candidate_feature_rows,
+    select_bridge_beam_positions,
     select_bridge_greedy_positions,
     select_learned_greedy_positions,
 )
@@ -133,6 +134,90 @@ def test_select_bridge_greedy_positions_can_bootstrap_from_anchor_entities():
 
     assert selected_positions == [0, 1, 2, 3]
     assert trace["selection_steps"][2]["doc_id"] == 2
+
+
+def test_select_bridge_beam_positions_matches_bridge_completion_case():
+    selected_positions, trace = select_bridge_beam_positions(
+        pool_doc_ids=[0, 1, 2, 3, 4],
+        pool_doc_scores=np.array([0.95, 0.90, 0.30, 0.25, 0.80], dtype=float),
+        doc_idx_to_entities={
+            0: {"film x", "person a"},
+            1: {"film y", "person b"},
+            2: {"person a", "birth a"},
+            3: {"person b", "birth b"},
+            4: {"noise"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [("person a", "birth a", 1.0, "related_to")],
+            3: [("person b", "birth b", 1.0, "related_to")],
+            4: [("noise", "other noise", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("birth a", 1.0, "related_to")],
+            "person b": [("birth b", 1.0, "related_to")],
+        },
+        qa_top_k=4,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        beam_width=4,
+        beam_expand_per_state=4,
+    )
+
+    assert selected_positions == [0, 1, 2, 3]
+    assert trace["beam_width"] == 4
+    assert trace["beam_expand_per_state"] == 4
+    assert trace["selection_steps"][2]["doc_id"] == 2
+    assert trace["selection_steps"][3]["doc_id"] == 3
+
+
+def test_select_bridge_beam_positions_recovers_two_step_chain_when_greedy_takes_distractor():
+    common_kwargs = dict(
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_scores=np.array([1.0, 0.95, 0.30, 0.05], dtype=float),
+        doc_idx_to_entities={
+            0: {"film x", "person a"},
+            1: {"person a", "helper h"},
+            2: {"person a", "helper h", "person b"},
+            3: {"person b", "birth b"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "helper h", 1.0, "related_to")],
+            2: [("person a", "helper h", 0.40, "related_to")],
+            3: [("person b", "birth b", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("helper h", 1.0, "related_to")],
+            "person b": [("birth b", 1.0, "related_to")],
+        },
+        qa_top_k=3,
+        initial_seed_entities=set(),
+        anchor_count=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+
+    greedy_positions, greedy_trace = select_bridge_greedy_positions(**common_kwargs)
+    beam_positions, beam_trace = select_bridge_beam_positions(
+        **common_kwargs,
+        beam_width=2,
+        beam_expand_per_state=2,
+    )
+
+    assert greedy_positions == [0, 1, 3]
+    assert beam_positions == [0, 2, 3]
+    assert greedy_trace["selection_steps"][1]["doc_id"] == 1
+    assert beam_trace["selection_steps"][1]["doc_id"] == 2
+    assert beam_trace["selection_steps"][2]["doc_id"] == 3
+    assert beam_trace["beam_best_cumulative_score"] > 1.0
 
 
 def test_collect_lexical_query_seed_entities_matches_query_entity_strings():

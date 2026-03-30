@@ -445,6 +445,82 @@ def select_learned_greedy_positions(query: str,
     }
 
 
+def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
+                            normalized_base_scores: np.ndarray,
+                            doc_idx_to_entities: Dict[int, Set[str]],
+                            doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                            adjacency: Dict[str, List[Tuple[str, float, str]]],
+                            remaining_positions: Sequence[int],
+                            covered_entities: Sequence[str] | Set[str] | None,
+                            structure_max_hops: int,
+                            base_weight: float,
+                            structure_weight: float,
+                            novelty_weight: float) -> List[Dict[str, object]]:
+    normalized_covered = normalize_entity_set(covered_entities)
+    candidate_doc_ids = [
+        int(pool_doc_ids[pos])
+        for pos in remaining_positions
+        if pos < len(pool_doc_ids) and pool_doc_ids[pos] is not None
+    ]
+    structure_scores = (
+        score_candidate_docs_by_structure(
+            candidate_doc_ids=candidate_doc_ids,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            seed_entities=normalized_covered,
+            adjacency=adjacency,
+            max_hops=structure_max_hops,
+        )
+        if candidate_doc_ids and normalized_covered
+        else {}
+    )
+
+    scored_candidates: List[Dict[str, object]] = []
+    for pos in remaining_positions:
+        doc_id = pool_doc_ids[pos]
+        doc_entities = (
+            normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set()))
+            if doc_id is not None
+            else set()
+        )
+        novelty_score = (
+            len(doc_entities - normalized_covered) / max(1, len(doc_entities))
+            if doc_entities
+            else 0.0
+        )
+        structure_score = (
+            float(structure_scores.get(int(doc_id), 0.0))
+            if doc_id is not None
+            else 0.0
+        )
+        base_score = float(normalized_base_scores[pos]) if pos < len(normalized_base_scores) else 0.0
+        combined_score = (
+            base_weight * base_score
+            + structure_weight * structure_score
+            + novelty_weight * novelty_score
+        )
+        scored_candidates.append({
+            "pool_position": int(pos),
+            "doc_id": int(doc_id) if doc_id is not None else None,
+            "doc_entities": doc_entities,
+            "new_entity_count": len(doc_entities - normalized_covered),
+            "base_score": round(base_score, 4),
+            "structure_score": round(structure_score, 4),
+            "novelty_score": round(float(novelty_score), 4),
+            "combined_score": round(float(combined_score), 4),
+            "combined_score_raw": float(combined_score),
+        })
+
+    scored_candidates.sort(
+        key=lambda item: (
+            -float(item["combined_score_raw"]),
+            -int(item["new_entity_count"]),
+            int(item["pool_position"]),
+        )
+    )
+    return scored_candidates
+
+
 def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
                                    pool_doc_scores: np.ndarray,
                                    doc_idx_to_entities: Dict[int, Set[str]],
@@ -495,61 +571,21 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
     remaining_positions = [pos for pos in remaining_positions if pos not in set(selected_positions)]
 
     while len(selected_positions) < target_k and remaining_positions:
-        candidate_doc_ids = [
-            int(pool_doc_ids[pos])
-            for pos in remaining_positions
-            if pool_doc_ids[pos] is not None
-        ]
-        structure_scores = (
-            score_candidate_docs_by_structure(
-                candidate_doc_ids=candidate_doc_ids,
-                doc_idx_to_entities=doc_idx_to_entities,
-                doc_idx_to_edges=doc_idx_to_edges,
-                seed_entities=covered_entities,
-                adjacency=adjacency,
-                max_hops=structure_max_hops,
-            )
-            if candidate_doc_ids and covered_entities
-            else {}
+        scored_candidates = score_bridge_candidates(
+            pool_doc_ids=pool_doc_ids,
+            normalized_base_scores=normalized_base_scores,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            adjacency=adjacency,
+            remaining_positions=remaining_positions,
+            covered_entities=covered_entities,
+            structure_max_hops=structure_max_hops,
+            base_weight=base_weight,
+            structure_weight=structure_weight,
+            novelty_weight=novelty_weight,
         )
-
-        best_pos = remaining_positions[0]
-        best_combined = float("-inf")
-        best_detail: Dict[str, object] = {}
-        for pos in remaining_positions:
-            doc_id = pool_doc_ids[pos]
-            doc_entities = (
-                normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set()))
-                if doc_id is not None
-                else set()
-            )
-            novelty_score = (
-                len(doc_entities - covered_entities) / max(1, len(doc_entities))
-                if doc_entities
-                else 0.0
-            )
-            structure_score = (
-                float(structure_scores.get(int(doc_id), 0.0))
-                if doc_id is not None
-                else 0.0
-            )
-            base_score = float(normalized_base_scores[pos]) if pos < len(normalized_base_scores) else 0.0
-            combined_score = (
-                base_weight * base_score
-                + structure_weight * structure_score
-                + novelty_weight * novelty_score
-            )
-            if combined_score > best_combined + 1e-9 or (
-                abs(combined_score - best_combined) <= 1e-9 and pos < best_pos
-            ):
-                best_pos = pos
-                best_combined = combined_score
-                best_detail = {
-                    "base_score": round(base_score, 4),
-                    "structure_score": round(structure_score, 4),
-                    "novelty_score": round(float(novelty_score), 4),
-                    "combined_score": round(float(combined_score), 4),
-                }
+        best_detail = scored_candidates[0]
+        best_pos = int(best_detail["pool_position"])
 
         selected_positions.append(best_pos)
         remaining_positions.remove(best_pos)
@@ -561,7 +597,10 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
             "mode": "greedy",
             "pool_position": int(best_pos),
             "doc_id": int(chosen_doc_id) if chosen_doc_id is not None else None,
-            **best_detail,
+            "base_score": float(best_detail["base_score"]),
+            "structure_score": float(best_detail["structure_score"]),
+            "novelty_score": float(best_detail["novelty_score"]),
+            "combined_score": float(best_detail["combined_score"]),
         })
 
     return selected_positions, {
@@ -570,6 +609,158 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
         "seed_entity_count_initial": len(normalize_entity_set(initial_seed_entities)),
         "covered_entity_count_final": len(covered_entities),
         "candidate_count": candidate_count,
+    }
+
+
+def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
+                                 pool_doc_scores: np.ndarray,
+                                 doc_idx_to_entities: Dict[int, Set[str]],
+                                 doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                 adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                 qa_top_k: int,
+                                 initial_seed_entities: Sequence[str] | Set[str] | None = None,
+                                 anchor_count: int = 2,
+                                 structure_max_hops: int = 2,
+                                 base_weight: float = 0.25,
+                                 structure_weight: float = 0.60,
+                                 novelty_weight: float = 0.15,
+                                 beam_width: int = 4,
+                                 beam_expand_per_state: int = 4) -> Tuple[List[int], Dict[str, object]]:
+    candidate_count = len(pool_doc_ids)
+    if candidate_count == 0 or qa_top_k <= 0:
+        return [], {
+            "selection_steps": [],
+            "anchor_positions": [],
+            "seed_entity_count_initial": 0,
+            "covered_entity_count_final": 0,
+            "candidate_count": candidate_count,
+            "beam_width": int(max(beam_width, 1)),
+            "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
+        }
+
+    normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
+    target_k = min(candidate_count, qa_top_k)
+    seed_entities = normalize_entity_set(initial_seed_entities)
+    actual_anchor_count = min(max(anchor_count, 0), target_k)
+    anchor_positions = list(range(actual_anchor_count))
+
+    initial_covered = seed_entities.copy()
+    initial_steps: List[Dict[str, object]] = []
+    for anchor_pos in anchor_positions:
+        doc_id = pool_doc_ids[anchor_pos]
+        if doc_id is not None:
+            initial_covered.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+        initial_steps.append({
+            "step": len(initial_steps) + 1,
+            "mode": "anchor",
+            "pool_position": int(anchor_pos),
+            "doc_id": int(doc_id) if doc_id is not None else None,
+            "base_score": round(float(normalized_base_scores[anchor_pos]), 4),
+            "structure_score": 0.0,
+            "novelty_score": 0.0,
+            "combined_score": round(float(normalized_base_scores[anchor_pos]), 4),
+        })
+
+    beam_width = max(int(beam_width), 1)
+    beam_expand_per_state = max(int(beam_expand_per_state), 1)
+    beam_states: List[Dict[str, object]] = [{
+        "selected_positions": list(anchor_positions),
+        "covered_entities": initial_covered,
+        "selection_steps": initial_steps,
+        "cumulative_score": 0.0,
+    }]
+    seen_signatures = {tuple(anchor_positions)}
+
+    while beam_states and len(beam_states[0]["selected_positions"]) < target_k:
+        expanded_states: List[Dict[str, object]] = []
+        for state in beam_states:
+            selected_positions = list(state["selected_positions"])
+            remaining_positions = [
+                pos for pos in range(candidate_count)
+                if pos not in set(selected_positions)
+            ]
+            if not remaining_positions:
+                expanded_states.append(state)
+                continue
+
+            scored_candidates = score_bridge_candidates(
+                pool_doc_ids=pool_doc_ids,
+                normalized_base_scores=normalized_base_scores,
+                doc_idx_to_entities=doc_idx_to_entities,
+                doc_idx_to_edges=doc_idx_to_edges,
+                adjacency=adjacency,
+                remaining_positions=remaining_positions,
+                covered_entities=state["covered_entities"],
+                structure_max_hops=structure_max_hops,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+            )
+
+            for candidate in scored_candidates[:beam_expand_per_state]:
+                chosen_pos = int(candidate["pool_position"])
+                signature = tuple(selected_positions + [chosen_pos])
+                if signature in seen_signatures:
+                    continue
+                seen_signatures.add(signature)
+
+                next_covered = set(state["covered_entities"])
+                next_covered.update(set(candidate["doc_entities"]))
+                expanded_states.append({
+                    "selected_positions": list(signature),
+                    "covered_entities": next_covered,
+                    "selection_steps": list(state["selection_steps"]) + [{
+                        "step": len(state["selection_steps"]) + 1,
+                        "mode": "beam",
+                        "pool_position": chosen_pos,
+                        "doc_id": int(candidate["doc_id"]) if candidate["doc_id"] is not None else None,
+                        "base_score": float(candidate["base_score"]),
+                        "structure_score": float(candidate["structure_score"]),
+                        "novelty_score": float(candidate["novelty_score"]),
+                        "combined_score": float(candidate["combined_score"]),
+                    }],
+                    "cumulative_score": float(state["cumulative_score"]) + float(candidate["combined_score_raw"]),
+                })
+
+        if not expanded_states:
+            break
+
+        expanded_states.sort(
+            key=lambda state: (
+                -float(state["cumulative_score"]),
+                -len(state["covered_entities"]),
+                tuple(int(pos) for pos in state["selected_positions"]),
+            )
+        )
+        beam_states = expanded_states[:beam_width]
+
+    if beam_states:
+        best_state = max(
+            beam_states,
+            key=lambda state: (
+                float(state["cumulative_score"]),
+                len(state["covered_entities"]),
+                tuple(-int(pos) for pos in state["selected_positions"]),
+            ),
+        )
+    else:
+        best_state = {
+            "selected_positions": list(anchor_positions),
+            "covered_entities": initial_covered,
+            "selection_steps": initial_steps,
+            "cumulative_score": 0.0,
+        }
+
+    return list(best_state["selected_positions"]), {
+        "selection_steps": list(best_state["selection_steps"]),
+        "anchor_positions": [int(pos) for pos in anchor_positions],
+        "seed_entity_count_initial": len(seed_entities),
+        "covered_entity_count_final": len(set(best_state["covered_entities"])),
+        "candidate_count": candidate_count,
+        "beam_width": beam_width,
+        "beam_expand_per_state": beam_expand_per_state,
+        "beam_finalist_count": len(beam_states),
+        "beam_best_cumulative_score": round(float(best_state["cumulative_score"]), 4),
     }
 
 
@@ -584,10 +775,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            base_weight: float,
                            structure_weight: float,
                            novelty_weight: float,
-                           learned_model_bundle: Dict[str, object] | None = None) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           learned_model_bundle: Dict[str, object] | None = None,
+                           beam_width: int = 4,
+                           beam_expand_per_state: int = 4) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
-    if selector_name not in {"bridge_greedy", "learned_greedy"}:
+    if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -635,6 +828,23 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
+            )
+        elif selector_name == "bridge_beam":
+            selected_positions, selector_trace = select_bridge_beam_positions(
+                pool_doc_ids=pool_doc_ids,
+                pool_doc_scores=pool_scores,
+                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                adjacency=hipporag.structure_graph_out,
+                qa_top_k=qa_top_k,
+                initial_seed_entities=seed_entities,
+                anchor_count=anchor_count,
+                structure_max_hops=structure_max_hops,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                beam_width=beam_width,
+                beam_expand_per_state=beam_expand_per_state,
             )
         else:
             if learned_model_bundle is None:
@@ -717,6 +927,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
             float(np.mean(selected_structured_doc_counts)) if selected_structured_doc_counts else 0.0,
             4,
         ),
+        "beam_width": int(beam_width),
+        "beam_expand_per_state": int(beam_expand_per_state),
         "examples_preview": selector_examples,
     }
     logger.info(
@@ -1076,7 +1288,7 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "learned_greedy"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "learned_greedy"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
                         help="Candidate pool size used by the setwise selector.")
@@ -1090,6 +1302,10 @@ def main():
                         help="Weight assigned to structure bridge score inside setwise selection.")
     parser.add_argument("--setwise_novelty_weight", type=float, default=0.15,
                         help="Weight assigned to entity novelty inside setwise selection.")
+    parser.add_argument("--setwise_beam_width", type=int, default=4,
+                        help="Beam width used when --setwise_selector bridge_beam.")
+    parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
+                        help="Number of candidates expanded per beam state for --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_model_path", type=str, default="",
                         help="Joblib bundle path used by --setwise_selector learned_greedy.")
     parser.add_argument("--output_json", type=str, default=None)
@@ -1370,6 +1586,8 @@ def main():
             structure_weight=float(args.setwise_structure_weight),
             novelty_weight=float(args.setwise_novelty_weight),
             learned_model_bundle=learned_model_bundle,
+            beam_width=int(args.setwise_beam_width),
+            beam_expand_per_state=int(args.setwise_beam_expand_per_state),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -1436,6 +1654,8 @@ def main():
             "base_weight": float(args.setwise_base_weight),
             "structure_weight": float(args.setwise_structure_weight),
             "novelty_weight": float(args.setwise_novelty_weight),
+            "beam_width": int(args.setwise_beam_width),
+            "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "setwise_model_path": args.setwise_model_path or None,
             "selector_EM": round(float(selector_em), 4),
             "selector_F1": round(float(selector_f1), 4),
@@ -1627,6 +1847,8 @@ def main():
             "setwise_base_weight": float(args.setwise_base_weight),
             "setwise_structure_weight": float(args.setwise_structure_weight),
             "setwise_novelty_weight": float(args.setwise_novelty_weight),
+            "setwise_beam_width": int(args.setwise_beam_width),
+            "setwise_beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "setwise_model_path": args.setwise_model_path or None,
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
