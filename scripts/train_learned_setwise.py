@@ -497,6 +497,7 @@ def main():
         learned_model_bundle=model_bundle,
         gate_mode="none",
         gate_min_structure_score=0.15,
+        gate_min_combined_margin=0.0,
     )
     selector_retrieval = compute_slice_metrics(
         config=config,

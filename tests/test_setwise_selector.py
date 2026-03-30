@@ -380,6 +380,7 @@ def test_compute_bridge_gate_decision_skips_without_strong_offrank_bridge_signal
         novelty_weight=0.15,
         gate_mode="suffix_bridge",
         gate_min_structure_score=0.15,
+        gate_min_combined_margin=0.0,
     )
 
     assert decision["gate_enabled"] is True
@@ -424,12 +425,58 @@ def test_compute_bridge_gate_decision_applies_for_stronger_offrank_bridge_signal
         novelty_weight=0.15,
         gate_mode="suffix_bridge",
         gate_min_structure_score=0.15,
+        gate_min_combined_margin=0.0,
     )
 
     assert decision["gate_enabled"] is True
     assert decision["use_selector"] is True
     assert decision["reason"] == "offrank_bridge_signal_detected"
     assert decision["baseline_suffix_positions"] == [4]
+    assert decision["best_offrank_pool_position"] == 5
+    assert decision["weakest_baseline_suffix_pool_position"] == 4
+
+
+def test_compute_bridge_gate_decision_skips_when_combined_margin_is_too_small():
+    decision = compute_bridge_gate_decision(
+        pool_doc_ids=[0, 1, 2, 3, 4, 5],
+        pool_doc_scores=np.array([1.0, 0.95, 0.90, 0.85, 0.80, 0.79], dtype=float),
+        pool_doc_titles=["A", "B", "C", "D", "Suffix", "Bridge"],
+        doc_idx_to_entities={
+            0: {"entity a"},
+            1: {"entity b"},
+            2: {"entity c"},
+            3: {"entity d"},
+            4: {"suffix"},
+            5: {"entity d", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [("entity d", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "entity d": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=5,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        reserve_top_m=4,
+        max_bridge_slots=1,
+        structure_max_hops=2,
+        base_weight=0.9,
+        structure_weight=0.05,
+        novelty_weight=0.05,
+        gate_mode="suffix_bridge",
+        gate_min_structure_score=0.15,
+        gate_min_combined_margin=0.05,
+    )
+
+    assert decision["gate_enabled"] is True
+    assert decision["use_selector"] is False
+    assert decision["reason"] == "offrank_combined_margin_too_small"
     assert decision["best_offrank_pool_position"] == 5
     assert decision["weakest_baseline_suffix_pool_position"] == 4
 

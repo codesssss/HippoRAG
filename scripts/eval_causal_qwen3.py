@@ -579,6 +579,7 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
                                  max_bridge_slots: int = 0,
                                  gate_mode: str = "none",
                                  gate_min_structure_score: float = 0.15,
+                                 gate_min_combined_margin: float = 0.0,
                                  non_anchor_title_dedup: bool = False) -> Dict[str, object]:
     normalized_gate_mode = str(gate_mode or "none").strip().lower()
     candidate_count = len(pool_doc_ids)
@@ -614,6 +615,7 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
         "weakest_baseline_suffix_structure_score": 0.0,
         "weakest_baseline_suffix_combined_score": 0.0,
         "gate_min_structure_score": round(float(gate_min_structure_score), 4),
+        "gate_min_combined_margin": round(float(gate_min_combined_margin), 4),
     }
     if normalized_gate_mode == "none":
         return decision
@@ -720,6 +722,15 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
     ):
         decision["use_selector"] = False
         decision["reason"] = "baseline_suffix_already_has_equal_or_better_bridge"
+        return decision
+
+    if (
+        weakest_baseline_suffix is not None
+        and float(best_offrank["combined_score_raw"])
+        <= float(weakest_baseline_suffix["combined_score_raw"]) + float(gate_min_combined_margin)
+    ):
+        decision["use_selector"] = False
+        decision["reason"] = "offrank_combined_margin_too_small"
         return decision
 
     decision["reason"] = "offrank_bridge_signal_detected"
@@ -1067,7 +1078,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            beam_expand_per_state: int = 4,
                            non_anchor_title_dedup: bool = False,
                            gate_mode: str = "none",
-                           gate_min_structure_score: float = 0.15) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           gate_min_structure_score: float = 0.15,
+                           gate_min_combined_margin: float = 0.0) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy"}:
@@ -1133,6 +1145,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 max_bridge_slots=max_bridge_slots,
                 gate_mode=gate_mode,
                 gate_min_structure_score=gate_min_structure_score,
+                gate_min_combined_margin=gate_min_combined_margin,
                 non_anchor_title_dedup=non_anchor_title_dedup,
             )
             if gate_decision.get("gate_enabled", False):
@@ -1303,6 +1316,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         "gate_mode": str(gate_mode or "none").strip().lower(),
         "gate_min_structure_score": round(float(gate_min_structure_score), 4),
+        "gate_min_combined_margin": round(float(gate_min_combined_margin), 4),
         "gate_apply_count": int(gate_apply_count),
         "gate_skip_count": int(gate_skip_count),
         "gate_reason_counts": dict(sorted(gate_reason_counts.items())),
@@ -1691,6 +1705,8 @@ def main():
                         help="Per-query activation gate for bridge selectors. suffix_bridge only fires when an off-prefix candidate shows stronger bridge signal than the baseline suffix.")
     parser.add_argument("--setwise_gate_min_structure_score", type=float, default=0.15,
                         help="Minimum structure score required for the adaptive setwise gate to activate on an off-prefix bridge candidate.")
+    parser.add_argument("--setwise_gate_min_combined_margin", type=float, default=0.0,
+                        help="Minimum combined-score advantage an off-prefix bridge candidate must have over the weakest baseline suffix doc before the gate activates.")
     parser.add_argument("--setwise_beam_width", type=int, default=4,
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
@@ -1982,6 +1998,7 @@ def main():
             non_anchor_title_dedup=bool(args.setwise_non_anchor_title_dedup),
             gate_mode=str(args.setwise_gate_mode),
             gate_min_structure_score=float(args.setwise_gate_min_structure_score),
+            gate_min_combined_margin=float(args.setwise_gate_min_combined_margin),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -2053,6 +2070,7 @@ def main():
             "non_anchor_title_dedup": bool(args.setwise_non_anchor_title_dedup),
             "gate_mode": str(args.setwise_gate_mode),
             "gate_min_structure_score": round(float(args.setwise_gate_min_structure_score), 4),
+            "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "setwise_model_path": args.setwise_model_path or None,
