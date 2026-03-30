@@ -1,6 +1,6 @@
 # Result Registry
 
-Last updated: 2026-03-29
+Last updated: 2026-03-30
 
 This file stores concrete results only. Every result must have a file path.
 
@@ -8,11 +8,14 @@ This file stores concrete results only. Every result must have a file path.
 
 Summary note:
 - `research_memory/emnlp_expand_then_compose/05_non_oracle_bridge_greedy.md`
+- `research_memory/emnlp_expand_then_compose/06_bridge_beam_search.md`
 
 Key status:
 - The minimal non-oracle method is now implemented.
 - There is a positive small-sample signal on `2Wiki` under the earlier `general_relation_graph` path.
-- On the canonical `legacy_fact_graph` backbone, the current heuristic is not yet robust.
+- On the canonical `legacy_fact_graph` backbone, `bridge_beam` now gives a stronger positive `2Wiki` signal than `bridge_greedy`.
+- `MuSiQue bridge_beam@100` is now a negative overall result despite a positive `4-doc` bucket signal.
+- The main remaining question is whether `beam` still beats matched `greedy` on `MuSiQue`, or whether the score itself is the limiting factor.
 - The failed `seed union + title dedup` tweak has been recorded and reverted.
 
 ## 2WikiMultihopQA-1000
@@ -85,6 +88,22 @@ Canonical-backbone non-oracle pilot:
 - baseline `Recall@20 = 0.8875`, selector `Recall@20 = 0.8875`
 - `2-doc EM delta = +0.1333`
 - `4-doc EM delta = -0.2000`
+
+Canonical-backbone search ablation:
+- greedy report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_greedy_pilot_100_legacy.json`
+- beam report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_pilot_100_legacy.json`
+- setup: `limit=100`, `pool_k=100`, anchor `2`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.3800 / 0.4332`
+- greedy `EM/F1 = 0.4300 / 0.4726`
+- beam `EM/F1 = 0.4600 / 0.4924`
+- greedy delta `EM/F1 = +0.0500 / +0.0394`
+- beam delta `EM/F1 = +0.0800 / +0.0592`
+- greedy `Recall@5 / Recall@20 = 0.8150 / 0.8825`
+- beam `Recall@5 / Recall@20 = 0.8075 / 0.8825`
+- greedy `2-doc EM delta = +0.0909`
+- beam `2-doc EM delta = +0.0909`
+- greedy `4-doc EM delta = -0.0870`
+- beam `4-doc EM delta = +0.0435`
 
 Failed micro-tweak:
 - report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_greedy_pilot_20_legacy_seedunion_dedup.json`
@@ -173,6 +192,23 @@ Canonical-backbone non-oracle pilot:
 - `2-doc EM delta = -0.2727`
 - `3-doc EM delta = 0.0000`
 - `4-doc EM delta = 0.0000`
+
+Canonical-backbone beam pilot:
+- report path: `outputs_step0_general_musique/eval_reports/setwise_bridge_beam_pilot_100_legacy.json`
+- setup: `limit=100`, `pool_k=100`, selector `bridge_beam`, anchor `2`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.2600 / 0.3466`
+- selector `EM/F1 = 0.1800 / 0.2498`
+- delta `EM/F1 = -0.0800 / -0.0968`
+- baseline `Recall@5 / Recall@20 = 0.6150 / 0.7858`
+- beam `Recall@5 / Recall@20 = 0.4950 / 0.7933`
+- `2-doc EM delta = -0.1458`
+- `3-doc EM delta = -0.0667`
+- `4-doc EM delta = +0.0455`
+
+Interpretation:
+- The first matched `MuSiQue` beam run is not paper-ready as a practical method result.
+- It helps the hardest `4-doc` bucket but hurts `2-doc` and `3-doc` enough to become destructive overall.
+- This currently supports a narrow hard-case mechanism story, not a broad robustness claim.
 
 ## Cross-Dataset Summary
 
