@@ -185,14 +185,62 @@ Interpretation:
 - `Recall@20` improves slightly, but `Recall@5` drops by more than five points and QA quality falls with it.
 - So even with a stronger reserved prefix, the current beam selector is still too willing to trade away top-ranked evidence when the dataset is already shallow.
 
+## Shared Closure-Only Beam
+
+Report files:
+- `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve4_bridge1_gate015.json`
+- `outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve4_bridge1_gate015.json`
+- `outputs_step0_general_musique/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve4_bridge1_gate015.json`
+
+Shared setup:
+- canonical `legacy_fact_graph` backbone
+- selector: `bridge_beam`
+- anchor count: `2`
+- reserve top `4`
+- max bridge slots: `1`
+- non-anchor title dedup: `true`
+- gate mode: `suffix_bridge`
+- gate min structure score: `0.15`
+- beam params: `beam_width=4`, `beam_expand_per_state=4`
+
+Cross-dataset results:
+
+| Dataset | Baseline EM | Selector EM | Delta EM | Baseline F1 | Selector F1 | Delta F1 | Selector Recall@5 | Selector Recall@20 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `2Wiki` | 0.3800 | 0.4300 | +0.0500 | 0.4332 | 0.4719 | +0.0387 | 0.8075 | 0.8775 |
+| `HotpotQA` | 0.5900 | 0.5900 | +0.0000 | 0.7114 | 0.7064 | -0.0050 | 0.9150 | 0.9700 |
+| `MuSiQue` | 0.2600 | 0.2600 | +0.0000 | 0.3466 | 0.3452 | -0.0014 | 0.5842 | 0.7908 |
+
+Gate activity:
+
+| Dataset | Apply | Skip | Main gate reading |
+|---|---:|---:|---|
+| `2Wiki` | 21 | 79 | selective activation with clear net gain |
+| `HotpotQA` | 15 | 85 | mostly skipped, which avoids the earlier shallow-case failure |
+| `MuSiQue` | 55 | 45 | still activates too often, which flattens overall gain |
+
+Bucket behavior:
+
+| Dataset | `2-doc` Delta EM | `3-doc` Delta EM | `4-doc` Delta EM |
+|---|---:|---:|---:|
+| `2Wiki` | +0.0649 | — | +0.0000 |
+| `HotpotQA` | +0.0000 | — | — |
+| `MuSiQue` | -0.0208 | +0.0000 | +0.0455 |
+
+Interpretation:
+- This is the first shared configuration that is clearly safe enough to discuss across all three datasets.
+- It keeps a meaningful positive `2Wiki` result while removing the previous destructive `HotpotQA` behavior.
+- On `MuSiQue`, it no longer wins overall, but it does recover to neutral while preserving the `4-doc` hard-case gain.
+- The price of this safety is reduced exploration: the earlier aggressive `2Wiki` beam had stronger hard-case lift, which is now mostly gated away.
+
 ## Interpretation
 
 What this means:
 - The bridge-aware selector is now clearly useful on the canonical `2Wiki` setting.
 - Search matters on top of scoring: `beam` beats `greedy` under the same local score.
 - The gain is not explained by shallow recall alone.
-- On `MuSiQue`, stronger prefix preservation makes the method usable enough to keep as a hard-dataset stress-test result.
-- On `HotpotQA`, the same shared config is negative, so the current selector is not a universal drop-in replacement.
+- The closure-only controls are enough to turn the previous shallow-dataset failure into an effectively non-destructive result.
+- On `MuSiQue`, the shared config is now neutral overall and still positive on `4-doc`, so the remaining bottleneck is score calibration rather than search alone.
 
 Why the last point matters:
 - `bridge_greedy` has slightly higher `Recall@5` than `bridge_beam` (`0.8150` vs `0.8075`)
@@ -203,15 +251,17 @@ Conclusion:
 - `bridge_beam` improves evidence composition, not just top-5 lexical coverage.
 - This is exactly the kind of evidence needed for the `Expand-then-Compose` story.
 - Today the strongest clean claim is still on canonical `2Wiki`.
-- `MuSiQue` is now a partially rescued hard-case stress test rather than a total failure.
-- `HotpotQA` is an explicit shallow boundary condition showing that the shared config still over-explores when top evidence is already concentrated.
+- The closure-only shared config is the current safest cross-dataset setting, not the strongest single-dataset setting.
+- `MuSiQue` is now a neutral-but-informative hard-case stress test rather than a broad failure.
+- `HotpotQA` now functions as a shallow boundary check that validates the gate logic instead of exposing a catastrophic over-exploration bug.
 
 ## Paper Positioning
 
 Recommended framing:
 - present `bridge_beam` as the strongest current practical candidate on `2Wiki`
 - present `bridge_greedy` as the search-ablation control
-- present reserved-prefix `bridge_beam` on `MuSiQue` as a robustness-improvement stress test
+- present the closure-only shared config as the current robust cross-dataset control
+- present `MuSiQue` as a neutral hard-dataset stress test with retained `4-doc` lift
 - present `HotpotQA` as a boundary-condition check rather than a success case
 - make the claim narrow and defensible:
   - widening the pool is necessary but not sufficient
@@ -219,7 +269,7 @@ Recommended framing:
 
 What should not be claimed yet:
 - do not claim broad cross-dataset robustness
-- do not claim that the current shared score/config generalizes cleanly across datasets
+- do not claim that the current shared score/config is a universal positive improvement
 - do not claim that beam fully solves hard multi-hop retrieval
 
 ## Relation To Oracle Headroom
@@ -241,17 +291,18 @@ Current decision:
 - keep `bridge_beam` as the main `2Wiki` non-oracle selector line
 - keep `bridge_greedy` as the immediate search-ablation / control
 - freeze the learned selector as pilot-only evidence unless later runs become much stronger
-- treat `MuSiQue reserve3 + dedup` as improved but still not fully stable evidence
-- treat `HotpotQA` as evidence that score calibration and prefix protection remain the next bottlenecks for shallow datasets
+- keep the closure-only shared config as the safest cross-dataset selector checkpoint
+- treat `MuSiQue` as evidence that score calibration remains the next bottleneck even after search and gating are stabilized
+- treat `HotpotQA` as evidence that prefix protection and gating are necessary for shallow datasets
 
 ## Immediate Next Step
 
 Run:
-- retune the selector toward stronger top-prefix preservation or adaptive scoring on shallow datasets
+- retune the gate so that `MuSiQue` activates on fewer shallow queries while keeping the `4-doc` lift
 
 Decision rule:
 - keep the search claim narrow:
   - on `2Wiki`, beam search helps under a fixed bridge-aware score
-  - on `MuSiQue`, stronger prefix preservation recovers a modest positive `EM`
-  - on `HotpotQA`, the remaining failure is still over-exploration on shallow cases
-- next method iteration should preserve anchors / shallow relevance more aggressively before adding bridge exploration
+  - on `MuSiQue`, the closure-only gate removes the overall loss but still needs better calibration
+  - on `HotpotQA`, the gate now behaves like a useful safety mechanism
+- next method iteration should preserve the shared closure-only structure and retune only the gate aggressiveness

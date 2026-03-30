@@ -147,6 +147,14 @@ def filter_title_dedup_candidates(scored_candidates: Sequence[Dict[str, object]]
     return filtered_candidates or list(scored_candidates)
 
 
+def resolve_selection_target_k(target_k: int,
+                               reserved_count: int,
+                               max_bridge_slots: int) -> int:
+    if max_bridge_slots <= 0:
+        return int(target_k)
+    return int(min(target_k, max(0, reserved_count) + max(0, max_bridge_slots)))
+
+
 def normalize_entity_set(entities: Sequence[str] | Set[str] | None) -> Set[str]:
     normalized_entities: Set[str] = set()
     for entity in entities or []:
@@ -554,6 +562,170 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
     return scored_candidates
 
 
+def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
+                                 pool_doc_scores: np.ndarray,
+                                 pool_doc_titles: Sequence[str] | None,
+                                 doc_idx_to_entities: Dict[int, Set[str]],
+                                 doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                 adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                 qa_top_k: int,
+                                 initial_seed_entities: Sequence[str] | Set[str] | None = None,
+                                 anchor_count: int = 2,
+                                 reserve_top_m: int = 0,
+                                 structure_max_hops: int = 2,
+                                 base_weight: float = 0.25,
+                                 structure_weight: float = 0.60,
+                                 novelty_weight: float = 0.15,
+                                 max_bridge_slots: int = 0,
+                                 gate_mode: str = "none",
+                                 gate_min_structure_score: float = 0.15,
+                                 non_anchor_title_dedup: bool = False) -> Dict[str, object]:
+    normalized_gate_mode = str(gate_mode or "none").strip().lower()
+    candidate_count = len(pool_doc_ids)
+    target_k = min(candidate_count, max(int(qa_top_k), 0))
+    anchor_positions, reserved_positions = resolve_reserved_positions(
+        candidate_count=candidate_count,
+        target_k=target_k,
+        anchor_count=anchor_count,
+        reserve_top_m=reserve_top_m,
+    )
+    selection_target_k = resolve_selection_target_k(
+        target_k=target_k,
+        reserved_count=len(reserved_positions),
+        max_bridge_slots=max_bridge_slots,
+    )
+    suffix_budget = max(0, selection_target_k - len(reserved_positions))
+
+    decision = {
+        "gate_mode": normalized_gate_mode,
+        "gate_enabled": normalized_gate_mode != "none",
+        "use_selector": True,
+        "reason": "disabled" if normalized_gate_mode == "none" else "apply",
+        "target_k": int(target_k),
+        "selection_target_k": int(selection_target_k),
+        "max_bridge_slots": int(max(0, max_bridge_slots)),
+        "reserved_positions": [int(pos) for pos in reserved_positions],
+        "suffix_budget": int(suffix_budget),
+        "baseline_suffix_positions": [],
+        "best_offrank_pool_position": None,
+        "best_offrank_structure_score": 0.0,
+        "best_offrank_combined_score": 0.0,
+        "weakest_baseline_suffix_pool_position": None,
+        "weakest_baseline_suffix_structure_score": 0.0,
+        "weakest_baseline_suffix_combined_score": 0.0,
+        "gate_min_structure_score": round(float(gate_min_structure_score), 4),
+    }
+    if normalized_gate_mode == "none":
+        return decision
+
+    if suffix_budget <= 0:
+        decision["use_selector"] = False
+        decision["reason"] = "no_bridge_slots"
+        return decision
+
+    normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
+    covered_entities = normalize_entity_set(initial_seed_entities)
+    blocked_titles: Set[str] = set()
+    for reserved_pos in reserved_positions:
+        doc_id = pool_doc_ids[reserved_pos]
+        if doc_id is not None:
+            covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+        if pool_doc_titles is not None and reserved_pos < len(pool_doc_titles):
+            reserved_title = str(pool_doc_titles[reserved_pos]).strip()
+            if reserved_title:
+                blocked_titles.add(reserved_title)
+
+    remaining_positions = [pos for pos in range(candidate_count) if pos not in set(reserved_positions)]
+    baseline_suffix_positions = list(remaining_positions[:suffix_budget])
+    decision["baseline_suffix_positions"] = [int(pos) for pos in baseline_suffix_positions]
+    if not remaining_positions:
+        decision["use_selector"] = False
+        decision["reason"] = "no_remaining_candidates"
+        return decision
+
+    scored_candidates = score_bridge_candidates(
+        pool_doc_ids=pool_doc_ids,
+        normalized_base_scores=normalized_base_scores,
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities=doc_idx_to_entities,
+        doc_idx_to_edges=doc_idx_to_edges,
+        adjacency=adjacency,
+        remaining_positions=remaining_positions,
+        covered_entities=covered_entities,
+        structure_max_hops=structure_max_hops,
+        base_weight=base_weight,
+        structure_weight=structure_weight,
+        novelty_weight=novelty_weight,
+    )
+    scored_candidates = filter_title_dedup_candidates(
+        scored_candidates=scored_candidates,
+        blocked_titles=blocked_titles,
+        enabled=non_anchor_title_dedup,
+    )
+    candidates_by_position = {
+        int(candidate["pool_position"]): candidate
+        for candidate in scored_candidates
+    }
+    baseline_suffix_candidates = [
+        candidates_by_position[pos]
+        for pos in baseline_suffix_positions
+        if pos in candidates_by_position
+    ]
+    offrank_candidates = [
+        candidate
+        for candidate in scored_candidates
+        if int(candidate["pool_position"]) not in set(baseline_suffix_positions)
+    ]
+
+    if not offrank_candidates:
+        decision["use_selector"] = False
+        decision["reason"] = "no_offrank_bridge_candidate"
+        return decision
+
+    best_offrank = max(
+        offrank_candidates,
+        key=lambda candidate: (
+            float(candidate["structure_score"]),
+            float(candidate["combined_score_raw"]),
+            -int(candidate["pool_position"]),
+        ),
+    )
+    decision["best_offrank_pool_position"] = int(best_offrank["pool_position"])
+    decision["best_offrank_structure_score"] = round(float(best_offrank["structure_score"]), 4)
+    decision["best_offrank_combined_score"] = round(float(best_offrank["combined_score"]), 4)
+
+    if baseline_suffix_candidates:
+        weakest_baseline_suffix = min(
+            baseline_suffix_candidates,
+            key=lambda candidate: (
+                float(candidate["structure_score"]),
+                float(candidate["combined_score_raw"]),
+                int(candidate["pool_position"]),
+            ),
+        )
+        decision["weakest_baseline_suffix_pool_position"] = int(weakest_baseline_suffix["pool_position"])
+        decision["weakest_baseline_suffix_structure_score"] = round(float(weakest_baseline_suffix["structure_score"]), 4)
+        decision["weakest_baseline_suffix_combined_score"] = round(float(weakest_baseline_suffix["combined_score"]), 4)
+    else:
+        weakest_baseline_suffix = None
+
+    if float(best_offrank["structure_score"]) < float(gate_min_structure_score):
+        decision["use_selector"] = False
+        decision["reason"] = "offrank_structure_below_threshold"
+        return decision
+
+    if (
+        weakest_baseline_suffix is not None
+        and float(best_offrank["structure_score"]) <= float(weakest_baseline_suffix["structure_score"]) + 1e-9
+    ):
+        decision["use_selector"] = False
+        decision["reason"] = "baseline_suffix_already_has_equal_or_better_bridge"
+        return decision
+
+    decision["reason"] = "offrank_bridge_signal_detected"
+    return decision
+
+
 def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
                                    pool_doc_scores: np.ndarray,
                                    pool_doc_titles: Sequence[str] | None,
@@ -564,6 +736,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
                                    initial_seed_entities: Sequence[str] | Set[str] | None = None,
                                    anchor_count: int = 2,
                                    reserve_top_m: int = 0,
+                                   max_bridge_slots: int = 0,
                                    structure_max_hops: int = 2,
                                    base_weight: float = 0.25,
                                    structure_weight: float = 0.60,
@@ -579,6 +752,8 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
             "covered_entity_count_final": 0,
             "candidate_count": candidate_count,
             "reserve_top_m": 0,
+            "max_bridge_slots": int(max(0, max_bridge_slots)),
+            "selection_target_k": 0,
             "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         }
 
@@ -594,6 +769,11 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
         target_k=target_k,
         anchor_count=anchor_count,
         reserve_top_m=reserve_top_m,
+    )
+    selection_target_k = resolve_selection_target_k(
+        target_k=target_k,
+        reserved_count=len(reserved_positions),
+        max_bridge_slots=max_bridge_slots,
     )
     anchor_position_set = set(anchor_positions)
     blocked_titles: Set[str] = set()
@@ -619,7 +799,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
 
     remaining_positions = [pos for pos in remaining_positions if pos not in set(selected_positions)]
 
-    while len(selected_positions) < target_k and remaining_positions:
+    while len(selected_positions) < selection_target_k and remaining_positions:
         scored_candidates = score_bridge_candidates(
             pool_doc_ids=pool_doc_ids,
             normalized_base_scores=normalized_base_scores,
@@ -669,6 +849,8 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
         "covered_entity_count_final": len(covered_entities),
         "candidate_count": candidate_count,
         "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+        "max_bridge_slots": int(max(0, max_bridge_slots)),
+        "selection_target_k": int(selection_target_k),
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
     }
 
@@ -683,6 +865,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  initial_seed_entities: Sequence[str] | Set[str] | None = None,
                                  anchor_count: int = 2,
                                  reserve_top_m: int = 0,
+                                 max_bridge_slots: int = 0,
                                  structure_max_hops: int = 2,
                                  base_weight: float = 0.25,
                                  structure_weight: float = 0.60,
@@ -700,6 +883,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "covered_entity_count_final": 0,
             "candidate_count": candidate_count,
             "reserve_top_m": 0,
+            "max_bridge_slots": int(max(0, max_bridge_slots)),
+            "selection_target_k": 0,
             "non_anchor_title_dedup": bool(non_anchor_title_dedup),
             "beam_width": int(max(beam_width, 1)),
             "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
@@ -713,6 +898,11 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         target_k=target_k,
         anchor_count=anchor_count,
         reserve_top_m=reserve_top_m,
+    )
+    selection_target_k = resolve_selection_target_k(
+        target_k=target_k,
+        reserved_count=len(reserved_positions),
+        max_bridge_slots=max_bridge_slots,
     )
     anchor_position_set = set(anchor_positions)
 
@@ -749,7 +939,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
     }]
     seen_signatures = {tuple(reserved_positions)}
 
-    while beam_states and len(beam_states[0]["selected_positions"]) < target_k:
+    while beam_states and len(beam_states[0]["selected_positions"]) < selection_target_k:
         expanded_states: List[Dict[str, object]] = []
         for state in beam_states:
             selected_positions = list(state["selected_positions"])
@@ -849,6 +1039,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "covered_entity_count_final": len(set(best_state["covered_entities"])),
         "candidate_count": candidate_count,
         "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+        "max_bridge_slots": int(max(0, max_bridge_slots)),
+        "selection_target_k": int(selection_target_k),
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         "beam_width": beam_width,
         "beam_expand_per_state": beam_expand_per_state,
@@ -865,6 +1057,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            selector_name: str,
                            anchor_count: int,
                            reserve_top_m: int,
+                           max_bridge_slots: int,
                            structure_max_hops: int,
                            base_weight: float,
                            structure_weight: float,
@@ -872,7 +1065,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            learned_model_bundle: Dict[str, object] | None = None,
                            beam_width: int = 4,
                            beam_expand_per_state: int = 4,
-                           non_anchor_title_dedup: bool = False) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           non_anchor_title_dedup: bool = False,
+                           gate_mode: str = "none",
+                           gate_min_structure_score: float = 0.15) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy"}:
@@ -883,6 +1078,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
     seed_entity_counts: List[int] = []
     selected_structured_doc_counts: List[int] = []
     selector_examples: List[Dict[str, object]] = []
+    gate_reason_counts: Counter[str] = Counter()
+    gate_apply_count = 0
+    gate_skip_count = 0
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
 
@@ -910,44 +1108,111 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 pool_doc_ids=pool_doc_ids,
                 doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
             )
+        gate_decision = {
+            "gate_mode": str(gate_mode or "none").strip().lower(),
+            "gate_enabled": False,
+            "use_selector": True,
+            "reason": "disabled",
+        }
+        if selector_name in {"bridge_greedy", "bridge_beam"}:
+            gate_decision = compute_bridge_gate_decision(
+                pool_doc_ids=pool_doc_ids,
+                pool_doc_scores=pool_scores,
+                pool_doc_titles=pool_titles,
+                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                adjacency=hipporag.structure_graph_out,
+                qa_top_k=qa_top_k,
+                initial_seed_entities=seed_entities,
+                anchor_count=anchor_count,
+                reserve_top_m=reserve_top_m,
+                structure_max_hops=structure_max_hops,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                max_bridge_slots=max_bridge_slots,
+                gate_mode=gate_mode,
+                gate_min_structure_score=gate_min_structure_score,
+                non_anchor_title_dedup=non_anchor_title_dedup,
+            )
+            if gate_decision.get("gate_enabled", False):
+                gate_reason_counts[str(gate_decision.get("reason", "unknown"))] += 1
+                if gate_decision.get("use_selector", False):
+                    gate_apply_count += 1
+                else:
+                    gate_skip_count += 1
         if selector_name == "bridge_greedy":
-            selected_positions, selector_trace = select_bridge_greedy_positions(
-                pool_doc_ids=pool_doc_ids,
-                pool_doc_scores=pool_scores,
-                pool_doc_titles=pool_titles,
-                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
-                doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
-                adjacency=hipporag.structure_graph_out,
-                qa_top_k=qa_top_k,
-                initial_seed_entities=seed_entities,
-                anchor_count=anchor_count,
-                reserve_top_m=reserve_top_m,
-                structure_max_hops=structure_max_hops,
-                base_weight=base_weight,
-                structure_weight=structure_weight,
-                novelty_weight=novelty_weight,
-                non_anchor_title_dedup=non_anchor_title_dedup,
-            )
+            if gate_decision.get("use_selector", True):
+                selected_positions, selector_trace = select_bridge_greedy_positions(
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_scores=pool_scores,
+                    pool_doc_titles=pool_titles,
+                    doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                    doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                    adjacency=hipporag.structure_graph_out,
+                    qa_top_k=qa_top_k,
+                    initial_seed_entities=seed_entities,
+                    anchor_count=anchor_count,
+                    reserve_top_m=reserve_top_m,
+                    max_bridge_slots=max_bridge_slots,
+                    structure_max_hops=structure_max_hops,
+                    base_weight=base_weight,
+                    structure_weight=structure_weight,
+                    novelty_weight=novelty_weight,
+                    non_anchor_title_dedup=non_anchor_title_dedup,
+                )
+            else:
+                selected_positions, selector_trace = [], {
+                    "selection_steps": [],
+                    "anchor_positions": [],
+                    "reserved_positions": [],
+                    "seed_entity_count_initial": len(seed_entities),
+                    "covered_entity_count_final": len(seed_entities),
+                    "candidate_count": len(pool_doc_ids),
+                    "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+                    "max_bridge_slots": int(max(0, max_bridge_slots)),
+                    "selection_target_k": int(gate_decision.get("selection_target_k", min(pool_limit, qa_top_k))),
+                    "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+                }
         elif selector_name == "bridge_beam":
-            selected_positions, selector_trace = select_bridge_beam_positions(
-                pool_doc_ids=pool_doc_ids,
-                pool_doc_scores=pool_scores,
-                pool_doc_titles=pool_titles,
-                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
-                doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
-                adjacency=hipporag.structure_graph_out,
-                qa_top_k=qa_top_k,
-                initial_seed_entities=seed_entities,
-                anchor_count=anchor_count,
-                reserve_top_m=reserve_top_m,
-                structure_max_hops=structure_max_hops,
-                base_weight=base_weight,
-                structure_weight=structure_weight,
-                novelty_weight=novelty_weight,
-                beam_width=beam_width,
-                beam_expand_per_state=beam_expand_per_state,
-                non_anchor_title_dedup=non_anchor_title_dedup,
-            )
+            if gate_decision.get("use_selector", True):
+                selected_positions, selector_trace = select_bridge_beam_positions(
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_scores=pool_scores,
+                    pool_doc_titles=pool_titles,
+                    doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                    doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                    adjacency=hipporag.structure_graph_out,
+                    qa_top_k=qa_top_k,
+                    initial_seed_entities=seed_entities,
+                    anchor_count=anchor_count,
+                    reserve_top_m=reserve_top_m,
+                    max_bridge_slots=max_bridge_slots,
+                    structure_max_hops=structure_max_hops,
+                    base_weight=base_weight,
+                    structure_weight=structure_weight,
+                    novelty_weight=novelty_weight,
+                    beam_width=beam_width,
+                    beam_expand_per_state=beam_expand_per_state,
+                    non_anchor_title_dedup=non_anchor_title_dedup,
+                )
+            else:
+                selected_positions, selector_trace = [], {
+                    "selection_steps": [],
+                    "anchor_positions": [],
+                    "reserved_positions": [],
+                    "seed_entity_count_initial": len(seed_entities),
+                    "covered_entity_count_final": len(seed_entities),
+                    "candidate_count": len(pool_doc_ids),
+                    "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+                    "max_bridge_slots": int(max(0, max_bridge_slots)),
+                    "selection_target_k": int(gate_decision.get("selection_target_k", min(pool_limit, qa_top_k))),
+                    "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+                    "beam_width": int(beam_width),
+                    "beam_expand_per_state": int(beam_expand_per_state),
+                    "beam_finalist_count": 0,
+                    "beam_best_cumulative_score": 0.0,
+                }
         else:
             if learned_model_bundle is None:
                 raise ValueError("learned_greedy selector requires a loaded model bundle")
@@ -985,7 +1250,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "pool_k": int(pool_limit),
             "anchor_count": int(min(max(anchor_count, 0), min(pool_limit, qa_top_k))),
             "reserve_top_m": int(min(max(max(anchor_count, 0), max(reserve_top_m, 0)), min(pool_limit, qa_top_k))),
+            "max_bridge_slots": int(max(0, max_bridge_slots)),
             "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+            "gate_decision": gate_decision,
             "seed_entities_preview": sorted(seed_entities)[:12],
             "selected_pool_positions": [int(pos) for pos in selected_positions],
             "selected_doc_ids": [
@@ -1032,7 +1299,13 @@ def apply_setwise_selector(hipporag: HippoRAG,
             4,
         ),
         "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+        "max_bridge_slots": int(max(0, max_bridge_slots)),
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+        "gate_mode": str(gate_mode or "none").strip().lower(),
+        "gate_min_structure_score": round(float(gate_min_structure_score), 4),
+        "gate_apply_count": int(gate_apply_count),
+        "gate_skip_count": int(gate_skip_count),
+        "gate_reason_counts": dict(sorted(gate_reason_counts.items())),
         "beam_width": int(beam_width),
         "beam_expand_per_state": int(beam_expand_per_state),
         "examples_preview": selector_examples,
@@ -1402,6 +1675,8 @@ def main():
                         help="Number of top-ranked anchor docs preserved before greedy bridge completion.")
     parser.add_argument("--setwise_reserve_top_m", type=int, default=0,
                         help="Preserve the top-M pool docs before setwise expansion; effective reserve is max(anchor_count, reserve_top_m).")
+    parser.add_argument("--setwise_max_bridge_slots", type=int, default=0,
+                        help="Maximum number of non-reserved slots actively filled by the setwise selector. 0 keeps the old unrestricted behavior.")
     parser.add_argument("--setwise_structure_max_hops", type=int, default=2,
                         help="Directed structure expansion depth used by the setwise selector.")
     parser.add_argument("--setwise_base_weight", type=float, default=0.25,
@@ -1412,6 +1687,10 @@ def main():
                         help="Weight assigned to entity novelty inside setwise selection.")
     parser.add_argument("--setwise_non_anchor_title_dedup", type=string_to_bool, default=False,
                         help="If true, avoid selecting duplicate titles after the reserved prefix unless no alternatives remain.")
+    parser.add_argument("--setwise_gate_mode", choices=["none", "suffix_bridge"], default="none",
+                        help="Per-query activation gate for bridge selectors. suffix_bridge only fires when an off-prefix candidate shows stronger bridge signal than the baseline suffix.")
+    parser.add_argument("--setwise_gate_min_structure_score", type=float, default=0.15,
+                        help="Minimum structure score required for the adaptive setwise gate to activate on an off-prefix bridge candidate.")
     parser.add_argument("--setwise_beam_width", type=int, default=4,
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
@@ -1692,6 +1971,7 @@ def main():
             selector_name=setwise_selector,
             anchor_count=int(args.setwise_anchor_count),
             reserve_top_m=int(args.setwise_reserve_top_m),
+            max_bridge_slots=int(args.setwise_max_bridge_slots),
             structure_max_hops=int(args.setwise_structure_max_hops),
             base_weight=float(args.setwise_base_weight),
             structure_weight=float(args.setwise_structure_weight),
@@ -1700,6 +1980,8 @@ def main():
             beam_width=int(args.setwise_beam_width),
             beam_expand_per_state=int(args.setwise_beam_expand_per_state),
             non_anchor_title_dedup=bool(args.setwise_non_anchor_title_dedup),
+            gate_mode=str(args.setwise_gate_mode),
+            gate_min_structure_score=float(args.setwise_gate_min_structure_score),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -1763,11 +2045,14 @@ def main():
             "pool_k": int(args.setwise_pool_k),
             "anchor_count": int(args.setwise_anchor_count),
             "reserve_top_m": int(max(int(args.setwise_anchor_count), int(args.setwise_reserve_top_m))),
+            "max_bridge_slots": int(max(0, int(args.setwise_max_bridge_slots))),
             "structure_max_hops": int(args.setwise_structure_max_hops),
             "base_weight": float(args.setwise_base_weight),
             "structure_weight": float(args.setwise_structure_weight),
             "novelty_weight": float(args.setwise_novelty_weight),
             "non_anchor_title_dedup": bool(args.setwise_non_anchor_title_dedup),
+            "gate_mode": str(args.setwise_gate_mode),
+            "gate_min_structure_score": round(float(args.setwise_gate_min_structure_score), 4),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "setwise_model_path": args.setwise_model_path or None,

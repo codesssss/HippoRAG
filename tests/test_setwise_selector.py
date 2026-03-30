@@ -11,6 +11,7 @@ if str(SCRIPT_DIR) not in sys.path:
 from eval_causal_qwen3 import (
     LEARNED_SETWISE_FEATURE_NAMES,
     collect_lexical_query_seed_entities,
+    compute_bridge_gate_decision,
     compute_candidate_feature_rows,
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
@@ -300,6 +301,137 @@ def test_select_bridge_beam_positions_non_anchor_title_dedup_skips_duplicate_tit
     assert trace["non_anchor_title_dedup"] is True
     assert trace["selection_steps"][2]["mode"] == "beam"
     assert trace["selection_steps"][2]["pool_position"] == 3
+
+
+def test_select_bridge_beam_positions_max_bridge_slots_only_fills_suffix_budget():
+    selected_positions, trace = select_bridge_beam_positions(
+        pool_doc_ids=[0, 1, 2, 3, 4, 5],
+        pool_doc_scores=np.array([1.0, 0.95, 0.90, 0.85, 0.84, 0.20], dtype=float),
+        pool_doc_titles=["A", "B", "C", "D", "Noise", "Bridge"],
+        doc_idx_to_entities={
+            0: {"entity a"},
+            1: {"entity b"},
+            2: {"entity c"},
+            3: {"entity d"},
+            4: {"noise"},
+            5: {"entity d", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [("entity d", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "entity d": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=5,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        reserve_top_m=4,
+        max_bridge_slots=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        beam_width=2,
+        beam_expand_per_state=2,
+    )
+
+    assert selected_positions == [0, 1, 2, 3, 5]
+    assert trace["selection_target_k"] == 5
+    assert trace["max_bridge_slots"] == 1
+    assert trace["selection_steps"][-1]["mode"] == "beam"
+    assert trace["selection_steps"][-1]["pool_position"] == 5
+
+
+def test_compute_bridge_gate_decision_skips_without_strong_offrank_bridge_signal():
+    decision = compute_bridge_gate_decision(
+        pool_doc_ids=[0, 1, 2, 3, 4, 5],
+        pool_doc_scores=np.array([1.0, 0.95, 0.90, 0.85, 0.84, 0.20], dtype=float),
+        pool_doc_titles=["A", "B", "C", "D", "Suffix", "Noise"],
+        doc_idx_to_entities={
+            0: {"entity a"},
+            1: {"entity b"},
+            2: {"entity c"},
+            3: {"entity d"},
+            4: {"suffix"},
+            5: {"noise"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+        },
+        adjacency={},
+        qa_top_k=5,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        reserve_top_m=4,
+        max_bridge_slots=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        gate_mode="suffix_bridge",
+        gate_min_structure_score=0.15,
+    )
+
+    assert decision["gate_enabled"] is True
+    assert decision["use_selector"] is False
+    assert decision["reason"] == "offrank_structure_below_threshold"
+    assert decision["baseline_suffix_positions"] == [4]
+    assert decision["best_offrank_pool_position"] == 5
+
+
+def test_compute_bridge_gate_decision_applies_for_stronger_offrank_bridge_signal():
+    decision = compute_bridge_gate_decision(
+        pool_doc_ids=[0, 1, 2, 3, 4, 5],
+        pool_doc_scores=np.array([1.0, 0.95, 0.90, 0.85, 0.84, 0.20], dtype=float),
+        pool_doc_titles=["A", "B", "C", "D", "Suffix", "Bridge"],
+        doc_idx_to_entities={
+            0: {"entity a"},
+            1: {"entity b"},
+            2: {"entity c"},
+            3: {"entity d"},
+            4: {"suffix"},
+            5: {"entity d", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [("entity d", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "entity d": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=5,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        reserve_top_m=4,
+        max_bridge_slots=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        gate_mode="suffix_bridge",
+        gate_min_structure_score=0.15,
+    )
+
+    assert decision["gate_enabled"] is True
+    assert decision["use_selector"] is True
+    assert decision["reason"] == "offrank_bridge_signal_detected"
+    assert decision["baseline_suffix_positions"] == [4]
+    assert decision["best_offrank_pool_position"] == 5
+    assert decision["weakest_baseline_suffix_pool_position"] == 4
 
 
 def test_collect_lexical_query_seed_entities_matches_query_entity_strings():

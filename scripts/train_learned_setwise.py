@@ -489,11 +489,14 @@ def main():
         selector_name="learned_greedy",
         anchor_count=int(args.setwise_anchor_count),
         reserve_top_m=0,
+        max_bridge_slots=0,
         structure_max_hops=int(args.setwise_structure_max_hops),
         base_weight=0.0,
         structure_weight=0.0,
         novelty_weight=0.0,
         learned_model_bundle=model_bundle,
+        gate_mode="none",
+        gate_min_structure_score=0.15,
     )
     selector_retrieval = compute_slice_metrics(
         config=config,

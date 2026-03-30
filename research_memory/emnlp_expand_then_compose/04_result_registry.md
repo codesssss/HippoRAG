@@ -14,8 +14,9 @@ Key status:
 - The minimal non-oracle method is now implemented.
 - There is a positive small-sample signal on `2Wiki` under the earlier `general_relation_graph` path.
 - On the canonical `legacy_fact_graph` backbone, `bridge_beam` now gives a stronger positive `2Wiki` signal than `bridge_greedy`.
-- The original `MuSiQue bridge_beam@100` failure has been partially rescued by a stronger reserved prefix plus non-anchor title dedup.
-- The same shared selector config is still negative on shallow `HotpotQA`, so current robustness claims must stay narrow.
+- The strongest `2Wiki` result still comes from the more aggressive beam setting, but that version does not transfer safely across datasets.
+- The new shared closure-only selector keeps a positive `2Wiki` gain while removing the earlier `HotpotQA` failure and neutralizing the overall `MuSiQue` loss.
+- The tradeoff is that the closure-only selector is more conservative on the hardest cases, especially `2Wiki 4-doc`.
 - The failed `seed union + title dedup` tweak has been recorded and reverted.
 
 ## 2WikiMultihopQA-1000
@@ -105,6 +106,23 @@ Canonical-backbone search ablation:
 - greedy `4-doc EM delta = -0.0870`
 - beam `4-doc EM delta = +0.0435`
 
+Canonical-backbone closure-only shared config:
+- report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve4_bridge1_gate015.json`
+- setup: `limit=100`, `pool_k=100`, selector `bridge_beam`, anchor `2`, `reserve_top_m=4`, `max_bridge_slots=1`, `non_anchor_title_dedup=true`, `gate_mode=suffix_bridge`, `gate_min_structure_score=0.15`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.3800 / 0.4332`
+- selector `EM/F1 = 0.4300 / 0.4719`
+- delta `EM/F1 = +0.0500 / +0.0387`
+- baseline `Recall@5 / Recall@20 = 0.7800 / 0.8675`
+- selector `Recall@5 / Recall@20 = 0.8075 / 0.8775`
+- `2-doc EM delta = +0.0649`
+- `4-doc EM delta = +0.0000`
+- gate apply / skip `= 21 / 79`
+
+Interpretation:
+- This is the current safest shared selector setting.
+- It preserves a clear positive `2Wiki` gain, but is less aggressive than the earlier beam run.
+- The benefit now concentrates on easier `2-doc` cases; the old positive `4-doc` lift is mostly gone under the tighter gate.
+
 Failed micro-tweak:
 - report path: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_greedy_pilot_20_legacy_seedunion_dedup.json`
 - tweak: union `fact seeds` with `lexical seeds` and add title dedup
@@ -157,6 +175,22 @@ Interpretation:
 - The same selector settings that help hard datasets do not transfer cleanly to shallow `HotpotQA`.
 - `Recall@20` ticks up slightly, but `Recall@5` and QA both drop, so the issue is still evidence composition quality near the top of the set.
 - This should be treated as a boundary condition for the current method, not as a cross-dataset success.
+
+Canonical-backbone closure-only boundary repair:
+- report path: `outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve4_bridge1_gate015.json`
+- setup: `limit=100`, `pool_k=100`, selector `bridge_beam`, anchor `2`, `reserve_top_m=4`, `max_bridge_slots=1`, `non_anchor_title_dedup=true`, `gate_mode=suffix_bridge`, `gate_min_structure_score=0.15`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.5900 / 0.7114`
+- selector `EM/F1 = 0.5900 / 0.7064`
+- delta `EM/F1 = +0.0000 / -0.0050`
+- baseline `Recall@5 / Recall@20 = 0.9150 / 0.9650`
+- selector `Recall@5 / Recall@20 = 0.9150 / 0.9700`
+- `2-doc EM delta = +0.0000`
+- gate apply / skip `= 15 / 85`
+
+Interpretation:
+- The closure-only gate removes the earlier destructive `HotpotQA` drop.
+- This makes the shared setting effectively non-destructive on the shallow dataset, with only a very small `F1` loss.
+- The result supports a narrow claim: shallow datasets should mostly skip bridge exploration unless there is strong off-prefix structure.
 
 ## MuSiQue-1000
 
@@ -260,6 +294,24 @@ Interpretation:
 - Overall `EM` is now positive, though still modest.
 - The method now looks plausibly usable across hard datasets, but `F1` remains slightly below baseline and should be treated as still stabilizing.
 
+Canonical-backbone closure-only shared config:
+- report path: `outputs_step0_general_musique/eval_reports/setwise_bridge_beam_pilot_100_legacy_reserve4_bridge1_gate015.json`
+- setup: `limit=100`, `pool_k=100`, selector `bridge_beam`, anchor `2`, `reserve_top_m=4`, `max_bridge_slots=1`, `non_anchor_title_dedup=true`, `gate_mode=suffix_bridge`, `gate_min_structure_score=0.15`, base mode `legacy_fact_graph`
+- baseline `EM/F1 = 0.2600 / 0.3466`
+- selector `EM/F1 = 0.2600 / 0.3452`
+- delta `EM/F1 = +0.0000 / -0.0014`
+- baseline `Recall@5 / Recall@20 = 0.6150 / 0.7858`
+- selector `Recall@5 / Recall@20 = 0.5842 / 0.7908`
+- `2-doc EM delta = -0.0208`
+- `3-doc EM delta = +0.0000`
+- `4-doc EM delta = +0.0455`
+- gate apply / skip `= 55 / 45`
+
+Interpretation:
+- This shared closure-only setting removes the overall MuSiQue `EM` loss without needing dataset-specific parameters.
+- The hard-case signal remains real: `4-doc` stays positive while the aggregate result recovers to neutral.
+- The remaining issue is calibration, not pure search: the gate still fires on too many MuSiQue queries, so shallow-case damage cancels the hard-case gains.
+
 ## Cross-Dataset Summary
 
 Summary files:
@@ -270,4 +322,6 @@ Takeaways:
 - `2Wiki` is the main mechanism dataset: it has the bridge diagnosis and the sharp `2-doc` vs `4-doc` split.
 - `MuSiQue` is the main hard-generalization dataset: support depth grows from `2-doc` to `4-doc`, and oracle gains keep growing with larger pools.
 - `HotpotQA` is the shallow contrast dataset: nearly all support is already near the top, so larger pools still help but much less.
-- The current shared `bridge_beam` selector is not universally safe: it is strong on `2Wiki`, modestly rescued on `MuSiQue`, and negative on shallow `HotpotQA`.
+- The aggressive `bridge_beam` config is strongest on `2Wiki`, but not safe as a shared cross-dataset setting.
+- The closure-only shared config is the current best compromise: `2Wiki` stays positive, `HotpotQA` becomes non-destructive, and `MuSiQue` recovers to neutral overall while keeping a positive `4-doc` signal.
+- So the method story is now safer, but still not a clean universal improvement claim.
