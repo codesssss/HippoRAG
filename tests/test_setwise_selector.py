@@ -37,6 +37,7 @@ def test_select_bridge_greedy_positions_prefers_bridge_docs_over_high_rank_distr
     selected_positions, trace = select_bridge_greedy_positions(
         pool_doc_ids=[0, 1, 2, 3, 4],
         pool_doc_scores=np.array([0.95, 0.90, 0.30, 0.25, 0.80], dtype=float),
+        pool_doc_titles=["Film X", "Film Y", "Director A", "Director B", "Noise"],
         doc_idx_to_entities={
             0: {"film x", "person a"},
             1: {"film y", "person b"},
@@ -74,6 +75,7 @@ def test_select_bridge_greedy_positions_falls_back_to_rank_order_without_structu
     selected_positions, trace = select_bridge_greedy_positions(
         pool_doc_ids=[10, 11, 12, 13],
         pool_doc_scores=np.array([0.80, 0.60, 0.40, 0.20], dtype=float),
+        pool_doc_titles=["A", "B", "C", "D"],
         doc_idx_to_entities={
             10: {"a"},
             11: {"b"},
@@ -105,6 +107,7 @@ def test_select_bridge_greedy_positions_can_bootstrap_from_anchor_entities():
     selected_positions, trace = select_bridge_greedy_positions(
         pool_doc_ids=[0, 1, 2, 3, 4],
         pool_doc_scores=np.array([0.95, 0.90, 0.30, 0.25, 0.80], dtype=float),
+        pool_doc_titles=["Film X", "Film Y", "Director A", "Director B", "Noise"],
         doc_idx_to_entities={
             0: {"film x", "person a"},
             1: {"film y", "person b"},
@@ -140,6 +143,7 @@ def test_select_bridge_beam_positions_matches_bridge_completion_case():
     selected_positions, trace = select_bridge_beam_positions(
         pool_doc_ids=[0, 1, 2, 3, 4],
         pool_doc_scores=np.array([0.95, 0.90, 0.30, 0.25, 0.80], dtype=float),
+        pool_doc_titles=["Film X", "Film Y", "Director A", "Director B", "Noise"],
         doc_idx_to_entities={
             0: {"film x", "person a"},
             1: {"film y", "person b"},
@@ -180,6 +184,7 @@ def test_select_bridge_beam_positions_recovers_two_step_chain_when_greedy_takes_
     common_kwargs = dict(
         pool_doc_ids=[0, 1, 2, 3],
         pool_doc_scores=np.array([1.0, 0.95, 0.30, 0.05], dtype=float),
+        pool_doc_titles=["Film X", "Helper H", "Bridge AB", "Birth B"],
         doc_idx_to_entities={
             0: {"film x", "person a"},
             1: {"person a", "helper h"},
@@ -218,6 +223,83 @@ def test_select_bridge_beam_positions_recovers_two_step_chain_when_greedy_takes_
     assert beam_trace["selection_steps"][1]["doc_id"] == 2
     assert beam_trace["selection_steps"][2]["doc_id"] == 3
     assert beam_trace["beam_best_cumulative_score"] > 1.0
+
+
+def test_select_bridge_greedy_positions_reserve_top_m_keeps_prefix_before_bridge_fill():
+    selected_positions, trace = select_bridge_greedy_positions(
+        pool_doc_ids=[0, 1, 2, 3, 4],
+        pool_doc_scores=np.array([0.95, 0.90, 0.85, 0.30, 0.25], dtype=float),
+        pool_doc_titles=["Film X", "Film Y", "Distractor", "Director A", "Director B"],
+        doc_idx_to_entities={
+            0: {"film x", "person a"},
+            1: {"film y", "person b"},
+            2: {"distractor"},
+            3: {"person a", "birth a"},
+            4: {"person b", "birth b"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [("person a", "birth a", 1.0, "related_to")],
+            4: [("person b", "birth b", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("birth a", 1.0, "related_to")],
+            "person b": [("birth b", 1.0, "related_to")],
+        },
+        qa_top_k=4,
+        initial_seed_entities={"person a", "person b"},
+        anchor_count=2,
+        reserve_top_m=3,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+
+    assert selected_positions == [0, 1, 2, 3]
+    assert trace["anchor_positions"] == [0, 1]
+    assert trace["reserved_positions"] == [0, 1, 2]
+    assert trace["selection_steps"][2]["mode"] == "reserve"
+    assert trace["selection_steps"][3]["mode"] == "greedy"
+
+
+def test_select_bridge_beam_positions_non_anchor_title_dedup_skips_duplicate_titles():
+    selected_positions, trace = select_bridge_beam_positions(
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_scores=np.array([1.0, 0.9, 0.8, 0.7], dtype=float),
+        pool_doc_titles=["Alpha", "Beta", "Beta", "Gamma"],
+        doc_idx_to_entities={
+            0: {"alpha"},
+            1: {"beta"},
+            2: {"beta-dup"},
+            3: {"gamma"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+        },
+        adjacency={},
+        qa_top_k=3,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        reserve_top_m=2,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        beam_width=2,
+        beam_expand_per_state=2,
+        non_anchor_title_dedup=True,
+    )
+
+    assert selected_positions == [0, 1, 3]
+    assert trace["non_anchor_title_dedup"] is True
+    assert trace["selection_steps"][2]["mode"] == "beam"
+    assert trace["selection_steps"][2]["pool_position"] == 3
 
 
 def test_collect_lexical_query_seed_entities_matches_query_entity_strings():

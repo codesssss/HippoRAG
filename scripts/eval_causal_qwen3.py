@@ -119,6 +119,34 @@ def min_max_normalize_array(values: np.ndarray) -> np.ndarray:
     return (values - min_value) / (max_value - min_value)
 
 
+def extract_doc_title(doc_text: str) -> str:
+    return str(doc_text).split("\n", 1)[0].strip()
+
+
+def resolve_reserved_positions(candidate_count: int,
+                               target_k: int,
+                               anchor_count: int,
+                               reserve_top_m: int) -> Tuple[List[int], List[int]]:
+    actual_anchor_count = min(max(anchor_count, 0), target_k, candidate_count)
+    actual_reserve_count = min(max(actual_anchor_count, max(reserve_top_m, 0)), target_k, candidate_count)
+    anchor_positions = list(range(actual_anchor_count))
+    reserved_positions = list(range(actual_reserve_count))
+    return anchor_positions, reserved_positions
+
+
+def filter_title_dedup_candidates(scored_candidates: Sequence[Dict[str, object]],
+                                  blocked_titles: Set[str],
+                                  enabled: bool) -> List[Dict[str, object]]:
+    if not enabled or not blocked_titles:
+        return list(scored_candidates)
+
+    filtered_candidates = [
+        candidate for candidate in scored_candidates
+        if str(candidate.get("doc_title", "")).strip() not in blocked_titles
+    ]
+    return filtered_candidates or list(scored_candidates)
+
+
 def normalize_entity_set(entities: Sequence[str] | Set[str] | None) -> Set[str]:
     normalized_entities: Set[str] = set()
     for entity in entities or []:
@@ -447,6 +475,7 @@ def select_learned_greedy_positions(query: str,
 
 def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
                             normalized_base_scores: np.ndarray,
+                            pool_doc_titles: Sequence[str] | None,
                             doc_idx_to_entities: Dict[int, Set[str]],
                             doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
                             adjacency: Dict[str, List[Tuple[str, float, str]]],
@@ -494,6 +523,9 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
             else 0.0
         )
         base_score = float(normalized_base_scores[pos]) if pos < len(normalized_base_scores) else 0.0
+        doc_title = ""
+        if pool_doc_titles is not None and pos < len(pool_doc_titles):
+            doc_title = str(pool_doc_titles[pos]).strip()
         combined_score = (
             base_weight * base_score
             + structure_weight * structure_score
@@ -502,6 +534,7 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
         scored_candidates.append({
             "pool_position": int(pos),
             "doc_id": int(doc_id) if doc_id is not None else None,
+            "doc_title": doc_title,
             "doc_entities": doc_entities,
             "new_entity_count": len(doc_entities - normalized_covered),
             "base_score": round(base_score, 4),
@@ -523,24 +556,30 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
 
 def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
                                    pool_doc_scores: np.ndarray,
+                                   pool_doc_titles: Sequence[str] | None,
                                    doc_idx_to_entities: Dict[int, Set[str]],
                                    doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
                                    adjacency: Dict[str, List[Tuple[str, float, str]]],
                                    qa_top_k: int,
                                    initial_seed_entities: Sequence[str] | Set[str] | None = None,
                                    anchor_count: int = 2,
+                                   reserve_top_m: int = 0,
                                    structure_max_hops: int = 2,
                                    base_weight: float = 0.25,
                                    structure_weight: float = 0.60,
-                                   novelty_weight: float = 0.15) -> Tuple[List[int], Dict[str, object]]:
+                                   novelty_weight: float = 0.15,
+                                   non_anchor_title_dedup: bool = False) -> Tuple[List[int], Dict[str, object]]:
     candidate_count = len(pool_doc_ids)
     if candidate_count == 0 or qa_top_k <= 0:
         return [], {
             "selection_steps": [],
             "anchor_positions": [],
+            "reserved_positions": [],
             "seed_entity_count_initial": 0,
             "covered_entity_count_final": 0,
             "candidate_count": candidate_count,
+            "reserve_top_m": 0,
+            "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         }
 
     normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
@@ -550,22 +589,32 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
     covered_entities = normalize_entity_set(initial_seed_entities)
     selection_steps: List[Dict[str, object]] = []
 
-    actual_anchor_count = min(max(anchor_count, 0), target_k)
-    anchor_positions = remaining_positions[:actual_anchor_count]
-    for anchor_pos in anchor_positions:
-        selected_positions.append(anchor_pos)
-        doc_id = pool_doc_ids[anchor_pos]
+    anchor_positions, reserved_positions = resolve_reserved_positions(
+        candidate_count=candidate_count,
+        target_k=target_k,
+        anchor_count=anchor_count,
+        reserve_top_m=reserve_top_m,
+    )
+    anchor_position_set = set(anchor_positions)
+    blocked_titles: Set[str] = set()
+    for reserved_pos in reserved_positions:
+        selected_positions.append(reserved_pos)
+        doc_id = pool_doc_ids[reserved_pos]
         if doc_id is not None:
             covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+        if pool_doc_titles is not None and reserved_pos < len(pool_doc_titles):
+            reserved_title = str(pool_doc_titles[reserved_pos]).strip()
+            if reserved_title:
+                blocked_titles.add(reserved_title)
         selection_steps.append({
             "step": len(selection_steps) + 1,
-            "mode": "anchor",
-            "pool_position": int(anchor_pos),
+            "mode": "anchor" if reserved_pos in anchor_position_set else "reserve",
+            "pool_position": int(reserved_pos),
             "doc_id": int(doc_id) if doc_id is not None else None,
-            "base_score": round(float(normalized_base_scores[anchor_pos]), 4),
+            "base_score": round(float(normalized_base_scores[reserved_pos]), 4),
             "structure_score": 0.0,
             "novelty_score": 0.0,
-            "combined_score": round(float(normalized_base_scores[anchor_pos]), 4),
+            "combined_score": round(float(normalized_base_scores[reserved_pos]), 4),
         })
 
     remaining_positions = [pos for pos in remaining_positions if pos not in set(selected_positions)]
@@ -574,6 +623,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
         scored_candidates = score_bridge_candidates(
             pool_doc_ids=pool_doc_ids,
             normalized_base_scores=normalized_base_scores,
+            pool_doc_titles=pool_doc_titles,
             doc_idx_to_entities=doc_idx_to_entities,
             doc_idx_to_edges=doc_idx_to_edges,
             adjacency=adjacency,
@@ -584,6 +634,11 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
             structure_weight=structure_weight,
             novelty_weight=novelty_weight,
         )
+        scored_candidates = filter_title_dedup_candidates(
+            scored_candidates=scored_candidates,
+            blocked_titles=blocked_titles,
+            enabled=non_anchor_title_dedup,
+        )
         best_detail = scored_candidates[0]
         best_pos = int(best_detail["pool_position"])
 
@@ -592,6 +647,9 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
         chosen_doc_id = pool_doc_ids[best_pos]
         if chosen_doc_id is not None:
             covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(chosen_doc_id), set())))
+        chosen_title = str(best_detail.get("doc_title", "")).strip()
+        if chosen_title:
+            blocked_titles.add(chosen_title)
         selection_steps.append({
             "step": len(selection_steps) + 1,
             "mode": "greedy",
@@ -606,34 +664,43 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
     return selected_positions, {
         "selection_steps": selection_steps,
         "anchor_positions": [int(pos) for pos in anchor_positions],
+        "reserved_positions": [int(pos) for pos in reserved_positions],
         "seed_entity_count_initial": len(normalize_entity_set(initial_seed_entities)),
         "covered_entity_count_final": len(covered_entities),
         "candidate_count": candidate_count,
+        "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+        "non_anchor_title_dedup": bool(non_anchor_title_dedup),
     }
 
 
 def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  pool_doc_scores: np.ndarray,
+                                 pool_doc_titles: Sequence[str] | None,
                                  doc_idx_to_entities: Dict[int, Set[str]],
                                  doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
                                  adjacency: Dict[str, List[Tuple[str, float, str]]],
                                  qa_top_k: int,
                                  initial_seed_entities: Sequence[str] | Set[str] | None = None,
                                  anchor_count: int = 2,
+                                 reserve_top_m: int = 0,
                                  structure_max_hops: int = 2,
                                  base_weight: float = 0.25,
                                  structure_weight: float = 0.60,
                                  novelty_weight: float = 0.15,
                                  beam_width: int = 4,
-                                 beam_expand_per_state: int = 4) -> Tuple[List[int], Dict[str, object]]:
+                                 beam_expand_per_state: int = 4,
+                                 non_anchor_title_dedup: bool = False) -> Tuple[List[int], Dict[str, object]]:
     candidate_count = len(pool_doc_ids)
     if candidate_count == 0 or qa_top_k <= 0:
         return [], {
             "selection_steps": [],
             "anchor_positions": [],
+            "reserved_positions": [],
             "seed_entity_count_initial": 0,
             "covered_entity_count_final": 0,
             "candidate_count": candidate_count,
+            "reserve_top_m": 0,
+            "non_anchor_title_dedup": bool(non_anchor_title_dedup),
             "beam_width": int(max(beam_width, 1)),
             "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
         }
@@ -641,35 +708,46 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
     normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
     target_k = min(candidate_count, qa_top_k)
     seed_entities = normalize_entity_set(initial_seed_entities)
-    actual_anchor_count = min(max(anchor_count, 0), target_k)
-    anchor_positions = list(range(actual_anchor_count))
+    anchor_positions, reserved_positions = resolve_reserved_positions(
+        candidate_count=candidate_count,
+        target_k=target_k,
+        anchor_count=anchor_count,
+        reserve_top_m=reserve_top_m,
+    )
+    anchor_position_set = set(anchor_positions)
 
     initial_covered = seed_entities.copy()
     initial_steps: List[Dict[str, object]] = []
-    for anchor_pos in anchor_positions:
-        doc_id = pool_doc_ids[anchor_pos]
+    initial_blocked_titles: Set[str] = set()
+    for reserved_pos in reserved_positions:
+        doc_id = pool_doc_ids[reserved_pos]
         if doc_id is not None:
             initial_covered.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+        if pool_doc_titles is not None and reserved_pos < len(pool_doc_titles):
+            reserved_title = str(pool_doc_titles[reserved_pos]).strip()
+            if reserved_title:
+                initial_blocked_titles.add(reserved_title)
         initial_steps.append({
             "step": len(initial_steps) + 1,
-            "mode": "anchor",
-            "pool_position": int(anchor_pos),
+            "mode": "anchor" if reserved_pos in anchor_position_set else "reserve",
+            "pool_position": int(reserved_pos),
             "doc_id": int(doc_id) if doc_id is not None else None,
-            "base_score": round(float(normalized_base_scores[anchor_pos]), 4),
+            "base_score": round(float(normalized_base_scores[reserved_pos]), 4),
             "structure_score": 0.0,
             "novelty_score": 0.0,
-            "combined_score": round(float(normalized_base_scores[anchor_pos]), 4),
+            "combined_score": round(float(normalized_base_scores[reserved_pos]), 4),
         })
 
     beam_width = max(int(beam_width), 1)
     beam_expand_per_state = max(int(beam_expand_per_state), 1)
     beam_states: List[Dict[str, object]] = [{
-        "selected_positions": list(anchor_positions),
+        "selected_positions": list(reserved_positions),
         "covered_entities": initial_covered,
+        "blocked_titles": set(initial_blocked_titles),
         "selection_steps": initial_steps,
         "cumulative_score": 0.0,
     }]
-    seen_signatures = {tuple(anchor_positions)}
+    seen_signatures = {tuple(reserved_positions)}
 
     while beam_states and len(beam_states[0]["selected_positions"]) < target_k:
         expanded_states: List[Dict[str, object]] = []
@@ -686,6 +764,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             scored_candidates = score_bridge_candidates(
                 pool_doc_ids=pool_doc_ids,
                 normalized_base_scores=normalized_base_scores,
+                pool_doc_titles=pool_doc_titles,
                 doc_idx_to_entities=doc_idx_to_entities,
                 doc_idx_to_edges=doc_idx_to_edges,
                 adjacency=adjacency,
@@ -695,6 +774,11 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
+            )
+            scored_candidates = filter_title_dedup_candidates(
+                scored_candidates=scored_candidates,
+                blocked_titles=set(state["blocked_titles"]),
+                enabled=non_anchor_title_dedup,
             )
 
             for candidate in scored_candidates[:beam_expand_per_state]:
@@ -706,9 +790,14 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
 
                 next_covered = set(state["covered_entities"])
                 next_covered.update(set(candidate["doc_entities"]))
+                next_blocked_titles = set(state["blocked_titles"])
+                chosen_title = str(candidate.get("doc_title", "")).strip()
+                if chosen_title:
+                    next_blocked_titles.add(chosen_title)
                 expanded_states.append({
                     "selected_positions": list(signature),
                     "covered_entities": next_covered,
+                    "blocked_titles": next_blocked_titles,
                     "selection_steps": list(state["selection_steps"]) + [{
                         "step": len(state["selection_steps"]) + 1,
                         "mode": "beam",
@@ -745,8 +834,9 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         )
     else:
         best_state = {
-            "selected_positions": list(anchor_positions),
+            "selected_positions": list(reserved_positions),
             "covered_entities": initial_covered,
+            "blocked_titles": set(initial_blocked_titles),
             "selection_steps": initial_steps,
             "cumulative_score": 0.0,
         }
@@ -754,9 +844,12 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
     return list(best_state["selected_positions"]), {
         "selection_steps": list(best_state["selection_steps"]),
         "anchor_positions": [int(pos) for pos in anchor_positions],
+        "reserved_positions": [int(pos) for pos in reserved_positions],
         "seed_entity_count_initial": len(seed_entities),
         "covered_entity_count_final": len(set(best_state["covered_entities"])),
         "candidate_count": candidate_count,
+        "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+        "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         "beam_width": beam_width,
         "beam_expand_per_state": beam_expand_per_state,
         "beam_finalist_count": len(beam_states),
@@ -771,13 +864,15 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            qa_top_k: int,
                            selector_name: str,
                            anchor_count: int,
+                           reserve_top_m: int,
                            structure_max_hops: int,
                            base_weight: float,
                            structure_weight: float,
                            novelty_weight: float,
                            learned_model_bundle: Dict[str, object] | None = None,
                            beam_width: int = 4,
-                           beam_expand_per_state: int = 4) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           beam_expand_per_state: int = 4,
+                           non_anchor_title_dedup: bool = False) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy"}:
@@ -794,6 +889,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
     for qs in query_solutions:
         pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
         pool_docs = list(qs.docs[:pool_limit])
+        pool_titles = [extract_doc_title(doc_text) for doc_text in pool_docs]
         if qs.doc_scores is not None and len(qs.doc_scores) >= pool_limit:
             pool_scores = np.asarray(qs.doc_scores[:pool_limit], dtype=float)
             tail_scores = np.asarray(qs.doc_scores[pool_limit:], dtype=float) if len(qs.doc_scores) > pool_limit else np.array([], dtype=float)
@@ -818,33 +914,39 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selected_positions, selector_trace = select_bridge_greedy_positions(
                 pool_doc_ids=pool_doc_ids,
                 pool_doc_scores=pool_scores,
+                pool_doc_titles=pool_titles,
                 doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
                 doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
                 adjacency=hipporag.structure_graph_out,
                 qa_top_k=qa_top_k,
                 initial_seed_entities=seed_entities,
                 anchor_count=anchor_count,
+                reserve_top_m=reserve_top_m,
                 structure_max_hops=structure_max_hops,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
+                non_anchor_title_dedup=non_anchor_title_dedup,
             )
         elif selector_name == "bridge_beam":
             selected_positions, selector_trace = select_bridge_beam_positions(
                 pool_doc_ids=pool_doc_ids,
                 pool_doc_scores=pool_scores,
+                pool_doc_titles=pool_titles,
                 doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
                 doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
                 adjacency=hipporag.structure_graph_out,
                 qa_top_k=qa_top_k,
                 initial_seed_entities=seed_entities,
                 anchor_count=anchor_count,
+                reserve_top_m=reserve_top_m,
                 structure_max_hops=structure_max_hops,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
                 beam_width=beam_width,
                 beam_expand_per_state=beam_expand_per_state,
+                non_anchor_title_dedup=non_anchor_title_dedup,
             )
         else:
             if learned_model_bundle is None:
@@ -882,13 +984,15 @@ def apply_setwise_selector(hipporag: HippoRAG,
         retrieval_trace["setwise_selector_trace"] = {
             "pool_k": int(pool_limit),
             "anchor_count": int(min(max(anchor_count, 0), min(pool_limit, qa_top_k))),
+            "reserve_top_m": int(min(max(max(anchor_count, 0), max(reserve_top_m, 0)), min(pool_limit, qa_top_k))),
+            "non_anchor_title_dedup": bool(non_anchor_title_dedup),
             "seed_entities_preview": sorted(seed_entities)[:12],
             "selected_pool_positions": [int(pos) for pos in selected_positions],
             "selected_doc_ids": [
                 int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
                 for pos in selected_positions
             ],
-            "selected_titles": [pool_docs[pos].split("\n", 1)[0] for pos in selected_positions],
+            "selected_titles": [pool_titles[pos] for pos in selected_positions],
             **selector_trace,
         }
 
@@ -914,7 +1018,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         if len(selector_examples) < 5:
             selector_examples.append({
                 "question": qs.question,
-                "selected_titles": [pool_docs[pos].split("\n", 1)[0] for pos in selected_positions],
+                "selected_titles": [pool_titles[pos] for pos in selected_positions],
                 "seed_entities_preview": sorted(seed_entities)[:8],
                 "selection_steps": selector_trace["selection_steps"],
             })
@@ -927,6 +1031,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
             float(np.mean(selected_structured_doc_counts)) if selected_structured_doc_counts else 0.0,
             4,
         ),
+        "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
+        "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         "beam_width": int(beam_width),
         "beam_expand_per_state": int(beam_expand_per_state),
         "examples_preview": selector_examples,
@@ -1294,6 +1400,8 @@ def main():
                         help="Candidate pool size used by the setwise selector.")
     parser.add_argument("--setwise_anchor_count", type=int, default=2,
                         help="Number of top-ranked anchor docs preserved before greedy bridge completion.")
+    parser.add_argument("--setwise_reserve_top_m", type=int, default=0,
+                        help="Preserve the top-M pool docs before setwise expansion; effective reserve is max(anchor_count, reserve_top_m).")
     parser.add_argument("--setwise_structure_max_hops", type=int, default=2,
                         help="Directed structure expansion depth used by the setwise selector.")
     parser.add_argument("--setwise_base_weight", type=float, default=0.25,
@@ -1302,6 +1410,8 @@ def main():
                         help="Weight assigned to structure bridge score inside setwise selection.")
     parser.add_argument("--setwise_novelty_weight", type=float, default=0.15,
                         help="Weight assigned to entity novelty inside setwise selection.")
+    parser.add_argument("--setwise_non_anchor_title_dedup", type=string_to_bool, default=False,
+                        help="If true, avoid selecting duplicate titles after the reserved prefix unless no alternatives remain.")
     parser.add_argument("--setwise_beam_width", type=int, default=4,
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
@@ -1581,6 +1691,7 @@ def main():
             qa_top_k=int(config.qa_top_k),
             selector_name=setwise_selector,
             anchor_count=int(args.setwise_anchor_count),
+            reserve_top_m=int(args.setwise_reserve_top_m),
             structure_max_hops=int(args.setwise_structure_max_hops),
             base_weight=float(args.setwise_base_weight),
             structure_weight=float(args.setwise_structure_weight),
@@ -1588,6 +1699,7 @@ def main():
             learned_model_bundle=learned_model_bundle,
             beam_width=int(args.setwise_beam_width),
             beam_expand_per_state=int(args.setwise_beam_expand_per_state),
+            non_anchor_title_dedup=bool(args.setwise_non_anchor_title_dedup),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -1650,10 +1762,12 @@ def main():
             "selector": setwise_selector,
             "pool_k": int(args.setwise_pool_k),
             "anchor_count": int(args.setwise_anchor_count),
+            "reserve_top_m": int(max(int(args.setwise_anchor_count), int(args.setwise_reserve_top_m))),
             "structure_max_hops": int(args.setwise_structure_max_hops),
             "base_weight": float(args.setwise_base_weight),
             "structure_weight": float(args.setwise_structure_weight),
             "novelty_weight": float(args.setwise_novelty_weight),
+            "non_anchor_title_dedup": bool(args.setwise_non_anchor_title_dedup),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "setwise_model_path": args.setwise_model_path or None,

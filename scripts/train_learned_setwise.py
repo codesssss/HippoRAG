@@ -488,6 +488,7 @@ def main():
         qa_top_k=int(args.qa_top_k),
         selector_name="learned_greedy",
         anchor_count=int(args.setwise_anchor_count),
+        reserve_top_m=0,
         structure_max_hops=int(args.setwise_structure_max_hops),
         base_weight=0.0,
         structure_weight=0.0,
