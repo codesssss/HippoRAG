@@ -39,6 +39,16 @@ LEARNED_SETWISE_FEATURE_NAMES = [
     "edge_count_norm",
 ]
 
+DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG = {
+    "support_mean": 0.25,
+    "support_min": 0.10,
+    "closure_mean": 0.20,
+    "suffix_base_mean": 0.10,
+    "query_coverage": 0.25,
+    "frontier_ratio": 0.10,
+    "redundancy_penalty": 0.10,
+}
+
 
 def get_gold_docs(samples: List, dataset_name: str = None, corpus: List | None = None) -> List:
     gold_docs = []
@@ -161,6 +171,17 @@ def normalize_setwise_score_mode(score_mode: str | None) -> str:
     if normalized not in {"bridge", "closure_proxy", "set_closure"}:
         raise ValueError(f"Unsupported setwise score mode: {score_mode}")
     return normalized
+
+
+def resolve_set_closure_state_weight_config(
+    state_weight_config: Dict[str, float] | None = None,
+) -> Dict[str, float]:
+    resolved = dict(DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG)
+    if state_weight_config:
+        for key in resolved:
+            if key in state_weight_config:
+                resolved[key] = float(state_weight_config[key])
+    return resolved
 
 
 def normalize_entity_set(entities: Sequence[str] | Set[str] | None) -> Set[str]:
@@ -687,9 +708,11 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
                          structure_max_hops: int,
                          base_weight: float,
                          structure_weight: float,
-                         novelty_weight: float) -> Dict[str, float]:
+                         novelty_weight: float,
+                         state_weight_config: Dict[str, float] | None = None) -> Dict[str, float]:
     normalized_seed = normalize_entity_set(seed_entities)
     normalized_query = normalize_entity_set(query_entities) or set(normalized_seed)
+    state_weights = resolve_set_closure_state_weight_config(state_weight_config)
     chosen_positions = [int(pos) for pos in selected_positions]
     fixed_prefix = {int(pos) for pos in (fixed_prefix_positions or [])}
     suffix_positions = [pos for pos in chosen_positions if pos not in fixed_prefix]
@@ -800,13 +823,13 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
     ]
     suffix_base_mean = float(np.mean(suffix_base_scores)) if suffix_base_scores else 0.0
     state_score = (
-        0.25 * support_mean
-        + 0.10 * support_min
-        + 0.20 * closure_mean
-        + 0.10 * suffix_base_mean
-        + 0.25 * query_coverage
-        + 0.10 * frontier_ratio
-        - 0.10 * redundancy_penalty
+        state_weights["support_mean"] * support_mean
+        + state_weights["support_min"] * support_min
+        + state_weights["closure_mean"] * closure_mean
+        + state_weights["suffix_base_mean"] * suffix_base_mean
+        + state_weights["query_coverage"] * query_coverage
+        + state_weights["frontier_ratio"] * frontier_ratio
+        - state_weights["redundancy_penalty"] * redundancy_penalty
     )
     return {
         "state_score": float(state_score),
@@ -817,6 +840,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
         "query_coverage": float(query_coverage),
         "frontier_ratio": float(frontier_ratio),
         "redundancy_penalty": float(redundancy_penalty),
+        "state_weight_config": dict(state_weights),
     }
 
 
@@ -1154,7 +1178,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  score_mode: str = "bridge",
                                  beam_width: int = 4,
                                  beam_expand_per_state: int = 4,
-                                 non_anchor_title_dedup: bool = False) -> Tuple[List[int], Dict[str, object]]:
+                                 non_anchor_title_dedup: bool = False,
+                                 state_weight_config: Dict[str, float] | None = None) -> Tuple[List[int], Dict[str, object]]:
     normalized_score_mode = normalize_setwise_score_mode(score_mode)
     uses_state_level_ranking = normalized_score_mode == "set_closure"
     candidate_count = len(pool_doc_ids)
@@ -1176,6 +1201,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
             "beam_best_state_score": 0.0,
             "beam_best_state_suffix_base_mean": 0.0,
+            "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
         }
 
     normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
@@ -1233,6 +1259,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         base_weight=base_weight,
         structure_weight=structure_weight,
         novelty_weight=novelty_weight,
+        state_weight_config=state_weight_config,
     )
     beam_states: List[Dict[str, object]] = [{
         "selected_positions": list(reserved_positions),
@@ -1308,6 +1335,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                     base_weight=base_weight,
                     structure_weight=structure_weight,
                     novelty_weight=novelty_weight,
+                    state_weight_config=state_weight_config,
                 )
                 expanded_states.append({
                     "selected_positions": list(signature),
@@ -1386,6 +1414,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_best_state_support_mean": round(float(best_state["state_metrics"]["support_mean"]), 4),
         "beam_best_state_suffix_base_mean": round(float(best_state["state_metrics"]["suffix_base_mean"]), 4),
         "beam_best_state_query_coverage": round(float(best_state["state_metrics"]["query_coverage"]), 4),
+        "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
     }
 
 
@@ -1409,7 +1438,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            non_anchor_title_dedup: bool = False,
                            gate_mode: str = "none",
                            gate_min_structure_score: float = 0.15,
-                           gate_min_combined_margin: float = 0.0) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           gate_min_combined_margin: float = 0.0,
+                           state_weight_config: Dict[str, float] | None = None) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
@@ -1545,6 +1575,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     beam_width=beam_width,
                     beam_expand_per_state=beam_expand_per_state,
                     non_anchor_title_dedup=non_anchor_title_dedup,
+                    state_weight_config=state_weight_config,
                 )
             else:
                 selected_positions, selector_trace = [], {
@@ -1568,6 +1599,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "beam_best_state_support_mean": 0.0,
                     "beam_best_state_suffix_base_mean": 0.0,
                     "beam_best_state_query_coverage": 0.0,
+                    "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
                 }
         else:
             if learned_model_bundle is None:
@@ -2058,6 +2090,20 @@ def main():
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
                         help="Number of candidates expanded per beam state for --setwise_selector bridge_beam.")
+    parser.add_argument("--setwise_state_support_mean_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["support_mean"],
+                        help="Set-level beam score weight for suffix support mean under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_support_min_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["support_min"],
+                        help="Set-level beam score weight for suffix support minimum under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_closure_mean_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["closure_mean"],
+                        help="Set-level beam score weight for suffix closure mean under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_suffix_base_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["suffix_base_mean"],
+                        help="Set-level beam score weight for suffix-only baseline relevance under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_query_coverage_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["query_coverage"],
+                        help="Set-level beam score weight for query-entity coverage under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_frontier_ratio_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["frontier_ratio"],
+                        help="Set-level beam score weight for frontier support ratio under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_redundancy_penalty_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["redundancy_penalty"],
+                        help="Set-level beam score penalty weight for redundancy under --setwise_score_mode set_closure.")
     parser.add_argument("--setwise_model_path", type=str, default="",
                         help="Joblib bundle path used by --setwise_selector learned_greedy.")
     parser.add_argument("--output_json", type=str, default=None)
@@ -2095,6 +2141,15 @@ def main():
     oracle_reorder_qa_results = None
     setwise_selector_results = None
     learned_model_bundle = None
+    state_weight_config = {
+        "support_mean": float(args.setwise_state_support_mean_weight),
+        "support_min": float(args.setwise_state_support_min_weight),
+        "closure_mean": float(args.setwise_state_closure_mean_weight),
+        "suffix_base_mean": float(args.setwise_state_suffix_base_weight),
+        "query_coverage": float(args.setwise_state_query_coverage_weight),
+        "frontier_ratio": float(args.setwise_state_frontier_ratio_weight),
+        "redundancy_penalty": float(args.setwise_state_redundancy_penalty_weight),
+    }
     setwise_selector = args.setwise_selector.lower() if not gold_doc_reader else "none"
     if setwise_selector == "learned_greedy":
         if not args.setwise_model_path:
@@ -2347,6 +2402,7 @@ def main():
             gate_mode=str(args.setwise_gate_mode),
             gate_min_structure_score=float(args.setwise_gate_min_structure_score),
             gate_min_combined_margin=float(args.setwise_gate_min_combined_margin),
+            state_weight_config=state_weight_config,
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -2422,6 +2478,7 @@ def main():
             "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
+            "state_score_weights": {k: round(float(v), 4) for k, v in resolve_set_closure_state_weight_config(state_weight_config).items()},
             "setwise_model_path": args.setwise_model_path or None,
             "selector_EM": round(float(selector_em), 4),
             "selector_F1": round(float(selector_f1), 4),

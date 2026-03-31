@@ -492,6 +492,43 @@ def test_score_evidence_state_uses_suffix_base_mean_not_prefix_base_mean():
     assert score["query_coverage"] == 1.0
 
 
+def test_score_evidence_state_respects_custom_state_weights():
+    score = score_evidence_state(
+        pool_doc_ids=[0, 1],
+        normalized_base_scores=np.array([1.0, 0.2], dtype=float),
+        pool_doc_titles=["Anchor", "Suffix"],
+        doc_idx_to_entities={
+            0: {"anchor"},
+            1: {"target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+        },
+        adjacency={},
+        selected_positions=[0, 1],
+        fixed_prefix_positions=[0],
+        seed_entities={"anchor"},
+        query_entities={"target"},
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        state_weight_config={
+            "support_mean": 0.0,
+            "support_min": 0.0,
+            "closure_mean": 0.0,
+            "suffix_base_mean": 0.5,
+            "query_coverage": 0.5,
+            "frontier_ratio": 0.0,
+            "redundancy_penalty": 0.0,
+        },
+    )
+
+    assert score["state_score"] == 0.6
+    assert score["state_weight_config"]["suffix_base_mean"] == 0.5
+
+
 def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
     common_kwargs = dict(
         pool_doc_ids=[0, 1, 2, 3, 4],
@@ -541,6 +578,7 @@ def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
     assert closure_trace["beam_rank_metric"] == "cumulative_score"
     assert set_trace["beam_rank_metric"] == "state_score"
     assert set_trace["beam_best_state_suffix_base_mean"] == 0.1
+    assert set_trace["state_score_weights"]["suffix_base_mean"] == 0.1
     assert set_trace["beam_best_state_score"] > closure_trace["beam_best_state_score"]
 
 
