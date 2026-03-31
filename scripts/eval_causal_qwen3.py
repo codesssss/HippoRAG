@@ -288,6 +288,28 @@ def compute_state_path_connectivity_metrics(selected_doc_entities: Dict[int, Set
     }
 
 
+def should_keep_set_closure_expansion(candidate: Dict[str, object],
+                                      current_state_metrics: Dict[str, float] | None,
+                                      next_state_metrics: Dict[str, float],
+                                      eps: float = 1e-9) -> bool:
+    current_metrics = current_state_metrics or {}
+    candidate_positive_signal = max(
+        float(candidate.get("selection_score_raw", 0.0) or 0.0),
+        float(candidate.get("closure_score_raw", 0.0) or 0.0),
+        float(candidate.get("structure_score", 0.0) or 0.0),
+        float(candidate.get("path_coherence_score", 0.0) or 0.0),
+        float(candidate.get("query_anchor_score", 0.0) or 0.0),
+        float(candidate.get("frontier_gain_score", 0.0) or 0.0),
+    ) > float(eps)
+    if candidate_positive_signal:
+        return True
+
+    for metric_name in ("path_connectivity", "reachable_doc_ratio", "query_reachability", "query_coverage"):
+        if float(next_state_metrics.get(metric_name, 0.0) or 0.0) > float(current_metrics.get(metric_name, 0.0) or 0.0) + float(eps):
+            return True
+    return False
+
+
 def collect_query_seed_entities(hipporag: HippoRAG, query: str) -> Set[str]:
     try:
         query_fact_scores = hipporag.get_fact_scores(query)
@@ -1325,6 +1347,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "beam_best_state_reachable_doc_ratio": 0.0,
             "beam_best_state_query_reachability": 0.0,
             "beam_best_state_suffix_base_mean": 0.0,
+            "beam_set_closure_guard_skip_count": 0,
             "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
         }
 
@@ -1395,6 +1418,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "state_metrics": initial_state_metrics,
     }]
     seen_signatures = {tuple(reserved_positions)}
+    set_closure_guard_skip_count = 0
 
     while beam_states and len(beam_states[0]["selected_positions"]) < selection_target_k:
         expanded_states: List[Dict[str, object]] = []
@@ -1435,7 +1459,6 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 signature = tuple(selected_positions + [chosen_pos])
                 if signature in seen_signatures:
                     continue
-                seen_signatures.add(signature)
 
                 next_covered = set(state["covered_entities"])
                 next_covered.update(set(candidate["doc_entities"]))
@@ -1461,6 +1484,14 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                     novelty_weight=novelty_weight,
                     state_weight_config=state_weight_config,
                 )
+                if uses_state_level_ranking and not should_keep_set_closure_expansion(
+                    candidate=candidate,
+                    current_state_metrics=state.get("state_metrics"),
+                    next_state_metrics=next_state_metrics,
+                ):
+                    set_closure_guard_skip_count += 1
+                    continue
+                seen_signatures.add(signature)
                 expanded_states.append({
                     "selected_positions": list(signature),
                     "covered_entities": next_covered,
@@ -1541,6 +1572,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_best_state_support_mean": round(float(best_state["state_metrics"]["support_mean"]), 4),
         "beam_best_state_suffix_base_mean": round(float(best_state["state_metrics"]["suffix_base_mean"]), 4),
         "beam_best_state_query_coverage": round(float(best_state["state_metrics"]["query_coverage"]), 4),
+        "beam_set_closure_guard_skip_count": int(set_closure_guard_skip_count),
         "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
     }
 

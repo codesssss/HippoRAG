@@ -625,6 +625,49 @@ def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
     assert set_trace["beam_best_state_score"] > closure_trace["beam_best_state_score"]
 
 
+def test_select_bridge_beam_positions_set_closure_stops_before_zero_signal_filler():
+    selected_positions, trace = select_bridge_beam_positions(
+        pool_doc_ids=[0, 1, 2, 3, 4],
+        pool_doc_scores=np.array([1.0, 0.35, 0.30, 0.95, 0.90], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge", "Answer", "Filler1", "Filler2"],
+        doc_idx_to_entities={
+            0: {"person a"},
+            1: {"person a", "person b"},
+            2: {"person b", "target"},
+            3: {"noise one"},
+            4: {"noise two"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "person b", 1.0, "related_to")],
+            2: [("person b", "target", 1.0, "related_to")],
+            3: [],
+            4: [],
+        },
+        adjacency={
+            "person a": [("person b", 1.0, "related_to")],
+            "person b": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=4,
+        initial_seed_entities={"person a"},
+        query_entities={"target"},
+        anchor_count=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        score_mode="set_closure",
+        beam_width=4,
+        beam_expand_per_state=4,
+    )
+
+    assert selected_positions == [0, 1, 2]
+    assert trace["selection_target_k"] == 4
+    assert len(selected_positions) < trace["selection_target_k"]
+    assert trace["beam_set_closure_guard_skip_count"] >= 1
+    assert [step["doc_id"] for step in trace["selection_steps"]] == [0, 1, 2]
+
+
 def test_compute_bridge_gate_decision_skips_without_strong_offrank_bridge_signal():
     decision = compute_bridge_gate_decision(
         pool_doc_ids=[0, 1, 2, 3, 4, 5],
