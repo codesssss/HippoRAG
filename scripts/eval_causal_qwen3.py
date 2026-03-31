@@ -1454,14 +1454,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 enabled=non_anchor_title_dedup,
             )
 
-            candidate_expansions: List[Dict[str, object]] = []
-            candidates_to_expand = (
-                scored_candidates
-                if uses_state_level_ranking
-                else scored_candidates[:beam_expand_per_state]
-            )
-
-            for candidate in candidates_to_expand:
+            for candidate in scored_candidates[:beam_expand_per_state]:
                 chosen_pos = int(candidate["pool_position"])
                 signature = tuple(selected_positions + [chosen_pos])
                 if signature in seen_signatures:
@@ -1498,11 +1491,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 ):
                     set_closure_guard_skip_count += 1
                     continue
-                candidate_expansions.append({
-                    "signature": signature,
-                    "candidate_combined_score_raw": float(candidate["combined_score_raw"]),
-                    "candidate_selection_score_raw": float(candidate["selection_score_raw"]),
-                    "state_score_delta": float(next_state_metrics["state_score"]) - float(state["state_score"]),
+                seen_signatures.add(signature)
+                expanded_states.append({
                     "selected_positions": list(signature),
                     "covered_entities": next_covered,
                     "blocked_titles": next_blocked_titles,
@@ -1517,30 +1507,12 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                         "closure_score": float(candidate["closure_score"]),
                         "selection_score": float(candidate["selection_score"]),
                         "combined_score": float(candidate["combined_score"]),
-                        "state_score_delta": float(next_state_metrics["state_score"]) - float(state["state_score"]),
                         "state_score": float(next_state_metrics["state_score"]),
                     }],
                     "cumulative_score": next_cumulative_score,
                     "state_score": float(next_state_metrics["state_score"]),
                     "state_metrics": next_state_metrics,
                 })
-
-            if uses_state_level_ranking:
-                candidate_expansions.sort(
-                    key=lambda state: (
-                        -float(state["state_score_delta"]),
-                        -float(state["state_score"]),
-                        -float(state["candidate_selection_score_raw"]),
-                        -float(state["candidate_combined_score_raw"]),
-                        -len(state["covered_entities"]),
-                        tuple(int(pos) for pos in state["selected_positions"]),
-                    )
-                )
-                candidate_expansions = candidate_expansions[:beam_expand_per_state]
-
-            for expanded_state in candidate_expansions:
-                seen_signatures.add(tuple(int(pos) for pos in expanded_state["selected_positions"]))
-                expanded_states.append(expanded_state)
 
         if not expanded_states:
             break
