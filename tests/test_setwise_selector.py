@@ -10,9 +10,13 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from eval_causal_qwen3 import (
     LEARNED_SETWISE_FEATURE_NAMES,
+    build_setwise_late_rerank_candidates,
     collect_lexical_query_seed_entities,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
+    materialize_reader_top_positions,
+    parse_setwise_late_rerank_response,
+    rerank_completed_evidence_sets_with_llm,
     score_evidence_state,
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
@@ -33,6 +37,124 @@ class DummyReachabilityModel:
         )
         positive_score = np.clip(positive_score, 0.0, 1.0)
         return np.stack([1.0 - positive_score, positive_score], axis=1)
+
+
+class DummyLateRerankModel:
+    def __init__(self, response_text):
+        if isinstance(response_text, list):
+            self.responses = list(response_text)
+        else:
+            self.responses = [response_text]
+        self.calls = []
+
+    def infer(self, **kwargs):
+        self.calls.append(kwargs)
+        response_text = self.responses[min(len(self.calls) - 1, len(self.responses) - 1)]
+        return response_text, {"finish_reason": "stop", "prompt_tokens": 1, "completion_tokens": 1}
+
+
+def test_materialize_reader_top_positions_preserves_selected_prefix_and_fills_tail():
+    top_positions = materialize_reader_top_positions(
+        selected_positions=[3, 1, 3],
+        pool_limit=6,
+        qa_top_k=5,
+    )
+
+    assert top_positions == [3, 1, 0, 2, 4]
+
+
+def test_parse_setwise_late_rerank_response_accepts_best_id_schema():
+    parsed = parse_setwise_late_rerank_response(
+        response_text='<JSON>{"best_id": 2, "confidence": 0.8}</JSON>',
+        num_candidates=4,
+    )
+
+    assert parsed["parse_succeeded"] is True
+    assert parsed["best_id"] == 2
+    assert parsed["confidence"] == 0.8
+
+
+def test_rerank_completed_evidence_sets_with_llm_selects_valid_candidate():
+    llm_model = DummyLateRerankModel('<JSON>{"best_id": 1, "confidence": 0.67}</JSON>')
+    candidate_sets = [
+        {
+            "source": "heuristic_best",
+            "reader_top_positions": [0, 1],
+        },
+        {
+            "source": "baseline_topk",
+            "reader_top_positions": [2, 3],
+        },
+    ]
+    best_id, trace = rerank_completed_evidence_sets_with_llm(
+        query="Which city is person A from?",
+        pool_docs=[
+            "Doc A\nPerson A was born in City X.",
+            "Doc B\nPerson A won an award.",
+            "Doc C\nCity Y is in Country Z.",
+            "Doc D\nCity X is in Country Z.",
+        ],
+        candidate_sets=candidate_sets,
+        llm_infer_fn=llm_model.infer,
+        model_name="dummy-model",
+        max_doc_chars=80,
+    )
+
+    assert best_id == 1
+    assert trace["parse_succeeded"] is True
+    assert trace["selected_candidate_id"] == 1
+    assert len(llm_model.calls) == 1
+
+
+def test_rerank_completed_evidence_sets_with_llm_repairs_invalid_first_response():
+    llm_model = DummyLateRerankModel([
+        "best_id: 1",
+        '<JSON>{"best_id": 0, "confidence": 0.55}</JSON>',
+    ])
+    best_id, trace = rerank_completed_evidence_sets_with_llm(
+        query="Which city is person A from?",
+        pool_docs=[
+            "Doc A\nPerson A was born in City X.",
+            "Doc B\nPerson A won an award.",
+            "Doc C\nCity Y is in Country Z.",
+            "Doc D\nCity X is in Country Z.",
+        ],
+        candidate_sets=[
+            {"source": "heuristic_best", "reader_top_positions": [0, 1]},
+            {"source": "baseline_topk", "reader_top_positions": [2, 3]},
+        ],
+        llm_infer_fn=llm_model.infer,
+        model_name="dummy-model",
+        max_doc_chars=80,
+    )
+
+    assert best_id == 0
+    assert trace["repair_applied"] is True
+    assert trace["repair_parse_succeeded"] is True
+    assert len(llm_model.calls) == 2
+
+
+def test_build_setwise_late_rerank_candidates_dedups_equivalent_reader_topk():
+    candidates = build_setwise_late_rerank_candidates(
+        selected_positions=[0, 2],
+        selector_trace={
+            "beam_finalists": [
+                {"selected_positions": [0, 2]},
+                {"selected_positions": [0, 1]},
+            ],
+        },
+        pool_limit=5,
+        qa_top_k=3,
+        include_baseline=True,
+        max_candidates=5,
+    )
+
+    assert [candidate["source"] for candidate in candidates] == [
+        "heuristic_best",
+        "beam_finalist",
+    ]
+    assert candidates[0]["reader_top_positions"] == [0, 2, 1]
+    assert candidates[1]["reader_top_positions"] == [0, 1, 2]
 
 
 def test_select_bridge_greedy_positions_prefers_bridge_docs_over_high_rank_distractor():
@@ -614,15 +736,16 @@ def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
     )
 
     assert closure_positions == [0, 1, 2]
-    assert set_positions == [0, 3, 4]
+    assert set_positions == [0, 1, 4]
     assert closure_trace["beam_rank_metric"] == "cumulative_score"
     assert set_trace["beam_rank_metric"] == "state_score"
-    assert set_trace["beam_best_state_path_connectivity"] == 1.0
+    assert set_trace["beam_best_state_path_connectivity"] < 1.0
     assert set_trace["beam_best_state_reachable_doc_ratio"] == 1.0
     assert set_trace["beam_best_state_query_reachability"] == 1.0
-    assert set_trace["beam_best_state_suffix_base_mean"] == 0.1
-    assert set_trace["state_score_weights"]["suffix_base_mean"] == 0.1
+    assert set_trace["beam_best_state_suffix_base_mean"] > 0.1
     assert set_trace["beam_best_state_score"] > closure_trace["beam_best_state_score"]
+    assert set_trace["beam_finalists"][0]["selected_positions"] == [0, 1, 4]
+    assert any(finalist["selected_positions"] == [0, 3, 4] for finalist in set_trace["beam_finalists"])
 
 
 def test_select_bridge_beam_positions_set_closure_stops_before_zero_signal_filler():

@@ -1,10 +1,11 @@
 import argparse
+import ast
 import json
 import logging
 import os
 from collections import Counter
 from pathlib import Path
-from typing import Dict, List, Sequence, Set, Tuple
+from typing import Any, Dict, List, Sequence, Set, Tuple
 
 import joblib
 import numpy as np
@@ -51,6 +52,12 @@ DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG = {
     "frontier_ratio": 0.05,
     "redundancy_penalty": 0.10,
 }
+
+SETWISE_LLM_JSON_START_TAG = "<JSON>"
+SETWISE_LLM_JSON_END_TAG = "</JSON>"
+SETWISE_LLM_LATE_RERANK_MAX_COMPLETION_TOKENS = 256
+SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS = 96
+SETWISE_LLM_NO_THINK_PREFIX = "/no_think"
 
 
 def get_gold_docs(samples: List, dataset_name: str = None, corpus: List | None = None) -> List:
@@ -135,6 +142,355 @@ def min_max_normalize_array(values: np.ndarray) -> np.ndarray:
 
 def extract_doc_title(doc_text: str) -> str:
     return str(doc_text).split("\n", 1)[0].strip()
+
+
+def materialize_reader_top_positions(selected_positions: Sequence[int],
+                                     pool_limit: int,
+                                     qa_top_k: int) -> List[int]:
+    normalized_positions: List[int] = []
+    seen_positions: Set[int] = set()
+    effective_pool_limit = max(int(pool_limit), 0)
+    effective_top_k = min(effective_pool_limit, max(int(qa_top_k), 0))
+    for raw_pos in selected_positions:
+        pos = int(raw_pos)
+        if pos < 0 or pos >= effective_pool_limit or pos in seen_positions:
+            continue
+        normalized_positions.append(pos)
+        seen_positions.add(pos)
+    for pos in range(effective_pool_limit):
+        if pos in seen_positions:
+            continue
+        normalized_positions.append(pos)
+        if len(normalized_positions) >= effective_top_k:
+            break
+    return normalized_positions[:effective_top_k]
+
+
+def truncate_prompt_text(value: str | None, max_chars: int) -> str:
+    cleaned = " ".join(str(value or "").split())
+    if max_chars > 0 and len(cleaned) > max_chars:
+        return cleaned[: max_chars - 1] + "…"
+    return cleaned
+
+
+def normalize_llm_result(response: Any) -> Tuple[str, Dict[str, Any]]:
+    if isinstance(response, (tuple, list)) and len(response) >= 2:
+        response_text = response[0]
+        metadata = response[1]
+        if isinstance(metadata, dict):
+            return str(response_text), dict(metadata or {})
+    return str(response), {}
+
+
+def extract_setwise_late_rerank_payload(response_text: str) -> str:
+    cleaned = str(response_text or "").strip()
+    if not cleaned:
+        return cleaned
+
+    tag_start = cleaned.find(SETWISE_LLM_JSON_START_TAG)
+    if tag_start != -1:
+        tag_end = cleaned.find(SETWISE_LLM_JSON_END_TAG, tag_start + len(SETWISE_LLM_JSON_START_TAG))
+        tagged_payload = (
+            cleaned[tag_start + len(SETWISE_LLM_JSON_START_TAG):tag_end]
+            if tag_end != -1 else
+            cleaned[tag_start + len(SETWISE_LLM_JSON_START_TAG):]
+        ).strip()
+        if tagged_payload:
+            return tagged_payload
+
+    object_start = cleaned.find("{")
+    object_end = cleaned.rfind("}")
+    if object_start != -1 and object_end != -1 and object_end > object_start:
+        return cleaned[object_start:object_end + 1]
+    return cleaned
+
+
+def parse_setwise_late_rerank_response(response_text: str,
+                                       num_candidates: int) -> Dict[str, object]:
+    payload_text = extract_setwise_late_rerank_payload(response_text)
+    if not payload_text:
+        return {
+            "best_id": None,
+            "confidence": None,
+            "parse_succeeded": False,
+            "parse_error": "empty_response",
+            "payload_text": payload_text,
+        }
+
+    parsed_payload: Any = None
+    parse_error = None
+    for parser in (json.loads, ast.literal_eval):
+        try:
+            parsed_payload = parser(payload_text)
+            parse_error = None
+            break
+        except (json.JSONDecodeError, ValueError, SyntaxError) as exc:
+            parse_error = str(exc)
+
+    if parsed_payload is None:
+        return {
+            "best_id": None,
+            "confidence": None,
+            "parse_succeeded": False,
+            "parse_error": f"unparseable_payload: {parse_error}",
+            "payload_text": payload_text,
+        }
+
+    raw_best_id: Any = None
+    raw_confidence = None
+    if isinstance(parsed_payload, dict):
+        raw_best_id = parsed_payload.get("best_id")
+        if raw_best_id is None:
+            best_ids = parsed_payload.get("best_ids")
+            if isinstance(best_ids, list) and best_ids:
+                raw_best_id = best_ids[0]
+        raw_confidence = parsed_payload.get("confidence")
+    elif isinstance(parsed_payload, list) and parsed_payload:
+        raw_best_id = parsed_payload[0]
+
+    try:
+        if isinstance(raw_best_id, bool):
+            raise ValueError("best_id cannot be bool")
+        best_id = int(raw_best_id)
+    except (TypeError, ValueError):
+        best_id = None
+
+    confidence = None
+    try:
+        if raw_confidence is not None:
+            confidence = float(raw_confidence)
+    except (TypeError, ValueError):
+        confidence = None
+
+    if best_id is None or best_id < 0 or best_id >= max(int(num_candidates), 0):
+        return {
+            "best_id": None,
+            "confidence": confidence,
+            "parse_succeeded": False,
+            "parse_error": f"invalid_best_id: {raw_best_id}",
+            "payload_text": payload_text,
+        }
+
+    return {
+        "best_id": int(best_id),
+        "confidence": confidence,
+        "parse_succeeded": True,
+        "parse_error": None,
+        "payload_text": payload_text,
+    }
+
+
+def build_setwise_late_rerank_candidates(selected_positions: Sequence[int],
+                                         selector_trace: Dict[str, object] | None,
+                                         pool_limit: int,
+                                         qa_top_k: int,
+                                         include_baseline: bool = True,
+                                         max_candidates: int = 4) -> List[Dict[str, object]]:
+    if max_candidates <= 0:
+        return []
+
+    candidates: List[Dict[str, object]] = [{
+        "source": "heuristic_best",
+        "selected_positions": [int(pos) for pos in selected_positions],
+        "reader_top_positions": materialize_reader_top_positions(
+            selected_positions=selected_positions,
+            pool_limit=pool_limit,
+            qa_top_k=qa_top_k,
+        ),
+    }]
+
+    for finalist in (selector_trace or {}).get("beam_finalists", []):
+        candidates.append({
+            "source": str(finalist.get("source", "beam_finalist")),
+            "selected_positions": [int(pos) for pos in finalist.get("selected_positions", [])],
+            "reader_top_positions": materialize_reader_top_positions(
+                selected_positions=finalist.get("selected_positions", []),
+                pool_limit=pool_limit,
+                qa_top_k=qa_top_k,
+            ),
+            "state_score": float(finalist.get("state_score", 0.0) or 0.0),
+            "cumulative_score": float(finalist.get("cumulative_score", 0.0) or 0.0),
+        })
+
+    if include_baseline:
+        baseline_positions = list(range(min(max(int(pool_limit), 0), max(int(qa_top_k), 0))))
+        candidates.append({
+            "source": "baseline_topk",
+            "selected_positions": list(baseline_positions),
+            "reader_top_positions": list(baseline_positions),
+        })
+
+    deduped_candidates: List[Dict[str, object]] = []
+    seen_signatures: Set[Tuple[int, ...]] = set()
+    for candidate in candidates:
+        signature = tuple(int(pos) for pos in candidate.get("reader_top_positions", []))
+        if not signature or signature in seen_signatures:
+            continue
+        seen_signatures.add(signature)
+        deduped_candidates.append(candidate)
+        if len(deduped_candidates) >= int(max_candidates):
+            break
+    return deduped_candidates
+
+
+def rerank_completed_evidence_sets_with_llm(query: str,
+                                            pool_docs: Sequence[str],
+                                            candidate_sets: Sequence[Dict[str, object]],
+                                            llm_infer_fn,
+                                            model_name: str,
+                                            max_doc_chars: int = 280) -> Tuple[int | None, Dict[str, object]]:
+    trace: Dict[str, object] = {
+        "applied": False,
+        "candidate_count": int(len(candidate_sets)),
+        "parse_succeeded": False,
+        "parse_error": None,
+        "selected_candidate_id": None,
+        "confidence": None,
+        "response_preview": None,
+        "metadata": {},
+        "llm_error": None,
+        "repair_applied": False,
+        "repair_parse_succeeded": False,
+        "repair_response_preview": None,
+        "repair_error": None,
+        "candidate_sources": [str(candidate.get("source", "unknown")) for candidate in candidate_sets],
+        "candidates": [],
+    }
+
+    if len(candidate_sets) <= 1:
+        return None, trace
+
+    for idx, candidate in enumerate(candidate_sets):
+        reader_top_positions = [
+            int(pos) for pos in candidate.get("reader_top_positions", [])
+            if 0 <= int(pos) < len(pool_docs)
+        ]
+        trace["candidates"].append({
+            "candidate_id": int(idx),
+            "source": str(candidate.get("source", "unknown")),
+            "reader_top_positions": reader_top_positions,
+            "reader_top_titles": [extract_doc_title(pool_docs[pos]) for pos in reader_top_positions],
+        })
+
+    candidate_sections: List[str] = []
+    for idx, candidate in enumerate(candidate_sets):
+        candidate_sections.append(f"Candidate {idx}:")
+        for rank, pos in enumerate(candidate.get("reader_top_positions", []), start=1):
+            pool_pos = int(pos)
+            if pool_pos < 0 or pool_pos >= len(pool_docs):
+                continue
+            doc_text = str(pool_docs[pool_pos])
+            title = extract_doc_title(doc_text)
+            body = doc_text.split("\n", 1)[1] if "\n" in doc_text else ""
+            candidate_sections.append(f"[{rank}] Title: {title}")
+            candidate_sections.append(f"Snippet: {truncate_prompt_text(body, max_doc_chars)}")
+        candidate_sections.append("")
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You judge candidate evidence sets for multi-hop question answering. "
+                f"Return exactly one JSON object wrapped in {SETWISE_LLM_JSON_START_TAG} and {SETWISE_LLM_JSON_END_TAG}. "
+                "The JSON object may contain keys \"best_id\" and optional \"confidence\" only. "
+                "\"best_id\" must be a single 0-based integer id from the provided candidates. "
+                "Choose the evidence set that is most sufficient to answer the question using only the provided documents. "
+                "Prefer complete support chains and penalize superficially related bridge documents that replace necessary evidence."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
+                f"Question: {query}\n\n"
+                "Candidate evidence sets:\n"
+                + "\n".join(candidate_sections)
+                + "\nReturn exactly one line in this shape:\n"
+                f"{SETWISE_LLM_JSON_START_TAG}{{\"best_id\":1,\"confidence\":0.72}}{SETWISE_LLM_JSON_END_TAG}"
+            ),
+        },
+    ]
+
+    try:
+        response = llm_infer_fn(
+            messages=messages,
+            model=model_name,
+            response_format=None,
+            max_completion_tokens=SETWISE_LLM_LATE_RERANK_MAX_COMPLETION_TOKENS,
+            temperature=0,
+            top_p=1,
+            stop=[SETWISE_LLM_JSON_END_TAG],
+        )
+        response_text, metadata = normalize_llm_result(response)
+    except Exception as exc:
+        trace["applied"] = True
+        trace["llm_error"] = str(exc)
+        return None, trace
+
+    parse_info = parse_setwise_late_rerank_response(
+        response_text=response_text,
+        num_candidates=len(candidate_sets),
+    )
+    if not parse_info["parse_succeeded"]:
+        trace["repair_applied"] = True
+        repair_messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You repair evidence-set reranker outputs. "
+                    f"Return exactly one JSON object wrapped in {SETWISE_LLM_JSON_START_TAG} and {SETWISE_LLM_JSON_END_TAG}. "
+                    "The JSON object may contain keys \"best_id\" and optional \"confidence\" only. "
+                    "\"best_id\" must be a single 0-based integer id from the provided candidates."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
+                    f"Question: {query}\n"
+                    f"Valid candidate ids: 0 to {max(len(candidate_sets) - 1, 0)}\n"
+                    f"Previous output preview: {truncate_prompt_text(response_text, 240)}\n"
+                    f"Issue: {parse_info['parse_error']}\n"
+                    "Return exactly one line in this shape:\n"
+                    f"{SETWISE_LLM_JSON_START_TAG}{{\"best_id\":1,\"confidence\":0.72}}{SETWISE_LLM_JSON_END_TAG}"
+                ),
+            },
+        ]
+        try:
+            repair_response = llm_infer_fn(
+                messages=repair_messages,
+                model=model_name,
+                response_format=None,
+                max_completion_tokens=SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS,
+                temperature=0,
+                top_p=1,
+                stop=[SETWISE_LLM_JSON_END_TAG],
+            )
+            repair_response_text, repair_metadata = normalize_llm_result(repair_response)
+            repair_parse_info = parse_setwise_late_rerank_response(
+                response_text=repair_response_text,
+                num_candidates=len(candidate_sets),
+            )
+            trace["repair_parse_succeeded"] = bool(repair_parse_info["parse_succeeded"])
+            trace["repair_response_preview"] = truncate_prompt_text(repair_response_text, 240)
+            if repair_parse_info["parse_succeeded"]:
+                parse_info = repair_parse_info
+                response_text = repair_response_text
+                metadata = repair_metadata
+        except Exception as exc:
+            trace["repair_error"] = str(exc)
+
+    trace["applied"] = True
+    trace["parse_succeeded"] = bool(parse_info["parse_succeeded"])
+    trace["parse_error"] = parse_info["parse_error"]
+    trace["selected_candidate_id"] = parse_info["best_id"]
+    trace["confidence"] = parse_info["confidence"]
+    trace["response_preview"] = truncate_prompt_text(response_text, 240)
+    trace["metadata"] = metadata
+    return (
+        int(parse_info["best_id"]) if parse_info["best_id"] is not None else None,
+        trace,
+    )
 
 
 def resolve_reserved_positions(candidate_count: int,
@@ -1348,6 +1704,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "beam_best_state_query_reachability": 0.0,
             "beam_best_state_suffix_base_mean": 0.0,
             "beam_set_closure_guard_skip_count": 0,
+            "beam_finalists": [],
             "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
         }
 
@@ -1537,6 +1894,15 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 tuple(-int(pos) for pos in state["selected_positions"]),
             ),
         )
+        ranked_finalists = sorted(
+            beam_states,
+            key=lambda state: (
+                -float(state["state_score"] if uses_state_level_ranking else state["cumulative_score"]),
+                -float(state["cumulative_score"]),
+                -len(state["covered_entities"]),
+                tuple(int(pos) for pos in state["selected_positions"]),
+            ),
+        )
     else:
         best_state = {
             "selected_positions": list(reserved_positions),
@@ -1547,6 +1913,32 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "state_score": float(initial_state_metrics["state_score"]),
             "state_metrics": initial_state_metrics,
         }
+        ranked_finalists = [best_state]
+
+    beam_finalists: List[Dict[str, object]] = []
+    for finalist in ranked_finalists:
+        finalist_positions = [int(pos) for pos in finalist["selected_positions"]]
+        beam_finalists.append({
+            "source": "beam_finalist",
+            "selected_positions": finalist_positions,
+            "selected_doc_ids": [
+                int(pool_doc_ids[pos]) if 0 <= pos < len(pool_doc_ids) and pool_doc_ids[pos] is not None else None
+                for pos in finalist_positions
+            ],
+            "selected_titles": [
+                str(pool_doc_titles[pos]).strip()
+                for pos in finalist_positions
+                if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+            ],
+            "cumulative_score": round(float(finalist["cumulative_score"]), 4),
+            "state_score": round(float(finalist["state_score"]), 4),
+            "path_connectivity": round(float(finalist["state_metrics"]["path_connectivity"]), 4),
+            "reachable_doc_ratio": round(float(finalist["state_metrics"]["reachable_doc_ratio"]), 4),
+            "query_reachability": round(float(finalist["state_metrics"]["query_reachability"]), 4),
+            "query_coverage": round(float(finalist["state_metrics"]["query_coverage"]), 4),
+            "support_mean": round(float(finalist["state_metrics"]["support_mean"]), 4),
+            "suffix_base_mean": round(float(finalist["state_metrics"]["suffix_base_mean"]), 4),
+        })
 
     return list(best_state["selected_positions"]), {
         "selection_steps": list(best_state["selection_steps"]),
@@ -1573,6 +1965,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_best_state_suffix_base_mean": round(float(best_state["state_metrics"]["suffix_base_mean"]), 4),
         "beam_best_state_query_coverage": round(float(best_state["state_metrics"]["query_coverage"]), 4),
         "beam_set_closure_guard_skip_count": int(set_closure_guard_skip_count),
+        "beam_finalists": beam_finalists,
         "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
     }
 
@@ -1598,7 +1991,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            gate_mode: str = "none",
                            gate_min_structure_score: float = 0.15,
                            gate_min_combined_margin: float = 0.0,
-                           state_weight_config: Dict[str, float] | None = None) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           state_weight_config: Dict[str, float] | None = None,
+                           late_rerank_enabled: bool = False,
+                           late_rerank_candidate_count: int = 4,
+                           late_rerank_include_baseline: bool = True,
+                           late_rerank_doc_char_limit: int = 280) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
@@ -1613,6 +2010,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
     gate_reason_counts: Counter[str] = Counter()
     gate_apply_count = 0
     gate_skip_count = 0
+    late_rerank_apply_count = 0
+    late_rerank_override_count = 0
+    late_rerank_parse_failure_count = 0
+    late_rerank_error_count = 0
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
 
@@ -1761,6 +2162,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "beam_best_state_support_mean": 0.0,
                     "beam_best_state_suffix_base_mean": 0.0,
                     "beam_best_state_query_coverage": 0.0,
+                    "beam_finalists": [],
                     "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
                 }
         else:
@@ -1781,8 +2183,60 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 structure_max_hops=structure_max_hops,
             )
 
-        selected_position_set = set(selected_positions)
-        reordered_pool_positions = selected_positions + [
+        heuristic_selected_positions = [int(pos) for pos in selected_positions]
+        final_front_positions = materialize_reader_top_positions(
+            selected_positions=heuristic_selected_positions,
+            pool_limit=pool_limit,
+            qa_top_k=qa_top_k,
+        )
+        late_rerank_trace: Dict[str, object] = {
+            "enabled": bool(late_rerank_enabled),
+            "applied": False,
+            "override_applied": False,
+            "candidate_count": 0,
+        }
+        if late_rerank_enabled and selector_name == "bridge_beam":
+            late_rerank_candidates = build_setwise_late_rerank_candidates(
+                selected_positions=heuristic_selected_positions,
+                selector_trace=selector_trace,
+                pool_limit=pool_limit,
+                qa_top_k=qa_top_k,
+                include_baseline=late_rerank_include_baseline,
+                max_candidates=late_rerank_candidate_count,
+            )
+            chosen_candidate_id, late_rerank_trace = rerank_completed_evidence_sets_with_llm(
+                query=qs.question,
+                pool_docs=pool_docs,
+                candidate_sets=late_rerank_candidates,
+                llm_infer_fn=hipporag.llm_model.infer,
+                model_name=hipporag.global_config.llm_name,
+                max_doc_chars=late_rerank_doc_char_limit,
+            )
+            late_rerank_apply_count += int(bool(late_rerank_trace.get("applied", False)))
+            if late_rerank_trace.get("llm_error"):
+                late_rerank_error_count += 1
+            if late_rerank_trace.get("applied", False) and not late_rerank_trace.get("parse_succeeded", False):
+                late_rerank_parse_failure_count += 1
+            if chosen_candidate_id is not None and 0 <= chosen_candidate_id < len(late_rerank_candidates):
+                chosen_candidate = late_rerank_candidates[chosen_candidate_id]
+                final_front_positions = [
+                    int(pos) for pos in chosen_candidate.get("reader_top_positions", [])
+                ]
+                late_rerank_trace["selected_candidate_source"] = str(chosen_candidate.get("source", "unknown"))
+                late_rerank_trace["selected_reader_top_positions"] = list(final_front_positions)
+                late_rerank_trace["selected_reader_top_titles"] = [
+                    pool_titles[pos] for pos in final_front_positions
+                ]
+                late_rerank_trace["override_applied"] = final_front_positions != materialize_reader_top_positions(
+                    selected_positions=heuristic_selected_positions,
+                    pool_limit=pool_limit,
+                    qa_top_k=qa_top_k,
+                )
+                if late_rerank_trace["override_applied"]:
+                    late_rerank_override_count += 1
+
+        selected_position_set = set(final_front_positions)
+        reordered_pool_positions = final_front_positions + [
             pos for pos in range(pool_limit)
             if pos not in selected_position_set
         ]
@@ -1805,12 +2259,19 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "non_anchor_title_dedup": bool(non_anchor_title_dedup),
             "gate_decision": gate_decision,
             "seed_entities_preview": sorted(seed_entities)[:12],
-            "selected_pool_positions": [int(pos) for pos in selected_positions],
+            "selected_pool_positions": list(heuristic_selected_positions),
             "selected_doc_ids": [
                 int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
-                for pos in selected_positions
+                for pos in heuristic_selected_positions
             ],
-            "selected_titles": [pool_titles[pos] for pos in selected_positions],
+            "selected_titles": [pool_titles[pos] for pos in heuristic_selected_positions],
+            "final_front_pool_positions": list(final_front_positions),
+            "final_front_doc_ids": [
+                int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
+                for pos in final_front_positions
+            ],
+            "final_front_titles": [pool_titles[pos] for pos in final_front_positions],
+            "late_rerank_trace": late_rerank_trace,
             **selector_trace,
         }
 
@@ -1829,14 +2290,14 @@ def apply_setwise_selector(hipporag: HippoRAG,
         seed_entity_counts.append(len(seed_entities))
         selected_structured_doc_counts.append(sum(
             1
-            for pos in selected_positions
+            for pos in final_front_positions
             if pool_doc_ids[pos] is not None
             and bool(hipporag.doc_idx_to_structure_entities.get(int(pool_doc_ids[pos]), set()))
         ))
         if len(selector_examples) < 5:
             selector_examples.append({
                 "question": qs.question,
-                "selected_titles": [pool_titles[pos] for pos in selected_positions],
+                "selected_titles": [pool_titles[pos] for pos in final_front_positions],
                 "seed_entities_preview": sorted(seed_entities)[:8],
                 "selection_steps": selector_trace["selection_steps"],
             })
@@ -1859,6 +2320,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "gate_apply_count": int(gate_apply_count),
         "gate_skip_count": int(gate_skip_count),
         "gate_reason_counts": dict(sorted(gate_reason_counts.items())),
+        "late_rerank_enabled": bool(late_rerank_enabled),
+        "late_rerank_apply_count": int(late_rerank_apply_count),
+        "late_rerank_override_count": int(late_rerank_override_count),
+        "late_rerank_parse_failure_count": int(late_rerank_parse_failure_count),
+        "late_rerank_error_count": int(late_rerank_error_count),
         "beam_width": int(beam_width),
         "beam_expand_per_state": int(beam_expand_per_state),
         "examples_preview": selector_examples,
@@ -2252,6 +2718,14 @@ def main():
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
                         help="Number of candidates expanded per beam state for --setwise_selector bridge_beam.")
+    parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
+                        help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
+    parser.add_argument("--setwise_late_rerank_candidate_count", type=int, default=4,
+                        help="Maximum number of completed evidence-set candidates exposed to the LLM late reranker.")
+    parser.add_argument("--setwise_late_rerank_include_baseline", type=string_to_bool, default=True,
+                        help="Include the original baseline top-k evidence set in the late LLM rerank shortlist.")
+    parser.add_argument("--setwise_late_rerank_doc_char_limit", type=int, default=280,
+                        help="Per-document character budget when serializing evidence sets for late LLM reranking.")
     parser.add_argument("--setwise_state_path_connectivity_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["path_connectivity"],
                         help="Set-level beam score weight for explicit chain/path connectivity under --setwise_score_mode set_closure.")
     parser.add_argument("--setwise_state_reachable_doc_ratio_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["reachable_doc_ratio"],
@@ -2574,6 +3048,10 @@ def main():
             gate_min_structure_score=float(args.setwise_gate_min_structure_score),
             gate_min_combined_margin=float(args.setwise_gate_min_combined_margin),
             state_weight_config=state_weight_config,
+            late_rerank_enabled=bool(args.setwise_late_rerank_enabled),
+            late_rerank_candidate_count=int(args.setwise_late_rerank_candidate_count),
+            late_rerank_include_baseline=bool(args.setwise_late_rerank_include_baseline),
+            late_rerank_doc_char_limit=int(args.setwise_late_rerank_doc_char_limit),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -2649,6 +3127,10 @@ def main():
             "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
+            "late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
+            "late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
+            "late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
+            "late_rerank_doc_char_limit": int(args.setwise_late_rerank_doc_char_limit),
             "state_score_weights": {k: round(float(v), 4) for k, v in resolve_set_closure_state_weight_config(state_weight_config).items()},
             "setwise_model_path": args.setwise_model_path or None,
             "selector_EM": round(float(selector_em), 4),
@@ -2845,6 +3327,10 @@ def main():
             "setwise_novelty_weight": float(args.setwise_novelty_weight),
             "setwise_beam_width": int(args.setwise_beam_width),
             "setwise_beam_expand_per_state": int(args.setwise_beam_expand_per_state),
+            "setwise_late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
+            "setwise_late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
+            "setwise_late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
+            "setwise_late_rerank_doc_char_limit": int(args.setwise_late_rerank_doc_char_limit),
             "setwise_model_path": args.setwise_model_path or None,
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
