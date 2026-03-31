@@ -392,7 +392,7 @@ def test_select_bridge_beam_positions_max_bridge_slots_only_fills_suffix_budget(
     assert trace["selection_steps"][-1]["pool_position"] == 5
 
 
-def test_score_evidence_state_prefers_target_covering_set_over_redundant_helpers():
+def test_score_evidence_state_prefers_connected_chain_over_redundant_helpers():
     pool_doc_ids = [0, 1, 2, 3, 4]
     normalized_base_scores = np.array([1.0, 0.9444, 0.9333, 0.5556, 0.0], dtype=float)
     score_redundant = score_evidence_state(
@@ -426,7 +426,7 @@ def test_score_evidence_state_prefers_target_covering_set_over_redundant_helpers
         structure_weight=0.60,
         novelty_weight=0.15,
     )
-    score_target_covering = score_evidence_state(
+    score_connected_chain = score_evidence_state(
         pool_doc_ids=pool_doc_ids,
         normalized_base_scores=normalized_base_scores,
         pool_doc_titles=["Anchor", "Helper1", "Helper2", "Bridge", "Answer"],
@@ -448,7 +448,7 @@ def test_score_evidence_state_prefers_target_covering_set_over_redundant_helpers
             "person a": [("helper h1", 1.0, "related_to"), ("helper h2", 1.0, "related_to"), ("person b", 0.9, "related_to")],
             "person b": [("target", 1.0, "related_to")],
         },
-        selected_positions=[0, 1, 4],
+        selected_positions=[0, 3, 4],
         fixed_prefix_positions=[0],
         seed_entities={"person a"},
         query_entities={"target"},
@@ -458,8 +458,45 @@ def test_score_evidence_state_prefers_target_covering_set_over_redundant_helpers
         novelty_weight=0.15,
     )
 
-    assert score_target_covering["query_coverage"] > score_redundant["query_coverage"]
-    assert score_target_covering["state_score"] > score_redundant["state_score"]
+    assert score_connected_chain["path_connectivity"] == 1.0
+    assert score_connected_chain["reachable_doc_ratio"] == 1.0
+    assert score_connected_chain["query_reachability"] == 1.0
+    assert score_connected_chain["state_score"] > score_redundant["state_score"]
+
+
+def test_score_evidence_state_distinguishes_query_coverage_from_query_reachability():
+    score = score_evidence_state(
+        pool_doc_ids=[0, 1, 2],
+        normalized_base_scores=np.array([1.0, 0.9, 0.1], dtype=float),
+        pool_doc_titles=["Anchor", "Helper", "Answer"],
+        doc_idx_to_entities={
+            0: {"person a"},
+            1: {"person a", "helper h"},
+            2: {"person b", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "helper h", 1.0, "related_to")],
+            2: [("person b", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("helper h", 1.0, "related_to")],
+            "person b": [("target", 1.0, "related_to")],
+        },
+        selected_positions=[0, 1, 2],
+        fixed_prefix_positions=[0],
+        seed_entities={"person a"},
+        query_entities={"target"},
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+
+    assert score["query_coverage"] == 1.0
+    assert score["query_reachability"] == 0.0
+    assert score["path_connectivity"] == 0.5
+    assert score["reachable_doc_ratio"] == 0.5
 
 
 def test_score_evidence_state_uses_suffix_base_mean_not_prefix_base_mean():
@@ -515,6 +552,9 @@ def test_score_evidence_state_respects_custom_state_weights():
         structure_weight=0.60,
         novelty_weight=0.15,
         state_weight_config={
+            "path_connectivity": 0.0,
+            "reachable_doc_ratio": 0.0,
+            "query_reachability": 0.0,
             "support_mean": 0.0,
             "support_min": 0.0,
             "closure_mean": 0.0,
@@ -574,9 +614,12 @@ def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
     )
 
     assert closure_positions == [0, 1, 2]
-    assert set_positions == [0, 1, 4]
+    assert set_positions == [0, 3, 4]
     assert closure_trace["beam_rank_metric"] == "cumulative_score"
     assert set_trace["beam_rank_metric"] == "state_score"
+    assert set_trace["beam_best_state_path_connectivity"] == 1.0
+    assert set_trace["beam_best_state_reachable_doc_ratio"] == 1.0
+    assert set_trace["beam_best_state_query_reachability"] == 1.0
     assert set_trace["beam_best_state_suffix_base_mean"] == 0.1
     assert set_trace["state_score_weights"]["suffix_base_mean"] == 0.1
     assert set_trace["beam_best_state_score"] > closure_trace["beam_best_state_score"]

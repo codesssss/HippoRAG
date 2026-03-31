@@ -40,12 +40,15 @@ LEARNED_SETWISE_FEATURE_NAMES = [
 ]
 
 DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG = {
-    "support_mean": 0.25,
-    "support_min": 0.10,
-    "closure_mean": 0.20,
-    "suffix_base_mean": 0.10,
-    "query_coverage": 0.25,
-    "frontier_ratio": 0.10,
+    "path_connectivity": 0.30,
+    "reachable_doc_ratio": 0.20,
+    "query_reachability": 0.15,
+    "support_mean": 0.05,
+    "support_min": 0.05,
+    "closure_mean": 0.10,
+    "suffix_base_mean": 0.05,
+    "query_coverage": 0.10,
+    "frontier_ratio": 0.05,
     "redundancy_penalty": 0.10,
 }
 
@@ -191,6 +194,98 @@ def normalize_entity_set(entities: Sequence[str] | Set[str] | None) -> Set[str]:
         if normalized:
             normalized_entities.add(normalized)
     return normalized_entities
+
+
+def score_doc_path_attachment(doc_entities: Set[str],
+                              reachable_entities: Set[str],
+                              frontier_scores: Dict[str, float]) -> float:
+    if not doc_entities:
+        return 0.0
+
+    overlap_support = 1.0 if doc_entities & reachable_entities else 0.0
+    frontier_support = max(
+        (float(frontier_scores.get(entity, 0.0)) for entity in doc_entities if entity in frontier_scores),
+        default=0.0,
+    )
+    return float(max(overlap_support, frontier_support))
+
+
+def compute_state_path_connectivity_metrics(selected_doc_entities: Dict[int, Set[str]],
+                                            focus_positions: Sequence[int],
+                                            initial_reachable_entities: Sequence[str] | Set[str] | None,
+                                            query_entities: Sequence[str] | Set[str] | None,
+                                            adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                            structure_max_hops: int) -> Dict[str, float]:
+    ordered_focus_positions = [int(pos) for pos in focus_positions]
+    total_focus = len(ordered_focus_positions)
+    if total_focus <= 0:
+        return {
+            "path_connectivity": 0.0,
+            "reachable_doc_ratio": 0.0,
+            "query_reachability": 0.0,
+            "connected_doc_count": 0.0,
+        }
+
+    normalized_query = normalize_entity_set(query_entities)
+    reachable_entities = normalize_entity_set(initial_reachable_entities)
+    remaining_positions = list(ordered_focus_positions)
+    connected_doc_count = 0
+    attachment_scores: List[float] = []
+
+    while remaining_positions:
+        frontier_scores = (
+            expand_directed_entities(reachable_entities, adjacency, max_hops=structure_max_hops)
+            if reachable_entities
+            else {}
+        )
+        best_index = -1
+        best_score = 0.0
+        best_query_gain = -1
+        best_new_entity_count = -1
+        best_pos = 0
+
+        for idx, pos in enumerate(remaining_positions):
+            doc_entities = selected_doc_entities.get(pos, set())
+            attachment_score = score_doc_path_attachment(
+                doc_entities=doc_entities,
+                reachable_entities=reachable_entities,
+                frontier_scores=frontier_scores,
+            )
+            if attachment_score <= 0.0:
+                continue
+
+            query_gain = len((doc_entities - reachable_entities) & normalized_query)
+            new_entity_count = len(doc_entities - reachable_entities)
+            if (
+                attachment_score > best_score
+                or (
+                    np.isclose(attachment_score, best_score)
+                    and (query_gain, new_entity_count, -pos)
+                    > (best_query_gain, best_new_entity_count, -best_pos)
+                )
+            ):
+                best_index = idx
+                best_score = attachment_score
+                best_query_gain = query_gain
+                best_new_entity_count = new_entity_count
+                best_pos = pos
+
+        if best_index < 0:
+            break
+
+        chosen_pos = remaining_positions.pop(best_index)
+        reachable_entities.update(selected_doc_entities.get(chosen_pos, set()))
+        connected_doc_count += 1
+        attachment_scores.append(float(best_score))
+
+    query_denominator = max(1, len(normalized_query))
+    query_reachability = len(reachable_entities & normalized_query) / float(query_denominator)
+    return {
+        "path_connectivity": float(sum(attachment_scores) / float(total_focus)),
+        "reachable_doc_ratio": float(connected_doc_count / float(total_focus)),
+        "query_reachability": float(query_reachability),
+        "connected_doc_count": float(connected_doc_count),
+    }
 
 
 def collect_query_seed_entities(hipporag: HippoRAG, query: str) -> Set[str]:
@@ -740,6 +835,9 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
     if not focus_positions:
         return {
             "state_score": 0.0,
+            "path_connectivity": 0.0,
+            "reachable_doc_ratio": 0.0,
+            "query_reachability": 0.0,
             "support_mean": 0.0,
             "support_min": 0.0,
             "closure_mean": 0.0,
@@ -747,6 +845,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
             "query_coverage": 0.0,
             "frontier_ratio": 0.0,
             "redundancy_penalty": 0.0,
+            "state_weight_config": dict(state_weights),
         }
 
     support_scores: List[float] = []
@@ -822,8 +921,27 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
         if 0 <= pos < len(normalized_base_scores)
     ]
     suffix_base_mean = float(np.mean(suffix_base_scores)) if suffix_base_scores else 0.0
+    prefix_reachable_entities = set(normalized_seed)
+    for pos in chosen_positions:
+        if pos not in fixed_prefix:
+            continue
+        prefix_reachable_entities.update(selected_doc_entities.get(pos, set()))
+    path_metrics = compute_state_path_connectivity_metrics(
+        selected_doc_entities=selected_doc_entities,
+        focus_positions=focus_positions,
+        initial_reachable_entities=prefix_reachable_entities,
+        query_entities=normalized_query,
+        adjacency=adjacency,
+        structure_max_hops=structure_max_hops,
+    )
+    path_connectivity = float(path_metrics["path_connectivity"])
+    reachable_doc_ratio = float(path_metrics["reachable_doc_ratio"])
+    query_reachability = float(path_metrics["query_reachability"])
     state_score = (
-        state_weights["support_mean"] * support_mean
+        state_weights["path_connectivity"] * path_connectivity
+        + state_weights["reachable_doc_ratio"] * reachable_doc_ratio
+        + state_weights["query_reachability"] * query_reachability
+        + state_weights["support_mean"] * support_mean
         + state_weights["support_min"] * support_min
         + state_weights["closure_mean"] * closure_mean
         + state_weights["suffix_base_mean"] * suffix_base_mean
@@ -833,6 +951,9 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
     )
     return {
         "state_score": float(state_score),
+        "path_connectivity": float(path_connectivity),
+        "reachable_doc_ratio": float(reachable_doc_ratio),
+        "query_reachability": float(query_reachability),
         "support_mean": float(support_mean),
         "support_min": float(support_min),
         "closure_mean": float(closure_mean),
@@ -1200,6 +1321,9 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
             "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
             "beam_best_state_score": 0.0,
+            "beam_best_state_path_connectivity": 0.0,
+            "beam_best_state_reachable_doc_ratio": 0.0,
+            "beam_best_state_query_reachability": 0.0,
             "beam_best_state_suffix_base_mean": 0.0,
             "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
         }
@@ -1411,6 +1535,9 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
         "beam_best_cumulative_score": round(float(best_state["cumulative_score"]), 4),
         "beam_best_state_score": round(float(best_state["state_score"]), 4),
+        "beam_best_state_path_connectivity": round(float(best_state["state_metrics"]["path_connectivity"]), 4),
+        "beam_best_state_reachable_doc_ratio": round(float(best_state["state_metrics"]["reachable_doc_ratio"]), 4),
+        "beam_best_state_query_reachability": round(float(best_state["state_metrics"]["query_reachability"]), 4),
         "beam_best_state_support_mean": round(float(best_state["state_metrics"]["support_mean"]), 4),
         "beam_best_state_suffix_base_mean": round(float(best_state["state_metrics"]["suffix_base_mean"]), 4),
         "beam_best_state_query_coverage": round(float(best_state["state_metrics"]["query_coverage"]), 4),
@@ -1596,6 +1723,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "beam_rank_metric": "state_score" if score_mode == "set_closure" else "cumulative_score",
                     "beam_best_cumulative_score": 0.0,
                     "beam_best_state_score": 0.0,
+                    "beam_best_state_path_connectivity": 0.0,
+                    "beam_best_state_reachable_doc_ratio": 0.0,
+                    "beam_best_state_query_reachability": 0.0,
                     "beam_best_state_support_mean": 0.0,
                     "beam_best_state_suffix_base_mean": 0.0,
                     "beam_best_state_query_coverage": 0.0,
@@ -2061,7 +2191,7 @@ def main():
     parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "learned_greedy"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy", "set_closure"], default="bridge",
-                        help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score.")
+                        help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score centered on explicit path connectivity.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
                         help="Candidate pool size used by the setwise selector.")
     parser.add_argument("--setwise_anchor_count", type=int, default=2,
@@ -2090,6 +2220,12 @@ def main():
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
                         help="Number of candidates expanded per beam state for --setwise_selector bridge_beam.")
+    parser.add_argument("--setwise_state_path_connectivity_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["path_connectivity"],
+                        help="Set-level beam score weight for explicit chain/path connectivity under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_reachable_doc_ratio_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["reachable_doc_ratio"],
+                        help="Set-level beam score weight for the fraction of suffix docs that attach to the connected chain under --setwise_score_mode set_closure.")
+    parser.add_argument("--setwise_state_query_reachability_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["query_reachability"],
+                        help="Set-level beam score weight for query entities that are reachable from the connected chain under --setwise_score_mode set_closure.")
     parser.add_argument("--setwise_state_support_mean_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["support_mean"],
                         help="Set-level beam score weight for suffix support mean under --setwise_score_mode set_closure.")
     parser.add_argument("--setwise_state_support_min_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["support_min"],
@@ -2142,6 +2278,9 @@ def main():
     setwise_selector_results = None
     learned_model_bundle = None
     state_weight_config = {
+        "path_connectivity": float(args.setwise_state_path_connectivity_weight),
+        "reachable_doc_ratio": float(args.setwise_state_reachable_doc_ratio_weight),
+        "query_reachability": float(args.setwise_state_query_reachability_weight),
         "support_mean": float(args.setwise_state_support_mean_weight),
         "support_min": float(args.setwise_state_support_min_weight),
         "closure_mean": float(args.setwise_state_closure_mean_weight),
