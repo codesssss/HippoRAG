@@ -720,6 +720,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
             "support_mean": 0.0,
             "support_min": 0.0,
             "closure_mean": 0.0,
+            "suffix_base_mean": 0.0,
             "query_coverage": 0.0,
             "frontier_ratio": 0.0,
             "redundancy_penalty": 0.0,
@@ -792,11 +793,18 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
     support_mean = float(np.mean(support_scores)) if support_scores else 0.0
     support_min = float(np.min(support_scores)) if support_scores else 0.0
     closure_mean = float(np.mean(closure_scores)) if closure_scores else 0.0
+    suffix_base_scores = [
+        float(normalized_base_scores[pos])
+        for pos in focus_positions
+        if 0 <= pos < len(normalized_base_scores)
+    ]
+    suffix_base_mean = float(np.mean(suffix_base_scores)) if suffix_base_scores else 0.0
     state_score = (
-        0.35 * support_mean
-        + 0.20 * support_min
+        0.25 * support_mean
+        + 0.10 * support_min
         + 0.20 * closure_mean
-        + 0.15 * query_coverage
+        + 0.10 * suffix_base_mean
+        + 0.25 * query_coverage
         + 0.10 * frontier_ratio
         - 0.10 * redundancy_penalty
     )
@@ -805,6 +813,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
         "support_mean": float(support_mean),
         "support_min": float(support_min),
         "closure_mean": float(closure_mean),
+        "suffix_base_mean": float(suffix_base_mean),
         "query_coverage": float(query_coverage),
         "frontier_ratio": float(frontier_ratio),
         "redundancy_penalty": float(redundancy_penalty),
@@ -1166,6 +1175,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
             "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
             "beam_best_state_score": 0.0,
+            "beam_best_state_suffix_base_mean": 0.0,
         }
 
     normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
@@ -1374,6 +1384,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_best_cumulative_score": round(float(best_state["cumulative_score"]), 4),
         "beam_best_state_score": round(float(best_state["state_score"]), 4),
         "beam_best_state_support_mean": round(float(best_state["state_metrics"]["support_mean"]), 4),
+        "beam_best_state_suffix_base_mean": round(float(best_state["state_metrics"]["suffix_base_mean"]), 4),
         "beam_best_state_query_coverage": round(float(best_state["state_metrics"]["query_coverage"]), 4),
     }
 
@@ -1555,6 +1566,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "beam_best_cumulative_score": 0.0,
                     "beam_best_state_score": 0.0,
                     "beam_best_state_support_mean": 0.0,
+                    "beam_best_state_suffix_base_mean": 0.0,
                     "beam_best_state_query_coverage": 0.0,
                 }
         else:
