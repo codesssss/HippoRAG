@@ -158,7 +158,7 @@ def resolve_selection_target_k(target_k: int,
 
 def normalize_setwise_score_mode(score_mode: str | None) -> str:
     normalized = str(score_mode or "bridge").strip().lower()
-    if normalized not in {"bridge", "closure_proxy"}:
+    if normalized not in {"bridge", "closure_proxy", "set_closure"}:
         raise ValueError(f"Unsupported setwise score mode: {score_mode}")
     return normalized
 
@@ -632,7 +632,7 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
         ))
         selection_score = (
             0.60 * float(structure_score) + 0.40 * float(closure_score)
-            if normalized_score_mode == "closure_proxy"
+            if normalized_score_mode in {"closure_proxy", "set_closure"}
             else float(structure_score)
         )
         combined_score = (
@@ -655,6 +655,7 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
             "path_coherence_score": round(float(path_coherence_score), 4),
             "redundancy_penalty": round(float(redundancy_penalty), 4),
             "closure_score": round(float(closure_score), 4),
+            "closure_score_raw": float(closure_score),
             "selection_score": round(float(selection_score), 4),
             "score_mode": normalized_score_mode,
             "combined_score": round(float(combined_score), 4),
@@ -671,6 +672,143 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
         )
     )
     return scored_candidates
+
+
+def score_evidence_state(pool_doc_ids: Sequence[int | None],
+                         normalized_base_scores: np.ndarray,
+                         pool_doc_titles: Sequence[str] | None,
+                         doc_idx_to_entities: Dict[int, Set[str]],
+                         doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                         adjacency: Dict[str, List[Tuple[str, float, str]]],
+                         selected_positions: Sequence[int],
+                         fixed_prefix_positions: Sequence[int] | None,
+                         seed_entities: Sequence[str] | Set[str] | None,
+                         query_entities: Sequence[str] | Set[str] | None,
+                         structure_max_hops: int,
+                         base_weight: float,
+                         structure_weight: float,
+                         novelty_weight: float) -> Dict[str, float]:
+    normalized_seed = normalize_entity_set(seed_entities)
+    normalized_query = normalize_entity_set(query_entities) or set(normalized_seed)
+    chosen_positions = [int(pos) for pos in selected_positions]
+    fixed_prefix = {int(pos) for pos in (fixed_prefix_positions or [])}
+    suffix_positions = [pos for pos in chosen_positions if pos not in fixed_prefix]
+    focus_positions = suffix_positions or list(chosen_positions)
+
+    selected_doc_entities: Dict[int, Set[str]] = {}
+    selected_titles: List[str] = []
+    selected_entity_union: Set[str] = set()
+    for pos in chosen_positions:
+        if pos >= len(pool_doc_ids):
+            continue
+        doc_id = pool_doc_ids[pos]
+        doc_entities = (
+            normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set()))
+            if doc_id is not None
+            else set()
+        )
+        selected_doc_entities[pos] = doc_entities
+        selected_entity_union.update(doc_entities)
+        if pool_doc_titles is not None and pos < len(pool_doc_titles):
+            title = str(pool_doc_titles[pos]).strip()
+            if title:
+                selected_titles.append(title)
+
+    if not focus_positions:
+        return {
+            "state_score": 0.0,
+            "support_mean": 0.0,
+            "support_min": 0.0,
+            "closure_mean": 0.0,
+            "query_coverage": 0.0,
+            "frontier_ratio": 0.0,
+            "redundancy_penalty": 0.0,
+        }
+
+    support_scores: List[float] = []
+    closure_scores: List[float] = []
+    for pos in focus_positions:
+        context_entities = set(normalized_seed)
+        for other_pos, other_entities in selected_doc_entities.items():
+            if other_pos == pos:
+                continue
+            context_entities.update(other_entities)
+        candidate_rows = score_bridge_candidates(
+            pool_doc_ids=pool_doc_ids,
+            normalized_base_scores=normalized_base_scores,
+            pool_doc_titles=pool_doc_titles,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            adjacency=adjacency,
+            remaining_positions=[pos],
+            covered_entities=context_entities,
+            structure_max_hops=structure_max_hops,
+            base_weight=base_weight,
+            structure_weight=structure_weight,
+            novelty_weight=novelty_weight,
+            query_entities=normalized_query,
+            score_mode="closure_proxy",
+        )
+        if not candidate_rows:
+            continue
+        candidate_detail = candidate_rows[0]
+        support_scores.append(float(candidate_detail["selection_score_raw"]))
+        closure_scores.append(float(candidate_detail["closure_score_raw"]))
+
+    supported_entities = selected_entity_union - normalized_seed
+    frontier_scores = (
+        expand_directed_entities(normalized_seed, adjacency, max_hops=structure_max_hops)
+        if normalized_seed
+        else {}
+    )
+    frontier_values = [
+        min(
+            1.0,
+            max(
+                float(frontier_scores.get(entity, 0.0)),
+                1.0 if entity in normalized_query else 0.0,
+            ),
+        )
+        for entity in supported_entities
+    ]
+    frontier_ratio = float(np.mean(frontier_values)) if frontier_values else 0.0
+
+    query_denominator = max(1, len(normalized_query))
+    query_coverage = len(selected_entity_union & normalized_query) / float(query_denominator)
+
+    total_entity_mentions = sum(len(selected_doc_entities.get(pos, set())) for pos in chosen_positions)
+    entity_redundancy = (
+        1.0 - (len(selected_entity_union) / float(total_entity_mentions))
+        if total_entity_mentions > 0
+        else 0.0
+    )
+    title_redundancy = (
+        (len(selected_titles) - len(set(selected_titles))) / float(len(selected_titles))
+        if selected_titles
+        else 0.0
+    )
+    redundancy_penalty = max(entity_redundancy, title_redundancy)
+
+    support_mean = float(np.mean(support_scores)) if support_scores else 0.0
+    support_min = float(np.min(support_scores)) if support_scores else 0.0
+    closure_mean = float(np.mean(closure_scores)) if closure_scores else 0.0
+    state_score = (
+        0.35 * support_mean
+        + 0.20 * support_min
+        + 0.20 * closure_mean
+        + 0.15 * query_coverage
+        + 0.10 * frontier_ratio
+        - 0.10 * redundancy_penalty
+    )
+    return {
+        "state_score": float(state_score),
+        "support_mean": float(support_mean),
+        "support_min": float(support_min),
+        "closure_mean": float(closure_mean),
+        "query_coverage": float(query_coverage),
+        "frontier_ratio": float(frontier_ratio),
+        "redundancy_penalty": float(redundancy_penalty),
+    }
 
 
 def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
@@ -1008,6 +1146,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  beam_width: int = 4,
                                  beam_expand_per_state: int = 4,
                                  non_anchor_title_dedup: bool = False) -> Tuple[List[int], Dict[str, object]]:
+    normalized_score_mode = normalize_setwise_score_mode(score_mode)
+    uses_state_level_ranking = normalized_score_mode == "set_closure"
     candidate_count = len(pool_doc_ids)
     if candidate_count == 0 or qa_top_k <= 0:
         return [], {
@@ -1020,9 +1160,12 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "reserve_top_m": 0,
             "max_bridge_slots": int(max(0, max_bridge_slots)),
             "selection_target_k": 0,
+            "score_mode": normalized_score_mode,
             "non_anchor_title_dedup": bool(non_anchor_title_dedup),
             "beam_width": int(max(beam_width, 1)),
             "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
+            "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
+            "beam_best_state_score": 0.0,
         }
 
     normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
@@ -1065,12 +1208,30 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
 
     beam_width = max(int(beam_width), 1)
     beam_expand_per_state = max(int(beam_expand_per_state), 1)
+    initial_state_metrics = score_evidence_state(
+        pool_doc_ids=pool_doc_ids,
+        normalized_base_scores=normalized_base_scores,
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities=doc_idx_to_entities,
+        doc_idx_to_edges=doc_idx_to_edges,
+        adjacency=adjacency,
+        selected_positions=reserved_positions,
+        fixed_prefix_positions=reserved_positions,
+        seed_entities=seed_entities,
+        query_entities=query_entities or initial_seed_entities,
+        structure_max_hops=structure_max_hops,
+        base_weight=base_weight,
+        structure_weight=structure_weight,
+        novelty_weight=novelty_weight,
+    )
     beam_states: List[Dict[str, object]] = [{
         "selected_positions": list(reserved_positions),
         "covered_entities": initial_covered,
         "blocked_titles": set(initial_blocked_titles),
         "selection_steps": initial_steps,
         "cumulative_score": 0.0,
+        "state_score": float(initial_state_metrics["state_score"]),
+        "state_metrics": initial_state_metrics,
     }]
     seen_signatures = {tuple(reserved_positions)}
 
@@ -1121,6 +1282,23 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 chosen_title = str(candidate.get("doc_title", "")).strip()
                 if chosen_title:
                     next_blocked_titles.add(chosen_title)
+                next_cumulative_score = float(state["cumulative_score"]) + float(candidate["combined_score_raw"])
+                next_state_metrics = score_evidence_state(
+                    pool_doc_ids=pool_doc_ids,
+                    normalized_base_scores=normalized_base_scores,
+                    pool_doc_titles=pool_doc_titles,
+                    doc_idx_to_entities=doc_idx_to_entities,
+                    doc_idx_to_edges=doc_idx_to_edges,
+                    adjacency=adjacency,
+                    selected_positions=signature,
+                    fixed_prefix_positions=reserved_positions,
+                    seed_entities=seed_entities,
+                    query_entities=query_entities or initial_seed_entities,
+                    structure_max_hops=structure_max_hops,
+                    base_weight=base_weight,
+                    structure_weight=structure_weight,
+                    novelty_weight=novelty_weight,
+                )
                 expanded_states.append({
                     "selected_positions": list(signature),
                     "covered_entities": next_covered,
@@ -1136,8 +1314,11 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                         "closure_score": float(candidate["closure_score"]),
                         "selection_score": float(candidate["selection_score"]),
                         "combined_score": float(candidate["combined_score"]),
+                        "state_score": float(next_state_metrics["state_score"]),
                     }],
-                    "cumulative_score": float(state["cumulative_score"]) + float(candidate["combined_score_raw"]),
+                    "cumulative_score": next_cumulative_score,
+                    "state_score": float(next_state_metrics["state_score"]),
+                    "state_metrics": next_state_metrics,
                 })
 
         if not expanded_states:
@@ -1145,6 +1326,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
 
         expanded_states.sort(
             key=lambda state: (
+                -float(state["state_score"] if uses_state_level_ranking else state["cumulative_score"]),
                 -float(state["cumulative_score"]),
                 -len(state["covered_entities"]),
                 tuple(int(pos) for pos in state["selected_positions"]),
@@ -1156,6 +1338,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         best_state = max(
             beam_states,
             key=lambda state: (
+                float(state["state_score"] if uses_state_level_ranking else state["cumulative_score"]),
                 float(state["cumulative_score"]),
                 len(state["covered_entities"]),
                 tuple(-int(pos) for pos in state["selected_positions"]),
@@ -1168,6 +1351,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "blocked_titles": set(initial_blocked_titles),
             "selection_steps": initial_steps,
             "cumulative_score": 0.0,
+            "state_score": float(initial_state_metrics["state_score"]),
+            "state_metrics": initial_state_metrics,
         }
 
     return list(best_state["selected_positions"]), {
@@ -1180,12 +1365,16 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
         "max_bridge_slots": int(max(0, max_bridge_slots)),
         "selection_target_k": int(selection_target_k),
-        "score_mode": normalize_setwise_score_mode(score_mode),
+        "score_mode": normalized_score_mode,
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         "beam_width": beam_width,
         "beam_expand_per_state": beam_expand_per_state,
         "beam_finalist_count": len(beam_states),
+        "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
         "beam_best_cumulative_score": round(float(best_state["cumulative_score"]), 4),
+        "beam_best_state_score": round(float(best_state["state_score"]), 4),
+        "beam_best_state_support_mean": round(float(best_state["state_metrics"]["support_mean"]), 4),
+        "beam_best_state_query_coverage": round(float(best_state["state_metrics"]["query_coverage"]), 4),
     }
 
 
@@ -1357,11 +1546,16 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
                     "max_bridge_slots": int(max(0, max_bridge_slots)),
                     "selection_target_k": int(gate_decision.get("selection_target_k", min(pool_limit, qa_top_k))),
+                    "score_mode": score_mode,
                     "non_anchor_title_dedup": bool(non_anchor_title_dedup),
                     "beam_width": int(beam_width),
                     "beam_expand_per_state": int(beam_expand_per_state),
                     "beam_finalist_count": 0,
+                    "beam_rank_metric": "state_score" if score_mode == "set_closure" else "cumulative_score",
                     "beam_best_cumulative_score": 0.0,
+                    "beam_best_state_score": 0.0,
+                    "beam_best_state_support_mean": 0.0,
+                    "beam_best_state_query_coverage": 0.0,
                 }
         else:
             if learned_model_bundle is None:
@@ -1822,8 +2016,8 @@ def main():
                         help="Device for cross-encoder model.")
     parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "learned_greedy"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
-    parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy"], default="bridge",
-                        help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy.")
+    parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy", "set_closure"], default="bridge",
+                        help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
                         help="Candidate pool size used by the setwise selector.")
     parser.add_argument("--setwise_anchor_count", type=int, default=2,

@@ -13,6 +13,7 @@ from eval_causal_qwen3 import (
     collect_lexical_query_seed_entities,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
+    score_evidence_state,
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
     select_learned_greedy_positions,
@@ -389,6 +390,127 @@ def test_select_bridge_beam_positions_max_bridge_slots_only_fills_suffix_budget(
     assert trace["max_bridge_slots"] == 1
     assert trace["selection_steps"][-1]["mode"] == "beam"
     assert trace["selection_steps"][-1]["pool_position"] == 5
+
+
+def test_score_evidence_state_prefers_target_covering_set_over_redundant_helpers():
+    pool_doc_ids = [0, 1, 2, 3, 4]
+    normalized_base_scores = np.array([1.0, 0.9444, 0.9333, 0.5556, 0.0], dtype=float)
+    score_redundant = score_evidence_state(
+        pool_doc_ids=pool_doc_ids,
+        normalized_base_scores=normalized_base_scores,
+        pool_doc_titles=["Anchor", "Helper1", "Helper2", "Bridge", "Answer"],
+        doc_idx_to_entities={
+            0: {"person a"},
+            1: {"person a", "helper h1"},
+            2: {"person a", "helper h2"},
+            3: {"person a", "person b"},
+            4: {"person b", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "helper h1", 1.0, "related_to")],
+            2: [("person a", "helper h2", 1.0, "related_to")],
+            3: [("person a", "person b", 0.9, "related_to")],
+            4: [("person b", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("helper h1", 1.0, "related_to"), ("helper h2", 1.0, "related_to"), ("person b", 0.9, "related_to")],
+            "person b": [("target", 1.0, "related_to")],
+        },
+        selected_positions=[0, 1, 2],
+        fixed_prefix_positions=[0],
+        seed_entities={"person a"},
+        query_entities={"target"},
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+    score_target_covering = score_evidence_state(
+        pool_doc_ids=pool_doc_ids,
+        normalized_base_scores=normalized_base_scores,
+        pool_doc_titles=["Anchor", "Helper1", "Helper2", "Bridge", "Answer"],
+        doc_idx_to_entities={
+            0: {"person a"},
+            1: {"person a", "helper h1"},
+            2: {"person a", "helper h2"},
+            3: {"person a", "person b"},
+            4: {"person b", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "helper h1", 1.0, "related_to")],
+            2: [("person a", "helper h2", 1.0, "related_to")],
+            3: [("person a", "person b", 0.9, "related_to")],
+            4: [("person b", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("helper h1", 1.0, "related_to"), ("helper h2", 1.0, "related_to"), ("person b", 0.9, "related_to")],
+            "person b": [("target", 1.0, "related_to")],
+        },
+        selected_positions=[0, 1, 4],
+        fixed_prefix_positions=[0],
+        seed_entities={"person a"},
+        query_entities={"target"},
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+
+    assert score_target_covering["query_coverage"] > score_redundant["query_coverage"]
+    assert score_target_covering["state_score"] > score_redundant["state_score"]
+
+
+def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
+    common_kwargs = dict(
+        pool_doc_ids=[0, 1, 2, 3, 4],
+        pool_doc_scores=np.array([1.0, 0.95, 0.94, 0.60, 0.10], dtype=float),
+        pool_doc_titles=["Anchor", "Helper1", "Helper2", "Bridge", "Answer"],
+        doc_idx_to_entities={
+            0: {"person a"},
+            1: {"person a", "helper h1"},
+            2: {"person a", "helper h2"},
+            3: {"person a", "person b"},
+            4: {"person b", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "helper h1", 1.0, "related_to")],
+            2: [("person a", "helper h2", 1.0, "related_to")],
+            3: [("person a", "person b", 0.9, "related_to")],
+            4: [("person b", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("helper h1", 1.0, "related_to"), ("helper h2", 1.0, "related_to"), ("person b", 0.9, "related_to")],
+            "person b": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=3,
+        initial_seed_entities={"person a"},
+        query_entities={"target"},
+        anchor_count=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        beam_width=3,
+        beam_expand_per_state=3,
+    )
+
+    closure_positions, closure_trace = select_bridge_beam_positions(
+        **common_kwargs,
+        score_mode="closure_proxy",
+    )
+    set_positions, set_trace = select_bridge_beam_positions(
+        **common_kwargs,
+        score_mode="set_closure",
+    )
+
+    assert closure_positions == [0, 1, 2]
+    assert set_positions == [0, 1, 4]
+    assert closure_trace["beam_rank_metric"] == "cumulative_score"
+    assert set_trace["beam_rank_metric"] == "state_score"
+    assert set_trace["beam_best_state_score"] > closure_trace["beam_best_state_score"]
 
 
 def test_compute_bridge_gate_decision_skips_without_strong_offrank_bridge_signal():
