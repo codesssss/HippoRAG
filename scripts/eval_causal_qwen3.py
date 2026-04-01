@@ -1,5 +1,6 @@
 import argparse
 import ast
+from dataclasses import dataclass
 import json
 import logging
 import os
@@ -9,6 +10,8 @@ from typing import Any, Dict, List, Sequence, Set, Tuple
 
 import joblib
 import numpy as np
+import pydantic
+from openai import OpenAI
 
 from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
@@ -58,6 +61,209 @@ SETWISE_LLM_JSON_END_TAG = "</JSON>"
 SETWISE_LLM_LATE_RERANK_MAX_COMPLETION_TOKENS = 256
 SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS = 96
 SETWISE_LLM_NO_THINK_PREFIX = "/no_think"
+
+
+class SetwiseLateRerankResponseModel(pydantic.BaseModel):
+    best_id: int = pydantic.Field(..., description="0-based id of the best candidate evidence set.")
+    confidence: float | None = pydantic.Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Optional confidence score between 0 and 1.",
+    )
+
+
+@dataclass
+class SetwiseLateRerankJudgeBundle:
+    infer_fn: Any
+    model_name: str
+    backend: str
+    base_url: str | None = None
+    response_format: Any = None
+    reasoning_effort: str | None = None
+    api_key_env: str | None = None
+
+
+class OpenAICompatibleLateRerankJudge:
+    def __init__(self,
+                 model_name: str,
+                 base_url: str | None = None,
+                 api_key: str | None = None,
+                 backend: str = "responses",
+                 timeout_s: float = 120.0,
+                 reasoning_effort: str | None = None,
+                 client: OpenAI | None = None) -> None:
+        normalized_backend = str(backend or "responses").strip().lower()
+        if normalized_backend not in {"responses", "chat_completions"}:
+            raise ValueError(f"Unsupported late rerank judge backend: {backend}")
+
+        self.model_name = str(model_name).strip()
+        if not self.model_name:
+            raise ValueError("Late rerank judge model name must be non-empty.")
+        self.base_url = str(base_url).strip() if base_url else None
+        self.backend = normalized_backend
+        self.reasoning_effort = str(reasoning_effort).strip() if reasoning_effort else None
+        self.client = client or OpenAI(
+            api_key=api_key,
+            base_url=self.base_url,
+            timeout=float(timeout_s),
+            max_retries=2,
+        )
+
+    def infer(self,
+              messages: List[Dict[str, str]],
+              **kwargs) -> Tuple[str, Dict[str, Any]]:
+        response_format = kwargs.get("response_format")
+        model_name = str(kwargs.get("model") or self.model_name)
+        temperature = float(kwargs.get("temperature", 0))
+        top_p = float(kwargs.get("top_p", 1))
+        max_completion_tokens = int(kwargs.get("max_completion_tokens", SETWISE_LLM_LATE_RERANK_MAX_COMPLETION_TOKENS))
+        if self.backend == "responses":
+            return self._infer_with_responses(
+                messages=messages,
+                model_name=model_name,
+                response_format=response_format,
+                max_completion_tokens=max_completion_tokens,
+                temperature=temperature,
+                top_p=top_p,
+            )
+        return self._infer_with_chat_completions(
+            messages=messages,
+            model_name=model_name,
+            response_format=response_format,
+            max_completion_tokens=max_completion_tokens,
+            temperature=temperature,
+            top_p=top_p,
+        )
+
+    def _infer_with_responses(self,
+                              messages: List[Dict[str, str]],
+                              model_name: str,
+                              response_format: Any,
+                              max_completion_tokens: int,
+                              temperature: float,
+                              top_p: float) -> Tuple[str, Dict[str, Any]]:
+        params: Dict[str, Any] = {
+            "model": model_name,
+            "input": messages,
+            "max_output_tokens": int(max_completion_tokens),
+            "temperature": float(temperature),
+            "top_p": float(top_p),
+        }
+        if self.reasoning_effort:
+            params["reasoning"] = {"effort": self.reasoning_effort}
+
+        response = self.client.responses.create(**params)
+        response_text, response_text_source = extract_responses_api_text(response)
+
+        usage = getattr(response, "usage", None)
+        metadata = {
+            "backend": self.backend,
+            "model": model_name,
+            "prompt_tokens": int(getattr(usage, "input_tokens", 0) or 0),
+            "completion_tokens": int(getattr(usage, "output_tokens", 0) or 0),
+            "finish_reason": str(getattr(response, "status", "") or ""),
+            "response_text_source": response_text_source,
+            "structured_output_requested": bool(is_pydantic_response_format(response_format)),
+        }
+        return response_text, metadata
+
+    def _infer_with_chat_completions(self,
+                                     messages: List[Dict[str, str]],
+                                     model_name: str,
+                                     response_format: Any,
+                                     max_completion_tokens: int,
+                                     temperature: float,
+                                     top_p: float) -> Tuple[str, Dict[str, Any]]:
+        if not is_pydantic_response_format(response_format):
+            return self._infer_with_chat_stream(
+                messages=messages,
+                model_name=model_name,
+                max_completion_tokens=max_completion_tokens,
+                temperature=temperature,
+                top_p=top_p,
+            )
+
+        params: Dict[str, Any] = {
+            "model": model_name,
+            "messages": messages,
+            "max_completion_tokens": int(max_completion_tokens),
+            "temperature": float(temperature),
+            "top_p": float(top_p),
+        }
+        if self.reasoning_effort:
+            params["reasoning_effort"] = self.reasoning_effort
+
+        if is_pydantic_response_format(response_format):
+            response = self.client.beta.chat.completions.parse(
+                **params,
+                response_format=response_format,
+            )
+            message = response.choices[0].message
+            parsed_payload = getattr(message, "parsed", None)
+            if parsed_payload is not None:
+                response_text = parsed_payload.model_dump_json()
+            else:
+                response_text = str(message.content or "")
+        else:
+            response = self.client.chat.completions.create(
+                **params,
+                response_format=response_format,
+            )
+            response_text = str(response.choices[0].message.content or "")
+
+        usage = getattr(response, "usage", None)
+        finish_reason = None
+        if getattr(response, "choices", None):
+            finish_reason = getattr(response.choices[0], "finish_reason", None)
+        metadata = {
+            "backend": self.backend,
+            "model": model_name,
+            "prompt_tokens": int(getattr(usage, "prompt_tokens", 0) or 0),
+            "completion_tokens": int(getattr(usage, "completion_tokens", 0) or 0),
+            "finish_reason": str(finish_reason or ""),
+        }
+        return response_text, metadata
+
+    def _infer_with_chat_stream(self,
+                                messages: List[Dict[str, str]],
+                                model_name: str,
+                                max_completion_tokens: int,
+                                temperature: float,
+                                top_p: float) -> Tuple[str, Dict[str, Any]]:
+        params: Dict[str, Any] = {
+            "model": model_name,
+            "messages": messages,
+            "max_tokens": int(max_completion_tokens),
+            "temperature": float(temperature),
+            "top_p": float(top_p),
+            "stream": True,
+        }
+        stream = self.client.chat.completions.create(**params)
+        response_chunks: List[str] = []
+        last_chunk = None
+        for chunk in stream:
+            last_chunk = chunk
+            if not getattr(chunk, "choices", None):
+                continue
+            delta = getattr(chunk.choices[0], "delta", None)
+            content = getattr(delta, "content", None) if delta is not None else None
+            if isinstance(content, str) and content:
+                response_chunks.append(content)
+
+        usage = getattr(last_chunk, "usage", None) if last_chunk is not None else None
+        finish_reason = None
+        if last_chunk is not None and getattr(last_chunk, "choices", None):
+            finish_reason = getattr(last_chunk.choices[0], "finish_reason", None)
+        metadata = {
+            "backend": self.backend,
+            "model": model_name,
+            "prompt_tokens": int(getattr(usage, "prompt_tokens", 0) or 0),
+            "completion_tokens": int(getattr(usage, "completion_tokens", 0) or 0),
+            "finish_reason": str(finish_reason or ""),
+            "streamed": True,
+        }
+        return "".join(response_chunks), metadata
 
 
 def get_gold_docs(samples: List, dataset_name: str = None, corpus: List | None = None) -> List:
@@ -182,6 +388,109 @@ def normalize_llm_result(response: Any) -> Tuple[str, Dict[str, Any]]:
     return str(response), {}
 
 
+def is_pydantic_response_format(response_format: Any) -> bool:
+    return isinstance(response_format, type) and issubclass(response_format, pydantic.BaseModel)
+
+
+def _lookup_response_value(payload: Any, field_name: str) -> Any:
+    if payload is None:
+        return None
+    if isinstance(payload, dict):
+        return payload.get(field_name)
+    return getattr(payload, field_name, None)
+
+
+def extract_responses_api_text(response: Any) -> Tuple[str, str]:
+    direct_output_text = str(getattr(response, "output_text", "") or "").strip()
+    if direct_output_text:
+        return direct_output_text, "output_text"
+
+    collected_fragments: List[str] = []
+    output_items = _lookup_response_value(response, "output")
+    if isinstance(output_items, Sequence) and not isinstance(output_items, (str, bytes)):
+        for output_item in output_items:
+            item_content = _lookup_response_value(output_item, "content")
+            if not isinstance(item_content, Sequence) or isinstance(item_content, (str, bytes)):
+                item_content = [output_item]
+            for content_part in item_content:
+                for field_name in ("text", "output_text", "content"):
+                    value = _lookup_response_value(content_part, field_name)
+                    if isinstance(value, str) and value.strip():
+                        collected_fragments.append(value.strip())
+                        break
+
+    if collected_fragments:
+        return "\n".join(collected_fragments), "output"
+    return "", "empty"
+
+
+def resolve_setwise_late_rerank_api_key(api_key: str | None,
+                                        api_key_env: str | None,
+                                        base_url: str | None) -> str:
+    normalized_api_key = str(api_key).strip() if api_key else ""
+    if normalized_api_key:
+        return normalized_api_key
+
+    normalized_env_name = str(api_key_env).strip() if api_key_env else ""
+    if normalized_env_name:
+        env_value = str(os.getenv(normalized_env_name, "")).strip()
+        if env_value:
+            return env_value
+
+    normalized_base_url = str(base_url or "").strip().lower()
+    if "localhost" in normalized_base_url or "127.0.0.1" in normalized_base_url:
+        return "sk-"
+
+    if not normalized_env_name:
+        normalized_env_name = "OPENAI_API_KEY"
+    raise ValueError(
+        "No API key resolved for late rerank judge. "
+        f"Provide --setwise_late_rerank_judge_api_key or set {normalized_env_name}."
+    )
+
+
+def build_setwise_late_rerank_judge_bundle(args: argparse.Namespace,
+                                           fallback_model_name: str,
+                                           fallback_base_url: str | None) -> SetwiseLateRerankJudgeBundle:
+    backend = str(getattr(args, "setwise_late_rerank_judge_backend", "inherit") or "inherit").strip().lower()
+    if backend == "inherit":
+        return SetwiseLateRerankJudgeBundle(
+            infer_fn=None,
+            model_name=str(fallback_model_name),
+            backend="inherit",
+            base_url=str(fallback_base_url).strip() if fallback_base_url else None,
+            response_format=None,
+        )
+
+    model_name = str(getattr(args, "setwise_late_rerank_judge_model", "") or "").strip() or str(fallback_model_name)
+    base_url = str(getattr(args, "setwise_late_rerank_judge_base_url", "") or "").strip() or None
+    api_key_env = str(getattr(args, "setwise_late_rerank_judge_api_key_env", "OPENAI_API_KEY") or "OPENAI_API_KEY").strip()
+    api_key = resolve_setwise_late_rerank_api_key(
+        api_key=getattr(args, "setwise_late_rerank_judge_api_key", None),
+        api_key_env=api_key_env,
+        base_url=base_url or fallback_base_url,
+    )
+    reasoning_effort = str(getattr(args, "setwise_late_rerank_judge_reasoning_effort", "") or "").strip() or None
+    timeout_s = float(getattr(args, "setwise_late_rerank_judge_timeout_s", 120.0) or 120.0)
+    judge = OpenAICompatibleLateRerankJudge(
+        model_name=model_name,
+        base_url=base_url,
+        api_key=api_key,
+        backend=backend,
+        timeout_s=timeout_s,
+        reasoning_effort=reasoning_effort,
+    )
+    return SetwiseLateRerankJudgeBundle(
+        infer_fn=judge.infer,
+        model_name=model_name,
+        backend=backend,
+        base_url=base_url,
+        response_format=None,
+        reasoning_effort=reasoning_effort,
+        api_key_env=api_key_env,
+    )
+
+
 def extract_setwise_late_rerank_payload(response_text: str) -> str:
     cleaned = str(response_text or "").strip()
     if not cleaned:
@@ -297,6 +606,8 @@ def build_setwise_late_rerank_candidates(selected_positions: Sequence[int],
             pool_limit=pool_limit,
             qa_top_k=qa_top_k,
         ),
+        "state_score": float((selector_trace or {}).get("beam_best_state_score", 0.0) or 0.0),
+        "cumulative_score": float((selector_trace or {}).get("beam_best_cumulative_score", 0.0) or 0.0),
     }]
 
     for finalist in (selector_trace or {}).get("beam_finalists", []):
@@ -333,11 +644,60 @@ def build_setwise_late_rerank_candidates(selected_positions: Sequence[int],
     return deduped_candidates
 
 
+def normalize_setwise_late_rerank_policy(policy: str | None) -> str:
+    normalized = str(policy or "always").strip().lower()
+    if normalized not in {"always", "tiebreak"}:
+        raise ValueError(f"Unsupported late rerank policy: {policy}")
+    return normalized
+
+
+def should_apply_setwise_late_rerank_override(heuristic_candidate: Dict[str, object],
+                                              chosen_candidate: Dict[str, object],
+                                              policy: str = "always",
+                                              max_state_score_gap: float = 0.0) -> Tuple[bool, Dict[str, object]]:
+    normalized_policy = normalize_setwise_late_rerank_policy(policy)
+    heuristic_state_score_raw = heuristic_candidate.get("state_score")
+    chosen_state_score_raw = chosen_candidate.get("state_score")
+    heuristic_state_score = (
+        float(heuristic_state_score_raw)
+        if heuristic_state_score_raw is not None
+        else None
+    )
+    chosen_state_score = (
+        float(chosen_state_score_raw)
+        if chosen_state_score_raw is not None
+        else None
+    )
+    info: Dict[str, object] = {
+        "override_policy": normalized_policy,
+        "override_max_state_score_gap": float(max_state_score_gap),
+        "heuristic_state_score": heuristic_state_score,
+        "selected_candidate_state_score": chosen_state_score,
+        "override_state_score_gap": None,
+        "override_block_reason": None,
+    }
+    if normalized_policy == "always":
+        return True, info
+
+    if heuristic_state_score is None or chosen_state_score is None:
+        info["override_block_reason"] = "missing_state_score"
+        return False, info
+
+    state_score_gap = abs(heuristic_state_score - chosen_state_score)
+    info["override_state_score_gap"] = float(state_score_gap)
+    if state_score_gap > float(max_state_score_gap):
+        info["override_block_reason"] = "state_score_gap_exceeded"
+        return False, info
+
+    return True, info
+
+
 def rerank_completed_evidence_sets_with_llm(query: str,
                                             pool_docs: Sequence[str],
                                             candidate_sets: Sequence[Dict[str, object]],
                                             llm_infer_fn,
                                             model_name: str,
+                                            response_format: Any = None,
                                             max_doc_chars: int = 280) -> Tuple[int | None, Dict[str, object]]:
     trace: Dict[str, object] = {
         "applied": False,
@@ -359,6 +719,8 @@ def rerank_completed_evidence_sets_with_llm(query: str,
 
     if len(candidate_sets) <= 1:
         return None, trace
+
+    use_structured_output = response_format is not None
 
     for idx, candidate in enumerate(candidate_sets):
         reader_top_positions = [
@@ -391,22 +753,37 @@ def rerank_completed_evidence_sets_with_llm(query: str,
             "role": "system",
             "content": (
                 "You judge candidate evidence sets for multi-hop question answering. "
-                f"Return exactly one JSON object wrapped in {SETWISE_LLM_JSON_START_TAG} and {SETWISE_LLM_JSON_END_TAG}. "
                 "The JSON object may contain keys \"best_id\" and optional \"confidence\" only. "
                 "\"best_id\" must be a single 0-based integer id from the provided candidates. "
                 "Choose the evidence set that is most sufficient to answer the question using only the provided documents. "
                 "Prefer complete support chains and penalize superficially related bridge documents that replace necessary evidence."
+                + (
+                    ""
+                    if use_structured_output
+                    else (
+                        f" Return exactly one JSON object wrapped in {SETWISE_LLM_JSON_START_TAG} and {SETWISE_LLM_JSON_END_TAG}."
+                        " Do not include markdown, code fences, or explanation."
+                    )
+                )
             ),
         },
         {
             "role": "user",
             "content": (
-                f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
-                f"Question: {query}\n\n"
+                (
+                    ""
+                    if use_structured_output
+                    else f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
+                )
+                + f"Question: {query}\n\n"
                 "Candidate evidence sets:\n"
                 + "\n".join(candidate_sections)
-                + "\nReturn exactly one line in this shape:\n"
-                f"{SETWISE_LLM_JSON_START_TAG}{{\"best_id\":1,\"confidence\":0.72}}{SETWISE_LLM_JSON_END_TAG}"
+                + (
+                    "\nReturn a JSON object with fields best_id and optional confidence."
+                    if use_structured_output
+                    else "\nReturn exactly one line in this shape:\n"
+                    f"{SETWISE_LLM_JSON_START_TAG}{{\"best_id\":1,\"confidence\":0.72}}{SETWISE_LLM_JSON_END_TAG}"
+                )
             ),
         },
     ]
@@ -415,11 +792,10 @@ def rerank_completed_evidence_sets_with_llm(query: str,
         response = llm_infer_fn(
             messages=messages,
             model=model_name,
-            response_format=None,
+            response_format=response_format,
             max_completion_tokens=SETWISE_LLM_LATE_RERANK_MAX_COMPLETION_TOKENS,
             temperature=0,
             top_p=1,
-            stop=[SETWISE_LLM_JSON_END_TAG],
         )
         response_text, metadata = normalize_llm_result(response)
     except Exception as exc:
@@ -438,21 +814,36 @@ def rerank_completed_evidence_sets_with_llm(query: str,
                 "role": "system",
                 "content": (
                     "You repair evidence-set reranker outputs. "
-                    f"Return exactly one JSON object wrapped in {SETWISE_LLM_JSON_START_TAG} and {SETWISE_LLM_JSON_END_TAG}. "
                     "The JSON object may contain keys \"best_id\" and optional \"confidence\" only. "
                     "\"best_id\" must be a single 0-based integer id from the provided candidates."
+                    + (
+                        ""
+                        if use_structured_output
+                        else (
+                            f" Return exactly one JSON object wrapped in {SETWISE_LLM_JSON_START_TAG} and {SETWISE_LLM_JSON_END_TAG}."
+                            " Do not include markdown, code fences, or explanation."
+                        )
+                    )
                 ),
             },
             {
                 "role": "user",
                 "content": (
-                    f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
-                    f"Question: {query}\n"
+                    (
+                        ""
+                        if use_structured_output
+                        else f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
+                    )
+                    + f"Question: {query}\n"
                     f"Valid candidate ids: 0 to {max(len(candidate_sets) - 1, 0)}\n"
                     f"Previous output preview: {truncate_prompt_text(response_text, 240)}\n"
                     f"Issue: {parse_info['parse_error']}\n"
-                    "Return exactly one line in this shape:\n"
-                    f"{SETWISE_LLM_JSON_START_TAG}{{\"best_id\":1,\"confidence\":0.72}}{SETWISE_LLM_JSON_END_TAG}"
+                    + (
+                        "Return a JSON object with fields best_id and optional confidence."
+                        if use_structured_output
+                        else "Return exactly one line in this shape:\n"
+                        f"{SETWISE_LLM_JSON_START_TAG}{{\"best_id\":1,\"confidence\":0.72}}{SETWISE_LLM_JSON_END_TAG}"
+                    )
                 ),
             },
         ]
@@ -460,11 +851,10 @@ def rerank_completed_evidence_sets_with_llm(query: str,
             repair_response = llm_infer_fn(
                 messages=repair_messages,
                 model=model_name,
-                response_format=None,
+                response_format=response_format,
                 max_completion_tokens=SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS,
                 temperature=0,
                 top_p=1,
-                stop=[SETWISE_LLM_JSON_END_TAG],
             )
             repair_response_text, repair_metadata = normalize_llm_result(repair_response)
             repair_parse_info = parse_setwise_late_rerank_response(
@@ -1995,7 +2385,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            late_rerank_enabled: bool = False,
                            late_rerank_candidate_count: int = 4,
                            late_rerank_include_baseline: bool = True,
-                           late_rerank_doc_char_limit: int = 280) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           late_rerank_doc_char_limit: int = 280,
+                           late_rerank_policy: str = "always",
+                           late_rerank_max_state_score_gap: float = 0.0,
+                           late_rerank_judge_bundle: SetwiseLateRerankJudgeBundle | None = None) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
@@ -2012,8 +2405,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
     gate_skip_count = 0
     late_rerank_apply_count = 0
     late_rerank_override_count = 0
+    late_rerank_block_count = 0
     late_rerank_parse_failure_count = 0
     late_rerank_error_count = 0
+    normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
 
@@ -2194,8 +2589,20 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "applied": False,
             "override_applied": False,
             "candidate_count": 0,
+            "override_policy": normalized_late_rerank_policy,
+            "override_max_state_score_gap": float(late_rerank_max_state_score_gap),
         }
         if late_rerank_enabled and selector_name == "bridge_beam":
+            if late_rerank_judge_bundle is not None and late_rerank_judge_bundle.infer_fn is not None:
+                judge_bundle = late_rerank_judge_bundle
+            else:
+                judge_bundle = SetwiseLateRerankJudgeBundle(
+                    infer_fn=hipporag.llm_model.infer,
+                    model_name=hipporag.global_config.llm_name,
+                    backend="inherit",
+                    base_url=hipporag.global_config.llm_base_url,
+                    response_format=None,
+                )
             late_rerank_candidates = build_setwise_late_rerank_candidates(
                 selected_positions=heuristic_selected_positions,
                 selector_trace=selector_trace,
@@ -2208,10 +2615,15 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 query=qs.question,
                 pool_docs=pool_docs,
                 candidate_sets=late_rerank_candidates,
-                llm_infer_fn=hipporag.llm_model.infer,
-                model_name=hipporag.global_config.llm_name,
+                llm_infer_fn=judge_bundle.infer_fn,
+                model_name=judge_bundle.model_name,
+                response_format=judge_bundle.response_format,
                 max_doc_chars=late_rerank_doc_char_limit,
             )
+            late_rerank_trace["judge_backend"] = judge_bundle.backend
+            late_rerank_trace["judge_model"] = judge_bundle.model_name
+            late_rerank_trace["judge_base_url"] = judge_bundle.base_url
+            late_rerank_trace["judge_reasoning_effort"] = judge_bundle.reasoning_effort
             late_rerank_apply_count += int(bool(late_rerank_trace.get("applied", False)))
             if late_rerank_trace.get("llm_error"):
                 late_rerank_error_count += 1
@@ -2219,21 +2631,38 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 late_rerank_parse_failure_count += 1
             if chosen_candidate_id is not None and 0 <= chosen_candidate_id < len(late_rerank_candidates):
                 chosen_candidate = late_rerank_candidates[chosen_candidate_id]
-                final_front_positions = [
+                chosen_front_positions = [
                     int(pos) for pos in chosen_candidate.get("reader_top_positions", [])
                 ]
                 late_rerank_trace["selected_candidate_source"] = str(chosen_candidate.get("source", "unknown"))
-                late_rerank_trace["selected_reader_top_positions"] = list(final_front_positions)
+                late_rerank_trace["selected_reader_top_positions"] = list(chosen_front_positions)
                 late_rerank_trace["selected_reader_top_titles"] = [
-                    pool_titles[pos] for pos in final_front_positions
+                    pool_titles[pos] for pos in chosen_front_positions
                 ]
-                late_rerank_trace["override_applied"] = final_front_positions != materialize_reader_top_positions(
+                heuristic_front_positions = materialize_reader_top_positions(
                     selected_positions=heuristic_selected_positions,
                     pool_limit=pool_limit,
                     qa_top_k=qa_top_k,
                 )
-                if late_rerank_trace["override_applied"]:
-                    late_rerank_override_count += 1
+                override_requested = chosen_front_positions != heuristic_front_positions
+                late_rerank_trace["override_requested"] = bool(override_requested)
+                if not override_requested:
+                    final_front_positions = list(heuristic_front_positions)
+                else:
+                    override_allowed, override_info = should_apply_setwise_late_rerank_override(
+                        heuristic_candidate=late_rerank_candidates[0],
+                        chosen_candidate=chosen_candidate,
+                        policy=normalized_late_rerank_policy,
+                        max_state_score_gap=late_rerank_max_state_score_gap,
+                    )
+                    late_rerank_trace.update(override_info)
+                    late_rerank_trace["override_applied"] = bool(override_allowed)
+                    if override_allowed:
+                        final_front_positions = list(chosen_front_positions)
+                        late_rerank_override_count += 1
+                    else:
+                        final_front_positions = list(heuristic_front_positions)
+                        late_rerank_block_count += 1
 
         selected_position_set = set(final_front_positions)
         reordered_pool_positions = final_front_positions + [
@@ -2323,8 +2752,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "late_rerank_enabled": bool(late_rerank_enabled),
         "late_rerank_apply_count": int(late_rerank_apply_count),
         "late_rerank_override_count": int(late_rerank_override_count),
+        "late_rerank_block_count": int(late_rerank_block_count),
         "late_rerank_parse_failure_count": int(late_rerank_parse_failure_count),
         "late_rerank_error_count": int(late_rerank_error_count),
+        "late_rerank_policy": normalized_late_rerank_policy,
+        "late_rerank_max_state_score_gap": float(late_rerank_max_state_score_gap),
         "beam_width": int(beam_width),
         "beam_expand_per_state": int(beam_expand_per_state),
         "examples_preview": selector_examples,
@@ -2726,6 +3158,24 @@ def main():
                         help="Include the original baseline top-k evidence set in the late LLM rerank shortlist.")
     parser.add_argument("--setwise_late_rerank_doc_char_limit", type=int, default=280,
                         help="Per-document character budget when serializing evidence sets for late LLM reranking.")
+    parser.add_argument("--setwise_late_rerank_policy", choices=["always", "tiebreak"], default="always",
+                        help="Override policy for the late rerank judge. always lets the judge replace heuristic-best whenever it picks a different candidate; tiebreak only allows overrides when the chosen candidate stays within a small heuristic state-score gap.")
+    parser.add_argument("--setwise_late_rerank_max_state_score_gap", type=float, default=0.0,
+                        help="Maximum absolute state-score gap allowed when --setwise_late_rerank_policy=tiebreak. Candidates without state scores are blocked from overriding.")
+    parser.add_argument("--setwise_late_rerank_judge_backend", choices=["inherit", "responses", "chat_completions"], default="inherit",
+                        help="Judge backend used by late evidence-set rerank. inherit uses the main HippoRAG LLM path; responses uses raw-text JSON prompting with local parsing, while chat_completions uses raw JSON prompting and falls back to streaming collection for provider compatibility.")
+    parser.add_argument("--setwise_late_rerank_judge_model", type=str, default="",
+                        help="Optional model name for the separate late-rerank judge. Defaults to the main --llm_name when omitted.")
+    parser.add_argument("--setwise_late_rerank_judge_base_url", type=str, default="",
+                        help="Optional base URL for the separate late-rerank judge. Leave empty to use the provider default endpoint.")
+    parser.add_argument("--setwise_late_rerank_judge_api_key", type=str, default="",
+                        help="Optional API key for the separate late-rerank judge. Prefer env vars for security.")
+    parser.add_argument("--setwise_late_rerank_judge_api_key_env", type=str, default="OPENAI_API_KEY",
+                        help="Environment variable used to resolve the separate late-rerank judge API key when --setwise_late_rerank_judge_api_key is empty.")
+    parser.add_argument("--setwise_late_rerank_judge_reasoning_effort", type=str, default="",
+                        help="Optional reasoning effort passed to compatible judge models, e.g. low/medium/high.")
+    parser.add_argument("--setwise_late_rerank_judge_timeout_s", type=float, default=120.0,
+                        help="Timeout in seconds for the separate late-rerank judge API calls.")
     parser.add_argument("--setwise_state_path_connectivity_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["path_connectivity"],
                         help="Set-level beam score weight for explicit chain/path connectivity under --setwise_score_mode set_closure.")
     parser.add_argument("--setwise_state_reachable_doc_ratio_weight", type=float, default=DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG["reachable_doc_ratio"],
@@ -2800,6 +3250,13 @@ def main():
         if not args.setwise_model_path:
             raise ValueError("--setwise_model_path is required when --setwise_selector learned_greedy")
         learned_model_bundle = load_learned_model_bundle(args.setwise_model_path)
+    late_rerank_judge_bundle = SetwiseLateRerankJudgeBundle(
+        infer_fn=None,
+        model_name=str(args.llm_name),
+        backend="inherit",
+        base_url=str(args.llm_base_url).strip() if args.llm_base_url else None,
+        response_format=None,
+    )
 
     if gold_doc_reader:
         # Exp2: Gold-doc reader — skip retrieval, feed gold docs to reader
@@ -2840,6 +3297,13 @@ def main():
                 gold_answers=gold_answers,
             )
             effective_gold_answers = gold_answers
+
+        if bool(args.setwise_late_rerank_enabled) and setwise_selector == "bridge_beam":
+            late_rerank_judge_bundle = build_setwise_late_rerank_judge_bundle(
+                args=args,
+                fallback_model_name=hipporag.global_config.llm_name,
+                fallback_base_url=hipporag.global_config.llm_base_url,
+            )
 
         # Exp3: Oracle reorder within top-K
         if oracle_reorder_k > 0 and not retrieval_only:
@@ -3052,6 +3516,9 @@ def main():
             late_rerank_candidate_count=int(args.setwise_late_rerank_candidate_count),
             late_rerank_include_baseline=bool(args.setwise_late_rerank_include_baseline),
             late_rerank_doc_char_limit=int(args.setwise_late_rerank_doc_char_limit),
+            late_rerank_policy=str(args.setwise_late_rerank_policy),
+            late_rerank_max_state_score_gap=float(args.setwise_late_rerank_max_state_score_gap),
+            late_rerank_judge_bundle=late_rerank_judge_bundle,
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -3131,6 +3598,12 @@ def main():
             "late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
             "late_rerank_doc_char_limit": int(args.setwise_late_rerank_doc_char_limit),
+            "late_rerank_policy": str(args.setwise_late_rerank_policy),
+            "late_rerank_max_state_score_gap": round(float(args.setwise_late_rerank_max_state_score_gap), 4),
+            "late_rerank_judge_backend": late_rerank_judge_bundle.backend,
+            "late_rerank_judge_model": late_rerank_judge_bundle.model_name,
+            "late_rerank_judge_base_url": late_rerank_judge_bundle.base_url,
+            "late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
             "state_score_weights": {k: round(float(v), 4) for k, v in resolve_set_closure_state_weight_config(state_weight_config).items()},
             "setwise_model_path": args.setwise_model_path or None,
             "selector_EM": round(float(selector_em), 4),
@@ -3331,6 +3804,12 @@ def main():
             "setwise_late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "setwise_late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
             "setwise_late_rerank_doc_char_limit": int(args.setwise_late_rerank_doc_char_limit),
+            "setwise_late_rerank_policy": str(args.setwise_late_rerank_policy),
+            "setwise_late_rerank_max_state_score_gap": float(args.setwise_late_rerank_max_state_score_gap),
+            "setwise_late_rerank_judge_backend": late_rerank_judge_bundle.backend,
+            "setwise_late_rerank_judge_model": late_rerank_judge_bundle.model_name,
+            "setwise_late_rerank_judge_base_url": late_rerank_judge_bundle.base_url,
+            "setwise_late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
             "setwise_model_path": args.setwise_model_path or None,
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,

@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import sys
 
@@ -10,17 +11,22 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from eval_causal_qwen3 import (
     LEARNED_SETWISE_FEATURE_NAMES,
+    OpenAICompatibleLateRerankJudge,
+    SetwiseLateRerankResponseModel,
     build_setwise_late_rerank_candidates,
+    build_setwise_late_rerank_judge_bundle,
     collect_lexical_query_seed_entities,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
     materialize_reader_top_positions,
+    normalize_setwise_late_rerank_policy,
     parse_setwise_late_rerank_response,
     rerank_completed_evidence_sets_with_llm,
     score_evidence_state,
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
     select_learned_greedy_positions,
+    should_apply_setwise_late_rerank_override,
 )
 
 
@@ -51,6 +57,119 @@ class DummyLateRerankModel:
         self.calls.append(kwargs)
         response_text = self.responses[min(len(self.calls) - 1, len(self.responses) - 1)]
         return response_text, {"finish_reason": "stop", "prompt_tokens": 1, "completion_tokens": 1}
+
+
+class DummyParsedResponse:
+    def __init__(self, parsed_payload=None, output_text="", usage=None, status="completed", output=None):
+        self.output_parsed = parsed_payload
+        self.output_text = output_text
+        self.output = output or []
+        self.usage = usage or type("Usage", (), {"input_tokens": 7, "output_tokens": 3})()
+        self.status = status
+
+
+class DummyResponseContentPart:
+    def __init__(self, text=""):
+        self.text = text
+
+
+class DummyResponseOutputItem:
+    def __init__(self, *content_parts):
+        self.content = list(content_parts)
+
+
+class DummyChatParsedMessage:
+    def __init__(self, parsed_payload=None, content=""):
+        self.parsed = parsed_payload
+        self.content = content
+
+
+class DummyChatParsedChoice:
+    def __init__(self, parsed_payload=None, content="", finish_reason="stop"):
+        self.message = DummyChatParsedMessage(parsed_payload=parsed_payload, content=content)
+        self.finish_reason = finish_reason
+
+
+class DummyChatParsedResponse:
+    def __init__(self, parsed_payload=None, content="", finish_reason="stop"):
+        self.choices = [DummyChatParsedChoice(parsed_payload=parsed_payload, content=content, finish_reason=finish_reason)]
+        self.usage = type("Usage", (), {"prompt_tokens": 5, "completion_tokens": 2})()
+
+
+class DummyChatStreamDelta:
+    def __init__(self, content=None, reasoning_content=None):
+        self.content = content
+        self.reasoning_content = reasoning_content
+
+
+class DummyChatStreamChoice:
+    def __init__(self, content=None, reasoning_content=None, finish_reason=None):
+        self.delta = DummyChatStreamDelta(content=content, reasoning_content=reasoning_content)
+        self.finish_reason = finish_reason
+
+
+class DummyChatStreamChunk:
+    def __init__(self, content=None, reasoning_content=None, finish_reason=None, usage=None):
+        self.choices = [DummyChatStreamChoice(content=content, reasoning_content=reasoning_content, finish_reason=finish_reason)]
+        self.usage = usage
+
+
+class DummyResponsesAPI:
+    def __init__(self, parsed_payload=None, output_text="", output=None):
+        self.parsed_payload = parsed_payload
+        self.output_text = output_text
+        self.output = output or []
+        self.parse_calls = []
+        self.create_calls = []
+
+    def parse(self, **kwargs):
+        self.parse_calls.append(kwargs)
+        return DummyParsedResponse(parsed_payload=self.parsed_payload)
+
+    def create(self, **kwargs):
+        self.create_calls.append(kwargs)
+        return DummyParsedResponse(output_text=self.output_text, output=self.output)
+
+
+class DummyBetaChatCompletionsAPI:
+    def __init__(self, parsed_payload):
+        self.parsed_payload = parsed_payload
+        self.calls = []
+
+    def parse(self, **kwargs):
+        self.calls.append(kwargs)
+        return DummyChatParsedResponse(parsed_payload=self.parsed_payload)
+
+
+class DummyBetaChatAPI:
+    def __init__(self, parsed_payload):
+        self.completions = DummyBetaChatCompletionsAPI(parsed_payload=parsed_payload)
+
+
+class DummyChatCompletionsAPI:
+    def __init__(self, stream_chunks=None):
+        self.stream_chunks = list(stream_chunks or [])
+        self.calls = []
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        return iter(self.stream_chunks)
+
+
+class DummyChatAPI:
+    def __init__(self, stream_chunks=None):
+        self.completions = DummyChatCompletionsAPI(stream_chunks=stream_chunks)
+
+
+class DummyOpenAIClient:
+    def __init__(self, parsed_payload=None, response_output_text="", response_output=None, chat_stream_chunks=None):
+        self.responses = DummyResponsesAPI(
+            parsed_payload=parsed_payload,
+            output_text=response_output_text,
+            output=response_output,
+        )
+        self.beta = type("BetaNamespace", (), {"chat": DummyBetaChatAPI(parsed_payload=parsed_payload)})()
+        self.chat = DummyChatAPI(stream_chunks=chat_stream_chunks)
 
 
 def test_materialize_reader_top_positions_preserves_selected_prefix_and_fills_tail():
@@ -134,10 +253,197 @@ def test_rerank_completed_evidence_sets_with_llm_repairs_invalid_first_response(
     assert len(llm_model.calls) == 2
 
 
+def test_openai_compatible_late_rerank_judge_responses_backend_uses_create_and_returns_raw_json():
+    judge = OpenAICompatibleLateRerankJudge(
+        model_name="gpt-5.4",
+        base_url="https://example.com/v1",
+        api_key="sk-test",
+        backend="responses",
+        client=DummyOpenAIClient(
+            parsed_payload=SetwiseLateRerankResponseModel(best_id=2, confidence=0.81),
+            response_output_text='<JSON>{"best_id": 2, "confidence": 0.81}</JSON>',
+        ),
+    )
+
+    response_text, metadata = judge.infer(
+        messages=[{"role": "user", "content": "pick the best set"}],
+        model="gpt-5.4",
+        response_format=SetwiseLateRerankResponseModel,
+        max_completion_tokens=64,
+        temperature=0,
+        top_p=1,
+    )
+
+    parsed = parse_setwise_late_rerank_response(response_text, num_candidates=4)
+    assert parsed["best_id"] == 2
+    assert parsed["confidence"] == 0.81
+    assert metadata["backend"] == "responses"
+    assert metadata["prompt_tokens"] == 7
+    assert metadata["response_text_source"] == "output_text"
+    assert metadata["structured_output_requested"] is True
+    assert len(judge.client.responses.create_calls) == 1
+    assert len(judge.client.responses.parse_calls) == 0
+
+
+def test_openai_compatible_late_rerank_judge_responses_backend_extracts_text_from_output_items():
+    judge = OpenAICompatibleLateRerankJudge(
+        model_name="gpt-5.4",
+        base_url="https://example.com/v1",
+        api_key="sk-test",
+        backend="responses",
+        client=DummyOpenAIClient(
+            response_output=[
+                DummyResponseOutputItem(
+                    DummyResponseContentPart('<JSON>{"best_id": 1}</JSON>'),
+                ),
+            ],
+        ),
+    )
+
+    response_text, metadata = judge.infer(
+        messages=[{"role": "user", "content": "pick the best set"}],
+        model="gpt-5.4",
+        response_format=None,
+        max_completion_tokens=64,
+        temperature=0,
+        top_p=1,
+    )
+
+    parsed = parse_setwise_late_rerank_response(response_text, num_candidates=3)
+    assert parsed["best_id"] == 1
+    assert metadata["response_text_source"] == "output"
+
+
+def test_openai_compatible_late_rerank_judge_chat_backend_returns_structured_json():
+    judge = OpenAICompatibleLateRerankJudge(
+        model_name="gpt-5.4",
+        base_url="https://example.com/v1",
+        api_key="sk-test",
+        backend="chat_completions",
+        client=DummyOpenAIClient(
+            parsed_payload=SetwiseLateRerankResponseModel(best_id=1, confidence=0.64),
+        ),
+    )
+
+    response_text, metadata = judge.infer(
+        messages=[{"role": "user", "content": "pick the best set"}],
+        model="gpt-5.4",
+        response_format=SetwiseLateRerankResponseModel,
+        max_completion_tokens=64,
+        temperature=0,
+        top_p=1,
+    )
+
+    parsed = SetwiseLateRerankResponseModel.model_validate_json(response_text)
+    assert parsed.best_id == 1
+    assert parsed.confidence == 0.64
+    assert metadata["backend"] == "chat_completions"
+    assert metadata["completion_tokens"] == 2
+
+
+def test_openai_compatible_late_rerank_judge_chat_backend_stream_collects_content_only():
+    judge = OpenAICompatibleLateRerankJudge(
+        model_name="gpt-5.4",
+        base_url="https://example.com/v1",
+        api_key="sk-test",
+        backend="chat_completions",
+        client=DummyOpenAIClient(
+            chat_stream_chunks=[
+                DummyChatStreamChunk(reasoning_content="thinking"),
+                DummyChatStreamChunk(content="<JSON>"),
+                DummyChatStreamChunk(content='{"best_id":0,"confidence":0.7}'),
+                DummyChatStreamChunk(content="</JSON>", finish_reason="stop", usage=type("Usage", (), {"prompt_tokens": 8, "completion_tokens": 4})()),
+            ],
+        ),
+    )
+
+    response_text, metadata = judge.infer(
+        messages=[{"role": "user", "content": "pick the best set"}],
+        model="gpt-5.4",
+        response_format=None,
+        max_completion_tokens=64,
+        temperature=0,
+        top_p=1,
+    )
+
+    parsed = parse_setwise_late_rerank_response(response_text, num_candidates=2)
+    assert parsed["best_id"] == 0
+    assert parsed["confidence"] == 0.7
+    assert metadata["streamed"] is True
+    assert metadata["prompt_tokens"] == 8
+    assert metadata["completion_tokens"] == 4
+    assert judge.client.chat.completions.calls[0]["stream"] is True
+    assert judge.client.chat.completions.calls[0]["max_tokens"] == 64
+
+
+def test_build_setwise_late_rerank_judge_bundle_uses_env_key_and_raw_response_for_responses_backend():
+    args = type(
+        "Args",
+        (),
+        {
+            "setwise_late_rerank_judge_backend": "responses",
+            "setwise_late_rerank_judge_model": "gpt-5.4",
+            "setwise_late_rerank_judge_base_url": "https://example.com/v1",
+            "setwise_late_rerank_judge_api_key": "",
+            "setwise_late_rerank_judge_api_key_env": "OPENAI_API_KEY",
+            "setwise_late_rerank_judge_reasoning_effort": "low",
+            "setwise_late_rerank_judge_timeout_s": 30.0,
+        },
+    )()
+
+    old_api_key = os.environ.get("OPENAI_API_KEY")
+    os.environ["OPENAI_API_KEY"] = "sk-from-env"
+    try:
+        bundle = build_setwise_late_rerank_judge_bundle(
+            args=args,
+            fallback_model_name="fallback-model",
+            fallback_base_url="https://fallback.example/v1",
+        )
+    finally:
+        if old_api_key is None:
+            os.environ.pop("OPENAI_API_KEY", None)
+        else:
+            os.environ["OPENAI_API_KEY"] = old_api_key
+
+    assert bundle.backend == "responses"
+    assert bundle.model_name == "gpt-5.4"
+    assert bundle.base_url == "https://example.com/v1"
+    assert bundle.response_format is None
+    assert bundle.reasoning_effort == "low"
+    assert callable(bundle.infer_fn)
+
+
+def test_build_setwise_late_rerank_judge_bundle_keeps_structured_response_for_chat_backend():
+    args = type(
+        "Args",
+        (),
+        {
+            "setwise_late_rerank_judge_backend": "chat_completions",
+            "setwise_late_rerank_judge_model": "gpt-5.4",
+            "setwise_late_rerank_judge_base_url": "https://example.com/v1",
+            "setwise_late_rerank_judge_api_key": "sk-test",
+            "setwise_late_rerank_judge_api_key_env": "OPENAI_API_KEY",
+            "setwise_late_rerank_judge_reasoning_effort": "",
+            "setwise_late_rerank_judge_timeout_s": 30.0,
+        },
+    )()
+
+    bundle = build_setwise_late_rerank_judge_bundle(
+        args=args,
+        fallback_model_name="fallback-model",
+        fallback_base_url="https://fallback.example/v1",
+    )
+
+    assert bundle.backend == "chat_completions"
+    assert bundle.response_format is None
+
+
 def test_build_setwise_late_rerank_candidates_dedups_equivalent_reader_topk():
     candidates = build_setwise_late_rerank_candidates(
         selected_positions=[0, 2],
         selector_trace={
+            "beam_best_state_score": 0.91,
+            "beam_best_cumulative_score": 1.37,
             "beam_finalists": [
                 {"selected_positions": [0, 2]},
                 {"selected_positions": [0, 1]},
@@ -154,7 +460,54 @@ def test_build_setwise_late_rerank_candidates_dedups_equivalent_reader_topk():
         "beam_finalist",
     ]
     assert candidates[0]["reader_top_positions"] == [0, 2, 1]
+    assert candidates[0]["state_score"] == 0.91
+    assert candidates[0]["cumulative_score"] == 1.37
     assert candidates[1]["reader_top_positions"] == [0, 1, 2]
+
+
+def test_normalize_setwise_late_rerank_policy_accepts_known_modes():
+    assert normalize_setwise_late_rerank_policy("always") == "always"
+    assert normalize_setwise_late_rerank_policy("TieBreak") == "tiebreak"
+
+
+def test_should_apply_setwise_late_rerank_override_allows_tight_tiebreak():
+    allow_override, info = should_apply_setwise_late_rerank_override(
+        heuristic_candidate={"state_score": 0.82},
+        chosen_candidate={"state_score": 0.805},
+        policy="tiebreak",
+        max_state_score_gap=0.02,
+    )
+
+    assert allow_override is True
+    assert info["override_policy"] == "tiebreak"
+    assert info["override_block_reason"] is None
+    assert np.isclose(info["override_state_score_gap"], 0.015)
+
+
+def test_should_apply_setwise_late_rerank_override_blocks_wide_gap():
+    allow_override, info = should_apply_setwise_late_rerank_override(
+        heuristic_candidate={"state_score": 0.82},
+        chosen_candidate={"state_score": 0.73},
+        policy="tiebreak",
+        max_state_score_gap=0.02,
+    )
+
+    assert allow_override is False
+    assert info["override_block_reason"] == "state_score_gap_exceeded"
+    assert np.isclose(info["override_state_score_gap"], 0.09)
+
+
+def test_should_apply_setwise_late_rerank_override_blocks_missing_state_score():
+    allow_override, info = should_apply_setwise_late_rerank_override(
+        heuristic_candidate={"state_score": 0.82},
+        chosen_candidate={},
+        policy="tiebreak",
+        max_state_score_gap=0.02,
+    )
+
+    assert allow_override is False
+    assert info["override_block_reason"] == "missing_state_score"
+    assert info["selected_candidate_state_score"] is None
 
 
 def test_select_bridge_greedy_positions_prefers_bridge_docs_over_high_rank_distractor():
