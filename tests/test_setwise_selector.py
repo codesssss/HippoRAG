@@ -18,6 +18,7 @@ from eval_causal_qwen3 import (
     collect_lexical_query_seed_entities,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
+    compute_state_path_connectivity_metrics,
     materialize_reader_top_positions,
     normalize_setwise_late_rerank_policy,
     parse_setwise_late_rerank_response,
@@ -1044,6 +1045,41 @@ def test_score_evidence_state_respects_custom_state_weights():
     assert score["state_weight_config"]["suffix_base_mean"] == 0.5
 
 
+def test_compute_state_path_connectivity_metrics_is_order_invariant_for_small_focus_sets():
+    common_kwargs = dict(
+        selected_doc_entities={
+            0: {"person a", "bridge x"},
+            1: {"target"},
+            2: {"bridge x", "target"},
+        },
+        initial_reachable_entities={"person a"},
+        query_entities={"target"},
+        adjacency={
+            "person a": [("bridge x", 1.0, "related_to")],
+            "bridge x": [("target", 1.0, "related_to")],
+        },
+        structure_max_hops=2,
+    )
+
+    forward = compute_state_path_connectivity_metrics(
+        focus_positions=[0, 2, 1],
+        **common_kwargs,
+    )
+    reverse = compute_state_path_connectivity_metrics(
+        focus_positions=[1, 2, 0],
+        **common_kwargs,
+    )
+
+    assert forward["path_search_mode"] == "exact"
+    assert reverse["path_search_mode"] == "exact"
+    assert forward["path_connectivity"] == 1.0
+    assert reverse["path_connectivity"] == 1.0
+    assert forward["reachable_doc_ratio"] == 1.0
+    assert reverse["reachable_doc_ratio"] == 1.0
+    assert forward["query_reachability"] == 1.0
+    assert reverse["query_reachability"] == 1.0
+
+
 def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
     common_kwargs = dict(
         pool_doc_ids=[0, 1, 2, 3, 4],
@@ -1099,6 +1135,56 @@ def test_select_bridge_beam_positions_set_closure_reranks_by_state_score():
     assert set_trace["beam_best_state_score"] > closure_trace["beam_best_state_score"]
     assert set_trace["beam_finalists"][0]["selected_positions"] == [0, 1, 4]
     assert any(finalist["selected_positions"] == [0, 3, 4] for finalist in set_trace["beam_finalists"])
+
+
+def test_select_bridge_beam_positions_projected_shortlist_can_rescue_low_rank_bridge():
+    common_kwargs = dict(
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_scores=np.array([1.0, 0.95, 0.94, 0.30], dtype=float),
+        pool_doc_titles=["Anchor", "Helper H1", "Helper H2", "Bridge B"],
+        doc_idx_to_entities={
+            0: {"person a"},
+            1: {"person a", "helper h1"},
+            2: {"person a", "helper h2"},
+            3: {"person a", "person b"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("person a", "helper h1", 1.0, "related_to")],
+            2: [("person a", "helper h2", 1.0, "related_to")],
+            3: [("person a", "person b", 1.0, "related_to")],
+        },
+        adjacency={
+            "person a": [("helper h1", 1.0, "related_to"), ("helper h2", 1.0, "related_to")],
+            "person b": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=2,
+        initial_seed_entities={"person a"},
+        query_entities={"person b"},
+        anchor_count=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        score_mode="set_closure",
+        beam_width=1,
+        beam_expand_per_state=1,
+    )
+
+    legacy_positions, legacy_trace = select_bridge_beam_positions(
+        **common_kwargs,
+        beam_projected_shortlist_factor=1,
+    )
+    projected_positions, projected_trace = select_bridge_beam_positions(
+        **common_kwargs,
+        beam_projected_shortlist_factor=3,
+    )
+
+    assert legacy_positions == [0, 1]
+    assert projected_positions == [0, 3]
+    assert legacy_trace["beam_projected_shortlist_factor"] == 1
+    assert projected_trace["beam_projected_shortlist_factor"] == 3
+    assert projected_trace["beam_best_state_query_reachability"] > legacy_trace["beam_best_state_query_reachability"]
 
 
 def test_select_bridge_beam_positions_set_closure_stops_before_zero_signal_filler():

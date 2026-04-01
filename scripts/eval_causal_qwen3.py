@@ -55,6 +55,8 @@ DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG = {
     "frontier_ratio": 0.05,
     "redundancy_penalty": 0.10,
 }
+DEFAULT_SET_CLOSURE_EXACT_PATH_MAX_DOCS = 4
+DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR = 1
 
 SETWISE_LLM_JSON_START_TAG = "<JSON>"
 SETWISE_LLM_JSON_END_TAG = "</JSON>"
@@ -956,24 +958,30 @@ def score_doc_path_attachment(doc_entities: Set[str],
     return float(max(overlap_support, frontier_support))
 
 
-def compute_state_path_connectivity_metrics(selected_doc_entities: Dict[int, Set[str]],
-                                            focus_positions: Sequence[int],
-                                            initial_reachable_entities: Sequence[str] | Set[str] | None,
-                                            query_entities: Sequence[str] | Set[str] | None,
-                                            adjacency: Dict[str, List[Tuple[str, float, str]]],
-                                            structure_max_hops: int) -> Dict[str, float]:
-    ordered_focus_positions = [int(pos) for pos in focus_positions]
-    total_focus = len(ordered_focus_positions)
-    if total_focus <= 0:
-        return {
-            "path_connectivity": 0.0,
-            "reachable_doc_ratio": 0.0,
-            "query_reachability": 0.0,
-            "connected_doc_count": 0.0,
-        }
+def finalize_state_path_connectivity_metrics(attachment_scores: Sequence[float],
+                                             reachable_entities: Set[str],
+                                             normalized_query: Set[str],
+                                             total_focus: int,
+                                             connected_doc_count: int,
+                                             mode: str) -> Dict[str, float]:
+    query_denominator = max(1, len(normalized_query))
+    query_reachability = len(reachable_entities & normalized_query) / float(query_denominator)
+    return {
+        "path_connectivity": float(sum(attachment_scores) / float(total_focus)),
+        "reachable_doc_ratio": float(connected_doc_count / float(total_focus)),
+        "query_reachability": float(query_reachability),
+        "connected_doc_count": float(connected_doc_count),
+        "path_search_mode": str(mode),
+    }
 
-    normalized_query = normalize_entity_set(query_entities)
-    reachable_entities = normalize_entity_set(initial_reachable_entities)
+
+def compute_greedy_state_path_connectivity_metrics(selected_doc_entities: Dict[int, Set[str]],
+                                                   ordered_focus_positions: Sequence[int],
+                                                   initial_reachable_entities: Set[str],
+                                                   normalized_query: Set[str],
+                                                   adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                                   structure_max_hops: int) -> Dict[str, float]:
+    reachable_entities = set(initial_reachable_entities)
     remaining_positions = list(ordered_focus_positions)
     connected_doc_count = 0
     attachment_scores: List[float] = []
@@ -1024,14 +1032,139 @@ def compute_state_path_connectivity_metrics(selected_doc_entities: Dict[int, Set
         connected_doc_count += 1
         attachment_scores.append(float(best_score))
 
-    query_denominator = max(1, len(normalized_query))
-    query_reachability = len(reachable_entities & normalized_query) / float(query_denominator)
-    return {
-        "path_connectivity": float(sum(attachment_scores) / float(total_focus)),
-        "reachable_doc_ratio": float(connected_doc_count / float(total_focus)),
-        "query_reachability": float(query_reachability),
-        "connected_doc_count": float(connected_doc_count),
-    }
+    return finalize_state_path_connectivity_metrics(
+        attachment_scores=attachment_scores,
+        reachable_entities=reachable_entities,
+        normalized_query=normalized_query,
+        total_focus=len(ordered_focus_positions),
+        connected_doc_count=connected_doc_count,
+        mode="greedy",
+    )
+
+
+def compute_exact_state_path_connectivity_metrics(selected_doc_entities: Dict[int, Set[str]],
+                                                  ordered_focus_positions: Sequence[int],
+                                                  initial_reachable_entities: Set[str],
+                                                  normalized_query: Set[str],
+                                                  adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                                  structure_max_hops: int) -> Dict[str, float]:
+    total_focus = len(ordered_focus_positions)
+    best_metrics = finalize_state_path_connectivity_metrics(
+        attachment_scores=[],
+        reachable_entities=set(initial_reachable_entities),
+        normalized_query=normalized_query,
+        total_focus=total_focus,
+        connected_doc_count=0,
+        mode="exact",
+    )
+
+    def metric_key(metrics: Dict[str, float]) -> Tuple[float, float, float, float]:
+        return (
+            float(metrics["query_reachability"]),
+            float(metrics["reachable_doc_ratio"]),
+            float(metrics["path_connectivity"]),
+            float(metrics["connected_doc_count"]),
+        )
+
+    def dfs(remaining_positions: Tuple[int, ...],
+            reachable_entities: Set[str],
+            attachment_scores: List[float],
+            connected_doc_count: int) -> None:
+        nonlocal best_metrics
+
+        current_metrics = finalize_state_path_connectivity_metrics(
+            attachment_scores=attachment_scores,
+            reachable_entities=reachable_entities,
+            normalized_query=normalized_query,
+            total_focus=total_focus,
+            connected_doc_count=connected_doc_count,
+            mode="exact",
+        )
+        if metric_key(current_metrics) > metric_key(best_metrics):
+            best_metrics = current_metrics
+
+        if not remaining_positions:
+            return
+
+        frontier_scores = (
+            expand_directed_entities(reachable_entities, adjacency, max_hops=structure_max_hops)
+            if reachable_entities
+            else {}
+        )
+        candidate_steps: List[Tuple[int, float, int, int]] = []
+        for pos in remaining_positions:
+            doc_entities = selected_doc_entities.get(pos, set())
+            attachment_score = score_doc_path_attachment(
+                doc_entities=doc_entities,
+                reachable_entities=reachable_entities,
+                frontier_scores=frontier_scores,
+            )
+            if attachment_score <= 0.0:
+                continue
+            candidate_steps.append((
+                int(pos),
+                float(attachment_score),
+                len((doc_entities - reachable_entities) & normalized_query),
+                len(doc_entities - reachable_entities),
+            ))
+
+        candidate_steps.sort(key=lambda item: (-item[1], -item[2], -item[3], item[0]))
+        for pos, attachment_score, _, _ in candidate_steps:
+            next_remaining = tuple(candidate for candidate in remaining_positions if candidate != pos)
+            next_reachable = set(reachable_entities)
+            next_reachable.update(selected_doc_entities.get(pos, set()))
+            dfs(
+                remaining_positions=next_remaining,
+                reachable_entities=next_reachable,
+                attachment_scores=list(attachment_scores) + [float(attachment_score)],
+                connected_doc_count=connected_doc_count + 1,
+            )
+
+    dfs(
+        remaining_positions=tuple(int(pos) for pos in ordered_focus_positions),
+        reachable_entities=set(initial_reachable_entities),
+        attachment_scores=[],
+        connected_doc_count=0,
+    )
+    return best_metrics
+
+
+def compute_state_path_connectivity_metrics(selected_doc_entities: Dict[int, Set[str]],
+                                            focus_positions: Sequence[int],
+                                            initial_reachable_entities: Sequence[str] | Set[str] | None,
+                                            query_entities: Sequence[str] | Set[str] | None,
+                                            adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                            structure_max_hops: int) -> Dict[str, float]:
+    ordered_focus_positions = [int(pos) for pos in focus_positions]
+    total_focus = len(ordered_focus_positions)
+    if total_focus <= 0:
+        return {
+            "path_connectivity": 0.0,
+            "reachable_doc_ratio": 0.0,
+            "query_reachability": 0.0,
+            "connected_doc_count": 0.0,
+            "path_search_mode": "none",
+        }
+
+    normalized_query = normalize_entity_set(query_entities)
+    reachable_entities = normalize_entity_set(initial_reachable_entities)
+    if total_focus <= DEFAULT_SET_CLOSURE_EXACT_PATH_MAX_DOCS:
+        return compute_exact_state_path_connectivity_metrics(
+            selected_doc_entities=selected_doc_entities,
+            ordered_focus_positions=ordered_focus_positions,
+            initial_reachable_entities=reachable_entities,
+            normalized_query=normalized_query,
+            adjacency=adjacency,
+            structure_max_hops=structure_max_hops,
+        )
+    return compute_greedy_state_path_connectivity_metrics(
+        selected_doc_entities=selected_doc_entities,
+        ordered_focus_positions=ordered_focus_positions,
+        initial_reachable_entities=reachable_entities,
+        normalized_query=normalized_query,
+        adjacency=adjacency,
+        structure_max_hops=structure_max_hops,
+    )
 
 
 def should_keep_set_closure_expansion(candidate: Dict[str, object],
@@ -2067,6 +2200,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  score_mode: str = "bridge",
                                  beam_width: int = 4,
                                  beam_expand_per_state: int = 4,
+                                 beam_projected_shortlist_factor: int = DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR,
                                  non_anchor_title_dedup: bool = False,
                                  state_weight_config: Dict[str, float] | None = None) -> Tuple[List[int], Dict[str, object]]:
     normalized_score_mode = normalize_setwise_score_mode(score_mode)
@@ -2087,6 +2221,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "non_anchor_title_dedup": bool(non_anchor_title_dedup),
             "beam_width": int(max(beam_width, 1)),
             "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
+            "beam_projected_shortlist_factor": int(max(beam_projected_shortlist_factor, 1)),
             "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
             "beam_best_state_score": 0.0,
             "beam_best_state_path_connectivity": 0.0,
@@ -2138,6 +2273,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
 
     beam_width = max(int(beam_width), 1)
     beam_expand_per_state = max(int(beam_expand_per_state), 1)
+    beam_projected_shortlist_factor = max(int(beam_projected_shortlist_factor), 1)
     initial_state_metrics = score_evidence_state(
         pool_doc_ids=pool_doc_ids,
         normalized_base_scores=normalized_base_scores,
@@ -2200,8 +2336,13 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 blocked_titles=set(state["blocked_titles"]),
                 enabled=non_anchor_title_dedup,
             )
-
-            for candidate in scored_candidates[:beam_expand_per_state]:
+            candidate_shortlist = (
+                scored_candidates[:beam_expand_per_state * beam_projected_shortlist_factor]
+                if uses_state_level_ranking
+                else scored_candidates[:beam_expand_per_state]
+            )
+            projected_candidates: List[Dict[str, object]] = []
+            for candidate in candidate_shortlist:
                 chosen_pos = int(candidate["pool_position"])
                 signature = tuple(selected_positions + [chosen_pos])
                 if signature in seen_signatures:
@@ -2238,6 +2379,33 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 ):
                     set_closure_guard_skip_count += 1
                     continue
+                projected_candidates.append({
+                    "candidate": candidate,
+                    "signature": signature,
+                    "next_covered": next_covered,
+                    "next_blocked_titles": next_blocked_titles,
+                    "next_cumulative_score": next_cumulative_score,
+                    "next_state_metrics": next_state_metrics,
+                })
+
+            if uses_state_level_ranking:
+                projected_candidates.sort(
+                    key=lambda item: (
+                        -float(item["next_state_metrics"]["state_score"]),
+                        -float(item["next_cumulative_score"]),
+                        -len(item["next_covered"]),
+                        int(item["candidate"]["pool_position"]),
+                    )
+                )
+
+            for projected in projected_candidates[:beam_expand_per_state]:
+                candidate = projected["candidate"]
+                signature = projected["signature"]
+                next_covered = projected["next_covered"]
+                next_blocked_titles = projected["next_blocked_titles"]
+                next_cumulative_score = float(projected["next_cumulative_score"])
+                next_state_metrics = projected["next_state_metrics"]
+                chosen_pos = int(candidate["pool_position"])
                 seen_signatures.add(signature)
                 expanded_states.append({
                     "selected_positions": list(signature),
@@ -2344,6 +2512,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
         "beam_width": beam_width,
         "beam_expand_per_state": beam_expand_per_state,
+        "beam_projected_shortlist_factor": beam_projected_shortlist_factor,
         "beam_finalist_count": len(beam_states),
         "beam_rank_metric": "state_score" if uses_state_level_ranking else "cumulative_score",
         "beam_best_cumulative_score": round(float(best_state["cumulative_score"]), 4),
@@ -2377,6 +2546,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            learned_model_bundle: Dict[str, object] | None = None,
                            beam_width: int = 4,
                            beam_expand_per_state: int = 4,
+                           beam_projected_shortlist_factor: int = DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR,
                            non_anchor_title_dedup: bool = False,
                            gate_mode: str = "none",
                            gate_min_structure_score: float = 0.15,
@@ -2529,6 +2699,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     score_mode=score_mode,
                     beam_width=beam_width,
                     beam_expand_per_state=beam_expand_per_state,
+                    beam_projected_shortlist_factor=beam_projected_shortlist_factor,
                     non_anchor_title_dedup=non_anchor_title_dedup,
                     state_weight_config=state_weight_config,
                 )
@@ -2547,6 +2718,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "non_anchor_title_dedup": bool(non_anchor_title_dedup),
                     "beam_width": int(beam_width),
                     "beam_expand_per_state": int(beam_expand_per_state),
+                    "beam_projected_shortlist_factor": int(beam_projected_shortlist_factor),
                     "beam_finalist_count": 0,
                     "beam_rank_metric": "state_score" if score_mode == "set_closure" else "cumulative_score",
                     "beam_best_cumulative_score": 0.0,
@@ -2759,6 +2931,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "late_rerank_max_state_score_gap": float(late_rerank_max_state_score_gap),
         "beam_width": int(beam_width),
         "beam_expand_per_state": int(beam_expand_per_state),
+        "beam_projected_shortlist_factor": int(beam_projected_shortlist_factor),
         "examples_preview": selector_examples,
     }
     logger.info(
@@ -3150,6 +3323,8 @@ def main():
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
                         help="Number of candidates expanded per beam state for --setwise_selector bridge_beam.")
+    parser.add_argument("--setwise_beam_projected_shortlist_factor", type=int, default=DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR,
+                        help="When --setwise_score_mode set_closure, evaluate projected set-level state scores for up to beam_expand_per_state * factor doc-level proposals before keeping the final beam expansions. 1 preserves the legacy behavior.")
     parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
                         help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
     parser.add_argument("--setwise_late_rerank_candidate_count", type=int, default=4,
@@ -3507,6 +3682,7 @@ def main():
             learned_model_bundle=learned_model_bundle,
             beam_width=int(args.setwise_beam_width),
             beam_expand_per_state=int(args.setwise_beam_expand_per_state),
+            beam_projected_shortlist_factor=int(args.setwise_beam_projected_shortlist_factor),
             non_anchor_title_dedup=bool(args.setwise_non_anchor_title_dedup),
             gate_mode=str(args.setwise_gate_mode),
             gate_min_structure_score=float(args.setwise_gate_min_structure_score),
@@ -3594,6 +3770,7 @@ def main():
             "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
+            "beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),
             "late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
             "late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
@@ -3800,6 +3977,7 @@ def main():
             "setwise_novelty_weight": float(args.setwise_novelty_weight),
             "setwise_beam_width": int(args.setwise_beam_width),
             "setwise_beam_expand_per_state": int(args.setwise_beam_expand_per_state),
+            "setwise_beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),
             "setwise_late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
             "setwise_late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "setwise_late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
