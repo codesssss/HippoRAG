@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-03-29
+Last updated: 2026-04-02
 
 ## Canonical Outputs
 
@@ -11,6 +11,10 @@ Last updated: 2026-03-29
 - `Cross-dataset summary script`: `scripts/compile_oracle_select_summary.py`
 - `Cross-dataset summary output`: `research_memory/emnlp_expand_then_compose/oracle_select_cross_dataset_summary_20260329_resume.md`
 - `Non-oracle pilot note`: `research_memory/emnlp_expand_then_compose/05_non_oracle_bridge_greedy.md`
+- `Bridge-beam search memo`: `research_memory/emnlp_expand_then_compose/06_bridge_beam_search.md`
+- `PCRS-RAG V1 branch memo`: `research_memory/emnlp_expand_then_compose/07_pcrs_rag_v1.md`
+- `Requirement cache builder`: `scripts/build_requirement_cache.py`
+- `Requirement matcher trainer`: `scripts/train_requirement_setwise.py`
 
 ## Done
 
@@ -34,6 +38,13 @@ Last updated: 2026-03-29
 - Ran `2Wiki` non-oracle pilot on the canonical `legacy_fact_graph` backbone
 - Ran `MuSiQue` non-oracle pilot on the canonical `legacy_fact_graph` backbone
 - Tried one cheap selector tweak (`seed union + title dedup`) and reverted it after it hurt `2Wiki`
+- Implemented a parallel `PCRS-RAG V1` branch with a new selector:
+  - `requirement_beam`
+- Added offline requirement-cache construction:
+  - `scripts/build_requirement_cache.py`
+- Added a lightweight requirement matcher training path:
+  - `scripts/train_requirement_setwise.py`
+- Added selector/test coverage for requirement support and counterfactual leakage scoring
 
 ## Running
 
@@ -41,26 +52,34 @@ Last updated: 2026-03-29
 
 ## Next Wave
 
-1. Redesign the non-oracle selector so it targets hard-case chain completion rather than generic novelty
-2. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs bridge-greedy
-3. Turn support-depth and ceiling curves into paper figures
-4. Optional: run a lighter bridge-style analysis on `MuSiQue` if reviewer risk feels high
+1. Build a first offline cache for `PCRS-RAG V1` and verify cache quality:
+   - non-empty positive requirements
+   - non-empty counterfactual sets
+   - top-20 vs top-50 annotation sanity
+2. Run `requirement_beam` in `oracle` mode before any matcher training
+3. Promote to the learned matcher only if the oracle selector shows useful signal
+4. Keep the current simple `pathcore_guard` line as the paper-facing default unless the new branch clearly wins
+5. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs current simple selector
+6. Turn support-depth and ceiling curves into paper figures
 
 ## Method Priority
 
 Method implementation order should be:
 
-1. Cheapest heuristic first:
-   - widen candidate pool
-   - setwise select top-5
-   - no reader prompt changes
-2. Only then consider learned setwise scoring
-3. Only after that consider more complex planning or slot-filling variants
+1. Paper mainline:
+   - keep `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup` frozen as the current simple story
+2. Parallel branch:
+   - validate `requirement_beam` in oracle mode
+   - only then train the lightweight matcher
+3. Only after those gates clear should the new branch be considered for promotion
+4. Do not jump to more complex repair loops, online judges, or planner-style control before the branch clears the oracle gate
 
 ## Blockers
 
 - The current non-oracle heuristic is not robust on the canonical backbone
 - It helps some easy `2-doc` cases but does not yet improve hard `4-doc` composition
+- The new `PCRS-RAG V1` branch has implementation but no benchmark evidence yet
+- The biggest technical risk on the new branch is cache quality, not search code
 
 ## Do Not Drift
 
@@ -68,3 +87,4 @@ Method implementation order should be:
 - Do not re-open reader-side graph context
 - Do not re-open causal-only framing
 - Do not pitch this as a generic reranking paper
+- Do not let the unvalidated `PCRS-RAG V1` branch overwrite the current simple paper line by default

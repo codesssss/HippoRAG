@@ -1,6 +1,6 @@
 # Decision Log
 
-Last updated: 2026-03-28
+Last updated: 2026-04-02
 
 ## 2026-03-26: Freeze the retrieval backbone
 
@@ -52,3 +52,32 @@ Reason:
 Consequence:
 - Prioritize: `MuSiQue` generalization, `2Wiki` bridge analysis, and one simple non-oracle baseline.
 - Do not overbuild a complicated planner unless the simple method fails.
+
+## 2026-04-02: Freeze the current simple line and open a parallel PCRS-RAG V1 branch
+
+Decision:
+- Keep the current paper-facing mainline as the simple selector stack:
+  - `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup`
+- Do not silently replace that line with the new requirement-aware method.
+- Open a separate experimental branch, `feature/pcrs-rag-v1`, around a new selector:
+  - `requirement_beam`
+
+Reason:
+- The current simple line is still the strongest validated practical story.
+- The new branch changes the objective itself, not just a search hyperparameter:
+  - positive requirement support
+  - counterfactual leakage
+  - Pareto beam selection
+- That makes it a real method branch, not a safe micro-tweak to merge into the paper line before evidence exists.
+
+Consequence:
+- Treat `PCRS-RAG V1` as a parallel high-information branch.
+- Require explicit promotion gates before it can replace the current simple line:
+  - cache quality gate
+  - oracle selector gate
+  - learned matcher gate
+- Keep the paper story honest:
+  - the current mainline remains the simple bridge-aware composition story
+  - the new branch is an attempt to fix the `MuSiQue` objective mismatch rather than a confirmed replacement
+- Record implementation and operating details in:
+  - `research_memory/emnlp_expand_then_compose/07_pcrs_rag_v1.md`
