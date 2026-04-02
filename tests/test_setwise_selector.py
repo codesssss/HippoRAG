@@ -1205,6 +1205,13 @@ def test_select_bridge_beam_positions_projected_shortlist_can_rescue_low_rank_br
     assert projected_positions == [0, 3]
     assert legacy_trace["beam_projected_shortlist_factor"] == 1
     assert projected_trace["beam_projected_shortlist_factor"] == 3
+    assert legacy_trace["beam_projection_rescue_count"] == 0
+    assert projected_trace["beam_projection_eval_count"] == 3
+    assert projected_trace["beam_projection_extra_eval_count"] == 2
+    assert projected_trace["beam_projection_rescue_count"] == 1
+    assert projected_trace["beam_projection_changed_state_count"] == 1
+    assert projected_trace["beam_projection_max_selected_rank"] == 3
+    assert projected_trace["selection_steps"][1]["proposal_rank"] > 1
     assert projected_trace["beam_best_state_query_reachability"] > legacy_trace["beam_best_state_query_reachability"]
 
 

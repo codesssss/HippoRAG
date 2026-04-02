@@ -2369,6 +2369,11 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
             "beam_best_state_query_reachability": 0.0,
             "beam_best_state_suffix_base_mean": 0.0,
             "beam_set_closure_guard_skip_count": 0,
+            "beam_projection_eval_count": 0,
+            "beam_projection_extra_eval_count": 0,
+            "beam_projection_rescue_count": 0,
+            "beam_projection_changed_state_count": 0,
+            "beam_projection_max_selected_rank": 0,
             "beam_finalists": [],
             "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
         }
@@ -2459,6 +2464,11 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
     }]
     seen_signatures = {tuple(reserved_positions)}
     set_closure_guard_skip_count = 0
+    beam_projection_eval_count = 0
+    beam_projection_extra_eval_count = 0
+    beam_projection_rescue_count = 0
+    beam_projection_changed_state_count = 0
+    beam_projection_max_selected_rank = 0
 
     while beam_states and len(beam_states[0]["selected_positions"]) < selection_target_k:
         expanded_states: List[Dict[str, object]] = []
@@ -2493,6 +2503,10 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 blocked_titles=set(state["blocked_titles"]),
                 enabled=non_anchor_title_dedup,
             )
+            candidate_ranks = {
+                int(candidate["pool_position"]): idx + 1
+                for idx, candidate in enumerate(scored_candidates)
+            }
             candidate_shortlist = (
                 scored_candidates[:beam_expand_per_state * beam_projected_shortlist_factor]
                 if uses_state_level_ranking
@@ -2539,6 +2553,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                     continue
                 projected_candidates.append({
                     "candidate": candidate,
+                    "proposal_rank": int(candidate_ranks.get(chosen_pos, 0)),
                     "signature": signature,
                     "next_covered": next_covered,
                     "next_blocked_titles": next_blocked_titles,
@@ -2552,12 +2567,30 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                         -float(item["next_state_metrics"]["state_score"]),
                         -float(item["next_cumulative_score"]),
                         -len(item["next_covered"]),
+                        int(item["proposal_rank"]),
                         int(item["candidate"]["pool_position"]),
                     )
                 )
 
-            for projected in projected_candidates[:beam_expand_per_state]:
+            selected_projected_candidates = projected_candidates[:beam_expand_per_state]
+            if uses_state_level_ranking and beam_projected_shortlist_factor > 1:
+                beam_projection_eval_count += len(projected_candidates)
+                beam_projection_extra_eval_count += max(0, len(projected_candidates) - beam_expand_per_state)
+                rescued_selected_candidates = [
+                    projected for projected in selected_projected_candidates
+                    if int(projected["proposal_rank"]) > beam_expand_per_state
+                ]
+                if rescued_selected_candidates:
+                    beam_projection_changed_state_count += 1
+                beam_projection_rescue_count += len(rescued_selected_candidates)
+                beam_projection_max_selected_rank = max(
+                    beam_projection_max_selected_rank,
+                    max((int(projected["proposal_rank"]) for projected in selected_projected_candidates), default=0),
+                )
+
+            for projected in selected_projected_candidates:
                 candidate = projected["candidate"]
+                proposal_rank = int(projected["proposal_rank"])
                 signature = projected["signature"]
                 next_covered = projected["next_covered"]
                 next_blocked_titles = projected["next_blocked_titles"]
@@ -2580,6 +2613,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                         "closure_score": float(candidate["closure_score"]),
                         "selection_score": float(candidate["selection_score"]),
                         "combined_score": float(candidate["combined_score"]),
+                        "proposal_rank": proposal_rank,
                         "state_score": float(next_state_metrics["state_score"]),
                     }],
                     "cumulative_score": next_cumulative_score,
@@ -2682,6 +2716,11 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_best_state_suffix_base_mean": round(float(best_state["state_metrics"]["suffix_base_mean"]), 4),
         "beam_best_state_query_coverage": round(float(best_state["state_metrics"]["query_coverage"]), 4),
         "beam_set_closure_guard_skip_count": int(set_closure_guard_skip_count),
+        "beam_projection_eval_count": int(beam_projection_eval_count),
+        "beam_projection_extra_eval_count": int(beam_projection_extra_eval_count),
+        "beam_projection_rescue_count": int(beam_projection_rescue_count),
+        "beam_projection_changed_state_count": int(beam_projection_changed_state_count),
+        "beam_projection_max_selected_rank": int(beam_projection_max_selected_rank),
         "beam_finalists": beam_finalists,
         "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
     }
@@ -2737,6 +2776,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
     late_rerank_block_count = 0
     late_rerank_parse_failure_count = 0
     late_rerank_error_count = 0
+    beam_projection_eval_count = 0
+    beam_projection_extra_eval_count = 0
+    beam_projection_rescue_count = 0
+    beam_projection_changed_query_count = 0
+    beam_projection_max_selected_rank = 0
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
@@ -2911,6 +2955,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "beam_best_state_support_mean": 0.0,
                     "beam_best_state_suffix_base_mean": 0.0,
                     "beam_best_state_query_coverage": 0.0,
+                    "beam_projection_eval_count": 0,
+                    "beam_projection_extra_eval_count": 0,
+                    "beam_projection_rescue_count": 0,
+                    "beam_projection_changed_state_count": 0,
+                    "beam_projection_max_selected_rank": 0,
                     "beam_finalists": [],
                     "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
                 }
@@ -3074,6 +3123,15 @@ def apply_setwise_selector(hipporag: HippoRAG,
             qa_trace=qs.qa_trace,
         )
         selected_solutions.append(selected_qs)
+        beam_projection_eval_count += int(selector_trace.get("beam_projection_eval_count", 0) or 0)
+        beam_projection_extra_eval_count += int(selector_trace.get("beam_projection_extra_eval_count", 0) or 0)
+        beam_projection_rescue_count += int(selector_trace.get("beam_projection_rescue_count", 0) or 0)
+        if int(selector_trace.get("beam_projection_rescue_count", 0) or 0) > 0:
+            beam_projection_changed_query_count += 1
+        beam_projection_max_selected_rank = max(
+            beam_projection_max_selected_rank,
+            int(selector_trace.get("beam_projection_max_selected_rank", 0) or 0),
+        )
 
         mapped_pool_doc_counts.append(sum(doc_id is not None for doc_id in pool_doc_ids))
         seed_entity_counts.append(len(seed_entities))
@@ -3125,6 +3183,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "beam_width": int(beam_width),
         "beam_expand_per_state": int(beam_expand_per_state),
         "beam_projected_shortlist_factor": int(beam_projected_shortlist_factor),
+        "beam_projection_eval_count": int(beam_projection_eval_count),
+        "beam_projection_extra_eval_count": int(beam_projection_extra_eval_count),
+        "beam_projection_rescue_count": int(beam_projection_rescue_count),
+        "beam_projection_changed_query_count": int(beam_projection_changed_query_count),
+        "beam_projection_max_selected_rank": int(beam_projection_max_selected_rank),
         "examples_preview": selector_examples,
     }
     logger.info(
