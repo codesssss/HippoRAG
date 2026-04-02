@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import json
 import logging
 import os
+import sys
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Set, Tuple
@@ -13,6 +14,26 @@ import numpy as np
 import pydantic
 from openai import OpenAI
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = SCRIPT_DIR.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from requirement_beam_utils import (
+    DEFAULT_REQUIREMENT_ANNOTATION_POOL_K,
+    DEFAULT_REQUIREMENT_CF_TAU,
+    DEFAULT_REQUIREMENT_SMOOTH_TAU,
+    compute_requirement_candidate_feature_rows,
+    compute_requirement_state_metrics,
+    is_pareto_dominated,
+    load_requirement_cache,
+    load_requirement_model_bundle,
+    requirement_feature_rows_to_matrix,
+    resolve_requirement_cache_entry,
+    validate_requirement_cache_entry,
+)
 from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
 from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
@@ -57,6 +78,7 @@ DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG = {
 }
 DEFAULT_SET_CLOSURE_EXACT_PATH_MAX_DOCS = 4
 DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR = 1
+DEFAULT_REQUIREMENT_BEAM_PROJECTED_SHORTLIST_FACTOR = 1
 
 SETWISE_LLM_JSON_START_TAG = "<JSON>"
 SETWISE_LLM_JSON_END_TAG = "</JSON>"
@@ -1540,6 +1562,353 @@ def load_learned_model_bundle(model_path: str) -> Dict[str, object]:
     return bundle
 
 
+def prune_requirement_pareto_frontier(states: Sequence[Dict[str, object]]) -> Tuple[List[Dict[str, object]], int]:
+    survivors: List[Dict[str, object]] = []
+    pruned_count = 0
+    for state in states:
+        state_metrics = state.get("state_metrics", {}) or {}
+        dominated = False
+        retained: List[Dict[str, object]] = []
+        for survivor in survivors:
+            survivor_metrics = survivor.get("state_metrics", {}) or {}
+            if is_pareto_dominated(state_metrics, survivor_metrics):
+                dominated = True
+                pruned_count += 1
+                retained.append(survivor)
+                continue
+            if is_pareto_dominated(survivor_metrics, state_metrics):
+                pruned_count += 1
+                continue
+            retained.append(survivor)
+        if dominated:
+            survivors = retained
+            continue
+        retained.append(state)
+        survivors = retained
+    return survivors, int(pruned_count)
+
+
+def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
+                                      pool_doc_scores: np.ndarray,
+                                      pool_doc_titles: Sequence[str] | None,
+                                      doc_idx_to_entities: Dict[int, Set[str]],
+                                      doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                      adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                      qa_top_k: int,
+                                      cache_entry: Dict[str, object],
+                                      initial_seed_entities: Sequence[str] | Set[str] | None = None,
+                                      proposal_query_entities: Sequence[str] | Set[str] | None = None,
+                                      anchor_count: int = 2,
+                                      reserve_top_m: int = 0,
+                                      max_bridge_slots: int = 0,
+                                      structure_max_hops: int = 2,
+                                      base_weight: float = 0.25,
+                                      structure_weight: float = 0.60,
+                                      novelty_weight: float = 0.15,
+                                      beam_width: int = 4,
+                                      beam_expand_per_state: int = 4,
+                                      beam_projected_shortlist_factor: int = DEFAULT_REQUIREMENT_BEAM_PROJECTED_SHORTLIST_FACTOR,
+                                      non_anchor_title_dedup: bool = False,
+                                      requirement_mode: str = "oracle",
+                                      requirement_model_bundle: Dict[str, object] | None = None,
+                                      requirement_smooth_tau: float = DEFAULT_REQUIREMENT_SMOOTH_TAU,
+                                      requirement_counterfactual_tau: float = DEFAULT_REQUIREMENT_CF_TAU) -> Tuple[List[int], Dict[str, object]]:
+    effective_candidate_count = min(
+        len(pool_doc_ids),
+        int(cache_entry.get("annotation_pool_k", 0) or 0),
+    )
+    normalized_mode = str(requirement_mode or "oracle").strip().lower()
+    if normalized_mode not in {"oracle", "learned"}:
+        raise ValueError(f"Unsupported requirement beam mode: {requirement_mode}")
+    if normalized_mode == "learned" and requirement_model_bundle is None:
+        raise ValueError("learned requirement_beam requires a loaded matcher bundle")
+
+    if effective_candidate_count <= 0 or qa_top_k <= 0:
+        return [], {
+            "selection_steps": [],
+            "anchor_positions": [],
+            "reserved_positions": [],
+            "candidate_count": int(effective_candidate_count),
+            "selection_target_k": 0,
+            "requirement_mode": normalized_mode,
+            "annotation_pool_k": int(cache_entry.get("annotation_pool_k", 0) or 0),
+            "beam_width": int(max(beam_width, 1)),
+            "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
+            "beam_projected_shortlist_factor": int(max(beam_projected_shortlist_factor, 1)),
+            "beam_avg_frontier_size": 0.0,
+            "beam_pareto_pruned_count": 0,
+            "beam_learned_eval_count": 0,
+            "beam_best_support_completeness": 0.0,
+            "beam_best_counterfactual_leakage": 0.0,
+            "beam_best_utility_margin": 0.0,
+            "beam_best_utopia_distance": 0.0,
+            "beam_finalists": [],
+        }
+
+    normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores[:effective_candidate_count], dtype=float))
+    target_k = min(effective_candidate_count, qa_top_k)
+    proposal_query_entities = normalize_entity_set(proposal_query_entities) or normalize_entity_set(initial_seed_entities)
+    seed_entities = normalize_entity_set(initial_seed_entities)
+    anchor_positions, reserved_positions = resolve_reserved_positions(
+        candidate_count=effective_candidate_count,
+        target_k=target_k,
+        anchor_count=anchor_count,
+        reserve_top_m=reserve_top_m,
+    )
+    selection_target_k = resolve_selection_target_k(
+        target_k=target_k,
+        reserved_count=len(reserved_positions),
+        max_bridge_slots=max_bridge_slots,
+    )
+    anchor_position_set = set(anchor_positions)
+
+    initial_covered = set(seed_entities)
+    blocked_titles: Set[str] = set()
+    initial_steps: List[Dict[str, object]] = []
+    for reserved_pos in reserved_positions:
+        doc_id = pool_doc_ids[reserved_pos]
+        if doc_id is not None:
+            initial_covered.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+        if pool_doc_titles is not None and reserved_pos < len(pool_doc_titles):
+            reserved_title = str(pool_doc_titles[reserved_pos]).strip()
+            if reserved_title:
+                blocked_titles.add(reserved_title)
+        initial_steps.append({
+            "step": len(initial_steps) + 1,
+            "mode": "anchor" if reserved_pos in anchor_position_set else "reserve",
+            "pool_position": int(reserved_pos),
+            "doc_id": int(doc_id) if doc_id is not None else None,
+            "title": str(pool_doc_titles[reserved_pos]).strip() if pool_doc_titles is not None and reserved_pos < len(pool_doc_titles) else "",
+        })
+
+    beam_width = max(int(beam_width), 1)
+    beam_expand_per_state = max(int(beam_expand_per_state), 1)
+    beam_projected_shortlist_factor = max(int(beam_projected_shortlist_factor), 1)
+    initial_state_metrics = compute_requirement_state_metrics(
+        cache_entry=cache_entry,
+        selected_positions=reserved_positions,
+        smooth_tau=requirement_smooth_tau,
+        counterfactual_tau=requirement_counterfactual_tau,
+    )
+    beam_states: List[Dict[str, object]] = [{
+        "selected_positions": list(reserved_positions),
+        "covered_entities": initial_covered,
+        "blocked_titles": set(blocked_titles),
+        "selection_steps": initial_steps,
+        "cumulative_score": 0.0,
+        "state_metrics": initial_state_metrics,
+        "proposal_bonus": 0.0,
+    }]
+    seen_signatures = {tuple(reserved_positions)}
+    frontier_sizes: List[int] = []
+    pareto_pruned_count = 0
+    learned_eval_count = 0
+
+    while beam_states and len(beam_states[0]["selected_positions"]) < selection_target_k:
+        expanded_states: List[Dict[str, object]] = []
+        for state in beam_states:
+            selected_positions = list(state["selected_positions"])
+            remaining_positions = [
+                pos for pos in range(effective_candidate_count)
+                if pos not in set(selected_positions)
+            ]
+            if not remaining_positions:
+                expanded_states.append(state)
+                continue
+
+            scored_candidates = score_bridge_candidates(
+                pool_doc_ids=pool_doc_ids[:effective_candidate_count],
+                normalized_base_scores=normalized_base_scores,
+                pool_doc_titles=pool_doc_titles[:effective_candidate_count] if pool_doc_titles is not None else None,
+                doc_idx_to_entities=doc_idx_to_entities,
+                doc_idx_to_edges=doc_idx_to_edges,
+                adjacency=adjacency,
+                remaining_positions=remaining_positions,
+                covered_entities=state["covered_entities"],
+                query_entities=proposal_query_entities or seed_entities,
+                structure_max_hops=structure_max_hops,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                score_mode="bridge",
+            )
+            scored_candidates = filter_title_dedup_candidates(
+                scored_candidates=scored_candidates,
+                blocked_titles=set(state["blocked_titles"]),
+                enabled=non_anchor_title_dedup,
+            )
+            candidate_shortlist = scored_candidates[:beam_expand_per_state * beam_projected_shortlist_factor]
+            candidate_positions = [int(candidate["pool_position"]) for candidate in candidate_shortlist]
+            candidate_feature_rows = compute_requirement_candidate_feature_rows(
+                cache_entry=cache_entry,
+                selected_positions=selected_positions,
+                candidate_positions=candidate_positions,
+                normalized_base_scores=normalized_base_scores,
+                qa_top_k=qa_top_k,
+                smooth_tau=requirement_smooth_tau,
+                counterfactual_tau=requirement_counterfactual_tau,
+            )
+            candidate_rows_by_position = {
+                int(row["pool_position"]): row
+                for row in candidate_feature_rows
+            }
+            predicted_scores_by_position: Dict[int, float] = {}
+            if normalized_mode == "learned" and candidate_feature_rows:
+                feature_matrix = requirement_feature_rows_to_matrix(candidate_feature_rows)
+                predicted_scores = predict_binary_scores(requirement_model_bundle, feature_matrix)
+                learned_eval_count += len(candidate_feature_rows)
+                for row, predicted_score in zip(candidate_feature_rows, predicted_scores):
+                    predicted_scores_by_position[int(row["pool_position"])] = float(predicted_score)
+
+            for proposal_rank, candidate in enumerate(candidate_shortlist, start=1):
+                chosen_pos = int(candidate["pool_position"])
+                signature = tuple(selected_positions + [chosen_pos])
+                if signature in seen_signatures:
+                    continue
+
+                next_covered = set(state["covered_entities"])
+                next_covered.update(set(candidate["doc_entities"]))
+                next_blocked_titles = set(state["blocked_titles"])
+                chosen_title = str(candidate.get("doc_title", "")).strip()
+                if chosen_title:
+                    next_blocked_titles.add(chosen_title)
+                next_state_metrics = compute_requirement_state_metrics(
+                    cache_entry=cache_entry,
+                    selected_positions=signature,
+                    smooth_tau=requirement_smooth_tau,
+                    counterfactual_tau=requirement_counterfactual_tau,
+                )
+                candidate_row = candidate_rows_by_position.get(chosen_pos, {})
+                predicted_score = float(predicted_scores_by_position.get(chosen_pos, 0.0))
+                expanded_states.append({
+                    "selected_positions": list(signature),
+                    "covered_entities": next_covered,
+                    "blocked_titles": next_blocked_titles,
+                    "selection_steps": list(state["selection_steps"]) + [{
+                        "step": len(state["selection_steps"]) + 1,
+                        "mode": "requirement_beam",
+                        "pool_position": int(chosen_pos),
+                        "doc_id": int(candidate["doc_id"]) if candidate["doc_id"] is not None else None,
+                        "title": str(candidate.get("doc_title", "")).strip(),
+                        "proposal_rank": int(proposal_rank),
+                        "combined_score": float(candidate.get("combined_score", 0.0)),
+                        "support_completeness": float(next_state_metrics["support_completeness"]),
+                        "counterfactual_leakage": float(next_state_metrics["counterfactual_leakage"]),
+                        "utility_margin": float(next_state_metrics["utility_margin"]),
+                        "utopia_distance": float(next_state_metrics["utopia_distance"]),
+                        "predicted_utility": float(predicted_score),
+                    }],
+                    "cumulative_score": float(state["cumulative_score"]) + float(candidate.get("combined_score_raw", 0.0)),
+                    "state_metrics": next_state_metrics,
+                    "proposal_bonus": float(state["proposal_bonus"]) + float(predicted_score),
+                    "proposal_rank": int(proposal_rank),
+                    "candidate_features": candidate_row,
+                })
+
+        if not expanded_states:
+            break
+
+        expanded_states.sort(
+            key=lambda state: (
+                -float(state["state_metrics"]["support_completeness"]),
+                float(state["state_metrics"]["counterfactual_leakage"]),
+                float(state["state_metrics"]["utopia_distance"]),
+                -float(state["proposal_bonus"]),
+                -float(state["cumulative_score"]),
+                tuple(int(pos) for pos in state["selected_positions"]),
+            )
+        )
+        expanded_states, step_pruned_count = prune_requirement_pareto_frontier(expanded_states)
+        pareto_pruned_count += int(step_pruned_count)
+        expanded_states.sort(
+            key=lambda state: (
+                float(state["state_metrics"]["utopia_distance"]),
+                -float(state["state_metrics"]["support_completeness"]),
+                float(state["state_metrics"]["counterfactual_leakage"]),
+                -float(state["proposal_bonus"]) if normalized_mode == "learned" else 0.0,
+                -float(state["cumulative_score"]),
+                tuple(int(pos) for pos in state["selected_positions"]),
+            )
+        )
+        beam_states = expanded_states[:beam_width]
+        frontier_sizes.append(len(expanded_states))
+        for state in beam_states:
+            seen_signatures.add(tuple(int(pos) for pos in state["selected_positions"]))
+
+    best_state = min(
+        beam_states,
+        key=lambda state: (
+            float(state["state_metrics"]["utopia_distance"]),
+            -float(state["state_metrics"]["support_completeness"]),
+            float(state["state_metrics"]["counterfactual_leakage"]),
+            -float(state["proposal_bonus"]) if normalized_mode == "learned" else 0.0,
+            -float(state["cumulative_score"]),
+            tuple(int(pos) for pos in state["selected_positions"]),
+        ),
+    ) if beam_states else {
+        "selected_positions": list(reserved_positions),
+        "covered_entities": initial_covered,
+        "blocked_titles": set(blocked_titles),
+        "selection_steps": initial_steps,
+        "cumulative_score": 0.0,
+        "state_metrics": initial_state_metrics,
+        "proposal_bonus": 0.0,
+    }
+    ranked_finalists = sorted(
+        beam_states or [best_state],
+        key=lambda state: (
+            float(state["state_metrics"]["utopia_distance"]),
+            -float(state["state_metrics"]["support_completeness"]),
+            float(state["state_metrics"]["counterfactual_leakage"]),
+            -float(state["proposal_bonus"]) if normalized_mode == "learned" else 0.0,
+            -float(state["cumulative_score"]),
+            tuple(int(pos) for pos in state["selected_positions"]),
+        ),
+    )
+    beam_finalists: List[Dict[str, object]] = []
+    for finalist in ranked_finalists:
+        finalist_positions = [int(pos) for pos in finalist["selected_positions"]]
+        finalist_metrics = finalist["state_metrics"]
+        beam_finalists.append({
+            "source": "beam_finalist",
+            "selected_positions": finalist_positions,
+            "selected_titles": [
+                str(pool_doc_titles[pos]).strip()
+                for pos in finalist_positions
+                if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+            ],
+            "support_completeness": round(float(finalist_metrics["support_completeness"]), 4),
+            "counterfactual_leakage": round(float(finalist_metrics["counterfactual_leakage"]), 4),
+            "utility_margin": round(float(finalist_metrics["utility_margin"]), 4),
+            "utopia_distance": round(float(finalist_metrics["utopia_distance"]), 4),
+            "proposal_bonus": round(float(finalist.get("proposal_bonus", 0.0) or 0.0), 4),
+        })
+
+    best_metrics = best_state["state_metrics"]
+    return list(best_state["selected_positions"]), {
+        "selection_steps": list(best_state["selection_steps"]),
+        "anchor_positions": [int(pos) for pos in anchor_positions],
+        "reserved_positions": [int(pos) for pos in reserved_positions],
+        "candidate_count": int(effective_candidate_count),
+        "selection_target_k": int(selection_target_k),
+        "requirement_mode": normalized_mode,
+        "annotation_pool_k": int(cache_entry.get("annotation_pool_k", 0) or 0),
+        "beam_width": int(beam_width),
+        "beam_expand_per_state": int(beam_expand_per_state),
+        "beam_projected_shortlist_factor": int(beam_projected_shortlist_factor),
+        "beam_avg_frontier_size": round(float(np.mean(frontier_sizes)) if frontier_sizes else 0.0, 4),
+        "beam_pareto_pruned_count": int(pareto_pruned_count),
+        "beam_learned_eval_count": int(learned_eval_count),
+        "beam_best_support_completeness": round(float(best_metrics["support_completeness"]), 4),
+        "beam_best_counterfactual_leakage": round(float(best_metrics["counterfactual_leakage"]), 4),
+        "beam_best_utility_margin": round(float(best_metrics["utility_margin"]), 4),
+        "beam_best_utopia_distance": round(float(best_metrics["utopia_distance"]), 4),
+        "requirement_positive_count": int(len(cache_entry.get("positive_requirements", []))),
+        "requirement_counterfactual_count": int(len(cache_entry.get("counterfactual_sets", []))),
+        "beam_finalists": beam_finalists,
+    }
+
+
 def select_learned_greedy_positions(query: str,
                                     pool_docs: Sequence[str],
                                     pool_doc_ids: Sequence[int | None],
@@ -2756,11 +3125,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            late_rerank_doc_char_limit: int = 280,
                            late_rerank_policy: str = "always",
                            late_rerank_max_state_score_gap: float = 0.0,
-                           late_rerank_judge_bundle: SetwiseLateRerankJudgeBundle | None = None) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           late_rerank_judge_bundle: SetwiseLateRerankJudgeBundle | None = None,
+                           requirement_selector_bundle: Dict[str, object] | None = None) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
-    if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy"}:
+    if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy", "requirement_beam"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -2781,11 +3151,15 @@ def apply_setwise_selector(hipporag: HippoRAG,
     beam_projection_rescue_count = 0
     beam_projection_changed_query_count = 0
     beam_projection_max_selected_rank = 0
+    requirement_support_scores: List[float] = []
+    requirement_leakage_scores: List[float] = []
+    requirement_frontier_sizes: List[float] = []
+    requirement_cache_hit_count = 0
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
 
-    for qs in query_solutions:
+    for q_idx, qs in enumerate(query_solutions):
         pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
         pool_docs = list(qs.docs[:pool_limit])
         pool_titles = [extract_doc_title(doc_text) for doc_text in pool_docs]
@@ -2963,7 +3337,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "beam_finalists": [],
                     "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
                 }
-        else:
+        elif selector_name == "learned_greedy":
             if learned_model_bundle is None:
                 raise ValueError("learned_greedy selector requires a loaded model bundle")
             selected_positions, selector_trace = select_learned_greedy_positions(
@@ -2980,6 +3354,52 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 anchor_count=anchor_count,
                 structure_max_hops=structure_max_hops,
             )
+        else:
+            if requirement_selector_bundle is None:
+                raise ValueError("requirement_beam selector requires a loaded requirement selector bundle")
+            requirement_cache = requirement_selector_bundle.get("cache")
+            if requirement_cache is None:
+                raise ValueError("requirement_beam selector bundle is missing cache payload")
+            cache_entry = resolve_requirement_cache_entry(
+                cache_payload=requirement_cache,
+                question=qs.question,
+                query_index=q_idx,
+            )
+            validate_requirement_cache_entry(
+                cache_entry=cache_entry,
+                pool_titles=pool_titles,
+            )
+            requirement_cache_hit_count += 1
+            selected_positions, selector_trace = select_requirement_beam_positions(
+                pool_doc_ids=pool_doc_ids,
+                pool_doc_scores=pool_scores,
+                pool_doc_titles=pool_titles,
+                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                adjacency=hipporag.structure_graph_out,
+                qa_top_k=qa_top_k,
+                cache_entry=cache_entry,
+                initial_seed_entities=seed_entities,
+                proposal_query_entities=proposal_query_entities,
+                anchor_count=anchor_count,
+                reserve_top_m=reserve_top_m,
+                max_bridge_slots=max_bridge_slots,
+                structure_max_hops=structure_max_hops,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                beam_width=beam_width,
+                beam_expand_per_state=beam_expand_per_state,
+                beam_projected_shortlist_factor=beam_projected_shortlist_factor,
+                non_anchor_title_dedup=non_anchor_title_dedup,
+                requirement_mode=str(requirement_selector_bundle.get("mode", "oracle")),
+                requirement_model_bundle=requirement_selector_bundle.get("model_bundle"),
+                requirement_smooth_tau=float(requirement_selector_bundle.get("smooth_tau", DEFAULT_REQUIREMENT_SMOOTH_TAU)),
+                requirement_counterfactual_tau=float(requirement_selector_bundle.get("counterfactual_tau", DEFAULT_REQUIREMENT_CF_TAU)),
+            )
+            requirement_support_scores.append(float(selector_trace.get("beam_best_support_completeness", 0.0) or 0.0))
+            requirement_leakage_scores.append(float(selector_trace.get("beam_best_counterfactual_leakage", 0.0) or 0.0))
+            requirement_frontier_sizes.append(float(selector_trace.get("beam_avg_frontier_size", 0.0) or 0.0))
 
         heuristic_selected_positions = [int(pos) for pos in selected_positions]
         final_front_positions = materialize_reader_top_positions(
@@ -3190,6 +3610,18 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "beam_projection_max_selected_rank": int(beam_projection_max_selected_rank),
         "examples_preview": selector_examples,
     }
+    if selector_name == "requirement_beam":
+        summary.update({
+            "requirement_mode": str((requirement_selector_bundle or {}).get("mode", "oracle")),
+            "requirement_cache_path": str((requirement_selector_bundle or {}).get("cache_path", "")),
+            "requirement_model_path": str((requirement_selector_bundle or {}).get("model_path", "")) or None,
+            "requirement_smooth_tau": round(float((requirement_selector_bundle or {}).get("smooth_tau", DEFAULT_REQUIREMENT_SMOOTH_TAU)), 4),
+            "requirement_counterfactual_tau": round(float((requirement_selector_bundle or {}).get("counterfactual_tau", DEFAULT_REQUIREMENT_CF_TAU)), 4),
+            "requirement_cache_hit_count": int(requirement_cache_hit_count),
+            "avg_requirement_support_completeness": round(float(np.mean(requirement_support_scores)) if requirement_support_scores else 0.0, 4),
+            "avg_requirement_counterfactual_leakage": round(float(np.mean(requirement_leakage_scores)) if requirement_leakage_scores else 0.0, 4),
+            "avg_requirement_frontier_size": round(float(np.mean(requirement_frontier_sizes)) if requirement_frontier_sizes else 0.0, 4),
+        })
     logger.info(
         "Applied %s selector over pool@%d for %d queries (avg mapped pool docs=%.2f, avg seed entities=%.2f)",
         selector_name,
@@ -3547,7 +3979,7 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "learned_greedy"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "learned_greedy", "requirement_beam"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy", "set_closure"], default="bridge",
                         help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score centered on explicit path connectivity.")
@@ -3631,6 +4063,18 @@ def main():
                         help="Set-level beam score penalty weight for redundancy under --setwise_score_mode set_closure.")
     parser.add_argument("--setwise_model_path", type=str, default="",
                         help="Joblib bundle path used by --setwise_selector learned_greedy.")
+    parser.add_argument("--setwise_requirement_cache_path", type=str, default="",
+                        help="Offline requirement cache JSON used by --setwise_selector requirement_beam.")
+    parser.add_argument("--setwise_requirement_mode", choices=["oracle", "learned"], default="oracle",
+                        help="Mode used by requirement_beam. oracle uses cached requirement annotations directly; learned adds a lightweight matcher as a proposal prior.")
+    parser.add_argument("--setwise_requirement_model_path", type=str, default="",
+                        help="Optional requirement matcher joblib bundle used when --setwise_requirement_mode learned.")
+    parser.add_argument("--setwise_requirement_annotation_pool_k", type=int, default=DEFAULT_REQUIREMENT_ANNOTATION_POOL_K,
+                        help="Expected annotation pool size stored in the requirement cache. Used for reporting and cache validation only.")
+    parser.add_argument("--setwise_requirement_smooth_tau", type=float, default=DEFAULT_REQUIREMENT_SMOOTH_TAU,
+                        help="Smooth-min temperature for requirement support completeness.")
+    parser.add_argument("--setwise_requirement_counterfactual_tau", type=float, default=DEFAULT_REQUIREMENT_CF_TAU,
+                        help="Soft worst-case temperature for counterfactual leakage.")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -3683,6 +4127,28 @@ def main():
         if not args.setwise_model_path:
             raise ValueError("--setwise_model_path is required when --setwise_selector learned_greedy")
         learned_model_bundle = load_learned_model_bundle(args.setwise_model_path)
+    requirement_selector_bundle = None
+    if setwise_selector == "requirement_beam":
+        if not args.setwise_requirement_cache_path:
+            raise ValueError("--setwise_requirement_cache_path is required when --setwise_selector requirement_beam")
+        requirement_cache = load_requirement_cache(args.setwise_requirement_cache_path)
+        requirement_model_bundle = None
+        requirement_model_path = ""
+        if str(args.setwise_requirement_mode).strip().lower() == "learned":
+            requirement_model_path = str(args.setwise_requirement_model_path or "").strip()
+            if not requirement_model_path:
+                raise ValueError("--setwise_requirement_model_path is required when --setwise_requirement_mode learned")
+            requirement_model_bundle = load_requirement_model_bundle(requirement_model_path)
+        requirement_selector_bundle = {
+            "cache": requirement_cache,
+            "cache_path": str(args.setwise_requirement_cache_path),
+            "mode": str(args.setwise_requirement_mode).strip().lower(),
+            "model_bundle": requirement_model_bundle,
+            "model_path": requirement_model_path,
+            "annotation_pool_k": int(args.setwise_requirement_annotation_pool_k),
+            "smooth_tau": float(args.setwise_requirement_smooth_tau),
+            "counterfactual_tau": float(args.setwise_requirement_counterfactual_tau),
+        }
     late_rerank_judge_bundle = SetwiseLateRerankJudgeBundle(
         infer_fn=None,
         model_name=str(args.llm_name),
@@ -3954,6 +4420,7 @@ def main():
             late_rerank_policy=str(args.setwise_late_rerank_policy),
             late_rerank_max_state_score_gap=float(args.setwise_late_rerank_max_state_score_gap),
             late_rerank_judge_bundle=late_rerank_judge_bundle,
+            requirement_selector_bundle=requirement_selector_bundle,
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -4043,6 +4510,12 @@ def main():
             "late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
             "state_score_weights": {k: round(float(v), 4) for k, v in resolve_set_closure_state_weight_config(state_weight_config).items()},
             "setwise_model_path": args.setwise_model_path or None,
+            "setwise_requirement_cache_path": args.setwise_requirement_cache_path or None,
+            "setwise_requirement_mode": str(args.setwise_requirement_mode),
+            "setwise_requirement_model_path": args.setwise_requirement_model_path or None,
+            "setwise_requirement_annotation_pool_k": int(args.setwise_requirement_annotation_pool_k),
+            "setwise_requirement_smooth_tau": round(float(args.setwise_requirement_smooth_tau), 4),
+            "setwise_requirement_counterfactual_tau": round(float(args.setwise_requirement_counterfactual_tau), 4),
             "selector_EM": round(float(selector_em), 4),
             "selector_F1": round(float(selector_f1), 4),
             "baseline_EM": round(float(baseline_em), 4),

@@ -30,7 +30,14 @@ from eval_causal_qwen3 import (
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
     select_learned_greedy_positions,
+    select_requirement_beam_positions,
     should_apply_setwise_late_rerank_override,
+)
+from requirement_beam_utils import (
+    build_requirement_cache_entry,
+    compute_requirement_state_metrics,
+    load_requirement_cache,
+    save_requirement_cache,
 )
 
 
@@ -1633,3 +1640,133 @@ def test_select_learned_greedy_positions_uses_model_scores_to_pick_bridge_docs()
     assert trace["selection_steps"][2]["mode"] == "learned_greedy"
     assert trace["selection_steps"][2]["doc_id"] == 2
     assert trace["selection_steps"][3]["doc_id"] == 3
+
+
+def test_requirement_cache_roundtrip_and_state_metrics_prefer_support_over_counterfactual(tmp_path):
+    cache_entry = build_requirement_cache_entry(
+        query_index=0,
+        question="Which city is Person A from?",
+        pool_docs=[
+            "Person A\nPerson A is a musician.",
+            "City X\nCity X is the hometown of Person A.",
+            "City Y\nCity Y is associated with Person B.",
+        ],
+        pool_doc_entities=[
+            {"person a"},
+            {"person a", "city x"},
+            {"person b", "city y"},
+        ],
+        seed_entities={"person a"},
+        question_entities={"person a", "city x"},
+        annotation_pool_k=3,
+    )
+    cache_path = tmp_path / "requirement_cache.json"
+    save_requirement_cache(cache_path, {
+        "version": "pcrs_rag_v1",
+        "queries": [cache_entry],
+    })
+    loaded_cache = load_requirement_cache(cache_path)
+    loaded_entry = loaded_cache["entries_by_question"]["Which city is Person A from?"]
+
+    metrics_anchor_only = compute_requirement_state_metrics(
+        cache_entry=loaded_entry,
+        selected_positions=[0],
+    )
+    metrics_supported = compute_requirement_state_metrics(
+        cache_entry=loaded_entry,
+        selected_positions=[0, 1],
+    )
+
+    assert loaded_entry["question"] == "Which city is Person A from?"
+    assert metrics_supported["support_completeness"] > metrics_anchor_only["support_completeness"]
+    assert metrics_supported["selected_annotation_count"] == 2.0
+
+
+def test_select_requirement_beam_positions_prefers_low_leakage_chain():
+    cache_entry = {
+        "annotation_pool_k": 4,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+            {"requirement_id": "decision_0", "type": "decision"},
+        ],
+        "counterfactual_sets": [
+            {
+                "cf_id": "cf_0",
+                "requirements": [
+                    {"requirement_id": "anchor_0"},
+                    {"requirement_id": "bridge_0"},
+                    {"requirement_id": "decision_0"},
+                ],
+            }
+        ],
+        "pool_titles": ["A", "Bridge", "Leak", "Answer"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "A",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {"cf_0": {"anchor_0": 0.0, "bridge_0": 0.0, "decision_0": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge",
+                "positive_requirement_scores": {"anchor_0": 0.1, "bridge_0": 1.0, "decision_0": 0.2},
+                "counterfactual_requirement_scores": {"cf_0": {"anchor_0": 0.0, "bridge_0": 0.0, "decision_0": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Leak",
+                "positive_requirement_scores": {"anchor_0": 0.1, "bridge_0": 0.7, "decision_0": 0.1},
+                "counterfactual_requirement_scores": {"cf_0": {"anchor_0": 0.9, "bridge_0": 1.0, "decision_0": 0.9}},
+                "counterfactual_set_scores": {"cf_0": 0.933333},
+            },
+            {
+                "pool_position": 3,
+                "doc_title": "Answer",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.2, "decision_0": 1.0},
+                "counterfactual_requirement_scores": {"cf_0": {"anchor_0": 0.0, "bridge_0": 0.0, "decision_0": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+        ],
+    }
+
+    selected_positions, trace = select_requirement_beam_positions(
+        pool_doc_ids=[10, 11, 12, 13],
+        pool_doc_scores=np.array([0.9, 0.6, 0.8, 0.4], dtype=float),
+        pool_doc_titles=["A", "Bridge", "Leak", "Answer"],
+        doc_idx_to_entities={
+            10: {"person a"},
+            11: {"bridge"},
+            12: {"fake bridge"},
+            13: {"target"},
+        },
+        doc_idx_to_edges={
+            10: [],
+            11: [],
+            12: [],
+            13: [],
+        },
+        adjacency={
+            "person a": [("bridge", 1.0, "related_to"), ("fake bridge", 1.0, "related_to")],
+            "bridge": [("target", 1.0, "related_to")],
+            "fake bridge": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=3,
+        cache_entry=cache_entry,
+        initial_seed_entities={"person a"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=2,
+        beam_width=3,
+        beam_expand_per_state=3,
+        non_anchor_title_dedup=True,
+    )
+
+    assert selected_positions == [0, 1, 3]
+    assert trace["beam_best_support_completeness"] > 0.5
+    assert trace["beam_best_counterfactual_leakage"] < 0.5
+    assert trace["beam_finalists"][0]["selected_positions"] == [0, 1, 3]
