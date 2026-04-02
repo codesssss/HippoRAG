@@ -15,7 +15,9 @@ from eval_causal_qwen3 import (
     SetwiseLateRerankResponseModel,
     build_setwise_late_rerank_candidates,
     build_setwise_late_rerank_judge_bundle,
+    collect_grounded_question_query_entities,
     collect_lexical_query_seed_entities,
+    collect_question_query_entities,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
     compute_state_path_connectivity_metrics,
@@ -23,6 +25,7 @@ from eval_causal_qwen3 import (
     normalize_setwise_late_rerank_policy,
     parse_setwise_late_rerank_response,
     rerank_completed_evidence_sets_with_llm,
+    resolve_setwise_query_targets,
     score_evidence_state,
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
@@ -171,6 +174,19 @@ class DummyOpenAIClient:
         )
         self.beta = type("BetaNamespace", (), {"chat": DummyBetaChatAPI(parsed_payload=parsed_payload)})()
         self.chat = DummyChatAPI(stream_chunks=chat_stream_chunks)
+
+
+class DummyCausalV2Engine:
+    def __init__(self, entities=None):
+        self.entities = list(entities or [])
+
+    def _extract_query_entities(self, query):
+        return list(self.entities)
+
+
+class DummyHippoRAGForQueryEntities:
+    def __init__(self, entities=None):
+        self.causal_v2_engine = DummyCausalV2Engine(entities=entities)
 
 
 def test_materialize_reader_top_positions_preserves_selected_prefix_and_fills_tail():
@@ -897,6 +913,7 @@ def test_score_evidence_state_prefers_connected_chain_over_redundant_helpers():
         fixed_prefix_positions=[0],
         seed_entities={"person a"},
         query_entities={"target"},
+        support_query_entities={"target"},
         structure_max_hops=2,
         base_weight=0.25,
         structure_weight=0.60,
@@ -928,6 +945,7 @@ def test_score_evidence_state_prefers_connected_chain_over_redundant_helpers():
         fixed_prefix_positions=[0],
         seed_entities={"person a"},
         query_entities={"target"},
+        support_query_entities={"target"},
         structure_max_hops=2,
         base_weight=0.25,
         structure_weight=0.60,
@@ -963,6 +981,7 @@ def test_score_evidence_state_distinguishes_query_coverage_from_query_reachabili
         fixed_prefix_positions=[0],
         seed_entities={"person a"},
         query_entities={"target"},
+        support_query_entities={"target"},
         structure_max_hops=2,
         base_weight=0.25,
         structure_weight=0.60,
@@ -995,6 +1014,7 @@ def test_score_evidence_state_uses_suffix_base_mean_not_prefix_base_mean():
         fixed_prefix_positions=[0, 1],
         seed_entities={"anchor"},
         query_entities={"suffix"},
+        support_query_entities={"suffix"},
         structure_max_hops=2,
         base_weight=0.25,
         structure_weight=0.60,
@@ -1023,6 +1043,7 @@ def test_score_evidence_state_respects_custom_state_weights():
         fixed_prefix_positions=[0],
         seed_entities={"anchor"},
         query_entities={"target"},
+        support_query_entities={"target"},
         structure_max_hops=2,
         base_weight=0.25,
         structure_weight=0.60,
@@ -1376,6 +1397,148 @@ def test_collect_lexical_query_seed_entities_matches_query_entity_strings():
     )
 
     assert "lothair ii" in seeds
+
+
+def test_collect_question_query_entities_prefers_question_extractor_output():
+    entities = collect_question_query_entities(
+        hipporag=DummyHippoRAGForQueryEntities(entities=["Lothair II", "Ermengarde of Tours"]),
+        query="When did Lothair II's mother die?",
+        pool_doc_ids=[0, 1],
+        doc_idx_to_entities={
+            0: {"noise entity"},
+            1: {"another noise entity"},
+        },
+    )
+
+    assert entities == {"lothair ii", "ermengarde of tours"}
+
+
+def test_collect_question_query_entities_falls_back_to_lexical_matching():
+    entities = collect_question_query_entities(
+        hipporag=DummyHippoRAGForQueryEntities(entities=[]),
+        query="When did Lothair II's mother die?",
+        pool_doc_ids=[0, 1, 2],
+        doc_idx_to_entities={
+            0: {"donna summer"},
+            1: {"lothair ii", "lotharingia"},
+            2: {"ermengarde of tours"},
+        },
+    )
+
+    assert "lothair ii" in entities
+
+
+def test_collect_grounded_question_query_entities_filters_offgraph_noise():
+    grounded_entities = collect_grounded_question_query_entities(
+        seed_entities={"seed a"},
+        question_entities={"seed a", "bridge b", "target c", "offgraph noise"},
+        pool_doc_ids=[0, 1, 2],
+        doc_idx_to_entities={
+            0: {"seed a"},
+            1: {"bridge b"},
+            2: {"target c"},
+        },
+        adjacency={
+            "seed a": [("bridge b", 1.0, "related_to")],
+            "bridge b": [("target c", 1.0, "related_to")],
+        },
+        structure_max_hops=2,
+    )
+
+    assert grounded_entities == {"seed a", "bridge b", "target c"}
+
+
+def test_resolve_setwise_query_targets_hybrid_falls_back_to_seed_when_grounding_is_empty():
+    query_targets = resolve_setwise_query_targets(
+        query_entity_source="hybrid",
+        seed_entities={"seed a"},
+        question_entities={"offgraph noise"},
+        pool_doc_ids=[0],
+        doc_idx_to_entities={0: {"unrelated entity"}},
+        adjacency={},
+        structure_max_hops=2,
+    )
+
+    assert query_targets["proposal_query_entities"] == {"seed a"}
+    assert query_targets["state_query_entities"] == {"seed a"}
+    assert query_targets["state_support_query_entities"] == {"seed a"}
+    assert query_targets["grounded_question_entities"] == set()
+
+
+def test_select_bridge_beam_positions_can_use_seed_for_proposal_and_question_for_state():
+    legacy_positions, legacy_trace = select_bridge_beam_positions(
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_scores=np.array([1.0, 0.92, 0.35, 0.30], dtype=float),
+        pool_doc_titles=["Anchor", "Helper", "Bridge", "Answer"],
+        doc_idx_to_entities={
+            0: {"seed a"},
+            1: {"seed a", "helper h"},
+            2: {"seed a", "bridge b"},
+            3: {"bridge b", "target c"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("seed a", "helper h", 1.0, "related_to")],
+            2: [("seed a", "bridge b", 1.0, "related_to")],
+            3: [("bridge b", "target c", 1.0, "related_to")],
+        },
+        adjacency={
+            "seed a": [("helper h", 1.0, "related_to"), ("bridge b", 1.0, "related_to")],
+            "bridge b": [("target c", 1.0, "related_to")],
+        },
+        qa_top_k=3,
+        initial_seed_entities={"seed a"},
+        query_entities={"seed a"},
+        anchor_count=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        score_mode="set_closure",
+        beam_width=3,
+        beam_expand_per_state=3,
+    )
+
+    hybrid_positions, hybrid_trace = select_bridge_beam_positions(
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_scores=np.array([1.0, 0.92, 0.35, 0.30], dtype=float),
+        pool_doc_titles=["Anchor", "Helper", "Bridge", "Answer"],
+        doc_idx_to_entities={
+            0: {"seed a"},
+            1: {"seed a", "helper h"},
+            2: {"seed a", "bridge b"},
+            3: {"bridge b", "target c"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [("seed a", "helper h", 1.0, "related_to")],
+            2: [("seed a", "bridge b", 1.0, "related_to")],
+            3: [("bridge b", "target c", 1.0, "related_to")],
+        },
+        adjacency={
+            "seed a": [("helper h", 1.0, "related_to"), ("bridge b", 1.0, "related_to")],
+            "bridge b": [("target c", 1.0, "related_to")],
+        },
+        qa_top_k=3,
+        initial_seed_entities={"seed a"},
+        query_entities={"seed a"},
+        proposal_query_entities={"seed a"},
+        state_query_entities={"target c"},
+        state_support_query_entities={"seed a"},
+        anchor_count=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        score_mode="set_closure",
+        beam_width=3,
+        beam_expand_per_state=3,
+    )
+
+    assert legacy_positions == [0, 1, 2]
+    assert hybrid_positions == [0, 1, 3]
+    assert hybrid_trace["beam_best_state_query_reachability"] == 1.0
+    assert hybrid_trace["beam_best_state_query_reachability"] == legacy_trace["beam_best_state_query_reachability"]
 
 
 def test_compute_candidate_feature_rows_exposes_bridge_structure_signal():

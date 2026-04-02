@@ -1252,6 +1252,141 @@ def collect_lexical_query_seed_entities(query: str,
     return {entity for _, _, entity in scored_entities[:max_seed_entities]}
 
 
+def collect_question_query_entities(hipporag: HippoRAG,
+                                    query: str,
+                                    pool_doc_ids: Sequence[int | None],
+                                    doc_idx_to_entities: Dict[int, Set[str]],
+                                    max_query_entities: int = 8) -> Set[str]:
+    extracted_entities: Set[str] = set()
+    causal_engine = getattr(hipporag, "causal_v2_engine", None)
+    extract_fn = getattr(causal_engine, "_extract_query_entities", None) if causal_engine is not None else None
+    if callable(extract_fn):
+        try:
+            extracted_entities = normalize_entity_set(extract_fn(query))
+        except Exception as exc:
+            logging.getLogger(__name__).warning(
+                "Failed to derive question entities for query %r: %s",
+                query[:160],
+                exc,
+            )
+
+    if extracted_entities:
+        return extracted_entities
+
+    return collect_lexical_query_seed_entities(
+        query=query,
+        pool_doc_ids=pool_doc_ids,
+        doc_idx_to_entities=doc_idx_to_entities,
+        max_seed_entities=max_query_entities,
+    )
+
+
+def collect_pool_entities(pool_doc_ids: Sequence[int | None],
+                          doc_idx_to_entities: Dict[int, Set[str]],
+                          top_k: int | None = None) -> Set[str]:
+    collected_entities: Set[str] = set()
+    limited_doc_ids = list(pool_doc_ids[:max(int(top_k or 0), 0)]) if top_k is not None else list(pool_doc_ids)
+    if top_k is not None and int(top_k) <= 0:
+        limited_doc_ids = []
+    for doc_id in limited_doc_ids:
+        if doc_id is None:
+            continue
+        collected_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+    return collected_entities
+
+
+def collect_grounded_question_query_entities(seed_entities: Sequence[str] | Set[str] | None,
+                                             question_entities: Sequence[str] | Set[str] | None,
+                                             pool_doc_ids: Sequence[int | None],
+                                             doc_idx_to_entities: Dict[int, Set[str]],
+                                             adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                             structure_max_hops: int,
+                                             max_query_entities: int = 8,
+                                             top_pool_k: int = 20) -> Set[str]:
+    normalized_seed = normalize_entity_set(seed_entities)
+    normalized_question = normalize_entity_set(question_entities)
+    if not normalized_question:
+        return set()
+
+    top_pool_entities = collect_pool_entities(
+        pool_doc_ids=pool_doc_ids,
+        doc_idx_to_entities=doc_idx_to_entities,
+        top_k=top_pool_k,
+    )
+    seed_frontier = (
+        expand_directed_entities(normalized_seed, adjacency, max_hops=structure_max_hops)
+        if normalized_seed
+        else {}
+    )
+
+    scored_entities: List[Tuple[float, int, str]] = []
+    for entity in normalized_question:
+        score = 0.0
+        if entity in normalized_seed:
+            score += 4.0
+        if entity in seed_frontier:
+            score += 3.0
+        if entity in top_pool_entities:
+            score += 2.0
+        if score < 2.0:
+            continue
+        scored_entities.append((score, len(entity), entity))
+
+    if not scored_entities:
+        return set()
+
+    scored_entities.sort(key=lambda item: (-item[0], -item[1], item[2]))
+    return {entity for _, _, entity in scored_entities[:max(max_query_entities, 1)]}
+
+
+def resolve_setwise_query_targets(query_entity_source: str,
+                                  seed_entities: Sequence[str] | Set[str] | None,
+                                  question_entities: Sequence[str] | Set[str] | None,
+                                  pool_doc_ids: Sequence[int | None],
+                                  doc_idx_to_entities: Dict[int, Set[str]],
+                                  adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                  structure_max_hops: int) -> Dict[str, Set[str]]:
+    normalized_source = str(query_entity_source or "seed").strip().lower()
+    normalized_seed = normalize_entity_set(seed_entities)
+    normalized_question = normalize_entity_set(question_entities)
+    grounded_question = collect_grounded_question_query_entities(
+        seed_entities=normalized_seed,
+        question_entities=normalized_question,
+        pool_doc_ids=pool_doc_ids,
+        doc_idx_to_entities=doc_idx_to_entities,
+        adjacency=adjacency,
+        structure_max_hops=structure_max_hops,
+    )
+
+    if normalized_source == "question":
+        effective_question = normalized_question or grounded_question or set(normalized_seed)
+        return {
+            "proposal_query_entities": set(effective_question),
+            "state_query_entities": set(effective_question),
+            "state_support_query_entities": set(effective_question),
+            "grounded_question_entities": set(grounded_question),
+        }
+
+    if normalized_source == "hybrid":
+        proposal_query_entities = set(normalized_seed or grounded_question or normalized_question)
+        state_query_entities = set(grounded_question or normalized_seed or normalized_question)
+        state_support_query_entities = set(normalized_seed or state_query_entities)
+        return {
+            "proposal_query_entities": proposal_query_entities,
+            "state_query_entities": state_query_entities,
+            "state_support_query_entities": state_support_query_entities,
+            "grounded_question_entities": set(grounded_question),
+        }
+
+    effective_seed = set(normalized_seed or grounded_question or normalized_question)
+    return {
+        "proposal_query_entities": set(effective_seed),
+        "state_query_entities": set(effective_seed),
+        "state_support_query_entities": set(effective_seed),
+        "grounded_question_entities": set(grounded_question),
+    }
+
+
 def normalized_token_set(text: str | None) -> Set[str]:
     normalized_text = normalize_structure_text(text or "")
     if not normalized_text:
@@ -1701,6 +1836,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
                          fixed_prefix_positions: Sequence[int] | None,
                          seed_entities: Sequence[str] | Set[str] | None,
                          query_entities: Sequence[str] | Set[str] | None,
+                         support_query_entities: Sequence[str] | Set[str] | None,
                          structure_max_hops: int,
                          base_weight: float,
                          structure_weight: float,
@@ -1708,6 +1844,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
                          state_weight_config: Dict[str, float] | None = None) -> Dict[str, float]:
     normalized_seed = normalize_entity_set(seed_entities)
     normalized_query = normalize_entity_set(query_entities) or set(normalized_seed)
+    normalized_support_query = normalize_entity_set(support_query_entities) or set(normalized_query) or set(normalized_seed)
     state_weights = resolve_set_closure_state_weight_config(state_weight_config)
     chosen_positions = [int(pos) for pos in selected_positions]
     fixed_prefix = {int(pos) for pos in (fixed_prefix_positions or [])}
@@ -1770,7 +1907,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
             base_weight=base_weight,
             structure_weight=structure_weight,
             novelty_weight=novelty_weight,
-            query_entities=normalized_query,
+            query_entities=normalized_support_query,
             score_mode="closure_proxy",
         )
         if not candidate_rows:
@@ -2190,6 +2327,9 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  qa_top_k: int,
                                  initial_seed_entities: Sequence[str] | Set[str] | None = None,
                                  query_entities: Sequence[str] | Set[str] | None = None,
+                                 proposal_query_entities: Sequence[str] | Set[str] | None = None,
+                                 state_query_entities: Sequence[str] | Set[str] | None = None,
+                                 state_support_query_entities: Sequence[str] | Set[str] | None = None,
                                  anchor_count: int = 2,
                                  reserve_top_m: int = 0,
                                  max_bridge_slots: int = 0,
@@ -2236,6 +2376,22 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
     normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
     target_k = min(candidate_count, qa_top_k)
     seed_entities = normalize_entity_set(initial_seed_entities)
+    proposal_query_entities = (
+        normalize_entity_set(proposal_query_entities)
+        or normalize_entity_set(query_entities)
+        or set(seed_entities)
+    )
+    state_query_entities = (
+        normalize_entity_set(state_query_entities)
+        or normalize_entity_set(query_entities)
+        or set(seed_entities)
+    )
+    state_support_query_entities = (
+        normalize_entity_set(state_support_query_entities)
+        or set(proposal_query_entities)
+        or set(state_query_entities)
+        or set(seed_entities)
+    )
     anchor_positions, reserved_positions = resolve_reserved_positions(
         candidate_count=candidate_count,
         target_k=target_k,
@@ -2284,7 +2440,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         selected_positions=reserved_positions,
         fixed_prefix_positions=reserved_positions,
         seed_entities=seed_entities,
-        query_entities=query_entities or initial_seed_entities,
+        query_entities=state_query_entities,
+        support_query_entities=state_support_query_entities,
         structure_max_hops=structure_max_hops,
         base_weight=base_weight,
         structure_weight=structure_weight,
@@ -2324,7 +2481,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 adjacency=adjacency,
                 remaining_positions=remaining_positions,
                 covered_entities=state["covered_entities"],
-                query_entities=query_entities or initial_seed_entities,
+                query_entities=proposal_query_entities,
                 structure_max_hops=structure_max_hops,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
@@ -2365,7 +2522,8 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                     selected_positions=signature,
                     fixed_prefix_positions=reserved_positions,
                     seed_entities=seed_entities,
-                    query_entities=query_entities or initial_seed_entities,
+                    query_entities=state_query_entities,
+                    support_query_entities=state_support_query_entities,
                     structure_max_hops=structure_max_hops,
                     base_weight=base_weight,
                     structure_weight=structure_weight,
@@ -2548,6 +2706,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            beam_expand_per_state: int = 4,
                            beam_projected_shortlist_factor: int = DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR,
                            non_anchor_title_dedup: bool = False,
+                           query_entity_source: str = "seed",
                            gate_mode: str = "none",
                            gate_min_structure_score: float = 0.15,
                            gate_min_combined_margin: float = 0.0,
@@ -2606,6 +2765,26 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 pool_doc_ids=pool_doc_ids,
                 doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
             )
+        question_entities = collect_question_query_entities(
+            hipporag=hipporag,
+            query=qs.question,
+            pool_doc_ids=pool_doc_ids,
+            doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+        )
+        normalized_query_entity_source = str(query_entity_source or "seed").strip().lower()
+        query_target_config = resolve_setwise_query_targets(
+            query_entity_source=normalized_query_entity_source,
+            seed_entities=seed_entities,
+            question_entities=question_entities,
+            pool_doc_ids=pool_doc_ids,
+            doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+            adjacency=hipporag.structure_graph_out,
+            structure_max_hops=structure_max_hops,
+        )
+        proposal_query_entities = set(query_target_config["proposal_query_entities"])
+        state_query_entities = set(query_target_config["state_query_entities"])
+        state_support_query_entities = set(query_target_config["state_support_query_entities"])
+        grounded_question_entities = set(query_target_config["grounded_question_entities"])
         gate_decision = {
             "gate_mode": str(gate_mode or "none").strip().lower(),
             "gate_enabled": False,
@@ -2622,7 +2801,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 adjacency=hipporag.structure_graph_out,
                 qa_top_k=qa_top_k,
                 initial_seed_entities=seed_entities,
-                query_entities=seed_entities,
+                query_entities=proposal_query_entities,
                 anchor_count=anchor_count,
                 reserve_top_m=reserve_top_m,
                 structure_max_hops=structure_max_hops,
@@ -2653,7 +2832,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     adjacency=hipporag.structure_graph_out,
                     qa_top_k=qa_top_k,
                     initial_seed_entities=seed_entities,
-                    query_entities=seed_entities,
+                    query_entities=proposal_query_entities,
                     anchor_count=anchor_count,
                     reserve_top_m=reserve_top_m,
                     max_bridge_slots=max_bridge_slots,
@@ -2688,7 +2867,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     adjacency=hipporag.structure_graph_out,
                     qa_top_k=qa_top_k,
                     initial_seed_entities=seed_entities,
-                    query_entities=seed_entities,
+                    query_entities=proposal_query_entities,
+                    proposal_query_entities=proposal_query_entities,
+                    state_query_entities=state_query_entities,
+                    state_support_query_entities=state_support_query_entities,
                     anchor_count=anchor_count,
                     reserve_top_m=reserve_top_m,
                     max_bridge_slots=max_bridge_slots,
@@ -2858,8 +3040,14 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "reserve_top_m": int(min(max(max(anchor_count, 0), max(reserve_top_m, 0)), min(pool_limit, qa_top_k))),
             "max_bridge_slots": int(max(0, max_bridge_slots)),
             "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+            "query_entity_source": normalized_query_entity_source,
             "gate_decision": gate_decision,
             "seed_entities_preview": sorted(seed_entities)[:12],
+            "question_entities_preview": sorted(question_entities)[:12],
+            "grounded_question_entities_preview": sorted(grounded_question_entities)[:12],
+            "proposal_query_entities_preview": sorted(proposal_query_entities)[:12],
+            "query_entities_preview": sorted(state_query_entities)[:12],
+            "state_support_query_entities_preview": sorted(state_support_query_entities)[:12],
             "selected_pool_positions": list(heuristic_selected_positions),
             "selected_doc_ids": [
                 int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
@@ -2900,6 +3088,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "question": qs.question,
                 "selected_titles": [pool_titles[pos] for pos in final_front_positions],
                 "seed_entities_preview": sorted(seed_entities)[:8],
+                "question_entities_preview": sorted(question_entities)[:8],
+                "grounded_question_entities_preview": sorted(grounded_question_entities)[:8],
+                "proposal_query_entities_preview": sorted(proposal_query_entities)[:8],
+                "query_entities_preview": sorted(state_query_entities)[:8],
                 "selection_steps": selector_trace["selection_steps"],
             })
 
@@ -2915,6 +3107,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "reserve_top_m": int(max(max(anchor_count, 0), max(reserve_top_m, 0))),
         "max_bridge_slots": int(max(0, max_bridge_slots)),
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+        "query_entity_source": normalized_query_entity_source if query_solutions else str(query_entity_source or "seed").strip().lower(),
         "gate_mode": str(gate_mode or "none").strip().lower(),
         "gate_min_structure_score": round(float(gate_min_structure_score), 4),
         "gate_min_combined_margin": round(float(gate_min_combined_margin), 4),
@@ -3313,6 +3506,8 @@ def main():
                         help="Weight assigned to entity novelty inside setwise selection.")
     parser.add_argument("--setwise_non_anchor_title_dedup", type=string_to_bool, default=False,
                         help="If true, avoid selecting duplicate titles after the reserved prefix unless no alternatives remain.")
+    parser.add_argument("--setwise_query_entity_source", choices=["seed", "question", "hybrid"], default="seed",
+                        help="Source used for query-side closure features inside the setwise selector. seed keeps the legacy behavior; question uses question-derived entities throughout; hybrid keeps seed entities for bridge proposal but uses grounded question entities for set-level state scoring.")
     parser.add_argument("--setwise_gate_mode", choices=["none", "suffix_bridge"], default="none",
                         help="Per-query activation gate for bridge selectors. suffix_bridge only fires when an off-prefix candidate shows stronger bridge signal than the baseline suffix.")
     parser.add_argument("--setwise_gate_min_structure_score", type=float, default=0.15,
@@ -3684,6 +3879,7 @@ def main():
             beam_expand_per_state=int(args.setwise_beam_expand_per_state),
             beam_projected_shortlist_factor=int(args.setwise_beam_projected_shortlist_factor),
             non_anchor_title_dedup=bool(args.setwise_non_anchor_title_dedup),
+            query_entity_source=str(args.setwise_query_entity_source),
             gate_mode=str(args.setwise_gate_mode),
             gate_min_structure_score=float(args.setwise_gate_min_structure_score),
             gate_min_combined_margin=float(args.setwise_gate_min_combined_margin),
@@ -3765,6 +3961,7 @@ def main():
             "structure_weight": float(args.setwise_structure_weight),
             "novelty_weight": float(args.setwise_novelty_weight),
             "non_anchor_title_dedup": bool(args.setwise_non_anchor_title_dedup),
+            "query_entity_source": str(args.setwise_query_entity_source),
             "gate_mode": str(args.setwise_gate_mode),
             "gate_min_structure_score": round(float(args.setwise_gate_min_structure_score), 4),
             "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
