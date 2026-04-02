@@ -39,10 +39,13 @@ from eval_causal_qwen3 import (
 )
 from requirement_beam_utils import (
     align_requirement_cache_entry_to_pool,
+    build_need_unit_cache_entry,
     build_requirement_cache_entry,
     compute_requirement_state_metrics,
     load_requirement_cache,
+    NEED_UNIT_MATCHER_FEATURE_NAMES,
     REQUIREMENT_MATCHER_FEATURE_NAMES,
+    requirement_feature_rows_to_matrix,
     save_requirement_cache,
 )
 from run_requirement_beam_reserve_ablation import (
@@ -75,6 +78,19 @@ class DummyRequirementPriorModel:
         positive_score = (
             0.55 * feature_matrix[:, support_gain_idx]
             + 0.45 * feature_matrix[:, utility_gain_idx]
+        )
+        positive_score = np.clip(positive_score, 0.0, 1.0)
+        return np.stack([1.0 - positive_score, positive_score], axis=1)
+
+
+class DummyNeedUnitPriorModel:
+    def predict_proba(self, feature_matrix):
+        support_gain_idx = NEED_UNIT_MATCHER_FEATURE_NAMES.index("support_completeness_gain")
+        hop_support_idx = NEED_UNIT_MATCHER_FEATURE_NAMES.index("relation_hop_support_after")
+
+        positive_score = (
+            0.60 * feature_matrix[:, support_gain_idx]
+            + 0.40 * feature_matrix[:, hop_support_idx]
         )
         positive_score = np.clip(positive_score, 0.0, 1.0)
         return np.stack([1.0 - positive_score, positive_score], axis=1)
@@ -1706,6 +1722,62 @@ def test_requirement_cache_roundtrip_and_state_metrics_prefer_support_over_count
     assert metrics_supported["selected_annotation_count"] == 2.0
 
 
+def test_need_unit_cache_roundtrip_drops_wh_subjects_and_tracks_v2_groups(tmp_path):
+    cache_entry = build_need_unit_cache_entry(
+        query_index=0,
+        question="Which city is Person A from?",
+        pool_docs=[
+            "Person A\nPerson A is from City X.",
+            "City X\nCity X is the hometown of Person A.",
+            "City Y\nCity Y is associated with Person B.",
+        ],
+        pool_doc_entities=[
+            {"person a", "city x"},
+            {"person a", "city x"},
+            {"person b", "city y"},
+        ],
+        seed_entities={"person a"},
+        question_entities={"person a", "city x"},
+        annotation_pool_k=3,
+    )
+    cache_path = tmp_path / "need_unit_cache.json"
+    save_requirement_cache(cache_path, {
+        "version": "pcrs_rag_v2_need_units",
+        "queries": [cache_entry],
+    })
+    loaded_cache = load_requirement_cache(cache_path)
+    loaded_entry = loaded_cache["entries_by_question"]["Which city is Person A from?"]
+
+    subjects = [str(unit.get("subject", "")).strip().lower() for unit in loaded_entry["positive_need_units"]]
+    assert loaded_entry["version"] == "pcrs_rag_v2_need_units"
+    assert "which" not in subjects
+    assert loaded_entry["qdmr_steps"]
+
+    metrics = compute_requirement_state_metrics(
+        cache_entry=loaded_entry,
+        selected_positions=[0, 1],
+    )
+    assert metrics["entity_locator_support"] >= 0.0
+    assert metrics["answer_slot_support"] >= 0.0
+    assert metrics["selected_annotation_count"] == 2.0
+
+
+def test_need_unit_feature_matrix_uses_v2_feature_order():
+    feature_rows = [{
+        "support_completeness_gain": 0.4,
+        "relation_hop_support_after": 0.7,
+        "doc_contradiction_mean": 0.2,
+    }]
+    matrix = requirement_feature_rows_to_matrix(
+        feature_rows,
+        feature_names=NEED_UNIT_MATCHER_FEATURE_NAMES,
+    )
+
+    assert matrix.shape == (1, len(NEED_UNIT_MATCHER_FEATURE_NAMES))
+    assert matrix[0, NEED_UNIT_MATCHER_FEATURE_NAMES.index("relation_hop_support_after")] == 0.7
+    assert matrix[0, NEED_UNIT_MATCHER_FEATURE_NAMES.index("doc_contradiction_mean")] == 0.2
+
+
 def test_select_requirement_beam_positions_prefers_low_leakage_chain():
     cache_entry = {
         "annotation_pool_k": 4,
@@ -1794,6 +1866,100 @@ def test_select_requirement_beam_positions_prefers_low_leakage_chain():
     assert trace["beam_best_support_completeness"] > 0.5
     assert trace["beam_best_counterfactual_leakage"] < 0.5
     assert trace["beam_finalists"][0]["selected_positions"] == [0, 1, 3]
+
+
+def test_select_requirement_beam_positions_supports_v2_need_unit_cache_entries():
+    cache_entry = {
+        "version": "pcrs_rag_v2_need_units",
+        "annotation_pool_k": 4,
+        "positive_need_units": [
+            {"unit_id": "u0", "unit_type": "entity_locator"},
+            {"unit_id": "u1", "unit_type": "relation_hop"},
+            {"unit_id": "u2", "unit_type": "answer_slot"},
+        ],
+        "counterfactual_sets": [
+            {
+                "cf_id": "cf_0",
+                "requirements": [
+                    {"unit_id": "u0", "unit_type": "entity_locator"},
+                    {"unit_id": "u1_cf", "unit_type": "relation_hop"},
+                    {"unit_id": "u2", "unit_type": "answer_slot"},
+                ],
+            }
+        ],
+        "pool_titles": ["A", "Bridge", "Leak", "Answer"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "A",
+                "positive_need_unit_scores": {"u0": 1.0, "u1": 0.0, "u2": 0.0},
+                "positive_requirement_scores": {"u0": 1.0, "u1": 0.0, "u2": 0.0},
+                "counterfactual_requirement_scores": {"cf_0": {"u0": 0.0, "u1_cf": 0.0, "u2": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge",
+                "positive_need_unit_scores": {"u0": 0.1, "u1": 1.0, "u2": 0.2},
+                "positive_requirement_scores": {"u0": 0.1, "u1": 1.0, "u2": 0.2},
+                "counterfactual_requirement_scores": {"cf_0": {"u0": 0.0, "u1_cf": 0.0, "u2": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Leak",
+                "positive_need_unit_scores": {"u0": 0.1, "u1": 0.7, "u2": 0.1},
+                "positive_requirement_scores": {"u0": 0.1, "u1": 0.7, "u2": 0.1},
+                "counterfactual_requirement_scores": {"cf_0": {"u0": 0.9, "u1_cf": 1.0, "u2": 0.9}},
+                "counterfactual_set_scores": {"cf_0": 0.933333},
+            },
+            {
+                "pool_position": 3,
+                "doc_title": "Answer",
+                "positive_need_unit_scores": {"u0": 0.0, "u1": 0.2, "u2": 1.0},
+                "positive_requirement_scores": {"u0": 0.0, "u1": 0.2, "u2": 1.0},
+                "counterfactual_requirement_scores": {"cf_0": {"u0": 0.0, "u1_cf": 0.0, "u2": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+        ],
+    }
+
+    selected_positions, trace = select_requirement_beam_positions(
+        pool_doc_ids=[10, 11, 12, 13],
+        pool_doc_scores=np.array([0.9, 0.6, 0.8, 0.4], dtype=float),
+        pool_doc_titles=["A", "Bridge", "Leak", "Answer"],
+        doc_idx_to_entities={
+            10: {"person a"},
+            11: {"bridge"},
+            12: {"fake bridge"},
+            13: {"target"},
+        },
+        doc_idx_to_edges={
+            10: [],
+            11: [],
+            12: [],
+            13: [],
+        },
+        adjacency={
+            "person a": [("bridge", 1.0, "related_to"), ("fake bridge", 1.0, "related_to")],
+            "bridge": [("target", 1.0, "related_to")],
+            "fake bridge": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=3,
+        cache_entry=cache_entry,
+        initial_seed_entities={"person a"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=2,
+        beam_width=3,
+        beam_expand_per_state=3,
+        non_anchor_title_dedup=True,
+    )
+
+    assert selected_positions == [0, 1, 3]
+    assert trace["requirement_positive_count"] == 3
+    assert trace["beam_best_support_completeness"] > 0.5
 
 
 def test_requirement_beam_dedupes_permuted_doc_sets_by_canonical_signature():

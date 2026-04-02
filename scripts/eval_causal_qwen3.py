@@ -1871,7 +1871,10 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
             }
             predicted_scores_by_position: Dict[int, float] = {}
             if normalized_mode == "learned" and candidate_feature_rows:
-                feature_matrix = requirement_feature_rows_to_matrix(candidate_feature_rows)
+                feature_matrix = requirement_feature_rows_to_matrix(
+                    candidate_feature_rows,
+                    feature_names=requirement_model_bundle.get("feature_names") if requirement_model_bundle is not None else None,
+                )
                 predicted_scores = predict_binary_scores(requirement_model_bundle, feature_matrix)
                 learned_eval_count += len(candidate_feature_rows)
                 for row, predicted_score in zip(candidate_feature_rows, predicted_scores):
@@ -2009,7 +2012,7 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_best_counterfactual_leakage": round(float(best_metrics["counterfactual_leakage"]), 4),
         "beam_best_utility_margin": round(float(best_metrics["utility_margin"]), 4),
         "beam_best_utopia_distance": round(float(best_metrics["utopia_distance"]), 4),
-        "requirement_positive_count": int(len(cache_entry.get("positive_requirements", []))),
+        "requirement_positive_count": int(len(cache_entry.get("positive_need_units", cache_entry.get("positive_requirements", [])))),
         "requirement_counterfactual_count": int(len(cache_entry.get("counterfactual_sets", []))),
         "beam_finalists": beam_finalists,
     }

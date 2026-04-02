@@ -19,7 +19,17 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from build_requirement_cache import build_canonical_args, load_dataset, resolve_save_dir
 from eval_causal_qwen3 import build_config, build_doc_text_to_chunk_id, get_gold_docs
-from requirement_beam_utils import align_requirement_cache_entry_to_pool, load_requirement_cache, resolve_requirement_cache_entry
+from requirement_beam_utils import (
+    align_requirement_cache_entry_to_pool,
+    get_counterfactual_score_map,
+    get_counterfactual_sets,
+    get_positive_score_map,
+    get_positive_units,
+    get_requirement_cache_version,
+    get_requirement_group_types,
+    load_requirement_cache,
+    resolve_requirement_cache_entry,
+)
 from src.hipporag.HippoRAG import HippoRAG
 
 
@@ -113,22 +123,32 @@ def threshold_rates(scores: Sequence[float], thresholds: Sequence[float]) -> Dic
 def suspicious_anchor_rate(cache_entries: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     wh_tokens = {"when", "where", "who", "what", "which", "how", "whom", "why"}
     anchor_texts: List[str] = []
+    subject_texts: List[str] = []
     suspicious = 0
     for entry in cache_entries:
-        for requirement in entry.get("positive_requirements", []):
-            if str(requirement.get("type", "")) != "anchor":
-                continue
-            text = str(requirement.get("normalized_text", "")).strip().lower()
-            if not text:
-                continue
-            anchor_texts.append(text)
-            if text in wh_tokens:
-                suspicious += 1
-    return rounded_dict({
+        for requirement in get_positive_units(entry):
+            requirement_type = str(requirement.get("unit_type", requirement.get("type", ""))).strip()
+            if requirement_type == "anchor":
+                text = str(requirement.get("normalized_text", "")).strip().lower()
+                if not text:
+                    continue
+                anchor_texts.append(text)
+                if text in wh_tokens:
+                    suspicious += 1
+            subject = str(requirement.get("subject", "")).strip().lower()
+            if subject:
+                subject_texts.append(subject)
+    payload = {
         "anchor_requirement_count": len(anchor_texts),
         "suspicious_wh_anchor_count": suspicious,
         "suspicious_wh_anchor_rate": safe_div(suspicious, len(anchor_texts)),
-    })
+    }
+    if subject_texts:
+        suspicious_subjects = sum(1 for subject in subject_texts if subject in wh_tokens)
+        payload["need_unit_subject_count"] = len(subject_texts)
+        payload["suspicious_wh_subject_count"] = suspicious_subjects
+        payload["suspicious_wh_subject_rate"] = safe_div(suspicious_subjects, len(subject_texts))
+    return rounded_dict(payload)
 
 
 def build_runtime_args(report: Dict[str, Any], dataset: str, save_dir_root: str) -> SimpleNamespace:
@@ -212,14 +232,12 @@ def compute_state_detail(cache_entry: Dict[str, Any],
 
     positive_requirement_coverages: Dict[str, float] = {}
     group_values: Dict[str, List[float]] = {}
-    for requirement in cache_entry.get("positive_requirements", []):
-        requirement_id = str(requirement.get("requirement_id", ""))
-        requirement_type = str(requirement.get("type", "bridge"))
+    for requirement in get_positive_units(cache_entry):
+        requirement_id = str(requirement.get("unit_id", requirement.get("requirement_id", "")))
+        requirement_type = str(requirement.get("unit_type", requirement.get("type", "bridge")))
         scores = [
             float(
-                annotations_by_position[pos]
-                .get("positive_requirement_scores", {})
-                .get(requirement_id, 0.0)
+                get_positive_score_map(annotations_by_position[pos]).get(requirement_id, 0.0)
             )
             for pos in unique_positions
             if pos in annotations_by_position
@@ -237,17 +255,14 @@ def compute_state_detail(cache_entry: Dict[str, Any],
     counterfactual_set_coverages: Dict[str, float] = {}
     counterfactual_requirement_coverages: Dict[str, Dict[str, float]] = {}
     requirement_ranges: List[float] = []
-    for cf_set in cache_entry.get("counterfactual_sets", []):
+    for cf_set in get_counterfactual_sets(cache_entry):
         cf_id = str(cf_set.get("cf_id", ""))
         requirement_scores: Dict[str, float] = {}
         for requirement in cf_set.get("requirements", []):
-            requirement_id = str(requirement.get("requirement_id", ""))
+            requirement_id = str(requirement.get("unit_id", requirement.get("requirement_id", "")))
             scores = [
                 float(
-                    annotations_by_position[pos]
-                    .get("counterfactual_requirement_scores", {})
-                    .get(cf_id, {})
-                    .get(requirement_id, 0.0)
+                    get_counterfactual_score_map(annotations_by_position[pos]).get(cf_id, {}).get(requirement_id, 0.0)
                 )
                 for pos in unique_positions
                 if pos in annotations_by_position
