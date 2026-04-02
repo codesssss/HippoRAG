@@ -1981,3 +1981,47 @@ def test_align_requirement_cache_entry_to_pool_reorders_annotations_by_title():
     assert [row["pool_position"] for row in aligned_entry["doc_annotations"]] == [0, 1, 2]
     assert aligned_entry["doc_annotations"][1]["positive_requirement_scores"]["anchor_0"] == 0.2
     assert aligned_entry["diagnostics"]["title_aligned_from_cache"] is True
+
+
+def test_align_requirement_cache_entry_to_pool_rebuilds_missing_titles_from_runtime_docs():
+    cache_entry = build_requirement_cache_entry(
+        query_index=0,
+        question="Where was Alpha born?",
+        pool_docs=[
+            "Alpha\nAlpha was born in Paris.",
+            "Beta\nBeta links Alpha to Paris.",
+            "Gamma\nGamma is a distractor.",
+        ],
+        pool_doc_entities=[
+            {"alpha", "paris"},
+            {"beta", "alpha", "paris"},
+            {"gamma"},
+        ],
+        seed_entities={"alpha"},
+        question_entities={"alpha"},
+        annotation_pool_k=3,
+    )
+
+    aligned_entry = align_requirement_cache_entry_to_pool(
+        cache_entry=cache_entry,
+        pool_titles=["Alpha", "Delta", "Gamma"],
+        pool_docs=[
+            "Alpha\nAlpha was born in Paris.",
+            "Delta\nDelta mentions Paris as Alpha's birthplace.",
+            "Gamma\nGamma is a distractor.",
+        ],
+        pool_doc_entities=[
+            {"alpha", "paris"},
+            {"delta", "alpha", "paris"},
+            {"gamma"},
+        ],
+    )
+
+    assert aligned_entry["pool_titles"] == ["Alpha", "Delta", "Gamma"]
+    assert [row["doc_title"] for row in aligned_entry["doc_annotations"]] == ["Alpha", "Delta", "Gamma"]
+    rebuilt_row = aligned_entry["doc_annotations"][1]
+    assert rebuilt_row["pool_position"] == 1
+    assert rebuilt_row["doc_title"] == "Delta"
+    assert rebuilt_row["positive_requirement_scores"]
+    assert aligned_entry["diagnostics"]["title_alignment_rebuilt_count"] == 1
+    assert aligned_entry["diagnostics"]["title_alignment_rebuilt_first_title"] == "Delta"

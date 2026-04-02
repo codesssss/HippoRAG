@@ -339,6 +339,51 @@ def score_requirement_coverage(requirement: Dict[str, Any],
     return round(float(min(1.0, max(phrase_match, entity_overlap, lexical_score))), 6)
 
 
+def build_requirement_doc_annotation(pool_position: int,
+                                     doc_text: str,
+                                     doc_entities: Sequence[str] | Set[str] | None,
+                                     positive_requirements: Sequence[Dict[str, Any]],
+                                     counterfactual_sets: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    doc_title, doc_body = (str(doc_text).split("\n", 1) + [""])[:2]
+    normalized_doc_entities = unique_ordered_texts(doc_entities)
+
+    positive_scores = {
+        str(requirement["requirement_id"]): score_requirement_coverage(
+            requirement=requirement,
+            doc_title=doc_title,
+            doc_body=doc_body,
+            doc_entities=normalized_doc_entities,
+        )
+        for requirement in positive_requirements
+    }
+
+    counterfactual_scores: Dict[str, Dict[str, float]] = {}
+    counterfactual_set_scores: Dict[str, float] = {}
+    for cf_set in counterfactual_sets:
+        requirement_scores = {
+            str(requirement["requirement_id"]): score_requirement_coverage(
+                requirement=requirement,
+                doc_title=doc_title,
+                doc_body=doc_body,
+                doc_entities=normalized_doc_entities,
+            )
+            for requirement in cf_set.get("requirements", [])
+        }
+        counterfactual_scores[str(cf_set["cf_id"])] = requirement_scores
+        counterfactual_set_scores[str(cf_set["cf_id"])] = round(
+            float(np.mean(list(requirement_scores.values()))) if requirement_scores else 0.0,
+            6,
+        )
+
+    return {
+        "pool_position": int(pool_position),
+        "doc_title": doc_title,
+        "positive_requirement_scores": positive_scores,
+        "counterfactual_requirement_scores": counterfactual_scores,
+        "counterfactual_set_scores": counterfactual_set_scores,
+    }
+
+
 def build_requirement_cache_entry(query_index: int,
                                   question: str,
                                   pool_docs: Sequence[str],
@@ -363,45 +408,13 @@ def build_requirement_cache_entry(query_index: int,
     doc_annotations: List[Dict[str, Any]] = []
     effective_annotation_pool_k = min(len(pool_docs), max(int(annotation_pool_k), 0))
     for pool_position in range(effective_annotation_pool_k):
-        doc_text = str(pool_docs[pool_position])
-        doc_title, doc_body = (doc_text.split("\n", 1) + [""])[:2]
-        doc_entities = unique_ordered_texts(pool_doc_entities[pool_position] if pool_position < len(pool_doc_entities) else [])
-
-        positive_scores = {
-            str(requirement["requirement_id"]): score_requirement_coverage(
-                requirement=requirement,
-                doc_title=doc_title,
-                doc_body=doc_body,
-                doc_entities=doc_entities,
-            )
-            for requirement in positive_requirements
-        }
-
-        counterfactual_scores: Dict[str, Dict[str, float]] = {}
-        counterfactual_set_scores: Dict[str, float] = {}
-        for cf_set in counterfactual_sets:
-            requirement_scores = {
-                str(requirement["requirement_id"]): score_requirement_coverage(
-                    requirement=requirement,
-                    doc_title=doc_title,
-                    doc_body=doc_body,
-                    doc_entities=doc_entities,
-                )
-                for requirement in cf_set.get("requirements", [])
-            }
-            counterfactual_scores[str(cf_set["cf_id"])] = requirement_scores
-            counterfactual_set_scores[str(cf_set["cf_id"])] = round(
-                float(np.mean(list(requirement_scores.values()))) if requirement_scores else 0.0,
-                6,
-            )
-
-        doc_annotations.append({
-            "pool_position": int(pool_position),
-            "doc_title": doc_title,
-            "positive_requirement_scores": positive_scores,
-            "counterfactual_requirement_scores": counterfactual_scores,
-            "counterfactual_set_scores": counterfactual_set_scores,
-        })
+        doc_annotations.append(build_requirement_doc_annotation(
+            pool_position=pool_position,
+            doc_text=str(pool_docs[pool_position]),
+            doc_entities=pool_doc_entities[pool_position] if pool_position < len(pool_doc_entities) else [],
+            positive_requirements=positive_requirements,
+            counterfactual_sets=counterfactual_sets,
+        ))
 
     return {
         "query_index": int(query_index),
@@ -484,7 +497,9 @@ def validate_requirement_cache_entry(cache_entry: Dict[str, Any],
 
 
 def align_requirement_cache_entry_to_pool(cache_entry: Dict[str, Any],
-                                          pool_titles: Sequence[str]) -> Dict[str, Any]:
+                                          pool_titles: Sequence[str],
+                                          pool_docs: Sequence[str] | None = None,
+                                          pool_doc_entities: Sequence[Sequence[str] | Set[str]] | None = None) -> Dict[str, Any]:
     cached_titles = list(cache_entry.get("pool_titles", []))
     effective_length = min(
         int(cache_entry.get("annotation_pool_k", 0) or 0),
@@ -504,15 +519,31 @@ def align_requirement_cache_entry_to_pool(cache_entry: Dict[str, Any],
 
     aligned_annotations: List[Dict[str, Any]] = []
     missing_titles: List[str] = []
+    rebuilt_titles: List[str] = []
+    positive_requirements = list(cache_entry.get("positive_requirements", []))
+    counterfactual_sets = list(cache_entry.get("counterfactual_sets", []))
     for pool_position, raw_title in enumerate(pool_titles[:effective_length]):
         title = str(raw_title).strip()
         candidates = annotations_by_title.get(title, [])
-        if not candidates:
+        if candidates:
+            aligned_annotation = copy.deepcopy(candidates.pop(0))
+            aligned_annotation["pool_position"] = int(pool_position)
+            aligned_annotation["doc_title"] = title
+        elif pool_docs is not None and pool_position < len(pool_docs):
+            doc_entities = []
+            if pool_doc_entities is not None and pool_position < len(pool_doc_entities):
+                doc_entities = pool_doc_entities[pool_position]
+            aligned_annotation = build_requirement_doc_annotation(
+                pool_position=pool_position,
+                doc_text=str(pool_docs[pool_position]),
+                doc_entities=doc_entities,
+                positive_requirements=positive_requirements,
+                counterfactual_sets=counterfactual_sets,
+            )
+            rebuilt_titles.append(title)
+        else:
             missing_titles.append(title)
             continue
-        aligned_annotation = copy.deepcopy(candidates.pop(0))
-        aligned_annotation["pool_position"] = int(pool_position)
-        aligned_annotation["doc_title"] = title
         aligned_annotations.append(aligned_annotation)
 
     if missing_titles:
@@ -528,6 +559,9 @@ def align_requirement_cache_entry_to_pool(cache_entry: Dict[str, Any],
     diagnostics = dict(aligned_entry.get("diagnostics", {}) or {})
     diagnostics["title_aligned_from_cache"] = True
     diagnostics["title_alignment_size"] = int(effective_length)
+    diagnostics["title_alignment_rebuilt_count"] = int(len(rebuilt_titles))
+    if rebuilt_titles:
+        diagnostics["title_alignment_rebuilt_first_title"] = rebuilt_titles[0]
     aligned_entry["diagnostics"] = diagnostics
     return aligned_entry
 

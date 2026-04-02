@@ -3418,9 +3418,16 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     pool_titles=pool_titles,
                 )
             except ValueError:
+                pool_doc_entities = [
+                    hipporag.doc_idx_to_structure_entities.get(int(doc_id), set())
+                    if doc_id is not None else set()
+                    for doc_id in pool_doc_ids
+                ]
                 cache_entry = align_requirement_cache_entry_to_pool(
                     cache_entry=cache_entry,
                     pool_titles=pool_titles,
+                    pool_docs=pool_docs,
+                    pool_doc_entities=pool_doc_entities,
                 )
             requirement_cache_hit_count += 1
             selected_positions, selector_trace = select_requirement_beam_positions(
