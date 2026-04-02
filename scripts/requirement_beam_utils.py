@@ -501,15 +501,25 @@ def align_requirement_cache_entry_to_pool(cache_entry: Dict[str, Any],
                                           pool_docs: Sequence[str] | None = None,
                                           pool_doc_entities: Sequence[Sequence[str] | Set[str]] | None = None) -> Dict[str, Any]:
     cached_titles = list(cache_entry.get("pool_titles", []))
-    effective_length = min(
-        int(cache_entry.get("annotation_pool_k", 0) or 0),
-        len(cached_titles),
-        len(pool_titles),
-    )
+    cached_annotation_pool_k = int(cache_entry.get("annotation_pool_k", 0) or 0)
+    if pool_docs is not None:
+        effective_length = min(len(pool_titles), len(pool_docs))
+        if pool_doc_entities is not None:
+            effective_length = min(effective_length, len(pool_doc_entities))
+    else:
+        effective_length = min(
+            cached_annotation_pool_k,
+            len(cached_titles),
+            len(pool_titles),
+        )
     if effective_length <= 0:
         return cache_entry
 
-    if cached_titles[:effective_length] == [str(title).strip() for title in pool_titles[:effective_length]]:
+    normalized_pool_titles = [str(title).strip() for title in pool_titles[:effective_length]]
+    if (
+        effective_length <= cached_annotation_pool_k
+        and cached_titles[:effective_length] == normalized_pool_titles
+    ):
         return cache_entry
 
     annotations_by_title: Dict[str, List[Dict[str, Any]]] = {}
@@ -553,7 +563,7 @@ def align_requirement_cache_entry_to_pool(cache_entry: Dict[str, Any],
         )
 
     aligned_entry = copy.deepcopy(cache_entry)
-    aligned_entry["pool_titles"] = [str(title).strip() for title in pool_titles[:effective_length]]
+    aligned_entry["pool_titles"] = normalized_pool_titles
     aligned_entry["doc_annotations"] = aligned_annotations
     aligned_entry["annotation_pool_k"] = int(effective_length)
     diagnostics = dict(aligned_entry.get("diagnostics", {}) or {})

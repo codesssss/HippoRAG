@@ -80,7 +80,7 @@ DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG = {
 }
 DEFAULT_SET_CLOSURE_EXACT_PATH_MAX_DOCS = 4
 DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR = 1
-DEFAULT_REQUIREMENT_BEAM_PROJECTED_SHORTLIST_FACTOR = 1
+DEFAULT_REQUIREMENT_BEAM_PROJECTED_SHORTLIST_FACTOR = 3
 
 SETWISE_LLM_JSON_START_TAG = "<JSON>"
 SETWISE_LLM_JSON_END_TAG = "</JSON>"
@@ -912,11 +912,30 @@ def rerank_completed_evidence_sets_with_llm(query: str,
 def resolve_reserved_positions(candidate_count: int,
                                target_k: int,
                                anchor_count: int,
-                               reserve_top_m: int) -> Tuple[List[int], List[int]]:
+                               reserve_top_m: int,
+                               pool_doc_titles: Sequence[str] | None = None,
+                               dedup_titles: bool = False) -> Tuple[List[int], List[int]]:
     actual_anchor_count = min(max(anchor_count, 0), target_k, candidate_count)
     actual_reserve_count = min(max(actual_anchor_count, max(reserve_top_m, 0)), target_k, candidate_count)
-    anchor_positions = list(range(actual_anchor_count))
-    reserved_positions = list(range(actual_reserve_count))
+    if not dedup_titles or pool_doc_titles is None:
+        anchor_positions = list(range(actual_anchor_count))
+        reserved_positions = list(range(actual_reserve_count))
+        return anchor_positions, reserved_positions
+
+    deduped_positions: List[int] = []
+    seen_titles: Set[str] = set()
+    for pos in range(candidate_count):
+        title = str(pool_doc_titles[pos]).strip() if pos < len(pool_doc_titles) else ""
+        if title and title in seen_titles:
+            continue
+        deduped_positions.append(pos)
+        if title:
+            seen_titles.add(title)
+        if len(deduped_positions) >= actual_reserve_count:
+            break
+
+    anchor_positions = deduped_positions[:actual_anchor_count]
+    reserved_positions = deduped_positions[:actual_reserve_count]
     return anchor_positions, reserved_positions
 
 
@@ -1665,10 +1684,7 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                                       requirement_model_bundle: Dict[str, object] | None = None,
                                       requirement_smooth_tau: float = DEFAULT_REQUIREMENT_SMOOTH_TAU,
                                       requirement_counterfactual_tau: float = DEFAULT_REQUIREMENT_CF_TAU) -> Tuple[List[int], Dict[str, object]]:
-    effective_candidate_count = min(
-        len(pool_doc_ids),
-        int(cache_entry.get("annotation_pool_k", 0) or 0),
-    )
+    effective_candidate_count = len(pool_doc_ids)
     normalized_mode = str(requirement_mode or "oracle").strip().lower()
     if normalized_mode not in {"oracle", "learned"}:
         raise ValueError(f"Unsupported requirement beam mode: {requirement_mode}")
@@ -1706,6 +1722,8 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         target_k=target_k,
         anchor_count=anchor_count,
         reserve_top_m=reserve_top_m,
+        pool_doc_titles=pool_doc_titles[:effective_candidate_count] if pool_doc_titles is not None else None,
+        dedup_titles=bool(non_anchor_title_dedup),
     )
     selection_target_k = resolve_selection_target_k(
         target_k=target_k,
@@ -3412,17 +3430,22 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 question=qs.question,
                 query_index=q_idx,
             )
+            pool_doc_entities = [
+                hipporag.doc_idx_to_structure_entities.get(int(doc_id), set())
+                if doc_id is not None else set()
+                for doc_id in pool_doc_ids
+            ]
+            needs_cache_alignment = (
+                len(pool_titles) > int(cache_entry.get("annotation_pool_k", 0) or 0)
+            )
             try:
                 validate_requirement_cache_entry(
                     cache_entry=cache_entry,
                     pool_titles=pool_titles,
                 )
             except ValueError:
-                pool_doc_entities = [
-                    hipporag.doc_idx_to_structure_entities.get(int(doc_id), set())
-                    if doc_id is not None else set()
-                    for doc_id in pool_doc_ids
-                ]
+                needs_cache_alignment = True
+            if needs_cache_alignment:
                 cache_entry = align_requirement_cache_entry_to_pool(
                     cache_entry=cache_entry,
                     pool_titles=pool_titles,

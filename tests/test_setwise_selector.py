@@ -25,6 +25,7 @@ from eval_causal_qwen3 import (
     normalize_setwise_late_rerank_policy,
     parse_setwise_late_rerank_response,
     rerank_completed_evidence_sets_with_llm,
+    resolve_reserved_positions,
     resolve_setwise_query_targets,
     score_evidence_state,
     select_bridge_beam_positions,
@@ -1879,7 +1880,7 @@ def test_requirement_beam_learned_mode_reorders_widened_shortlist_before_expansi
         ],
     }
 
-    oracle_positions, _ = select_requirement_beam_positions(
+    oracle_positions, oracle_trace = select_requirement_beam_positions(
         pool_doc_ids=[30, 31, 32],
         pool_doc_scores=np.array([0.95, 0.80, 0.20], dtype=float),
         pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Support"],
@@ -1935,10 +1936,117 @@ def test_requirement_beam_learned_mode_reorders_widened_shortlist_before_expansi
         requirement_model_bundle={"model": DummyRequirementPriorModel()},
     )
 
-    assert oracle_positions == [0, 1]
+    assert oracle_positions == [0, 2]
     assert learned_positions == [0, 2]
+    assert oracle_positions == learned_positions
+    assert oracle_trace["selection_steps"][1]["proposal_rank"] == 2
+    assert learned_trace["selection_steps"][1]["proposal_rank"] == 1
     assert learned_trace["beam_learned_eval_count"] == 2
     assert learned_trace["selection_steps"][1]["predicted_utility"] > 0.0
+
+
+def test_requirement_beam_oracle_widened_shortlist_allows_state_rescue():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+            {"requirement_id": "decision_0", "type": "decision"},
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Anchor", "Bridge Prior", "Bridge Rescue"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge Prior",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.1, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Bridge Rescue",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 1.0, "decision_0": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    legacy_positions, legacy_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.90, 0.05], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Rescue"],
+        doc_idx_to_entities={
+            40: {"anchor"},
+            41: {"bridge prior"},
+            42: {"bridge rescue"},
+        },
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=1,
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+    projected_positions, projected_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.90, 0.05], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Rescue"],
+        doc_idx_to_entities={
+            40: {"anchor"},
+            41: {"bridge prior"},
+            42: {"bridge rescue"},
+        },
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=3,
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+
+    assert legacy_positions == [0, 1]
+    assert projected_positions == [0, 2]
+    assert legacy_trace["selection_steps"][1]["proposal_rank"] == 1
+    assert projected_trace["selection_steps"][1]["proposal_rank"] == 2
+
+
+def test_resolve_reserved_positions_dedupes_prefix_titles():
+    anchor_positions, reserved_positions = resolve_reserved_positions(
+        candidate_count=5,
+        target_k=3,
+        anchor_count=2,
+        reserve_top_m=3,
+        pool_doc_titles=["A", "A", "B", "C", "D"],
+        dedup_titles=True,
+    )
+
+    assert anchor_positions == [0, 2]
+    assert reserved_positions == [0, 2, 3]
 
 
 def test_align_requirement_cache_entry_to_pool_reorders_annotations_by_title():
@@ -2025,3 +2133,45 @@ def test_align_requirement_cache_entry_to_pool_rebuilds_missing_titles_from_runt
     assert rebuilt_row["positive_requirement_scores"]
     assert aligned_entry["diagnostics"]["title_alignment_rebuilt_count"] == 1
     assert aligned_entry["diagnostics"]["title_alignment_rebuilt_first_title"] == "Delta"
+
+
+def test_align_requirement_cache_entry_to_pool_extends_runtime_pool_beyond_cached_annotation_depth():
+    cache_entry = build_requirement_cache_entry(
+        query_index=0,
+        question="Where was Alpha born?",
+        pool_docs=[
+            "Alpha\nAlpha was born in Paris.",
+            "Beta\nBeta links Alpha to Paris.",
+        ],
+        pool_doc_entities=[
+            {"alpha", "paris"},
+            {"beta", "alpha", "paris"},
+        ],
+        seed_entities={"alpha"},
+        question_entities={"alpha"},
+        annotation_pool_k=2,
+    )
+
+    aligned_entry = align_requirement_cache_entry_to_pool(
+        cache_entry=cache_entry,
+        pool_titles=["Alpha", "Beta", "Gamma", "Delta"],
+        pool_docs=[
+            "Alpha\nAlpha was born in Paris.",
+            "Beta\nBeta links Alpha to Paris.",
+            "Gamma\nGamma is located in France.",
+            "Delta\nDelta mentions Alpha and Paris together.",
+        ],
+        pool_doc_entities=[
+            {"alpha", "paris"},
+            {"beta", "alpha", "paris"},
+            {"gamma", "france"},
+            {"delta", "alpha", "paris"},
+        ],
+    )
+
+    assert aligned_entry["annotation_pool_k"] == 4
+    assert aligned_entry["pool_titles"] == ["Alpha", "Beta", "Gamma", "Delta"]
+    assert [row["pool_position"] for row in aligned_entry["doc_annotations"]] == [0, 1, 2, 3]
+    assert [row["doc_title"] for row in aligned_entry["doc_annotations"]] == ["Alpha", "Beta", "Gamma", "Delta"]
+    assert aligned_entry["diagnostics"]["title_alignment_rebuilt_count"] == 2
+    assert aligned_entry["diagnostics"]["title_alignment_rebuilt_first_title"] == "Gamma"

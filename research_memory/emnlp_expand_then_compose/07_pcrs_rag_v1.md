@@ -9,7 +9,8 @@ This note documents the new parallel branch around `requirement_beam`.
 Current status:
 - implementation landed
 - tests for the new selector path passed locally through a Python harness
-- no benchmark result files exist yet
+- initial smoke reports now exist for `2Wiki` and `MuSiQue`
+- branch-definition fixes landed for canonical set signatures, learned-mode shortlist reordering, runtime cache alignment, and prefix / pool behavior
 
 This is not the current paper-facing mainline.
 
@@ -95,8 +96,8 @@ New selector:
 - `--setwise_selector requirement_beam`
 
 Search structure:
-- keep the widened deep pool
-- preserve prefix anchors / reserves as before
+- keep the widened deep pool as the effective search space, not just the nominal pool size
+- preserve prefix anchors / reserves, but dedupe repeated titles inside the reserved prefix when title dedup is enabled
 - expand candidate states
 - canonicalize beam state identity by document set signature
 - prune by Pareto dominance
@@ -104,7 +105,8 @@ Search structure:
 
 Important nuance:
 - proposal generation still reuses the old cheap bridge-aware candidate scorer as a pruning prior
-- the new branch changes the state objective first, not the whole proposal layer
+- the branch still changes the state objective first, not the whole proposal layer
+- but the requirement branch should not collapse back to an old-bridge top-4 reranker: oracle mode must see a widened shortlist and the full runtime pool
 
 ### 4. Optional Learned Prior
 
@@ -192,6 +194,7 @@ Main risks:
 - requirement typing is still coarse
 - proposal and state objectives are still not perfectly unified
 - counterfactual sets are still heuristic rather than model-generated
+- `MuSiQue` is especially sensitive to shallow shortlist bias and heavy reserved prefixes
 
 This means the branch is currently:
 - high-information
@@ -216,9 +219,11 @@ Until then, the correct project state is:
 Run in this order:
 
 1. build a first cache with `annotation_pool_k = 50`
-2. run `requirement_beam` in oracle mode on a small `2Wiki` and `MuSiQue` slice
-3. inspect mechanism metrics before EM/F1 only:
+2. at eval time, expand the effective requirement annotation coverage to the runtime pool instead of truncating search to the cached `annotation_pool_k`
+3. run `requirement_beam` in oracle mode on a small `2Wiki` and `MuSiQue` slice with a widened requirement shortlist
+4. inspect whether prefix title dedup reduces repeated-anchor waste on `MuSiQue`
+5. inspect mechanism metrics before EM/F1 only:
    - support completeness
    - counterfactual leakage
    - frontier size
-4. train the lightweight matcher only if the oracle branch shows real signal
+6. train the lightweight matcher only if the oracle branch shows real signal
