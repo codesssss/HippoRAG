@@ -22,6 +22,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from requirement_beam_utils import (
+    align_requirement_cache_entry_to_pool,
     canonicalize_requirement_positions,
     DEFAULT_REQUIREMENT_ANNOTATION_POOL_K,
     DEFAULT_REQUIREMENT_CF_TAU,
@@ -3411,10 +3412,16 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 question=qs.question,
                 query_index=q_idx,
             )
-            validate_requirement_cache_entry(
-                cache_entry=cache_entry,
-                pool_titles=pool_titles,
-            )
+            try:
+                validate_requirement_cache_entry(
+                    cache_entry=cache_entry,
+                    pool_titles=pool_titles,
+                )
+            except ValueError:
+                cache_entry = align_requirement_cache_entry_to_pool(
+                    cache_entry=cache_entry,
+                    pool_titles=pool_titles,
+                )
             requirement_cache_hit_count += 1
             selected_positions, selector_trace = select_requirement_beam_positions(
                 pool_doc_ids=pool_doc_ids,

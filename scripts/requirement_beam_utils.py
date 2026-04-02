@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import copy
 import re
 import sys
 from collections import Counter
@@ -480,6 +481,55 @@ def validate_requirement_cache_entry(cache_entry: Dict[str, Any],
                 "Requirement cache pool mismatch at position "
                 f"{idx}: cache={cached_titles[idx]!r} current={pool_titles[idx]!r}"
             )
+
+
+def align_requirement_cache_entry_to_pool(cache_entry: Dict[str, Any],
+                                          pool_titles: Sequence[str]) -> Dict[str, Any]:
+    cached_titles = list(cache_entry.get("pool_titles", []))
+    effective_length = min(
+        int(cache_entry.get("annotation_pool_k", 0) or 0),
+        len(cached_titles),
+        len(pool_titles),
+    )
+    if effective_length <= 0:
+        return cache_entry
+
+    if cached_titles[:effective_length] == [str(title).strip() for title in pool_titles[:effective_length]]:
+        return cache_entry
+
+    annotations_by_title: Dict[str, List[Dict[str, Any]]] = {}
+    for annotation in cache_entry.get("doc_annotations", []):
+        title = str(annotation.get("doc_title", "")).strip()
+        annotations_by_title.setdefault(title, []).append(annotation)
+
+    aligned_annotations: List[Dict[str, Any]] = []
+    missing_titles: List[str] = []
+    for pool_position, raw_title in enumerate(pool_titles[:effective_length]):
+        title = str(raw_title).strip()
+        candidates = annotations_by_title.get(title, [])
+        if not candidates:
+            missing_titles.append(title)
+            continue
+        aligned_annotation = copy.deepcopy(candidates.pop(0))
+        aligned_annotation["pool_position"] = int(pool_position)
+        aligned_annotation["doc_title"] = title
+        aligned_annotations.append(aligned_annotation)
+
+    if missing_titles:
+        raise ValueError(
+            "Requirement cache title alignment failed; missing "
+            f"{len(missing_titles)} titles, first={missing_titles[0]!r}"
+        )
+
+    aligned_entry = copy.deepcopy(cache_entry)
+    aligned_entry["pool_titles"] = [str(title).strip() for title in pool_titles[:effective_length]]
+    aligned_entry["doc_annotations"] = aligned_annotations
+    aligned_entry["annotation_pool_k"] = int(effective_length)
+    diagnostics = dict(aligned_entry.get("diagnostics", {}) or {})
+    diagnostics["title_aligned_from_cache"] = True
+    diagnostics["title_alignment_size"] = int(effective_length)
+    aligned_entry["diagnostics"] = diagnostics
+    return aligned_entry
 
 
 def _smooth_min(values: Sequence[float], tau: float) -> float:

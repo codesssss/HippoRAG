@@ -34,6 +34,7 @@ from eval_causal_qwen3 import (
     should_apply_setwise_late_rerank_override,
 )
 from requirement_beam_utils import (
+    align_requirement_cache_entry_to_pool,
     build_requirement_cache_entry,
     compute_requirement_state_metrics,
     load_requirement_cache,
@@ -1938,3 +1939,45 @@ def test_requirement_beam_learned_mode_reorders_widened_shortlist_before_expansi
     assert learned_positions == [0, 2]
     assert learned_trace["beam_learned_eval_count"] == 2
     assert learned_trace["selection_steps"][1]["predicted_utility"] > 0.0
+
+
+def test_align_requirement_cache_entry_to_pool_reorders_annotations_by_title():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "pool_titles": ["A", "B", "C"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "A",
+                "positive_requirement_scores": {"anchor_0": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "B",
+                "positive_requirement_scores": {"anchor_0": 0.5},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "C",
+                "positive_requirement_scores": {"anchor_0": 0.2},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+        "diagnostics": {},
+    }
+
+    aligned_entry = align_requirement_cache_entry_to_pool(
+        cache_entry=cache_entry,
+        pool_titles=["A", "C", "B", "D"],
+    )
+
+    assert aligned_entry["pool_titles"] == ["A", "C", "B"]
+    assert [row["doc_title"] for row in aligned_entry["doc_annotations"]] == ["A", "C", "B"]
+    assert [row["pool_position"] for row in aligned_entry["doc_annotations"]] == [0, 1, 2]
+    assert aligned_entry["doc_annotations"][1]["positive_requirement_scores"]["anchor_0"] == 0.2
+    assert aligned_entry["diagnostics"]["title_aligned_from_cache"] is True
