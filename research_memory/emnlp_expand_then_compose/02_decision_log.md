@@ -81,3 +81,22 @@ Consequence:
   - the new branch is an attempt to fix the `MuSiQue` objective mismatch rather than a confirmed replacement
 - Record implementation and operating details in:
   - `research_memory/emnlp_expand_then_compose/07_pcrs_rag_v1.md`
+
+## 2026-04-02: Use PCRS-RAG V1 as the default development branch, while keeping the paper mainline frozen
+
+Decision:
+- Treat `feature/pcrs-rag-v1` as the default code development branch for ongoing selector work.
+- Keep the paper-facing method definition frozen on the current simple line:
+  - `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup`
+
+Reason:
+- The old simple line is already committed and stable enough to serve as the paper-facing baseline.
+- Ongoing work now centers on requirement quality, counterfactual construction, and selector diagnostics, all of which belong to the new branch.
+- Keeping engineering on the branch avoids repeated branch hopping without forcing an early paper-story promotion.
+
+Consequence:
+- New selector-side implementation and diagnostics should land on `feature/pcrs-rag-v1` by default.
+- Paper claims must continue to describe the simple `pathcore_guard` stack as the current mainline until the PCRS branch clears promotion gates.
+- Branch operating status and diagnostics should be documented in:
+  - `research_memory/emnlp_expand_then_compose/07_pcrs_rag_v1.md`
+  - `research_memory/emnlp_expand_then_compose/03_experiment_board.md`

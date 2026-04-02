@@ -4,20 +4,26 @@ Last updated: 2026-04-02
 
 ## Status
 
-This note documents the new parallel branch around `requirement_beam`.
+This note documents the current default development branch around `requirement_beam`.
 
 Current status:
 - implementation landed
 - tests for the new selector path passed locally through a Python harness
 - initial smoke reports now exist for `2Wiki` and `MuSiQue`
 - branch-definition fixes landed for canonical set signatures, learned-mode shortlist reordering, runtime cache alignment, and prefix / pool behavior
+- reserve-ablation diagnostics landed for `MuSiQue`
+- offline selector diagnostics now exist for trace-level failure analysis
 
 This is not the current paper-facing mainline.
 
 The current stable simple line remains:
 - `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup`
 
-`PCRS-RAG V1` is a separate branch that tries to fix the current objective bias on `MuSiQue` without changing the HippoRAG retrieval backbone.
+Current role split:
+- code development default: `feature/pcrs-rag-v1`
+- paper-facing mainline: `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup`
+
+`PCRS-RAG V1` is the active development branch that tries to fix the current objective bias on `MuSiQue` without changing the HippoRAG retrieval backbone.
 
 ## Why This Branch Exists
 
@@ -57,6 +63,26 @@ Files:
 Important boundary:
 - this branch does not replace the current simple selector by default
 - promotion requires benchmark evidence
+
+Working files for this branch now include:
+- `scripts/analyze_requirement_beam_report.py`
+- `research_memory/emnlp_expand_then_compose/musique_requirement_beam_reserve_diagnostics_20260402.md`
+
+## Current Evaluation State
+
+What the latest branch runs established:
+- the branch can improve `2Wiki` on small oracle smoke slices
+- the branch still degrades `MuSiQue`
+- reducing `reserve_top_m` did not rescue `MuSiQue`
+- offline diagnostics point to upstream signal quality, not mainly to reserve or final aggregation
+
+Current high-confidence diagnosis:
+- positive requirement construction is noisy
+- counterfactual construction is too weak
+- positive-vs-negative separation is near random on the current cache
+- the leakage axis is nearly collapsed within finalists
+
+This means the branch is now in an upstream-signal repair phase rather than a beam-search tuning phase.
 
 ## Method Summary
 
@@ -190,11 +216,11 @@ Goal:
 ## Risks
 
 Main risks:
-- cache quality is the largest risk
+- upstream signal quality is the largest risk
 - requirement typing is still coarse
 - proposal and state objectives are still not perfectly unified
 - counterfactual sets are still heuristic rather than model-generated
-- `MuSiQue` is especially sensitive to shallow shortlist bias and heavy reserved prefixes
+- `MuSiQue` is especially sensitive to semantic completion failures that the current cache does not represent well
 
 This means the branch is currently:
 - high-information
@@ -212,18 +238,23 @@ Do not replace the current simple line unless all of the following happen:
 
 Until then, the correct project state is:
 - paper mainline: current simple `pathcore_guard` stack
-- parallel branch: `PCRS-RAG V1`
+- default development branch: `PCRS-RAG V1`
 
 ## Recommended Next Step
 
 Run in this order:
 
-1. build a first cache with `annotation_pool_k = 50`
-2. at eval time, expand the effective requirement annotation coverage to the runtime pool instead of truncating search to the cached `annotation_pool_k`
-3. run `requirement_beam` in oracle mode on a small `2Wiki` and `MuSiQue` slice with a widened requirement shortlist
-4. inspect whether prefix title dedup reduces repeated-anchor waste on `MuSiQue`
-5. inspect mechanism metrics before EM/F1 only:
-   - support completeness
-   - counterfactual leakage
-   - frontier size
-6. train the lightweight matcher only if the oracle branch shows real signal
+1. patch positive requirement construction:
+   - drop wh-word anchors
+   - keep only entity-like or title-grounded anchors
+   - stop force-filling anchor slots
+2. patch counterfactual construction:
+   - retain `entity_swap`
+   - add minimal `role_swap`
+   - add minimal `temporal_shift`
+3. rebuild a small `MuSiQue` cache and rerun offline diagnostics first:
+   - suspicious anchor rate
+   - positive-vs-negative separation
+   - finalist leakage range
+4. rerun reader-heavy QA only if those upstream diagnostics improve
+5. revisit matcher training only after the oracle branch stops collapsing on negative discrimination

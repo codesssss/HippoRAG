@@ -2,7 +2,13 @@
 
 ## Overview
 
-HippoRAG is a multi-hop QA retrieval system. The current work is on branch `planner-hipporag-integration`, focused on improving retrieval accuracy (Recall@K, EM, F1) on multi-hop QA benchmarks (2WikiMultiHopQA, HotpotQA).
+HippoRAG is a multi-hop QA retrieval system.
+
+Current branch roles:
+- Default development branch: `feature/pcrs-rag-v1`
+- Paper-facing mainline: `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup`
+
+This means current engineering work should default to the `feature/pcrs-rag-v1` branch, while paper claims should continue to treat the simple `pathcore_guard` stack as the frozen stable line until the new branch clears its promotion gates.
 
 ## Current Research Memory
 
@@ -88,6 +94,12 @@ The current research direction is not another causal or general-graph retrieval 
 - Immediate method target: simple setwise or bridge-aware evidence selection from a larger top-K pool
 - Main analysis dataset: `2WikiMultihopQA`
 - Cross-dataset ceiling checks: `HotpotQA`, `MuSiQue`
+
+Current branch split:
+- Paper mainline stays on the simple `pathcore_guard` selector stack
+- Default development work proceeds on `feature/pcrs-rag-v1`
+- `requirement_beam` is the active experimental selector on that branch
+- Do not present `requirement_beam` as the paper default unless it clears the explicit validation gates recorded under `research_memory/emnlp_expand_then_compose/`
 
 Retrieval-side negative results remain important, but now serve as motivation for the pivot rather than an unfinished algorithm branch.
 

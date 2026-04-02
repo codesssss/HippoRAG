@@ -15,6 +15,8 @@ Last updated: 2026-04-02
 - `PCRS-RAG V1 branch memo`: `research_memory/emnlp_expand_then_compose/07_pcrs_rag_v1.md`
 - `Requirement cache builder`: `scripts/build_requirement_cache.py`
 - `Requirement matcher trainer`: `scripts/train_requirement_setwise.py`
+- `Requirement beam diagnostics script`: `scripts/analyze_requirement_beam_report.py`
+- `MuSiQue requirement beam diagnostic note`: `research_memory/emnlp_expand_then_compose/musique_requirement_beam_reserve_diagnostics_20260402.md`
 
 ## Done
 
@@ -45,6 +47,15 @@ Last updated: 2026-04-02
 - Added a lightweight requirement matcher training path:
   - `scripts/train_requirement_setwise.py`
 - Added selector/test coverage for requirement support and counterfactual leakage scoring
+- Added `setwise_selector_query_traces` export and reserve-policy ablation support for `requirement_beam`
+- Ran `requirement_beam` Phase A oracle smoke on `2Wiki` and `MuSiQue`
+- Ran `MuSiQue` reserve ablation for `requirement_beam` (`reserve3` vs `reserve1`)
+- Added `scripts/analyze_requirement_beam_report.py` for offline requirement-beam diagnostics
+- Diagnosed the current `MuSiQue` failure mode as upstream signal quality:
+  - weak positive requirement construction
+  - weak counterfactual construction
+  - poor positive-vs-negative separation
+  - near-collapsed leakage axis
 
 ## Running
 
@@ -52,15 +63,21 @@ Last updated: 2026-04-02
 
 ## Next Wave
 
-1. Build a first offline cache for `PCRS-RAG V1` and verify cache quality:
-   - non-empty positive requirements
-   - non-empty counterfactual sets
-   - top-20 vs top-50 annotation sanity
-2. Run `requirement_beam` in `oracle` mode before any matcher training
-3. Promote to the learned matcher only if the oracle selector shows useful signal
-4. Keep the current simple `pathcore_guard` line as the paper-facing default unless the new branch clearly wins
-5. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs current simple selector
-6. Turn support-depth and ceiling curves into paper figures
+1. Patch positive requirement construction on `feature/pcrs-rag-v1`:
+   - stop emitting wh-word anchors
+   - keep only entity-like or title-grounded anchors
+   - do not force-fill anchor count
+2. Patch counterfactual construction on `feature/pcrs-rag-v1`:
+   - keep `entity_swap`
+   - add minimal `role_swap`
+   - add minimal `temporal_shift`
+3. Rebuild a small `MuSiQue` requirement cache and rerun offline diagnostics before paying reader cost
+4. Only rerun QA if the upstream diagnostics improve materially:
+   - suspicious anchor rate drops
+   - positive-vs-negative separation rises above random
+   - finalist leakage range stops collapsing
+5. Keep the current simple `pathcore_guard` line as the paper-facing default unless the new branch clearly wins
+6. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs current simple selector
 
 ## Method Priority
 
@@ -69,8 +86,9 @@ Method implementation order should be:
 1. Paper mainline:
    - keep `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup` frozen as the current simple story
 2. Parallel branch:
-   - validate `requirement_beam` in oracle mode
-   - only then train the lightweight matcher
+   - treat `feature/pcrs-rag-v1` as the default development branch
+   - fix upstream requirement and counterfactual construction first
+   - only revisit matcher training after the oracle signal stops collapsing
 3. Only after those gates clear should the new branch be considered for promotion
 4. Do not jump to more complex repair loops, online judges, or planner-style control before the branch clears the oracle gate
 
@@ -78,8 +96,9 @@ Method implementation order should be:
 
 - The current non-oracle heuristic is not robust on the canonical backbone
 - It helps some easy `2-doc` cases but does not yet improve hard `4-doc` composition
-- The new `PCRS-RAG V1` branch has implementation but no benchmark evidence yet
-- The biggest technical risk on the new branch is cache quality, not search code
+- The new `PCRS-RAG V1` branch now has implementation and initial smoke evidence, but not promotion-quality cross-dataset wins
+- The biggest technical risk on the new branch is upstream signal quality, not beam search mechanics
+- Current `MuSiQue` failure appears to come from requirement and counterfactual construction rather than reserve tuning
 
 ## Do Not Drift
 
