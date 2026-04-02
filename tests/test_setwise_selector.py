@@ -14,7 +14,9 @@ from eval_causal_qwen3 import (
     OpenAICompatibleLateRerankJudge,
     SetwiseLateRerankResponseModel,
     build_setwise_late_rerank_candidates,
+    build_setwise_selector_query_traces,
     build_setwise_late_rerank_judge_bundle,
+    build_report_examples,
     collect_grounded_question_query_entities,
     collect_lexical_query_seed_entities,
     collect_question_query_entities,
@@ -25,6 +27,7 @@ from eval_causal_qwen3 import (
     normalize_setwise_late_rerank_policy,
     parse_setwise_late_rerank_response,
     rerank_completed_evidence_sets_with_llm,
+    resolve_requirement_beam_runtime_reserve_config,
     resolve_reserved_positions,
     resolve_setwise_query_targets,
     score_evidence_state,
@@ -42,6 +45,11 @@ from requirement_beam_utils import (
     REQUIREMENT_MATCHER_FEATURE_NAMES,
     save_requirement_cache,
 )
+from run_requirement_beam_reserve_ablation import (
+    build_requirement_reserve_ablation_jobs,
+    resolve_dataset_save_dir,
+)
+from src.hipporag.utils.misc_utils import QuerySolution
 
 
 class DummyReachabilityModel:
@@ -2175,3 +2183,150 @@ def test_align_requirement_cache_entry_to_pool_extends_runtime_pool_beyond_cache
     assert [row["doc_title"] for row in aligned_entry["doc_annotations"]] == ["Alpha", "Beta", "Gamma", "Delta"]
     assert aligned_entry["diagnostics"]["title_alignment_rebuilt_count"] == 2
     assert aligned_entry["diagnostics"]["title_alignment_rebuilt_first_title"] == "Gamma"
+
+
+def test_resolve_requirement_beam_runtime_reserve_config_supports_fixed_and_adaptive():
+    small_cache_entry = {
+        "positive_requirements": [
+            {"requirement_id": "anchor_0"},
+            {"requirement_id": "decision_0"},
+        ],
+    }
+    medium_cache_entry = {
+        "positive_requirements": [
+            {"requirement_id": "anchor_0"},
+            {"requirement_id": "bridge_0"},
+            {"requirement_id": "bridge_1"},
+            {"requirement_id": "decision_0"},
+        ],
+    }
+
+    fixed_config = resolve_requirement_beam_runtime_reserve_config(
+        anchor_count=2,
+        reserve_top_m=3,
+        cache_entry=small_cache_entry,
+        policy="fixed",
+    )
+    adaptive_small = resolve_requirement_beam_runtime_reserve_config(
+        anchor_count=2,
+        reserve_top_m=3,
+        cache_entry=small_cache_entry,
+        policy="adaptive_requirement_count",
+    )
+    adaptive_medium = resolve_requirement_beam_runtime_reserve_config(
+        anchor_count=2,
+        reserve_top_m=3,
+        cache_entry=medium_cache_entry,
+        policy="adaptive_requirement_count",
+    )
+
+    assert fixed_config["anchor_count"] == 2
+    assert fixed_config["reserve_top_m"] == 3
+    assert fixed_config["effective_reserved_count"] == 3
+    assert fixed_config["policy_reason"] == "fixed"
+
+    assert adaptive_small["anchor_count"] == 1
+    assert adaptive_small["reserve_top_m"] == 1
+    assert adaptive_small["effective_reserved_count"] == 1
+    assert adaptive_small["policy_reason"] == "positive_requirements<=2"
+
+    assert adaptive_medium["anchor_count"] == 1
+    assert adaptive_medium["reserve_top_m"] == 2
+    assert adaptive_medium["effective_reserved_count"] == 2
+    assert adaptive_medium["policy_reason"] == "positive_requirements<=4"
+
+
+def test_build_report_examples_preserves_current_solution_trace():
+    config = type("Config", (), {"qa_top_k": 2, "causal_engine_version": "legacy"})()
+    query_solution = QuerySolution(
+        question="Where was Alpha born?",
+        docs=["Alpha\nAlpha was born in Paris.", "Beta\nBeta is unrelated."],
+        answer="Paris",
+        gold_answers=["Paris"],
+        retrieval_trace={"setwise_selector_trace": {"runtime_reserve_top_m": 1}},
+    )
+
+    examples = build_report_examples(
+        config=config,
+        query_solutions=[query_solution],
+        doc_text_to_chunk_id={
+            "Alpha\nAlpha was born in Paris.": "chunk-alpha",
+            "Beta\nBeta is unrelated.": "chunk-beta",
+        },
+        retrieval_only=False,
+        doc_limit=1,
+    )
+
+    assert len(examples) == 1
+    assert examples[0]["docs"] == ["Alpha\nAlpha was born in Paris."]
+    assert examples[0]["retrieval_trace"]["setwise_selector_trace"]["runtime_reserve_top_m"] == 1
+    assert examples[0]["retrieved_doc_ids"] == ["chunk-alpha", "chunk-beta"]
+
+
+def test_build_setwise_selector_query_traces_uses_selected_solutions():
+    config = type("Config", (), {"qa_top_k": 2, "causal_engine_version": "legacy"})()
+    baseline_solution = QuerySolution(
+        question="Where was Alpha born?",
+        docs=["Alpha\nAlpha was born in London.", "Beta\nBeta mentions Paris."],
+        answer="London",
+        gold_answers=["Paris"],
+        retrieval_trace={},
+    )
+    selected_solution = QuerySolution(
+        question="Where was Alpha born?",
+        docs=["Beta\nBeta mentions Paris.", "Alpha\nAlpha was born in London."],
+        answer="Paris",
+        gold_answers=["Paris"],
+        retrieval_trace={
+            "setwise_selector_trace": {
+                "selected_titles": ["Beta", "Alpha"],
+                "runtime_reserve_top_m": 1,
+                "selection_steps": [{"step": 1, "mode": "requirement_beam"}],
+            },
+        },
+    )
+
+    query_traces = build_setwise_selector_query_traces(
+        config=config,
+        baseline_solutions=[baseline_solution],
+        selected_solutions=[selected_solution],
+        gold_docs=[["Beta\nBeta mentions Paris."]],
+        gold_answers=[["Paris"]],
+        doc_text_to_chunk_id={
+            "Alpha\nAlpha was born in London.": "chunk-alpha",
+            "Beta\nBeta mentions Paris.": "chunk-beta",
+        },
+    )
+
+    assert len(query_traces) == 1
+    trace = query_traces[0]
+    assert trace["baseline_top_titles"] == ["Alpha", "Beta"]
+    assert trace["selector_top_titles"] == ["Beta", "Alpha"]
+    assert trace["changed_from_baseline"] is True
+    assert trace["baseline_metrics"]["ExactMatch"] == 0.0
+    assert trace["selector_metrics"]["ExactMatch"] == 1.0
+    assert trace["selector_trace"]["runtime_reserve_top_m"] == 1
+    assert trace["selector_top_doc_ids"] == ["chunk-beta", "chunk-alpha"]
+
+
+def test_build_requirement_reserve_ablation_jobs_maps_effective_prefix_sizes():
+    jobs = build_requirement_reserve_ablation_jobs(
+        datasets=["musique"],
+        reserve_values=[3, 1, 0],
+        limit=40,
+        save_dir="outputs_step0_general",
+        default_anchor_count=2,
+        include_adaptive=True,
+        adaptive_base_reserve_top_m=3,
+    )
+
+    assert [job.label for job in jobs] == ["reserve3", "reserve1", "reserve0", "adaptive_reqcount"]
+    assert resolve_dataset_save_dir("outputs_step0_general", "musique").as_posix().endswith("outputs_step0_general_musique")
+
+    reserve3_job, reserve1_job, reserve0_job, adaptive_job = jobs
+    assert reserve3_job.anchor_count == 2 and reserve3_job.reserve_top_m == 3
+    assert reserve1_job.anchor_count == 1 and reserve1_job.reserve_top_m == 1
+    assert reserve0_job.anchor_count == 0 and reserve0_job.reserve_top_m == 0
+    assert adaptive_job.anchor_count == 2 and adaptive_job.reserve_top_m == 3
+    assert adaptive_job.reserve_policy == "adaptive_requirement_count"
+    assert reserve3_job.output_json.endswith("reserve3.json")

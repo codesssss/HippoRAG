@@ -81,6 +81,7 @@ DEFAULT_SET_CLOSURE_STATE_WEIGHT_CONFIG = {
 DEFAULT_SET_CLOSURE_EXACT_PATH_MAX_DOCS = 4
 DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR = 1
 DEFAULT_REQUIREMENT_BEAM_PROJECTED_SHORTLIST_FACTOR = 3
+DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY = "fixed"
 
 SETWISE_LLM_JSON_START_TAG = "<JSON>"
 SETWISE_LLM_JSON_END_TAG = "</JSON>"
@@ -958,6 +959,46 @@ def resolve_selection_target_k(target_k: int,
     if max_bridge_slots <= 0:
         return int(target_k)
     return int(min(target_k, max(0, reserved_count) + max(0, max_bridge_slots)))
+
+
+def resolve_requirement_beam_runtime_reserve_config(anchor_count: int,
+                                                    reserve_top_m: int,
+                                                    cache_entry: Dict[str, Any],
+                                                    policy: str = DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY) -> Dict[str, int | str]:
+    fixed_anchor_count = max(int(anchor_count), 0)
+    fixed_reserve_top_m = max(int(reserve_top_m), 0)
+    normalized_policy = str(policy or DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY).strip().lower()
+    if normalized_policy not in {"fixed", "adaptive_requirement_count"}:
+        raise ValueError(f"Unsupported requirement beam reserve policy: {policy}")
+
+    positive_requirement_count = int(len(cache_entry.get("positive_requirements", []) or []))
+    runtime_anchor_count = fixed_anchor_count
+    runtime_reserve_top_m = fixed_reserve_top_m
+    policy_reason = "fixed"
+
+    if normalized_policy == "adaptive_requirement_count":
+        if positive_requirement_count <= 2:
+            runtime_anchor_count = min(fixed_anchor_count, 1)
+            runtime_reserve_top_m = 1 if (fixed_anchor_count > 0 or fixed_reserve_top_m > 0) else 0
+            policy_reason = "positive_requirements<=2"
+        elif positive_requirement_count <= 4:
+            runtime_anchor_count = min(fixed_anchor_count, 1)
+            runtime_reserve_top_m = min(max(fixed_anchor_count, fixed_reserve_top_m), 2)
+            policy_reason = "positive_requirements<=4"
+        else:
+            policy_reason = "positive_requirements>4"
+
+    effective_reserved_count = max(runtime_anchor_count, runtime_reserve_top_m)
+    return {
+        "policy": normalized_policy,
+        "policy_reason": policy_reason,
+        "positive_requirement_count": positive_requirement_count,
+        "fixed_anchor_count": fixed_anchor_count,
+        "fixed_reserve_top_m": fixed_reserve_top_m,
+        "anchor_count": int(runtime_anchor_count),
+        "reserve_top_m": int(runtime_reserve_top_m),
+        "effective_reserved_count": int(effective_reserved_count),
+    }
 
 
 def normalize_setwise_score_mode(score_mode: str | None) -> str:
@@ -3191,7 +3232,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            late_rerank_policy: str = "always",
                            late_rerank_max_state_score_gap: float = 0.0,
                            late_rerank_judge_bundle: SetwiseLateRerankJudgeBundle | None = None,
-                           requirement_selector_bundle: Dict[str, object] | None = None) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           requirement_selector_bundle: Dict[str, object] | None = None,
+                           requirement_reserve_policy: str = DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
@@ -3220,6 +3262,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
     requirement_leakage_scores: List[float] = []
     requirement_frontier_sizes: List[float] = []
     requirement_cache_hit_count = 0
+    requirement_runtime_anchor_counts: List[int] = []
+    requirement_runtime_reserve_counts: List[int] = []
+    requirement_reserve_reason_counts: Counter[str] = Counter()
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
@@ -3453,6 +3498,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     pool_doc_entities=pool_doc_entities,
                 )
             requirement_cache_hit_count += 1
+            runtime_reserve_config = resolve_requirement_beam_runtime_reserve_config(
+                anchor_count=anchor_count,
+                reserve_top_m=reserve_top_m,
+                cache_entry=cache_entry,
+                policy=requirement_reserve_policy,
+            )
             selected_positions, selector_trace = select_requirement_beam_positions(
                 pool_doc_ids=pool_doc_ids,
                 pool_doc_scores=pool_scores,
@@ -3464,8 +3515,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 cache_entry=cache_entry,
                 initial_seed_entities=seed_entities,
                 proposal_query_entities=proposal_query_entities,
-                anchor_count=anchor_count,
-                reserve_top_m=reserve_top_m,
+                anchor_count=int(runtime_reserve_config["anchor_count"]),
+                reserve_top_m=int(runtime_reserve_config["reserve_top_m"]),
                 max_bridge_slots=max_bridge_slots,
                 structure_max_hops=structure_max_hops,
                 base_weight=base_weight,
@@ -3480,9 +3531,18 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 requirement_smooth_tau=float(requirement_selector_bundle.get("smooth_tau", DEFAULT_REQUIREMENT_SMOOTH_TAU)),
                 requirement_counterfactual_tau=float(requirement_selector_bundle.get("counterfactual_tau", DEFAULT_REQUIREMENT_CF_TAU)),
             )
+            selector_trace["requirement_reserve_policy"] = str(runtime_reserve_config["policy"])
+            selector_trace["requirement_reserve_policy_reason"] = str(runtime_reserve_config["policy_reason"])
+            selector_trace["requirement_positive_count"] = int(runtime_reserve_config["positive_requirement_count"])
+            selector_trace["runtime_anchor_count"] = int(runtime_reserve_config["anchor_count"])
+            selector_trace["runtime_reserve_top_m"] = int(runtime_reserve_config["reserve_top_m"])
+            selector_trace["runtime_effective_reserved_count"] = int(runtime_reserve_config["effective_reserved_count"])
             requirement_support_scores.append(float(selector_trace.get("beam_best_support_completeness", 0.0) or 0.0))
             requirement_leakage_scores.append(float(selector_trace.get("beam_best_counterfactual_leakage", 0.0) or 0.0))
             requirement_frontier_sizes.append(float(selector_trace.get("beam_avg_frontier_size", 0.0) or 0.0))
+            requirement_runtime_anchor_counts.append(int(runtime_reserve_config["anchor_count"]))
+            requirement_runtime_reserve_counts.append(int(runtime_reserve_config["effective_reserved_count"]))
+            requirement_reserve_reason_counts[str(runtime_reserve_config["policy_reason"])] += 1
 
         heuristic_selected_positions = [int(pos) for pos in selected_positions]
         final_front_positions = materialize_reader_top_positions(
@@ -3698,12 +3758,16 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "requirement_mode": str((requirement_selector_bundle or {}).get("mode", "oracle")),
             "requirement_cache_path": str((requirement_selector_bundle or {}).get("cache_path", "")),
             "requirement_model_path": str((requirement_selector_bundle or {}).get("model_path", "")) or None,
+            "requirement_reserve_policy": str(requirement_reserve_policy or DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY),
             "requirement_smooth_tau": round(float((requirement_selector_bundle or {}).get("smooth_tau", DEFAULT_REQUIREMENT_SMOOTH_TAU)), 4),
             "requirement_counterfactual_tau": round(float((requirement_selector_bundle or {}).get("counterfactual_tau", DEFAULT_REQUIREMENT_CF_TAU)), 4),
             "requirement_cache_hit_count": int(requirement_cache_hit_count),
             "avg_requirement_support_completeness": round(float(np.mean(requirement_support_scores)) if requirement_support_scores else 0.0, 4),
             "avg_requirement_counterfactual_leakage": round(float(np.mean(requirement_leakage_scores)) if requirement_leakage_scores else 0.0, 4),
             "avg_requirement_frontier_size": round(float(np.mean(requirement_frontier_sizes)) if requirement_frontier_sizes else 0.0, 4),
+            "avg_requirement_runtime_anchor_count": round(float(np.mean(requirement_runtime_anchor_counts)) if requirement_runtime_anchor_counts else 0.0, 4),
+            "avg_requirement_runtime_reserved_count": round(float(np.mean(requirement_runtime_reserve_counts)) if requirement_runtime_reserve_counts else 0.0, 4),
+            "requirement_reserve_reason_counts": dict(sorted(requirement_reserve_reason_counts.items())),
         })
     logger.info(
         "Applied %s selector over pool@%d for %d queries (avg mapped pool docs=%.2f, avg seed entities=%.2f)",
@@ -3721,6 +3785,88 @@ def is_causal_query_solution(config: BaseConfig, query_solution: QuerySolution) 
         trace = query_solution.retrieval_trace or {}
         return trace.get("router_label") in {"cause", "effect", "prevention", "causal"}
     return route_query_type(query_solution.question) != "non_causal"
+
+
+def resolve_report_query_type(config: BaseConfig, query_solution: QuerySolution) -> str | None:
+    if getattr(config, "causal_engine_version", "legacy") == "v2":
+        return (query_solution.retrieval_trace or {}).get("router_label")
+    return route_query_type(query_solution.question)
+
+
+def build_report_examples(config: BaseConfig,
+                          query_solutions: Sequence[QuerySolution],
+                          doc_text_to_chunk_id: Dict[str, str],
+                          retrieval_only: bool,
+                          doc_limit: int = 3) -> List[Dict[str, object]]:
+    examples: List[Dict[str, object]] = []
+    effective_doc_limit = max(int(doc_limit), 0)
+    for query_solution in query_solutions:
+        examples.append({
+            "question": query_solution.question,
+            "query_type": resolve_report_query_type(config, query_solution),
+            "answer": query_solution.answer if not retrieval_only else None,
+            "gold_answers": query_solution.gold_answers if not retrieval_only else None,
+            "docs": list(query_solution.docs[:effective_doc_limit]),
+            "retrieved_doc_ids": serialize_retrieved_doc_ids(query_solution.docs, doc_text_to_chunk_id),
+            "retrieval_trace": query_solution.retrieval_trace or {},
+        })
+    return examples
+
+
+def build_setwise_selector_query_traces(config: BaseConfig,
+                                        baseline_solutions: Sequence[QuerySolution],
+                                        selected_solutions: Sequence[QuerySolution],
+                                        gold_docs: Sequence[Sequence[str]],
+                                        gold_answers: Sequence[Sequence[str]],
+                                        doc_text_to_chunk_id: Dict[str, str]) -> List[Dict[str, object]]:
+    if len(baseline_solutions) != len(selected_solutions):
+        raise ValueError("Baseline and selected QuerySolution collections must have the same length.")
+
+    qa_em_metric = QAExactMatch(global_config=None)
+    qa_f1_metric = QAF1Score(global_config=None)
+    baseline_answers = [query_solution.answer or "" for query_solution in baseline_solutions]
+    selector_answers = [query_solution.answer or "" for query_solution in selected_solutions]
+    _, baseline_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, baseline_answers)
+    _, baseline_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, baseline_answers)
+    _, selector_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, selector_answers)
+    _, selector_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, selector_answers)
+
+    query_traces: List[Dict[str, object]] = []
+    reader_top_k = max(int(getattr(config, "qa_top_k", 5)), 0)
+    for q_idx, (baseline_qs, selected_qs) in enumerate(zip(baseline_solutions, selected_solutions)):
+        baseline_top_docs = list(baseline_qs.docs[:reader_top_k])
+        selector_top_docs = list(selected_qs.docs[:reader_top_k])
+        baseline_top_titles = [extract_doc_title(doc_text) for doc_text in baseline_top_docs]
+        selector_top_titles = [extract_doc_title(doc_text) for doc_text in selector_top_docs]
+        selector_trace = dict((selected_qs.retrieval_trace or {}).get("setwise_selector_trace", {}) or {})
+        query_traces.append({
+            "question": selected_qs.question,
+            "query_type": resolve_report_query_type(config, selected_qs),
+            "gold_answers": list(selected_qs.gold_answers or []),
+            "gold_doc_count": int(len(set(gold_docs[q_idx]))),
+            "baseline_answer": baseline_qs.answer or "",
+            "selector_answer": selected_qs.answer or "",
+            "baseline_top_titles": baseline_top_titles,
+            "selector_top_titles": selector_top_titles,
+            "baseline_top_doc_ids": serialize_retrieved_doc_ids(baseline_top_docs, doc_text_to_chunk_id),
+            "selector_top_doc_ids": serialize_retrieved_doc_ids(selector_top_docs, doc_text_to_chunk_id),
+            "baseline_title_duplicate_count": int(len(baseline_top_titles) - len(set(baseline_top_titles))),
+            "selector_title_duplicate_count": int(len(selector_top_titles) - len(set(selector_top_titles))),
+            "changed_from_baseline": bool(
+                baseline_top_titles != selector_top_titles
+                or (baseline_qs.answer or "") != (selected_qs.answer or "")
+            ),
+            "baseline_metrics": {
+                "ExactMatch": round(float(baseline_per_query_em[q_idx]["ExactMatch"]), 4),
+                "F1": round(float(baseline_per_query_f1[q_idx]["F1"]), 4),
+            },
+            "selector_metrics": {
+                "ExactMatch": round(float(selector_per_query_em[q_idx]["ExactMatch"]), 4),
+                "F1": round(float(selector_per_query_f1[q_idx]["F1"]), 4),
+            },
+            "selector_trace": selector_trace,
+        })
+    return query_traces
 
 
 def has_nonempty_v2_subgraph(query_solution: QuerySolution) -> bool:
@@ -4152,6 +4298,8 @@ def main():
                         help="Mode used by requirement_beam. oracle uses cached requirement annotations directly; learned adds a lightweight matcher as a proposal prior.")
     parser.add_argument("--setwise_requirement_model_path", type=str, default="",
                         help="Optional requirement matcher joblib bundle used when --setwise_requirement_mode learned.")
+    parser.add_argument("--setwise_requirement_reserve_policy", choices=["fixed", "adaptive_requirement_count"], default=DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY,
+                        help="Reserve-prefix policy used by requirement_beam. fixed preserves the configured anchor/reserve counts; adaptive_requirement_count reduces the reserved prefix on queries with very small positive-requirement sets.")
     parser.add_argument("--setwise_requirement_annotation_pool_k", type=int, default=DEFAULT_REQUIREMENT_ANNOTATION_POOL_K,
                         help="Expected annotation pool size stored in the requirement cache. Used for reporting and cache validation only.")
     parser.add_argument("--setwise_requirement_smooth_tau", type=float, default=DEFAULT_REQUIREMENT_SMOOTH_TAU,
@@ -4192,6 +4340,7 @@ def main():
 
     oracle_reorder_qa_results = None
     setwise_selector_results = None
+    setwise_selector_query_traces = None
     learned_model_bundle = None
     state_weight_config = {
         "path_connectivity": float(args.setwise_state_path_connectivity_weight),
@@ -4504,6 +4653,7 @@ def main():
             late_rerank_max_state_score_gap=float(args.setwise_late_rerank_max_state_score_gap),
             late_rerank_judge_bundle=late_rerank_judge_bundle,
             requirement_selector_bundle=requirement_selector_bundle,
+            requirement_reserve_policy=str(args.setwise_requirement_reserve_policy),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -4596,6 +4746,7 @@ def main():
             "setwise_requirement_cache_path": args.setwise_requirement_cache_path or None,
             "setwise_requirement_mode": str(args.setwise_requirement_mode),
             "setwise_requirement_model_path": args.setwise_requirement_model_path or None,
+            "setwise_requirement_reserve_policy": str(args.setwise_requirement_reserve_policy),
             "setwise_requirement_annotation_pool_k": int(args.setwise_requirement_annotation_pool_k),
             "setwise_requirement_smooth_tau": round(float(args.setwise_requirement_smooth_tau), 4),
             "setwise_requirement_counterfactual_tau": round(float(args.setwise_requirement_counterfactual_tau), 4),
@@ -4609,6 +4760,14 @@ def main():
             "per_bucket": bucket_summary,
             "selector_summary": selector_summary,
         }
+        setwise_selector_query_traces = build_setwise_selector_query_traces(
+            config=config,
+            baseline_solutions=query_solutions,
+            selected_solutions=selected_solutions,
+            gold_docs=gold_docs,
+            gold_answers=gold_answers,
+            doc_text_to_chunk_id=doc_text_to_chunk_id,
+        )
         logger.info(
             "Setwise selector %s[%s]@%d: EM=%.4f (delta=%+.4f), F1=%.4f",
             setwise_selector,
@@ -4805,6 +4964,7 @@ def main():
             "setwise_late_rerank_judge_base_url": late_rerank_judge_bundle.base_url,
             "setwise_late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
             "setwise_model_path": args.setwise_model_path or None,
+            "setwise_requirement_reserve_policy": str(args.setwise_requirement_reserve_policy),
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
             "causal_v2_extraction_workers": config.causal_v2_extraction_workers,
@@ -4835,23 +4995,15 @@ def main():
         **({"oracle_reorder_qa": oracle_reorder_qa_results} if oracle_reorder_qa_results else {}),
         **({"oracle_select_qa": oracle_select_qa_results} if oracle_select_qa_results else {}),
         **({"setwise_selector_qa": setwise_selector_results} if setwise_selector_results else {}),
+        **({"setwise_selector_query_traces": setwise_selector_query_traces} if setwise_selector_query_traces else {}),
         **({"cross_encoder_rerank_qa": cross_encoder_rerank_results} if cross_encoder_rerank_results else {}),
-        "examples": [
-            {
-                "question": query_solution.question,
-                "query_type": (
-                    (query_solution.retrieval_trace or {}).get("router_label")
-                    if getattr(config, "causal_engine_version", "legacy") == "v2"
-                    else route_query_type(query_solution.question)
-                ),
-                "answer": query_solution.answer if not retrieval_only else None,
-                "gold_answers": query_solution.gold_answers if not retrieval_only else None,
-                "docs": query_solution.docs[:3],
-                "retrieved_doc_ids": serialize_retrieved_doc_ids(query_solution.docs, doc_text_to_chunk_id),
-                "retrieval_trace": query_solution.retrieval_trace or {},
-            }
-            for query_solution in query_solutions
-        ],
+        "examples": build_report_examples(
+            config=config,
+            query_solutions=query_solutions,
+            doc_text_to_chunk_id=doc_text_to_chunk_id,
+            retrieval_only=retrieval_only,
+            doc_limit=3,
+        ),
     }
 
     output_json = args.output_json
