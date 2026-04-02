@@ -22,6 +22,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from requirement_beam_utils import (
+    canonicalize_requirement_positions,
     DEFAULT_REQUIREMENT_ANNOTATION_POOL_K,
     DEFAULT_REQUIREMENT_CF_TAU,
     DEFAULT_REQUIREMENT_SMOOTH_TAU,
@@ -1588,6 +1589,56 @@ def prune_requirement_pareto_frontier(states: Sequence[Dict[str, object]]) -> Tu
     return survivors, int(pruned_count)
 
 
+def get_requirement_state_signature(state: Dict[str, object]) -> Tuple[int, ...]:
+    signature = state.get("signature")
+    if signature is not None:
+        return tuple(int(pos) for pos in signature)
+    return canonicalize_requirement_positions(state.get("selected_positions", []))
+
+
+def build_requirement_pre_prune_sort_key(state: Dict[str, object],
+                                         normalized_mode: str) -> Tuple[object, ...]:
+    signature = get_requirement_state_signature(state)
+    state_metrics = state.get("state_metrics", {}) or {}
+    return (
+        -float(state_metrics.get("support_completeness", 0.0)),
+        float(state_metrics.get("counterfactual_leakage", 0.0)),
+        float(state_metrics.get("utopia_distance", 0.0)),
+        -float(state.get("proposal_bonus", 0.0)) if normalized_mode == "learned" else 0.0,
+        -float(state.get("cumulative_score", 0.0)),
+        signature,
+    )
+
+
+def build_requirement_final_sort_key(state: Dict[str, object],
+                                     normalized_mode: str) -> Tuple[object, ...]:
+    signature = get_requirement_state_signature(state)
+    state_metrics = state.get("state_metrics", {}) or {}
+    return (
+        float(state_metrics.get("utopia_distance", 0.0)),
+        -float(state_metrics.get("support_completeness", 0.0)),
+        float(state_metrics.get("counterfactual_leakage", 0.0)),
+        -float(state.get("proposal_bonus", 0.0)) if normalized_mode == "learned" else 0.0,
+        -float(state.get("cumulative_score", 0.0)),
+        signature,
+    )
+
+
+def dedupe_requirement_states_by_signature(states: Sequence[Dict[str, object]]) -> Tuple[List[Dict[str, object]], int]:
+    deduped_states: List[Dict[str, object]] = []
+    seen_signatures: Set[Tuple[int, ...]] = set()
+    pruned_count = 0
+    for state in states:
+        signature = get_requirement_state_signature(state)
+        if signature in seen_signatures:
+            pruned_count += 1
+            continue
+        state["signature"] = signature
+        deduped_states.append(state)
+        seen_signatures.add(signature)
+    return deduped_states, int(pruned_count)
+
+
 def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                                       pool_doc_scores: np.ndarray,
                                       pool_doc_titles: Sequence[str] | None,
@@ -1690,8 +1741,10 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         smooth_tau=requirement_smooth_tau,
         counterfactual_tau=requirement_counterfactual_tau,
     )
+    initial_signature = canonicalize_requirement_positions(reserved_positions)
     beam_states: List[Dict[str, object]] = [{
         "selected_positions": list(reserved_positions),
+        "signature": initial_signature,
         "covered_entities": initial_covered,
         "blocked_titles": set(blocked_titles),
         "selection_steps": initial_steps,
@@ -1699,9 +1752,10 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         "state_metrics": initial_state_metrics,
         "proposal_bonus": 0.0,
     }]
-    seen_signatures = {tuple(reserved_positions)}
+    seen_signatures = {initial_signature}
     frontier_sizes: List[int] = []
     pareto_pruned_count = 0
+    signature_pruned_count = 0
     learned_eval_count = 0
 
     while beam_states and len(beam_states[0]["selected_positions"]) < selection_target_k:
@@ -1737,8 +1791,11 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                 blocked_titles=set(state["blocked_titles"]),
                 enabled=non_anchor_title_dedup,
             )
-            candidate_shortlist = scored_candidates[:beam_expand_per_state * beam_projected_shortlist_factor]
-            candidate_positions = [int(candidate["pool_position"]) for candidate in candidate_shortlist]
+            proposal_source_limit = beam_expand_per_state * beam_projected_shortlist_factor
+            if normalized_mode == "learned":
+                proposal_source_limit = max(proposal_source_limit, beam_expand_per_state * 2)
+            candidate_source = scored_candidates[:proposal_source_limit]
+            candidate_positions = [int(candidate["pool_position"]) for candidate in candidate_source]
             candidate_feature_rows = compute_requirement_candidate_feature_rows(
                 cache_entry=cache_entry,
                 selected_positions=selected_positions,
@@ -1760,12 +1817,28 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                 for row, predicted_score in zip(candidate_feature_rows, predicted_scores):
                     predicted_scores_by_position[int(row["pool_position"])] = float(predicted_score)
 
+            if normalized_mode == "learned" and candidate_source:
+                candidate_source = sorted(
+                    candidate_source,
+                    key=lambda candidate: (
+                        -float(predicted_scores_by_position.get(int(candidate["pool_position"]), 0.0)),
+                        -float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("utility_margin_gain", 0.0) or 0.0),
+                        -float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("support_completeness_gain", 0.0) or 0.0),
+                        -float(candidate.get("combined_score", 0.0)),
+                        int(candidate["pool_position"]),
+                    ),
+                )
+                candidate_shortlist = candidate_source[:beam_expand_per_state]
+            else:
+                candidate_shortlist = candidate_source
+
             for proposal_rank, candidate in enumerate(candidate_shortlist, start=1):
                 chosen_pos = int(candidate["pool_position"])
-                signature = tuple(selected_positions + [chosen_pos])
+                signature = canonicalize_requirement_positions(list(selected_positions) + [chosen_pos])
                 if signature in seen_signatures:
                     continue
 
+                next_selected_positions = list(selected_positions) + [chosen_pos]
                 next_covered = set(state["covered_entities"])
                 next_covered.update(set(candidate["doc_entities"]))
                 next_blocked_titles = set(state["blocked_titles"])
@@ -1781,7 +1854,8 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                 candidate_row = candidate_rows_by_position.get(chosen_pos, {})
                 predicted_score = float(predicted_scores_by_position.get(chosen_pos, 0.0))
                 expanded_states.append({
-                    "selected_positions": list(signature),
+                    "selected_positions": next_selected_positions,
+                    "signature": signature,
                     "covered_entities": next_covered,
                     "blocked_titles": next_blocked_titles,
                     "selection_steps": list(state["selection_steps"]) + [{
@@ -1808,45 +1882,23 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         if not expanded_states:
             break
 
-        expanded_states.sort(
-            key=lambda state: (
-                -float(state["state_metrics"]["support_completeness"]),
-                float(state["state_metrics"]["counterfactual_leakage"]),
-                float(state["state_metrics"]["utopia_distance"]),
-                -float(state["proposal_bonus"]),
-                -float(state["cumulative_score"]),
-                tuple(int(pos) for pos in state["selected_positions"]),
-            )
-        )
+        expanded_states.sort(key=lambda state: build_requirement_pre_prune_sort_key(state, normalized_mode))
+        expanded_states, step_signature_pruned_count = dedupe_requirement_states_by_signature(expanded_states)
+        signature_pruned_count += int(step_signature_pruned_count)
         expanded_states, step_pruned_count = prune_requirement_pareto_frontier(expanded_states)
         pareto_pruned_count += int(step_pruned_count)
-        expanded_states.sort(
-            key=lambda state: (
-                float(state["state_metrics"]["utopia_distance"]),
-                -float(state["state_metrics"]["support_completeness"]),
-                float(state["state_metrics"]["counterfactual_leakage"]),
-                -float(state["proposal_bonus"]) if normalized_mode == "learned" else 0.0,
-                -float(state["cumulative_score"]),
-                tuple(int(pos) for pos in state["selected_positions"]),
-            )
-        )
+        expanded_states.sort(key=lambda state: build_requirement_final_sort_key(state, normalized_mode))
         beam_states = expanded_states[:beam_width]
         frontier_sizes.append(len(expanded_states))
         for state in beam_states:
-            seen_signatures.add(tuple(int(pos) for pos in state["selected_positions"]))
+            seen_signatures.add(get_requirement_state_signature(state))
 
     best_state = min(
         beam_states,
-        key=lambda state: (
-            float(state["state_metrics"]["utopia_distance"]),
-            -float(state["state_metrics"]["support_completeness"]),
-            float(state["state_metrics"]["counterfactual_leakage"]),
-            -float(state["proposal_bonus"]) if normalized_mode == "learned" else 0.0,
-            -float(state["cumulative_score"]),
-            tuple(int(pos) for pos in state["selected_positions"]),
-        ),
+        key=lambda state: build_requirement_final_sort_key(state, normalized_mode),
     ) if beam_states else {
         "selected_positions": list(reserved_positions),
+        "signature": initial_signature,
         "covered_entities": initial_covered,
         "blocked_titles": set(blocked_titles),
         "selection_steps": initial_steps,
@@ -1856,14 +1908,7 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
     }
     ranked_finalists = sorted(
         beam_states or [best_state],
-        key=lambda state: (
-            float(state["state_metrics"]["utopia_distance"]),
-            -float(state["state_metrics"]["support_completeness"]),
-            float(state["state_metrics"]["counterfactual_leakage"]),
-            -float(state["proposal_bonus"]) if normalized_mode == "learned" else 0.0,
-            -float(state["cumulative_score"]),
-            tuple(int(pos) for pos in state["selected_positions"]),
-        ),
+        key=lambda state: build_requirement_final_sort_key(state, normalized_mode),
     )
     beam_finalists: List[Dict[str, object]] = []
     for finalist in ranked_finalists:
@@ -1898,6 +1943,7 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_projected_shortlist_factor": int(beam_projected_shortlist_factor),
         "beam_avg_frontier_size": round(float(np.mean(frontier_sizes)) if frontier_sizes else 0.0, 4),
         "beam_pareto_pruned_count": int(pareto_pruned_count),
+        "beam_signature_pruned_count": int(signature_pruned_count),
         "beam_learned_eval_count": int(learned_eval_count),
         "beam_best_support_completeness": round(float(best_metrics["support_completeness"]), 4),
         "beam_best_counterfactual_leakage": round(float(best_metrics["counterfactual_leakage"]), 4),

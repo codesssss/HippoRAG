@@ -75,6 +75,14 @@ def unique_ordered_texts(values: Sequence[str] | Set[str] | None) -> List[str]:
     return deduped
 
 
+def canonicalize_requirement_positions(selected_positions: Sequence[int] | None) -> tuple[int, ...]:
+    return tuple(sorted({
+        int(pos)
+        for pos in (selected_positions or [])
+        if int(pos) >= 0
+    }))
+
+
 def stable_question_key(question: str) -> str:
     normalized = normalize_structure_text(question or "")
     return hashlib.md5(normalized.encode("utf-8")).hexdigest()
@@ -513,7 +521,7 @@ def compute_requirement_state_metrics(cache_entry: Dict[str, Any],
         int(annotation["pool_position"]): annotation
         for annotation in cache_entry.get("doc_annotations", [])
     }
-    unique_positions = sorted({int(pos) for pos in selected_positions if int(pos) >= 0})
+    unique_positions = list(canonicalize_requirement_positions(selected_positions))
 
     group_values: Dict[str, List[float]] = {group: [] for group in REQUIREMENT_TYPES}
     for requirement in cache_entry.get("positive_requirements", []):

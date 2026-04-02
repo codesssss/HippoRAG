@@ -37,6 +37,7 @@ from requirement_beam_utils import (
     build_requirement_cache_entry,
     compute_requirement_state_metrics,
     load_requirement_cache,
+    REQUIREMENT_MATCHER_FEATURE_NAMES,
     save_requirement_cache,
 )
 
@@ -51,6 +52,19 @@ class DummyReachabilityModel:
             0.25 * feature_matrix[:, base_score_idx]
             + 0.30 * feature_matrix[:, structure_seed_idx]
             + 0.45 * feature_matrix[:, structure_covered_idx]
+        )
+        positive_score = np.clip(positive_score, 0.0, 1.0)
+        return np.stack([1.0 - positive_score, positive_score], axis=1)
+
+
+class DummyRequirementPriorModel:
+    def predict_proba(self, feature_matrix):
+        support_gain_idx = REQUIREMENT_MATCHER_FEATURE_NAMES.index("support_completeness_gain")
+        utility_gain_idx = REQUIREMENT_MATCHER_FEATURE_NAMES.index("utility_margin_gain")
+
+        positive_score = (
+            0.55 * feature_matrix[:, support_gain_idx]
+            + 0.45 * feature_matrix[:, utility_gain_idx]
         )
         positive_score = np.clip(positive_score, 0.0, 1.0)
         return np.stack([1.0 - positive_score, positive_score], axis=1)
@@ -1770,3 +1784,157 @@ def test_select_requirement_beam_positions_prefers_low_leakage_chain():
     assert trace["beam_best_support_completeness"] > 0.5
     assert trace["beam_best_counterfactual_leakage"] < 0.5
     assert trace["beam_finalists"][0]["selected_positions"] == [0, 1, 3]
+
+
+def test_requirement_beam_dedupes_permuted_doc_sets_by_canonical_signature():
+    cache_entry = {
+        "annotation_pool_k": 2,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Doc A", "Doc B"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Doc A",
+                "positive_requirement_scores": {"anchor_0": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Doc B",
+                "positive_requirement_scores": {"anchor_0": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    selected_positions, trace = select_requirement_beam_positions(
+        pool_doc_ids=[20, 21],
+        pool_doc_scores=np.array([0.9, 0.8], dtype=float),
+        pool_doc_titles=["Doc A", "Doc B"],
+        doc_idx_to_entities={
+            20: {"doc a"},
+            21: {"doc b"},
+        },
+        doc_idx_to_edges={
+            20: [],
+            21: [],
+        },
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"seed"},
+        proposal_query_entities={"target"},
+        anchor_count=0,
+        reserve_top_m=0,
+        structure_max_hops=1,
+        beam_width=2,
+        beam_expand_per_state=2,
+        non_anchor_title_dedup=False,
+    )
+
+    assert selected_positions == [0, 1]
+    assert trace["beam_signature_pruned_count"] == 1
+    assert len(trace["beam_finalists"]) == 1
+    assert trace["beam_finalists"][0]["selected_positions"] == [0, 1]
+
+
+def test_requirement_beam_learned_mode_reorders_widened_shortlist_before_expansion():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+            {"requirement_id": "decision_0", "type": "decision"},
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Anchor", "Bridge Prior", "Bridge Support"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge Prior",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.15, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Bridge Support",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 1.0, "decision_0": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    oracle_positions, _ = select_requirement_beam_positions(
+        pool_doc_ids=[30, 31, 32],
+        pool_doc_scores=np.array([0.95, 0.80, 0.20], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Support"],
+        doc_idx_to_entities={
+            30: {"anchor"},
+            31: {"bridge prior"},
+            32: {"bridge support"},
+        },
+        doc_idx_to_edges={
+            30: [],
+            31: [],
+            32: [],
+        },
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+    learned_positions, learned_trace = select_requirement_beam_positions(
+        pool_doc_ids=[30, 31, 32],
+        pool_doc_scores=np.array([0.95, 0.80, 0.20], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Support"],
+        doc_idx_to_entities={
+            30: {"anchor"},
+            31: {"bridge prior"},
+            32: {"bridge support"},
+        },
+        doc_idx_to_edges={
+            30: [],
+            31: [],
+            32: [],
+        },
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        non_anchor_title_dedup=False,
+        requirement_mode="learned",
+        requirement_model_bundle={"model": DummyRequirementPriorModel()},
+    )
+
+    assert oracle_positions == [0, 1]
+    assert learned_positions == [0, 2]
+    assert learned_trace["beam_learned_eval_count"] == 2
+    assert learned_trace["selection_steps"][1]["predicted_utility"] > 0.0

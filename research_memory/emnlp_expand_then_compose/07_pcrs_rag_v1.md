@@ -98,6 +98,7 @@ Search structure:
 - keep the widened deep pool
 - preserve prefix anchors / reserves as before
 - expand candidate states
+- canonicalize beam state identity by document set signature
 - prune by Pareto dominance
 - pick the final state by `utopia_distance`
 
@@ -110,6 +111,7 @@ Important nuance:
 The branch also adds a lightweight matcher:
 - trained offline from requirement-state deltas
 - used only as an extra proposal prior in `learned` mode
+- in practice this means learned mode reorders a widened bridge shortlist before expansion
 
 It does not replace the set-level objective.
 
