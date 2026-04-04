@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 
 import numpy as np
+import pytest
 
 
 SCRIPT_DIR = Path(__file__).resolve().parents[1] / "scripts"
@@ -13,6 +14,7 @@ from eval_causal_qwen3 import (
     LEARNED_SETWISE_FEATURE_NAMES,
     OpenAICompatibleLateRerankJudge,
     SetwiseLateRerankResponseModel,
+    build_requirement_title_exposure_summary,
     build_setwise_late_rerank_candidates,
     build_setwise_selector_query_traces,
     build_setwise_late_rerank_judge_bundle,
@@ -29,6 +31,7 @@ from eval_causal_qwen3 import (
     rerank_completed_evidence_sets_with_llm,
     resolve_requirement_beam_runtime_reserve_config,
     resolve_reserved_positions,
+    resolve_query_pool_gold_titles,
     resolve_setwise_query_targets,
     score_evidence_state,
     select_bridge_beam_positions,
@@ -39,15 +42,28 @@ from eval_causal_qwen3 import (
 )
 from requirement_beam_utils import (
     align_requirement_cache_entry_to_pool,
+    build_need_unit,
+    build_need_unit_doc_annotation,
+    build_heuristic_qdmr_step_plan_payload,
     build_need_unit_cache_entry,
     build_requirement_cache_entry,
+    compile_qdmr_to_need_units,
     compute_requirement_state_metrics,
+    extract_need_unit_atomic_features,
     load_requirement_cache,
+    load_need_unit_atomic_model_bundle,
+    NEED_UNIT_ATOMIC_FEATURE_NAMES,
+    NEED_UNIT_ATOMIC_LABELS,
+    NEED_UNIT_CACHE_VERSION,
     NEED_UNIT_MATCHER_FEATURE_NAMES,
+    normalize_answer_type_label,
     REQUIREMENT_MATCHER_FEATURE_NAMES,
     requirement_feature_rows_to_matrix,
     save_requirement_cache,
+    score_need_unit_support,
 )
+from annotate_need_unit_support import resolve_atomic_annotation_bundle
+from train_need_unit_scorer import build_need_unit_atomic_training_rows
 from run_requirement_beam_reserve_ablation import (
     build_requirement_reserve_ablation_jobs,
     resolve_dataset_save_dir,
@@ -94,6 +110,21 @@ class DummyNeedUnitPriorModel:
         )
         positive_score = np.clip(positive_score, 0.0, 1.0)
         return np.stack([1.0 - positive_score, positive_score], axis=1)
+
+
+class DummyAtomicNeedUnitModel:
+    def __init__(self):
+        self.classes_ = np.asarray(list(NEED_UNIT_ATOMIC_LABELS), dtype=object)
+
+    def predict_proba(self, feature_matrix):
+        title_bridge_idx = NEED_UNIT_ATOMIC_FEATURE_NAMES.index("title_bridge_alignment")
+        outputs = []
+        for row in feature_matrix:
+            if row[title_bridge_idx] > 0.5:
+                outputs.append([0.1, 0.7, 0.1, 0.1])
+            else:
+                outputs.append([0.7, 0.1, 0.1, 0.1])
+        return np.asarray(outputs, dtype=float)
 
 
 class DummyLateRerankModel:
@@ -244,6 +275,17 @@ def test_materialize_reader_top_positions_preserves_selected_prefix_and_fills_ta
     )
 
     assert top_positions == [3, 1, 0, 2, 4]
+
+
+def test_materialize_reader_top_positions_can_force_prefix_positions():
+    top_positions = materialize_reader_top_positions(
+        selected_positions=[3, 1, 3],
+        pool_limit=6,
+        qa_top_k=5,
+        forced_prefix_positions=[5, 1],
+    )
+
+    assert top_positions == [5, 1, 3, 0, 2]
 
 
 def test_parse_setwise_late_rerank_response_accepts_best_id_schema():
@@ -1723,6 +1765,26 @@ def test_requirement_cache_roundtrip_and_state_metrics_prefer_support_over_count
 
 
 def test_need_unit_cache_roundtrip_drops_wh_subjects_and_tracks_v2_groups(tmp_path):
+    step_plan_payload = {
+        "question_id": "q0",
+        "answer_type": "city",
+        "qdmr_steps": [
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find the birth place of Person A.",
+                "inputs": ["Person A"],
+                "output_variable": "X",
+            },
+            {
+                "step_id": "s2",
+                "operation": "answer",
+                "description": "Return X as the final answer.",
+                "inputs": ["X"],
+                "output_variable": "ANSWER",
+            },
+        ],
+    }
     cache_entry = build_need_unit_cache_entry(
         query_index=0,
         question="Which city is Person A from?",
@@ -1739,19 +1801,23 @@ def test_need_unit_cache_roundtrip_drops_wh_subjects_and_tracks_v2_groups(tmp_pa
         seed_entities={"person a"},
         question_entities={"person a", "city x"},
         annotation_pool_k=3,
+        predicted_answer_type="city",
+        step_plan_payload=step_plan_payload,
     )
     cache_path = tmp_path / "need_unit_cache.json"
     save_requirement_cache(cache_path, {
-        "version": "pcrs_rag_v2_need_units",
+        "version": NEED_UNIT_CACHE_VERSION,
         "queries": [cache_entry],
     })
     loaded_cache = load_requirement_cache(cache_path)
     loaded_entry = loaded_cache["entries_by_question"]["Which city is Person A from?"]
 
     subjects = [str(unit.get("subject", "")).strip().lower() for unit in loaded_entry["positive_need_units"]]
-    assert loaded_entry["version"] == "pcrs_rag_v2_need_units"
+    predicates = [str(unit.get("predicate", "")).strip() for unit in loaded_entry["positive_need_units"]]
+    assert loaded_entry["version"] == NEED_UNIT_CACHE_VERSION
     assert "which" not in subjects
     assert loaded_entry["qdmr_steps"]
+    assert "birth_place" in predicates
 
     metrics = compute_requirement_state_metrics(
         cache_entry=loaded_entry,
@@ -1760,6 +1826,804 @@ def test_need_unit_cache_roundtrip_drops_wh_subjects_and_tracks_v2_groups(tmp_pa
     assert metrics["entity_locator_support"] >= 0.0
     assert metrics["answer_slot_support"] >= 0.0
     assert metrics["selected_annotation_count"] == 2.0
+
+
+def test_build_heuristic_qdmr_step_plan_payload_extracts_birthplace_then_end_date():
+    payload = build_heuristic_qdmr_step_plan_payload(
+        question="When was Lady Godiva's birthplace abolished?",
+        seed_entities={"lady godiva"},
+        question_entities={"lady godiva"},
+        predicted_answer_type="date",
+    )
+
+    descriptions = [str(step.get("description", "")) for step in payload["qdmr_steps"]]
+    assert descriptions[0] == "Find the birthplace of lady godiva."
+    assert descriptions[1] == "Find the end date of X."
+    assert payload["qdmr_steps"][-1]["operation"] == "answer"
+
+
+def test_normalize_answer_type_label_drops_lexical_suffix_noise():
+    assert normalize_answer_type_label("month tripartite") == "month"
+    assert normalize_answer_type_label("county erik") == "county"
+    assert normalize_answer_type_label("person name") == "person_or_character"
+
+
+def test_build_need_unit_cache_entry_preserves_parser_trace_across_fallback():
+    cache_entry = build_need_unit_cache_entry(
+        query_index=0,
+        question="Which city is Person A from?",
+        pool_docs=[
+            "Person A\nPerson A is from City X.",
+            "City X\nCity X is in Country Y.",
+        ],
+        pool_doc_entities=[
+            {"person a", "city x"},
+            {"city x", "country y"},
+        ],
+        seed_entities={"person a"},
+        question_entities={"person a"},
+        annotation_pool_k=2,
+        predicted_answer_type="city",
+        step_plan_payload={
+            "question_id": "q0",
+            "answer_type": "city",
+            "qdmr_steps": [
+                {
+                    "step_id": "s1",
+                    "operation": "relation_lookup",
+                    "description": "Find the body water of Person A.",
+                    "inputs": ["Person A"],
+                    "output_variable": "X",
+                },
+                {
+                    "step_id": "s2",
+                    "operation": "answer",
+                    "description": "Return X as the final answer.",
+                    "inputs": ["X"],
+                    "output_variable": "ANSWER",
+                },
+            ],
+        },
+        parser_trace={
+            "raw_response_preview": "{\"answer_type\":\"city\"}",
+            "metadata": {"finish_reason": "stop"},
+        },
+    )
+
+    diagnostics = cache_entry["diagnostics"]
+    assert diagnostics["parser_status"] == "fallback"
+    assert diagnostics["compiler_status"] == "fallback"
+    assert diagnostics["parser_raw_response_preview"] == "{\"answer_type\":\"city\"}"
+    assert diagnostics["parser_metadata"]["finish_reason"] == "stop"
+    assert diagnostics["pre_fallback_compiler_fallback_reasons"] == [
+        "no_selector_enabled_relation_hop",
+        "all_relation_hops_low_confidence",
+    ]
+
+
+def test_build_need_unit_cache_entry_supports_offline_hybrid_annotation_mode():
+    atomic_bundle = {
+        "model": DummyAtomicNeedUnitModel(),
+        "feature_names": list(NEED_UNIT_ATOMIC_FEATURE_NAMES),
+        "labels": list(NEED_UNIT_ATOMIC_LABELS),
+        "bridge_alpha_by_unit_type": {"relation_hop": 0.65},
+        "beta_contradiction": 1.0,
+        "scorer_version": "need_unit_atomic_v1",
+        "model_path": "/tmp/offline-hybrid-atomic.joblib",
+    }
+    cache_entry = build_need_unit_cache_entry(
+        query_index=0,
+        question="Where was Person A born?",
+        pool_docs=[
+            "Person A\nPerson A was born in City X.",
+            "City X\nCity X is the birth place of Person A.",
+        ],
+        pool_doc_entities=[
+            {"person a", "city x"},
+            {"person a", "city x"},
+        ],
+        seed_entities={"person a"},
+        question_entities={"person a"},
+        annotation_pool_k=2,
+        atomic_scorer_bundle=atomic_bundle,
+        score_mode="hybrid",
+    )
+
+    assert cache_entry["diagnostics"]["annotation_score_mode"] == "hybrid"
+    assert cache_entry["diagnostics"]["annotation_model_path"] == "/tmp/offline-hybrid-atomic.joblib"
+    assert len(cache_entry["doc_annotations"]) == 2
+    for row in cache_entry["doc_annotations"]:
+        assert row["annotation_metadata"]["score_mode"] == "hybrid"
+        assert row["annotation_metadata"]["model_path"] == "/tmp/offline-hybrid-atomic.joblib"
+
+
+def test_compile_qdmr_to_need_units_relation_hop_cap_is_configurable():
+    qdmr_steps = [
+        {
+            "step_id": "s1",
+            "operation": "relation_lookup",
+            "description": "Find the designer of Southeast Library.",
+            "inputs": ["Southeast Library"],
+            "output_variable": "X",
+        },
+        {
+            "step_id": "s2",
+            "operation": "relation_lookup",
+            "description": "Find the death place of X.",
+            "inputs": ["X"],
+            "output_variable": "Y",
+        },
+        {
+            "step_id": "s3",
+            "operation": "relation_lookup",
+            "description": "Find the body of water near Y that empties into the Gulf of Mexico.",
+            "inputs": ["Y", "Gulf of Mexico"],
+            "output_variable": "ANSWER",
+        },
+        {
+            "step_id": "s4",
+            "operation": "answer",
+            "description": "Return ANSWER as the final answer.",
+            "inputs": ["ANSWER"],
+            "output_variable": "ANSWER",
+        },
+    ]
+
+    compiled_cap2 = compile_qdmr_to_need_units(
+        question="Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+        qdmr_steps=qdmr_steps,
+        answer_type="location",
+        question_entities={"southeast library"},
+        seed_entities={"southeast library"},
+        max_relation_hops=2,
+    )
+    compiled_cap3 = compile_qdmr_to_need_units(
+        question="Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+        qdmr_steps=qdmr_steps,
+        answer_type="location",
+        question_entities={"southeast library"},
+        seed_entities={"southeast library"},
+        max_relation_hops=3,
+    )
+
+    relation_preds_cap2 = [
+        unit["predicate"]
+        for unit in compiled_cap2["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+    relation_preds_cap3 = [
+        unit["predicate"]
+        for unit in compiled_cap3["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+
+    assert relation_preds_cap2 == ["designer_of", "death_place"]
+    assert relation_preds_cap3 == ["designer_of", "death_place", "empties_into"]
+    assert compiled_cap2["diagnostics"]["relation_hop_cap"] == 2
+    assert compiled_cap2["diagnostics"]["pre_cap_relation_hop_count"] == 3
+    assert compiled_cap2["diagnostics"]["post_cap_relation_hop_count"] == 2
+    assert "empties_into" in compiled_cap2["diagnostics"]["dropped_unit_predicates"]
+    assert compiled_cap3["diagnostics"]["relation_hop_cap"] == 3
+    assert compiled_cap3["diagnostics"]["post_cap_relation_hop_count"] == 3
+
+
+def test_compile_qdmr_to_need_units_conditional_mode_keeps_third_hop_for_clean_chain():
+    qdmr_steps = [
+        {
+            "step_id": "s1",
+            "operation": "relation_lookup",
+            "description": "Find the designer of Southeast Library.",
+            "inputs": ["Southeast Library"],
+            "output_variable": "X",
+        },
+        {
+            "step_id": "s2",
+            "operation": "relation_lookup",
+            "description": "Find the death place of X.",
+            "inputs": ["X"],
+            "output_variable": "Y",
+        },
+        {
+            "step_id": "s3",
+            "operation": "relation_lookup",
+            "description": "Find the body of water near Y that empties into the Gulf of Mexico.",
+            "inputs": ["Y", "Gulf of Mexico"],
+            "output_variable": "ANSWER",
+        },
+        {
+            "step_id": "s4",
+            "operation": "answer",
+            "description": "Return ANSWER as the final answer.",
+            "inputs": ["ANSWER"],
+            "output_variable": "ANSWER",
+        },
+    ]
+
+    compiled = compile_qdmr_to_need_units(
+        question="Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+        qdmr_steps=qdmr_steps,
+        answer_type="location",
+        question_entities={"southeast library"},
+        seed_entities={"southeast library"},
+        max_relation_hops=2,
+        relation_hop_cap_mode="conditional",
+    )
+
+    relation_preds = [
+        unit["predicate"]
+        for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+    assert relation_preds == ["designer_of", "death_place", "empties_into"]
+    assert compiled["diagnostics"]["conditional_third_hop_allowed"] is True
+    assert compiled["diagnostics"]["conditional_third_hop_reasons"] == []
+
+
+def test_compile_qdmr_to_need_units_conditional_mode_blocks_noisy_third_hop():
+    qdmr_steps = [
+        {
+            "step_id": "s1",
+            "operation": "relation_lookup",
+            "description": "Find the designer of Southeast Library.",
+            "inputs": ["Southeast Library"],
+            "output_variable": "X",
+        },
+        {
+            "step_id": "s2",
+            "operation": "relation_lookup",
+            "description": "Find the death place of X.",
+            "inputs": ["X"],
+            "output_variable": "Y",
+        },
+        {
+            "step_id": "s3",
+            "operation": "relation_lookup",
+            "description": "Find the body water of Y.",
+            "inputs": ["Y"],
+            "output_variable": "ANSWER",
+        },
+        {
+            "step_id": "s4",
+            "operation": "answer",
+            "description": "Return ANSWER as the final answer.",
+            "inputs": ["ANSWER"],
+            "output_variable": "ANSWER",
+        },
+    ]
+
+    compiled = compile_qdmr_to_need_units(
+        question="Where does the body of water by the city where the Southeast Library designer died go?",
+        qdmr_steps=qdmr_steps,
+        answer_type="location",
+        question_entities={"southeast library"},
+        seed_entities={"southeast library"},
+        max_relation_hops=2,
+        relation_hop_cap_mode="conditional",
+    )
+
+    relation_preds = [
+        unit["predicate"]
+        for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+    assert relation_preds == ["designer_of", "death_place"]
+    assert compiled["diagnostics"]["conditional_third_hop_allowed"] is False
+    assert "third_relation_chain_not_high_confidence" in compiled["diagnostics"]["conditional_third_hop_reasons"]
+
+
+def test_compile_qdmr_to_need_units_marks_low_confidence_lexical_predicates_disabled():
+    compiled = compile_qdmr_to_need_units(
+        question="Which city is Person A from?",
+        qdmr_steps=[
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find the body water of Person A.",
+                "inputs": ["Person A"],
+                "output_variable": "X",
+            },
+            {
+                "step_id": "s2",
+                "operation": "answer",
+                "description": "Return X as the final answer.",
+                "inputs": ["X"],
+                "output_variable": "ANSWER",
+            },
+        ],
+        answer_type="city",
+        question_entities={"person a"},
+        seed_entities={"person a"},
+    )
+
+    relation_units = [
+        unit for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+    assert relation_units
+    assert relation_units[0]["confidence"] == "low"
+    assert relation_units[0]["selector_enabled"] is False
+    assert compiled["diagnostics"]["low_confidence_unit_count"] >= 1
+
+
+def test_compile_qdmr_to_need_units_keeps_county_relation_enabled():
+    compiled = compile_qdmr_to_need_units(
+        question="What county is Erik Hort's birthplace a part of?",
+        qdmr_steps=[
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find the birthplace of Erik Hort.",
+                "inputs": ["Erik Hort"],
+                "output_variable": "X",
+            },
+            {
+                "step_id": "s2",
+                "operation": "relation_lookup",
+                "description": "Find the county of X.",
+                "inputs": ["X"],
+                "output_variable": "ANSWER",
+            },
+            {
+                "step_id": "s3",
+                "operation": "answer",
+                "description": "Return ANSWER as the final answer.",
+                "inputs": ["ANSWER"],
+                "output_variable": "ANSWER",
+            },
+        ],
+        answer_type="county",
+        question_entities={"erik hort"},
+        seed_entities={"erik hort"},
+    )
+
+    relation_units = [
+        unit for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+    assert [unit["predicate"] for unit in relation_units] == ["birth_place", "county"]
+    assert relation_units[1]["confidence"] == "high"
+    assert relation_units[1]["selector_enabled"] is True
+
+
+def test_compile_qdmr_to_need_units_maps_end_year_to_end_date():
+    compiled = compile_qdmr_to_need_units(
+        question="What year did the publisher of Labyrinth end?",
+        qdmr_steps=[
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find the publisher of Labyrinth.",
+                "inputs": ["Labyrinth"],
+                "output_variable": "X",
+            },
+            {
+                "step_id": "s2",
+                "operation": "relation_lookup",
+                "description": "Find the end year of X.",
+                "inputs": ["X"],
+                "output_variable": "ANSWER",
+            },
+            {
+                "step_id": "s3",
+                "operation": "answer",
+                "description": "Return ANSWER as the final answer.",
+                "inputs": ["ANSWER"],
+                "output_variable": "ANSWER",
+            },
+        ],
+        answer_type="date",
+        question_entities={"labyrinth"},
+        seed_entities={"labyrinth"},
+    )
+
+    relation_units = [
+        unit for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+    assert [unit["predicate"] for unit in relation_units] == ["publisher", "end_date"]
+    assert relation_units[1]["selector_enabled"] is True
+
+
+def test_compile_qdmr_to_need_units_maps_city_where_died_to_death_place():
+    compiled = compile_qdmr_to_need_units(
+        question="Where is the city where Person A died?",
+        qdmr_steps=[
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find the city where X died.",
+                "inputs": ["X"],
+                "output_variable": "ANSWER",
+            },
+            {
+                "step_id": "s2",
+                "operation": "answer",
+                "description": "Return ANSWER as the final answer.",
+                "inputs": ["ANSWER"],
+                "output_variable": "ANSWER",
+            },
+        ],
+        answer_type="location",
+        question_entities={"person a"},
+        seed_entities={"person a"},
+    )
+
+    relation_unit = next(
+        unit for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    )
+    assert relation_unit["predicate"] == "death_place"
+    assert relation_unit["selector_enabled"] is True
+
+
+def test_compile_qdmr_to_need_units_maps_north_of_to_canonical_relation():
+    compiled = compile_qdmr_to_need_units(
+        question="When was the region immediately north of Israel created?",
+        qdmr_steps=[
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find the region immediately north of X.",
+                "inputs": ["X"],
+                "output_variable": "Y",
+            },
+            {
+                "step_id": "s2",
+                "operation": "answer",
+                "description": "Return Y as the final answer.",
+                "inputs": ["Y"],
+                "output_variable": "ANSWER",
+            },
+        ],
+        answer_type="date",
+        question_entities={"israel"},
+        seed_entities={"israel"},
+    )
+
+    relation_unit = next(
+        unit for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    )
+    assert relation_unit["predicate"] == "north_of"
+    assert relation_unit["selector_enabled"] is True
+
+
+def test_compile_qdmr_to_need_units_generates_role_and_temporal_counterfactuals():
+    compiled = compile_qdmr_to_need_units(
+        question="Which film directed by Christopher Nolan was released before 2010?",
+        qdmr_steps=[
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find films directed by Christopher Nolan.",
+                "inputs": ["Christopher Nolan"],
+                "output_variable": "X",
+            },
+            {
+                "step_id": "s2",
+                "operation": "constraint_check",
+                "description": "Keep the film X whose release date is before 2010.",
+                "inputs": ["X"],
+                "output_variable": "X",
+            },
+            {
+                "step_id": "s3",
+                "operation": "answer",
+                "description": "Return X as the final answer.",
+                "inputs": ["X"],
+                "output_variable": "ANSWER",
+            },
+        ],
+        answer_type="film",
+        question_entities={"christopher nolan"},
+        seed_entities={"christopher nolan"},
+    )
+
+    transforms = {str(item.get("transform", "")) for item in compiled["counterfactual_sets"]}
+    assert "role_swap" in transforms
+    assert "temporal_shift" in transforms or "constraint_flip" in transforms
+
+
+def test_compile_qdmr_to_need_units_preserves_variable_slots_in_positive_units():
+    compiled = compile_qdmr_to_need_units(
+        question="Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+        qdmr_steps=[
+            {
+                "step_id": "s1",
+                "operation": "relation_lookup",
+                "description": "Find the designer of Southeast Library.",
+                "inputs": ["Southeast Library"],
+                "output_variable": "X",
+            },
+            {
+                "step_id": "s2",
+                "operation": "relation_lookup",
+                "description": "Find the death place of X.",
+                "inputs": ["X"],
+                "output_variable": "Y",
+            },
+            {
+                "step_id": "s3",
+                "operation": "relation_lookup",
+                "description": "Find the body of water near Y that empties into the Gulf of Mexico.",
+                "inputs": ["Y", "Gulf of Mexico"],
+                "output_variable": "ANSWER",
+            },
+            {
+                "step_id": "s4",
+                "operation": "answer",
+                "description": "Return ANSWER as the final answer.",
+                "inputs": ["ANSWER"],
+                "output_variable": "ANSWER",
+            },
+        ],
+        answer_type="location",
+        question_entities={"southeast library"},
+        seed_entities={"southeast library"},
+        max_relation_hops=3,
+        relation_hop_cap_mode="conditional",
+    )
+
+    relation_units = [
+        unit for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "relation_hop"
+    ]
+    assert [unit["subject"] for unit in relation_units] == [
+        "southeast library",
+        "?x",
+        "?y",
+    ]
+    assert [unit["object"] for unit in relation_units] == ["?x", "?y", "?ans"]
+    assert [unit["target_variable"] for unit in relation_units] == ["?x", "?y", "?ans"]
+    answer_unit = next(
+        unit for unit in compiled["positive_need_units"]
+        if unit.get("unit_type") == "answer_slot"
+    )
+    assert answer_unit["subject"] == "?ans"
+    assert answer_unit["object"] == "?ans"
+    assert answer_unit["target_variable"] == "?ans"
+
+
+def test_build_need_unit_preserves_canonical_variable_slots():
+    unit = build_need_unit(
+        unit_id="u0",
+        unit_type="relation_hop",
+        subject="?x",
+        predicate="death_place",
+        object_value="ANSWER",
+        target_variable="Y",
+    )
+
+    assert unit["subject"] == "?x"
+    assert unit["object"] == "?ans"
+    assert unit["target_variable"] == "?y"
+
+
+def test_extract_need_unit_atomic_features_recovers_legacy_serialized_variables():
+    feature_row = extract_need_unit_atomic_features(
+        unit={
+            "unit_id": "u0",
+            "unit_type": "relation_hop",
+            "subject": "x",
+            "predicate": "death_place",
+            "object": "Minneapolis",
+            "constraints": [],
+        },
+        doc_title="Minneapolis",
+        doc_body="The death place is Minneapolis.",
+        doc_entities={"minneapolis"},
+    )
+
+    assert feature_row["subject_is_variable"] == 1.0
+    assert feature_row["object_is_variable"] == 0.0
+    assert feature_row["alias_or_variable_bridge_alignment"] >= 1.0
+
+
+def test_compute_requirement_state_metrics_ignores_selector_disabled_need_units():
+    cache_entry = {
+        "version": NEED_UNIT_CACHE_VERSION,
+        "annotation_pool_k": 2,
+        "positive_need_units": [
+            {"unit_id": "u0", "unit_type": "relation_hop", "selector_enabled": False},
+            {"unit_id": "u1", "unit_type": "answer_slot", "selector_enabled": True},
+        ],
+        "counterfactual_sets": [],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Distractor",
+                "positive_need_unit_scores": {"u0": 1.0, "u1": 0.0},
+                "positive_requirement_scores": {"u0": 1.0, "u1": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Answer",
+                "positive_need_unit_scores": {"u0": 0.0, "u1": 1.0},
+                "positive_requirement_scores": {"u0": 0.0, "u1": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    metrics_distractor = compute_requirement_state_metrics(
+        cache_entry=cache_entry,
+        selected_positions=[0],
+    )
+    metrics_answer = compute_requirement_state_metrics(
+        cache_entry=cache_entry,
+        selected_positions=[1],
+    )
+
+    assert metrics_distractor["active_group_count"] == 1.0
+    assert metrics_distractor["support_completeness"] == 0.0
+    assert metrics_answer["support_completeness"] == 1.0
+
+
+def test_score_need_unit_support_emits_atomic_fields_for_direct_support():
+    unit = {
+        "unit_id": "u0",
+        "unit_type": "relation_hop",
+        "subject": "southeast library",
+        "predicate": "designer_of",
+        "object": "?x",
+        "constraints": [],
+    }
+
+    scores = score_need_unit_support(
+        unit=unit,
+        doc_title="Southeast Library",
+        doc_body="The designer of Southeast Library is John Smith.",
+        doc_entities={"southeast library", "john smith"},
+    )
+
+    assert "full_support_prob" in scores
+    assert "bridge_support_prob" in scores
+    assert scores["full_support_prob"] > scores["bridge_support_prob"]
+    assert scores["coverage_score"] > 0.2
+    assert scores["score_source"] == "heuristic_fallback"
+
+
+def test_score_need_unit_support_emits_contradiction_for_opposing_predicate():
+    unit = {
+        "unit_id": "u0",
+        "unit_type": "relation_hop",
+        "subject": "the good shepherd",
+        "predicate": "directed_by",
+        "object": "?x",
+        "constraints": [],
+    }
+
+    scores = score_need_unit_support(
+        unit=unit,
+        doc_title="The Good Shepherd",
+        doc_body="The Good Shepherd starred in Matt Damon.",
+        doc_entities={"the good shepherd", "matt damon"},
+    )
+
+    assert scores["contradiction_prob"] >= 0.4
+    assert scores["coverage_score"] == 0.0
+
+
+def test_build_need_unit_doc_annotation_hybrid_adds_atomic_maps_and_metadata():
+    unit = {
+        "unit_id": "u0",
+        "unit_type": "relation_hop",
+        "subject": "person a",
+        "predicate": "birth_place",
+        "object": "city x",
+        "constraints": [],
+    }
+    bundle = {
+        "model": DummyAtomicNeedUnitModel(),
+        "feature_names": list(NEED_UNIT_ATOMIC_FEATURE_NAMES),
+        "labels": list(NEED_UNIT_ATOMIC_LABELS),
+        "bridge_alpha_by_unit_type": {
+            "relation_hop": 0.65,
+        },
+        "beta_contradiction": 1.0,
+        "scorer_version": "need_unit_atomic_v1",
+        "model_path": "/tmp/dummy-atomic.joblib",
+    }
+
+    annotation = build_need_unit_doc_annotation(
+        pool_position=0,
+        doc_text="Person A\nPerson A was from City X.",
+        doc_entities={"person a", "city x"},
+        positive_need_units=[unit],
+        counterfactual_sets=[],
+        atomic_scorer_bundle=bundle,
+        score_mode="hybrid",
+    )
+
+    atomic_scores = annotation["positive_atomic_scores"]["u0"]
+    assert annotation["annotation_metadata"]["score_mode"] == "hybrid"
+    assert annotation["annotation_metadata"]["model_path"] == "/tmp/dummy-atomic.joblib"
+    assert atomic_scores["bridge_support_prob"] == 0.7
+    assert annotation["positive_support_probs"]["u0"] == pytest.approx(0.555, abs=1e-6)
+
+
+def test_resolve_atomic_annotation_bundle_requires_model_path_for_hybrid():
+    with pytest.raises(ValueError):
+        resolve_atomic_annotation_bundle(score_mode="hybrid", atomic_model_path="")
+
+
+def test_load_need_unit_atomic_model_bundle_roundtrip(tmp_path):
+    bundle_path = tmp_path / "atomic_bundle.joblib"
+    import joblib
+
+    joblib.dump({
+        "task": "atomic_multiclass",
+        "model": DummyAtomicNeedUnitModel(),
+        "feature_names": list(NEED_UNIT_ATOMIC_FEATURE_NAMES),
+    }, bundle_path)
+
+    loaded = load_need_unit_atomic_model_bundle(bundle_path)
+
+    assert loaded["task"] == "atomic_multiclass"
+    assert loaded["feature_names"] == list(NEED_UNIT_ATOMIC_FEATURE_NAMES)
+    assert loaded["labels"] == list(NEED_UNIT_ATOMIC_LABELS)
+
+
+def test_build_need_unit_atomic_training_rows_prefers_label_override_and_schema():
+    doc_text = "Person A\nThe birth place of Person A is City X."
+    unit = {
+        "unit_id": "u0",
+        "unit_type": "relation_hop",
+        "subject": "person a",
+        "predicate": "birth_place",
+        "object": "city x",
+        "constraints": [],
+        "selector_enabled": True,
+    }
+    cache_entry = {
+        "version": NEED_UNIT_CACHE_VERSION,
+        "query_index": 0,
+        "question": "Which city is Person A from?",
+        "question_key": "q0",
+        "annotation_pool_k": 1,
+        "positive_need_units": [unit],
+        "counterfactual_sets": [],
+        "doc_annotations": [
+            build_need_unit_doc_annotation(
+                pool_position=0,
+                doc_text=doc_text,
+                doc_entities={"person a", "city x"},
+                positive_need_units=[unit],
+                counterfactual_sets=[],
+            ),
+        ],
+    }
+    cache_payload = {
+        "version": NEED_UNIT_CACHE_VERSION,
+        "queries": [cache_entry],
+        "entries_by_question": {cache_entry["question"]: cache_entry},
+        "entries_by_index": {0: cache_entry},
+    }
+    query_solution = QuerySolution(
+        question=cache_entry["question"],
+        docs=[doc_text],
+        gold_docs=[doc_text],
+    )
+
+    rows, summary = build_need_unit_atomic_training_rows(
+        query_solutions=[query_solution],
+        gold_docs=[[doc_text]],
+        requirement_cache=cache_payload,
+        doc_text_to_entities={doc_text: ["person a", "city x"]},
+        label_overrides={"q0:p0:u0": "bridge_support"},
+        include_counterfactual_samples=False,
+    )
+
+    assert summary["row_count"] == 1
+    assert rows[0]["sample_id"] == "q0:p0:u0"
+    assert rows[0]["llm_label"] == "bridge_support"
+    assert rows[0]["final_label"] == "bridge_support"
+    assert rows[0]["label_source"] == "llm"
+    assert "features" in rows[0]
+    assert rows[0]["features"]["predicate_alignment"] > 0.0
 
 
 def test_need_unit_feature_matrix_uses_v2_feature_order():
@@ -1870,7 +2734,7 @@ def test_select_requirement_beam_positions_prefers_low_leakage_chain():
 
 def test_select_requirement_beam_positions_supports_v2_need_unit_cache_entries():
     cache_entry = {
-        "version": "pcrs_rag_v2_need_units",
+        "version": NEED_UNIT_CACHE_VERSION,
         "annotation_pool_k": 4,
         "positive_need_units": [
             {"unit_id": "u0", "unit_type": "entity_locator"},
@@ -2117,6 +2981,11 @@ def test_requirement_beam_learned_mode_reorders_widened_shortlist_before_expansi
     assert learned_trace["selection_steps"][1]["proposal_rank"] == 1
     assert learned_trace["beam_learned_eval_count"] == 2
     assert learned_trace["selection_steps"][1]["predicted_utility"] > 0.0
+    assert [row["pool_position"] for row in oracle_trace["selection_steps"][1]["candidate_source_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in oracle_trace["selection_steps"][1]["candidate_shortlist_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in learned_trace["selection_steps"][1]["candidate_source_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in learned_trace["selection_steps"][1]["candidate_shortlist_preview"]] == [2]
+    assert learned_trace["selection_steps"][1]["candidate_shortlist_preview"][0]["predicted_utility"] > 0.0
 
 
 def test_requirement_beam_oracle_widened_shortlist_allows_state_rescue():
@@ -2207,6 +3076,555 @@ def test_requirement_beam_oracle_widened_shortlist_allows_state_rescue():
     assert projected_positions == [0, 2]
     assert legacy_trace["selection_steps"][1]["proposal_rank"] == 1
     assert projected_trace["selection_steps"][1]["proposal_rank"] == 2
+    assert [row["pool_position"] for row in legacy_trace["selection_steps"][1]["candidate_shortlist_preview"]] == [1]
+    assert [row["pool_position"] for row in projected_trace["selection_steps"][1]["candidate_shortlist_preview"]] == [1, 2]
+
+
+def test_requirement_beam_oracle_source_widening_can_keep_shortlist_small():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+            {"requirement_id": "decision_0", "type": "decision"},
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Anchor", "Bridge Prior", "Bridge Rescue"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge Prior",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.1, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Bridge Rescue",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 1.0, "decision_0": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    widened_positions, widened_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.90, 0.05], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Rescue"],
+        doc_idx_to_entities={
+            40: {"anchor"},
+            41: {"bridge prior"},
+            42: {"bridge rescue"},
+        },
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=3,
+        beam_candidate_shortlist_limit=1,
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+
+    assert widened_positions == [0, 2]
+    assert widened_trace["beam_candidate_shortlist_limit"] == 1
+    assert [row["pool_position"] for row in widened_trace["selection_steps"][1]["candidate_source_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in widened_trace["selection_steps"][1]["candidate_shortlist_preview"]] == [2]
+    assert widened_trace["selection_steps"][1]["proposal_rank"] == 1
+
+
+def test_requirement_beam_probe_force_source_injects_watch_title_without_forcing_shortlist():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+            {"requirement_id": "decision_0", "type": "decision"},
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Anchor", "Bridge Prior", "Deep Bridge"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge Prior",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.1, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Deep Bridge",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.9, "decision_0": 0.2},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    _, trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.90, 0.05], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Deep Bridge"],
+        doc_idx_to_entities={40: {"anchor"}, 41: {"bridge prior"}, 42: {"deep bridge"}},
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=1,
+        beam_candidate_shortlist_limit=1,
+        force_source_titles=["Deep Bridge"],
+        trace_watch_titles=["Deep Bridge"],
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+
+    step = trace["selection_steps"][1]
+    assert [row["pool_position"] for row in step["candidate_source_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in step["candidate_shortlist_preview"]] == [2]
+    assert step["forced_source_titles_applied"] == ["Deep Bridge"]
+    assert step["forced_shortlist_titles_applied"] == []
+    watch_row = step["watch_title_trace"][0]
+    assert watch_row["title"] == "Deep Bridge"
+    assert watch_row["forced_into_source"] is True
+    assert watch_row["forced_into_shortlist"] is False
+
+
+def test_requirement_beam_probe_force_shortlist_promotes_watch_title_from_source():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+            {"requirement_id": "decision_0", "type": "decision"},
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Anchor", "Bridge Prior", "Deep Bridge"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge Prior",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.1, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Deep Bridge",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.02, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    positions, trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.90, 0.05], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Deep Bridge"],
+        doc_idx_to_entities={40: {"anchor"}, 41: {"bridge prior"}, 42: {"deep bridge"}},
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=3,
+        beam_candidate_shortlist_limit=1,
+        force_shortlist_titles=["Deep Bridge"],
+        trace_watch_titles=["Deep Bridge"],
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+
+    step = trace["selection_steps"][1]
+    assert [row["pool_position"] for row in step["candidate_source_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in step["candidate_shortlist_preview"]] == [1, 2]
+    assert step["forced_source_titles_applied"] == []
+    assert step["forced_shortlist_titles_applied"] == ["Deep Bridge"]
+    watch_row = step["watch_title_trace"][0]
+    assert watch_row["forced_into_source"] is False
+    assert watch_row["forced_into_shortlist"] is True
+
+
+def test_requirement_beam_positive_only_shortlist_sort_prefers_support_gain():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+        ],
+        "counterfactual_sets": [
+            {
+                "cf_id": "cf_0",
+                "requirements": [
+                    {"requirement_id": "bridge_cf", "type": "bridge"},
+                ],
+            }
+        ],
+        "pool_titles": ["Anchor", "Margin Doc", "Support Doc"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0},
+                "counterfactual_requirement_scores": {"cf_0": {"bridge_cf": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Margin Doc",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.6},
+                "counterfactual_requirement_scores": {"cf_0": {"bridge_cf": 0.0}},
+                "counterfactual_set_scores": {"cf_0": 0.0},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Support Doc",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.9},
+                "counterfactual_requirement_scores": {"cf_0": {"bridge_cf": 0.85}},
+                "counterfactual_set_scores": {"cf_0": 0.85},
+            },
+        ],
+    }
+
+    margin_positions, margin_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.80, 0.70], dtype=float),
+        pool_doc_titles=["Anchor", "Margin Doc", "Support Doc"],
+        doc_idx_to_entities={40: {"anchor"}, 41: {"margin"}, 42: {"support"}},
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=2,
+        beam_candidate_shortlist_limit=1,
+        trace_watch_titles=["Support Doc"],
+        shortlist_sort_mode="margin_first",
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+    positive_positions, positive_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.80, 0.70], dtype=float),
+        pool_doc_titles=["Anchor", "Margin Doc", "Support Doc"],
+        doc_idx_to_entities={40: {"anchor"}, 41: {"margin"}, 42: {"support"}},
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=2,
+        beam_candidate_shortlist_limit=1,
+        trace_watch_titles=["Support Doc"],
+        shortlist_sort_mode="positive_only",
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+
+    assert margin_positions == [0, 1]
+    assert positive_positions == [0, 2]
+    margin_step = margin_trace["selection_steps"][1]
+    positive_step = positive_trace["selection_steps"][1]
+    assert margin_step["shortlist_sort_mode"] == "margin_first"
+    assert positive_step["shortlist_sort_mode"] == "positive_only"
+    assert margin_step["candidate_shortlist_preview"][0]["title"] == "Margin Doc"
+    assert positive_step["candidate_shortlist_preview"][0]["title"] == "Support Doc"
+    support_watch = positive_step["watch_title_trace"][0]
+    assert support_watch["dominant_positive_unit_id"] == "bridge_0"
+    assert support_watch["dominant_positive_unit_precovered"] is False
+    assert support_watch["support_completeness_after"] > support_watch["counterfactual_leakage_after"]
+
+
+def test_requirement_beam_support_bonus_source_sort_can_rescue_deep_bridge_into_source():
+    cache_entry = {
+        "annotation_pool_k": 3,
+        "positive_requirements": [
+            {"requirement_id": "anchor_0", "type": "anchor"},
+            {"requirement_id": "bridge_0", "type": "bridge"},
+            {"requirement_id": "decision_0", "type": "decision"},
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Anchor", "Bridge Prior", "Bridge Rescue"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor",
+                "positive_requirement_scores": {"anchor_0": 1.0, "bridge_0": 0.0, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Bridge Prior",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 0.1, "decision_0": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Bridge Rescue",
+                "positive_requirement_scores": {"anchor_0": 0.0, "bridge_0": 1.0, "decision_0": 1.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    combined_positions, combined_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.90, 0.05], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Rescue"],
+        doc_idx_to_entities={40: {"anchor"}, 41: {"bridge prior"}, 42: {"bridge rescue"}},
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=1,
+        beam_candidate_shortlist_limit=1,
+        trace_watch_titles=["Bridge Rescue"],
+        source_sort_mode="combined",
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+    support_positions, support_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.90, 0.05], dtype=float),
+        pool_doc_titles=["Anchor", "Bridge Prior", "Bridge Rescue"],
+        doc_idx_to_entities={40: {"anchor"}, 41: {"bridge prior"}, 42: {"bridge rescue"}},
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"anchor"},
+        proposal_query_entities={"target"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=1,
+        beam_candidate_shortlist_limit=1,
+        trace_watch_titles=["Bridge Rescue"],
+        source_sort_mode="support_bonus",
+        source_support_gain_weight=0.5,
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+
+    assert combined_positions == [0, 1]
+    assert support_positions == [0, 2]
+    combined_step = combined_trace["selection_steps"][1]
+    support_step = support_trace["selection_steps"][1]
+    assert combined_trace["source_sort_mode"] == "combined"
+    assert support_trace["source_sort_mode"] == "support_bonus"
+    assert support_trace["source_support_gain_weight"] == pytest.approx(0.5)
+    assert [row["pool_position"] for row in combined_step["candidate_source_preview"]] == [1]
+    assert [row["pool_position"] for row in support_step["candidate_source_preview"]] == [2]
+    assert [row["pool_position"] for row in support_step["candidate_shortlist_preview"]] == [2]
+    support_watch = support_step["watch_title_trace"][0]
+    assert support_watch["title"] == "Bridge Rescue"
+    assert support_watch["support_completeness_gain"] > 0.0
+    assert support_watch["source_sort_score"] > support_watch["combined_score"]
+    assert support_watch["base_score"] == pytest.approx(0.0)
+
+
+def test_requirement_beam_variable_binding_bonus_can_promote_upstream_bridge():
+    cache_entry = {
+        "version": NEED_UNIT_CACHE_VERSION,
+        "annotation_pool_k": 3,
+        "positive_need_units": [
+            {
+                "unit_id": "u0",
+                "unit_type": "entity_locator",
+                "subject": "southeast library",
+                "predicate": "designer_of",
+                "object": "ralph rapson",
+                "target_variable": "?x",
+            },
+            {
+                "unit_id": "u1",
+                "unit_type": "relation_hop",
+                "subject": "?x",
+                "predicate": "death_place",
+                "object": "gulf of mexico",
+                "target_variable": "?y",
+            },
+        ],
+        "counterfactual_sets": [],
+        "pool_titles": ["Anchor Doc", "Distractor", "Upstream Bridge"],
+        "doc_annotations": [
+            {
+                "pool_position": 0,
+                "doc_title": "Anchor Doc",
+                "doc_entities": ["ralph rapson"],
+                "positive_need_unit_scores": {"u0": 1.0, "u1": 0.0},
+                "positive_requirement_scores": {"u0": 1.0, "u1": 0.0},
+                "positive_alignment_scores": {"u0": 1.0, "u1": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 1,
+                "doc_title": "Distractor",
+                "doc_entities": ["noise"],
+                "positive_need_unit_scores": {"u0": 0.0, "u1": 0.0},
+                "positive_requirement_scores": {"u0": 0.0, "u1": 0.0},
+                "positive_alignment_scores": {"u0": 0.0, "u1": 0.0},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+            {
+                "pool_position": 2,
+                "doc_title": "Upstream Bridge",
+                "doc_entities": ["ralph rapson", "minneapolis"],
+                "positive_need_unit_scores": {"u0": 0.0, "u1": 0.0},
+                "positive_requirement_scores": {"u0": 0.0, "u1": 0.0},
+                "positive_alignment_scores": {"u0": 0.0, "u1": 0.8},
+                "counterfactual_requirement_scores": {},
+                "counterfactual_set_scores": {},
+            },
+        ],
+    }
+
+    baseline_positions, baseline_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.80, 0.05], dtype=float),
+        pool_doc_titles=["Anchor Doc", "Distractor", "Upstream Bridge"],
+        doc_idx_to_entities={
+            40: {"ralph rapson"},
+            41: {"noise"},
+            42: {"ralph rapson", "minneapolis"},
+        },
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"southeast library"},
+        proposal_query_entities={"gulf of mexico"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=2,
+        beam_candidate_shortlist_limit=1,
+        trace_watch_titles=["Upstream Bridge"],
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+    bonus_positions, bonus_trace = select_requirement_beam_positions(
+        pool_doc_ids=[40, 41, 42],
+        pool_doc_scores=np.array([0.95, 0.80, 0.05], dtype=float),
+        pool_doc_titles=["Anchor Doc", "Distractor", "Upstream Bridge"],
+        doc_idx_to_entities={
+            40: {"ralph rapson"},
+            41: {"noise"},
+            42: {"ralph rapson", "minneapolis"},
+        },
+        doc_idx_to_edges={40: [], 41: [], 42: []},
+        adjacency={},
+        qa_top_k=2,
+        cache_entry=cache_entry,
+        initial_seed_entities={"southeast library"},
+        proposal_query_entities={"gulf of mexico"},
+        anchor_count=1,
+        reserve_top_m=1,
+        structure_max_hops=1,
+        beam_width=1,
+        beam_expand_per_state=1,
+        beam_projected_shortlist_factor=2,
+        beam_candidate_shortlist_limit=1,
+        trace_watch_titles=["Upstream Bridge"],
+        bridge_bonus_mode="variable_binding",
+        bridge_bonus_weight=0.6,
+        non_anchor_title_dedup=False,
+        requirement_mode="oracle",
+    )
+
+    assert baseline_positions == [0, 1]
+    assert bonus_positions == [0, 2]
+    assert baseline_trace["bridge_bonus_mode"] == "off"
+    assert bonus_trace["bridge_bonus_mode"] == "variable_binding"
+    assert bonus_trace["bridge_bonus_weight"] == pytest.approx(0.6)
+
+    baseline_step = baseline_trace["selection_steps"][1]
+    bonus_step = bonus_trace["selection_steps"][1]
+    assert [row["pool_position"] for row in baseline_step["candidate_source_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in bonus_step["candidate_source_preview"]] == [1, 2]
+    assert [row["pool_position"] for row in baseline_step["candidate_shortlist_preview"]] == [1]
+    assert [row["pool_position"] for row in bonus_step["candidate_shortlist_preview"]] == [2]
+
+    bonus_watch = bonus_step["watch_title_trace"][0]
+    assert bonus_watch["title"] == "Upstream Bridge"
+    assert bonus_watch["bridge_bonus_applied"] is True
+    assert bonus_watch["bridge_bonus_unit_id"] == "u1"
+    assert bonus_watch["bridge_bonus_predecessor_id"] == "u0"
+    assert bonus_watch["bridge_bonus_score"] > 0.0
+    assert bonus_watch["support_completeness_gain"] > 0.0
+    assert bonus_watch["utility_margin_gain"] > 0.0
+    assert bonus_watch["dominant_positive_unit_id"] == "u1"
+    assert bonus_watch["dominant_positive_unit_score"] > 0.0
 
 
 def test_resolve_reserved_positions_dedupes_prefix_titles():
@@ -2351,6 +3769,53 @@ def test_align_requirement_cache_entry_to_pool_extends_runtime_pool_beyond_cache
     assert aligned_entry["diagnostics"]["title_alignment_rebuilt_first_title"] == "Gamma"
 
 
+def test_align_requirement_cache_entry_to_pool_records_hybrid_live_annotation_metadata():
+    cache_entry = build_need_unit_cache_entry(
+        query_index=0,
+        question="Where was Person A born?",
+        pool_docs=[
+            "Person A\nPerson A was born in City X.",
+        ],
+        pool_doc_entities=[
+            {"person a", "city x"},
+        ],
+        seed_entities={"person a"},
+        question_entities={"person a"},
+        annotation_pool_k=1,
+    )
+    atomic_bundle = {
+        "model": DummyAtomicNeedUnitModel(),
+        "feature_names": list(NEED_UNIT_ATOMIC_FEATURE_NAMES),
+        "labels": list(NEED_UNIT_ATOMIC_LABELS),
+        "bridge_alpha_by_unit_type": {"relation_hop": 0.65},
+        "beta_contradiction": 1.0,
+        "scorer_version": "need_unit_atomic_v1",
+        "model_path": "/tmp/live-atomic.joblib",
+    }
+
+    aligned_entry = align_requirement_cache_entry_to_pool(
+        cache_entry=cache_entry,
+        pool_titles=["Person A", "City X"],
+        pool_docs=[
+            "Person A\nPerson A was born in City X.",
+            "City X\nCity X is the birth place of Person A.",
+        ],
+        pool_doc_entities=[
+            {"person a", "city x"},
+            {"person a", "city x"},
+        ],
+        atomic_scorer_bundle=atomic_bundle,
+        score_mode="hybrid",
+    )
+
+    rebuilt_row = aligned_entry["doc_annotations"][1]
+    assert rebuilt_row["doc_title"] == "City X"
+    assert rebuilt_row["annotation_metadata"]["score_mode"] == "hybrid"
+    assert rebuilt_row["annotation_metadata"]["model_path"] == "/tmp/live-atomic.joblib"
+    assert aligned_entry["diagnostics"]["title_alignment_score_mode"] == "hybrid"
+    assert aligned_entry["diagnostics"]["title_alignment_atomic_model_path"] == "/tmp/live-atomic.joblib"
+
+
 def test_resolve_requirement_beam_runtime_reserve_config_supports_fixed_and_adaptive():
     small_cache_entry = {
         "positive_requirements": [
@@ -2473,6 +3938,174 @@ def test_build_setwise_selector_query_traces_uses_selected_solutions():
     assert trace["selector_metrics"]["ExactMatch"] == 1.0
     assert trace["selector_trace"]["runtime_reserve_top_m"] == 1
     assert trace["selector_top_doc_ids"] == ["chunk-beta", "chunk-alpha"]
+
+
+def test_build_requirement_title_exposure_summary_tracks_source_shortlist_and_selected():
+    selector_trace = {
+        "selected_titles": ["Bridge Doc"],
+        "final_front_titles": ["Bridge Doc"],
+        "selection_steps": [
+            {
+                "step": 2,
+                "candidate_source_preview": [
+                    {"preview_rank": 1, "pool_position": 1, "title": "Bridge Doc"},
+                    {"preview_rank": 2, "pool_position": 2, "title": "Deep Gold"},
+                ],
+                "candidate_shortlist_preview": [
+                    {"preview_rank": 1, "pool_position": 2, "title": "Deep Gold"},
+                ],
+            },
+        ],
+    }
+
+    summary = build_requirement_title_exposure_summary(
+        pool_titles=["Anchor", "Bridge Doc", "Deep Gold", "Distractor"],
+        selector_trace=selector_trace,
+        target_titles=["Bridge Doc", "Deep Gold", "Missing Gold"],
+    )
+
+    by_title = {row["title"]: row for row in summary}
+    assert by_title["Bridge Doc"]["stage"] == "selected"
+    assert by_title["Bridge Doc"]["appears_in_final_evidence"] is True
+    assert by_title["Deep Gold"]["stage"] == "shortlist"
+    assert by_title["Deep Gold"]["source_first_step"] == 2
+    assert by_title["Deep Gold"]["shortlist_first_step"] == 2
+    assert by_title["Missing Gold"]["stage"] == "not_in_pool"
+
+
+def test_build_requirement_title_exposure_summary_marks_forced_final_only_titles():
+    selector_trace = {
+        "selected_titles": ["Bridge Doc"],
+        "final_front_titles": ["Deep Gold", "Bridge Doc"],
+        "forced_final_titles_applied": ["Deep Gold"],
+        "selection_steps": [
+            {
+                "step": 2,
+                "candidate_source_preview": [
+                    {"preview_rank": 1, "pool_position": 1, "title": "Bridge Doc"},
+                ],
+                "candidate_shortlist_preview": [
+                    {"preview_rank": 1, "pool_position": 1, "title": "Bridge Doc"},
+                ],
+            },
+        ],
+    }
+
+    summary = build_requirement_title_exposure_summary(
+        pool_titles=["Anchor", "Bridge Doc", "Deep Gold", "Distractor"],
+        selector_trace=selector_trace,
+        target_titles=["Bridge Doc", "Deep Gold"],
+    )
+
+    by_title = {row["title"]: row for row in summary}
+    assert by_title["Deep Gold"]["stage"] == "final_only"
+    assert by_title["Deep Gold"]["appears_in_final_evidence"] is True
+    assert by_title["Deep Gold"]["appears_in_selected_set"] is False
+    assert by_title["Deep Gold"]["forced_into_final"] is True
+    assert by_title["Bridge Doc"]["stage"] == "selected"
+
+
+def test_build_requirement_title_exposure_summary_marks_forced_pool_gold_final_titles():
+    selector_trace = {
+        "selected_titles": ["Bridge Doc"],
+        "final_front_titles": ["Deep Gold", "Bridge Doc"],
+        "forced_pool_gold_final_titles_applied": ["Deep Gold"],
+        "selection_steps": [
+            {
+                "step": 2,
+                "candidate_source_preview": [
+                    {"preview_rank": 1, "pool_position": 1, "title": "Bridge Doc"},
+                ],
+                "candidate_shortlist_preview": [
+                    {"preview_rank": 1, "pool_position": 1, "title": "Bridge Doc"},
+                ],
+            },
+        ],
+    }
+
+    summary = build_requirement_title_exposure_summary(
+        pool_titles=["Anchor", "Bridge Doc", "Deep Gold", "Distractor"],
+        selector_trace=selector_trace,
+        target_titles=["Bridge Doc", "Deep Gold"],
+    )
+
+    by_title = {row["title"]: row for row in summary}
+    assert by_title["Deep Gold"]["stage"] == "final_only"
+    assert by_title["Deep Gold"]["forced_into_final"] is True
+
+
+def test_resolve_query_pool_gold_titles_separates_in_pool_from_missing_titles():
+    payload = resolve_query_pool_gold_titles(
+        pool_titles=[
+            "Vilaiyaadu Mankatha",
+            "The Right Stuff Records",
+            "Love Around",
+            "Sony Music",
+        ],
+        gold_docs=[
+            "Vilaiyaadu Mankatha\nA film page.",
+            "Sony Music\nA label page.",
+            "Santa Monica, California\nA city page.",
+        ],
+        pool_limit=3,
+    )
+
+    assert payload["requested_titles"] == [
+        "Vilaiyaadu Mankatha",
+        "Sony Music",
+        "Santa Monica, California",
+    ]
+    assert payload["in_pool_titles"] == ["Vilaiyaadu Mankatha"]
+    assert payload["missing_titles"] == ["Sony Music", "Santa Monica, California"]
+    assert payload["positions"] == [0]
+
+
+def test_build_setwise_selector_query_traces_surfaces_requirement_exposure_summary():
+    config = type("Config", (), {"qa_top_k": 2, "causal_engine_version": "legacy"})()
+    baseline_solution = QuerySolution(
+        question="Where was Alpha born?",
+        docs=["Alpha\nAlpha was born in London.", "Beta\nBeta mentions Paris."],
+        answer="London",
+        gold_answers=["Paris"],
+        retrieval_trace={},
+    )
+    selected_solution = QuerySolution(
+        question="Where was Alpha born?",
+        docs=["Beta\nBeta mentions Paris.", "Alpha\nAlpha was born in London."],
+        answer="Paris",
+        gold_answers=["Paris"],
+        retrieval_trace={
+            "setwise_selector_trace": {
+                "selected_titles": ["Beta", "Alpha"],
+                "final_front_titles": ["Beta", "Alpha"],
+                "requirement_title_exposure_summary": [
+                    {
+                        "title": "Beta",
+                        "stage": "selected",
+                        "appears_in_candidate_source": True,
+                        "appears_in_candidate_shortlist": True,
+                        "appears_in_final_evidence": True,
+                    },
+                ],
+            },
+        },
+    )
+
+    query_traces = build_setwise_selector_query_traces(
+        config=config,
+        baseline_solutions=[baseline_solution],
+        selected_solutions=[selected_solution],
+        gold_docs=[["Beta\nBeta mentions Paris."]],
+        gold_answers=[["Paris"]],
+        doc_text_to_chunk_id={
+            "Alpha\nAlpha was born in London.": "chunk-alpha",
+            "Beta\nBeta mentions Paris.": "chunk-beta",
+        },
+    )
+
+    assert query_traces[0]["gold_titles"] == ["Beta"]
+    assert query_traces[0]["requirement_title_exposure_summary"][0]["title"] == "Beta"
+    assert query_traces[0]["requirement_title_exposure_summary"][0]["stage"] == "selected"
 
 
 def test_build_requirement_reserve_ablation_jobs_maps_effective_prefix_sizes():

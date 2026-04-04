@@ -215,6 +215,154 @@ def test_derive_directed_structure_edge_handles_forward_and_reverse_predicates()
     )
 
 
+def test_derive_directed_structure_edge_relation_probe_is_flag_gated():
+    assert derive_directed_structure_edge(
+        "Southeast Library",
+        "designed by",
+        "Ralph Rapson",
+    ) is None
+
+    assert derive_directed_structure_edge(
+        "Southeast Library",
+        "designed by",
+        "Ralph Rapson",
+        relation_probe_mode="q6_factual",
+    ) == (
+        "ralph rapson",
+        "southeast library",
+        "factual_attribution",
+        0.85,
+    )
+    assert derive_directed_structure_edge(
+        "Riverside Plaza",
+        "opened in",
+        "Minneapolis",
+        relation_probe_mode="q6_factual",
+    ) == (
+        "riverside plaza",
+        "minneapolis",
+        "factual_located_in",
+        0.8,
+    )
+    assert derive_directed_structure_edge(
+        "Mississippi River",
+        "drains into",
+        "Gulf of Mexico",
+        relation_probe_mode="q6_factual",
+    ) == (
+        "mississippi river",
+        "gulf of mexico",
+        "factual_flows_to",
+        0.85,
+    )
+
+
+def test_prepare_structure_retrieval_objects_relation_probe_adds_q6_edges():
+    docs = [
+        {
+            "idx": "doc-0",
+            "extracted_triples": [
+                ["Southeast Library", "designed by", "Ralph Rapson"],
+                ["Riverside Plaza", "opened in", "Minneapolis"],
+            ],
+            "extracted_causal_relations": [],
+        },
+        {
+            "idx": "doc-1",
+            "extracted_triples": [
+                ["Mississippi River", "drains into", "Gulf of Mexico"],
+            ],
+            "extracted_causal_relations": [],
+        },
+    ]
+
+    without_probe = SimpleNamespace(
+        global_config=SimpleNamespace(
+            structure_rerank_enabled=True,
+            causal_confidence_threshold=0.5,
+            structure_relation_probe_mode="off",
+        ),
+        passage_node_key_to_doc_idx={"doc-0": 0, "doc-1": 1},
+    )
+    HippoRAG._prepare_structure_retrieval_objects(without_probe, docs)
+    assert without_probe.doc_idx_to_structure_edges[0] == []
+    assert without_probe.doc_idx_to_structure_edges[1] == []
+    assert dict(without_probe.structure_graph_out) == {}
+
+    with_probe = SimpleNamespace(
+        global_config=SimpleNamespace(
+            structure_rerank_enabled=True,
+            causal_confidence_threshold=0.5,
+            structure_relation_probe_mode="q6_factual",
+        ),
+        passage_node_key_to_doc_idx={"doc-0": 0, "doc-1": 1},
+    )
+    HippoRAG._prepare_structure_retrieval_objects(with_probe, docs)
+
+    assert ("ralph rapson", "southeast library", 0.85, "factual_attribution") in with_probe.doc_idx_to_structure_edges[0]
+    assert ("riverside plaza", "minneapolis", 0.8, "factual_located_in") in with_probe.doc_idx_to_structure_edges[0]
+    assert ("mississippi river", "gulf of mexico", 0.85, "factual_flows_to") in with_probe.doc_idx_to_structure_edges[1]
+    assert ("southeast library", 0.85, "factual_attribution") in with_probe.structure_graph_out["ralph rapson"]
+    assert ("minneapolis", 0.8, "factual_located_in") in with_probe.structure_graph_out["riverside plaza"]
+    assert ("gulf of mexico", 0.85, "factual_flows_to") in with_probe.structure_graph_out["mississippi river"]
+
+
+def test_prepare_structure_retrieval_objects_continuity_probe_adds_city_state_aliases():
+    docs = [
+        {
+            "idx": "doc-0",
+            "extracted_triples": [
+                ["Southeast Library", "designed by", "Ralph Rapson"],
+            ],
+            "extracted_causal_relations": [],
+        },
+        {
+            "idx": "doc-1",
+            "extracted_triples": [
+                ["Riverside Plaza", "designed by", "Ralph Rapson"],
+                ["Riverside Plaza", "opened in", "Minneapolis, Minnesota"],
+            ],
+            "extracted_causal_relations": [],
+        },
+        {
+            "idx": "doc-2",
+            "extracted_triples": [
+                ["Minneapolis", "lies on", "Mississippi River"],
+            ],
+            "extracted_causal_relations": [],
+        },
+    ]
+
+    without_continuity = SimpleNamespace(
+        global_config=SimpleNamespace(
+            structure_rerank_enabled=True,
+            causal_confidence_threshold=0.5,
+            structure_relation_probe_mode="q6_factual",
+            structure_continuity_probe_mode="off",
+        ),
+        passage_node_key_to_doc_idx={"doc-0": 0, "doc-1": 1, "doc-2": 2},
+    )
+    HippoRAG._prepare_structure_retrieval_objects(without_continuity, docs)
+    assert "minneapolis" not in without_continuity.doc_idx_to_structure_entities[1]
+    assert ("riverside plaza", "minneapolis", 0.8, "factual_located_in") not in without_continuity.doc_idx_to_structure_edges[1]
+
+    with_continuity = SimpleNamespace(
+        global_config=SimpleNamespace(
+            structure_rerank_enabled=True,
+            causal_confidence_threshold=0.5,
+            structure_relation_probe_mode="q6_factual",
+            structure_continuity_probe_mode="city_state_alias",
+        ),
+        passage_node_key_to_doc_idx={"doc-0": 0, "doc-1": 1, "doc-2": 2},
+    )
+    HippoRAG._prepare_structure_retrieval_objects(with_continuity, docs)
+
+    assert "minneapolis" in with_continuity.doc_idx_to_structure_entities[1]
+    assert ("minneapolis", 0.8, "factual_located_in") in with_continuity.structure_graph_out["riverside plaza"]
+    assert ("minneapolis minnesota", 1.0, "alias_city_state") in with_continuity.structure_graph_out["minneapolis"]
+    assert ("minneapolis", 1.0, "alias_city_state") in with_continuity.structure_graph_out["minneapolis minnesota"]
+
+
 def test_derive_composed_structure_edges_builds_bridge_edge_from_fact_chain():
     composed_edges = derive_composed_structure_edges(
         source_triple=("Smoking", "causes", "Cancer"),
@@ -279,6 +427,43 @@ def test_score_candidate_docs_by_structure_requires_explicit_bridge_edge():
     )
 
     assert scores == {}
+
+
+def test_score_candidate_docs_by_structure_seed_target_bridge_mode_accepts_seed_target():
+    candidate_doc_ids = [0]
+    doc_idx_to_entities = {
+        0: {"minneapolis", "mississippi river"},
+    }
+    doc_idx_to_edges = {
+        0: [("minneapolis", "mississippi river", 1.0, "lies on")],
+    }
+    adjacency = {
+        "minneapolis minnesota": [("minneapolis", 1.0, "alias")],
+    }
+    seed_entities = {"minneapolis minnesota", "mississippi river"}
+
+    legacy_scores = score_candidate_docs_by_structure(
+        candidate_doc_ids=candidate_doc_ids,
+        doc_idx_to_entities=doc_idx_to_entities,
+        doc_idx_to_edges=doc_idx_to_edges,
+        seed_entities=seed_entities,
+        adjacency=adjacency,
+        max_hops=2,
+        seed_target_bridge_mode="off",
+    )
+    bridge_scores = score_candidate_docs_by_structure(
+        candidate_doc_ids=candidate_doc_ids,
+        doc_idx_to_entities=doc_idx_to_entities,
+        doc_idx_to_edges=doc_idx_to_edges,
+        seed_entities=seed_entities,
+        adjacency=adjacency,
+        max_hops=2,
+        seed_target_bridge_mode="allow_seed_target",
+    )
+
+    assert legacy_scores == {}
+    assert 0 in bridge_scores
+    assert bridge_scores[0] > 0.0
 
 
 def _run_all_tests() -> None:

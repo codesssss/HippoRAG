@@ -38,6 +38,8 @@ from .utils.causal_utils import (
     derive_composed_structure_edges,
     derive_directed_structure_edge,
     filter_adjacency_by_relation,
+    normalize_structure_text,
+    resolve_structure_city_state_alias_pairs,
     route_query_type,
     score_candidate_docs_by_structure,
     score_query_causal_intent,
@@ -2495,7 +2497,10 @@ class HippoRAG:
                 if not isinstance(triple, (list, tuple)) or len(triple) != 3:
                     continue
 
-                normalized_triple = tuple(text_processing(list(triple)))
+                normalized_triple = tuple(
+                    normalize_structure_text(part)
+                    for part in triple
+                )
                 if not all(normalized_triple):
                     continue
 
@@ -2504,7 +2509,10 @@ class HippoRAG:
                 self.fact_id_to_entities[fact_id] = (normalized_triple[0], normalized_triple[2])
                 self.doc_idx_to_structure_entities[doc_idx].update((normalized_triple[0], normalized_triple[2]))
 
-                edge = derive_directed_structure_edge(*normalized_triple)
+                edge = derive_directed_structure_edge(
+                    *normalized_triple,
+                    relation_probe_mode=getattr(self.global_config, "structure_relation_probe_mode", "off"),
+                )
                 if edge is None:
                     continue
 
@@ -2552,6 +2560,57 @@ class HippoRAG:
                     )
                     edge_key = (source_entity, target_entity, edge_relation)
                     best_edge_weights[edge_key] = max(best_edge_weights.get(edge_key, 0.0), edge_confidence)
+
+        continuity_alias_map = resolve_structure_city_state_alias_pairs(
+            entities={
+                entity
+                for entity_set in self.doc_idx_to_structure_entities.values()
+                for entity in entity_set
+            },
+            continuity_probe_mode=getattr(self.global_config, "structure_continuity_probe_mode", "off"),
+        )
+        if continuity_alias_map:
+            docs_by_entity: Dict[str, Set[int]] = defaultdict(set)
+            for doc_idx, entity_set in self.doc_idx_to_structure_entities.items():
+                for entity in entity_set:
+                    docs_by_entity[entity].add(int(doc_idx))
+
+            for full_entity, bare_entity in continuity_alias_map.items():
+                for doc_idx in docs_by_entity.get(full_entity, set()):
+                    self.doc_idx_to_structure_entities[doc_idx].add(bare_entity)
+
+            alias_edge_updates: Dict[Tuple[str, str, str], float] = {}
+            for (source_entity, target_entity, relation_type), confidence in list(best_edge_weights.items()):
+                alias_source = continuity_alias_map.get(source_entity, "")
+                alias_target = continuity_alias_map.get(target_entity, "")
+                if alias_source and alias_source != target_entity:
+                    alias_edge_updates[(alias_source, target_entity, relation_type)] = max(
+                        alias_edge_updates.get((alias_source, target_entity, relation_type), 0.0),
+                        confidence,
+                    )
+                if alias_target and source_entity != alias_target:
+                    alias_edge_updates[(source_entity, alias_target, relation_type)] = max(
+                        alias_edge_updates.get((source_entity, alias_target, relation_type), 0.0),
+                        confidence,
+                    )
+                if alias_source and alias_target and alias_source != alias_target:
+                    alias_edge_updates[(alias_source, alias_target, relation_type)] = max(
+                        alias_edge_updates.get((alias_source, alias_target, relation_type), 0.0),
+                        confidence,
+                    )
+
+            for full_entity, bare_entity in continuity_alias_map.items():
+                alias_edge_updates[(full_entity, bare_entity, "alias_city_state")] = max(
+                    alias_edge_updates.get((full_entity, bare_entity, "alias_city_state"), 0.0),
+                    1.0,
+                )
+                alias_edge_updates[(bare_entity, full_entity, "alias_city_state")] = max(
+                    alias_edge_updates.get((bare_entity, full_entity, "alias_city_state"), 0.0),
+                    1.0,
+                )
+
+            for edge_key, confidence in alias_edge_updates.items():
+                best_edge_weights[edge_key] = max(best_edge_weights.get(edge_key, 0.0), confidence)
 
         for (source_entity, target_entity, relation_type), confidence in best_edge_weights.items():
             self.structure_graph_out[source_entity].append((target_entity, confidence, relation_type))

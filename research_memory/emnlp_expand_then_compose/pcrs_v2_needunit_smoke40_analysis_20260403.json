@@ -1,0 +1,1794 @@
+{
+  "dataset": "musique",
+  "limit": 40,
+  "cache_path": "research_memory/emnlp_expand_then_compose/models/musique_need_unit_cache_pool100_ann50_limit40.json",
+  "reports": [
+    "outputs_step0_general_musique/eval_reports/requirement_beam_needunit_oracle_smoke40_v2_legacyfact_pool100_ann50_reserve3.json"
+  ],
+  "analyses": [
+    {
+      "label": "outputs_step0_general_musique/eval_reports/requirement_beam_needunit_oracle_smoke40_v2_legacyfact_pool100_ann50_reserve3.json",
+      "report_path": "outputs_step0_general_musique/eval_reports/requirement_beam_needunit_oracle_smoke40_v2_legacyfact_pool100_ann50_reserve3.json",
+      "report_summary": {
+        "selector_EM": 0.35,
+        "selector_F1": 0.3667,
+        "EM_delta": -0.025,
+        "F1_delta": -0.0349,
+        "Recall@5": 0.5521,
+        "avg_support": 0.4941,
+        "avg_leakage": 0.0999,
+        "avg_frontier_size": 2.425,
+        "avg_reserved_count": 3.0
+      },
+      "bucket_summary": {
+        "2_doc": {
+          "count": 22,
+          "baseline_EM": 0.4091,
+          "selector_EM": 0.3636,
+          "EM_delta": -0.0455,
+          "baseline_F1": 0.4574,
+          "selector_F1": 0.3939,
+          "F1_delta": -0.0634
+        },
+        "3_doc": {
+          "count": 10,
+          "baseline_EM": 0.4,
+          "selector_EM": 0.4,
+          "EM_delta": 0.0,
+          "baseline_F1": 0.4,
+          "selector_F1": 0.4,
+          "F1_delta": 0.0
+        },
+        "4_doc": {
+          "count": 8,
+          "baseline_EM": 0.25,
+          "selector_EM": 0.25,
+          "EM_delta": 0.0,
+          "baseline_F1": 0.25,
+          "selector_F1": 0.25,
+          "F1_delta": 0.0
+        }
+      },
+      "trace_summary": {
+        "query_count": 40,
+        "alignment_mismatch_count": 0,
+        "changed_from_baseline_rate": 0.925,
+        "avg_finalist_count": 2.1,
+        "avg_finalist_support_range": 0.0223,
+        "median_finalist_support_range": 0.0,
+        "avg_finalist_leakage_range": 0.0187,
+        "median_finalist_leakage_range": 0.0,
+        "avg_cf_query_range": 0.005,
+        "median_cf_query_range": 0.0,
+        "avg_cf_query_std": 0.0025,
+        "avg_negative_requirement_range": 0.1047
+      },
+      "score_overlap": {
+        "cache_all_docs": {
+          "positive_mean": 0.0824,
+          "positive_std": 0.1196,
+          "positive_p90": 0.27,
+          "negative_mean": 0.0855,
+          "negative_std": 0.1343,
+          "negative_p90": 0.27,
+          "separation_auc": 0.5161,
+          "rate_ge_0_5": 0.0159,
+          "rate_ge_0_8": 0.0013,
+          "rate_ge_0_95": 0.0,
+          "negative_rate_ge_0_5": 0.0271,
+          "negative_rate_ge_0_8": 0.0016,
+          "negative_rate_ge_0_95": 0.0
+        },
+        "selected_docs_only": {
+          "positive_mean": 0.1498,
+          "positive_std": 0.1616,
+          "negative_mean": 0.1246,
+          "negative_std": 0.1464,
+          "separation_auc": 0.5499,
+          "rate_ge_0_5": 0.0378,
+          "rate_ge_0_8": 0.0079,
+          "rate_ge_0_95": 0.0,
+          "negative_rate_ge_0_5": 0.0286,
+          "negative_rate_ge_0_8": 0.0071,
+          "negative_rate_ge_0_95": 0.0
+        },
+        "requirement_parser": {
+          "anchor_requirement_count": 0,
+          "suspicious_wh_anchor_count": 0,
+          "suspicious_wh_anchor_rate": 0.0,
+          "need_unit_subject_count": 127,
+          "suspicious_wh_subject_count": 0,
+          "suspicious_wh_subject_rate": 0.0
+        }
+      },
+      "aggregator_ablation": {
+        "current_utopia": {
+          "query_count": 40.0,
+          "avg_gold_recall": 0.5312,
+          "full_support_rate": 0.2,
+          "avg_support": 0.4941,
+          "avg_leakage": 0.0999,
+          "picked_non_current_rate": 0.375
+        },
+        "support_only": {
+          "query_count": 40.0,
+          "avg_gold_recall": 0.5312,
+          "full_support_rate": 0.2,
+          "avg_support": 0.4981,
+          "avg_leakage": 0.1061,
+          "picked_non_current_rate": 0.4
+        },
+        "margin_softworst": {
+          "query_count": 40.0,
+          "avg_gold_recall": 0.525,
+          "full_support_rate": 0.2,
+          "avg_support": 0.4913,
+          "avg_leakage": 0.097,
+          "picked_non_current_rate": 0.425
+        },
+        "margin_maxcf": {
+          "query_count": 40.0,
+          "avg_gold_recall": 0.525,
+          "full_support_rate": 0.2,
+          "avg_support": 0.4913,
+          "avg_leakage": 0.097,
+          "picked_non_current_rate": 0.425
+        },
+        "margin_meancf": {
+          "query_count": 40.0,
+          "avg_gold_recall": 0.525,
+          "full_support_rate": 0.2,
+          "avg_support": 0.4913,
+          "avg_leakage": 0.097,
+          "picked_non_current_rate": 0.425
+        },
+        "margin_top2cfmean": {
+          "query_count": 40.0,
+          "avg_gold_recall": 0.525,
+          "full_support_rate": 0.2,
+          "avg_support": 0.4913,
+          "avg_leakage": 0.097,
+          "picked_non_current_rate": 0.425
+        },
+        "leak_only": {
+          "query_count": 40.0,
+          "avg_gold_recall": 0.525,
+          "full_support_rate": 0.2,
+          "avg_support": 0.4759,
+          "avg_leakage": 0.0874,
+          "picked_non_current_rate": 0.45
+        }
+      },
+      "query_rows": [
+        {
+          "question": "When was the person who Messi's goals in Copa del Rey compared to get signed by Barcelona?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.6667,
+          "current_support": 0.6476106204867308,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Lionel Messi",
+            "FC Barcelona",
+            "FC Barcelona",
+            "Lionel Messi",
+            "FC Barcelona"
+          ],
+          "selector_titles": [
+            "Lionel Messi",
+            "FC Barcelona",
+            "Iker Muniain",
+            "List of international goals scored by Lionel Messi",
+            "El Clásico"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            9,
+            10,
+            12
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.716727546025,
+            "relation_hop": 0.7991037088632583,
+            "answer_slot": 0.5432660696142578
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities commonwealth, the top-ranking Warsaw Pact operatives originated?",
+          "gold_doc_count": 3,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.598854867273979,
+          "current_leakage": 0.6225468815492984,
+          "current_cf_query_range": 0.13135423643141986,
+          "current_negative_requirement_range_mean": 0.3386095468722457,
+          "current_gold_recall": 0.3333333333333333,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Warsaw Pact",
+            "Warsaw Pact",
+            "Molotov–Ribbentrop Pact",
+            "Warsaw Pact",
+            "Warsaw Pact"
+          ],
+          "selector_titles": [
+            "Warsaw Pact",
+            "Molotov–Ribbentrop Pact",
+            "Dissolution of the Soviet Union",
+            "Pacific War",
+            "Events leading to the attack on Pearl Harbor"
+          ],
+          "current_selected_positions": [
+            0,
+            2,
+            14,
+            84,
+            51
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.5366950085823619,
+            "cf_1": 0.6680492450137817
+          },
+          "current_group_supports": {
+            "entity_locator": 0.47108676645156244,
+            "relation_hop": 0.7788178176879883,
+            "answer_slot": 0.7542431509017944
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "What county is Erik Hort's birthplace a part of?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.6146252339125606,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Erik Hort",
+            "Erik Jensen (American football)",
+            "Horton Park (Saint Paul, Minnesota)",
+            "Långe Erik",
+            "Hickory Grove, Wisconsin"
+          ],
+          "selector_titles": [
+            "Erik Hort",
+            "Erik Jensen (American football)",
+            "Horton Park (Saint Paul, Minnesota)",
+            "E Township, Maine",
+            "Långe Erik"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            5,
+            3
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.7423472228710937,
+            "relation_hop": 0.5307859970629216,
+            "answer_slot": 0.6435865224859374
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "What year did the publisher of Labyrinth end?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.4808686826588672,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Warlocked",
+            "The Devil's Labyrinth",
+            "Labyrinth (1984 video game)",
+            "The Sense of an Ending",
+            "Acornsoft"
+          ],
+          "selector_titles": [
+            "Warlocked",
+            "The Devil's Labyrinth",
+            "Labyrinth (1984 video game)",
+            "List of Little House on the Prairie books",
+            "Presto Studios"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            5,
+            7
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.47108676645156244,
+            "relation_hop": 0.4998922451257706,
+            "answer_slot": 0.47330393576904295
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "When was Lady Godiva's birthplace abolished?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.43093383991657724,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Spalding Priory",
+            "Cuthred of Kent",
+            "Board of Longitude",
+            "Lady Godiva Rides Again",
+            "Lordship of Frisia"
+          ],
+          "selector_titles": [
+            "Spalding Priory",
+            "Cuthred of Kent",
+            "Board of Longitude",
+            "Lady Godiva Rides Again",
+            "Mercia"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.3868829788647461,
+            "relation_hop": 0.46603280958175664,
+            "answer_slot": 0.4522914091726562
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "When was the region immediately north of the region where Israel is located and the location of the Battle of Qurah and Umm al Maradim created?",
+          "gold_doc_count": 4,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.5578050610363944,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.25,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Battle of Qurah and Umm al Maradim",
+            "Battle of Maroun al-Ras",
+            "Qaruh Island",
+            "Umayyad Caliphate",
+            "1948 Arab–Israeli War"
+          ],
+          "selector_titles": [
+            "Battle of Qurah and Umm al Maradim",
+            "Battle of Maroun al-Ras",
+            "Qaruh Island",
+            "Israel",
+            "Gamal Abdel Nasser"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            40,
+            47
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.6973253231500001,
+            "relation_hop": 0.49803829478472483,
+            "answer_slot": 0.5413434115093749
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+          "gold_doc_count": 4,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.6506424308950006,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.25,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Southeast Library",
+            "Colorado River (Texas)",
+            "Gulf of Mexico",
+            "Cedar Bayou",
+            "Oklahoma City"
+          ],
+          "selector_titles": [
+            "Southeast Library",
+            "Colorado River (Texas)",
+            "Gulf of Mexico",
+            "Elliott Bay",
+            "The Hague City Hall"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            9,
+            6
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.6965147577087403,
+            "relation_hop": 0.5620669305920603,
+            "answer_slot": 0.7675852281625
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+          "gold_doc_count": 4,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.1694650666983811,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.25,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Look What I Almost Stepped In...",
+            "News World India",
+            "Vilaiyaadu Mankatha",
+            "Metropolis International",
+            "Café Coffee Day"
+          ],
+          "selector_titles": [
+            "Look What I Almost Stepped In...",
+            "News World India",
+            "Vilaiyaadu Mankatha",
+            "Seattle",
+            "Love Around"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            7,
+            8
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.4348598326468749,
+            "relation_hop": 0.24590606670826665,
+            "constraint_check": 0.0,
+            "answer_slot": 0.47108676645156244
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "When was the start of the battle of the birthplace of the performer of III?",
+          "gold_doc_count": 3,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.6003265243566628,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.0,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Battle of the Border",
+            "Battle of Korytsa",
+            "Franco-Prussian War",
+            "III (Stanton Moore album)",
+            "American Idol"
+          ],
+          "selector_titles": [
+            "Battle of the Border",
+            "Battle of Korytsa",
+            "Franco-Prussian War",
+            "Battle of Oosterweel",
+            "Battle of Atapuerca"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            6,
+            7
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.859814109802246,
+            "answer_slot": 0.5037909528063965
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "What is the Till dom ensamma performer's birth date?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.4066220583830193,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Till dom ensamma",
+            "Elias Tillandz",
+            "Mauro Scocco",
+            "Tittsworth",
+            "Immanu El"
+          ],
+          "selector_titles": [
+            "Till dom ensamma",
+            "Elias Tillandz",
+            "Mauro Scocco",
+            "Tittsworth",
+            "Immanu El"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.47108676645156244,
+            "relation_hop": 0.38475510839372873,
+            "answer_slot": 0.3802272751
+          },
+          "finalist_count": 3
+        },
+        {
+          "question": "How many episodes are in season 5 of the series with The Bag or the Bat?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.5882105585370662,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Batman Beyond",
+            "List of Orange Is the New Black episodes",
+            "The Bag or the Bat",
+            "The Wire",
+            "Arrested Development (season 5)"
+          ],
+          "selector_titles": [
+            "Batman Beyond",
+            "List of Orange Is the New Black episodes",
+            "The Bag or the Bat",
+            "Arrested Development (season 5)",
+            "The Wire"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            4,
+            3
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.4798695630950929,
+            "relation_hop": 0.74588623046875,
+            "answer_slot": 0.6670093524551391
+          },
+          "finalist_count": 3
+        },
+        {
+          "question": "How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+          "gold_doc_count": 4,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.5948960088152742,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.25,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Ottoman Empire",
+            "Somalis",
+            "Somalis",
+            "Somalis",
+            "Galicia (Spain)"
+          ],
+          "selector_titles": [
+            "Ottoman Empire",
+            "Somalis",
+            "Galicia (Spain)",
+            "Portugal",
+            "British Empire"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            4,
+            16,
+            6
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.49807737784805306,
+            "relation_hop": 0.7371917221587344,
+            "answer_slot": 0.6471440818244628
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "What is the birthplace of the person after whom São José dos Campos was named?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.40620246026343954,
+          "current_leakage": 0.5405797603733928,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.9930950919402344,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Casa Natal del General Santander",
+            "José Pinto Coelho",
+            "São José dos Campos",
+            "Lockroy",
+            "Chico Xavier"
+          ],
+          "selector_titles": [
+            "Casa Natal del General Santander",
+            "José Pinto Coelho",
+            "São José dos Campos",
+            "Mission San Carlos Borromeo de Carmelo",
+            "Mission San Juan Capistrano (Texas)"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            9,
+            11
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.5405797603733928
+          },
+          "current_group_supports": {
+            "entity_locator": 0.9930950919402344,
+            "relation_hop": 0.7537652462720871,
+            "constraint_check": 0.244375,
+            "answer_slot": 0.41545870328125
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "How many times did plague occur in the place where Crucifixion's creator died?",
+          "gold_doc_count": 3,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.6249012622564794,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.3333333333333333,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Crucifixion of Jesus",
+            "Black Death",
+            "Crucifixion of Jesus",
+            "Christian Ackermann",
+            "Crucifixion of Jesus"
+          ],
+          "selector_titles": [
+            "Crucifixion of Jesus",
+            "Black Death",
+            "Christian Ackermann",
+            "The Crucifixion of St Julia",
+            "Crucifixion (Titian)"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            3,
+            13,
+            11
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.6830302962064743,
+            "answer_slot": 0.5928578234497069
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "What year did the Governor of the city where the basilica named after the same saint as the one that Mantua Cathedral is dedicated to die?",
+          "gold_doc_count": 3,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.35852732622412675,
+          "current_leakage": 0.4476904763451976,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.7570502012968063,
+          "current_gold_recall": 0.3333333333333333,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Mantua Cathedral",
+            "Governor of Vatican City",
+            "Foligno Cathedral",
+            "Saint Peter",
+            "Mosaic"
+          ],
+          "selector_titles": [
+            "Mantua Cathedral",
+            "Governor of Vatican City",
+            "Foligno Cathedral",
+            "Esztergom Basilica",
+            "Basilica del Santo Niño"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            8,
+            10
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.4476904763451976
+          },
+          "current_group_supports": {
+            "entity_locator": 0.2772726705964842,
+            "relation_hop": 0.7570502012968063,
+            "constraint_check": 0.244375,
+            "answer_slot": 0.7564390334875
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "What company succeeded the owner of Empire Sports Network?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.5538406484462949,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Empire Sports Network",
+            "NBCSN",
+            "Comcast Sports Southwest",
+            "Nova Sports",
+            "Fox Sports West and Prime Ticket"
+          ],
+          "selector_titles": [
+            "Empire Sports Network",
+            "NBCSN",
+            "Comcast Sports Southwest",
+            "Nova Sports",
+            "CBC Television"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            3,
+            10
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.4959847353706991,
+            "relation_hop": 0.5953253967992109,
+            "answer_slot": 0.592857823449707
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?",
+          "gold_doc_count": 3,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.6258605085829427,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.6666666666666666,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Martin of Aragon",
+            "Gothic architecture",
+            "Luis de Olona",
+            "Palau Güell",
+            "Perdiguera"
+          ],
+          "selector_titles": [
+            "Martin of Aragon",
+            "Gothic architecture",
+            "Luis de Olona",
+            "Josep Domènech i Estapà",
+            "Museu d'Art Jaume Morera"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            5,
+            6
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.47108676645156244,
+            "relation_hop": 0.9732669675722718,
+            "answer_slot": 0.9786985471
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Who married the actor from Terminator?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.6941487169713897,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Terminator (character)",
+            "John Connor",
+            "Terri Conn",
+            "Edward Furlong",
+            "List of 24 characters"
+          ],
+          "selector_titles": [
+            "Terminator (character)",
+            "John Connor",
+            "Terri Conn",
+            "Lexa Doig",
+            "Edward Furlong"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            5,
+            3
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.8414270520210266,
+            "answer_slot": 0.7088197419578125
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Who was in charge of the place where Castricum is located?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.4321742576859794,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Castricum",
+            "Kastrat (settlement)",
+            "Bajzë",
+            "Theo van den Boogaard",
+            "Krimulda Castle"
+          ],
+          "selector_titles": [
+            "Castricum",
+            "Kastrat (settlement)",
+            "Bajzë",
+            "Alcuéscar",
+            "Theo van den Boogaard"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            7,
+            3
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.5864137121124999,
+            "relation_hop": 0.4453030183613301,
+            "answer_slot": 0.35028793161499006
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Who is the mascot of the university related to Randy Conrads?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.5777132125907011,
+          "current_leakage": 0.49561310518275514,
+          "current_cf_query_range": 0.01634368890275556,
+          "current_negative_requirement_range_mean": 0.6081978434458666,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Randy Conrads",
+            "The Oregon Duck",
+            "Benny Beaver",
+            "Smokey (mascot)",
+            "Ramblin' Wreck"
+          ],
+          "selector_titles": [
+            "Randy Conrads",
+            "The Oregon Duck",
+            "Benny Beaver",
+            "Billiken",
+            "Ramblin' Wreck"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            6,
+            4
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.4871077364822916,
+            "cf_1": 0.5034514253850472
+          },
+          "current_group_supports": {
+            "entity_locator": 0.4348598326468749,
+            "relation_hop": 0.8037031618878245,
+            "answer_slot": 0.8295883768
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "What does seal stand for in the U.S. military branch that operates destroyers, as well as the USS Edsall?",
+          "gold_doc_count": 3,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.2578590873881272,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.6666666666666666,
+          "current_full_support": false,
+          "baseline_titles": [
+            "United States Navy SEALs",
+            "USS Edsall (DE-129)",
+            "United States Navy SEALs",
+            "HMS Seal (1897)",
+            "USS Holder (DE-401)"
+          ],
+          "selector_titles": [
+            "United States Navy SEALs",
+            "USS Edsall (DE-129)",
+            "HMS Seal (1897)",
+            "United States v. Seale",
+            "Charleston, South Carolina"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            3,
+            21,
+            25
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.38475510839372884,
+            "relation_hop": 0.38475510839372884,
+            "answer_slot": 0.14361761652871086
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "Who is the child of Chiang Hsiao-wen's father?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.6448885811671251,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Chiang Hsiao-chang",
+            "Chiang Hsiao-wu",
+            "Chiang Hsiao-wen",
+            "Chiang Ching-kuo",
+            "Chai Ling"
+          ],
+          "selector_titles": [
+            "Chiang Hsiao-chang",
+            "Chiang Hsiao-wu",
+            "Chiang Hsiao-wen",
+            "Chai Ling",
+            "Mao Yuanxin"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            4,
+            5
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.8241180330514908,
+            "answer_slot": 0.5881474384960937
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "Where was the person who wrote about the rioting being a dividing factor in Birmingham educated?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.5205674930670415,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Priestley Riots",
+            "Richard Cory-Wright",
+            "Ernest Barnes",
+            "James Meredith",
+            "Nigel Griffiths"
+          ],
+          "selector_titles": [
+            "Priestley Riots",
+            "Richard Cory-Wright",
+            "Ernest Barnes",
+            "James Meredith",
+            "The Bronx"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            3,
+            6
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.6484314905107021,
+            "answer_slot": 0.4141133304554687
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "Whose sister played Susie in miracle on 34th street?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.2932691509136281,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.0,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Miracle on 34th Street",
+            "Miracle on 34th Street",
+            "Miracle on 34th Street",
+            "Miracle on 34th Street",
+            "Mara Wilson"
+          ],
+          "selector_titles": [
+            "Miracle on 34th Street",
+            "Mara Wilson",
+            "Sister Mary Explains It All",
+            "Secret of the Wings",
+            "Susie, Washington"
+          ],
+          "current_selected_positions": [
+            0,
+            4,
+            5,
+            10,
+            11
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.2277707987195311,
+            "relation_hop": 0.24869124472141269,
+            "answer_slot": 0.6293358797302246
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Who is the child of the Italian navigator who explored the eastern coast of the continent César Gaytan was born in for the English?",
+          "gold_doc_count": 4,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.5344377959027942,
+          "current_leakage": 0.54223392854595,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.11488735885902523,
+          "current_gold_recall": 0.25,
+          "current_full_support": false,
+          "baseline_titles": [
+            "San Diego",
+            "Vicente Yáñez Pinzón",
+            "Exploration of North America",
+            "César Gaytan",
+            "Sebastian Cabot (explorer)"
+          ],
+          "selector_titles": [
+            "San Diego",
+            "Vicente Yáñez Pinzón",
+            "Exploration of North America",
+            "Sebastian Cabot (explorer)",
+            "Pedro Álvares Cabral"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            4,
+            5
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.54223392854595,
+            "cf_1": 0.54223392854595
+          },
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.4980382947847247,
+            "answer_slot": 0.515737837209375
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "Who is the spouse of Young Man Luther's author?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.3996089152962103,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Young Man Luther",
+            "Elisabeth Luther",
+            "Erikson's stages of psychosocial development",
+            "Mary, mother of Jesus",
+            "Margaret Blair Young"
+          ],
+          "selector_titles": [
+            "Young Man Luther",
+            "Elisabeth Luther",
+            "Erikson's stages of psychosocial development",
+            "Mary, mother of Jesus",
+            "Margaret Blair Young"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.36133402594594644,
+            "relation_hop": 0.43280088685750195,
+            "answer_slot": 0.4141133304554687
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "How many times did the plague occur in the city where the painter of The Bacchanal of the Andrians died?",
+          "gold_doc_count": 3,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.3955942499670413,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.3333333333333333,
+          "current_full_support": false,
+          "baseline_titles": [
+            "The Bacchanal of the Andrians",
+            "Christian Ackermann",
+            "Black Death",
+            "Black Death",
+            "Black Death"
+          ],
+          "selector_titles": [
+            "The Bacchanal of the Andrians",
+            "Christian Ackermann",
+            "Black Death",
+            "Black Death in England",
+            "Peter Strudel"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            24,
+            17
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.4352869542175293,
+            "relation_hop": 0.4995050635337831,
+            "answer_slot": 0.3131770358124999
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "In what year was the group who performed Attics To Eden formed?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.5044086320295178,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Attics to Eden",
+            "Peter Green Splinter Group (album)",
+            "Attic Entertainment Software",
+            "Friday Night Lights (Attic Lights album)",
+            "Reaching the Cold 100"
+          ],
+          "selector_titles": [
+            "Attics to Eden",
+            "Peter Green Splinter Group (album)",
+            "Attic Entertainment Software",
+            "Tenement (band)",
+            "Madina Lake"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            5,
+            6
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.36133402594594655,
+            "relation_hop": 0.7577350783212593,
+            "answer_slot": 0.7317781552
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+          "gold_doc_count": 3,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.38935547164331513,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.3333333333333333,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Korean War",
+            "Central Intelligence Agency",
+            "Korean War",
+            "Korean War",
+            "Korean War"
+          ],
+          "selector_titles": [
+            "Korean War",
+            "Central Intelligence Agency",
+            "United States in the Korean War",
+            "Space Race",
+            "Cold War"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            5,
+            36,
+            77
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.2772726705964842,
+            "relation_hop": 0.47184082493185997,
+            "answer_slot": 0.5641290085
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "When did military instruction start at the place where Larry Alcala was educated?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.40555796010258316,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Larry Alcala",
+            "Reserve Officers' Training Corps (Philippines)",
+            "Alexander Military Law Academy",
+            "Alan Green (politician)",
+            "John Roberts"
+          ],
+          "selector_titles": [
+            "Larry Alcala",
+            "Reserve Officers' Training Corps (Philippines)",
+            "Alexander Military Law Academy",
+            "Alan Green (politician)",
+            "Perry Belmont"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            3,
+            7
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.2772726705964842,
+            "relation_hop": 0.5621624714136124,
+            "answer_slot": 0.5881474384960937
+          },
+          "finalist_count": 2
+        },
+        {
+          "question": "When did the city where Greenwood Laboratory School is located become capitol of the state where the screenwriter of The Poor Boob was born?",
+          "gold_doc_count": 4,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.7545550100998809,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.75,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Forrest Gump",
+            "Greenwood Laboratory School",
+            "The Poor Boob",
+            "Marion Greenwood",
+            "Springfield, Illinois"
+          ],
+          "selector_titles": [
+            "Forrest Gump",
+            "Greenwood Laboratory School",
+            "The Poor Boob",
+            "Marion Greenwood",
+            "Springfield, Illinois"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.936966338154516,
+            "relation_hop": 0.673706899845104,
+            "answer_slot": 0.7561627733687499
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Who is played by the director of The Good Shepherd in The Godfather?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.4054540711560303,
+          "current_leakage": 0.4008159856906553,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.2698317705011083,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "The Good Shepherd (film)",
+            "The Godfather Part II",
+            "Vito Corleone",
+            "Lenny Montana",
+            "Tom Hagen"
+          ],
+          "selector_titles": [
+            "The Good Shepherd (film)",
+            "The Godfather Part II",
+            "Vito Corleone",
+            "Good Will Hunting",
+            "Gary Oldman"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            9,
+            12
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.4008159856906553,
+            "cf_1": 0.4008159856906553,
+            "cf_2": 0.4008159856906553,
+            "cf_3": 0.4008159856906553
+          },
+          "current_group_supports": {
+            "entity_locator": 0.444212700978982,
+            "relation_hop": 0.3216567022871321,
+            "answer_slot": 0.515737837209375
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "How long are the council terms of the city that shares a county with Helvetia?",
+          "gold_doc_count": 3,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.42048879902610253,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.6666666666666666,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Helvetia, Arizona",
+            "Świecie County",
+            "Tucson, Arizona",
+            "Ann Arbor, Michigan",
+            "Richmond, Virginia"
+          ],
+          "selector_titles": [
+            "Helvetia, Arizona",
+            "Świecie County",
+            "Tucson, Arizona",
+            "Richmond, Virginia",
+            "Cork (city)"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            4,
+            8
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.4348598326468749,
+            "relation_hop": 0.5238183945417405,
+            "answer_slot": 0.3510028341566406
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "When was the region immediately north of the region that prevailed with the disgrace of Near East and the terrain feature on which shamal is located created?",
+          "gold_doc_count": 4,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.46414690906354783,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Near East",
+            "Shamal (wind)",
+            "Near East",
+            "Arabian Peninsula",
+            "Deuteronilus Mensae"
+          ],
+          "selector_titles": [
+            "Near East",
+            "Shamal (wind)",
+            "Arabian Peninsula",
+            "Nilo Syrtis",
+            "Carpetania"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            3,
+            5,
+            7
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.4348598326468749,
+            "relation_hop": 0.3870274599790574,
+            "answer_slot": 0.7922596256532226
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "How did did the people fare during the reign of the abolisher of sati partha in India?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.46115824716822007,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Sati (practice)",
+            "Bengal Sati Regulation, 1829",
+            "Sati (film)",
+            "Queen Victoria",
+            "Indian Rebellion of 1857"
+          ],
+          "selector_titles": [
+            "Sati (practice)",
+            "Bengal Sati Regulation, 1829",
+            "Sati (film)",
+            "Nawabs of Bengal and Murshidabad",
+            "Indian Rebellion of 1857"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            9,
+            4
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.714224140071869,
+            "answer_slot": 0.32666085692500013
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "What is the position of the 1st governor general of India?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.564660660812069,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Governor-General of India",
+            "Governor-General of India",
+            "Impeachment of Warren Hastings",
+            "Governor-General of India",
+            "Warren Hastings"
+          ],
+          "selector_titles": [
+            "Governor-General of India",
+            "Impeachment of Warren Hastings",
+            "Warren Hastings",
+            "Nawabs of Bengal and Murshidabad",
+            "Jallianwala Bagh massacre"
+          ],
+          "current_selected_positions": [
+            0,
+            2,
+            4,
+            12,
+            52
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.7926928407,
+            "relation_hop": 0.6658698043057323,
+            "answer_slot": 0.4415589510015625
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Who is the child of the president who suffered a major defeat when the body which approves members of the American cabinet refused to ratify the Versailles treaty?",
+          "gold_doc_count": 3,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.42767393413404264,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 0.6666666666666666,
+          "current_full_support": false,
+          "baseline_titles": [
+            "Jessie Woodrow Wilson Sayre",
+            "Treaty of Versailles",
+            "Vance C. McCormick",
+            "William Howard Taft",
+            "Strasbourg"
+          ],
+          "selector_titles": [
+            "Jessie Woodrow Wilson Sayre",
+            "Treaty of Versailles",
+            "Vance C. McCormick",
+            "Dwight D. Eisenhower",
+            "Strasbourg"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            6,
+            4
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.2772726705964842,
+            "relation_hop": 0.6510236679077148,
+            "answer_slot": 0.8805601651599121
+          },
+          "finalist_count": 3
+        },
+        {
+          "question": "What does dell call the feature letting the interface replacing FireWire in later iterations of the iPod drives to remain powered when the computer is off?",
+          "gold_doc_count": 2,
+          "selector_em": 0.0,
+          "selector_f1": 0.0,
+          "current_support": 0.20233352227593757,
+          "current_leakage": 0.557273159063613,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.47898549209999997,
+          "current_gold_recall": 0.5,
+          "current_full_support": false,
+          "baseline_titles": [
+            "IPod",
+            "USB",
+            "IPod",
+            "USB",
+            "Macintosh"
+          ],
+          "selector_titles": [
+            "IPod",
+            "USB",
+            "Macintosh",
+            "Apple TV",
+            "Dell"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            4,
+            30,
+            25
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.557273159063613
+          },
+          "current_group_supports": {
+            "entity_locator": 0.61292565364375,
+            "relation_hop": 0.648431490510702,
+            "constraint_check": 0.0,
+            "answer_slot": 0.7233604921
+          },
+          "finalist_count": 4
+        },
+        {
+          "question": "Who wrote Turn Me On by the singer of Come Away with Me?",
+          "gold_doc_count": 2,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.7287405017566734,
+          "current_leakage": 0.0,
+          "current_cf_query_range": 0.0,
+          "current_negative_requirement_range_mean": 0.0,
+          "current_gold_recall": 1.0,
+          "current_full_support": true,
+          "baseline_titles": [
+            "Turn Me On (Mark Dinning song)",
+            "Feelin' the Same Way",
+            "Come Away with Me",
+            "Angel (Sarah McLachlan song)",
+            "Angel (Sarah McLachlan song)"
+          ],
+          "selector_titles": [
+            "Turn Me On (Mark Dinning song)",
+            "Feelin' the Same Way",
+            "Come Away with Me",
+            "Albert E. Brumley",
+            "The One That Got Away (Katy Perry song)"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            8,
+            10
+          ],
+          "current_counterfactual_set_coverages": {},
+          "current_group_supports": {
+            "entity_locator": 0.615626110578957,
+            "relation_hop": 0.7982897262986736,
+            "answer_slot": 0.9395103051982422
+          },
+          "finalist_count": 1
+        },
+        {
+          "question": "Who was second pick in the 1999 draft of the league that has a competition where they give out the MLB MVP award after it?",
+          "gold_doc_count": 4,
+          "selector_em": 1.0,
+          "selector_f1": 1.0,
+          "current_support": 0.37421655731463327,
+          "current_leakage": 0.3882363431527472,
+          "current_cf_query_range": 0.0535032031249999,
+          "current_negative_requirement_range_mean": 0.6285487767359375,
+          "current_gold_recall": 0.25,
+          "current_full_support": false,
+          "baseline_titles": [
+            "1999 Major League Baseball draft",
+            "Major League Baseball draft",
+            "Mike Thompson (2000s pitcher)",
+            "Bottom of the 9th '99",
+            "Major League Baseball draft"
+          ],
+          "selector_titles": [
+            "1999 Major League Baseball draft",
+            "Major League Baseball draft",
+            "Mike Thompson (2000s pitcher)",
+            "Montreal Expos",
+            "Los Angeles Dodgers"
+          ],
+          "current_selected_positions": [
+            0,
+            1,
+            2,
+            78,
+            36
+          ],
+          "current_counterfactual_set_coverages": {
+            "cf_0": 0.35794838282313207,
+            "cf_1": 0.41145158594813197
+          },
+          "current_group_supports": {
+            "entity_locator": 0.3868829788647461,
+            "relation_hop": 0.4077476585149765,
+            "constraint_check": 0.25594550781250003,
+            "answer_slot": 0.7507362767359375
+          },
+          "finalist_count": 4
+        }
+      ]
+    }
+  ]
+}

@@ -13,6 +13,7 @@ Last updated: 2026-04-02
 - `Non-oracle pilot note`: `research_memory/emnlp_expand_then_compose/05_non_oracle_bridge_greedy.md`
 - `Bridge-beam search memo`: `research_memory/emnlp_expand_then_compose/06_bridge_beam_search.md`
 - `PCRS-RAG V1 branch memo`: `research_memory/emnlp_expand_then_compose/07_pcrs_rag_v1.md`
+- `PCRS-RAG V2 parser/compiler spec`: `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
 - `Requirement cache builder`: `scripts/build_requirement_cache.py`
 - `Requirement matcher trainer`: `scripts/train_requirement_setwise.py`
 - `Requirement beam diagnostics script`: `scripts/analyze_requirement_beam_report.py`
@@ -56,6 +57,8 @@ Last updated: 2026-04-02
   - weak counterfactual construction
   - poor positive-vs-negative separation
   - near-collapsed leakage axis
+- Added a full implementation spec for the next V2 parser/compiler rebuild:
+  - `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
 
 ## Running
 
@@ -63,15 +66,9 @@ Last updated: 2026-04-02
 
 ## Next Wave
 
-1. Patch positive requirement construction on `feature/pcrs-rag-v1`:
-   - stop emitting wh-word anchors
-   - keep only entity-like or title-grounded anchors
-   - do not force-fill anchor count
-2. Patch counterfactual construction on `feature/pcrs-rag-v1`:
-   - keep `entity_swap`
-   - add minimal `role_swap`
-   - add minimal `temporal_shift`
-3. Rebuild a small `MuSiQue` requirement cache and rerun offline diagnostics before paying reader cost
+1. Implement the parser/compiler spec in `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
+2. Rebuild a small `MuSiQue` need-unit cache with the new step-plan compiler
+3. Rerun offline diagnostics before paying reader cost
 4. Only rerun QA if the upstream diagnostics improve materially:
    - suspicious anchor rate drops
    - positive-vs-negative separation rises above random

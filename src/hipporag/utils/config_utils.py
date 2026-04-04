@@ -325,6 +325,18 @@ class BaseConfig:
         default=2,
         metadata={"help": "How many directed hops to expand when building structure rerank signals."}
     )
+    structure_relation_probe_mode: Literal["off", "q6_factual"] = field(
+        default="off",
+        metadata={"help": "Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` additionally promotes a narrow factual relation family used to audit q6-style bridge coverage."}
+    )
+    structure_continuity_probe_mode: Literal["off", "city_state_alias"] = field(
+        default="off",
+        metadata={"help": "Eval-only structure-graph node continuity probe. `off` preserves the current node inventory; `city_state_alias` adds narrow city/state -> bare-city aliases for high-confidence continuity audits."}
+    )
+    structure_seed_target_bridge_mode: Literal["off", "allow_seed_target"] = field(
+        default="off",
+        metadata={"help": "Eval-only structure scorer mode. `off` preserves legacy bridge-edge acceptance; `allow_seed_target` also accepts explicit bridge edges whose target is already in the covered seed set."}
+    )
     structure_rerank_margin_threshold: float = field(
         default=0.02,
         metadata={"help": "Only apply structure reranking when the top doc-score margin is below this threshold."}

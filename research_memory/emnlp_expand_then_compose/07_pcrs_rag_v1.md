@@ -67,6 +67,12 @@ Important boundary:
 Working files for this branch now include:
 - `scripts/analyze_requirement_beam_report.py`
 - `research_memory/emnlp_expand_then_compose/musique_requirement_beam_reserve_diagnostics_20260402.md`
+- `research_memory/emnlp_expand_then_compose/pcrs_v2_needunit_review_20260403.md`
+- `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
+
+Current parser/compiler design reference:
+- use `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md` as the source of truth for the next need-unit rebuild
+- do not continue widening beam/search heuristics before the parser/compiler spec is implemented and its offline gates pass
 
 ## Current Evaluation State
 

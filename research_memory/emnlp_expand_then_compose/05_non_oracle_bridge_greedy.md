@@ -1,6 +1,6 @@
 # Non-Oracle Bridge-Greedy Pilot
 
-Last updated: 2026-03-29
+Last updated: 2026-03-30
 
 ## Implementation
 
@@ -102,6 +102,42 @@ Interpretation:
 - It can waste top-5 budget on semantically nearby but non-completing evidence.
 - This is not yet strong enough for the method section of an EMNLP main paper.
 
+### 2Wiki search follow-up on canonical backbone
+
+This follow-up isolates search from local scoring by keeping the bridge-aware local score fixed and comparing:
+- `bridge_greedy`
+- `bridge_beam`
+
+Report paths:
+- greedy: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_greedy_pilot_100_legacy.json`
+- beam: `outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_pilot_100_legacy.json`
+
+Matched setup:
+- dataset: `2wikimultihopqa`
+- limit: `100`
+- pool: `100`
+- anchor count: `2`
+- beam params: `beam_width=4`, `beam_expand_per_state=4`
+
+Results:
+- baseline `EM/F1 = 0.3800 / 0.4332`
+- greedy `EM/F1 = 0.4300 / 0.4726`
+- beam `EM/F1 = 0.4600 / 0.4924`
+- greedy delta `EM/F1 = +0.0500 / +0.0394`
+- beam delta `EM/F1 = +0.0800 / +0.0592`
+- greedy `Recall@5 = 0.8150`, beam `Recall@5 = 0.8075`
+- greedy `Recall@20 = 0.8825`, beam `Recall@20 = 0.8825`
+
+Per-bucket:
+- `2-doc`: greedy `EM +0.0909`, beam `EM +0.0909`
+- `4-doc`: greedy `EM -0.0870`, beam `EM +0.0435`
+
+Interpretation:
+- Search is now part of the bottleneck, not just local scoring.
+- `bridge_beam` beats `bridge_greedy` on QA despite slightly lower `Recall@5`, which argues for better evidence composition rather than only shallower support coverage.
+- The strongest gain is on `4-doc` queries: beam flips the hard bucket from negative to positive.
+- On `2Wiki`, this is strong enough to use `bridge_beam` as the current practical non-oracle selector.
+
 ## Failed Micro-Tweak
 
 Attempt:
@@ -122,8 +158,10 @@ Decision:
 What is true now:
 - The oracle diagnosis story is strong.
 - A practical non-oracle baseline exists and runs end-to-end.
-- But the current bridge-greedy heuristic is not yet paper-ready on the canonical backbone.
+- `bridge_greedy` alone is not yet paper-ready on the canonical backbone.
+- `bridge_beam` is the more promising line because it improves the canonical `2Wiki` setting and rescues the hard bucket.
 
 Implication:
 - The paper can already support a strong diagnosis-first story.
-- For EMNLP main, the next method iteration must target hard-query chain completion directly, not just novelty or diversity.
+- For EMNLP main, the practical method should now be centered on `bridge_beam`, with `bridge_greedy` retained as the search-control ablation.
+- The next decision depends on whether the same trend appears on `MuSiQue`.

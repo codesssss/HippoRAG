@@ -20,10 +20,17 @@ from eval_causal_qwen3 import (
     get_gold_docs,
 )
 from requirement_beam_utils import (
+    DEFAULT_NEED_UNIT_MAX_RELATION_HOPS,
     DEFAULT_NEED_UNIT_MAX_COUNTERFACTUALS,
+    DEFAULT_NEED_UNIT_RELATION_HOP_CAP_MODE,
+    DEFAULT_QDMR_POOL_TITLE_HEAD,
     DEFAULT_REQUIREMENT_ANNOTATION_POOL_K,
+    ATOMIC_ANNOTATION_SCORE_MODES,
     NEED_UNIT_CACHE_VERSION,
     build_need_unit_cache_entry,
+    guess_answer_type_label,
+    infer_qdmr_step_plan,
+    load_need_unit_atomic_model_bundle,
     save_requirement_cache,
 )
 from src.hipporag.HippoRAG import HippoRAG
@@ -43,6 +50,8 @@ def main() -> None:
     parser.add_argument("--max_qa_steps", type=int, default=3)
     parser.add_argument("--embedding_batch_size", type=int, default=8)
     parser.add_argument("--max_counterfactual_sets", type=int, default=DEFAULT_NEED_UNIT_MAX_COUNTERFACTUALS)
+    parser.add_argument("--max_relation_hops", type=int, default=DEFAULT_NEED_UNIT_MAX_RELATION_HOPS)
+    parser.add_argument("--relation_hop_cap_mode", choices=["fixed", "conditional"], default=DEFAULT_NEED_UNIT_RELATION_HOP_CAP_MODE)
     parser.add_argument("--llm_base_url", type=str, default="http://localhost:8039/v1")
     parser.add_argument("--llm_name", type=str, default="qwen3-8b")
     parser.add_argument("--embedding_name", type=str, default="VLLM//mnt/nvme/Qwen3-Embedding-8B")
@@ -51,6 +60,8 @@ def main() -> None:
     parser.add_argument("--force_index_from_scratch", type=str, default="false")
     parser.add_argument("--force_openie_from_scratch", type=str, default="false")
     parser.add_argument("--openie_mode", choices=["online", "offline", "Transformers-offline"], default="online")
+    parser.add_argument("--annotation_score_mode", choices=sorted(ATOMIC_ANNOTATION_SCORE_MODES), default="heuristic")
+    parser.add_argument("--atomic_model_path", type=str, default="")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
@@ -67,6 +78,14 @@ def main() -> None:
     config = build_config(config_args, corpus_len=len(corpus))
     hipporag = HippoRAG(global_config=config)
     hipporag.index(docs)
+
+    annotation_score_mode = str(args.annotation_score_mode or "heuristic").strip().lower()
+    atomic_model_path = str(args.atomic_model_path or "").strip()
+    atomic_scorer_bundle = None
+    if annotation_score_mode == "hybrid":
+        if not atomic_model_path:
+            raise ValueError("--annotation_score_mode=hybrid requires --atomic_model_path")
+        atomic_scorer_bundle = load_need_unit_atomic_model_bundle(atomic_model_path)
 
     logger.info("Retrieving %d queries to build need-unit cache on %s", len(queries), args.dataset)
     query_solutions, retrieval_metrics = hipporag.retrieve(
@@ -107,6 +126,19 @@ def main() -> None:
             if doc_id is not None else set()
             for doc_id in pool_doc_ids
         ]
+        predicted_answer_type = guess_answer_type_label(qs.question)
+        parser_trace = infer_qdmr_step_plan(
+            question=qs.question,
+            question_entities=question_entities,
+            seed_entities=seed_entities,
+            pool_titles=[
+                str(doc_text).split("\n", 1)[0].strip()
+                for doc_text in pool_docs[:DEFAULT_QDMR_POOL_TITLE_HEAD]
+            ],
+            predicted_answer_type=predicted_answer_type,
+            llm_infer_fn=hipporag.llm_model.infer,
+            model_name=hipporag.global_config.llm_name,
+        )
         cache_entry = build_need_unit_cache_entry(
             query_index=q_idx,
             question=qs.question,
@@ -116,6 +148,13 @@ def main() -> None:
             question_entities=question_entities,
             annotation_pool_k=int(args.annotation_pool_k),
             max_counterfactual_sets=int(args.max_counterfactual_sets),
+            max_relation_hops=int(args.max_relation_hops),
+            relation_hop_cap_mode=str(args.relation_hop_cap_mode),
+            atomic_scorer_bundle=atomic_scorer_bundle,
+            score_mode=annotation_score_mode,
+            predicted_answer_type=predicted_answer_type,
+            step_plan_payload=parser_trace.get("payload"),
+            parser_trace=parser_trace,
         )
         cache_entries.append(cache_entry)
         mapped_pool_doc_counts.append(sum(doc_id is not None for doc_id in pool_doc_ids))
@@ -131,6 +170,10 @@ def main() -> None:
         "setwise_pool_k": int(args.setwise_pool_k),
         "annotation_pool_k": int(args.annotation_pool_k),
         "qa_top_k": int(args.qa_top_k),
+        "max_relation_hops": int(args.max_relation_hops),
+        "relation_hop_cap_mode": str(args.relation_hop_cap_mode),
+        "annotation_score_mode": annotation_score_mode,
+        "atomic_model_path": atomic_model_path,
         "retrieval_metrics": retrieval_metrics,
         "avg_mapped_pool_doc_count": round(sum(mapped_pool_doc_counts) / max(1, len(mapped_pool_doc_counts)), 4),
         "queries": cache_entries,

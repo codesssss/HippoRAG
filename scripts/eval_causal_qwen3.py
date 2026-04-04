@@ -29,9 +29,17 @@ from requirement_beam_utils import (
     DEFAULT_REQUIREMENT_SMOOTH_TAU,
     compute_requirement_candidate_feature_rows,
     compute_requirement_state_metrics,
+    get_counterfactual_set_score_map,
+    get_positive_score_map_with_overrides,
+    get_positive_score_map,
+    get_positive_units,
     is_pareto_dominated,
+    is_need_unit_cache_version,
     load_requirement_cache,
+    load_need_unit_atomic_model_bundle,
     load_requirement_model_bundle,
+    merge_positive_score_overrides_by_position,
+    normalize_requirement_bridge_bonus_mode,
     requirement_feature_rows_to_matrix,
     resolve_requirement_cache_entry,
     validate_requirement_cache_entry,
@@ -42,6 +50,7 @@ from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
 from src.hipporag.utils.causal_utils import (
     expand_directed_entities,
     normalize_structure_text,
+    normalize_structure_seed_target_bridge_mode,
     route_query_type,
     score_candidate_docs_by_structure,
 )
@@ -82,6 +91,15 @@ DEFAULT_SET_CLOSURE_EXACT_PATH_MAX_DOCS = 4
 DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR = 1
 DEFAULT_REQUIREMENT_BEAM_PROJECTED_SHORTLIST_FACTOR = 3
 DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY = "fixed"
+DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES = (
+    "Riverside Plaza",
+    "Minneapolis",
+    "Mississippi River",
+    "The Right Stuff Records",
+    "Sony Music",
+)
+DEFAULT_REQUIREMENT_SOURCE_SORT_MODE = "combined"
+DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE = "margin_first"
 
 SETWISE_LLM_JSON_START_TAG = "<JSON>"
 SETWISE_LLM_JSON_END_TAG = "</JSON>"
@@ -377,13 +395,249 @@ def extract_doc_title(doc_text: str) -> str:
     return str(doc_text).split("\n", 1)[0].strip()
 
 
+def unique_ordered_titles(values: Sequence[str] | None) -> List[str]:
+    deduped: List[str] = []
+    seen: Set[str] = set()
+    for value in values or []:
+        title = str(value or "").strip()
+        title_key = normalize_structure_text(title)
+        if not title or not title_key or title_key in seen:
+            continue
+        deduped.append(title)
+        seen.add(title_key)
+    return deduped
+
+
+def normalize_title_set(values: Sequence[str] | None) -> Set[str]:
+    return {
+        normalize_structure_text(value)
+        for value in unique_ordered_titles(values)
+        if normalize_structure_text(value)
+    }
+
+
+def parse_title_csv(value: str | None,
+                    default: Sequence[str] | None = None) -> List[str]:
+    raw_value = str(value or "").strip()
+    if not raw_value:
+        return unique_ordered_titles(default)
+    return unique_ordered_titles([
+        item.strip()
+        for item in raw_value.split(",")
+        if str(item).strip()
+    ])
+
+
+def resolve_title_pool_positions(pool_titles: Sequence[str],
+                                 target_titles: Sequence[str] | None,
+                                 pool_limit: int | None = None) -> List[int]:
+    normalized_targets = unique_ordered_titles(target_titles)
+    if not normalized_targets:
+        return []
+    target_keys = {
+        normalize_structure_text(title): title
+        for title in normalized_targets
+    }
+    resolved_positions: List[int] = []
+    used_keys: Set[str] = set()
+    effective_pool_limit = min(len(pool_titles), max(int(pool_limit or len(pool_titles)), 0))
+    for pool_position, raw_title in enumerate(pool_titles[:effective_pool_limit]):
+        title_key = normalize_structure_text(str(raw_title or "").strip())
+        if not title_key or title_key not in target_keys or title_key in used_keys:
+            continue
+        resolved_positions.append(int(pool_position))
+        used_keys.add(title_key)
+    return resolved_positions
+
+
+def resolve_query_pool_gold_titles(pool_titles: Sequence[str],
+                                   gold_docs: Sequence[str] | None,
+                                   pool_limit: int | None = None) -> Dict[str, object]:
+    requested_titles = unique_ordered_titles([
+        extract_doc_title(doc_text)
+        for doc_text in gold_docs or []
+    ])
+    resolved_positions = resolve_title_pool_positions(
+        pool_titles=pool_titles,
+        target_titles=requested_titles,
+        pool_limit=pool_limit,
+    )
+    resolved_titles = unique_ordered_titles([
+        str(pool_titles[pos]).strip()
+        for pos in resolved_positions
+        if 0 <= int(pos) < len(pool_titles)
+    ])
+    resolved_title_keys = normalize_title_set(resolved_titles)
+    missing_titles = [
+        title for title in requested_titles
+        if normalize_structure_text(title) not in resolved_title_keys
+    ]
+    return {
+        "requested_titles": requested_titles,
+        "in_pool_titles": resolved_titles,
+        "missing_titles": missing_titles,
+        "positions": [int(pos) for pos in resolved_positions],
+    }
+
+
+def build_requirement_title_exposure_summary(pool_titles: Sequence[str],
+                                             selector_trace: Dict[str, object] | None,
+                                             target_titles: Sequence[str] | None) -> List[Dict[str, object]]:
+    normalized_targets = unique_ordered_titles(target_titles)
+    if not normalized_targets:
+        return []
+
+    title_key_to_label = {
+        normalize_structure_text(title): title
+        for title in normalized_targets
+    }
+    pool_positions_by_key: Dict[str, List[int]] = {}
+    for pool_position, raw_title in enumerate(pool_titles):
+        title = str(raw_title or "").strip()
+        title_key = normalize_structure_text(title)
+        if not title_key:
+            continue
+        pool_positions_by_key.setdefault(title_key, []).append(int(pool_position))
+
+    trace_payload = dict(selector_trace or {})
+    source_hits: Dict[str, List[Dict[str, int]]] = {}
+    shortlist_hits: Dict[str, List[Dict[str, int]]] = {}
+    scored_hits: Dict[str, List[Dict[str, object]]] = {}
+    forced_source_hits: Dict[str, bool] = {}
+    forced_shortlist_hits: Dict[str, bool] = {}
+    forced_final_hits = normalize_title_set(trace_payload.get("forced_final_titles_applied", []))
+    forced_final_hits.update(normalize_title_set(trace_payload.get("forced_probe_final_titles_applied", [])))
+    forced_final_hits.update(normalize_title_set(trace_payload.get("forced_pool_gold_final_titles_applied", [])))
+    for step in trace_payload.get("selection_steps", []) or []:
+        if not isinstance(step, dict):
+            continue
+        step_index = int(step.get("step", 0) or 0)
+        for watch_row in step.get("watch_title_trace", []) or []:
+            if not isinstance(watch_row, dict):
+                continue
+            title = str(watch_row.get("title", "")).strip()
+            title_key = normalize_structure_text(title)
+            if title_key not in title_key_to_label:
+                continue
+            scored_hits.setdefault(title_key, []).append({
+                "step": int(step_index),
+                "scored_rank": int(watch_row.get("scored_rank", 0) or 0),
+                "combined_score": float(watch_row.get("combined_score", 0.0) or 0.0),
+                "utility_margin_gain": float(watch_row.get("utility_margin_gain", 0.0) or 0.0),
+                "support_completeness_gain": float(watch_row.get("support_completeness_gain", 0.0) or 0.0),
+                "forced_into_source": bool(watch_row.get("forced_into_source", False)),
+                "forced_into_shortlist": bool(watch_row.get("forced_into_shortlist", False)),
+            })
+            forced_source_hits[title_key] = forced_source_hits.get(title_key, False) or bool(
+                watch_row.get("forced_into_source", False)
+            )
+            forced_shortlist_hits[title_key] = forced_shortlist_hits.get(title_key, False) or bool(
+                watch_row.get("forced_into_shortlist", False)
+            )
+        for field_name, collector in (
+            ("candidate_source_preview", source_hits),
+            ("candidate_shortlist_preview", shortlist_hits),
+        ):
+            preview_rows = step.get(field_name) or []
+            if not isinstance(preview_rows, Sequence) or isinstance(preview_rows, (str, bytes)):
+                continue
+            for preview_row in preview_rows:
+                if not isinstance(preview_row, dict):
+                    continue
+                title = str(preview_row.get("title", "")).strip()
+                title_key = normalize_structure_text(title)
+                if title_key not in title_key_to_label:
+                    continue
+                collector.setdefault(title_key, []).append({
+                    "step": int(step_index),
+                    "preview_rank": int(preview_row.get("preview_rank", 0) or 0),
+                    "pool_position": int(preview_row.get("pool_position", -1) or -1),
+                })
+
+    heuristic_selected_keys = {
+        normalize_structure_text(title)
+        for title in trace_payload.get("selected_titles", []) or []
+        if str(title or "").strip()
+    }
+    final_selected_keys = {
+        normalize_structure_text(title)
+        for title in trace_payload.get("final_front_titles", []) or []
+        if str(title or "").strip()
+    }
+
+    exposure_rows: List[Dict[str, object]] = []
+    for title in normalized_targets:
+        title_key = normalize_structure_text(title)
+        pool_positions = list(pool_positions_by_key.get(title_key, []))
+        source_entries = list(source_hits.get(title_key, []))
+        shortlist_entries = list(shortlist_hits.get(title_key, []))
+        scored_entries = list(scored_hits.get(title_key, []))
+        in_pool = bool(pool_positions)
+        in_source = bool(source_entries)
+        in_shortlist = bool(shortlist_entries)
+        in_selected_set = title_key in heuristic_selected_keys
+        in_final_evidence = title_key in final_selected_keys
+        if in_final_evidence and not in_selected_set:
+            stage = "final_only"
+        elif in_final_evidence:
+            stage = "selected"
+        elif in_shortlist:
+            stage = "shortlist"
+        elif in_source:
+            stage = "source"
+        elif in_pool:
+            stage = "pool_only"
+        else:
+            stage = "not_in_pool"
+        exposure_rows.append({
+            "title": title,
+            "stage": stage,
+            "present_in_pool": bool(in_pool),
+            "pool_positions": pool_positions[:8],
+            "appears_in_candidate_source": bool(in_source),
+            "appears_in_candidate_shortlist": bool(in_shortlist),
+            "appears_in_selected_set": bool(in_selected_set),
+            "appears_in_final_evidence": bool(in_final_evidence),
+            "source_first_step": int(source_entries[0]["step"]) if source_entries else None,
+            "shortlist_first_step": int(shortlist_entries[0]["step"]) if shortlist_entries else None,
+            "source_steps": [int(entry["step"]) for entry in source_entries[:8]],
+            "shortlist_steps": [int(entry["step"]) for entry in shortlist_entries[:8]],
+            "source_preview_ranks": [int(entry["preview_rank"]) for entry in source_entries[:8]],
+            "shortlist_preview_ranks": [int(entry["preview_rank"]) for entry in shortlist_entries[:8]],
+            "best_scored_rank": min((int(entry["scored_rank"]) for entry in scored_entries), default=None),
+            "best_combined_score": round(
+                max((float(entry["combined_score"]) for entry in scored_entries), default=0.0),
+                4,
+            ) if scored_entries else None,
+            "best_utility_margin_gain": round(
+                max((float(entry["utility_margin_gain"]) for entry in scored_entries), default=0.0),
+                4,
+            ) if scored_entries else None,
+            "best_support_completeness_gain": round(
+                max((float(entry["support_completeness_gain"]) for entry in scored_entries), default=0.0),
+                4,
+            ) if scored_entries else None,
+            "forced_into_source": bool(forced_source_hits.get(title_key, False)),
+            "forced_into_shortlist": bool(forced_shortlist_hits.get(title_key, False)),
+            "forced_into_final": bool(title_key in forced_final_hits and in_final_evidence),
+        })
+    return exposure_rows
+
+
 def materialize_reader_top_positions(selected_positions: Sequence[int],
                                      pool_limit: int,
-                                     qa_top_k: int) -> List[int]:
+                                     qa_top_k: int,
+                                     forced_prefix_positions: Sequence[int] | None = None) -> List[int]:
     normalized_positions: List[int] = []
     seen_positions: Set[int] = set()
     effective_pool_limit = max(int(pool_limit), 0)
     effective_top_k = min(effective_pool_limit, max(int(qa_top_k), 0))
+    for raw_pos in forced_prefix_positions or []:
+        pos = int(raw_pos)
+        if pos < 0 or pos >= effective_pool_limit or pos in seen_positions:
+            continue
+        normalized_positions.append(pos)
+        seen_positions.add(pos)
     for raw_pos in selected_positions:
         pos = int(raw_pos)
         if pos < 0 or pos >= effective_pool_limit or pos in seen_positions:
@@ -1008,6 +1262,20 @@ def normalize_setwise_score_mode(score_mode: str | None) -> str:
     return normalized
 
 
+def normalize_requirement_source_sort_mode(sort_mode: str | None) -> str:
+    normalized = str(sort_mode or DEFAULT_REQUIREMENT_SOURCE_SORT_MODE).strip().lower()
+    if normalized not in {"combined", "support_bonus"}:
+        raise ValueError(f"Unsupported requirement source sort mode: {sort_mode}")
+    return normalized
+
+
+def normalize_requirement_shortlist_sort_mode(sort_mode: str | None) -> str:
+    normalized = str(sort_mode or DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE).strip().lower()
+    if normalized not in {"margin_first", "positive_only"}:
+        raise ValueError(f"Unsupported requirement shortlist sort mode: {sort_mode}")
+    return normalized
+
+
 def resolve_set_closure_state_weight_config(
     state_weight_config: Dict[str, float] | None = None,
 ) -> Dict[str, float]:
@@ -1489,6 +1757,7 @@ def compute_candidate_feature_rows(query: str,
                                    selected_positions: Sequence[int] | None = None,
                                    seed_entities: Sequence[str] | Set[str] | None = None,
                                    structure_max_hops: int = 2,
+                                   structure_seed_target_bridge_mode: str = "off",
                                    candidate_positions: Sequence[int] | None = None) -> List[Dict[str, float | int | str | None]]:
     pool_size = len(pool_doc_ids)
     normalized_base_scores = min_max_normalize_array(np.asarray(pool_doc_scores, dtype=float))
@@ -1520,6 +1789,7 @@ def compute_candidate_feature_rows(query: str,
             seed_entities=normalized_seed_entities,
             adjacency=adjacency,
             max_hops=structure_max_hops,
+            seed_target_bridge_mode=structure_seed_target_bridge_mode,
         )
         if candidate_doc_ids and normalized_seed_entities
         else {}
@@ -1532,6 +1802,7 @@ def compute_candidate_feature_rows(query: str,
             seed_entities=covered_entities,
             adjacency=adjacency,
             max_hops=structure_max_hops,
+            seed_target_bridge_mode=structure_seed_target_bridge_mode,
         )
         if candidate_doc_ids and covered_entities
         else {}
@@ -1714,26 +1985,211 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                                       reserve_top_m: int = 0,
                                       max_bridge_slots: int = 0,
                                       structure_max_hops: int = 2,
+                                      structure_seed_target_bridge_mode: str = "off",
                                       base_weight: float = 0.25,
                                       structure_weight: float = 0.60,
                                       novelty_weight: float = 0.15,
                                       beam_width: int = 4,
                                       beam_expand_per_state: int = 4,
                                       beam_projected_shortlist_factor: int = DEFAULT_REQUIREMENT_BEAM_PROJECTED_SHORTLIST_FACTOR,
+                                      beam_candidate_shortlist_limit: int | None = None,
+                                      force_source_titles: Sequence[str] | None = None,
+                                      force_shortlist_titles: Sequence[str] | None = None,
+                                      trace_watch_titles: Sequence[str] | None = None,
+                                      source_sort_mode: str = DEFAULT_REQUIREMENT_SOURCE_SORT_MODE,
+                                      source_support_gain_weight: float = 0.0,
+                                      shortlist_sort_mode: str = DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE,
+                                      bridge_bonus_mode: str = "off",
+                                      bridge_bonus_weight: float = 0.0,
                                       non_anchor_title_dedup: bool = False,
                                       requirement_mode: str = "oracle",
                                       requirement_model_bundle: Dict[str, object] | None = None,
                                       requirement_smooth_tau: float = DEFAULT_REQUIREMENT_SMOOTH_TAU,
                                       requirement_counterfactual_tau: float = DEFAULT_REQUIREMENT_CF_TAU) -> Tuple[List[int], Dict[str, object]]:
+    def build_candidate_trace_preview(
+        candidates: Sequence[Dict[str, object]],
+        candidate_rows_by_position: Dict[int, Dict[str, float | int]],
+        predicted_scores_by_position: Dict[int, float],
+        candidate_requirement_diagnostics: Dict[int, Dict[str, object]],
+    ) -> List[Dict[str, object]]:
+        preview_rows: List[Dict[str, object]] = []
+        for preview_rank, candidate in enumerate(candidates, start=1):
+            pool_position = int(candidate["pool_position"])
+            candidate_row = candidate_rows_by_position.get(pool_position, {})
+            candidate_diag = candidate_requirement_diagnostics.get(pool_position, {})
+            preview_rows.append({
+                "preview_rank": int(preview_rank),
+                "pool_position": int(pool_position),
+                "doc_id": int(candidate["doc_id"]) if candidate["doc_id"] is not None else None,
+                "title": str(candidate.get("doc_title", "")).strip(),
+                "base_score": round(float(candidate.get("base_score", 0.0) or 0.0), 4),
+                "combined_score": round(float(candidate.get("combined_score", 0.0) or 0.0), 4),
+                "source_sort_score": round(float(candidate.get("source_sort_score_raw", candidate.get("combined_score_raw", 0.0)) or 0.0), 4),
+                "structure_score": round(float(candidate.get("structure_score", 0.0) or 0.0), 4),
+                "novelty_score": round(float(candidate.get("novelty_score", 0.0) or 0.0), 4),
+                "support_completeness_gain": round(float(candidate_row.get("support_completeness_gain", 0.0) or 0.0), 4),
+                "counterfactual_leakage_gain": round(float(candidate_row.get("counterfactual_leakage_gain", 0.0) or 0.0), 4),
+                "utility_margin_gain": round(float(candidate_row.get("utility_margin_gain", 0.0) or 0.0), 4),
+                "support_completeness_after": round(float(candidate_row.get("support_completeness_after", 0.0) or 0.0), 4),
+                "counterfactual_leakage_after": round(float(candidate_row.get("counterfactual_leakage_after", 0.0) or 0.0), 4),
+                "utility_margin_after": round(float(candidate_row.get("utility_margin_after", 0.0) or 0.0), 4),
+                "bridge_bonus_applied": bool(candidate_row.get("bridge_bonus_applied", 0.0) or 0.0),
+                "bridge_bonus_mode": str(candidate_row.get("bridge_bonus_mode", "") or ""),
+                "bridge_bonus_score": round(float(candidate_row.get("bridge_bonus_score", 0.0) or 0.0), 4),
+                "bridge_bonus_base_score": round(float(candidate_row.get("bridge_bonus_base_score", 0.0) or 0.0), 4),
+                "bridge_bonus_alignment_score": round(float(candidate_row.get("bridge_bonus_alignment_score", 0.0) or 0.0), 4),
+                "bridge_bonus_predecessor_coverage": round(float(candidate_row.get("bridge_bonus_predecessor_coverage", 0.0) or 0.0), 4),
+                "bridge_bonus_overlap_entity_count": int(candidate_row.get("bridge_bonus_overlap_entity_count", 0) or 0),
+                "bridge_bonus_novel_entity_count": int(candidate_row.get("bridge_bonus_novel_entity_count", 0) or 0),
+                "bridge_bonus_unit_id": str(candidate_row.get("bridge_bonus_unit_id", "") or ""),
+                "bridge_bonus_unit_type": str(candidate_row.get("bridge_bonus_unit_type", "") or ""),
+                "bridge_bonus_unit_predicate": str(candidate_row.get("bridge_bonus_unit_predicate", "") or ""),
+                "bridge_bonus_predecessor_id": str(candidate_row.get("bridge_bonus_predecessor_id", "") or ""),
+                "doc_positive_mean": round(float(candidate_row.get("doc_positive_mean", 0.0) or 0.0), 4),
+                "doc_counterfactual_mean": round(float(candidate_row.get("doc_counterfactual_mean", 0.0) or 0.0), 4),
+                "doc_contradiction_mean": round(float(candidate_row.get("doc_contradiction_mean", 0.0) or 0.0), 4),
+                "predicted_utility": round(float(predicted_scores_by_position.get(pool_position, 0.0) or 0.0), 4),
+                "dominant_positive_unit_id": candidate_diag.get("dominant_positive_unit_id"),
+                "dominant_positive_unit_type": candidate_diag.get("dominant_positive_unit_type"),
+                "dominant_positive_unit_predicate": candidate_diag.get("dominant_positive_unit_predicate"),
+                "dominant_positive_unit_score": candidate_diag.get("dominant_positive_unit_score"),
+                "dominant_positive_unit_coverage_before": candidate_diag.get("dominant_positive_unit_coverage_before"),
+                "dominant_positive_unit_coverage_after": candidate_diag.get("dominant_positive_unit_coverage_after"),
+                "dominant_positive_unit_gain": candidate_diag.get("dominant_positive_unit_gain"),
+                "dominant_positive_unit_precovered": candidate_diag.get("dominant_positive_unit_precovered"),
+                "dominant_counterfactual_id": candidate_diag.get("dominant_counterfactual_id"),
+                "dominant_counterfactual_coverage_before": candidate_diag.get("dominant_counterfactual_coverage_before"),
+                "dominant_counterfactual_coverage_after": candidate_diag.get("dominant_counterfactual_coverage_after"),
+                "dominant_counterfactual_gain": candidate_diag.get("dominant_counterfactual_gain"),
+            })
+        return preview_rows
+
+    def inject_forced_title_candidates(
+        candidate_list: Sequence[Dict[str, object]],
+        fallback_candidates: Sequence[Dict[str, object]],
+        forced_title_keys: Set[str],
+    ) -> Tuple[List[Dict[str, object]], List[str]]:
+        if not forced_title_keys:
+            return list(candidate_list), []
+        merged = list(candidate_list)
+        existing_positions = {
+            int(candidate["pool_position"])
+            for candidate in merged
+        }
+        added_titles: List[str] = []
+        for candidate in fallback_candidates:
+            title = str(candidate.get("doc_title", "")).strip()
+            title_key = normalize_structure_text(title)
+            pool_position = int(candidate["pool_position"])
+            if title_key not in forced_title_keys or pool_position in existing_positions:
+                continue
+            merged.append(candidate)
+            existing_positions.add(pool_position)
+            if title:
+                added_titles.append(title)
+        return merged, unique_ordered_titles(added_titles)
+
+    def build_watch_title_trace(
+        scored_candidates: Sequence[Dict[str, object]],
+        candidate_rows_by_position: Dict[int, Dict[str, float | int]],
+        candidate_requirement_diagnostics: Dict[int, Dict[str, object]],
+        candidate_source: Sequence[Dict[str, object]],
+        candidate_shortlist: Sequence[Dict[str, object]],
+        predicted_scores_by_position: Dict[int, float],
+        forced_source_title_keys: Set[str],
+        forced_shortlist_title_keys: Set[str],
+    ) -> List[Dict[str, object]]:
+        watch_title_keys = normalize_title_set(trace_watch_titles)
+        if not watch_title_keys:
+            return []
+        source_rank_by_position = {
+            int(candidate["pool_position"]): rank
+            for rank, candidate in enumerate(candidate_source, start=1)
+        }
+        shortlist_rank_by_position = {
+            int(candidate["pool_position"]): rank
+            for rank, candidate in enumerate(candidate_shortlist, start=1)
+        }
+        watch_rows: List[Dict[str, object]] = []
+        for scored_rank, candidate in enumerate(scored_candidates, start=1):
+            title = str(candidate.get("doc_title", "")).strip()
+            title_key = normalize_structure_text(title)
+            if title_key not in watch_title_keys:
+                continue
+            pool_position = int(candidate["pool_position"])
+            feature_row = candidate_rows_by_position.get(pool_position, {})
+            candidate_diag = candidate_requirement_diagnostics.get(pool_position, {})
+            watch_rows.append({
+                "title": title,
+                "pool_position": int(pool_position),
+                "scored_rank": int(scored_rank),
+                "source_rank": int(source_rank_by_position.get(pool_position, 0) or 0),
+                "shortlist_rank": int(shortlist_rank_by_position.get(pool_position, 0) or 0),
+                "base_score": round(float(candidate.get("base_score", 0.0) or 0.0), 4),
+                "combined_score": round(float(candidate.get("combined_score", 0.0) or 0.0), 4),
+                "source_sort_score": round(float(candidate.get("source_sort_score_raw", candidate.get("combined_score_raw", 0.0)) or 0.0), 4),
+                "structure_score": round(float(candidate.get("structure_score", 0.0) or 0.0), 4),
+                "novelty_score": round(float(candidate.get("novelty_score", 0.0) or 0.0), 4),
+                "predicted_utility": round(float(predicted_scores_by_position.get(pool_position, 0.0) or 0.0), 4),
+                "utility_margin_gain": round(float(feature_row.get("utility_margin_gain", 0.0) or 0.0), 4),
+                "support_completeness_gain": round(float(feature_row.get("support_completeness_gain", 0.0) or 0.0), 4),
+                "counterfactual_leakage_gain": round(float(feature_row.get("counterfactual_leakage_gain", 0.0) or 0.0), 4),
+                "support_completeness_after": round(float(feature_row.get("support_completeness_after", 0.0) or 0.0), 4),
+                "counterfactual_leakage_after": round(float(feature_row.get("counterfactual_leakage_after", 0.0) or 0.0), 4),
+                "utility_margin_after": round(float(feature_row.get("utility_margin_after", 0.0) or 0.0), 4),
+                "bridge_bonus_applied": bool(feature_row.get("bridge_bonus_applied", 0.0) or 0.0),
+                "bridge_bonus_mode": str(feature_row.get("bridge_bonus_mode", "") or ""),
+                "bridge_bonus_score": round(float(feature_row.get("bridge_bonus_score", 0.0) or 0.0), 4),
+                "bridge_bonus_base_score": round(float(feature_row.get("bridge_bonus_base_score", 0.0) or 0.0), 4),
+                "bridge_bonus_alignment_score": round(float(feature_row.get("bridge_bonus_alignment_score", 0.0) or 0.0), 4),
+                "bridge_bonus_predecessor_coverage": round(float(feature_row.get("bridge_bonus_predecessor_coverage", 0.0) or 0.0), 4),
+                "bridge_bonus_overlap_entity_count": int(feature_row.get("bridge_bonus_overlap_entity_count", 0) or 0),
+                "bridge_bonus_novel_entity_count": int(feature_row.get("bridge_bonus_novel_entity_count", 0) or 0),
+                "bridge_bonus_unit_id": str(feature_row.get("bridge_bonus_unit_id", "") or ""),
+                "bridge_bonus_unit_type": str(feature_row.get("bridge_bonus_unit_type", "") or ""),
+                "bridge_bonus_unit_predicate": str(feature_row.get("bridge_bonus_unit_predicate", "") or ""),
+                "bridge_bonus_predecessor_id": str(feature_row.get("bridge_bonus_predecessor_id", "") or ""),
+                "dominant_positive_unit_id": candidate_diag.get("dominant_positive_unit_id"),
+                "dominant_positive_unit_type": candidate_diag.get("dominant_positive_unit_type"),
+                "dominant_positive_unit_predicate": candidate_diag.get("dominant_positive_unit_predicate"),
+                "dominant_positive_unit_score": candidate_diag.get("dominant_positive_unit_score"),
+                "dominant_positive_unit_coverage_before": candidate_diag.get("dominant_positive_unit_coverage_before"),
+                "dominant_positive_unit_coverage_after": candidate_diag.get("dominant_positive_unit_coverage_after"),
+                "dominant_positive_unit_gain": candidate_diag.get("dominant_positive_unit_gain"),
+                "dominant_positive_unit_precovered": candidate_diag.get("dominant_positive_unit_precovered"),
+                "dominant_counterfactual_id": candidate_diag.get("dominant_counterfactual_id"),
+                "dominant_counterfactual_coverage_before": candidate_diag.get("dominant_counterfactual_coverage_before"),
+                "dominant_counterfactual_coverage_after": candidate_diag.get("dominant_counterfactual_coverage_after"),
+                "dominant_counterfactual_gain": candidate_diag.get("dominant_counterfactual_gain"),
+                "forced_into_source": bool(
+                    title_key in forced_source_title_keys and pool_position in source_rank_by_position
+                ),
+                "forced_into_shortlist": bool(
+                    title_key in forced_shortlist_title_keys and pool_position in shortlist_rank_by_position
+                ),
+            })
+        return watch_rows
+
     effective_candidate_count = len(pool_doc_ids)
     normalized_mode = str(requirement_mode or "oracle").strip().lower()
     if normalized_mode not in {"oracle", "learned"}:
         raise ValueError(f"Unsupported requirement beam mode: {requirement_mode}")
     if normalized_mode == "learned" and requirement_model_bundle is None:
         raise ValueError("learned requirement_beam requires a loaded matcher bundle")
+    normalized_source_sort_mode = normalize_requirement_source_sort_mode(source_sort_mode)
+    effective_source_support_gain_weight = max(float(source_support_gain_weight), 0.0)
+    normalized_shortlist_sort_mode = normalize_requirement_shortlist_sort_mode(shortlist_sort_mode)
+    normalized_bridge_bonus_mode = normalize_requirement_bridge_bonus_mode(bridge_bonus_mode)
+    normalized_structure_seed_target_bridge_mode = normalize_structure_seed_target_bridge_mode(
+        structure_seed_target_bridge_mode
+    )
+    effective_bridge_bonus_weight = (
+        max(float(bridge_bonus_weight), 0.0)
+        if normalized_bridge_bonus_mode != "off" else 0.0
+    )
 
     if effective_candidate_count <= 0 or qa_top_k <= 0:
-        return [], {
+            return [], {
             "selection_steps": [],
             "anchor_positions": [],
             "reserved_positions": [],
@@ -1744,7 +2200,13 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
             "beam_width": int(max(beam_width, 1)),
             "beam_expand_per_state": int(max(beam_expand_per_state, 1)),
             "beam_projected_shortlist_factor": int(max(beam_projected_shortlist_factor, 1)),
-            "beam_avg_frontier_size": 0.0,
+                "beam_candidate_shortlist_limit": int(max(beam_candidate_shortlist_limit or 0, 0)),
+                "source_sort_mode": normalized_source_sort_mode,
+                "source_support_gain_weight": round(float(effective_source_support_gain_weight), 4),
+                "structure_seed_target_bridge_mode": normalized_structure_seed_target_bridge_mode,
+                "beam_avg_frontier_size": 0.0,
+                "bridge_bonus_mode": normalized_bridge_bonus_mode,
+                "bridge_bonus_weight": round(float(effective_bridge_bonus_weight), 4),
             "beam_pareto_pruned_count": 0,
             "beam_learned_eval_count": 0,
             "beam_best_support_completeness": 0.0,
@@ -1795,9 +2257,156 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
     beam_width = max(int(beam_width), 1)
     beam_expand_per_state = max(int(beam_expand_per_state), 1)
     beam_projected_shortlist_factor = max(int(beam_projected_shortlist_factor), 1)
+    effective_candidate_shortlist_limit = (
+        max(int(beam_candidate_shortlist_limit), 1)
+        if beam_candidate_shortlist_limit is not None else None
+    )
+    normalized_force_source_titles = normalize_title_set(force_source_titles)
+    normalized_force_shortlist_titles = normalize_title_set(force_shortlist_titles)
+    normalized_trace_watch_titles = normalize_title_set(trace_watch_titles)
+    annotations_by_position = {
+        int(annotation["pool_position"]): annotation
+        for annotation in cache_entry.get("doc_annotations", [])
+    }
+    active_positive_units = [
+        requirement
+        for requirement in get_positive_units(cache_entry)
+        if (not is_need_unit_cache_version(cache_entry)) or bool(requirement.get("selector_enabled", True))
+    ]
+    active_counterfactual_ids = [
+        str(cf_set.get("cf_id", ""))
+        for cf_set in cache_entry.get("counterfactual_sets", [])
+        if str(cf_set.get("cf_id", "")).strip()
+    ]
+
+    def build_source_candidate_sort_key(
+        candidate: Dict[str, object],
+        candidate_rows_by_position: Dict[int, Dict[str, float | int]],
+    ) -> Tuple[float, float, float, int]:
+        pool_position = int(candidate["pool_position"])
+        support_gain = float(
+            candidate_rows_by_position.get(pool_position, {}).get("support_completeness_gain", 0.0) or 0.0
+        )
+        combined_score_raw = float(candidate.get("combined_score_raw", 0.0) or 0.0)
+        if normalized_source_sort_mode == "support_bonus":
+            source_sort_score = combined_score_raw + effective_source_support_gain_weight * support_gain
+        else:
+            source_sort_score = combined_score_raw
+        candidate["source_sort_score_raw"] = float(source_sort_score)
+        return (
+            -float(source_sort_score),
+            -float(support_gain),
+            -float(combined_score_raw),
+            int(pool_position),
+        )
+
+    def _coverage_from_scores(scores: Sequence[float]) -> float:
+        residual = 1.0
+        for score in scores:
+            residual *= max(0.0, 1.0 - float(score))
+        return float(1.0 - residual)
+
+    def build_candidate_requirement_diagnostic(
+        pool_position: int,
+        selected_positions_before: Sequence[int],
+        current_positive_score_overrides_by_position: Dict[int, Dict[str, float]] | None = None,
+        candidate_positive_score_override_map: Dict[str, float] | None = None,
+    ) -> Dict[str, object]:
+        annotation = annotations_by_position.get(int(pool_position), {})
+        current_positions = list(canonicalize_requirement_positions(selected_positions_before))
+        next_positive_score_overrides_by_position = merge_positive_score_overrides_by_position(
+            positive_score_overrides_by_position=current_positive_score_overrides_by_position,
+            pool_position=int(pool_position),
+            override_map=candidate_positive_score_override_map,
+        )
+        candidate_positive_scores = get_positive_score_map_with_overrides(
+            annotation,
+            int(pool_position),
+            positive_score_overrides_by_position=next_positive_score_overrides_by_position,
+        )
+        candidate_counterfactual_scores = get_counterfactual_set_score_map(annotation)
+
+        best_positive: Dict[str, object] | None = None
+        for requirement in active_positive_units:
+            requirement_id = str(requirement.get("unit_id", requirement.get("requirement_id", "")))
+            if not requirement_id:
+                continue
+            before_scores = [
+                float(
+                    get_positive_score_map_with_overrides(
+                        annotations_by_position[pos],
+                        pos,
+                        positive_score_overrides_by_position=current_positive_score_overrides_by_position,
+                    ).get(requirement_id, 0.0)
+                )
+                for pos in current_positions
+                if pos in annotations_by_position
+            ]
+            before_coverage = _coverage_from_scores(before_scores)
+            candidate_score = float(candidate_positive_scores.get(requirement_id, 0.0) or 0.0)
+            after_coverage = _coverage_from_scores(before_scores + [candidate_score])
+            gain = float(after_coverage - before_coverage)
+            row = {
+                "dominant_positive_unit_id": requirement_id,
+                "dominant_positive_unit_type": str(requirement.get("unit_type", requirement.get("type", "")) or ""),
+                "dominant_positive_unit_predicate": str(requirement.get("predicate", "") or ""),
+                "dominant_positive_unit_score": round(float(candidate_score), 4),
+                "dominant_positive_unit_coverage_before": round(float(before_coverage), 4),
+                "dominant_positive_unit_coverage_after": round(float(after_coverage), 4),
+                "dominant_positive_unit_gain": round(float(gain), 4),
+                "dominant_positive_unit_precovered": bool(before_coverage > 1e-6),
+            }
+            if best_positive is None or (
+                float(gain),
+                float(candidate_score),
+                float(before_coverage),
+                requirement_id,
+            ) > (
+                float(best_positive["dominant_positive_unit_gain"]),
+                float(best_positive["dominant_positive_unit_score"]),
+                float(best_positive["dominant_positive_unit_coverage_before"]),
+                str(best_positive["dominant_positive_unit_id"]),
+            ):
+                best_positive = row
+
+        best_counterfactual: Dict[str, object] | None = None
+        for cf_id in active_counterfactual_ids:
+            before_scores = [
+                float(get_counterfactual_set_score_map(annotations_by_position[pos]).get(cf_id, 0.0))
+                for pos in current_positions
+                if pos in annotations_by_position
+            ]
+            before_coverage = _coverage_from_scores(before_scores)
+            candidate_score = float(candidate_counterfactual_scores.get(cf_id, 0.0) or 0.0)
+            after_coverage = _coverage_from_scores(before_scores + [candidate_score])
+            gain = float(after_coverage - before_coverage)
+            row = {
+                "dominant_counterfactual_id": cf_id,
+                "dominant_counterfactual_coverage_before": round(float(before_coverage), 4),
+                "dominant_counterfactual_coverage_after": round(float(after_coverage), 4),
+                "dominant_counterfactual_gain": round(float(gain), 4),
+            }
+            if best_counterfactual is None or (
+                float(gain),
+                float(candidate_score),
+                cf_id,
+            ) > (
+                float(best_counterfactual["dominant_counterfactual_gain"]),
+                float(best_counterfactual["dominant_counterfactual_coverage_after"] or 0.0),
+                str(best_counterfactual["dominant_counterfactual_id"]),
+            ):
+                best_counterfactual = row
+
+        combined = {}
+        if best_positive is not None:
+            combined.update(best_positive)
+        if best_counterfactual is not None:
+            combined.update(best_counterfactual)
+        return combined
     initial_state_metrics = compute_requirement_state_metrics(
         cache_entry=cache_entry,
         selected_positions=reserved_positions,
+        positive_score_overrides_by_position={},
         smooth_tau=requirement_smooth_tau,
         counterfactual_tau=requirement_counterfactual_tau,
     )
@@ -1811,6 +2420,7 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         "cumulative_score": 0.0,
         "state_metrics": initial_state_metrics,
         "proposal_bonus": 0.0,
+        "positive_score_overrides_by_position": {},
     }]
     seen_signatures = {initial_signature}
     frontier_sizes: List[int] = []
@@ -1841,6 +2451,7 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                 covered_entities=state["covered_entities"],
                 query_entities=proposal_query_entities or seed_entities,
                 structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=normalized_structure_seed_target_bridge_mode,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
@@ -1854,14 +2465,21 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
             proposal_source_limit = beam_expand_per_state * beam_projected_shortlist_factor
             if normalized_mode == "learned":
                 proposal_source_limit = max(proposal_source_limit, beam_expand_per_state * 2)
-            candidate_source = scored_candidates[:proposal_source_limit]
-            candidate_positions = [int(candidate["pool_position"]) for candidate in candidate_source]
+            source_feature_positions = (
+                [int(candidate["pool_position"]) for candidate in scored_candidates]
+                if normalized_source_sort_mode == "support_bonus"
+                else [int(candidate["pool_position"]) for candidate in scored_candidates[:proposal_source_limit]]
+            )
             candidate_feature_rows = compute_requirement_candidate_feature_rows(
                 cache_entry=cache_entry,
                 selected_positions=selected_positions,
-                candidate_positions=candidate_positions,
+                candidate_positions=source_feature_positions,
                 normalized_base_scores=normalized_base_scores,
                 qa_top_k=qa_top_k,
+                positive_score_overrides_by_position=state.get("positive_score_overrides_by_position"),
+                bridge_bonus_binding_entities=state["covered_entities"],
+                bridge_bonus_mode=normalized_bridge_bonus_mode,
+                bridge_bonus_weight=effective_bridge_bonus_weight,
                 smooth_tau=requirement_smooth_tau,
                 counterfactual_tau=requirement_counterfactual_tau,
             )
@@ -1869,6 +2487,62 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                 int(row["pool_position"]): row
                 for row in candidate_feature_rows
             }
+            candidate_requirement_diagnostics = {
+                int(pos): build_candidate_requirement_diagnostic(
+                    pool_position=int(pos),
+                    selected_positions_before=selected_positions,
+                    current_positive_score_overrides_by_position=state.get("positive_score_overrides_by_position"),
+                    candidate_positive_score_override_map=dict(
+                        candidate_rows_by_position.get(int(pos), {}).get("positive_score_override_map", {}) or {}
+                    ),
+                )
+                for pos in source_feature_positions
+            }
+            source_sorted_candidates = sorted(
+                scored_candidates,
+                key=lambda candidate: build_source_candidate_sort_key(
+                    candidate,
+                    candidate_rows_by_position=candidate_rows_by_position,
+                ),
+            )
+            candidate_source = source_sorted_candidates[:proposal_source_limit]
+            candidate_source, forced_source_titles_applied = inject_forced_title_candidates(
+                candidate_list=candidate_source,
+                fallback_candidates=source_sorted_candidates,
+                forced_title_keys=normalized_force_source_titles,
+            )
+            candidate_source_raw = list(candidate_source)
+            candidate_positions = [int(candidate["pool_position"]) for candidate in candidate_source]
+            missing_feature_positions = [
+                int(pos) for pos in candidate_positions
+                if int(pos) not in candidate_rows_by_position
+            ]
+            if missing_feature_positions:
+                extra_feature_rows = compute_requirement_candidate_feature_rows(
+                    cache_entry=cache_entry,
+                    selected_positions=selected_positions,
+                    candidate_positions=missing_feature_positions,
+                    normalized_base_scores=normalized_base_scores,
+                    qa_top_k=qa_top_k,
+                    positive_score_overrides_by_position=state.get("positive_score_overrides_by_position"),
+                    bridge_bonus_binding_entities=state["covered_entities"],
+                    bridge_bonus_mode=normalized_bridge_bonus_mode,
+                    bridge_bonus_weight=effective_bridge_bonus_weight,
+                    smooth_tau=requirement_smooth_tau,
+                    counterfactual_tau=requirement_counterfactual_tau,
+                )
+                candidate_feature_rows.extend(extra_feature_rows)
+                for row in extra_feature_rows:
+                    candidate_rows_by_position[int(row["pool_position"])] = row
+                for pos in missing_feature_positions:
+                    candidate_requirement_diagnostics[int(pos)] = build_candidate_requirement_diagnostic(
+                        pool_position=int(pos),
+                        selected_positions_before=selected_positions,
+                        current_positive_score_overrides_by_position=state.get("positive_score_overrides_by_position"),
+                        candidate_positive_score_override_map=dict(
+                            candidate_rows_by_position.get(int(pos), {}).get("positive_score_override_map", {}) or {}
+                        ),
+                    )
             predicted_scores_by_position: Dict[int, float] = {}
             if normalized_mode == "learned" and candidate_feature_rows:
                 feature_matrix = requirement_feature_rows_to_matrix(
@@ -1892,8 +2566,53 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                     ),
                 )
                 candidate_shortlist = candidate_source[:beam_expand_per_state]
+            elif effective_candidate_shortlist_limit is not None and candidate_source:
+                if normalized_shortlist_sort_mode == "positive_only":
+                    shortlist_key = lambda candidate: (
+                        -float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("support_completeness_gain", 0.0) or 0.0),
+                        -float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("utility_margin_gain", 0.0) or 0.0),
+                        float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("counterfactual_leakage_gain", 0.0) or 0.0),
+                        -float(candidate.get("combined_score", 0.0) or 0.0),
+                        int(candidate["pool_position"]),
+                    )
+                else:
+                    shortlist_key = lambda candidate: (
+                        -float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("utility_margin_gain", 0.0) or 0.0),
+                        -float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("support_completeness_gain", 0.0) or 0.0),
+                        float(candidate_rows_by_position.get(int(candidate["pool_position"]), {}).get("counterfactual_leakage_gain", 0.0) or 0.0),
+                        -float(candidate.get("combined_score", 0.0) or 0.0),
+                        int(candidate["pool_position"]),
+                    )
+                candidate_shortlist = sorted(candidate_source, key=shortlist_key)[:effective_candidate_shortlist_limit]
             else:
                 candidate_shortlist = candidate_source
+            candidate_shortlist, forced_shortlist_titles_applied = inject_forced_title_candidates(
+                candidate_list=candidate_shortlist,
+                fallback_candidates=candidate_source,
+                forced_title_keys=normalized_force_shortlist_titles,
+            )
+            candidate_source_preview = build_candidate_trace_preview(
+                candidates=candidate_source_raw,
+                candidate_rows_by_position=candidate_rows_by_position,
+                predicted_scores_by_position=predicted_scores_by_position,
+                candidate_requirement_diagnostics=candidate_requirement_diagnostics,
+            )
+            candidate_shortlist_preview = build_candidate_trace_preview(
+                candidates=candidate_shortlist,
+                candidate_rows_by_position=candidate_rows_by_position,
+                predicted_scores_by_position=predicted_scores_by_position,
+                candidate_requirement_diagnostics=candidate_requirement_diagnostics,
+            )
+            watch_title_trace = build_watch_title_trace(
+                scored_candidates=scored_candidates,
+                candidate_rows_by_position=candidate_rows_by_position,
+                candidate_requirement_diagnostics=candidate_requirement_diagnostics,
+                candidate_source=candidate_source,
+                candidate_shortlist=candidate_shortlist,
+                predicted_scores_by_position=predicted_scores_by_position,
+                forced_source_title_keys=normalized_force_source_titles,
+                forced_shortlist_title_keys=normalized_force_shortlist_titles,
+            ) if normalized_trace_watch_titles else []
 
             for proposal_rank, candidate in enumerate(candidate_shortlist, start=1):
                 chosen_pos = int(candidate["pool_position"])
@@ -1908,13 +2627,19 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                 chosen_title = str(candidate.get("doc_title", "")).strip()
                 if chosen_title:
                     next_blocked_titles.add(chosen_title)
+                candidate_row = candidate_rows_by_position.get(chosen_pos, {})
+                next_positive_score_overrides_by_position = merge_positive_score_overrides_by_position(
+                    positive_score_overrides_by_position=state.get("positive_score_overrides_by_position"),
+                    pool_position=int(chosen_pos),
+                    override_map=dict(candidate_row.get("positive_score_override_map", {}) or {}),
+                )
                 next_state_metrics = compute_requirement_state_metrics(
                     cache_entry=cache_entry,
                     selected_positions=signature,
+                    positive_score_overrides_by_position=next_positive_score_overrides_by_position,
                     smooth_tau=requirement_smooth_tau,
                     counterfactual_tau=requirement_counterfactual_tau,
                 )
-                candidate_row = candidate_rows_by_position.get(chosen_pos, {})
                 predicted_score = float(predicted_scores_by_position.get(chosen_pos, 0.0))
                 expanded_states.append({
                     "selected_positions": next_selected_positions,
@@ -1934,12 +2659,24 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
                         "utility_margin": float(next_state_metrics["utility_margin"]),
                         "utopia_distance": float(next_state_metrics["utopia_distance"]),
                         "predicted_utility": float(predicted_score),
+                        "candidate_source_preview": [dict(row) for row in candidate_source_preview],
+                        "candidate_shortlist_preview": [dict(row) for row in candidate_shortlist_preview],
+                        "watch_title_trace": [dict(row) for row in watch_title_trace],
+                        "source_sort_mode": normalized_source_sort_mode,
+                        "source_support_gain_weight": float(effective_source_support_gain_weight),
+                        "shortlist_sort_mode": normalized_shortlist_sort_mode,
+                        "structure_seed_target_bridge_mode": normalized_structure_seed_target_bridge_mode,
+                        "bridge_bonus_mode": normalized_bridge_bonus_mode,
+                        "bridge_bonus_weight": float(effective_bridge_bonus_weight),
+                        "forced_source_titles_applied": list(forced_source_titles_applied),
+                        "forced_shortlist_titles_applied": list(forced_shortlist_titles_applied),
                     }],
                     "cumulative_score": float(state["cumulative_score"]) + float(candidate.get("combined_score_raw", 0.0)),
                     "state_metrics": next_state_metrics,
                     "proposal_bonus": float(state["proposal_bonus"]) + float(predicted_score),
                     "proposal_rank": int(proposal_rank),
                     "candidate_features": candidate_row,
+                    "positive_score_overrides_by_position": next_positive_score_overrides_by_position,
                 })
 
         if not expanded_states:
@@ -1968,11 +2705,13 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         "cumulative_score": 0.0,
         "state_metrics": initial_state_metrics,
         "proposal_bonus": 0.0,
+        "positive_score_overrides_by_position": {},
     }
     ranked_finalists = sorted(
         beam_states or [best_state],
         key=lambda state: build_requirement_final_sort_key(state, normalized_mode),
     )
+    best_metrics = best_state["state_metrics"]
     beam_finalists: List[Dict[str, object]] = []
     for finalist in ranked_finalists:
         finalist_positions = [int(pos) for pos in finalist["selected_positions"]]
@@ -1990,9 +2729,73 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
             "utility_margin": round(float(finalist_metrics["utility_margin"]), 4),
             "utopia_distance": round(float(finalist_metrics["utopia_distance"]), 4),
             "proposal_bonus": round(float(finalist.get("proposal_bonus", 0.0) or 0.0), 4),
+            "cumulative_score": round(float(finalist.get("cumulative_score", 0.0) or 0.0), 4),
         })
 
-    best_metrics = best_state["state_metrics"]
+    beam_watch_title_finalists: List[Dict[str, object]] = []
+    best_state_title_keys = normalize_title_set(
+        [
+            str(pool_doc_titles[pos]).strip()
+            for pos in best_state["selected_positions"]
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ]
+    )
+    if normalized_trace_watch_titles:
+        for watch_title in unique_ordered_titles(trace_watch_titles):
+            title_key = normalize_structure_text(watch_title)
+            if not title_key:
+                continue
+            containing_rows: List[Dict[str, object]] = []
+            for finalist_rank, finalist in enumerate(ranked_finalists, start=1):
+                finalist_positions = [int(pos) for pos in finalist["selected_positions"]]
+                finalist_titles = [
+                    str(pool_doc_titles[pos]).strip()
+                    for pos in finalist_positions
+                    if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+                ]
+                if title_key not in normalize_title_set(finalist_titles):
+                    continue
+                finalist_metrics = finalist["state_metrics"]
+                containing_rows.append({
+                    "finalist_rank": int(finalist_rank),
+                    "selected_positions": list(finalist_positions),
+                    "selected_titles": list(finalist_titles),
+                    "support_completeness": round(float(finalist_metrics["support_completeness"]), 4),
+                    "counterfactual_leakage": round(float(finalist_metrics["counterfactual_leakage"]), 4),
+                    "utility_margin": round(float(finalist_metrics["utility_margin"]), 4),
+                    "utopia_distance": round(float(finalist_metrics["utopia_distance"]), 4),
+                    "cumulative_score": round(float(finalist.get("cumulative_score", 0.0) or 0.0), 4),
+                })
+            best_containing = containing_rows[0] if containing_rows else None
+            beam_watch_title_finalists.append({
+                "title": watch_title,
+                "appears_in_best_state": bool(title_key in best_state_title_keys),
+                "appears_in_any_finalist": bool(best_containing is not None),
+                "best_containing_finalist_rank": int(best_containing["finalist_rank"]) if best_containing is not None else None,
+                "best_containing_selected_positions": list(best_containing["selected_positions"]) if best_containing is not None else [],
+                "best_containing_selected_titles": list(best_containing["selected_titles"]) if best_containing is not None else [],
+                "best_containing_support_completeness": best_containing["support_completeness"] if best_containing is not None else None,
+                "best_containing_counterfactual_leakage": best_containing["counterfactual_leakage"] if best_containing is not None else None,
+                "best_containing_utility_margin": best_containing["utility_margin"] if best_containing is not None else None,
+                "best_containing_utopia_distance": best_containing["utopia_distance"] if best_containing is not None else None,
+                "delta_vs_best_state_support_completeness": round(
+                    float(best_containing["support_completeness"]) - float(best_metrics["support_completeness"]),
+                    4,
+                ) if best_containing is not None else None,
+                "delta_vs_best_state_counterfactual_leakage": round(
+                    float(best_containing["counterfactual_leakage"]) - float(best_metrics["counterfactual_leakage"]),
+                    4,
+                ) if best_containing is not None else None,
+                "delta_vs_best_state_utility_margin": round(
+                    float(best_containing["utility_margin"]) - float(best_metrics["utility_margin"]),
+                    4,
+                ) if best_containing is not None else None,
+                "delta_vs_best_state_utopia_distance": round(
+                    float(best_containing["utopia_distance"]) - float(best_metrics["utopia_distance"]),
+                    4,
+                ) if best_containing is not None else None,
+            })
+
     return list(best_state["selected_positions"]), {
         "selection_steps": list(best_state["selection_steps"]),
         "anchor_positions": [int(pos) for pos in anchor_positions],
@@ -2004,6 +2807,16 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         "beam_width": int(beam_width),
         "beam_expand_per_state": int(beam_expand_per_state),
         "beam_projected_shortlist_factor": int(beam_projected_shortlist_factor),
+        "beam_candidate_shortlist_limit": int(effective_candidate_shortlist_limit or 0),
+        "source_sort_mode": normalized_source_sort_mode,
+        "source_support_gain_weight": round(float(effective_source_support_gain_weight), 4),
+        "shortlist_sort_mode": normalized_shortlist_sort_mode,
+        "structure_seed_target_bridge_mode": normalized_structure_seed_target_bridge_mode,
+        "bridge_bonus_mode": normalized_bridge_bonus_mode,
+        "bridge_bonus_weight": round(float(effective_bridge_bonus_weight), 4),
+        "forced_source_titles": list(unique_ordered_titles(force_source_titles)),
+        "forced_shortlist_titles": list(unique_ordered_titles(force_shortlist_titles)),
+        "trace_watch_titles": list(unique_ordered_titles(trace_watch_titles)),
         "beam_avg_frontier_size": round(float(np.mean(frontier_sizes)) if frontier_sizes else 0.0, 4),
         "beam_pareto_pruned_count": int(pareto_pruned_count),
         "beam_signature_pruned_count": int(signature_pruned_count),
@@ -2015,6 +2828,7 @@ def select_requirement_beam_positions(pool_doc_ids: Sequence[int | None],
         "requirement_positive_count": int(len(cache_entry.get("positive_need_units", cache_entry.get("positive_requirements", [])))),
         "requirement_counterfactual_count": int(len(cache_entry.get("counterfactual_sets", []))),
         "beam_finalists": beam_finalists,
+        "beam_watch_title_finalists": beam_watch_title_finalists,
     }
 
 
@@ -2029,7 +2843,8 @@ def select_learned_greedy_positions(query: str,
                                     learned_model_bundle: Dict[str, object],
                                     initial_seed_entities: Sequence[str] | Set[str] | None = None,
                                     anchor_count: int = 0,
-                                    structure_max_hops: int = 2) -> Tuple[List[int], Dict[str, object]]:
+                                    structure_max_hops: int = 2,
+                                    structure_seed_target_bridge_mode: str = "off") -> Tuple[List[int], Dict[str, object]]:
     candidate_count = len(pool_doc_ids)
     if candidate_count == 0 or qa_top_k <= 0:
         return [], {
@@ -2072,6 +2887,7 @@ def select_learned_greedy_positions(query: str,
             selected_positions=selected_positions,
             seed_entities=seed_entities,
             structure_max_hops=structure_max_hops,
+            structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
             candidate_positions=remaining_positions,
         )
         feature_matrix = feature_rows_to_matrix(feature_rows)
@@ -2128,6 +2944,7 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
                             remaining_positions: Sequence[int],
                             covered_entities: Sequence[str] | Set[str] | None,
                             structure_max_hops: int,
+                            structure_seed_target_bridge_mode: str,
                             base_weight: float,
                             structure_weight: float,
                             novelty_weight: float,
@@ -2149,6 +2966,7 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
             seed_entities=normalized_covered,
             adjacency=adjacency,
             max_hops=structure_max_hops,
+            seed_target_bridge_mode=structure_seed_target_bridge_mode,
         )
         if candidate_doc_ids and normalized_covered
         else {}
@@ -2161,6 +2979,7 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
             seed_entities=normalized_query,
             adjacency=adjacency,
             max_hops=structure_max_hops,
+            seed_target_bridge_mode=structure_seed_target_bridge_mode,
         )
         if candidate_doc_ids and normalized_query
         else {}
@@ -2319,6 +3138,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
                          base_weight: float,
                          structure_weight: float,
                          novelty_weight: float,
+                         structure_seed_target_bridge_mode: str = "off",
                          state_weight_config: Dict[str, float] | None = None) -> Dict[str, float]:
     normalized_seed = normalize_entity_set(seed_entities)
     normalized_query = normalize_entity_set(query_entities) or set(normalized_seed)
@@ -2382,6 +3202,7 @@ def score_evidence_state(pool_doc_ids: Sequence[int | None],
             remaining_positions=[pos],
             covered_entities=context_entities,
             structure_max_hops=structure_max_hops,
+            structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
             base_weight=base_weight,
             structure_weight=structure_weight,
             novelty_weight=novelty_weight,
@@ -2493,6 +3314,7 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
                                  anchor_count: int = 2,
                                  reserve_top_m: int = 0,
                                  structure_max_hops: int = 2,
+                                 structure_seed_target_bridge_mode: str = "off",
                                  base_weight: float = 0.25,
                                  structure_weight: float = 0.60,
                                  novelty_weight: float = 0.15,
@@ -2577,6 +3399,7 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
         covered_entities=covered_entities,
         query_entities=query_entities or initial_seed_entities,
         structure_max_hops=structure_max_hops,
+        structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
         base_weight=base_weight,
         structure_weight=structure_weight,
         novelty_weight=novelty_weight,
@@ -2673,6 +3496,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
                                    reserve_top_m: int = 0,
                                    max_bridge_slots: int = 0,
                                    structure_max_hops: int = 2,
+                                   structure_seed_target_bridge_mode: str = "off",
                                    base_weight: float = 0.25,
                                    structure_weight: float = 0.60,
                                    novelty_weight: float = 0.15,
@@ -2747,6 +3571,7 @@ def select_bridge_greedy_positions(pool_doc_ids: Sequence[int | None],
             covered_entities=covered_entities,
             query_entities=query_entities or initial_seed_entities,
             structure_max_hops=structure_max_hops,
+            structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
             base_weight=base_weight,
             structure_weight=structure_weight,
             novelty_weight=novelty_weight,
@@ -2812,6 +3637,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                                  reserve_top_m: int = 0,
                                  max_bridge_slots: int = 0,
                                  structure_max_hops: int = 2,
+                                 structure_seed_target_bridge_mode: str = "off",
                                  base_weight: float = 0.25,
                                  structure_weight: float = 0.60,
                                  novelty_weight: float = 0.15,
@@ -2929,6 +3755,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
         base_weight=base_weight,
         structure_weight=structure_weight,
         novelty_weight=novelty_weight,
+        structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
         state_weight_config=state_weight_config,
     )
     beam_states: List[Dict[str, object]] = [{
@@ -2971,6 +3798,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                 covered_entities=state["covered_entities"],
                 query_entities=proposal_query_entities,
                 structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
@@ -3020,6 +3848,7 @@ def select_bridge_beam_positions(pool_doc_ids: Sequence[int | None],
                     base_weight=base_weight,
                     structure_weight=structure_weight,
                     novelty_weight=novelty_weight,
+                    structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
                     state_weight_config=state_weight_config,
                 )
                 if uses_state_level_ranking and not should_keep_set_closure_expansion(
@@ -3218,6 +4047,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            base_weight: float,
                            structure_weight: float,
                            novelty_weight: float,
+                           structure_seed_target_bridge_mode: str = "off",
                            learned_model_bundle: Dict[str, object] | None = None,
                            beam_width: int = 4,
                            beam_expand_per_state: int = 4,
@@ -3268,6 +4098,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
     requirement_runtime_anchor_counts: List[int] = []
     requirement_runtime_reserve_counts: List[int] = []
     requirement_reserve_reason_counts: Counter[str] = Counter()
+    requirement_live_annotation_apply_count = 0
+    requirement_live_source_expand_apply_count = 0
+    requirement_probe_force_pool_gold_enabled_count = 0
+    requirement_probe_force_pool_gold_in_pool_query_count = 0
+    requirement_probe_force_pool_gold_applied_query_count = 0
+    requirement_probe_force_pool_gold_applied_title_count = 0
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
@@ -3336,6 +4172,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 anchor_count=anchor_count,
                 reserve_top_m=reserve_top_m,
                 structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
@@ -3368,6 +4205,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     reserve_top_m=reserve_top_m,
                     max_bridge_slots=max_bridge_slots,
                     structure_max_hops=structure_max_hops,
+                    structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
                     base_weight=base_weight,
                     structure_weight=structure_weight,
                     novelty_weight=novelty_weight,
@@ -3406,6 +4244,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     reserve_top_m=reserve_top_m,
                     max_bridge_slots=max_bridge_slots,
                     structure_max_hops=structure_max_hops,
+                    structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
                     base_weight=base_weight,
                     structure_weight=structure_weight,
                     novelty_weight=novelty_weight,
@@ -3466,6 +4305,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 initial_seed_entities=seed_entities,
                 anchor_count=anchor_count,
                 structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
             )
         else:
             if requirement_selector_bundle is None:
@@ -3473,6 +4313,58 @@ def apply_setwise_selector(hipporag: HippoRAG,
             requirement_cache = requirement_selector_bundle.get("cache")
             if requirement_cache is None:
                 raise ValueError("requirement_beam selector bundle is missing cache payload")
+            live_annotation_requested_pool_k = int(
+                (requirement_selector_bundle or {}).get("live_annotation_pool_k", 0) or 0
+            )
+            live_annotation_score_mode = str(
+                (requirement_selector_bundle or {}).get("live_annotation_score_mode", "heuristic")
+            ).strip().lower() or "heuristic"
+            live_atomic_scorer_bundle = requirement_selector_bundle.get("live_atomic_scorer_bundle")
+            live_atomic_model_path = str(
+                (requirement_selector_bundle or {}).get("live_atomic_model_path", "")
+            ).strip()
+            live_source_expand_factor = int(
+                (requirement_selector_bundle or {}).get("live_source_expand_factor", 0) or 0
+            )
+            probe_force_source_titles = list((requirement_selector_bundle or {}).get("probe_force_source_titles", []) or [])
+            probe_force_shortlist_titles = list((requirement_selector_bundle or {}).get("probe_force_shortlist_titles", []) or [])
+            probe_force_final_titles = list((requirement_selector_bundle or {}).get("probe_force_final_titles", []) or [])
+            probe_force_pool_gold_into_final = bool(
+                (requirement_selector_bundle or {}).get("probe_force_pool_gold_into_final", False)
+            )
+            probe_source_sort_mode = str(
+                (requirement_selector_bundle or {}).get("probe_source_sort_mode", DEFAULT_REQUIREMENT_SOURCE_SORT_MODE)
+                or DEFAULT_REQUIREMENT_SOURCE_SORT_MODE
+            )
+            probe_source_support_gain_weight = float(
+                (requirement_selector_bundle or {}).get("probe_source_support_gain_weight", 0.0) or 0.0
+            )
+            probe_shortlist_sort_mode = str(
+                (requirement_selector_bundle or {}).get("probe_shortlist_sort_mode", DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE)
+                or DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE
+            )
+            probe_bridge_bonus_mode = str(
+                (requirement_selector_bundle or {}).get("probe_bridge_bonus_mode", "off") or "off"
+            )
+            probe_bridge_bonus_weight = float(
+                (requirement_selector_bundle or {}).get("probe_bridge_bonus_weight", 0.0) or 0.0
+            )
+            trace_watch_titles = list((requirement_selector_bundle or {}).get("exposure_watch_titles", []) or [])
+            pool_gold_force_payload = {
+                "requested_titles": [],
+                "in_pool_titles": [],
+                "missing_titles": [],
+                "positions": [],
+            }
+            if probe_force_pool_gold_into_final:
+                requirement_probe_force_pool_gold_enabled_count += 1
+                pool_gold_force_payload = resolve_query_pool_gold_titles(
+                    pool_titles=pool_titles[:pool_limit],
+                    gold_docs=qs.gold_docs,
+                    pool_limit=pool_limit,
+                )
+                if pool_gold_force_payload["in_pool_titles"]:
+                    requirement_probe_force_pool_gold_in_pool_query_count += 1
             cache_entry = resolve_requirement_cache_entry(
                 cache_payload=requirement_cache,
                 question=qs.question,
@@ -3483,23 +4375,50 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 if doc_id is not None else set()
                 for doc_id in pool_doc_ids
             ]
+            cache_annotation_pool_k = int(cache_entry.get("annotation_pool_k", 0) or 0)
+            effective_live_annotation_pool_k = 0
+            alignment_pool_titles = pool_titles
+            alignment_pool_docs = pool_docs
+            alignment_pool_doc_entities = pool_doc_entities
+            if live_annotation_requested_pool_k > 0:
+                effective_live_annotation_pool_k = min(
+                    pool_limit,
+                    max(cache_annotation_pool_k, live_annotation_requested_pool_k),
+                )
+                alignment_pool_titles = pool_titles[:effective_live_annotation_pool_k]
+                alignment_pool_docs = pool_docs[:effective_live_annotation_pool_k]
+                alignment_pool_doc_entities = pool_doc_entities[:effective_live_annotation_pool_k]
             needs_cache_alignment = (
-                len(pool_titles) > int(cache_entry.get("annotation_pool_k", 0) or 0)
+                len(alignment_pool_titles) > cache_annotation_pool_k
             )
             try:
                 validate_requirement_cache_entry(
                     cache_entry=cache_entry,
-                    pool_titles=pool_titles,
+                    pool_titles=alignment_pool_titles,
                 )
             except ValueError:
                 needs_cache_alignment = True
             if needs_cache_alignment:
                 cache_entry = align_requirement_cache_entry_to_pool(
                     cache_entry=cache_entry,
-                    pool_titles=pool_titles,
-                    pool_docs=pool_docs,
-                    pool_doc_entities=pool_doc_entities,
+                    pool_titles=alignment_pool_titles,
+                    pool_docs=alignment_pool_docs,
+                    pool_doc_entities=alignment_pool_doc_entities,
+                    atomic_scorer_bundle=live_atomic_scorer_bundle if live_annotation_score_mode == "hybrid" else None,
+                    score_mode=live_annotation_score_mode,
                 )
+            effective_requirement_source_expand_factor = max(
+                int(beam_projected_shortlist_factor),
+                int(live_source_expand_factor),
+            ) if live_source_expand_factor > 0 else int(beam_projected_shortlist_factor)
+            effective_requirement_shortlist_limit = (
+                int(beam_expand_per_state)
+                if live_source_expand_factor > 0 else None
+            )
+            if needs_cache_alignment and effective_live_annotation_pool_k > 0:
+                requirement_live_annotation_apply_count += 1
+            if live_source_expand_factor > 0 and effective_requirement_source_expand_factor > int(beam_projected_shortlist_factor):
+                requirement_live_source_expand_apply_count += 1
             requirement_cache_hit_count += 1
             runtime_reserve_config = resolve_requirement_beam_runtime_reserve_config(
                 anchor_count=anchor_count,
@@ -3522,18 +4441,53 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 reserve_top_m=int(runtime_reserve_config["reserve_top_m"]),
                 max_bridge_slots=max_bridge_slots,
                 structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
                 base_weight=base_weight,
                 structure_weight=structure_weight,
                 novelty_weight=novelty_weight,
                 beam_width=beam_width,
                 beam_expand_per_state=beam_expand_per_state,
-                beam_projected_shortlist_factor=beam_projected_shortlist_factor,
+                beam_projected_shortlist_factor=effective_requirement_source_expand_factor,
+                beam_candidate_shortlist_limit=effective_requirement_shortlist_limit,
+                force_source_titles=probe_force_source_titles,
+                force_shortlist_titles=probe_force_shortlist_titles,
+                trace_watch_titles=trace_watch_titles,
+                source_sort_mode=probe_source_sort_mode,
+                source_support_gain_weight=probe_source_support_gain_weight,
+                shortlist_sort_mode=probe_shortlist_sort_mode,
+                bridge_bonus_mode=probe_bridge_bonus_mode,
+                bridge_bonus_weight=probe_bridge_bonus_weight,
                 non_anchor_title_dedup=non_anchor_title_dedup,
                 requirement_mode=str(requirement_selector_bundle.get("mode", "oracle")),
                 requirement_model_bundle=requirement_selector_bundle.get("model_bundle"),
                 requirement_smooth_tau=float(requirement_selector_bundle.get("smooth_tau", DEFAULT_REQUIREMENT_SMOOTH_TAU)),
                 requirement_counterfactual_tau=float(requirement_selector_bundle.get("counterfactual_tau", DEFAULT_REQUIREMENT_CF_TAU)),
             )
+            selector_trace["cache_annotation_pool_k_before_live"] = int(cache_annotation_pool_k)
+            selector_trace["live_annotation_applied"] = bool(needs_cache_alignment and effective_live_annotation_pool_k > 0)
+            selector_trace["live_annotation_requested_pool_k"] = int(live_annotation_requested_pool_k)
+            selector_trace["live_annotation_effective_pool_k"] = int(cache_entry.get("annotation_pool_k", 0) or 0)
+            selector_trace["live_annotation_score_mode"] = str(live_annotation_score_mode)
+            selector_trace["live_annotation_model_path"] = live_atomic_model_path or None
+            selector_trace["live_source_expand_factor"] = int(live_source_expand_factor)
+            selector_trace["effective_beam_projected_shortlist_factor"] = int(
+                effective_requirement_source_expand_factor
+            )
+            selector_trace["effective_beam_candidate_shortlist_limit"] = int(
+                effective_requirement_shortlist_limit or 0
+            )
+            selector_trace["probe_force_source_titles"] = list(unique_ordered_titles(probe_force_source_titles))
+            selector_trace["probe_force_shortlist_titles"] = list(unique_ordered_titles(probe_force_shortlist_titles))
+            selector_trace["probe_force_final_titles"] = list(unique_ordered_titles(probe_force_final_titles))
+            selector_trace["probe_force_pool_gold_into_final"] = bool(probe_force_pool_gold_into_final)
+            selector_trace["probe_force_pool_gold_titles_requested"] = list(pool_gold_force_payload["requested_titles"])
+            selector_trace["probe_force_pool_gold_titles_in_pool"] = list(pool_gold_force_payload["in_pool_titles"])
+            selector_trace["probe_force_pool_gold_titles_missing_from_pool"] = list(pool_gold_force_payload["missing_titles"])
+            selector_trace["probe_source_sort_mode"] = normalize_requirement_source_sort_mode(probe_source_sort_mode)
+            selector_trace["probe_source_support_gain_weight"] = round(float(probe_source_support_gain_weight), 4)
+            selector_trace["probe_shortlist_sort_mode"] = normalize_requirement_shortlist_sort_mode(probe_shortlist_sort_mode)
+            selector_trace["probe_bridge_bonus_mode"] = normalize_requirement_bridge_bonus_mode(probe_bridge_bonus_mode)
+            selector_trace["probe_bridge_bonus_weight"] = round(float(probe_bridge_bonus_weight), 4)
             selector_trace["requirement_reserve_policy"] = str(runtime_reserve_config["policy"])
             selector_trace["requirement_reserve_policy_reason"] = str(runtime_reserve_config["policy_reason"])
             selector_trace["requirement_positive_count"] = int(runtime_reserve_config["positive_requirement_count"])
@@ -3633,6 +4587,65 @@ def apply_setwise_selector(hipporag: HippoRAG,
                         final_front_positions = list(heuristic_front_positions)
                         late_rerank_block_count += 1
 
+        forced_final_positions = []
+        forced_final_titles_applied: List[str] = []
+        forced_probe_final_titles_applied: List[str] = []
+        forced_pool_gold_final_titles_applied: List[str] = []
+        if selector_name == "requirement_beam":
+            probe_force_final_positions = resolve_title_pool_positions(
+                pool_titles=pool_titles[:pool_limit],
+                target_titles=probe_force_final_titles,
+                pool_limit=pool_limit,
+            )
+            gold_force_final_positions = [
+                int(pos)
+                for pos in list(pool_gold_force_payload.get("positions", []) or [])
+            ]
+            seen_forced_final_positions: Set[int] = set()
+            for pos in list(probe_force_final_positions) + gold_force_final_positions:
+                normalized_pos = int(pos)
+                if normalized_pos in seen_forced_final_positions:
+                    continue
+                forced_final_positions.append(normalized_pos)
+                seen_forced_final_positions.add(normalized_pos)
+            if forced_final_positions:
+                original_front_positions = list(final_front_positions)
+                final_front_positions = materialize_reader_top_positions(
+                    selected_positions=final_front_positions,
+                    pool_limit=pool_limit,
+                    qa_top_k=qa_top_k,
+                    forced_prefix_positions=forced_final_positions,
+                )
+                forced_final_titles_applied = unique_ordered_titles(
+                    [
+                        pool_titles[pos]
+                        for pos in final_front_positions
+                        if pos in forced_final_positions and pos not in original_front_positions
+                    ]
+                )
+                forced_probe_final_titles_applied = unique_ordered_titles(
+                    [
+                        pool_titles[pos]
+                        for pos in final_front_positions
+                        if pos in probe_force_final_positions and pos not in original_front_positions
+                    ]
+                )
+                forced_pool_gold_final_titles_applied = unique_ordered_titles(
+                    [
+                        pool_titles[pos]
+                        for pos in final_front_positions
+                        if pos in gold_force_final_positions and pos not in original_front_positions
+                    ]
+                )
+                if forced_pool_gold_final_titles_applied:
+                    requirement_probe_force_pool_gold_applied_query_count += 1
+                    requirement_probe_force_pool_gold_applied_title_count += len(
+                        forced_pool_gold_final_titles_applied
+                    )
+            selector_trace["forced_final_titles_applied"] = list(forced_final_titles_applied)
+            selector_trace["forced_probe_final_titles_applied"] = list(forced_probe_final_titles_applied)
+            selector_trace["forced_pool_gold_final_titles_applied"] = list(forced_pool_gold_final_titles_applied)
+
         selected_position_set = set(final_front_positions)
         reordered_pool_positions = final_front_positions + [
             pos for pos in range(pool_limit)
@@ -3678,6 +4691,29 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "late_rerank_trace": late_rerank_trace,
             **selector_trace,
         }
+        if selector_name == "requirement_beam":
+            trace_target_titles = unique_ordered_titles(
+                list(
+                    parse_title_csv(
+                        str((requirement_selector_bundle or {}).get("exposure_watch_titles_csv", "")),
+                        default=requirement_selector_bundle.get("exposure_watch_titles"),
+                    )
+                )
+                + list((requirement_selector_bundle or {}).get("probe_force_source_titles", []) or [])
+                + list((requirement_selector_bundle or {}).get("probe_force_shortlist_titles", []) or [])
+                + list((requirement_selector_bundle or {}).get("probe_force_final_titles", []) or [])
+                + [
+                    extract_doc_title(doc_text)
+                    for doc_text in list(qs.gold_docs or [])
+                ]
+            )
+            retrieval_trace["setwise_selector_trace"]["requirement_title_exposure_summary"] = (
+                build_requirement_title_exposure_summary(
+                    pool_titles=pool_titles,
+                    selector_trace=retrieval_trace["setwise_selector_trace"],
+                    target_titles=trace_target_titles,
+                )
+            )
 
         selected_qs = QuerySolution(
             question=qs.question,
@@ -3770,6 +4806,27 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "avg_requirement_frontier_size": round(float(np.mean(requirement_frontier_sizes)) if requirement_frontier_sizes else 0.0, 4),
             "avg_requirement_runtime_anchor_count": round(float(np.mean(requirement_runtime_anchor_counts)) if requirement_runtime_anchor_counts else 0.0, 4),
             "avg_requirement_runtime_reserved_count": round(float(np.mean(requirement_runtime_reserve_counts)) if requirement_runtime_reserve_counts else 0.0, 4),
+            "requirement_live_annotation_apply_count": int(requirement_live_annotation_apply_count),
+            "requirement_live_source_expand_apply_count": int(requirement_live_source_expand_apply_count),
+            "requirement_live_annotation_pool_k": int((requirement_selector_bundle or {}).get("live_annotation_pool_k", 0) or 0),
+            "requirement_live_annotation_score_mode": str((requirement_selector_bundle or {}).get("live_annotation_score_mode", "heuristic")),
+            "requirement_live_atomic_model_path": str((requirement_selector_bundle or {}).get("live_atomic_model_path", "")) or None,
+            "requirement_live_source_expand_factor": int((requirement_selector_bundle or {}).get("live_source_expand_factor", 0) or 0),
+            "requirement_live_source_shortlist_limit": int(beam_expand_per_state if int((requirement_selector_bundle or {}).get("live_source_expand_factor", 0) or 0) > 0 else 0),
+            "requirement_exposure_watch_titles": list((requirement_selector_bundle or {}).get("exposure_watch_titles", []) or []),
+            "requirement_probe_force_source_titles": list((requirement_selector_bundle or {}).get("probe_force_source_titles", []) or []),
+            "requirement_probe_force_shortlist_titles": list((requirement_selector_bundle or {}).get("probe_force_shortlist_titles", []) or []),
+            "requirement_probe_force_final_titles": list((requirement_selector_bundle or {}).get("probe_force_final_titles", []) or []),
+            "requirement_probe_force_pool_gold_into_final": bool(
+                (requirement_selector_bundle or {}).get("probe_force_pool_gold_into_final", False)
+            ),
+            "requirement_probe_force_pool_gold_enabled_count": int(requirement_probe_force_pool_gold_enabled_count),
+            "requirement_probe_force_pool_gold_in_pool_query_count": int(requirement_probe_force_pool_gold_in_pool_query_count),
+            "requirement_probe_force_pool_gold_applied_query_count": int(requirement_probe_force_pool_gold_applied_query_count),
+            "requirement_probe_force_pool_gold_applied_title_count": int(requirement_probe_force_pool_gold_applied_title_count),
+            "requirement_probe_bridge_bonus_mode": str((requirement_selector_bundle or {}).get("probe_bridge_bonus_mode", "off")),
+            "requirement_probe_bridge_bonus_weight": round(float((requirement_selector_bundle or {}).get("probe_bridge_bonus_weight", 0.0) or 0.0), 4),
+            "requirement_probe_shortlist_sort_mode": str((requirement_selector_bundle or {}).get("probe_shortlist_sort_mode", DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE)),
             "requirement_reserve_reason_counts": dict(sorted(requirement_reserve_reason_counts.items())),
         })
     logger.info(
@@ -3842,11 +4899,15 @@ def build_setwise_selector_query_traces(config: BaseConfig,
         baseline_top_titles = [extract_doc_title(doc_text) for doc_text in baseline_top_docs]
         selector_top_titles = [extract_doc_title(doc_text) for doc_text in selector_top_docs]
         selector_trace = dict((selected_qs.retrieval_trace or {}).get("setwise_selector_trace", {}) or {})
+        requirement_title_exposure_summary = list(
+            selector_trace.get("requirement_title_exposure_summary", []) or []
+        )
         query_traces.append({
             "question": selected_qs.question,
             "query_type": resolve_report_query_type(config, selected_qs),
             "gold_answers": list(selected_qs.gold_answers or []),
             "gold_doc_count": int(len(set(gold_docs[q_idx]))),
+            "gold_titles": [extract_doc_title(doc_text) for doc_text in gold_docs[q_idx]],
             "baseline_answer": baseline_qs.answer or "",
             "selector_answer": selected_qs.answer or "",
             "baseline_top_titles": baseline_top_titles,
@@ -3867,6 +4928,7 @@ def build_setwise_selector_query_traces(config: BaseConfig,
                 "ExactMatch": round(float(selector_per_query_em[q_idx]["ExactMatch"]), 4),
                 "F1": round(float(selector_per_query_f1[q_idx]["F1"]), 4),
             },
+            "requirement_title_exposure_summary": requirement_title_exposure_summary,
             "selector_trace": selector_trace,
         })
     return query_traces
@@ -4131,6 +5193,9 @@ def build_config(args, corpus_len: int) -> BaseConfig:
         structure_rerank_max_top5_swaps=args.structure_rerank_max_top5_swaps,
         structure_rerank_seed_top_k=args.structure_rerank_seed_top_k,
         structure_rerank_max_hops=args.structure_rerank_max_hops,
+        structure_relation_probe_mode=getattr(args, "structure_relation_probe_mode", "off"),
+        structure_continuity_probe_mode=getattr(args, "structure_continuity_probe_mode", "off"),
+        structure_seed_target_bridge_mode=getattr(args, "structure_seed_target_bridge_mode", "off"),
         structure_rerank_margin_threshold=args.structure_rerank_margin_threshold,
         rerank_require_non_empty=string_to_bool(args.rerank_require_non_empty),
     )
@@ -4192,6 +5257,12 @@ def main():
     parser.add_argument("--structure_rerank_max_top5_swaps", type=int, default=2)
     parser.add_argument("--structure_rerank_seed_top_k", type=int, default=4)
     parser.add_argument("--structure_rerank_max_hops", type=int, default=2)
+    parser.add_argument("--structure_relation_probe_mode", choices=["off", "q6_factual"], default="off",
+                        help="Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` adds a narrow factual relation family for q6-style bridge audits.")
+    parser.add_argument("--structure_continuity_probe_mode", choices=["off", "city_state_alias"], default="off",
+                        help="Eval-only structure node continuity probe. `city_state_alias` adds narrow city/state -> bare-city aliases for high-confidence continuity audits.")
+    parser.add_argument("--structure_seed_target_bridge_mode", choices=["off", "allow_seed_target"], default="off",
+                        help="Eval-only structure scorer mode. `off` preserves legacy bridge-edge acceptance; `allow_seed_target` also accepts explicit bridge edges whose target is already in the covered seed set.")
     parser.add_argument("--structure_rerank_margin_threshold", type=float, default=0.02)
     parser.add_argument("--rerank_require_non_empty", type=str, default="true")
     parser.add_argument("--retrieval_only", type=str, default="false")
@@ -4309,6 +5380,34 @@ def main():
                         help="Smooth-min temperature for requirement support completeness.")
     parser.add_argument("--setwise_requirement_counterfactual_tau", type=float, default=DEFAULT_REQUIREMENT_CF_TAU,
                         help="Soft worst-case temperature for counterfactual leakage.")
+    parser.add_argument("--setwise_requirement_live_annotation_pool_k", type=int, default=0,
+                        help="Optional eval-only annotation frontier override for requirement_beam. When >0, rebuild requirement annotations up to this pool depth during live smoke eval.")
+    parser.add_argument("--setwise_requirement_live_annotation_score_mode", choices=["heuristic", "hybrid"], default="heuristic",
+                        help="Score mode used for eval-only live requirement annotation rebuilds.")
+    parser.add_argument("--setwise_requirement_live_atomic_model_path", type=str, default="",
+                        help="Atomic need-unit scorer bundle used when --setwise_requirement_live_annotation_score_mode hybrid.")
+    parser.add_argument("--setwise_requirement_live_source_expand_factor", type=int, default=0,
+                        help="Optional eval-only override for requirement_beam candidate source width. When >0, replaces beam_projected_shortlist_factor for requirement_beam only.")
+    parser.add_argument("--setwise_requirement_exposure_watch_titles", type=str, default=",".join(DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES),
+                        help="Comma-separated doc titles to summarize in requirement_beam exposure traces.")
+    parser.add_argument("--setwise_requirement_probe_force_source_titles", type=str, default="",
+                        help="Eval-only diagnostic: comma-separated titles forced into requirement-beam candidate source when present in the pool.")
+    parser.add_argument("--setwise_requirement_probe_force_shortlist_titles", type=str, default="",
+                        help="Eval-only diagnostic: comma-separated titles forced into requirement-beam candidate shortlist when already present in candidate source.")
+    parser.add_argument("--setwise_requirement_probe_force_final_titles", type=str, default="",
+                        help="Eval-only diagnostic: comma-separated titles forced into the final reader evidence set when present in the pool.")
+    parser.add_argument("--setwise_requirement_probe_force_pool_gold_into_final", type=string_to_bool, default=False,
+                        help="Eval-only diagnostic: for each query, force gold titles that are already inside the current pool into the final reader evidence set.")
+    parser.add_argument("--setwise_requirement_probe_source_sort_mode", choices=["combined", "support_bonus"], default=DEFAULT_REQUIREMENT_SOURCE_SORT_MODE,
+                        help="Eval-only source ranking mode for requirement_beam. combined preserves legacy source admission; support_bonus adds a small support_completeness gain bonus before the source cutoff.")
+    parser.add_argument("--setwise_requirement_probe_source_support_gain_weight", type=float, default=0.0,
+                        help="Eval-only support gain weight used when --setwise_requirement_probe_source_sort_mode support_bonus.")
+    parser.add_argument("--setwise_requirement_probe_shortlist_sort_mode", choices=["margin_first", "positive_only"], default=DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE,
+                        help="Eval-only shortlist ranking mode for requirement_beam. margin_first uses utility_margin first; positive_only uses support_completeness gain first.")
+    parser.add_argument("--setwise_requirement_probe_bridge_bonus_mode", choices=["off", "variable_binding"], default="off",
+                        help="Eval-only need-unit bridge bonus mode for requirement_beam. off preserves legacy scoring; variable_binding grants a small relation_hop override when predecessor coverage and entity-binding continuity are present.")
+    parser.add_argument("--setwise_requirement_probe_bridge_bonus_weight", type=float, default=0.0,
+                        help="Eval-only bridge bonus weight used when --setwise_requirement_probe_bridge_bonus_mode variable_binding.")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -4369,11 +5468,21 @@ def main():
         requirement_cache = load_requirement_cache(args.setwise_requirement_cache_path)
         requirement_model_bundle = None
         requirement_model_path = ""
+        live_annotation_score_mode = str(args.setwise_requirement_live_annotation_score_mode or "heuristic").strip().lower()
+        live_atomic_model_path = str(args.setwise_requirement_live_atomic_model_path or "").strip()
+        live_atomic_scorer_bundle = None
         if str(args.setwise_requirement_mode).strip().lower() == "learned":
             requirement_model_path = str(args.setwise_requirement_model_path or "").strip()
             if not requirement_model_path:
                 raise ValueError("--setwise_requirement_model_path is required when --setwise_requirement_mode learned")
             requirement_model_bundle = load_requirement_model_bundle(requirement_model_path)
+        if live_annotation_score_mode == "hybrid":
+            if not live_atomic_model_path:
+                raise ValueError(
+                    "--setwise_requirement_live_atomic_model_path is required when "
+                    "--setwise_requirement_live_annotation_score_mode hybrid"
+                )
+            live_atomic_scorer_bundle = load_need_unit_atomic_model_bundle(live_atomic_model_path)
         requirement_selector_bundle = {
             "cache": requirement_cache,
             "cache_path": str(args.setwise_requirement_cache_path),
@@ -4383,6 +5492,25 @@ def main():
             "annotation_pool_k": int(args.setwise_requirement_annotation_pool_k),
             "smooth_tau": float(args.setwise_requirement_smooth_tau),
             "counterfactual_tau": float(args.setwise_requirement_counterfactual_tau),
+            "live_annotation_pool_k": int(args.setwise_requirement_live_annotation_pool_k),
+            "live_annotation_score_mode": live_annotation_score_mode,
+            "live_atomic_model_path": live_atomic_model_path,
+            "live_atomic_scorer_bundle": live_atomic_scorer_bundle,
+            "live_source_expand_factor": int(args.setwise_requirement_live_source_expand_factor),
+            "exposure_watch_titles_csv": str(args.setwise_requirement_exposure_watch_titles or ""),
+            "exposure_watch_titles": parse_title_csv(
+                args.setwise_requirement_exposure_watch_titles,
+                default=DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES,
+            ),
+            "probe_force_source_titles": parse_title_csv(args.setwise_requirement_probe_force_source_titles),
+            "probe_force_shortlist_titles": parse_title_csv(args.setwise_requirement_probe_force_shortlist_titles),
+            "probe_force_final_titles": parse_title_csv(args.setwise_requirement_probe_force_final_titles),
+            "probe_force_pool_gold_into_final": bool(args.setwise_requirement_probe_force_pool_gold_into_final),
+            "probe_source_sort_mode": normalize_requirement_source_sort_mode(args.setwise_requirement_probe_source_sort_mode),
+            "probe_source_support_gain_weight": float(args.setwise_requirement_probe_source_support_gain_weight),
+            "probe_shortlist_sort_mode": normalize_requirement_shortlist_sort_mode(args.setwise_requirement_probe_shortlist_sort_mode),
+            "probe_bridge_bonus_mode": normalize_requirement_bridge_bonus_mode(args.setwise_requirement_probe_bridge_bonus_mode),
+            "probe_bridge_bonus_weight": float(args.setwise_requirement_probe_bridge_bonus_weight),
         }
     late_rerank_judge_bundle = SetwiseLateRerankJudgeBundle(
         infer_fn=None,
@@ -4635,6 +5763,7 @@ def main():
             reserve_top_m=int(args.setwise_reserve_top_m),
             max_bridge_slots=int(args.setwise_max_bridge_slots),
             structure_max_hops=int(args.setwise_structure_max_hops),
+            structure_seed_target_bridge_mode=str(args.structure_seed_target_bridge_mode),
             base_weight=float(args.setwise_base_weight),
             structure_weight=float(args.setwise_structure_weight),
             novelty_weight=float(args.setwise_novelty_weight),
@@ -4753,6 +5882,23 @@ def main():
             "setwise_requirement_annotation_pool_k": int(args.setwise_requirement_annotation_pool_k),
             "setwise_requirement_smooth_tau": round(float(args.setwise_requirement_smooth_tau), 4),
             "setwise_requirement_counterfactual_tau": round(float(args.setwise_requirement_counterfactual_tau), 4),
+            "setwise_requirement_live_annotation_pool_k": int(args.setwise_requirement_live_annotation_pool_k),
+            "setwise_requirement_live_annotation_score_mode": str(args.setwise_requirement_live_annotation_score_mode),
+            "setwise_requirement_live_atomic_model_path": args.setwise_requirement_live_atomic_model_path or None,
+            "setwise_requirement_live_source_expand_factor": int(args.setwise_requirement_live_source_expand_factor),
+            "setwise_requirement_exposure_watch_titles": parse_title_csv(
+                args.setwise_requirement_exposure_watch_titles,
+                default=DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES,
+            ),
+            "setwise_requirement_probe_force_source_titles": parse_title_csv(args.setwise_requirement_probe_force_source_titles),
+            "setwise_requirement_probe_force_shortlist_titles": parse_title_csv(args.setwise_requirement_probe_force_shortlist_titles),
+            "setwise_requirement_probe_force_final_titles": parse_title_csv(args.setwise_requirement_probe_force_final_titles),
+            "setwise_requirement_probe_force_pool_gold_into_final": bool(args.setwise_requirement_probe_force_pool_gold_into_final),
+            "setwise_requirement_probe_source_sort_mode": normalize_requirement_source_sort_mode(args.setwise_requirement_probe_source_sort_mode),
+            "setwise_requirement_probe_source_support_gain_weight": round(float(args.setwise_requirement_probe_source_support_gain_weight), 4),
+            "setwise_requirement_probe_shortlist_sort_mode": normalize_requirement_shortlist_sort_mode(args.setwise_requirement_probe_shortlist_sort_mode),
+            "setwise_requirement_probe_bridge_bonus_mode": normalize_requirement_bridge_bonus_mode(args.setwise_requirement_probe_bridge_bonus_mode),
+            "setwise_requirement_probe_bridge_bonus_weight": round(float(args.setwise_requirement_probe_bridge_bonus_weight), 4),
             "selector_EM": round(float(selector_em), 4),
             "selector_F1": round(float(selector_f1), 4),
             "baseline_EM": round(float(baseline_em), 4),
@@ -4968,6 +6114,23 @@ def main():
             "setwise_late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
             "setwise_model_path": args.setwise_model_path or None,
             "setwise_requirement_reserve_policy": str(args.setwise_requirement_reserve_policy),
+            "setwise_requirement_live_annotation_pool_k": int(args.setwise_requirement_live_annotation_pool_k),
+            "setwise_requirement_live_annotation_score_mode": str(args.setwise_requirement_live_annotation_score_mode),
+            "setwise_requirement_live_atomic_model_path": args.setwise_requirement_live_atomic_model_path or None,
+            "setwise_requirement_live_source_expand_factor": int(args.setwise_requirement_live_source_expand_factor),
+            "setwise_requirement_exposure_watch_titles": parse_title_csv(
+                args.setwise_requirement_exposure_watch_titles,
+                default=DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES,
+            ),
+            "setwise_requirement_probe_force_source_titles": parse_title_csv(args.setwise_requirement_probe_force_source_titles),
+            "setwise_requirement_probe_force_shortlist_titles": parse_title_csv(args.setwise_requirement_probe_force_shortlist_titles),
+            "setwise_requirement_probe_force_final_titles": parse_title_csv(args.setwise_requirement_probe_force_final_titles),
+            "setwise_requirement_probe_force_pool_gold_into_final": bool(args.setwise_requirement_probe_force_pool_gold_into_final),
+            "setwise_requirement_probe_source_sort_mode": normalize_requirement_source_sort_mode(args.setwise_requirement_probe_source_sort_mode),
+            "setwise_requirement_probe_source_support_gain_weight": round(float(args.setwise_requirement_probe_source_support_gain_weight), 4),
+            "setwise_requirement_probe_shortlist_sort_mode": normalize_requirement_shortlist_sort_mode(args.setwise_requirement_probe_shortlist_sort_mode),
+            "setwise_requirement_probe_bridge_bonus_mode": normalize_requirement_bridge_bonus_mode(args.setwise_requirement_probe_bridge_bonus_mode),
+            "setwise_requirement_probe_bridge_bonus_weight": round(float(args.setwise_requirement_probe_bridge_bonus_weight), 4),
             "causal_v2_extraction_max_tokens": config.causal_v2_extraction_max_tokens,
             "causal_v2_extraction_retry_attempts": config.causal_v2_extraction_retry_attempts,
             "causal_v2_extraction_workers": config.causal_v2_extraction_workers,
@@ -4985,6 +6148,9 @@ def main():
             "structure_rerank_max_top5_swaps": config.structure_rerank_max_top5_swaps,
             "structure_rerank_seed_top_k": config.structure_rerank_seed_top_k,
             "structure_rerank_max_hops": config.structure_rerank_max_hops,
+            "structure_relation_probe_mode": str(config.structure_relation_probe_mode),
+            "structure_continuity_probe_mode": str(config.structure_continuity_probe_mode),
+            "structure_seed_target_bridge_mode": str(config.structure_seed_target_bridge_mode),
             "structure_rerank_margin_threshold": config.structure_rerank_margin_threshold,
         },
         "overall_from_pipeline": {

@@ -10,6 +10,24 @@ from .misc_utils import CausalRelation, text_processing
 CAUSAL_RELATION_TYPES = ("causes", "enables", "prevents")
 CausalQueryType = Literal["cause", "effect", "prevention", "non_causal"]
 STRUCTURE_RELATION_TYPES = CAUSAL_RELATION_TYPES + ("state_transition",)
+STRUCTURE_RELATION_PROBE_MODES = ("off", "q6_factual")
+STRUCTURE_CONTINUITY_PROBE_MODES = ("off", "city_state_alias")
+STRUCTURE_SEED_TARGET_BRIDGE_MODES = ("off", "allow_seed_target")
+_US_STATE_NAMES = (
+    "alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut",
+    "delaware", "florida", "georgia", "hawaii", "idaho", "illinois", "indiana", "iowa",
+    "kansas", "kentucky", "louisiana", "maine", "maryland", "massachusetts", "michigan",
+    "minnesota", "mississippi", "missouri", "montana", "nebraska", "nevada",
+    "new hampshire", "new jersey", "new mexico", "new york", "north carolina",
+    "north dakota", "ohio", "oklahoma", "oregon", "pennsylvania", "rhode island",
+    "south carolina", "south dakota", "tennessee", "texas", "utah", "vermont",
+    "virginia", "washington", "west virginia", "wisconsin", "wyoming",
+    "district of columbia",
+)
+_US_STATE_TOKEN_SEQUENCES = tuple(
+    tuple(state_name.split())
+    for state_name in sorted(_US_STATE_NAMES, key=lambda value: (-len(value.split()), value))
+)
 
 PREVENTION_PATTERNS = (
     r"\bprevent\b",
@@ -153,7 +171,55 @@ def normalize_structure_text(text: str) -> str:
     return normalized
 
 
-def classify_directed_predicate(predicate: str) -> Tuple[str, bool, float] | None:
+def normalize_structure_seed_target_bridge_mode(mode: str | None) -> str:
+    normalized = str(mode or "off").strip().lower()
+    if normalized not in STRUCTURE_SEED_TARGET_BRIDGE_MODES:
+        raise ValueError(f"Unsupported structure seed-target bridge mode: {mode}")
+    return normalized
+
+
+def resolve_structure_city_state_alias_pairs(entities: Iterable[str],
+                                             continuity_probe_mode: str = "off") -> Dict[str, str]:
+    if str(continuity_probe_mode or "off").strip().lower() != "city_state_alias":
+        return {}
+
+    normalized_entities = {
+        normalize_structure_text(entity)
+        for entity in entities
+        if normalize_structure_text(entity)
+    }
+    if not normalized_entities:
+        return {}
+
+    candidate_pairs: Dict[str, str] = {}
+    full_forms_by_bare: Dict[str, Set[str]] = defaultdict(set)
+    for normalized_entity in normalized_entities:
+        tokens = normalized_entity.split()
+        if len(tokens) < 2:
+            continue
+        bare_entity = ""
+        for state_tokens in _US_STATE_TOKEN_SEQUENCES:
+            suffix_len = len(state_tokens)
+            if len(tokens) <= suffix_len:
+                continue
+            if tuple(tokens[-suffix_len:]) != state_tokens:
+                continue
+            bare_entity = " ".join(tokens[:-suffix_len]).strip()
+            break
+        if not bare_entity or bare_entity not in normalized_entities or bare_entity == normalized_entity:
+            continue
+        candidate_pairs[normalized_entity] = bare_entity
+        full_forms_by_bare[bare_entity].add(normalized_entity)
+
+    return {
+        full_entity: bare_entity
+        for full_entity, bare_entity in candidate_pairs.items()
+        if len(full_forms_by_bare.get(bare_entity, set())) == 1
+    }
+
+
+def classify_directed_predicate(predicate: str,
+                                relation_probe_mode: str = "off") -> Tuple[str, bool, float] | None:
     normalized = normalize_structure_text(predicate)
     if not normalized:
         return None
@@ -177,18 +243,41 @@ def classify_directed_predicate(predicate: str) -> Tuple[str, bool, float] | Non
     for pattern, relation_type, confidence in forward_specs:
         if re.search(pattern, normalized):
             return relation_type, False, confidence
+
+    if str(relation_probe_mode or "off").strip().lower() == "q6_factual":
+        factual_reverse_specs = (
+            (r"\bdesigned by\b|\bdesigns\b|\bdesign(?:ed|ing)? by\b", "factual_attribution", 0.85),
+            (r"\bcreated by\b|\bcreate(?:d|s|ing)? by\b", "factual_attribution", 0.85),
+            (r"\bbuilt by\b", "factual_attribution", 0.8),
+        )
+        factual_forward_specs = (
+            (r"\bopened in\b", "factual_located_in", 0.8),
+            (r"\blies on\b", "factual_located_on", 0.8),
+            (r"\bdrain(?:s|ed|ing)? into\b|\bflow(?:s|ed|ing)? into\b|\bempt(?:y|ies|ied|ying)? into\b", "factual_flows_to", 0.85),
+        )
+
+        for pattern, relation_type, confidence in factual_reverse_specs:
+            if re.search(pattern, normalized):
+                return relation_type, True, confidence
+        for pattern, relation_type, confidence in factual_forward_specs:
+            if re.search(pattern, normalized):
+                return relation_type, False, confidence
     return None
 
 
 def derive_directed_structure_edge(subject: str,
                                    predicate: str,
-                                   object_: str) -> Tuple[str, str, str, float] | None:
+                                   object_: str,
+                                   relation_probe_mode: str = "off") -> Tuple[str, str, str, float] | None:
     normalized_subject = normalize_structure_text(subject)
     normalized_object = normalize_structure_text(object_)
     if not normalized_subject or not normalized_object or normalized_subject == normalized_object:
         return None
 
-    predicate_info = classify_directed_predicate(predicate)
+    predicate_info = classify_directed_predicate(
+        predicate,
+        relation_probe_mode=relation_probe_mode,
+    )
     if predicate_info is None:
         return None
 
@@ -292,7 +381,9 @@ def score_candidate_docs_by_structure(candidate_doc_ids: Sequence[int],
                                       seed_entities: Set[str],
                                       adjacency: Dict[str, List[Tuple[str, float, str]]],
                                       max_hops: int = 2,
+                                      seed_target_bridge_mode: str = "off",
                                       return_details: bool = False) -> Dict[int, float] | Tuple[Dict[int, float], Dict[str, object]]:
+    normalized_seed_target_bridge_mode = normalize_structure_seed_target_bridge_mode(seed_target_bridge_mode)
     reachable_scores = expand_directed_entities(seed_entities, adjacency, max_hops=max_hops)
     if not reachable_scores:
         empty = {}
@@ -355,7 +446,14 @@ def score_candidate_docs_by_structure(candidate_doc_ids: Sequence[int],
             local_structure += positive_weight
 
             source_support = 1.0 if normalized_source in normalized_seeds else reachable_scores.get(normalized_source, 0.0)
-            target_support = reachable_scores.get(normalized_target, 0.0)
+            target_support = (
+                1.0
+                if (
+                    normalized_seed_target_bridge_mode == "allow_seed_target"
+                    and normalized_target in normalized_seeds
+                )
+                else reachable_scores.get(normalized_target, 0.0)
+            )
             if source_support > 0 and target_support > 0:
                 explicit_bridge_edge_count += 1
                 bridge_support = max(bridge_support, min(1.0, positive_weight * max(source_support, target_support)))
