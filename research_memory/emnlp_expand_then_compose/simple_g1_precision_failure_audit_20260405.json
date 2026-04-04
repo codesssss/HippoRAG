@@ -1,0 +1,740 @@
+{
+  "report_source": "",
+  "selector": "bridge_beam",
+  "score_mode": "bridge",
+  "query_count": 40,
+  "positive_summary": {
+    "count": 3,
+    "saturated_state_count": 1,
+    "state_score": {
+      "min": 0.4874,
+      "max": 0.9262,
+      "mean": 0.6566
+    },
+    "path_connectivity": {
+      "min": 0.5,
+      "max": 1.0,
+      "mean": 0.6667
+    },
+    "reachable_doc_ratio": {
+      "min": 0.5,
+      "max": 1.0,
+      "mean": 0.6667
+    },
+    "query_reachability": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "query_coverage": {
+      "min": 0.25,
+      "max": 1.0,
+      "mean": 0.75
+    },
+    "support_mean": {
+      "min": 0.4191,
+      "max": 0.9228,
+      "mean": 0.5941
+    },
+    "suffix_base_mean": {
+      "min": 0.1388,
+      "max": 0.4142,
+      "mean": 0.2455
+    },
+    "max_local_structure": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "max_local_novelty": {
+      "min": 0.9706,
+      "max": 1.0,
+      "mean": 0.9902
+    },
+    "max_local_closure": {
+      "min": 0.5957,
+      "max": 0.8541,
+      "mean": 0.717
+    },
+    "avg_local_structure": {
+      "min": 0.5,
+      "max": 0.9481,
+      "mean": 0.6494
+    },
+    "avg_local_novelty": {
+      "min": 0.8853,
+      "max": 0.9643,
+      "mean": 0.936
+    },
+    "avg_local_closure": {
+      "min": 0.2979,
+      "max": 0.7859,
+      "mean": 0.4782
+    }
+  },
+  "negative_summary": {
+    "count": 2,
+    "saturated_state_count": 2,
+    "state_score": {
+      "min": 0.8936,
+      "max": 0.9023,
+      "mean": 0.898
+    },
+    "path_connectivity": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "reachable_doc_ratio": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "query_reachability": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "query_coverage": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "support_mean": {
+      "min": 0.8678,
+      "max": 0.871,
+      "mean": 0.8694
+    },
+    "suffix_base_mean": {
+      "min": 0.0124,
+      "max": 0.1232,
+      "mean": 0.0678
+    },
+    "max_local_structure": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "max_local_novelty": {
+      "min": 0.9286,
+      "max": 0.9706,
+      "mean": 0.9496
+    },
+    "max_local_closure": {
+      "min": 0.6813,
+      "max": 0.6965,
+      "mean": 0.6889
+    },
+    "avg_local_structure": {
+      "min": 0.9748,
+      "max": 1.0,
+      "mean": 0.9874
+    },
+    "avg_local_novelty": {
+      "min": 0.9117,
+      "max": 0.952,
+      "mean": 0.9318
+    },
+    "avg_local_closure": {
+      "min": 0.6724,
+      "max": 0.6759,
+      "mean": 0.6742
+    }
+  },
+  "neutral_summary": {
+    "count": 35,
+    "saturated_state_count": 5,
+    "state_score": {
+      "min": 0.0,
+      "max": 0.9222,
+      "mean": 0.2953
+    },
+    "path_connectivity": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.323
+    },
+    "reachable_doc_ratio": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.3286
+    },
+    "query_reachability": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.3714
+    },
+    "query_coverage": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.3331
+    },
+    "support_mean": {
+      "min": 0.0,
+      "max": 0.9053,
+      "mean": 0.2739
+    },
+    "suffix_base_mean": {
+      "min": 0.0,
+      "max": 0.3709,
+      "mean": 0.0231
+    },
+    "max_local_structure": {
+      "min": 0.7938,
+      "max": 1.0,
+      "mean": 0.9736
+    },
+    "max_local_novelty": {
+      "min": 0.8571,
+      "max": 1.0,
+      "mean": 0.9448
+    },
+    "max_local_closure": {
+      "min": 0.5157,
+      "max": 0.8314,
+      "mean": 0.7116
+    },
+    "avg_local_structure": {
+      "min": 0.4436,
+      "max": 1.0,
+      "mean": 0.8208
+    },
+    "avg_local_novelty": {
+      "min": 0.616,
+      "max": 1.0,
+      "mean": 0.9013
+    },
+    "avg_local_closure": {
+      "min": 0.2579,
+      "max": 0.7138,
+      "mean": 0.5688
+    }
+  },
+  "feature_overlap": {
+    "state_score": {
+      "positive": {
+        "min": 0.4874,
+        "max": 0.9262,
+        "mean": 0.6566
+      },
+      "negative": {
+        "min": 0.8936,
+        "max": 0.9023,
+        "mean": 0.898
+      },
+      "ranges_overlap": true
+    },
+    "path_connectivity": {
+      "positive": {
+        "min": 0.5,
+        "max": 1.0,
+        "mean": 0.6667
+      },
+      "negative": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "ranges_overlap": true
+    },
+    "reachable_doc_ratio": {
+      "positive": {
+        "min": 0.5,
+        "max": 1.0,
+        "mean": 0.6667
+      },
+      "negative": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "ranges_overlap": true
+    },
+    "query_reachability": {
+      "positive": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "negative": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "ranges_overlap": true
+    },
+    "query_coverage": {
+      "positive": {
+        "min": 0.25,
+        "max": 1.0,
+        "mean": 0.75
+      },
+      "negative": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "ranges_overlap": true
+    },
+    "support_mean": {
+      "positive": {
+        "min": 0.4191,
+        "max": 0.9228,
+        "mean": 0.5941
+      },
+      "negative": {
+        "min": 0.8678,
+        "max": 0.871,
+        "mean": 0.8694
+      },
+      "ranges_overlap": true
+    },
+    "suffix_base_mean": {
+      "positive": {
+        "min": 0.1388,
+        "max": 0.4142,
+        "mean": 0.2455
+      },
+      "negative": {
+        "min": 0.0124,
+        "max": 0.1232,
+        "mean": 0.0678
+      },
+      "ranges_overlap": false
+    },
+    "max_local_structure": {
+      "positive": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "negative": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "ranges_overlap": true
+    },
+    "max_local_novelty": {
+      "positive": {
+        "min": 0.9706,
+        "max": 1.0,
+        "mean": 0.9902
+      },
+      "negative": {
+        "min": 0.9286,
+        "max": 0.9706,
+        "mean": 0.9496
+      },
+      "ranges_overlap": true
+    },
+    "max_local_closure": {
+      "positive": {
+        "min": 0.5957,
+        "max": 0.8541,
+        "mean": 0.717
+      },
+      "negative": {
+        "min": 0.6813,
+        "max": 0.6965,
+        "mean": 0.6889
+      },
+      "ranges_overlap": true
+    },
+    "avg_local_structure": {
+      "positive": {
+        "min": 0.5,
+        "max": 0.9481,
+        "mean": 0.6494
+      },
+      "negative": {
+        "min": 0.9748,
+        "max": 1.0,
+        "mean": 0.9874
+      },
+      "ranges_overlap": false
+    },
+    "avg_local_novelty": {
+      "positive": {
+        "min": 0.8853,
+        "max": 0.9643,
+        "mean": 0.936
+      },
+      "negative": {
+        "min": 0.9117,
+        "max": 0.952,
+        "mean": 0.9318
+      },
+      "ranges_overlap": true
+    },
+    "avg_local_closure": {
+      "positive": {
+        "min": 0.2979,
+        "max": 0.7859,
+        "mean": 0.4782
+      },
+      "negative": {
+        "min": 0.6724,
+        "max": 0.6759,
+        "mean": 0.6742
+      },
+      "ranges_overlap": true
+    }
+  },
+  "findings": [
+    "G1 changed 5 queries: 3 positive and 2 negative.",
+    "2/2 negative queries end in fully saturated beam states (path_connectivity, reachable_doc_ratio, query_reachability, query_coverage all ~1.0).",
+    "1/3 positive queries are also saturated, so saturation alone cannot serve as a safe precision gate.",
+    "max_local_structure overlaps between positive and negative queries, so current absolute scores do not cleanly separate true bridges from topical noise.",
+    "max_local_novelty overlaps between positive and negative queries, so current absolute scores do not cleanly separate true bridges from topical noise.",
+    "max_local_closure overlaps between positive and negative queries, so current absolute scores do not cleanly separate true bridges from topical noise.",
+    "support_mean overlaps between positive and negative queries, so current absolute scores do not cleanly separate true bridges from topical noise.",
+    "state_score overlaps between positive and negative queries, so current absolute scores do not cleanly separate true bridges from topical noise.",
+    "The remaining hard failure family is not missing-bridge capacity anymore. It is high-structure topical expansion: the beam can assign bridge-like local scores and high state scores to documents that stay inside a dense seed/query cluster.",
+    "The next precision signal should be incremental rather than absolute: measure whether a candidate adds chain utility beyond the current state, instead of only requiring high structure/novelty/closure in isolation."
+  ],
+  "top_positive_queries": [
+    {
+      "question": "In what year was the group who performed Attics To Eden formed?",
+      "delta_f1": 1.0,
+      "baseline_f1": 0.0,
+      "selector_f1": 1.0,
+      "baseline_answer": "Not mentioned.",
+      "selector_answer": "2005.",
+      "baseline_titles": [
+        "Attics to Eden",
+        "Peter Green Splinter Group (album)",
+        "Attic Entertainment Software",
+        "Friday Night Lights (Attic Lights album)",
+        "Reaching the Cold 100"
+      ],
+      "selector_titles": [
+        "Attics to Eden",
+        "Peter Green Splinter Group (album)",
+        "Attic Entertainment Software",
+        "Friday Night Lights (Attic Lights album)",
+        "Madina Lake"
+      ],
+      "gate_reason": "offrank_bridge_signal_detected",
+      "gate_use_selector": true,
+      "beam_steps": [
+        {
+          "step": 4,
+          "pool_position": 3,
+          "doc_id": 529,
+          "base_score": 0.1469,
+          "structure_score": 0.0,
+          "novelty_score": 1.0,
+          "closure_score": 0.0,
+          "selection_score": 0.0,
+          "combined_score": 0.1867,
+          "proposal_rank": 2,
+          "state_score": 0.2582
+        },
+        {
+          "step": 5,
+          "pool_position": 6,
+          "doc_id": 527,
+          "base_score": 0.1307,
+          "structure_score": 1.0,
+          "novelty_score": 0.9167,
+          "closure_score": 0.5957,
+          "selection_score": 1.0,
+          "combined_score": 0.7702,
+          "proposal_rank": 1,
+          "state_score": 0.5563
+        }
+      ],
+      "best_state": {
+        "state_score": 0.5563,
+        "path_connectivity": 0.5,
+        "reachable_doc_ratio": 0.5,
+        "query_reachability": 1.0,
+        "query_coverage": 1.0,
+        "support_mean": 0.4191,
+        "suffix_base_mean": 0.1388
+      },
+      "saturated_state": false,
+      "max_local_structure": 1.0,
+      "max_local_novelty": 1.0,
+      "max_local_closure": 0.5957,
+      "avg_local_structure": 0.5,
+      "avg_local_novelty": 0.9584,
+      "avg_local_closure": 0.2979
+    },
+    {
+      "question": "What is the position of the 1st governor general of India?",
+      "delta_f1": 0.8,
+      "baseline_f1": 0.2,
+      "selector_f1": 1.0,
+      "baseline_answer": "Governor of the Presidency of Fort William (Bengal).",
+      "selector_answer": "Governor-General of India.",
+      "baseline_titles": [
+        "Governor-General of India",
+        "Governor-General of India",
+        "Impeachment of Warren Hastings",
+        "Governor-General of India",
+        "Warren Hastings"
+      ],
+      "selector_titles": [
+        "Governor-General of India",
+        "Governor-General of India",
+        "Impeachment of Warren Hastings",
+        "Nawabs of Bengal and Murshidabad",
+        "Warren Hastings"
+      ],
+      "gate_reason": "offrank_bridge_signal_detected",
+      "gate_use_selector": true,
+      "beam_steps": [
+        {
+          "step": 4,
+          "pool_position": 12,
+          "doc_id": 641,
+          "base_score": 0.2825,
+          "structure_score": 1.0,
+          "novelty_score": 0.9706,
+          "closure_score": 0.8541,
+          "selection_score": 1.0,
+          "combined_score": 0.8162,
+          "proposal_rank": 1,
+          "state_score": 0.9223
+        },
+        {
+          "step": 5,
+          "pool_position": 4,
+          "doc_id": 664,
+          "base_score": 0.5458,
+          "structure_score": 0.8961,
+          "novelty_score": 0.8,
+          "closure_score": 0.7178,
+          "selection_score": 0.8961,
+          "combined_score": 0.7941,
+          "proposal_rank": 1,
+          "state_score": 0.9262
+        }
+      ],
+      "best_state": {
+        "state_score": 0.9262,
+        "path_connectivity": 1.0,
+        "reachable_doc_ratio": 1.0,
+        "query_reachability": 1.0,
+        "query_coverage": 1.0,
+        "support_mean": 0.9228,
+        "suffix_base_mean": 0.4142
+      },
+      "saturated_state": true,
+      "max_local_structure": 1.0,
+      "max_local_novelty": 0.9706,
+      "max_local_closure": 0.8541,
+      "avg_local_structure": 0.9481,
+      "avg_local_novelty": 0.8853,
+      "avg_local_closure": 0.7859
+    },
+    {
+      "question": "Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+      "delta_f1": 0.8,
+      "baseline_f1": 0.0,
+      "selector_f1": 0.8,
+      "baseline_answer": "Gulf of Mexico.",
+      "selector_answer": "Mississippi River.",
+      "baseline_titles": [
+        "Southeast Library",
+        "Colorado River (Texas)",
+        "Gulf of Mexico",
+        "Cedar Bayou",
+        "Oklahoma City"
+      ],
+      "selector_titles": [
+        "Southeast Library",
+        "Colorado River (Texas)",
+        "Gulf of Mexico",
+        "Oklahoma City",
+        "Riverside Plaza"
+      ],
+      "gate_reason": "offrank_bridge_signal_detected",
+      "gate_use_selector": true,
+      "beam_steps": [
+        {
+          "step": 4,
+          "pool_position": 4,
+          "doc_id": 1199,
+          "base_score": 0.2654,
+          "structure_score": 0.0,
+          "novelty_score": 1.0,
+          "closure_score": 0.0,
+          "selection_score": 0.0,
+          "combined_score": 0.2163,
+          "proposal_rank": 2,
+          "state_score": 0.1856
+        },
+        {
+          "step": 5,
+          "pool_position": 29,
+          "doc_id": 119,
+          "base_score": 0.1016,
+          "structure_score": 1.0,
+          "novelty_score": 0.9286,
+          "closure_score": 0.7013,
+          "selection_score": 1.0,
+          "combined_score": 0.7647,
+          "proposal_rank": 1,
+          "state_score": 0.4874
+        }
+      ],
+      "best_state": {
+        "state_score": 0.4874,
+        "path_connectivity": 0.5,
+        "reachable_doc_ratio": 0.5,
+        "query_reachability": 1.0,
+        "query_coverage": 0.25,
+        "support_mean": 0.4403,
+        "suffix_base_mean": 0.1835
+      },
+      "saturated_state": false,
+      "max_local_structure": 1.0,
+      "max_local_novelty": 1.0,
+      "max_local_closure": 0.7013,
+      "avg_local_structure": 0.5,
+      "avg_local_novelty": 0.9643,
+      "avg_local_closure": 0.3507
+    }
+  ],
+  "top_negative_queries": [
+    {
+      "question": "When was the person who Messi's goals in Copa del Rey compared to get signed by Barcelona?",
+      "delta_f1": -1.0,
+      "baseline_f1": 1.0,
+      "selector_f1": 0.0,
+      "baseline_answer": "June 1982.",
+      "selector_answer": "Not mentioned.",
+      "baseline_titles": [
+        "Lionel Messi",
+        "FC Barcelona",
+        "FC Barcelona",
+        "Lionel Messi",
+        "FC Barcelona"
+      ],
+      "selector_titles": [
+        "Lionel Messi",
+        "FC Barcelona",
+        "FC Barcelona",
+        "List of Spanish football champions",
+        "List of UEFA club competition winners"
+      ],
+      "gate_reason": "offrank_bridge_signal_detected",
+      "gate_use_selector": true,
+      "beam_steps": [
+        {
+          "step": 4,
+          "pool_position": 26,
+          "doc_id": 17,
+          "base_score": 0.1856,
+          "structure_score": 0.9496,
+          "novelty_score": 0.9286,
+          "closure_score": 0.6705,
+          "selection_score": 0.9496,
+          "combined_score": 0.7555,
+          "proposal_rank": 1,
+          "state_score": 0.8943
+        },
+        {
+          "step": 5,
+          "pool_position": 57,
+          "doc_id": 4157,
+          "base_score": 0.0607,
+          "structure_score": 1.0,
+          "novelty_score": 0.8947,
+          "closure_score": 0.6813,
+          "selection_score": 1.0,
+          "combined_score": 0.7494,
+          "proposal_rank": 1,
+          "state_score": 0.8936
+        }
+      ],
+      "best_state": {
+        "state_score": 0.8936,
+        "path_connectivity": 1.0,
+        "reachable_doc_ratio": 1.0,
+        "query_reachability": 1.0,
+        "query_coverage": 1.0,
+        "support_mean": 0.871,
+        "suffix_base_mean": 0.1232
+      },
+      "saturated_state": true,
+      "max_local_structure": 1.0,
+      "max_local_novelty": 0.9286,
+      "max_local_closure": 0.6813,
+      "avg_local_structure": 0.9748,
+      "avg_local_novelty": 0.9117,
+      "avg_local_closure": 0.6759
+    },
+    {
+      "question": "How did did the people fare during the reign of the abolisher of sati partha in India?",
+      "delta_f1": -0.1333,
+      "baseline_f1": 0.1333,
+      "selector_f1": 0.0,
+      "baseline_answer": "The practice of sati was abolished, ending its prevalence.",
+      "selector_answer": "Freed from forced immolation.",
+      "baseline_titles": [
+        "Sati (practice)",
+        "Bengal Sati Regulation, 1829",
+        "Sati (film)",
+        "Queen Victoria",
+        "Indian Rebellion of 1857"
+      ],
+      "selector_titles": [
+        "Sati (practice)",
+        "Bengal Sati Regulation, 1829",
+        "Sati (film)",
+        "Nawabs of Bengal and Murshidabad",
+        "Warren Hastings"
+      ],
+      "gate_reason": "offrank_bridge_signal_detected",
+      "gate_use_selector": true,
+      "beam_steps": [
+        {
+          "step": 4,
+          "pool_position": 9,
+          "doc_id": 641,
+          "base_score": 0.0197,
+          "structure_score": 1.0,
+          "novelty_score": 0.9706,
+          "closure_score": 0.6965,
+          "selection_score": 1.0,
+          "combined_score": 0.7505,
+          "proposal_rank": 1,
+          "state_score": 0.9077
+        },
+        {
+          "step": 5,
+          "pool_position": 54,
+          "doc_id": 664,
+          "base_score": 0.005,
+          "structure_score": 1.0,
+          "novelty_score": 0.9333,
+          "closure_score": 0.6483,
+          "selection_score": 1.0,
+          "combined_score": 0.7413,
+          "proposal_rank": 1,
+          "state_score": 0.9023
+        }
+      ],
+      "best_state": {
+        "state_score": 0.9023,
+        "path_connectivity": 1.0,
+        "reachable_doc_ratio": 1.0,
+        "query_reachability": 1.0,
+        "query_coverage": 1.0,
+        "support_mean": 0.8678,
+        "suffix_base_mean": 0.0124
+      },
+      "saturated_state": true,
+      "max_local_structure": 1.0,
+      "max_local_novelty": 0.9706,
+      "max_local_closure": 0.6965,
+      "avg_local_structure": 1.0,
+      "avg_local_novelty": 0.952,
+      "avg_local_closure": 0.6724
+    }
+  ]
+}
