@@ -1477,6 +1477,102 @@ def test_compute_bridge_gate_decision_skips_when_combined_margin_is_too_small():
     assert decision["gate_enabled"] is True
     assert decision["use_selector"] is False
     assert decision["reason"] == "offrank_combined_margin_too_small"
+
+
+def test_compute_bridge_gate_decision_precision_mode_applies_for_bridge_with_newinfo_signal():
+    decision = compute_bridge_gate_decision(
+        pool_doc_ids=[0, 1, 2, 3, 4, 5],
+        pool_doc_scores=np.array([1.0, 0.95, 0.90, 0.85, 0.84, 0.20], dtype=float),
+        pool_doc_titles=["A", "B", "C", "D", "Suffix", "Bridge"],
+        doc_idx_to_entities={
+            0: {"entity a"},
+            1: {"entity b"},
+            2: {"entity c"},
+            3: {"entity d"},
+            4: {"suffix"},
+            5: {"entity d", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [("entity d", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "entity d": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=5,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        reserve_top_m=4,
+        max_bridge_slots=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        gate_mode="suffix_bridge_precision",
+        gate_min_structure_score=0.15,
+        gate_min_combined_margin=0.0,
+        gate_min_closure_score=0.2,
+        gate_min_novelty_score=0.4,
+        gate_min_frontier_gain=0.2,
+        gate_min_path_coherence=0.2,
+    )
+
+    assert decision["gate_enabled"] is True
+    assert decision["use_selector"] is True
+    assert decision["reason"] == "offrank_bridge_signal_detected"
+    assert decision["best_offrank_closure_score"] >= 0.2
+    assert decision["best_offrank_novelty_score"] >= 0.4
+
+
+def test_compute_bridge_gate_decision_precision_mode_skips_without_enough_newinfo_signal():
+    decision = compute_bridge_gate_decision(
+        pool_doc_ids=[0, 1, 2, 3, 4, 5],
+        pool_doc_scores=np.array([1.0, 0.95, 0.90, 0.85, 0.84, 0.20], dtype=float),
+        pool_doc_titles=["A", "B", "C", "D", "Suffix", "Bridge"],
+        doc_idx_to_entities={
+            0: {"entity a"},
+            1: {"entity b"},
+            2: {"entity c"},
+            3: {"entity d"},
+            4: {"suffix"},
+            5: {"entity d", "target"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [("entity d", "target", 1.0, "related_to")],
+        },
+        adjacency={
+            "entity d": [("target", 1.0, "related_to")],
+        },
+        qa_top_k=5,
+        initial_seed_entities=set(),
+        anchor_count=2,
+        reserve_top_m=4,
+        max_bridge_slots=1,
+        structure_max_hops=2,
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        gate_mode="suffix_bridge_precision",
+        gate_min_structure_score=0.15,
+        gate_min_combined_margin=0.0,
+        gate_min_closure_score=0.2,
+        gate_min_novelty_score=1.1,
+        gate_min_frontier_gain=1.1,
+        gate_min_path_coherence=1.1,
+    )
+
+    assert decision["gate_enabled"] is True
+    assert decision["use_selector"] is False
+    assert decision["reason"] == "offrank_novelty_below_threshold"
     assert decision["best_offrank_pool_position"] == 5
     assert decision["weakest_baseline_suffix_pool_position"] == 4
 

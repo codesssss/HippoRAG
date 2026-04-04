@@ -3323,6 +3323,10 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
                                  gate_mode: str = "none",
                                  gate_min_structure_score: float = 0.15,
                                  gate_min_combined_margin: float = 0.0,
+                                 gate_min_closure_score: float = 0.0,
+                                 gate_min_novelty_score: float = 0.0,
+                                 gate_min_frontier_gain: float = 0.0,
+                                 gate_min_path_coherence: float = 0.0,
                                  non_anchor_title_dedup: bool = False) -> Dict[str, object]:
     normalized_gate_mode = str(gate_mode or "none").strip().lower()
     candidate_count = len(pool_doc_ids)
@@ -3354,11 +3358,23 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
         "best_offrank_pool_position": None,
         "best_offrank_structure_score": 0.0,
         "best_offrank_combined_score": 0.0,
+        "best_offrank_novelty_score": 0.0,
+        "best_offrank_frontier_gain_score": 0.0,
+        "best_offrank_path_coherence_score": 0.0,
+        "best_offrank_closure_score": 0.0,
         "weakest_baseline_suffix_pool_position": None,
         "weakest_baseline_suffix_structure_score": 0.0,
         "weakest_baseline_suffix_combined_score": 0.0,
+        "weakest_baseline_suffix_novelty_score": 0.0,
+        "weakest_baseline_suffix_frontier_gain_score": 0.0,
+        "weakest_baseline_suffix_path_coherence_score": 0.0,
+        "weakest_baseline_suffix_closure_score": 0.0,
         "gate_min_structure_score": round(float(gate_min_structure_score), 4),
         "gate_min_combined_margin": round(float(gate_min_combined_margin), 4),
+        "gate_min_closure_score": round(float(gate_min_closure_score), 4),
+        "gate_min_novelty_score": round(float(gate_min_novelty_score), 4),
+        "gate_min_frontier_gain": round(float(gate_min_frontier_gain), 4),
+        "gate_min_path_coherence": round(float(gate_min_path_coherence), 4),
     }
     if normalized_gate_mode == "none":
         return decision
@@ -3441,6 +3457,10 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
     decision["best_offrank_pool_position"] = int(best_offrank["pool_position"])
     decision["best_offrank_structure_score"] = round(float(best_offrank["structure_score"]), 4)
     decision["best_offrank_combined_score"] = round(float(best_offrank["combined_score"]), 4)
+    decision["best_offrank_novelty_score"] = round(float(best_offrank.get("novelty_score", 0.0) or 0.0), 4)
+    decision["best_offrank_frontier_gain_score"] = round(float(best_offrank.get("frontier_gain_score", 0.0) or 0.0), 4)
+    decision["best_offrank_path_coherence_score"] = round(float(best_offrank.get("path_coherence_score", 0.0) or 0.0), 4)
+    decision["best_offrank_closure_score"] = round(float(best_offrank.get("closure_score", 0.0) or 0.0), 4)
 
     if baseline_suffix_candidates:
         weakest_baseline_suffix = min(
@@ -3454,6 +3474,10 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
         decision["weakest_baseline_suffix_pool_position"] = int(weakest_baseline_suffix["pool_position"])
         decision["weakest_baseline_suffix_structure_score"] = round(float(weakest_baseline_suffix["structure_score"]), 4)
         decision["weakest_baseline_suffix_combined_score"] = round(float(weakest_baseline_suffix["combined_score"]), 4)
+        decision["weakest_baseline_suffix_novelty_score"] = round(float(weakest_baseline_suffix.get("novelty_score", 0.0) or 0.0), 4)
+        decision["weakest_baseline_suffix_frontier_gain_score"] = round(float(weakest_baseline_suffix.get("frontier_gain_score", 0.0) or 0.0), 4)
+        decision["weakest_baseline_suffix_path_coherence_score"] = round(float(weakest_baseline_suffix.get("path_coherence_score", 0.0) or 0.0), 4)
+        decision["weakest_baseline_suffix_closure_score"] = round(float(weakest_baseline_suffix.get("closure_score", 0.0) or 0.0), 4)
     else:
         weakest_baseline_suffix = None
 
@@ -3461,6 +3485,27 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
         decision["use_selector"] = False
         decision["reason"] = "offrank_structure_below_threshold"
         return decision
+
+    if normalized_gate_mode == "suffix_bridge_precision":
+        if float(best_offrank.get("closure_score_raw", 0.0) or 0.0) < float(gate_min_closure_score):
+            decision["use_selector"] = False
+            decision["reason"] = "offrank_closure_below_threshold"
+            return decision
+        has_novelty_signal = (
+            float(best_offrank.get("novelty_score", 0.0) or 0.0) >= float(gate_min_novelty_score)
+        )
+        has_chain_signal = (
+            float(best_offrank.get("frontier_gain_score", 0.0) or 0.0) >= float(gate_min_frontier_gain)
+            or float(best_offrank.get("path_coherence_score", 0.0) or 0.0) >= float(gate_min_path_coherence)
+        )
+        if not has_novelty_signal:
+            decision["use_selector"] = False
+            decision["reason"] = "offrank_novelty_below_threshold"
+            return decision
+        if not has_chain_signal:
+            decision["use_selector"] = False
+            decision["reason"] = "offrank_chain_signal_below_threshold"
+            return decision
 
     if (
         weakest_baseline_suffix is not None
@@ -4057,6 +4102,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            gate_mode: str = "none",
                            gate_min_structure_score: float = 0.15,
                            gate_min_combined_margin: float = 0.0,
+                           gate_min_closure_score: float = 0.0,
+                           gate_min_novelty_score: float = 0.0,
+                           gate_min_frontier_gain: float = 0.0,
+                           gate_min_path_coherence: float = 0.0,
                            state_weight_config: Dict[str, float] | None = None,
                            late_rerank_enabled: bool = False,
                            late_rerank_candidate_count: int = 4,
@@ -4181,6 +4230,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 gate_mode=gate_mode,
                 gate_min_structure_score=gate_min_structure_score,
                 gate_min_combined_margin=gate_min_combined_margin,
+                gate_min_closure_score=gate_min_closure_score,
+                gate_min_novelty_score=gate_min_novelty_score,
+                gate_min_frontier_gain=gate_min_frontier_gain,
+                gate_min_path_coherence=gate_min_path_coherence,
                 non_anchor_title_dedup=non_anchor_title_dedup,
             )
             if gate_decision.get("gate_enabled", False):
@@ -4771,6 +4824,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "gate_mode": str(gate_mode or "none").strip().lower(),
         "gate_min_structure_score": round(float(gate_min_structure_score), 4),
         "gate_min_combined_margin": round(float(gate_min_combined_margin), 4),
+        "gate_min_closure_score": round(float(gate_min_closure_score), 4),
+        "gate_min_novelty_score": round(float(gate_min_novelty_score), 4),
+        "gate_min_frontier_gain": round(float(gate_min_frontier_gain), 4),
+        "gate_min_path_coherence": round(float(gate_min_path_coherence), 4),
         "gate_apply_count": int(gate_apply_count),
         "gate_skip_count": int(gate_skip_count),
         "gate_reason_counts": dict(sorted(gate_reason_counts.items())),
@@ -5306,12 +5363,20 @@ def main():
                         help="If true, avoid selecting duplicate titles after the reserved prefix unless no alternatives remain.")
     parser.add_argument("--setwise_query_entity_source", choices=["seed", "question", "hybrid"], default="seed",
                         help="Source used for query-side closure features inside the setwise selector. seed keeps the legacy behavior; question uses question-derived entities throughout; hybrid keeps seed entities for bridge proposal but uses grounded question entities for set-level state scoring.")
-    parser.add_argument("--setwise_gate_mode", choices=["none", "suffix_bridge"], default="none",
-                        help="Per-query activation gate for bridge selectors. suffix_bridge only fires when an off-prefix candidate shows stronger bridge signal than the baseline suffix.")
+    parser.add_argument("--setwise_gate_mode", choices=["none", "suffix_bridge", "suffix_bridge_precision"], default="none",
+                        help="Per-query activation gate for bridge selectors. suffix_bridge only fires when an off-prefix candidate shows stronger bridge signal than the baseline suffix; suffix_bridge_precision adds an extra new-information / closure check before activation.")
     parser.add_argument("--setwise_gate_min_structure_score", type=float, default=0.15,
                         help="Minimum structure score required for the adaptive setwise gate to activate on an off-prefix bridge candidate.")
     parser.add_argument("--setwise_gate_min_combined_margin", type=float, default=0.0,
                         help="Minimum combined-score advantage an off-prefix bridge candidate must have over the weakest baseline suffix doc before the gate activates.")
+    parser.add_argument("--setwise_gate_min_closure_score", type=float, default=0.0,
+                        help="Optional stronger bridge-gate threshold on closure_score. Used by suffix_bridge_precision.")
+    parser.add_argument("--setwise_gate_min_novelty_score", type=float, default=0.0,
+                        help="Optional stronger bridge-gate threshold on novelty_score. Used by suffix_bridge_precision.")
+    parser.add_argument("--setwise_gate_min_frontier_gain", type=float, default=0.0,
+                        help="Optional stronger bridge-gate threshold on frontier_gain_score. Used by suffix_bridge_precision.")
+    parser.add_argument("--setwise_gate_min_path_coherence", type=float, default=0.0,
+                        help="Optional stronger bridge-gate threshold on path_coherence_score. Used by suffix_bridge_precision.")
     parser.add_argument("--setwise_beam_width", type=int, default=4,
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
@@ -5776,6 +5841,10 @@ def main():
             gate_mode=str(args.setwise_gate_mode),
             gate_min_structure_score=float(args.setwise_gate_min_structure_score),
             gate_min_combined_margin=float(args.setwise_gate_min_combined_margin),
+            gate_min_closure_score=float(args.setwise_gate_min_closure_score),
+            gate_min_novelty_score=float(args.setwise_gate_min_novelty_score),
+            gate_min_frontier_gain=float(args.setwise_gate_min_frontier_gain),
+            gate_min_path_coherence=float(args.setwise_gate_min_path_coherence),
             state_weight_config=state_weight_config,
             late_rerank_enabled=bool(args.setwise_late_rerank_enabled),
             late_rerank_candidate_count=int(args.setwise_late_rerank_candidate_count),
@@ -5860,6 +5929,10 @@ def main():
             "gate_mode": str(args.setwise_gate_mode),
             "gate_min_structure_score": round(float(args.setwise_gate_min_structure_score), 4),
             "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
+            "gate_min_closure_score": round(float(args.setwise_gate_min_closure_score), 4),
+            "gate_min_novelty_score": round(float(args.setwise_gate_min_novelty_score), 4),
+            "gate_min_frontier_gain": round(float(args.setwise_gate_min_frontier_gain), 4),
+            "gate_min_path_coherence": round(float(args.setwise_gate_min_path_coherence), 4),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),
