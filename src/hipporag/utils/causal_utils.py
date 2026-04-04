@@ -10,8 +10,8 @@ from .misc_utils import CausalRelation, text_processing
 CAUSAL_RELATION_TYPES = ("causes", "enables", "prevents")
 CausalQueryType = Literal["cause", "effect", "prevention", "non_causal"]
 STRUCTURE_RELATION_TYPES = CAUSAL_RELATION_TYPES + ("state_transition",)
-STRUCTURE_RELATION_PROBE_MODES = ("off", "q6_factual")
-STRUCTURE_CONTINUITY_PROBE_MODES = ("off", "city_state_alias")
+STRUCTURE_RELATION_PROBE_MODES = ("off", "q6_factual", "general_factual")
+STRUCTURE_CONTINUITY_PROBE_MODES = ("off", "city_state_alias", "location_alias")
 STRUCTURE_SEED_TARGET_BRIDGE_MODES = ("off", "allow_seed_target")
 _US_STATE_NAMES = (
     "alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut",
@@ -180,7 +180,7 @@ def normalize_structure_seed_target_bridge_mode(mode: str | None) -> str:
 
 def resolve_structure_city_state_alias_pairs(entities: Iterable[str],
                                              continuity_probe_mode: str = "off") -> Dict[str, str]:
-    if str(continuity_probe_mode or "off").strip().lower() != "city_state_alias":
+    if str(continuity_probe_mode or "off").strip().lower() not in {"city_state_alias", "location_alias"}:
         return {}
 
     normalized_entities = {
@@ -244,7 +244,7 @@ def classify_directed_predicate(predicate: str,
         if re.search(pattern, normalized):
             return relation_type, False, confidence
 
-    if str(relation_probe_mode or "off").strip().lower() == "q6_factual":
+    if str(relation_probe_mode or "off").strip().lower() in {"q6_factual", "general_factual"}:
         factual_reverse_specs = (
             (r"\bdesigned by\b|\bdesigns\b|\bdesign(?:ed|ing)? by\b", "factual_attribution", 0.85),
             (r"\bcreated by\b|\bcreate(?:d|s|ing)? by\b", "factual_attribution", 0.85),

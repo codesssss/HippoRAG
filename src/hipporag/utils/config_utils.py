@@ -325,13 +325,13 @@ class BaseConfig:
         default=2,
         metadata={"help": "How many directed hops to expand when building structure rerank signals."}
     )
-    structure_relation_probe_mode: Literal["off", "q6_factual"] = field(
+    structure_relation_probe_mode: Literal["off", "q6_factual", "general_factual"] = field(
         default="off",
-        metadata={"help": "Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` additionally promotes a narrow factual relation family used to audit q6-style bridge coverage."}
+        metadata={"help": "Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` keeps the existing q6 audit alias; `general_factual` exposes the same factual edge family under a reusable shared-layer name for simple-selector ablations."}
     )
-    structure_continuity_probe_mode: Literal["off", "city_state_alias"] = field(
+    structure_continuity_probe_mode: Literal["off", "city_state_alias", "location_alias"] = field(
         default="off",
-        metadata={"help": "Eval-only structure-graph node continuity probe. `off` preserves the current node inventory; `city_state_alias` adds narrow city/state -> bare-city aliases for high-confidence continuity audits."}
+        metadata={"help": "Eval-only structure-graph node continuity probe. `off` preserves the current node inventory; `city_state_alias` keeps the existing q6 audit alias; `location_alias` exposes the same high-confidence city/state -> bare-city closure under a reusable shared-layer name."}
     )
     structure_seed_target_bridge_mode: Literal["off", "allow_seed_target"] = field(
         default="off",

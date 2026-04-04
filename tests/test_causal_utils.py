@@ -255,6 +255,17 @@ def test_derive_directed_structure_edge_relation_probe_is_flag_gated():
         "factual_flows_to",
         0.85,
     )
+    assert derive_directed_structure_edge(
+        "Mississippi River",
+        "drains into",
+        "Gulf of Mexico",
+        relation_probe_mode="general_factual",
+    ) == (
+        "mississippi river",
+        "gulf of mexico",
+        "factual_flows_to",
+        0.85,
+    )
 
 
 def test_prepare_structure_retrieval_objects_relation_probe_adds_q6_edges():
@@ -305,6 +316,19 @@ def test_prepare_structure_retrieval_objects_relation_probe_adds_q6_edges():
     assert ("southeast library", 0.85, "factual_attribution") in with_probe.structure_graph_out["ralph rapson"]
     assert ("minneapolis", 0.8, "factual_located_in") in with_probe.structure_graph_out["riverside plaza"]
     assert ("gulf of mexico", 0.85, "factual_flows_to") in with_probe.structure_graph_out["mississippi river"]
+
+    with_general_probe = SimpleNamespace(
+        global_config=SimpleNamespace(
+            structure_rerank_enabled=True,
+            causal_confidence_threshold=0.5,
+            structure_relation_probe_mode="general_factual",
+        ),
+        passage_node_key_to_doc_idx={"doc-0": 0, "doc-1": 1},
+    )
+    HippoRAG._prepare_structure_retrieval_objects(with_general_probe, docs)
+
+    assert with_general_probe.doc_idx_to_structure_edges[0] == with_probe.doc_idx_to_structure_edges[0]
+    assert with_general_probe.doc_idx_to_structure_edges[1] == with_probe.doc_idx_to_structure_edges[1]
 
 
 def test_prepare_structure_retrieval_objects_continuity_probe_adds_city_state_aliases():
@@ -361,6 +385,20 @@ def test_prepare_structure_retrieval_objects_continuity_probe_adds_city_state_al
     assert ("minneapolis", 0.8, "factual_located_in") in with_continuity.structure_graph_out["riverside plaza"]
     assert ("minneapolis minnesota", 1.0, "alias_city_state") in with_continuity.structure_graph_out["minneapolis"]
     assert ("minneapolis", 1.0, "alias_city_state") in with_continuity.structure_graph_out["minneapolis minnesota"]
+
+    with_location_alias = SimpleNamespace(
+        global_config=SimpleNamespace(
+            structure_rerank_enabled=True,
+            causal_confidence_threshold=0.5,
+            structure_relation_probe_mode="q6_factual",
+            structure_continuity_probe_mode="location_alias",
+        ),
+        passage_node_key_to_doc_idx={"doc-0": 0, "doc-1": 1, "doc-2": 2},
+    )
+    HippoRAG._prepare_structure_retrieval_objects(with_location_alias, docs)
+
+    assert with_location_alias.doc_idx_to_structure_entities[1] == with_continuity.doc_idx_to_structure_entities[1]
+    assert with_location_alias.structure_graph_out["riverside plaza"] == with_continuity.structure_graph_out["riverside plaza"]
 
 
 def test_derive_composed_structure_edges_builds_bridge_edge_from_fact_chain():

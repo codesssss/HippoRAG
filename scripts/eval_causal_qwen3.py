@@ -5257,10 +5257,10 @@ def main():
     parser.add_argument("--structure_rerank_max_top5_swaps", type=int, default=2)
     parser.add_argument("--structure_rerank_seed_top_k", type=int, default=4)
     parser.add_argument("--structure_rerank_max_hops", type=int, default=2)
-    parser.add_argument("--structure_relation_probe_mode", choices=["off", "q6_factual"], default="off",
-                        help="Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` adds a narrow factual relation family for q6-style bridge audits.")
-    parser.add_argument("--structure_continuity_probe_mode", choices=["off", "city_state_alias"], default="off",
-                        help="Eval-only structure node continuity probe. `city_state_alias` adds narrow city/state -> bare-city aliases for high-confidence continuity audits.")
+    parser.add_argument("--structure_relation_probe_mode", choices=["off", "q6_factual", "general_factual"], default="off",
+                        help="Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` keeps the existing q6 audit alias; `general_factual` exposes the same factual edge family under a reusable shared-layer name for simple-selector ablations.")
+    parser.add_argument("--structure_continuity_probe_mode", choices=["off", "city_state_alias", "location_alias"], default="off",
+                        help="Eval-only structure node continuity probe. `city_state_alias` keeps the existing q6 audit alias; `location_alias` exposes the same high-confidence city/state -> bare-city closure under a reusable shared-layer name.")
     parser.add_argument("--structure_seed_target_bridge_mode", choices=["off", "allow_seed_target"], default="off",
                         help="Eval-only structure scorer mode. `off` preserves legacy bridge-edge acceptance; `allow_seed_target` also accepts explicit bridge edges whose target is already in the covered seed set.")
     parser.add_argument("--structure_rerank_margin_threshold", type=float, default=0.02)
