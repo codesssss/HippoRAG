@@ -197,7 +197,10 @@ class DSPyFilter:
         self.one_output_template = """[[ ## fact_after_filter ## ]]\n{fact_after_filter}\n\n[[ ## completed ## ]]"""
         self.message_template = self.make_template(dspy_file_path)
         self.llm_infer_fn = hipporag.llm_model.infer
-        self.model_name = hipporag.global_config.llm_name
+        self.model_name = str(
+            getattr(hipporag.global_config, "llm_request_name", None)
+            or hipporag.global_config.llm_name
+        )
         self.require_non_empty = bool(getattr(hipporag.global_config, "rerank_require_non_empty", True))
         self.force_no_think = os.getenv("HIPPORAG_RERANK_FORCE_NO_THINK", "").strip().lower() in {
             "1", "true", "yes", "on"

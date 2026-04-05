@@ -5741,7 +5741,10 @@ def main():
         if bool(args.setwise_late_rerank_enabled) and setwise_selector == "bridge_beam":
             late_rerank_judge_bundle = build_setwise_late_rerank_judge_bundle(
                 args=args,
-                fallback_model_name=hipporag.global_config.llm_name,
+                fallback_model_name=(
+                    getattr(hipporag.global_config, "llm_request_name", None)
+                    or hipporag.global_config.llm_name
+                ),
                 fallback_base_url=hipporag.global_config.llm_base_url,
             )
 
