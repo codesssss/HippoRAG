@@ -154,11 +154,16 @@ class CacheOpenAI(BaseLLM):
 
     def _init_llm_config(self) -> None:
         config_dict = self.global_config.__dict__
+        request_model_name = str(
+            getattr(self.global_config, "llm_request_name", None)
+            or self.global_config.llm_name
+        )
 
         config_dict['llm_name'] = self.global_config.llm_name
+        config_dict['llm_request_name'] = getattr(self.global_config, "llm_request_name", None)
         config_dict['llm_base_url'] = self.global_config.llm_base_url
         config_dict['generate_params'] = {
-                "model": self.global_config.llm_name,
+                "model": request_model_name,
                 "max_completion_tokens": config_dict.get("max_new_tokens", 400),
                 "n": config_dict.get("num_gen_choices", 1),
                 "seed": config_dict.get("seed", 0),
@@ -197,4 +202,3 @@ class CacheOpenAI(BaseLLM):
         }
 
         return response_message, metadata
-

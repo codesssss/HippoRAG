@@ -19,6 +19,10 @@ class BaseConfig:
         default="gpt-4o-mini",
         metadata={"help": "Class name indicating which LLM model to use."}
     )
+    llm_request_name: Optional[str] = field(
+        default=None,
+        metadata={"help": "Optional API-side model name. When set, requests use this name while local artifacts continue to key off llm_name."}
+    )
     llm_base_url: str = field(
         default=None,
         metadata={"help": "Base URL for the LLM model, if none, means using OPENAI service."}

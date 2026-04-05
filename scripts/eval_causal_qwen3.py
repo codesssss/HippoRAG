@@ -5298,6 +5298,7 @@ def build_config(args, corpus_len: int) -> BaseConfig:
         save_dir=args.save_dir,
         llm_base_url=args.llm_base_url,
         llm_name=args.llm_name,
+        llm_request_name=args.llm_request_name,
         embedding_base_url=args.embedding_base_url,
         dataset=args.dataset,
         embedding_model_name=args.embedding_name,
@@ -5367,6 +5368,12 @@ def main():
     parser.add_argument("--save_dir", type=str, default="outputs")
     parser.add_argument("--llm_base_url", type=str, default="http://localhost:8039/v1")
     parser.add_argument("--llm_name", type=str, default="qwen3-8b")
+    parser.add_argument(
+        "--llm_request_name",
+        type=str,
+        default=None,
+        help="Optional API-side model name. Use this to hit a renamed service while reusing llm_name-keyed artifacts.",
+    )
     parser.add_argument("--embedding_name", type=str, default="VLLM//mnt/nvme/Qwen3-Embedding-8B")
     parser.add_argument("--embedding_base_url", type=str, default="http://localhost:8018/v1/embeddings")
     parser.add_argument("--max_retry_attempts", type=int, default=5)
@@ -5685,7 +5692,7 @@ def main():
         }
     late_rerank_judge_bundle = SetwiseLateRerankJudgeBundle(
         infer_fn=None,
-        model_name=str(args.llm_name),
+        model_name=str(args.llm_request_name or args.llm_name),
         backend="inherit",
         base_url=str(args.llm_base_url).strip() if args.llm_base_url else None,
         response_format=None,
@@ -6247,10 +6254,12 @@ def main():
         "dataset": dataset_name,
         "limit": len(samples),
         "llm_name": args.llm_name,
+        "llm_request_name": args.llm_request_name,
         "llm_base_url": args.llm_base_url,
         "embedding_name": args.embedding_name,
         "embedding_base_url": args.embedding_base_url,
         "config": {
+            "llm_request_name": config.llm_request_name,
             "causal_enabled": config.causal_enabled,
             "causal_query_only": config.causal_query_only,
             "causal_gate_mode": config.causal_gate_mode,
