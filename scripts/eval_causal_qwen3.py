@@ -1541,6 +1541,70 @@ def should_keep_set_closure_expansion(candidate: Dict[str, object],
     return False
 
 
+def compute_selector_trace_avg_local_structure(selector_trace: Dict[str, object] | None) -> Tuple[float, int]:
+    structure_values: List[float] = []
+    for step in (selector_trace or {}).get("selection_steps", []) or []:
+        if not isinstance(step, dict) or str(step.get("mode", "")) != "beam":
+            continue
+        structure_values.append(float(step.get("structure_score", 0.0) or 0.0))
+    if not structure_values:
+        return 0.0, 0
+    return float(np.mean(structure_values)), int(len(structure_values))
+
+
+def maybe_apply_bridge_saturation_guard(selected_positions: Sequence[int],
+                                        selector_trace: Dict[str, object] | None,
+                                        gate_decision: Dict[str, object] | None,
+                                        pool_doc_titles: Sequence[str] | None,
+                                        gate_max_avg_local_structure: float,
+                                        gate_min_suffix_base_mean: float) -> Tuple[List[int], Dict[str, object], Dict[str, object]]:
+    updated_positions = [int(pos) for pos in selected_positions]
+    updated_selector_trace = dict(selector_trace or {})
+    updated_gate_decision = dict(gate_decision or {})
+    normalized_gate_mode = str(updated_gate_decision.get("gate_mode", "none") or "none").strip().lower()
+
+    avg_local_structure, local_structure_doc_count = compute_selector_trace_avg_local_structure(updated_selector_trace)
+    suffix_base_mean = float(updated_selector_trace.get("beam_best_state_suffix_base_mean", 0.0) or 0.0)
+
+    updated_gate_decision["gate_max_avg_local_structure"] = round(float(gate_max_avg_local_structure), 4)
+    updated_gate_decision["gate_min_suffix_base_mean"] = round(float(gate_min_suffix_base_mean), 4)
+    updated_gate_decision["avg_local_structure"] = round(float(avg_local_structure), 4)
+    updated_gate_decision["local_structure_doc_count"] = int(local_structure_doc_count)
+    updated_gate_decision["suffix_base_mean"] = round(float(suffix_base_mean), 4)
+    updated_gate_decision["saturation_guard_enabled"] = normalized_gate_mode == "suffix_bridge_saturation_guard"
+    updated_gate_decision["saturation_guard_triggered"] = False
+
+    updated_selector_trace["avg_local_structure"] = round(float(avg_local_structure), 4)
+    updated_selector_trace["local_structure_doc_count"] = int(local_structure_doc_count)
+    updated_selector_trace["saturation_guard_suffix_base_mean"] = round(float(suffix_base_mean), 4)
+    updated_selector_trace["saturation_guard_enabled"] = normalized_gate_mode == "suffix_bridge_saturation_guard"
+    updated_selector_trace["saturation_guard_triggered"] = False
+
+    if normalized_gate_mode != "suffix_bridge_saturation_guard":
+        return updated_positions, updated_selector_trace, updated_gate_decision
+    if not bool(updated_gate_decision.get("use_selector", False)):
+        return updated_positions, updated_selector_trace, updated_gate_decision
+    if local_structure_doc_count <= 0:
+        return updated_positions, updated_selector_trace, updated_gate_decision
+
+    if float(avg_local_structure) > float(gate_max_avg_local_structure) and float(suffix_base_mean) < float(gate_min_suffix_base_mean):
+        updated_gate_decision["pre_saturation_guard_reason"] = str(updated_gate_decision.get("reason", ""))
+        updated_gate_decision["use_selector"] = False
+        updated_gate_decision["reason"] = "structure_saturated_weak_suffix"
+        updated_gate_decision["saturation_guard_triggered"] = True
+        updated_selector_trace["saturation_guard_triggered"] = True
+        updated_selector_trace["saturation_guard_reason"] = "structure_saturated_weak_suffix"
+        updated_selector_trace["saturation_guard_original_selected_positions"] = list(updated_positions)
+        updated_selector_trace["saturation_guard_original_selected_titles"] = [
+            str(pool_doc_titles[pos]).strip()
+            for pos in updated_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ]
+        return [], updated_selector_trace, updated_gate_decision
+
+    return updated_positions, updated_selector_trace, updated_gate_decision
+
+
 def collect_query_seed_entities(hipporag: HippoRAG, query: str) -> Set[str]:
     try:
         query_fact_scores = hipporag.get_fact_scores(query)
@@ -3329,6 +3393,11 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
                                  gate_min_path_coherence: float = 0.0,
                                  non_anchor_title_dedup: bool = False) -> Dict[str, object]:
     normalized_gate_mode = str(gate_mode or "none").strip().lower()
+    gate_logic_mode = (
+        "suffix_bridge"
+        if normalized_gate_mode == "suffix_bridge_saturation_guard"
+        else normalized_gate_mode
+    )
     candidate_count = len(pool_doc_ids)
     target_k = min(candidate_count, max(int(qa_top_k), 0))
     anchor_positions, reserved_positions = resolve_reserved_positions(
@@ -3346,6 +3415,7 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
 
     decision = {
         "gate_mode": normalized_gate_mode,
+        "gate_logic_mode": gate_logic_mode,
         "gate_enabled": normalized_gate_mode != "none",
         "use_selector": True,
         "reason": "disabled" if normalized_gate_mode == "none" else "apply",
@@ -3486,7 +3556,7 @@ def compute_bridge_gate_decision(pool_doc_ids: Sequence[int | None],
         decision["reason"] = "offrank_structure_below_threshold"
         return decision
 
-    if normalized_gate_mode == "suffix_bridge_precision":
+    if gate_logic_mode == "suffix_bridge_precision":
         if float(best_offrank.get("closure_score_raw", 0.0) or 0.0) < float(gate_min_closure_score):
             decision["use_selector"] = False
             decision["reason"] = "offrank_closure_below_threshold"
@@ -4106,6 +4176,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            gate_min_novelty_score: float = 0.0,
                            gate_min_frontier_gain: float = 0.0,
                            gate_min_path_coherence: float = 0.0,
+                           gate_max_avg_local_structure: float = 0.95,
+                           gate_min_suffix_base_mean: float = 0.15,
                            state_weight_config: Dict[str, float] | None = None,
                            late_rerank_enabled: bool = False,
                            late_rerank_candidate_count: int = 4,
@@ -4130,6 +4202,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
     gate_reason_counts: Counter[str] = Counter()
     gate_apply_count = 0
     gate_skip_count = 0
+    saturation_guard_apply_count = 0
+    saturation_guard_skip_count = 0
     late_rerank_apply_count = 0
     late_rerank_override_count = 0
     late_rerank_block_count = 0
@@ -4237,11 +4311,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 non_anchor_title_dedup=non_anchor_title_dedup,
             )
             if gate_decision.get("gate_enabled", False):
-                gate_reason_counts[str(gate_decision.get("reason", "unknown"))] += 1
-                if gate_decision.get("use_selector", False):
-                    gate_apply_count += 1
-                else:
-                    gate_skip_count += 1
+                if str(gate_mode or "none").strip().lower() != "suffix_bridge_saturation_guard":
+                    gate_reason_counts[str(gate_decision.get("reason", "unknown"))] += 1
+                    if gate_decision.get("use_selector", False):
+                        gate_apply_count += 1
+                    else:
+                        gate_skip_count += 1
         if selector_name == "bridge_greedy":
             if gate_decision.get("use_selector", True):
                 selected_positions, selector_trace = select_bridge_greedy_positions(
@@ -4554,7 +4629,30 @@ def apply_setwise_selector(hipporag: HippoRAG,
             requirement_runtime_reserve_counts.append(int(runtime_reserve_config["effective_reserved_count"]))
             requirement_reserve_reason_counts[str(runtime_reserve_config["policy_reason"])] += 1
 
-        heuristic_selected_positions = [int(pos) for pos in selected_positions]
+        if selector_name in {"bridge_greedy", "bridge_beam"}:
+            guard_original_use_selector = bool(gate_decision.get("use_selector", False))
+            heuristic_selected_positions, selector_trace, gate_decision = maybe_apply_bridge_saturation_guard(
+                selected_positions=selected_positions,
+                selector_trace=selector_trace,
+                gate_decision=gate_decision,
+                pool_doc_titles=pool_titles,
+                gate_max_avg_local_structure=gate_max_avg_local_structure,
+                gate_min_suffix_base_mean=gate_min_suffix_base_mean,
+            )
+            if bool(gate_decision.get("saturation_guard_triggered", False)):
+                saturation_guard_skip_count += 1
+            elif str(gate_mode or "none").strip().lower() == "suffix_bridge_saturation_guard" and guard_original_use_selector:
+                saturation_guard_apply_count += 1
+
+            if gate_decision.get("gate_enabled", False) and str(gate_mode or "none").strip().lower() == "suffix_bridge_saturation_guard":
+                gate_reason_counts[str(gate_decision.get("reason", "unknown"))] += 1
+                if gate_decision.get("use_selector", False):
+                    gate_apply_count += 1
+                else:
+                    gate_skip_count += 1
+        else:
+            heuristic_selected_positions = [int(pos) for pos in selected_positions]
+
         final_front_positions = materialize_reader_top_positions(
             selected_positions=heuristic_selected_positions,
             pool_limit=pool_limit,
@@ -4828,9 +4926,13 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "gate_min_novelty_score": round(float(gate_min_novelty_score), 4),
         "gate_min_frontier_gain": round(float(gate_min_frontier_gain), 4),
         "gate_min_path_coherence": round(float(gate_min_path_coherence), 4),
+        "gate_max_avg_local_structure": round(float(gate_max_avg_local_structure), 4),
+        "gate_min_suffix_base_mean": round(float(gate_min_suffix_base_mean), 4),
         "gate_apply_count": int(gate_apply_count),
         "gate_skip_count": int(gate_skip_count),
         "gate_reason_counts": dict(sorted(gate_reason_counts.items())),
+        "saturation_guard_apply_count": int(saturation_guard_apply_count),
+        "saturation_guard_skip_count": int(saturation_guard_skip_count),
         "late_rerank_enabled": bool(late_rerank_enabled),
         "late_rerank_apply_count": int(late_rerank_apply_count),
         "late_rerank_override_count": int(late_rerank_override_count),
@@ -5363,8 +5465,8 @@ def main():
                         help="If true, avoid selecting duplicate titles after the reserved prefix unless no alternatives remain.")
     parser.add_argument("--setwise_query_entity_source", choices=["seed", "question", "hybrid"], default="seed",
                         help="Source used for query-side closure features inside the setwise selector. seed keeps the legacy behavior; question uses question-derived entities throughout; hybrid keeps seed entities for bridge proposal but uses grounded question entities for set-level state scoring.")
-    parser.add_argument("--setwise_gate_mode", choices=["none", "suffix_bridge", "suffix_bridge_precision"], default="none",
-                        help="Per-query activation gate for bridge selectors. suffix_bridge only fires when an off-prefix candidate shows stronger bridge signal than the baseline suffix; suffix_bridge_precision adds an extra new-information / closure check before activation.")
+    parser.add_argument("--setwise_gate_mode", choices=["none", "suffix_bridge", "suffix_bridge_precision", "suffix_bridge_saturation_guard"], default="none",
+                        help="Per-query activation gate for bridge selectors. suffix_bridge only fires when an off-prefix candidate shows stronger bridge signal than the baseline suffix; suffix_bridge_precision adds an extra new-information / closure check before activation; suffix_bridge_saturation_guard keeps suffix_bridge activation but can revert saturated high-structure, weak-suffix states after beam selection.")
     parser.add_argument("--setwise_gate_min_structure_score", type=float, default=0.15,
                         help="Minimum structure score required for the adaptive setwise gate to activate on an off-prefix bridge candidate.")
     parser.add_argument("--setwise_gate_min_combined_margin", type=float, default=0.0,
@@ -5377,6 +5479,10 @@ def main():
                         help="Optional stronger bridge-gate threshold on frontier_gain_score. Used by suffix_bridge_precision.")
     parser.add_argument("--setwise_gate_min_path_coherence", type=float, default=0.0,
                         help="Optional stronger bridge-gate threshold on path_coherence_score. Used by suffix_bridge_precision.")
+    parser.add_argument("--setwise_gate_max_avg_local_structure", type=float, default=0.95,
+                        help="Eval-only saturation-guard threshold on the average local structure score across selected beam bridge docs. Used by suffix_bridge_saturation_guard.")
+    parser.add_argument("--setwise_gate_min_suffix_base_mean", type=float, default=0.15,
+                        help="Eval-only saturation-guard threshold on the final state's suffix_base_mean. Used by suffix_bridge_saturation_guard.")
     parser.add_argument("--setwise_beam_width", type=int, default=4,
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
@@ -5845,6 +5951,8 @@ def main():
             gate_min_novelty_score=float(args.setwise_gate_min_novelty_score),
             gate_min_frontier_gain=float(args.setwise_gate_min_frontier_gain),
             gate_min_path_coherence=float(args.setwise_gate_min_path_coherence),
+            gate_max_avg_local_structure=float(args.setwise_gate_max_avg_local_structure),
+            gate_min_suffix_base_mean=float(args.setwise_gate_min_suffix_base_mean),
             state_weight_config=state_weight_config,
             late_rerank_enabled=bool(args.setwise_late_rerank_enabled),
             late_rerank_candidate_count=int(args.setwise_late_rerank_candidate_count),
@@ -5933,6 +6041,8 @@ def main():
             "gate_min_novelty_score": round(float(args.setwise_gate_min_novelty_score), 4),
             "gate_min_frontier_gain": round(float(args.setwise_gate_min_frontier_gain), 4),
             "gate_min_path_coherence": round(float(args.setwise_gate_min_path_coherence), 4),
+            "gate_max_avg_local_structure": round(float(args.setwise_gate_max_avg_local_structure), 4),
+            "gate_min_suffix_base_mean": round(float(args.setwise_gate_min_suffix_base_mean), 4),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),

@@ -24,6 +24,7 @@ from eval_causal_qwen3 import (
     collect_question_query_entities,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
+    maybe_apply_bridge_saturation_guard,
     compute_state_path_connectivity_metrics,
     materialize_reader_top_positions,
     normalize_setwise_late_rerank_policy,
@@ -1575,6 +1576,63 @@ def test_compute_bridge_gate_decision_precision_mode_skips_without_enough_newinf
     assert decision["reason"] == "offrank_novelty_below_threshold"
     assert decision["best_offrank_pool_position"] == 5
     assert decision["weakest_baseline_suffix_pool_position"] == 4
+
+
+def test_maybe_apply_bridge_saturation_guard_reverts_saturated_weak_suffix_state():
+    selected_positions, selector_trace, gate_decision = maybe_apply_bridge_saturation_guard(
+        selected_positions=[0, 1, 2, 26, 57],
+        selector_trace={
+            "selection_steps": [
+                {"step": 4, "mode": "beam", "pool_position": 26, "structure_score": 0.96},
+                {"step": 5, "mode": "beam", "pool_position": 57, "structure_score": 1.0},
+            ],
+            "beam_best_state_suffix_base_mean": 0.12,
+        },
+        gate_decision={
+            "gate_mode": "suffix_bridge_saturation_guard",
+            "gate_enabled": True,
+            "use_selector": True,
+            "reason": "offrank_bridge_signal_detected",
+        },
+        pool_doc_titles=["A", "B", "C", "D", "E"] * 20,
+        gate_max_avg_local_structure=0.95,
+        gate_min_suffix_base_mean=0.15,
+    )
+
+    assert selected_positions == []
+    assert selector_trace["saturation_guard_triggered"] is True
+    assert gate_decision["use_selector"] is False
+    assert gate_decision["reason"] == "structure_saturated_weak_suffix"
+    assert gate_decision["avg_local_structure"] == 0.98
+    assert gate_decision["suffix_base_mean"] == 0.12
+
+
+def test_maybe_apply_bridge_saturation_guard_keeps_high_structure_when_suffix_not_weak():
+    selected_positions, selector_trace, gate_decision = maybe_apply_bridge_saturation_guard(
+        selected_positions=[0, 1, 2, 12, 4],
+        selector_trace={
+            "selection_steps": [
+                {"step": 4, "mode": "beam", "pool_position": 12, "structure_score": 1.0},
+                {"step": 5, "mode": "beam", "pool_position": 4, "structure_score": 0.8961},
+            ],
+            "beam_best_state_suffix_base_mean": 0.4142,
+        },
+        gate_decision={
+            "gate_mode": "suffix_bridge_saturation_guard",
+            "gate_enabled": True,
+            "use_selector": True,
+            "reason": "offrank_bridge_signal_detected",
+        },
+        pool_doc_titles=["A", "B", "C", "D", "E"] * 20,
+        gate_max_avg_local_structure=0.95,
+        gate_min_suffix_base_mean=0.15,
+    )
+
+    assert selected_positions == [0, 1, 2, 12, 4]
+    assert selector_trace["saturation_guard_triggered"] is False
+    assert gate_decision["use_selector"] is True
+    assert gate_decision["reason"] == "offrank_bridge_signal_detected"
+    assert gate_decision["avg_local_structure"] == 0.9481
 
 
 def test_collect_lexical_query_seed_entities_matches_query_entity_strings():
