@@ -10,7 +10,7 @@ from .misc_utils import CausalRelation, text_processing
 CAUSAL_RELATION_TYPES = ("causes", "enables", "prevents")
 CausalQueryType = Literal["cause", "effect", "prevention", "non_causal"]
 STRUCTURE_RELATION_TYPES = CAUSAL_RELATION_TYPES + ("state_transition",)
-STRUCTURE_RELATION_PROBE_MODES = ("off", "q6_factual", "general_factual")
+STRUCTURE_RELATION_PROBE_MODES = ("off", "q6_factual", "general_factual", "general_factual_v2")
 STRUCTURE_CONTINUITY_PROBE_MODES = ("off", "city_state_alias", "location_alias")
 STRUCTURE_SEED_TARGET_BRIDGE_MODES = ("off", "allow_seed_target")
 _US_STATE_NAMES = (
@@ -244,7 +244,8 @@ def classify_directed_predicate(predicate: str,
         if re.search(pattern, normalized):
             return relation_type, False, confidence
 
-    if str(relation_probe_mode or "off").strip().lower() in {"q6_factual", "general_factual"}:
+    normalized_probe_mode = str(relation_probe_mode or "off").strip().lower()
+    if normalized_probe_mode in {"q6_factual", "general_factual", "general_factual_v2"}:
         factual_reverse_specs = (
             (r"\bdesigned by\b|\bdesigns\b|\bdesign(?:ed|ing)? by\b", "factual_attribution", 0.85),
             (r"\bcreated by\b|\bcreate(?:d|s|ing)? by\b", "factual_attribution", 0.85),
@@ -260,6 +261,15 @@ def classify_directed_predicate(predicate: str,
             if re.search(pattern, normalized):
                 return relation_type, True, confidence
         for pattern, relation_type, confidence in factual_forward_specs:
+            if re.search(pattern, normalized):
+                return relation_type, False, confidence
+
+    if normalized_probe_mode == "general_factual_v2":
+        factual_v2_forward_specs = (
+            (r"\bis part of\b|\bpart of\b|\bis located in\b|\blocated in\b|\bneighborhood of\b|\bdistrict of\b|\bregion of\b|\bcapital of\b|\bis the entry for\b", "factual_part_of_or_contains", 0.8),
+            (r"\bis also known as\b|\bis officially called\b|\bwas referred to as\b|\bis called\b", "factual_alias_or_name", 0.78),
+        )
+        for pattern, relation_type, confidence in factual_v2_forward_specs:
             if re.search(pattern, normalized):
                 return relation_type, False, confidence
     return None

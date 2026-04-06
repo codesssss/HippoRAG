@@ -329,9 +329,9 @@ class BaseConfig:
         default=2,
         metadata={"help": "How many directed hops to expand when building structure rerank signals."}
     )
-    structure_relation_probe_mode: Literal["off", "q6_factual", "general_factual"] = field(
+    structure_relation_probe_mode: Literal["off", "q6_factual", "general_factual", "general_factual_v2"] = field(
         default="off",
-        metadata={"help": "Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` keeps the existing q6 audit alias; `general_factual` exposes the same factual edge family under a reusable shared-layer name for simple-selector ablations."}
+        metadata={"help": "Eval-only structure-graph predicate coverage probe. `off` preserves the current directed predicate vocabulary; `q6_factual` keeps the existing q6 audit alias; `general_factual` exposes the original shared factual edge family; `general_factual_v2` adds a minimal, default-off coverage patch for high-frequency containment/reference predicates found by MuSiQue coverage audits."}
     )
     structure_continuity_probe_mode: Literal["off", "city_state_alias", "location_alias"] = field(
         default="off",
