@@ -653,6 +653,126 @@ def materialize_reader_top_positions(selected_positions: Sequence[int],
     return normalized_positions[:effective_top_k]
 
 
+SETWISE_READER_ORDER_PROBE_MODES = {
+    "none",
+    "promote_best_bridge_to_slot2",
+    "promote_best_bridge_to_slot3",
+}
+
+
+def normalize_setwise_reader_order_probe_mode(mode: str | None) -> str:
+    normalized = str(mode or "none").strip().lower()
+    if normalized not in SETWISE_READER_ORDER_PROBE_MODES:
+        raise ValueError(f"Unsupported setwise reader order probe mode: {mode}")
+    return normalized
+
+
+def maybe_apply_setwise_reader_order_probe(final_front_positions: Sequence[int],
+                                           selector_trace: Dict[str, object] | None,
+                                           pool_doc_ids: Sequence[int | None],
+                                           pool_doc_titles: Sequence[str] | None,
+                                           probe_mode: str = "none") -> Tuple[List[int], Dict[str, object]]:
+    normalized_mode = normalize_setwise_reader_order_probe_mode(probe_mode)
+    target_rank = 2 if normalized_mode == "promote_best_bridge_to_slot2" else 3
+    front_positions = [int(pos) for pos in final_front_positions]
+    original_titles = [
+        str(pool_doc_titles[pos]).strip()
+        for pos in front_positions
+        if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+    ]
+    probe_trace: Dict[str, object] = {
+        "enabled": normalized_mode != "none",
+        "mode": normalized_mode,
+        "applied": False,
+        "skip_reason": "disabled" if normalized_mode == "none" else "",
+        "target_rank": int(target_rank),
+        "promoted_pool_position": None,
+        "promoted_doc_id": None,
+        "promoted_title": "",
+        "promoted_from_rank": None,
+        "original_front_pool_positions": list(front_positions),
+        "original_front_titles": list(original_titles),
+        "probed_front_pool_positions": list(front_positions),
+        "probed_front_titles": list(original_titles),
+    }
+    if normalized_mode == "none":
+        return list(front_positions), probe_trace
+
+    if len(front_positions) < int(target_rank):
+        probe_trace["skip_reason"] = "front_too_short"
+        return list(front_positions), probe_trace
+
+    front_rank_by_position = {
+        int(pos): idx + 1
+        for idx, pos in enumerate(front_positions)
+    }
+    bridge_candidates: List[Dict[str, object]] = []
+    for step in list((selector_trace or {}).get("selection_steps", []) or []):
+        if not isinstance(step, dict):
+            continue
+        step_mode = str(step.get("mode", "") or "").strip().lower()
+        if step_mode not in {"beam", "greedy"}:
+            continue
+        pool_position = int(step.get("pool_position", -1) or -1)
+        if pool_position not in front_rank_by_position:
+            continue
+        bridge_candidates.append({
+            "pool_position": pool_position,
+            "doc_id": step.get("doc_id"),
+            "title": (
+                str(pool_doc_titles[pool_position]).strip()
+                if pool_doc_titles is not None and 0 <= pool_position < len(pool_doc_titles)
+                else ""
+            ),
+            "current_rank": int(front_rank_by_position[pool_position]),
+            "structure_score": float(step.get("structure_score", 0.0) or 0.0),
+            "closure_score": float(step.get("closure_score", 0.0) or 0.0),
+            "novelty_score": float(step.get("novelty_score", 0.0) or 0.0),
+        })
+
+    if not bridge_candidates:
+        probe_trace["skip_reason"] = "no_bridge_doc_in_final_front"
+        return list(front_positions), probe_trace
+
+    bridge_candidates.sort(
+        key=lambda item: (
+            -float(item["structure_score"]),
+            -float(item["closure_score"]),
+            -float(item["novelty_score"]),
+            int(item["pool_position"]),
+        )
+    )
+    best_bridge = bridge_candidates[0]
+    probe_trace["promoted_pool_position"] = int(best_bridge["pool_position"])
+    probe_trace["promoted_doc_id"] = (
+        int(best_bridge["doc_id"]) if best_bridge.get("doc_id") is not None else None
+    )
+    probe_trace["promoted_title"] = str(best_bridge.get("title", "") or "")
+    probe_trace["promoted_from_rank"] = int(best_bridge["current_rank"])
+
+    if int(best_bridge["current_rank"]) <= int(target_rank):
+        probe_trace["skip_reason"] = "bridge_already_in_prefix"
+        return list(front_positions), probe_trace
+
+    promoted_position = int(best_bridge["pool_position"])
+    reordered_front_positions = [pos for pos in front_positions if pos != promoted_position]
+    insert_index = max(0, min(int(target_rank) - 1, len(reordered_front_positions)))
+    reordered_front_positions.insert(insert_index, promoted_position)
+    if reordered_front_positions == front_positions:
+        probe_trace["skip_reason"] = "order_unchanged"
+        return list(front_positions), probe_trace
+
+    probe_trace["applied"] = True
+    probe_trace["skip_reason"] = ""
+    probe_trace["probed_front_pool_positions"] = list(reordered_front_positions)
+    probe_trace["probed_front_titles"] = [
+        str(pool_doc_titles[pos]).strip()
+        for pos in reordered_front_positions
+        if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+    ]
+    return reordered_front_positions, probe_trace
+
+
 def truncate_prompt_text(value: str | None, max_chars: int) -> str:
     cleaned = " ".join(str(value or "").split())
     if max_chars > 0 and len(cleaned) > max_chars:
@@ -4178,6 +4298,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            gate_min_path_coherence: float = 0.0,
                            gate_max_avg_local_structure: float = 0.95,
                            gate_min_suffix_base_mean: float = 0.15,
+                           setwise_reader_order_probe_mode: str = "none",
                            state_weight_config: Dict[str, float] | None = None,
                            late_rerank_enabled: bool = False,
                            late_rerank_candidate_count: int = 4,
@@ -4209,6 +4330,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
     late_rerank_block_count = 0
     late_rerank_parse_failure_count = 0
     late_rerank_error_count = 0
+    reader_order_probe_apply_count = 0
+    reader_order_probe_skip_count = 0
+    reader_order_probe_reason_counts: Counter[str] = Counter()
     beam_projection_eval_count = 0
     beam_projection_extra_eval_count = 0
     beam_projection_rescue_count = 0
@@ -4228,6 +4352,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
     requirement_probe_force_pool_gold_applied_query_count = 0
     requirement_probe_force_pool_gold_applied_title_count = 0
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
+    normalized_reader_order_probe_mode = normalize_setwise_reader_order_probe_mode(
+        setwise_reader_order_probe_mode
+    )
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
 
@@ -4797,6 +4924,38 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["forced_probe_final_titles_applied"] = list(forced_probe_final_titles_applied)
             selector_trace["forced_pool_gold_final_titles_applied"] = list(forced_pool_gold_final_titles_applied)
 
+        reader_order_probe_trace: Dict[str, object] = {
+            "enabled": False,
+            "mode": normalized_reader_order_probe_mode,
+            "applied": False,
+            "skip_reason": "disabled" if normalized_reader_order_probe_mode == "none" else "selector_not_bridge_beam",
+            "target_rank": 2 if normalized_reader_order_probe_mode == "promote_best_bridge_to_slot2" else 3,
+            "promoted_pool_position": None,
+            "promoted_doc_id": None,
+            "promoted_title": "",
+            "promoted_from_rank": None,
+            "original_front_pool_positions": list(final_front_positions),
+            "original_front_titles": [pool_titles[pos] for pos in final_front_positions],
+            "probed_front_pool_positions": list(final_front_positions),
+            "probed_front_titles": [pool_titles[pos] for pos in final_front_positions],
+        }
+        if selector_name == "bridge_beam":
+            final_front_positions, reader_order_probe_trace = maybe_apply_setwise_reader_order_probe(
+                final_front_positions=final_front_positions,
+                selector_trace=selector_trace,
+                pool_doc_ids=pool_doc_ids,
+                pool_doc_titles=pool_titles,
+                probe_mode=normalized_reader_order_probe_mode,
+            )
+            if bool(reader_order_probe_trace.get("enabled", False)):
+                if bool(reader_order_probe_trace.get("applied", False)):
+                    reader_order_probe_apply_count += 1
+                else:
+                    reader_order_probe_skip_count += 1
+                reader_order_probe_reason_counts[
+                    str(reader_order_probe_trace.get("skip_reason", "") or "applied")
+                ] += 1
+
         selected_position_set = set(final_front_positions)
         reordered_pool_positions = final_front_positions + [
             pos for pos in range(pool_limit)
@@ -4839,6 +4998,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 for pos in final_front_positions
             ],
             "final_front_titles": [pool_titles[pos] for pos in final_front_positions],
+            "reader_order_probe": reader_order_probe_trace,
             "late_rerank_trace": late_rerank_trace,
             **selector_trace,
         }
@@ -4928,6 +5088,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "gate_min_path_coherence": round(float(gate_min_path_coherence), 4),
         "gate_max_avg_local_structure": round(float(gate_max_avg_local_structure), 4),
         "gate_min_suffix_base_mean": round(float(gate_min_suffix_base_mean), 4),
+        "reader_order_probe_mode": normalized_reader_order_probe_mode,
+        "reader_order_probe_apply_count": int(reader_order_probe_apply_count),
+        "reader_order_probe_skip_count": int(reader_order_probe_skip_count),
+        "reader_order_probe_reason_counts": dict(sorted(reader_order_probe_reason_counts.items())),
         "gate_apply_count": int(gate_apply_count),
         "gate_skip_count": int(gate_skip_count),
         "gate_reason_counts": dict(sorted(gate_reason_counts.items())),
@@ -5490,6 +5654,10 @@ def main():
                         help="Eval-only saturation-guard threshold on the average local structure score across selected beam bridge docs. Used by suffix_bridge_saturation_guard.")
     parser.add_argument("--setwise_gate_min_suffix_base_mean", type=float, default=0.15,
                         help="Eval-only saturation-guard threshold on the final state's suffix_base_mean. Used by suffix_bridge_saturation_guard.")
+    parser.add_argument("--setwise_reader_order_probe_mode",
+                        choices=sorted(SETWISE_READER_ORDER_PROBE_MODES),
+                        default="none",
+                        help="Eval-only reader-side causal probe. Reorders the final reader top-k without changing the selected evidence set.")
     parser.add_argument("--setwise_beam_width", type=int, default=4,
                         help="Beam width used when --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_expand_per_state", type=int, default=4,
@@ -5963,6 +6131,7 @@ def main():
             gate_min_path_coherence=float(args.setwise_gate_min_path_coherence),
             gate_max_avg_local_structure=float(args.setwise_gate_max_avg_local_structure),
             gate_min_suffix_base_mean=float(args.setwise_gate_min_suffix_base_mean),
+            setwise_reader_order_probe_mode=str(args.setwise_reader_order_probe_mode),
             state_weight_config=state_weight_config,
             late_rerank_enabled=bool(args.setwise_late_rerank_enabled),
             late_rerank_candidate_count=int(args.setwise_late_rerank_candidate_count),
@@ -6053,6 +6222,7 @@ def main():
             "gate_min_path_coherence": round(float(args.setwise_gate_min_path_coherence), 4),
             "gate_max_avg_local_structure": round(float(args.setwise_gate_max_avg_local_structure), 4),
             "gate_min_suffix_base_mean": round(float(args.setwise_gate_min_suffix_base_mean), 4),
+            "reader_order_probe_mode": str(args.setwise_reader_order_probe_mode),
             "beam_width": int(args.setwise_beam_width),
             "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),
@@ -6307,6 +6477,7 @@ def main():
             "setwise_late_rerank_judge_model": late_rerank_judge_bundle.model_name,
             "setwise_late_rerank_judge_base_url": late_rerank_judge_bundle.base_url,
             "setwise_late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
+            "setwise_reader_order_probe_mode": str(args.setwise_reader_order_probe_mode),
             "setwise_model_path": args.setwise_model_path or None,
             "setwise_requirement_reserve_policy": str(args.setwise_requirement_reserve_policy),
             "setwise_requirement_live_annotation_pool_k": int(args.setwise_requirement_live_annotation_pool_k),

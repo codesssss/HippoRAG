@@ -25,6 +25,7 @@ from eval_causal_qwen3 import (
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
     maybe_apply_bridge_saturation_guard,
+    maybe_apply_setwise_reader_order_probe,
     compute_state_path_connectivity_metrics,
     materialize_reader_top_positions,
     normalize_setwise_late_rerank_policy,
@@ -287,6 +288,89 @@ def test_materialize_reader_top_positions_can_force_prefix_positions():
     )
 
     assert top_positions == [5, 1, 3, 0, 2]
+
+
+def test_maybe_apply_setwise_reader_order_probe_promotes_best_bridge_to_slot3():
+    reordered, trace = maybe_apply_setwise_reader_order_probe(
+        final_front_positions=[0, 1, 2, 4, 5],
+        selector_trace={
+            "selection_steps": [
+                {"mode": "anchor", "pool_position": 0, "doc_id": 10},
+                {"mode": "anchor", "pool_position": 1, "doc_id": 11},
+                {"mode": "reserve", "pool_position": 2, "doc_id": 12},
+                {"mode": "beam", "pool_position": 4, "doc_id": 14, "structure_score": 0.85, "closure_score": 0.40, "novelty_score": 0.30},
+                {"mode": "beam", "pool_position": 5, "doc_id": 15, "structure_score": 0.95, "closure_score": 0.60, "novelty_score": 0.50},
+            ],
+        },
+        pool_doc_ids=[10, 11, 12, 13, 14, 15],
+        pool_doc_titles=["A", "B", "C", "Noise", "Bridge 1", "Bridge 2"],
+        probe_mode="promote_best_bridge_to_slot3",
+    )
+
+    assert reordered == [0, 1, 5, 2, 4]
+    assert set(reordered) == {0, 1, 2, 4, 5}
+    assert trace["applied"] is True
+    assert trace["promoted_pool_position"] == 5
+    assert trace["promoted_from_rank"] == 5
+    assert trace["original_front_titles"] == ["A", "B", "C", "Bridge 1", "Bridge 2"]
+    assert trace["probed_front_titles"] == ["A", "B", "Bridge 2", "C", "Bridge 1"]
+
+
+def test_maybe_apply_setwise_reader_order_probe_promotes_best_bridge_to_slot2():
+    reordered, trace = maybe_apply_setwise_reader_order_probe(
+        final_front_positions=[0, 1, 2, 4, 5],
+        selector_trace={
+            "selection_steps": [
+                {"mode": "beam", "pool_position": 4, "doc_id": 14, "structure_score": 0.92, "closure_score": 0.55, "novelty_score": 0.45},
+            ],
+        },
+        pool_doc_ids=[10, 11, 12, 13, 14, 15],
+        pool_doc_titles=["A", "B", "C", "Noise", "Bridge 1", "Bridge 2"],
+        probe_mode="promote_best_bridge_to_slot2",
+    )
+
+    assert reordered == [0, 4, 1, 2, 5]
+    assert set(reordered) == {0, 1, 2, 4, 5}
+    assert trace["applied"] is True
+    assert trace["promoted_pool_position"] == 4
+    assert trace["promoted_from_rank"] == 4
+
+
+def test_maybe_apply_setwise_reader_order_probe_is_noop_without_bridge_doc():
+    reordered, trace = maybe_apply_setwise_reader_order_probe(
+        final_front_positions=[0, 1, 2, 3, 4],
+        selector_trace={
+            "selection_steps": [
+                {"mode": "anchor", "pool_position": 0, "doc_id": 10},
+                {"mode": "reserve", "pool_position": 2, "doc_id": 12},
+            ],
+        },
+        pool_doc_ids=[10, 11, 12, 13, 14],
+        pool_doc_titles=["A", "B", "C", "D", "E"],
+        probe_mode="promote_best_bridge_to_slot3",
+    )
+
+    assert reordered == [0, 1, 2, 3, 4]
+    assert trace["applied"] is False
+    assert trace["skip_reason"] == "no_bridge_doc_in_final_front"
+
+
+def test_maybe_apply_setwise_reader_order_probe_is_noop_when_bridge_already_in_prefix():
+    reordered, trace = maybe_apply_setwise_reader_order_probe(
+        final_front_positions=[0, 4, 1, 2, 3],
+        selector_trace={
+            "selection_steps": [
+                {"mode": "beam", "pool_position": 4, "doc_id": 14, "structure_score": 0.92, "closure_score": 0.55, "novelty_score": 0.45},
+            ],
+        },
+        pool_doc_ids=[10, 11, 12, 13, 14],
+        pool_doc_titles=["A", "B", "C", "D", "Bridge 1"],
+        probe_mode="promote_best_bridge_to_slot2",
+    )
+
+    assert reordered == [0, 4, 1, 2, 3]
+    assert trace["applied"] is False
+    assert trace["skip_reason"] == "bridge_already_in_prefix"
 
 
 def test_parse_setwise_late_rerank_response_accepts_best_id_schema():
