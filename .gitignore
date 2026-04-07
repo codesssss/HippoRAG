@@ -26,3 +26,13 @@ clear_outputs_and_logs.sh
 .venv-hipporag/
 nohup.out
 src/hipporag.egg-info/
+.codex
+
+# Local experiment artifacts
+outputs_step0_general_*/
+outputs_step0_general*/
+outputs_step0_general*
+run_logs/*.status
+run_logs/*.pid
+run_logs/*.screenlog
+research_memory/**/*.status
