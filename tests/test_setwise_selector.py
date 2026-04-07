@@ -1,19 +1,57 @@
 import os
 from pathlib import Path
 import sys
+import types
 
 import numpy as np
 import pytest
 
 
 SCRIPT_DIR = Path(__file__).resolve().parents[1] / "scripts"
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
+
+if "litellm" not in sys.modules:
+    litellm_stub = types.ModuleType("litellm")
+    litellm_stub.completion = lambda **kwargs: None
+    sys.modules["litellm"] = litellm_stub
+if "gritlm" not in sys.modules:
+    gritlm_stub = types.ModuleType("gritlm")
+    gritlm_stub.GritLM = object
+    sys.modules["gritlm"] = gritlm_stub
+if "sentence_transformers" not in sys.modules:
+    sentence_transformers_stub = types.ModuleType("sentence_transformers")
+    sentence_transformers_stub.SentenceTransformer = object
+    sys.modules["sentence_transformers"] = sentence_transformers_stub
+if "igraph" not in sys.modules:
+    igraph_stub = types.ModuleType("igraph")
+    igraph_stub.Graph = object
+    sys.modules["igraph"] = igraph_stub
+if "vllm" not in sys.modules:
+    vllm_stub = types.ModuleType("vllm")
+    vllm_stub.SamplingParams = object
+    vllm_stub.LLM = object
+    sys.modules["vllm"] = vllm_stub
+if "outlines" not in sys.modules:
+    outlines_stub = types.ModuleType("outlines")
+    outlines_generate_stub = types.ModuleType("outlines.generate")
+    outlines_generate_stub.json = lambda *args, **kwargs: (lambda prompts, **inner_kwargs: [])
+    outlines_models_stub = types.ModuleType("outlines.models")
+    outlines_models_stub.Transformers = object
+    sys.modules["outlines"] = outlines_stub
+    sys.modules["outlines.generate"] = outlines_generate_stub
+    sys.modules["outlines.models"] = outlines_models_stub
+
+import eval_causal_qwen3 as eval_causal_qwen3_module
 
 from eval_causal_qwen3 import (
     LEARNED_SETWISE_FEATURE_NAMES,
     OpenAICompatibleLateRerankJudge,
     SetwiseLateRerankResponseModel,
+    build_expand_assemble_query_traces,
     build_requirement_title_exposure_summary,
     build_setwise_late_rerank_candidates,
     build_setwise_selector_query_traces,
@@ -35,7 +73,9 @@ from eval_causal_qwen3 import (
     resolve_reserved_positions,
     resolve_query_pool_gold_titles,
     resolve_setwise_query_targets,
+    rerank_candidate_positions_for_assemble,
     score_evidence_state,
+    select_bridge_append_positions,
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
     select_learned_greedy_positions,
@@ -141,6 +181,16 @@ class DummyLateRerankModel:
         self.calls.append(kwargs)
         response_text = self.responses[min(len(self.calls) - 1, len(self.responses) - 1)]
         return response_text, {"finish_reason": "stop", "prompt_tokens": 1, "completion_tokens": 1}
+
+
+class DummyCrossEncoder:
+    def __init__(self, scores):
+        self.scores = list(scores)
+        self.calls = []
+
+    def compute_score(self, pairs):
+        self.calls.append(list(pairs))
+        return list(self.scores[:len(pairs)])
 
 
 class DummyParsedResponse:
@@ -267,6 +317,15 @@ class DummyCausalV2Engine:
 class DummyHippoRAGForQueryEntities:
     def __init__(self, entities=None):
         self.causal_v2_engine = DummyCausalV2Engine(entities=entities)
+
+
+class DummyHippoRAGForAssemble:
+    def __init__(self, query_embeddings=None, passage_embeddings=None):
+        self.query_to_embedding = {"passage": dict(query_embeddings or {})}
+        self.passage_embeddings = np.asarray(passage_embeddings if passage_embeddings is not None else np.zeros((0, 0)), dtype=float)
+
+    def _get_passage_query_embeddings(self, queries):
+        return None
 
 
 def test_materialize_reader_top_positions_preserves_selected_prefix_and_fills_tail():
@@ -4344,6 +4403,272 @@ def test_build_setwise_selector_query_traces_surfaces_requirement_exposure_summa
     assert query_traces[0]["gold_titles"] == ["Beta"]
     assert query_traces[0]["requirement_title_exposure_summary"][0]["title"] == "Beta"
     assert query_traces[0]["requirement_title_exposure_summary"][0]["stage"] == "selected"
+
+
+def test_select_bridge_append_positions_stops_below_threshold(monkeypatch):
+    def fake_score_bridge_candidates(**kwargs):
+        return [
+            {
+                "pool_position": 2,
+                "doc_id": 12,
+                "doc_title": "Weak Bridge",
+                "doc_entities": {"gamma"},
+                "structure_score": 0.20,
+                "closure_score": 0.15,
+                "novelty_score": 0.40,
+                "combined_score": 0.25,
+            },
+        ]
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12],
+        normalized_base_scores=np.asarray([1.0, 0.8, 0.2], dtype=float),
+        pool_doc_titles=["Anchor", "Incumbent", "Weak Bridge"],
+        doc_idx_to_entities={10: {"alpha"}, 11: {"beta"}, 12: {"gamma"}},
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"alpha"},
+        query_entities={"alpha"},
+        pool_limit=3,
+        expand_base_k=2,
+        append_max_docs=2,
+        expand_min_structure_score=0.35,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+
+    assert selected_positions == [0, 1]
+    assert trace["append_count"] == 0
+    assert trace["append_stop_reason"] == "structure_below_threshold"
+    assert trace["candidate_set_positions"] == [0, 1]
+
+
+def test_select_bridge_append_positions_skips_duplicate_titles_and_caps(monkeypatch):
+    def fake_score_bridge_candidates(**kwargs):
+        remaining_positions = list(kwargs["remaining_positions"])
+        rows = []
+        for pos in remaining_positions:
+            if pos == 2:
+                rows.append({
+                    "pool_position": 2,
+                    "doc_id": 12,
+                    "doc_title": "Incumbent",
+                    "doc_entities": {"gamma"},
+                    "structure_score": 0.95,
+                    "closure_score": 0.90,
+                    "novelty_score": 0.40,
+                    "combined_score": 0.70,
+                })
+            elif pos == 3:
+                rows.append({
+                    "pool_position": 3,
+                    "doc_id": 13,
+                    "doc_title": "Bridge A",
+                    "doc_entities": {"delta"},
+                    "structure_score": 0.90,
+                    "closure_score": 0.70,
+                    "novelty_score": 0.50,
+                    "combined_score": 0.65,
+                })
+            elif pos == 4:
+                rows.append({
+                    "pool_position": 4,
+                    "doc_id": 14,
+                    "doc_title": "Bridge B",
+                    "doc_entities": {"epsilon"},
+                    "structure_score": 0.88,
+                    "closure_score": 0.65,
+                    "novelty_score": 0.45,
+                    "combined_score": 0.62,
+                })
+        return rows
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13, 14],
+        normalized_base_scores=np.asarray([1.0, 0.9, 0.4, 0.3, 0.2], dtype=float),
+        pool_doc_titles=["Anchor", "Incumbent", "Incumbent", "Bridge A", "Bridge B"],
+        doc_idx_to_entities={10: {"alpha"}, 11: {"beta"}, 12: {"gamma"}, 13: {"delta"}, 14: {"epsilon"}},
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"alpha"},
+        query_entities={"alpha"},
+        pool_limit=5,
+        expand_base_k=2,
+        append_max_docs=2,
+        expand_min_structure_score=0.35,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+    )
+
+    assert selected_positions == [0, 1, 3, 4]
+    assert trace["appended_positions"] == [3, 4]
+    assert trace["append_count"] == 2
+    assert trace["append_stop_reason"] == "append_cap_reached"
+    assert trace["append_steps"][0]["duplicate_skip_count"] == 1
+
+
+def test_select_bridge_append_positions_supports_next_deep_policy():
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13, 14],
+        normalized_base_scores=np.asarray([1.0, 0.9, 0.4, 0.3, 0.2], dtype=float),
+        pool_doc_titles=["Anchor", "Incumbent", "Deep A", "Deep B", "Deep C"],
+        doc_idx_to_entities={10: {"alpha"}, 11: {"beta"}, 12: {"gamma"}, 13: {"delta"}, 14: {"epsilon"}},
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"alpha"},
+        query_entities={"alpha"},
+        pool_limit=5,
+        expand_base_k=2,
+        append_max_docs=2,
+        expand_min_structure_score=0.35,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="next_deep",
+    )
+
+    assert selected_positions == [0, 1, 2, 3]
+    assert trace["append_policy"] == "next_deep"
+    assert trace["appended_positions"] == [2, 3]
+    assert trace["append_steps"][0]["selection_policy"] == "next_deep"
+
+
+def test_select_bridge_append_positions_supports_random_deep_policy():
+    expected_positions = [
+        int(pos)
+        for pos in np.random.default_rng(7).permutation([2, 3, 4, 5]).tolist()[:2]
+    ]
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13, 14, 15],
+        normalized_base_scores=np.asarray([1.0, 0.9, 0.5, 0.4, 0.3, 0.2], dtype=float),
+        pool_doc_titles=["Anchor", "Incumbent", "Deep A", "Deep B", "Deep C", "Deep D"],
+        doc_idx_to_entities={
+            10: {"alpha"},
+            11: {"beta"},
+            12: {"gamma"},
+            13: {"delta"},
+            14: {"epsilon"},
+            15: {"zeta"},
+        },
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"alpha"},
+        query_entities={"alpha"},
+        pool_limit=6,
+        expand_base_k=2,
+        append_max_docs=2,
+        expand_min_structure_score=0.35,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="random_deep",
+        append_random_seed=7,
+    )
+
+    assert selected_positions == [0, 1] + expected_positions
+    assert trace["append_policy"] == "random_deep"
+    assert trace["append_random_seed"] == 7
+    assert trace["appended_positions"] == expected_positions
+    assert trace["append_steps"][0]["selection_policy"] == "random_deep"
+
+
+def test_rerank_candidate_positions_for_assemble_supports_similarity_and_ce():
+    hipporag = DummyHippoRAGForAssemble(
+        query_embeddings={"where is alpha": np.asarray([1.0, 0.0], dtype=float)},
+        passage_embeddings=np.asarray([
+            [1.0, 0.0],
+            [0.0, 1.0],
+            [0.5, 0.5],
+        ], dtype=float),
+    )
+
+    reranked_positions, trace = rerank_candidate_positions_for_assemble(
+        query="where is alpha",
+        pool_docs=["Doc A\nalpha", "Doc B\nbeta", "Doc C\ngamma"],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.3, 0.9, 0.6], dtype=float),
+        candidate_positions=[0, 1, 2],
+        assemble_mode="embedding_similarity",
+        hipporag=hipporag,
+        position_sources={0: "baseline_prefix", 1: "bridge_append", 2: "bridge_append"},
+    )
+
+    assert reranked_positions == [0, 2, 1]
+    assert trace["score_field"] == "embedding_similarity"
+    assert trace["ranking_rows"][0]["source"] == "baseline_prefix"
+
+    ce_reranker = DummyCrossEncoder([0.2, 0.9, 0.4])
+    ce_positions, ce_trace = rerank_candidate_positions_for_assemble(
+        query="where is alpha",
+        pool_docs=["Doc A\nalpha", "Doc B\nbeta", "Doc C\ngamma"],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.3, 0.9, 0.6], dtype=float),
+        candidate_positions=[0, 1, 2],
+        assemble_mode="cross_encoder",
+        hipporag=hipporag,
+        ce_reranker=ce_reranker,
+    )
+
+    assert ce_positions == [1, 2, 0]
+    assert ce_trace["score_field"] == "cross_encoder_score"
+    assert len(ce_reranker.calls) == 1
+
+
+def test_build_expand_assemble_query_traces_surfaces_method_trace():
+    config = type("Config", (), {"qa_top_k": 2, "causal_engine_version": "legacy"})()
+    baseline_solution = QuerySolution(
+        question="Where was Alpha born?",
+        docs=["Alpha\nAlpha was born in London.", "Beta\nBeta mentions Paris."],
+        answer="London",
+        gold_answers=["Paris"],
+        retrieval_trace={},
+    )
+    method_solution = QuerySolution(
+        question="Where was Alpha born?",
+        docs=["Beta\nBeta mentions Paris.", "Gamma\nGamma mentions Rome."],
+        answer="Paris",
+        gold_answers=["Paris"],
+        retrieval_trace={
+            "expand_assemble_trace": {
+                "candidate_set_titles": ["Alpha", "Beta", "Gamma"],
+                "appended_titles": ["Gamma"],
+                "assemble_mode": "cross_encoder",
+            },
+        },
+    )
+
+    query_traces = build_expand_assemble_query_traces(
+        config=config,
+        baseline_solutions=[baseline_solution],
+        method_solutions=[method_solution],
+        gold_docs=[["Beta\nBeta mentions Paris."]],
+        gold_answers=[["Paris"]],
+        doc_text_to_chunk_id={
+            "Alpha\nAlpha was born in London.": "chunk-alpha",
+            "Beta\nBeta mentions Paris.": "chunk-beta",
+            "Gamma\nGamma mentions Rome.": "chunk-gamma",
+        },
+    )
+
+    assert query_traces[0]["gold_titles"] == ["Beta"]
+    assert query_traces[0]["method_top_titles"] == ["Beta", "Gamma"]
+    assert query_traces[0]["method_metrics"]["ExactMatch"] == 1.0
+    assert query_traces[0]["expand_assemble_trace"]["assemble_mode"] == "cross_encoder"
 
 
 def test_build_requirement_reserve_ablation_jobs_maps_effective_prefix_sizes():

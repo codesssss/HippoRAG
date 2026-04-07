@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import sys
+import types
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Set, Tuple
@@ -20,6 +21,14 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
+
+LOCAL_SRC_DIR = ROOT_DIR / "src"
+existing_src_module = sys.modules.get("src")
+existing_src_paths = list(getattr(existing_src_module, "__path__", [])) if existing_src_module is not None else []
+if LOCAL_SRC_DIR.exists() and str(LOCAL_SRC_DIR) not in existing_src_paths:
+    local_src_module = types.ModuleType("src")
+    local_src_module.__path__ = [str(LOCAL_SRC_DIR)]
+    sys.modules["src"] = local_src_module
 
 from requirement_beam_utils import (
     align_requirement_cache_entry_to_pool,
@@ -3307,6 +3316,430 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
     return scored_candidates
 
 
+ASSEMBLE_MODES = {
+    "none",
+    "base_score",
+    "embedding_similarity",
+    "cross_encoder",
+}
+
+APPEND_POLICIES = {
+    "bridge",
+    "next_deep",
+    "random_deep",
+}
+
+
+def normalize_assemble_mode(mode: str | None) -> str:
+    normalized = str(mode or "none").strip().lower()
+    if normalized not in ASSEMBLE_MODES:
+        raise ValueError(f"Unsupported assemble mode: {mode}")
+    return normalized
+
+
+def normalize_append_policy(policy: str | None) -> str:
+    normalized = str(policy or "bridge").strip().lower()
+    if normalized not in APPEND_POLICIES:
+        raise ValueError(f"Unsupported append policy: {policy}")
+    return normalized
+
+
+def format_doc_for_assemble_rerank(doc_text: str) -> str:
+    cleaned_doc = str(doc_text or "").strip()
+    if not cleaned_doc:
+        return ""
+    title = extract_doc_title(cleaned_doc)
+    if not title:
+        return cleaned_doc
+    first_line, _, remainder = cleaned_doc.partition("\n")
+    if normalize_structure_text(first_line) == normalize_structure_text(title):
+        return cleaned_doc
+    remainder = cleaned_doc if normalize_structure_text(cleaned_doc) != normalize_structure_text(title) else ""
+    return f"{title}\n{remainder}".strip()
+
+
+def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
+                                   normalized_base_scores: np.ndarray,
+                                   pool_doc_titles: Sequence[str] | None,
+                                   doc_idx_to_entities: Dict[int, Set[str]],
+                                   doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                   adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                   initial_seed_entities: Sequence[str] | Set[str] | None,
+                                   query_entities: Sequence[str] | Set[str] | None,
+                                   pool_limit: int,
+                                   expand_base_k: int,
+                                   append_max_docs: int,
+                                   expand_min_structure_score: float,
+                                   structure_max_hops: int,
+                                   structure_seed_target_bridge_mode: str,
+                                   base_weight: float,
+                                   structure_weight: float,
+                                   novelty_weight: float,
+                                   score_mode: str = "bridge",
+                                   non_anchor_title_dedup: bool = True,
+                                   append_policy: str = "bridge",
+                                   append_random_seed: int = 0) -> Tuple[List[int], Dict[str, object]]:
+    effective_pool_limit = max(int(pool_limit), 0)
+    effective_base_k = min(max(int(expand_base_k), 0), effective_pool_limit)
+    effective_append_max_docs = max(int(append_max_docs), 0)
+    normalized_append_policy = normalize_append_policy(append_policy)
+    baseline_prefix_positions = list(range(effective_base_k))
+    candidate_positions = list(baseline_prefix_positions)
+    appended_positions: List[int] = []
+    append_steps: List[Dict[str, object]] = []
+    append_stop_reason = "append_cap_zero" if effective_append_max_docs == 0 else "unknown"
+    covered_entities = normalize_entity_set(initial_seed_entities)
+    for pos in baseline_prefix_positions:
+        doc_id = pool_doc_ids[pos] if pos < len(pool_doc_ids) else None
+        if doc_id is None:
+            continue
+        covered_entities.update(
+            normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set()))
+        )
+
+    seen_title_keys = set()
+    if non_anchor_title_dedup:
+        seen_title_keys = normalize_title_set([
+            str(pool_doc_titles[pos]).strip()
+            for pos in baseline_prefix_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ])
+
+    remaining_positions = list(range(effective_base_k, effective_pool_limit))
+    if not remaining_positions and effective_append_max_docs > 0:
+        append_stop_reason = "no_deep_pool_candidates"
+
+    if normalized_append_policy == "next_deep":
+        for step_index, selected_position in enumerate(remaining_positions[:effective_append_max_docs]):
+            selected_title = str(pool_doc_titles[selected_position]).strip() if pool_doc_titles is not None and 0 <= selected_position < len(pool_doc_titles) else ""
+            title_key = normalize_structure_text(selected_title)
+            if non_anchor_title_dedup and title_key and title_key in seen_title_keys:
+                append_stop_reason = "duplicate_title_only"
+                break
+            candidate_positions.append(selected_position)
+            appended_positions.append(selected_position)
+            selected_doc_id = pool_doc_ids[selected_position] if selected_position < len(pool_doc_ids) else None
+            if selected_doc_id is not None:
+                covered_entities.update(
+                    normalize_entity_set(doc_idx_to_entities.get(int(selected_doc_id), set()))
+                )
+            if non_anchor_title_dedup and title_key:
+                seen_title_keys.add(title_key)
+            append_steps.append({
+                "step": int(step_index + 1),
+                "selection_policy": normalized_append_policy,
+                "selected_pool_position": int(selected_position),
+                "selected_doc_id": int(selected_doc_id) if selected_doc_id is not None else None,
+                "selected_title": selected_title,
+            })
+        if append_steps and len(appended_positions) >= effective_append_max_docs:
+            append_stop_reason = "append_cap_reached"
+        elif not append_steps and append_stop_reason == "unknown":
+            append_stop_reason = "no_append"
+    elif normalized_append_policy == "random_deep":
+        rng = np.random.default_rng(int(append_random_seed))
+        random_order = [int(pos) for pos in rng.permutation(remaining_positions).tolist()]
+        for step_index, selected_position in enumerate(random_order[:effective_append_max_docs]):
+            selected_title = str(pool_doc_titles[selected_position]).strip() if pool_doc_titles is not None and 0 <= selected_position < len(pool_doc_titles) else ""
+            title_key = normalize_structure_text(selected_title)
+            if non_anchor_title_dedup and title_key and title_key in seen_title_keys:
+                append_stop_reason = "duplicate_title_only"
+                break
+            candidate_positions.append(selected_position)
+            appended_positions.append(selected_position)
+            selected_doc_id = pool_doc_ids[selected_position] if selected_position < len(pool_doc_ids) else None
+            if selected_doc_id is not None:
+                covered_entities.update(
+                    normalize_entity_set(doc_idx_to_entities.get(int(selected_doc_id), set()))
+                )
+            if non_anchor_title_dedup and title_key:
+                seen_title_keys.add(title_key)
+            append_steps.append({
+                "step": int(step_index + 1),
+                "selection_policy": normalized_append_policy,
+                "selected_pool_position": int(selected_position),
+                "selected_doc_id": int(selected_doc_id) if selected_doc_id is not None else None,
+                "selected_title": selected_title,
+            })
+        if append_steps and len(appended_positions) >= effective_append_max_docs:
+            append_stop_reason = "append_cap_reached"
+        elif not append_steps and append_stop_reason == "unknown":
+            append_stop_reason = "no_append"
+    else:
+        for step_index in range(effective_append_max_docs):
+            if not remaining_positions:
+                append_stop_reason = "no_candidate_remaining"
+                break
+
+            scored_candidates = score_bridge_candidates(
+                pool_doc_ids=pool_doc_ids,
+                normalized_base_scores=normalized_base_scores,
+                pool_doc_titles=pool_doc_titles,
+                doc_idx_to_entities=doc_idx_to_entities,
+                doc_idx_to_edges=doc_idx_to_edges,
+                adjacency=adjacency,
+                remaining_positions=remaining_positions,
+                covered_entities=covered_entities,
+                structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                query_entities=query_entities,
+                score_mode=score_mode,
+            )
+            if not scored_candidates:
+                append_stop_reason = "no_scored_candidate"
+                break
+
+            ranked_by_structure = sorted(
+                scored_candidates,
+                key=lambda row: (
+                    -float(row.get("structure_score", 0.0) or 0.0),
+                    -float(row.get("closure_score", 0.0) or 0.0),
+                    -float(row.get("novelty_score", 0.0) or 0.0),
+                    int(row.get("pool_position", 0) or 0),
+                ),
+            )
+            best_structure_score = float(ranked_by_structure[0].get("structure_score", 0.0) or 0.0)
+            if best_structure_score < float(expand_min_structure_score):
+                append_stop_reason = "structure_below_threshold"
+                break
+
+            selected_row = None
+            duplicate_skip_count = 0
+            for row in ranked_by_structure:
+                title_key = normalize_structure_text(str(row.get("doc_title", "")).strip())
+                if non_anchor_title_dedup and title_key and title_key in seen_title_keys:
+                    duplicate_skip_count += 1
+                    continue
+                selected_row = row
+                break
+
+            if selected_row is None:
+                append_stop_reason = "duplicate_title_only"
+                break
+
+            selected_position = int(selected_row["pool_position"])
+            candidate_positions.append(selected_position)
+            appended_positions.append(selected_position)
+            remaining_positions = [pos for pos in remaining_positions if int(pos) != selected_position]
+
+            selected_doc_id = selected_row.get("doc_id")
+            if selected_doc_id is not None:
+                covered_entities.update(
+                    normalize_entity_set(doc_idx_to_entities.get(int(selected_doc_id), set()))
+                )
+            selected_title_key = normalize_structure_text(str(selected_row.get("doc_title", "")).strip())
+            if non_anchor_title_dedup and selected_title_key:
+                seen_title_keys.add(selected_title_key)
+
+            append_steps.append({
+                "step": int(step_index + 1),
+                "selection_policy": normalized_append_policy,
+                "selected_pool_position": selected_position,
+                "selected_doc_id": int(selected_doc_id) if selected_doc_id is not None else None,
+                "selected_title": str(selected_row.get("doc_title", "") or ""),
+                "selected_structure_score": round(float(selected_row.get("structure_score", 0.0) or 0.0), 4),
+                "selected_closure_score": round(float(selected_row.get("closure_score", 0.0) or 0.0), 4),
+                "selected_novelty_score": round(float(selected_row.get("novelty_score", 0.0) or 0.0), 4),
+                "selected_combined_score": round(float(selected_row.get("combined_score", 0.0) or 0.0), 4),
+                "candidate_pool_size": int(len(scored_candidates)),
+                "best_structure_score": round(best_structure_score, 4),
+                "duplicate_skip_count": int(duplicate_skip_count),
+                "candidate_preview": [
+                    {
+                        "preview_rank": int(rank + 1),
+                        "pool_position": int(row.get("pool_position", -1) or -1),
+                        "doc_id": int(row["doc_id"]) if row.get("doc_id") is not None else None,
+                        "title": str(row.get("doc_title", "") or ""),
+                        "structure_score": round(float(row.get("structure_score", 0.0) or 0.0), 4),
+                        "closure_score": round(float(row.get("closure_score", 0.0) or 0.0), 4),
+                        "novelty_score": round(float(row.get("novelty_score", 0.0) or 0.0), 4),
+                        "combined_score": round(float(row.get("combined_score", 0.0) or 0.0), 4),
+                    }
+                    for rank, row in enumerate(ranked_by_structure[:5])
+                ],
+            })
+
+    if append_steps and len(appended_positions) >= effective_append_max_docs:
+        append_stop_reason = "append_cap_reached"
+    elif not append_steps and append_stop_reason == "unknown":
+        append_stop_reason = "no_append"
+
+    trace = {
+        "selector": "bridge_append",
+        "expand_base_k": int(effective_base_k),
+        "append_max_docs": int(effective_append_max_docs),
+        "append_policy": normalized_append_policy,
+        "append_random_seed": int(append_random_seed),
+        "expand_min_structure_score": round(float(expand_min_structure_score), 4),
+        "score_mode": normalize_setwise_score_mode(score_mode),
+        "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+        "baseline_prefix_positions": list(baseline_prefix_positions),
+        "baseline_prefix_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in baseline_prefix_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "appended_positions": list(appended_positions),
+        "appended_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in appended_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "append_count": int(len(appended_positions)),
+        "append_stop_reason": str(append_stop_reason),
+        "append_steps": append_steps,
+        "candidate_set_positions": list(candidate_positions),
+        "candidate_set_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in candidate_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "candidate_set_size": int(len(candidate_positions)),
+        "covered_entity_count_after_expand": int(len(covered_entities)),
+    }
+    return candidate_positions, trace
+
+
+def rerank_candidate_positions_for_assemble(query: str,
+                                            pool_docs: Sequence[str],
+                                            pool_doc_ids: Sequence[int | None],
+                                            pool_doc_scores: Sequence[float],
+                                            candidate_positions: Sequence[int],
+                                            assemble_mode: str,
+                                            hipporag: HippoRAG,
+                                            ce_reranker: Any = None,
+                                            position_sources: Dict[int, str] | None = None) -> Tuple[List[int], Dict[str, object]]:
+    normalized_mode = normalize_assemble_mode(assemble_mode)
+    normalized_positions = [
+        int(pos) for pos in candidate_positions
+        if 0 <= int(pos) < len(pool_docs)
+    ]
+    default_trace = {
+        "assemble_mode": normalized_mode,
+        "candidate_pool_positions": list(normalized_positions),
+        "candidate_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "ranked_pool_positions": list(normalized_positions),
+        "ranked_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "ranking_rows": [],
+        "score_field": "candidate_order",
+        "fallback_reason": "",
+    }
+    if normalized_mode == "none" or not normalized_positions:
+        default_trace["ranking_rows"] = [
+            {
+                "rank": int(rank + 1),
+                "pool_position": int(pos),
+                "doc_id": int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None,
+                "title": extract_doc_title(pool_docs[pos]),
+                "source": str((position_sources or {}).get(int(pos), "candidate")),
+                "base_score": round(float(pool_doc_scores[pos]), 4) if pos < len(pool_doc_scores) else 0.0,
+                "assemble_score": None,
+            }
+            for rank, pos in enumerate(normalized_positions)
+        ]
+        return list(normalized_positions), default_trace
+
+    rows: List[Dict[str, object]] = []
+    fallback_reason = ""
+    if normalized_mode == "cross_encoder":
+        if ce_reranker is None:
+            raise ValueError("cross_encoder assemble_mode requires a loaded ce_reranker")
+        pairs = [
+            [query, format_doc_for_assemble_rerank(pool_docs[pos])]
+            for pos in normalized_positions
+        ]
+        raw_scores = ce_reranker.compute_score(pairs)
+        if isinstance(raw_scores, (int, float)):
+            raw_scores = [raw_scores]
+        score_values = np.asarray(raw_scores, dtype=float)
+        score_field = "cross_encoder_score"
+    elif normalized_mode == "embedding_similarity":
+        query_embedding = None
+        query_embedding_store = getattr(hipporag, "query_to_embedding", {}) or {}
+        if isinstance(query_embedding_store, dict):
+            passage_query_embeddings = query_embedding_store.get("passage", {}) or {}
+            if isinstance(passage_query_embeddings, dict):
+                query_embedding = passage_query_embeddings.get(query)
+        if query_embedding is None and hasattr(hipporag, "_get_passage_query_embeddings"):
+            hipporag._get_passage_query_embeddings([query])
+            query_embedding = (
+                ((getattr(hipporag, "query_to_embedding", {}) or {}).get("passage", {}) or {}).get(query)
+            )
+        passage_embeddings = np.asarray(getattr(hipporag, "passage_embeddings", np.array([])))
+        if query_embedding is None or passage_embeddings.size == 0:
+            score_values = np.asarray([
+                float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0
+                for pos in normalized_positions
+            ], dtype=float)
+            fallback_reason = "missing_query_or_passage_embeddings"
+            score_field = "base_score_fallback"
+        else:
+            query_vector = np.asarray(query_embedding, dtype=float).reshape(-1)
+            similarity_scores: List[float] = []
+            for pos in normalized_positions:
+                doc_id = pool_doc_ids[pos]
+                if doc_id is None or int(doc_id) >= len(passage_embeddings):
+                    similarity_scores.append(float("-inf"))
+                    continue
+                passage_vector = np.asarray(passage_embeddings[int(doc_id)], dtype=float).reshape(-1)
+                if passage_vector.size == 0 or passage_vector.shape != query_vector.shape:
+                    similarity_scores.append(float("-inf"))
+                    continue
+                similarity_scores.append(float(np.dot(query_vector, passage_vector)))
+            score_values = np.asarray(similarity_scores, dtype=float)
+            score_field = "embedding_similarity"
+    else:
+        score_values = np.asarray([
+            float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0
+            for pos in normalized_positions
+        ], dtype=float)
+        score_field = "base_score"
+
+    for pos, score_value in zip(normalized_positions, score_values.tolist()):
+        rows.append({
+            "pool_position": int(pos),
+            "doc_id": int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None,
+            "title": extract_doc_title(pool_docs[pos]),
+            "source": str((position_sources or {}).get(int(pos), "candidate")),
+            "base_score": float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0,
+            "assemble_score": float(score_value),
+        })
+
+    rows.sort(
+        key=lambda row: (
+            -float(row.get("assemble_score", float("-inf"))),
+            -float(row.get("base_score", 0.0) or 0.0),
+            int(row.get("pool_position", 0) or 0),
+        )
+    )
+    ranked_positions = [int(row["pool_position"]) for row in rows]
+    trace = {
+        "assemble_mode": normalized_mode,
+        "candidate_pool_positions": list(normalized_positions),
+        "candidate_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "ranked_pool_positions": list(ranked_positions),
+        "ranked_titles": [extract_doc_title(pool_docs[pos]) for pos in ranked_positions],
+        "ranking_rows": [
+            {
+                "rank": int(rank + 1),
+                "pool_position": int(row["pool_position"]),
+                "doc_id": row["doc_id"],
+                "title": str(row["title"]),
+                "source": str(row["source"]),
+                "base_score": round(float(row["base_score"]), 4),
+                "assemble_score": None if not np.isfinite(float(row["assemble_score"])) else round(float(row["assemble_score"]), 4),
+            }
+            for rank, row in enumerate(rows)
+        ],
+        "score_field": str(score_field),
+        "fallback_reason": str(fallback_reason),
+    }
+    return ranked_positions, trace
+
+
 def score_evidence_state(pool_doc_ids: Sequence[int | None],
                          normalized_base_scores: np.ndarray,
                          pool_doc_titles: Sequence[str] | None,
@@ -4308,11 +4741,21 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            late_rerank_max_state_score_gap: float = 0.0,
                            late_rerank_judge_bundle: SetwiseLateRerankJudgeBundle | None = None,
                            requirement_selector_bundle: Dict[str, object] | None = None,
-                           requirement_reserve_policy: str = DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           requirement_reserve_policy: str = DEFAULT_REQUIREMENT_BEAM_RESERVE_POLICY,
+                           expand_base_k: int = 10,
+                           expand_min_structure_score: float = 0.35,
+                           assemble_mode: str = "cross_encoder",
+                           append_max_docs: int = 3,
+                           append_policy: str = "bridge",
+                           append_random_seed: int = 0,
+                           ce_model: str = "/mnt/nvme/bge-reranker-v2-m3",
+                           ce_device: str = "cuda:1") -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
-    if selector_name not in {"bridge_greedy", "bridge_beam", "learned_greedy", "requirement_beam"}:
+    normalized_assemble_mode = normalize_assemble_mode(assemble_mode)
+    normalized_append_policy = normalize_append_policy(append_policy)
+    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -4351,12 +4794,24 @@ def apply_setwise_selector(hipporag: HippoRAG,
     requirement_probe_force_pool_gold_in_pool_query_count = 0
     requirement_probe_force_pool_gold_applied_query_count = 0
     requirement_probe_force_pool_gold_applied_title_count = 0
+    appended_doc_counts: List[int] = []
+    expand_candidate_sizes: List[int] = []
+    append_stop_reason_counts: Counter[str] = Counter()
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
     normalized_reader_order_probe_mode = normalize_setwise_reader_order_probe_mode(
         setwise_reader_order_probe_mode
     )
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
+    assemble_reranker = None
+    if selector_name == "bridge_append" and normalized_assemble_mode == "embedding_similarity":
+        if hasattr(hipporag, "_get_passage_query_embeddings"):
+            hipporag._get_passage_query_embeddings(query_solutions)
+    if selector_name == "bridge_append" and normalized_assemble_mode == "cross_encoder":
+        from FlagEmbedding import FlagReranker
+
+        logger.info("Loading assemble cross-encoder model: %s on %s", ce_model, ce_device)
+        assemble_reranker = FlagReranker(ce_model, use_fp16=True, device=ce_device)
 
     for q_idx, qs in enumerate(query_solutions):
         pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
@@ -4544,6 +4999,59 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "beam_finalists": [],
                     "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
                 }
+        elif selector_name == "bridge_append":
+            normalized_pool_scores = np.asarray(pool_scores, dtype=float)
+            if normalized_pool_scores.size > 0:
+                score_range = float(normalized_pool_scores.max() - normalized_pool_scores.min())
+                normalized_pool_scores = (
+                    (normalized_pool_scores - normalized_pool_scores.min()) / (score_range + 1e-9)
+                    if score_range > 0
+                    else np.ones_like(normalized_pool_scores)
+                )
+            position_sources = {
+                int(pos): "baseline_prefix"
+                for pos in range(min(max(int(expand_base_k), 0), pool_limit))
+            }
+            selected_positions, selector_trace = select_bridge_append_positions(
+                pool_doc_ids=pool_doc_ids,
+                normalized_base_scores=normalized_pool_scores,
+                pool_doc_titles=pool_titles,
+                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                adjacency=hipporag.structure_graph_out,
+                initial_seed_entities=seed_entities,
+                query_entities=proposal_query_entities,
+                pool_limit=pool_limit,
+                expand_base_k=expand_base_k,
+                append_max_docs=append_max_docs,
+                expand_min_structure_score=expand_min_structure_score,
+                structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                score_mode=score_mode,
+                non_anchor_title_dedup=non_anchor_title_dedup,
+                append_policy=normalized_append_policy,
+                append_random_seed=append_random_seed,
+            )
+            for pos in selector_trace.get("appended_positions", []) or []:
+                position_sources[int(pos)] = f"append_{normalized_append_policy}"
+            reranked_positions, assemble_trace = rerank_candidate_positions_for_assemble(
+                query=qs.question,
+                pool_docs=pool_docs,
+                pool_doc_ids=pool_doc_ids,
+                pool_doc_scores=pool_scores,
+                candidate_positions=selected_positions,
+                assemble_mode=normalized_assemble_mode,
+                hipporag=hipporag,
+                ce_reranker=assemble_reranker,
+                position_sources=position_sources,
+            )
+            selector_trace["assemble_trace"] = assemble_trace
+            selector_trace["assemble_mode"] = normalized_assemble_mode
+            selector_trace["selected_positions_before_assemble"] = list(selected_positions)
+            selected_positions = list(reranked_positions)
         elif selector_name == "learned_greedy":
             if learned_model_bundle is None:
                 raise ValueError("learned_greedy selector requires a loaded model bundle")
@@ -4971,37 +5479,72 @@ def apply_setwise_selector(hipporag: HippoRAG,
 
         retrieval_trace = dict(qs.retrieval_trace or {})
         retrieval_trace["setwise_selector"] = selector_name
-        retrieval_trace["setwise_selector_trace"] = {
-            "pool_k": int(pool_limit),
-            "score_mode": score_mode,
-            "anchor_count": int(min(max(anchor_count, 0), min(pool_limit, qa_top_k))),
-            "reserve_top_m": int(min(max(max(anchor_count, 0), max(reserve_top_m, 0)), min(pool_limit, qa_top_k))),
-            "max_bridge_slots": int(max(0, max_bridge_slots)),
-            "non_anchor_title_dedup": bool(non_anchor_title_dedup),
-            "query_entity_source": normalized_query_entity_source,
-            "gate_decision": gate_decision,
-            "seed_entities_preview": sorted(seed_entities)[:12],
-            "question_entities_preview": sorted(question_entities)[:12],
-            "grounded_question_entities_preview": sorted(grounded_question_entities)[:12],
-            "proposal_query_entities_preview": sorted(proposal_query_entities)[:12],
-            "query_entities_preview": sorted(state_query_entities)[:12],
-            "state_support_query_entities_preview": sorted(state_support_query_entities)[:12],
-            "selected_pool_positions": list(heuristic_selected_positions),
-            "selected_doc_ids": [
-                int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
-                for pos in heuristic_selected_positions
-            ],
-            "selected_titles": [pool_titles[pos] for pos in heuristic_selected_positions],
-            "final_front_pool_positions": list(final_front_positions),
-            "final_front_doc_ids": [
-                int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
-                for pos in final_front_positions
-            ],
-            "final_front_titles": [pool_titles[pos] for pos in final_front_positions],
-            "reader_order_probe": reader_order_probe_trace,
-            "late_rerank_trace": late_rerank_trace,
-            **selector_trace,
-        }
+        if selector_name == "bridge_append":
+            retrieval_trace["expand_assemble_trace"] = {
+                "pool_k": int(pool_limit),
+                "score_mode": score_mode,
+                "expand_base_k": int(min(max(int(expand_base_k), 0), pool_limit)),
+                "append_max_docs": int(max(0, append_max_docs)),
+                "append_policy": normalized_append_policy,
+                "append_random_seed": int(append_random_seed),
+                "expand_min_structure_score": round(float(expand_min_structure_score), 4),
+                "assemble_mode": normalized_assemble_mode,
+                "assemble_ce_model": str(ce_model) if normalized_assemble_mode == "cross_encoder" else None,
+                "assemble_ce_device": str(ce_device) if normalized_assemble_mode == "cross_encoder" else None,
+                "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+                "query_entity_source": normalized_query_entity_source,
+                "seed_entities_preview": sorted(seed_entities)[:12],
+                "question_entities_preview": sorted(question_entities)[:12],
+                "grounded_question_entities_preview": sorted(grounded_question_entities)[:12],
+                "proposal_query_entities_preview": sorted(proposal_query_entities)[:12],
+                "query_entities_preview": sorted(state_query_entities)[:12],
+                "state_support_query_entities_preview": sorted(state_support_query_entities)[:12],
+                "selected_pool_positions": list(heuristic_selected_positions),
+                "selected_doc_ids": [
+                    int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
+                    for pos in heuristic_selected_positions
+                ],
+                "selected_titles": [pool_titles[pos] for pos in heuristic_selected_positions],
+                "final_front_pool_positions": list(final_front_positions),
+                "final_front_doc_ids": [
+                    int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
+                    for pos in final_front_positions
+                ],
+                "final_front_titles": [pool_titles[pos] for pos in final_front_positions],
+                **selector_trace,
+            }
+        else:
+            retrieval_trace["setwise_selector_trace"] = {
+                "pool_k": int(pool_limit),
+                "score_mode": score_mode,
+                "anchor_count": int(min(max(anchor_count, 0), min(pool_limit, qa_top_k))),
+                "reserve_top_m": int(min(max(max(anchor_count, 0), max(reserve_top_m, 0)), min(pool_limit, qa_top_k))),
+                "max_bridge_slots": int(max(0, max_bridge_slots)),
+                "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+                "query_entity_source": normalized_query_entity_source,
+                "gate_decision": gate_decision,
+                "seed_entities_preview": sorted(seed_entities)[:12],
+                "question_entities_preview": sorted(question_entities)[:12],
+                "grounded_question_entities_preview": sorted(grounded_question_entities)[:12],
+                "proposal_query_entities_preview": sorted(proposal_query_entities)[:12],
+                "query_entities_preview": sorted(state_query_entities)[:12],
+                "state_support_query_entities_preview": sorted(state_support_query_entities)[:12],
+                "selected_pool_positions": list(heuristic_selected_positions),
+                "selected_doc_ids": [
+                    int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
+                    for pos in heuristic_selected_positions
+                ],
+                "selected_titles": [pool_titles[pos] for pos in heuristic_selected_positions],
+                "final_front_pool_positions": list(final_front_positions),
+                "final_front_doc_ids": [
+                    int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None
+                    for pos in final_front_positions
+                ],
+                "final_front_titles": [pool_titles[pos] for pos in final_front_positions],
+                "reader_order_probe": reader_order_probe_trace,
+                "late_rerank_trace": late_rerank_trace,
+                **selector_trace,
+            }
         if selector_name == "requirement_beam":
             trace_target_titles = unique_ordered_titles(
                 list(
@@ -5045,6 +5588,13 @@ def apply_setwise_selector(hipporag: HippoRAG,
             beam_projection_max_selected_rank,
             int(selector_trace.get("beam_projection_max_selected_rank", 0) or 0),
         )
+        if selector_name == "bridge_append":
+            appended_doc_count = int(selector_trace.get("append_count", 0) or 0)
+            appended_doc_counts.append(appended_doc_count)
+            expand_candidate_sizes.append(int(selector_trace.get("candidate_set_size", 0) or 0))
+            append_stop_reason_counts[
+                str(selector_trace.get("append_stop_reason", "unknown") or "unknown")
+            ] += 1
 
         mapped_pool_doc_counts.append(sum(doc_id is not None for doc_id in pool_doc_ids))
         seed_entity_counts.append(len(seed_entities))
@@ -5063,7 +5613,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "grounded_question_entities_preview": sorted(grounded_question_entities)[:8],
                 "proposal_query_entities_preview": sorted(proposal_query_entities)[:8],
                 "query_entities_preview": sorted(state_query_entities)[:8],
-                "selection_steps": selector_trace["selection_steps"],
+                "selection_steps": selector_trace.get("selection_steps", selector_trace.get("append_steps", [])),
             })
 
     summary = {
@@ -5115,6 +5665,25 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "beam_projection_max_selected_rank": int(beam_projection_max_selected_rank),
         "examples_preview": selector_examples,
     }
+    if selector_name == "bridge_append":
+        append_count_histogram = Counter(appended_doc_counts)
+        summary.update({
+            "expand_base_k": int(max(int(expand_base_k), 0)),
+            "append_max_docs": int(max(int(append_max_docs), 0)),
+            "append_policy": normalized_append_policy,
+            "append_random_seed": int(append_random_seed),
+            "expand_min_structure_score": round(float(expand_min_structure_score), 4),
+            "assemble_mode": normalized_assemble_mode,
+            "assemble_ce_model": str(ce_model) if normalized_assemble_mode == "cross_encoder" else None,
+            "assemble_ce_device": str(ce_device) if normalized_assemble_mode == "cross_encoder" else None,
+            "avg_appended_doc_count": round(float(np.mean(appended_doc_counts)) if appended_doc_counts else 0.0, 4),
+            "avg_candidate_set_size": round(float(np.mean(expand_candidate_sizes)) if expand_candidate_sizes else 0.0, 4),
+            "append_count_histogram": {
+                str(int(k)): int(v)
+                for k, v in sorted(append_count_histogram.items())
+            },
+            "append_stop_reason_counts": dict(sorted(append_stop_reason_counts.items())),
+        })
     if selector_name == "requirement_beam":
         summary.update({
             "requirement_mode": str((requirement_selector_bundle or {}).get("mode", "oracle")),
@@ -5253,6 +5822,63 @@ def build_setwise_selector_query_traces(config: BaseConfig,
             },
             "requirement_title_exposure_summary": requirement_title_exposure_summary,
             "selector_trace": selector_trace,
+        })
+    return query_traces
+
+
+def build_expand_assemble_query_traces(config: BaseConfig,
+                                       baseline_solutions: Sequence[QuerySolution],
+                                       method_solutions: Sequence[QuerySolution],
+                                       gold_docs: Sequence[Sequence[str]],
+                                       gold_answers: Sequence[Sequence[str]],
+                                       doc_text_to_chunk_id: Dict[str, str]) -> List[Dict[str, object]]:
+    if len(baseline_solutions) != len(method_solutions):
+        raise ValueError("Baseline and method QuerySolution collections must have the same length.")
+
+    qa_em_metric = QAExactMatch(global_config=None)
+    qa_f1_metric = QAF1Score(global_config=None)
+    baseline_answers = [query_solution.answer or "" for query_solution in baseline_solutions]
+    method_answers = [query_solution.answer or "" for query_solution in method_solutions]
+    _, baseline_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, baseline_answers)
+    _, baseline_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, baseline_answers)
+    _, method_per_query_em = qa_em_metric.calculate_metric_scores(gold_answers, method_answers)
+    _, method_per_query_f1 = qa_f1_metric.calculate_metric_scores(gold_answers, method_answers)
+
+    query_traces: List[Dict[str, object]] = []
+    reader_top_k = max(int(getattr(config, "qa_top_k", 5)), 0)
+    for q_idx, (baseline_qs, method_qs) in enumerate(zip(baseline_solutions, method_solutions)):
+        baseline_top_docs = list(baseline_qs.docs[:reader_top_k])
+        method_top_docs = list(method_qs.docs[:reader_top_k])
+        baseline_top_titles = [extract_doc_title(doc_text) for doc_text in baseline_top_docs]
+        method_top_titles = [extract_doc_title(doc_text) for doc_text in method_top_docs]
+        expand_assemble_trace = dict((method_qs.retrieval_trace or {}).get("expand_assemble_trace", {}) or {})
+        query_traces.append({
+            "question": method_qs.question,
+            "query_type": resolve_report_query_type(config, method_qs),
+            "gold_answers": list(method_qs.gold_answers or []),
+            "gold_doc_count": int(len(set(gold_docs[q_idx]))),
+            "gold_titles": [extract_doc_title(doc_text) for doc_text in gold_docs[q_idx]],
+            "baseline_answer": baseline_qs.answer or "",
+            "method_answer": method_qs.answer or "",
+            "baseline_top_titles": baseline_top_titles,
+            "method_top_titles": method_top_titles,
+            "baseline_top_doc_ids": serialize_retrieved_doc_ids(baseline_top_docs, doc_text_to_chunk_id),
+            "method_top_doc_ids": serialize_retrieved_doc_ids(method_top_docs, doc_text_to_chunk_id),
+            "baseline_title_duplicate_count": int(len(baseline_top_titles) - len(set(baseline_top_titles))),
+            "method_title_duplicate_count": int(len(method_top_titles) - len(set(method_top_titles))),
+            "changed_from_baseline": bool(
+                baseline_top_titles != method_top_titles
+                or (baseline_qs.answer or "") != (method_qs.answer or "")
+            ),
+            "baseline_metrics": {
+                "ExactMatch": round(float(baseline_per_query_em[q_idx]["ExactMatch"]), 4),
+                "F1": round(float(baseline_per_query_f1[q_idx]["F1"]), 4),
+            },
+            "method_metrics": {
+                "ExactMatch": round(float(method_per_query_em[q_idx]["ExactMatch"]), 4),
+                "F1": round(float(method_per_query_f1[q_idx]["F1"]), 4),
+            },
+            "expand_assemble_trace": expand_assemble_trace,
         })
     return query_traces
 
@@ -5612,8 +6238,20 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "learned_greedy", "requirement_beam"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
+    parser.add_argument("--expand_base_k", type=int, default=10,
+                        help="For --setwise_selector bridge_append, preserve baseline top-B before appending deep-pool bridge candidates.")
+    parser.add_argument("--expand_min_structure_score", type=float, default=0.35,
+                        help="For --setwise_selector bridge_append, minimum structure score required before a deep-pool bridge proposal can be appended.")
+    parser.add_argument("--append_max_docs", type=int, default=3,
+                        help="For --setwise_selector bridge_append, maximum number of deep-pool bridge docs appended to the preserved baseline prefix.")
+    parser.add_argument("--append_policy", choices=sorted(APPEND_POLICIES), default="bridge",
+                        help="For --setwise_selector bridge_append, how deep-pool docs are proposed before answer-oriented assembly.")
+    parser.add_argument("--append_random_seed", type=int, default=0,
+                        help="For --append_policy random_deep, deterministic seed used to sample deep-pool docs.")
+    parser.add_argument("--assemble_mode", choices=sorted(ASSEMBLE_MODES), default="cross_encoder",
+                        help="For --setwise_selector bridge_append, answer-oriented assembly rerank mode applied over the expanded candidate set.")
     parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy", "set_closure"], default="bridge",
                         help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score centered on explicit path connectivity.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
@@ -5789,6 +6427,8 @@ def main():
     oracle_reorder_qa_results = None
     setwise_selector_results = None
     setwise_selector_query_traces = None
+    expand_assemble_results = None
+    expand_assemble_query_traces = None
     learned_model_bundle = None
     state_weight_config = {
         "path_connectivity": float(args.setwise_state_path_connectivity_weight),
@@ -6142,6 +6782,14 @@ def main():
             late_rerank_judge_bundle=late_rerank_judge_bundle,
             requirement_selector_bundle=requirement_selector_bundle,
             requirement_reserve_policy=str(args.setwise_requirement_reserve_policy),
+            expand_base_k=int(args.expand_base_k),
+            expand_min_structure_score=float(args.expand_min_structure_score),
+            assemble_mode=str(args.assemble_mode),
+            append_max_docs=int(args.append_max_docs),
+            append_policy=str(args.append_policy),
+            append_random_seed=int(args.append_random_seed),
+            ce_model=str(args.ce_model),
+            ce_device=str(args.ce_device),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -6200,95 +6848,154 @@ def main():
         selector_f1 = selector_qa_results.get("F1", 0.0)
         baseline_em = overall_qa_results.get("ExactMatch", 0.0) if overall_qa_results else 0.0
         baseline_f1 = overall_qa_results.get("F1", 0.0) if overall_qa_results else 0.0
-        setwise_selector_results = {
-            "selector": setwise_selector,
-            "score_mode": str(args.setwise_score_mode),
-            "pool_k": int(args.setwise_pool_k),
-            "anchor_count": int(args.setwise_anchor_count),
-            "reserve_top_m": int(max(int(args.setwise_anchor_count), int(args.setwise_reserve_top_m))),
-            "max_bridge_slots": int(max(0, int(args.setwise_max_bridge_slots))),
-            "structure_max_hops": int(args.setwise_structure_max_hops),
-            "base_weight": float(args.setwise_base_weight),
-            "structure_weight": float(args.setwise_structure_weight),
-            "novelty_weight": float(args.setwise_novelty_weight),
-            "non_anchor_title_dedup": bool(args.setwise_non_anchor_title_dedup),
-            "query_entity_source": str(args.setwise_query_entity_source),
-            "gate_mode": str(args.setwise_gate_mode),
-            "gate_min_structure_score": round(float(args.setwise_gate_min_structure_score), 4),
-            "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
-            "gate_min_closure_score": round(float(args.setwise_gate_min_closure_score), 4),
-            "gate_min_novelty_score": round(float(args.setwise_gate_min_novelty_score), 4),
-            "gate_min_frontier_gain": round(float(args.setwise_gate_min_frontier_gain), 4),
-            "gate_min_path_coherence": round(float(args.setwise_gate_min_path_coherence), 4),
-            "gate_max_avg_local_structure": round(float(args.setwise_gate_max_avg_local_structure), 4),
-            "gate_min_suffix_base_mean": round(float(args.setwise_gate_min_suffix_base_mean), 4),
-            "reader_order_probe_mode": str(args.setwise_reader_order_probe_mode),
-            "beam_width": int(args.setwise_beam_width),
-            "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
-            "beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),
-            "late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
-            "late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
-            "late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
-            "late_rerank_doc_char_limit": int(args.setwise_late_rerank_doc_char_limit),
-            "late_rerank_policy": str(args.setwise_late_rerank_policy),
-            "late_rerank_max_state_score_gap": round(float(args.setwise_late_rerank_max_state_score_gap), 4),
-            "late_rerank_judge_backend": late_rerank_judge_bundle.backend,
-            "late_rerank_judge_model": late_rerank_judge_bundle.model_name,
-            "late_rerank_judge_base_url": late_rerank_judge_bundle.base_url,
-            "late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
-            "state_score_weights": {k: round(float(v), 4) for k, v in resolve_set_closure_state_weight_config(state_weight_config).items()},
-            "setwise_model_path": args.setwise_model_path or None,
-            "setwise_requirement_cache_path": args.setwise_requirement_cache_path or None,
-            "setwise_requirement_mode": str(args.setwise_requirement_mode),
-            "setwise_requirement_model_path": args.setwise_requirement_model_path or None,
-            "setwise_requirement_reserve_policy": str(args.setwise_requirement_reserve_policy),
-            "setwise_requirement_annotation_pool_k": int(args.setwise_requirement_annotation_pool_k),
-            "setwise_requirement_smooth_tau": round(float(args.setwise_requirement_smooth_tau), 4),
-            "setwise_requirement_counterfactual_tau": round(float(args.setwise_requirement_counterfactual_tau), 4),
-            "setwise_requirement_live_annotation_pool_k": int(args.setwise_requirement_live_annotation_pool_k),
-            "setwise_requirement_live_annotation_score_mode": str(args.setwise_requirement_live_annotation_score_mode),
-            "setwise_requirement_live_atomic_model_path": args.setwise_requirement_live_atomic_model_path or None,
-            "setwise_requirement_live_source_expand_factor": int(args.setwise_requirement_live_source_expand_factor),
-            "setwise_requirement_exposure_watch_titles": parse_title_csv(
-                args.setwise_requirement_exposure_watch_titles,
-                default=DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES,
-            ),
-            "setwise_requirement_probe_force_source_titles": parse_title_csv(args.setwise_requirement_probe_force_source_titles),
-            "setwise_requirement_probe_force_shortlist_titles": parse_title_csv(args.setwise_requirement_probe_force_shortlist_titles),
-            "setwise_requirement_probe_force_final_titles": parse_title_csv(args.setwise_requirement_probe_force_final_titles),
-            "setwise_requirement_probe_force_pool_gold_into_final": bool(args.setwise_requirement_probe_force_pool_gold_into_final),
-            "setwise_requirement_probe_source_sort_mode": normalize_requirement_source_sort_mode(args.setwise_requirement_probe_source_sort_mode),
-            "setwise_requirement_probe_source_support_gain_weight": round(float(args.setwise_requirement_probe_source_support_gain_weight), 4),
-            "setwise_requirement_probe_shortlist_sort_mode": normalize_requirement_shortlist_sort_mode(args.setwise_requirement_probe_shortlist_sort_mode),
-            "setwise_requirement_probe_bridge_bonus_mode": normalize_requirement_bridge_bonus_mode(args.setwise_requirement_probe_bridge_bonus_mode),
-            "setwise_requirement_probe_bridge_bonus_weight": round(float(args.setwise_requirement_probe_bridge_bonus_weight), 4),
-            "selector_EM": round(float(selector_em), 4),
-            "selector_F1": round(float(selector_f1), 4),
-            "baseline_EM": round(float(baseline_em), 4),
-            "baseline_F1": round(float(baseline_f1), 4),
-            "EM_delta": round(float(selector_em) - float(baseline_em), 4),
-            "F1_delta": round(float(selector_f1) - float(baseline_f1), 4),
-            "selector_retrieval_metrics": selector_retrieval_metrics,
-            "per_bucket": bucket_summary,
-            "selector_summary": selector_summary,
-        }
-        setwise_selector_query_traces = build_setwise_selector_query_traces(
-            config=config,
-            baseline_solutions=query_solutions,
-            selected_solutions=selected_solutions,
-            gold_docs=gold_docs,
-            gold_answers=gold_answers,
-            doc_text_to_chunk_id=doc_text_to_chunk_id,
-        )
-        logger.info(
-            "Setwise selector %s[%s]@%d: EM=%.4f (delta=%+.4f), F1=%.4f",
-            setwise_selector,
-            str(args.setwise_score_mode),
-            int(args.setwise_pool_k),
-            float(selector_em),
-            float(selector_em) - float(baseline_em),
-            float(selector_f1),
-        )
+        if setwise_selector == "bridge_append":
+            expand_assemble_results = {
+                "selector": setwise_selector,
+                "score_mode": str(args.setwise_score_mode),
+                "pool_k": int(args.setwise_pool_k),
+                "expand_base_k": int(args.expand_base_k),
+                "append_max_docs": int(args.append_max_docs),
+                "append_policy": normalize_append_policy(args.append_policy),
+                "append_random_seed": int(args.append_random_seed),
+                "expand_min_structure_score": round(float(args.expand_min_structure_score), 4),
+                "assemble_mode": normalize_assemble_mode(args.assemble_mode),
+                "assemble_ce_model": args.ce_model if normalize_assemble_mode(args.assemble_mode) == "cross_encoder" else None,
+                "assemble_ce_device": args.ce_device if normalize_assemble_mode(args.assemble_mode) == "cross_encoder" else None,
+                "structure_max_hops": int(args.setwise_structure_max_hops),
+                "base_weight": float(args.setwise_base_weight),
+                "structure_weight": float(args.setwise_structure_weight),
+                "novelty_weight": float(args.setwise_novelty_weight),
+                "non_anchor_title_dedup": bool(args.setwise_non_anchor_title_dedup),
+                "query_entity_source": str(args.setwise_query_entity_source),
+                "method_EM": round(float(selector_em), 4),
+                "method_F1": round(float(selector_f1), 4),
+                "baseline_EM": round(float(baseline_em), 4),
+                "baseline_F1": round(float(baseline_f1), 4),
+                "EM_delta": round(float(selector_em) - float(baseline_em), 4),
+                "F1_delta": round(float(selector_f1) - float(baseline_f1), 4),
+                "method_retrieval_metrics": selector_retrieval_metrics,
+                "per_bucket": {
+                    key: {
+                        "count": value["count"],
+                        "baseline_EM": value["baseline_EM"],
+                        "method_EM": value["selector_EM"],
+                        "EM_delta": value["EM_delta"],
+                        "baseline_F1": value["baseline_F1"],
+                        "method_F1": value["selector_F1"],
+                        "F1_delta": value["F1_delta"],
+                    }
+                    for key, value in bucket_summary.items()
+                },
+                "method_summary": selector_summary,
+            }
+            expand_assemble_query_traces = build_expand_assemble_query_traces(
+                config=config,
+                baseline_solutions=query_solutions,
+                method_solutions=selected_solutions,
+                gold_docs=gold_docs,
+                gold_answers=gold_answers,
+                doc_text_to_chunk_id=doc_text_to_chunk_id,
+            )
+            logger.info(
+                "Expand-assemble %s[%s/%s]@%d: EM=%.4f (delta=%+.4f), F1=%.4f",
+                setwise_selector,
+                str(args.setwise_score_mode),
+                str(args.assemble_mode),
+                int(args.setwise_pool_k),
+                float(selector_em),
+                float(selector_em) - float(baseline_em),
+                float(selector_f1),
+            )
+        else:
+            setwise_selector_results = {
+                "selector": setwise_selector,
+                "score_mode": str(args.setwise_score_mode),
+                "pool_k": int(args.setwise_pool_k),
+                "anchor_count": int(args.setwise_anchor_count),
+                "reserve_top_m": int(max(int(args.setwise_anchor_count), int(args.setwise_reserve_top_m))),
+                "max_bridge_slots": int(max(0, int(args.setwise_max_bridge_slots))),
+                "structure_max_hops": int(args.setwise_structure_max_hops),
+                "base_weight": float(args.setwise_base_weight),
+                "structure_weight": float(args.setwise_structure_weight),
+                "novelty_weight": float(args.setwise_novelty_weight),
+                "non_anchor_title_dedup": bool(args.setwise_non_anchor_title_dedup),
+                "query_entity_source": str(args.setwise_query_entity_source),
+                "gate_mode": str(args.setwise_gate_mode),
+                "gate_min_structure_score": round(float(args.setwise_gate_min_structure_score), 4),
+                "gate_min_combined_margin": round(float(args.setwise_gate_min_combined_margin), 4),
+                "gate_min_closure_score": round(float(args.setwise_gate_min_closure_score), 4),
+                "gate_min_novelty_score": round(float(args.setwise_gate_min_novelty_score), 4),
+                "gate_min_frontier_gain": round(float(args.setwise_gate_min_frontier_gain), 4),
+                "gate_min_path_coherence": round(float(args.setwise_gate_min_path_coherence), 4),
+                "gate_max_avg_local_structure": round(float(args.setwise_gate_max_avg_local_structure), 4),
+                "gate_min_suffix_base_mean": round(float(args.setwise_gate_min_suffix_base_mean), 4),
+                "reader_order_probe_mode": str(args.setwise_reader_order_probe_mode),
+                "beam_width": int(args.setwise_beam_width),
+                "beam_expand_per_state": int(args.setwise_beam_expand_per_state),
+                "beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),
+                "late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
+                "late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
+                "late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
+                "late_rerank_doc_char_limit": int(args.setwise_late_rerank_doc_char_limit),
+                "late_rerank_policy": str(args.setwise_late_rerank_policy),
+                "late_rerank_max_state_score_gap": round(float(args.setwise_late_rerank_max_state_score_gap), 4),
+                "late_rerank_judge_backend": late_rerank_judge_bundle.backend,
+                "late_rerank_judge_model": late_rerank_judge_bundle.model_name,
+                "late_rerank_judge_base_url": late_rerank_judge_bundle.base_url,
+                "late_rerank_judge_reasoning_effort": late_rerank_judge_bundle.reasoning_effort,
+                "state_score_weights": {k: round(float(v), 4) for k, v in resolve_set_closure_state_weight_config(state_weight_config).items()},
+                "setwise_model_path": args.setwise_model_path or None,
+                "setwise_requirement_cache_path": args.setwise_requirement_cache_path or None,
+                "setwise_requirement_mode": str(args.setwise_requirement_mode),
+                "setwise_requirement_model_path": args.setwise_requirement_model_path or None,
+                "setwise_requirement_reserve_policy": str(args.setwise_requirement_reserve_policy),
+                "setwise_requirement_annotation_pool_k": int(args.setwise_requirement_annotation_pool_k),
+                "setwise_requirement_smooth_tau": round(float(args.setwise_requirement_smooth_tau), 4),
+                "setwise_requirement_counterfactual_tau": round(float(args.setwise_requirement_counterfactual_tau), 4),
+                "setwise_requirement_live_annotation_pool_k": int(args.setwise_requirement_live_annotation_pool_k),
+                "setwise_requirement_live_annotation_score_mode": str(args.setwise_requirement_live_annotation_score_mode),
+                "setwise_requirement_live_atomic_model_path": args.setwise_requirement_live_atomic_model_path or None,
+                "setwise_requirement_live_source_expand_factor": int(args.setwise_requirement_live_source_expand_factor),
+                "setwise_requirement_exposure_watch_titles": parse_title_csv(
+                    args.setwise_requirement_exposure_watch_titles,
+                    default=DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES,
+                ),
+                "setwise_requirement_probe_force_source_titles": parse_title_csv(args.setwise_requirement_probe_force_source_titles),
+                "setwise_requirement_probe_force_shortlist_titles": parse_title_csv(args.setwise_requirement_probe_force_shortlist_titles),
+                "setwise_requirement_probe_force_final_titles": parse_title_csv(args.setwise_requirement_probe_force_final_titles),
+                "setwise_requirement_probe_force_pool_gold_into_final": bool(args.setwise_requirement_probe_force_pool_gold_into_final),
+                "setwise_requirement_probe_source_sort_mode": normalize_requirement_source_sort_mode(args.setwise_requirement_probe_source_sort_mode),
+                "setwise_requirement_probe_source_support_gain_weight": round(float(args.setwise_requirement_probe_source_support_gain_weight), 4),
+                "setwise_requirement_probe_shortlist_sort_mode": normalize_requirement_shortlist_sort_mode(args.setwise_requirement_probe_shortlist_sort_mode),
+                "setwise_requirement_probe_bridge_bonus_mode": normalize_requirement_bridge_bonus_mode(args.setwise_requirement_probe_bridge_bonus_mode),
+                "setwise_requirement_probe_bridge_bonus_weight": round(float(args.setwise_requirement_probe_bridge_bonus_weight), 4),
+                "selector_EM": round(float(selector_em), 4),
+                "selector_F1": round(float(selector_f1), 4),
+                "baseline_EM": round(float(baseline_em), 4),
+                "baseline_F1": round(float(baseline_f1), 4),
+                "EM_delta": round(float(selector_em) - float(baseline_em), 4),
+                "F1_delta": round(float(selector_f1) - float(baseline_f1), 4),
+                "selector_retrieval_metrics": selector_retrieval_metrics,
+                "per_bucket": bucket_summary,
+                "selector_summary": selector_summary,
+            }
+            setwise_selector_query_traces = build_setwise_selector_query_traces(
+                config=config,
+                baseline_solutions=query_solutions,
+                selected_solutions=selected_solutions,
+                gold_docs=gold_docs,
+                gold_answers=gold_answers,
+                doc_text_to_chunk_id=doc_text_to_chunk_id,
+            )
+            logger.info(
+                "Setwise selector %s[%s]@%d: EM=%.4f (delta=%+.4f), F1=%.4f",
+                setwise_selector,
+                str(args.setwise_score_mode),
+                int(args.setwise_pool_k),
+                float(selector_em),
+                float(selector_em) - float(baseline_em),
+                float(selector_f1),
+            )
 
     # Cross-encoder rerank on baseline final top-K
     cross_encoder_rerank_results = None
@@ -6457,6 +7164,12 @@ def main():
             "oracle_select_ks": oracle_select_ks,
             "cross_encoder_rerank": cross_encoder_rerank,
             "setwise_selector": setwise_selector,
+            "expand_base_k": int(args.expand_base_k),
+            "expand_min_structure_score": float(args.expand_min_structure_score),
+            "append_max_docs": int(args.append_max_docs),
+            "append_policy": normalize_append_policy(args.append_policy),
+            "append_random_seed": int(args.append_random_seed),
+            "assemble_mode": normalize_assemble_mode(args.assemble_mode),
             "setwise_score_mode": str(args.setwise_score_mode),
             "setwise_pool_k": int(args.setwise_pool_k),
             "setwise_anchor_count": int(args.setwise_anchor_count),
@@ -6531,6 +7244,8 @@ def main():
         **({"oracle_select_qa": oracle_select_qa_results} if oracle_select_qa_results else {}),
         **({"setwise_selector_qa": setwise_selector_results} if setwise_selector_results else {}),
         **({"setwise_selector_query_traces": setwise_selector_query_traces} if setwise_selector_query_traces else {}),
+        **({"expand_assemble_qa": expand_assemble_results} if expand_assemble_results else {}),
+        **({"expand_assemble_query_traces": expand_assemble_query_traces} if expand_assemble_query_traces else {}),
         **({"cross_encoder_rerank_qa": cross_encoder_rerank_results} if cross_encoder_rerank_results else {}),
         "examples": build_report_examples(
             config=config,
@@ -6563,6 +7278,8 @@ def main():
         print_result["oracle_reorder_qa"] = oracle_reorder_qa_results
     if setwise_selector_results:
         print_result["setwise_selector_qa"] = setwise_selector_results
+    if expand_assemble_results:
+        print_result["expand_assemble_qa"] = expand_assemble_results
     if cross_encoder_rerank_results:
         print_result["cross_encoder_rerank_qa"] = cross_encoder_rerank_results
     if gold_doc_reader:
