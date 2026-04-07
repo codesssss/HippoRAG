@@ -1,0 +1,100 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "qa_top_k": 3,
+      "em": 0.2,
+      "f1": 0.2722164502164503,
+      "recall5": 0.615,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk3_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 5,
+      "em": 0.27,
+      "f1": 0.33475506308718184,
+      "recall5": 0.615,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 7,
+      "em": 0.32,
+      "f1": 0.3924270132409666,
+      "recall5": 0.615,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 10,
+      "em": 0.34,
+      "f1": 0.4235288129744652,
+      "recall5": 0.615,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "qa_top_k": 3,
+      "em": 0.45,
+      "f1": 0.5698982683982685,
+      "recall5": 0.915,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk3_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "qa_top_k": 5,
+      "em": 0.58,
+      "f1": 0.6966664388243337,
+      "recall5": 0.915,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "qa_top_k": 7,
+      "em": 0.58,
+      "f1": 0.6953155616313511,
+      "recall5": 0.915,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "qa_top_k": 10,
+      "em": 0.6,
+      "f1": 0.7295200785473629,
+      "recall5": 0.915,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "qa_top_k": 3,
+      "em": 0.36,
+      "f1": 0.39871676145205553,
+      "recall5": 0.78,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk3_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "qa_top_k": 5,
+      "em": 0.36,
+      "f1": 0.4008283143012568,
+      "recall5": 0.78,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "qa_top_k": 7,
+      "em": 0.42,
+      "f1": 0.4642319347319348,
+      "recall5": 0.78,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "qa_top_k": 10,
+      "em": 0.45,
+      "f1": 0.5118339105339105,
+      "recall5": 0.78,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    }
+  ]
+}

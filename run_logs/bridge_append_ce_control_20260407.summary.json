@@ -1,0 +1,256 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "run_type": "baseline",
+      "qa_top_k": 5,
+      "em": 0.27,
+      "f1": 0.33475506308718184,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.31,
+      "f1": 0.3577,
+      "delta_vs_baseline_em": 0.04,
+      "delta_vs_baseline_f1": 0.0218,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_control_topk5_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.32,
+      "f1": 0.381,
+      "delta_vs_baseline_em": 0.05,
+      "delta_vs_baseline_f1": 0.0462,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "baseline",
+      "qa_top_k": 7,
+      "em": 0.32,
+      "f1": 0.3924270132409666,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 7,
+      "em": 0.34,
+      "f1": 0.4007,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.0083,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_control_topk7_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 7,
+      "em": 0.38,
+      "f1": 0.4385,
+      "delta_vs_baseline_em": 0.06,
+      "delta_vs_baseline_f1": 0.0461,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "baseline",
+      "qa_top_k": 10,
+      "em": 0.34,
+      "f1": 0.4235288129744652,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 10,
+      "em": 0.39,
+      "f1": 0.4412,
+      "delta_vs_baseline_em": 0.05,
+      "delta_vs_baseline_f1": 0.0177,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_control_topk10_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 10,
+      "em": 0.37,
+      "f1": 0.4422,
+      "delta_vs_baseline_em": 0.03,
+      "delta_vs_baseline_f1": 0.0187,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "baseline",
+      "qa_top_k": 5,
+      "em": 0.58,
+      "f1": 0.6966664388243337,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.56,
+      "f1": 0.6746,
+      "delta_vs_baseline_em": -0.02,
+      "delta_vs_baseline_f1": -0.0221,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_control_topk5_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.62,
+      "f1": 0.7173,
+      "delta_vs_baseline_em": 0.04,
+      "delta_vs_baseline_f1": 0.0206,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "baseline",
+      "qa_top_k": 7,
+      "em": 0.58,
+      "f1": 0.6953155616313511,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 7,
+      "em": 0.6,
+      "f1": 0.7222,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.0269,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_control_topk7_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 7,
+      "em": 0.6,
+      "f1": 0.7136,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.0183,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "baseline",
+      "qa_top_k": 10,
+      "em": 0.6,
+      "f1": 0.7295200785473629,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 10,
+      "em": 0.59,
+      "f1": 0.6981,
+      "delta_vs_baseline_em": -0.01,
+      "delta_vs_baseline_f1": -0.0314,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_control_topk10_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 10,
+      "em": 0.58,
+      "f1": 0.6881,
+      "delta_vs_baseline_em": -0.02,
+      "delta_vs_baseline_f1": -0.0414,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline",
+      "qa_top_k": 5,
+      "em": 0.36,
+      "f1": 0.4008283143012568,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.37,
+      "f1": 0.4083,
+      "delta_vs_baseline_em": 0.01,
+      "delta_vs_baseline_f1": 0.0075,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_control_topk5_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.43,
+      "f1": 0.4728,
+      "delta_vs_baseline_em": 0.07,
+      "delta_vs_baseline_f1": 0.072,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline",
+      "qa_top_k": 7,
+      "em": 0.42,
+      "f1": 0.4642319347319348,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 7,
+      "em": 0.43,
+      "f1": 0.486,
+      "delta_vs_baseline_em": 0.01,
+      "delta_vs_baseline_f1": 0.0218,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_control_topk7_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 7,
+      "em": 0.44,
+      "f1": 0.5192,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.055,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline",
+      "qa_top_k": 10,
+      "em": 0.45,
+      "f1": 0.5118339105339105,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline_plus_ce",
+      "qa_top_k": 10,
+      "em": 0.46,
+      "f1": 0.4992,
+      "delta_vs_baseline_em": 0.01,
+      "delta_vs_baseline_f1": -0.0126,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_control_topk10_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "expand_plus_ce",
+      "qa_top_k": 10,
+      "em": 0.5,
+      "f1": 0.5403,
+      "delta_vs_baseline_em": 0.06,
+      "delta_vs_baseline_f1": 0.0385,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk10_20260406.json"
+    }
+  ]
+}

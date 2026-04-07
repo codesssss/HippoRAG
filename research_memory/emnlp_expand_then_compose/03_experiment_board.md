@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-02
+Last updated: 2026-04-07
 
 ## Canonical Outputs
 
@@ -18,6 +18,12 @@ Last updated: 2026-04-02
 - `Requirement matcher trainer`: `scripts/train_requirement_setwise.py`
 - `Requirement beam diagnostics script`: `scripts/analyze_requirement_beam_report.py`
 - `MuSiQue requirement beam diagnostic note`: `research_memory/emnlp_expand_then_compose/musique_requirement_beam_reserve_diagnostics_20260402.md`
+- `Baseline qa_top_k sweep summary`: `run_logs/baseline_qa_topk_sweep_20260406.summary.md`
+- `Bridge-append matrix summary`: `run_logs/bridge_append_matrix_20260406.summary.md`
+- `Baseline+same CE attribution summary`: `run_logs/bridge_append_ce_control_20260407.summary.md`
+- `Selector@10 expand probe summary`: `run_logs/selector_top10_expand_probe_20260406.summary.md`
+- `MuSiQue top-7 width-matched control`: `run_logs/width_matched_control_musique_top7_20260407.summary.md`
+- `Unified top-5 width-matched control`: `run_logs/width_matched_control_top5_20260407.summary.md`
 
 ## Done
 
@@ -59,6 +65,13 @@ Last updated: 2026-04-02
   - near-collapsed leakage axis
 - Added a full implementation spec for the next V2 parser/compiler rebuild:
   - `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
+- Ran `baseline qa_top_k` sweep on `MuSiQue / HotpotQA / 2Wiki` over `K in {3,5,7,10}`
+- Implemented and locked the `bridge_append` expand path with `assemble_mode in {none, base_score, embedding_similarity, cross_encoder}`
+- Ran the `bridge_append` matrix on `MuSiQue / HotpotQA / 2Wiki` over `qa_top_k in {5,7,10}`
+- Ran `baseline + same CE` attribution controls for `MuSiQue / HotpotQA / 2Wiki` over `qa_top_k in {5,7,10}`
+- Ran the ungated `selector@10` expand probe and confirmed the beam-fill failure mode
+- Ran the width-matched attribution control on `MuSiQue top-7`
+- Ran the unified width-matched attribution control on `top-5` for `MuSiQue / HotpotQA / 2Wiki`
 
 ## Running
 
@@ -75,6 +88,8 @@ Last updated: 2026-04-02
    - finalist leakage range stops collapsing
 5. Keep the current simple `pathcore_guard` line as the paper-facing default unless the new branch clearly wins
 6. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs current simple selector
+7. Use the locked `bridge_append` line as the frozen expand baseline for new expand exploration
+8. If expand exploration continues, compare against the locked width-matched controls rather than rerunning ad hoc probes
 
 ## Method Priority
 

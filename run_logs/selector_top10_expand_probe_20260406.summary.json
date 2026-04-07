@@ -1,0 +1,38 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "run_type": "baseline@10",
+      "em": 0.34,
+      "f1": 0.4235288129744652,
+      "recall5": 0.615,
+      "report": "/mnt/nvme/code/HippoRAG/outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "selector@10",
+      "em": 0.26,
+      "f1": 0.3212,
+      "recall5": 0.5467,
+      "baseline_em_internal": 0.34,
+      "baseline_f1_internal": 0.4235,
+      "report": "/mnt/nvme/code/HippoRAG/outputs_step0_general_musique/eval_reports/setwise_bridge_beam_bridge_100_legacy_reserve3_bridge7_nogate_generalfactual_qatopk10_qwen3-8b_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "run_type": "baseline@10",
+      "em": 0.6,
+      "f1": 0.7295200785473629,
+      "recall5": 0.915,
+      "report": "/mnt/nvme/code/HippoRAG/outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline@10",
+      "em": 0.45,
+      "f1": 0.5118339105339105,
+      "recall5": 0.78,
+      "report": "/mnt/nvme/code/HippoRAG/outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    }
+  ]
+}
