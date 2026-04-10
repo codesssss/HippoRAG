@@ -1,0 +1,170 @@
+{
+  "rows": [
+    {
+      "phase": "top5_all",
+      "dataset": "musique",
+      "run_type": "baseline_top5",
+      "qa_top_k": 5,
+      "em": 0.3,
+      "f1": 0.33088235294117646,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_full_qwen3-8b_qatopk5_baseline_20260409full.json"
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "musique",
+      "run_type": "baseline_top10_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.3,
+      "f1": 0.3,
+      "delta_vs_baseline_em": 0.0,
+      "delta_vs_baseline_f1": -0.025,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "musique",
+      "run_type": "random3_deep_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.25,
+      "f1": 0.2667,
+      "delta_vs_baseline_em": -0.05,
+      "delta_vs_baseline_f1": -0.0583,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": -0.05,
+      "delta_vs_baseline_top10_plus_ce_f1": -0.0333
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "musique",
+      "run_type": "bridge_append_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.3,
+      "f1": 0.3059,
+      "delta_vs_baseline_em": 0.0,
+      "delta_vs_baseline_f1": -0.0191,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0059
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "hotpotqa",
+      "run_type": "baseline_top5",
+      "qa_top_k": 5,
+      "em": 0.55,
+      "f1": 0.6567783094098882,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_full_qwen3-8b_qatopk5_baseline_20260409full.json"
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "hotpotqa",
+      "run_type": "baseline_top10_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.55,
+      "f1": 0.6515,
+      "delta_vs_baseline_em": 0.0,
+      "delta_vs_baseline_f1": -0.0053,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "hotpotqa",
+      "run_type": "random3_deep_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.5,
+      "f1": 0.6015,
+      "delta_vs_baseline_em": -0.05,
+      "delta_vs_baseline_f1": -0.0553,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": -0.05,
+      "delta_vs_baseline_top10_plus_ce_f1": -0.05
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "hotpotqa",
+      "run_type": "bridge_append_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.55,
+      "f1": 0.6515,
+      "delta_vs_baseline_em": 0.0,
+      "delta_vs_baseline_f1": -0.0053,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline_top5",
+      "qa_top_k": 5,
+      "em": 0.5,
+      "f1": 0.5523009121656247,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_full_qwen3-8b_qatopk5_baseline_20260409full.json"
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "2wikimultihopqa",
+      "run_type": "baseline_top10_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.5,
+      "f1": 0.5375,
+      "delta_vs_baseline_em": 0.0,
+      "delta_vs_baseline_f1": -0.0148,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "2wikimultihopqa",
+      "run_type": "random3_deep_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.45,
+      "f1": 0.5214,
+      "delta_vs_baseline_em": -0.05,
+      "delta_vs_baseline_f1": -0.0309,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": -0.05,
+      "delta_vs_baseline_top10_plus_ce_f1": -0.0161
+    },
+    {
+      "phase": "top5_all",
+      "dataset": "2wikimultihopqa",
+      "run_type": "bridge_append_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.5,
+      "f1": 0.5606,
+      "delta_vs_baseline_em": 0.0,
+      "delta_vs_baseline_f1": 0.0083,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0231
+    },
+    {
+      "phase": "musique_top7",
+      "dataset": "musique",
+      "run_type": "baseline_top7",
+      "qa_top_k": 7,
+      "em": 0.35,
+      "f1": 0.3527027027027027,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_full_qwen3-8b_qatopk7_baseline_20260409full.json"
+    },
+    {
+      "phase": "musique_top7",
+      "dataset": "musique",
+      "run_type": "baseline_top10_plus_ce",
+      "qa_top_k": 7,
+      "em": 0.35,
+      "f1": 0.3833,
+      "delta_vs_baseline_em": 0.0,
+      "delta_vs_baseline_f1": 0.0306,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk7_20260409full.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    }
+  ]
+}

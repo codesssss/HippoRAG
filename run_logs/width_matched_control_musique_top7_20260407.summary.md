@@ -1,5 +1,11 @@
 # Width-Matched Control: MuSiQue top-7
 
+Naming note:
+- `baseline_top7_plus_ce` = baseline-only CE rerank at `qa_top_k = 7`.
+- `baseline_top10_plus_ce` = width-matched no-append CE control over the top-10 baseline prefix.
+- `bridge_append_plus_ce` = same-pool pure CE rerank over `top-10 baseline prefix + 3 bridge-appended docs`.
+- `random3_deep_plus_ce` = matched random-append CE control.
+
 | Run | EM | F1 | ΔEM vs baseline top-7 | ΔEM vs baseline top-10+CE |
 |---|---:|---:|---:|---:|
 | baseline_top7 | 0.3200 | 0.3924 | — | — |

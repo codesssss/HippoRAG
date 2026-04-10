@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 import sys
@@ -52,9 +53,11 @@ from eval_causal_qwen3 import (
     OpenAICompatibleLateRerankJudge,
     SetwiseLateRerankResponseModel,
     build_expand_assemble_query_traces,
+    hydrate_query_solutions_from_baseline_report,
     build_requirement_title_exposure_summary,
     build_setwise_late_rerank_candidates,
     build_setwise_selector_query_traces,
+    build_retrieval_cache_examples,
     build_setwise_late_rerank_judge_bundle,
     build_report_examples,
     collect_grounded_question_query_entities,
@@ -62,9 +65,15 @@ from eval_causal_qwen3 import (
     collect_question_query_entities,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
+    compute_retrieval_recall_metrics,
+    ensure_runtime_objects_for_cached_retrieval,
+    load_baseline_report_payload,
+    load_retrieval_cache_payload,
     maybe_apply_bridge_saturation_guard,
     maybe_apply_setwise_reader_order_probe,
+    assemble_coverage_exact_search,
     compute_state_path_connectivity_metrics,
+    hydrate_query_solutions_from_retrieval_cache,
     materialize_reader_top_positions,
     normalize_setwise_late_rerank_policy,
     parse_setwise_late_rerank_response,
@@ -81,6 +90,7 @@ from eval_causal_qwen3 import (
     select_learned_greedy_positions,
     select_requirement_beam_positions,
     should_apply_setwise_late_rerank_override,
+    write_retrieval_cache_payload,
 )
 from requirement_beam_utils import (
     align_requirement_cache_entry_to_pool,
@@ -4629,6 +4639,554 @@ def test_rerank_candidate_positions_for_assemble_supports_similarity_and_ce():
     assert len(ce_reranker.calls) == 1
 
 
+def test_assemble_coverage_exact_search_prefers_covq_then_cove_then_ce():
+    selected_positions, trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to beta",
+            "Doc B\nbeta bridge",
+            "Doc C\ngamma bridge",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.9, 0.4, 0.8], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha", "beta"},
+        doc_idx_to_entities={
+            0: {"alpha", "beta"},
+            1: {"beta", "bridge"},
+            2: {"alpha", "gamma"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "beta", 1.0, "rel")],
+            1: [("beta", "bridge", 1.0, "rel")],
+            2: [("alpha", "gamma", 1.0, "rel"), ("gamma", "bridge", 1.0, "rel")],
+        },
+        ce_reranker=DummyCrossEncoder([0.2, 0.1, 0.9]),
+        position_sources={0: "baseline_prefix", 1: "append_bridge", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+    )
+
+    assert selected_positions == [2, 0]
+    assert trace["best_score"]["covQ"] == 2
+    assert trace["best_score"]["covE"] == 3
+    assert trace["best_ce_subset_by_true_ce"] == [0, 2]
+    assert trace["coverage_vs_ce_overlap"] == 2
+    assert trace["num_baseline_selected"] == 1
+    assert trace["num_appended_selected"] == 1
+    assert trace["effective_decision_layer"] == "CE"
+    assert trace["max_covQ_subset_count"] == 3
+    assert trace["max_covQ_max_covE_subset_count"] == 2
+    assert trace["max_covQ_max_covE_max_ce_subset_count"] == 1
+    assert trace["ranking_rows"][0]["pool_position"] == 2
+    assert trace["ranking_rows"][0]["ce_score"] == 0.9
+    assert trace["selected_appended_rows"][0]["title"] == "Doc C"
+    assert trace["selected_appended_with_nonzero_unique_gain"] == 1
+    assert trace["selected_appended_with_zero_unique_gain"] == 0
+
+
+def test_assemble_coverage_exact_search_supports_qeb_ce_variant():
+    selected_positions, trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha beta",
+            "Doc B\nbridge one",
+            "Doc C\nbridge two",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.8, 0.4, 0.3], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "shared"},
+            1: {"shared", "b1"},
+            2: {"shared", "b2", "b3"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "shared", 1.0, "rel")],
+            1: [("shared", "b1", 1.0, "rel")],
+            2: [("shared", "b2", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "append_bridge", 2: "append_bridge"},
+        coverage_score_variant="qeb_ce",
+    )
+
+    assert selected_positions == [0, 2]
+    assert trace["coverage_score_variant"] == "qeb_ce"
+    assert trace["best_covB_trace_only"] == 3
+    assert trace["ce_score_source"] == "base_score_fallback"
+
+
+def test_assemble_coverage_exact_search_candidate_pool_atom_source_matches_default():
+    kwargs = dict(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to base",
+            "Doc B\nbase to beta",
+            "Doc C\npoison edge",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.8, 0.2, 0.9], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "base"},
+            1: {"base", "beta"},
+            2: {"poison", "target"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "base", 1.0, "rel")],
+            1: [("base", "beta", 1.0, "rel")],
+            2: [("poison", "target", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+    )
+
+    default_positions, default_trace = assemble_coverage_exact_search(**kwargs)
+    explicit_positions, explicit_trace = assemble_coverage_exact_search(
+        **kwargs,
+        coverage_atom_source="candidate_pool",
+    )
+
+    assert explicit_positions == default_positions
+    assert explicit_trace["atom_source_mode"] == "candidate_pool"
+    assert explicit_trace["atom_source_positions"] == [0, 1, 2]
+    assert explicit_trace["atom_source_counts"] == default_trace["atom_source_counts"]
+    assert explicit_trace["best_score"] == default_trace["best_score"]
+
+
+def test_assemble_coverage_exact_search_baseline_prefix_freezes_atom_universe():
+    candidate_positions, candidate_trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to base",
+            "Doc B\nbase to beta",
+            "Doc C\npoison edge",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.8, 0.2, 0.9], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "base"},
+            1: {"base", "beta"},
+            2: {"poison", "target"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "base", 1.0, "rel")],
+            1: [("base", "beta", 1.0, "rel")],
+            2: [("poison", "target", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+        coverage_atom_source="candidate_pool",
+    )
+    frozen_positions, frozen_trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to base",
+            "Doc B\nbase to beta",
+            "Doc C\npoison edge",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.8, 0.2, 0.9], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "base"},
+            1: {"base", "beta"},
+            2: {"poison", "target"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "base", 1.0, "rel")],
+            1: [("base", "beta", 1.0, "rel")],
+            2: [("poison", "target", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+        coverage_atom_source="baseline_prefix",
+        coverage_atom_positions=[0, 1],
+    )
+    same_pool_positions, same_pool_trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to base",
+            "Doc B\nbase to beta",
+            "Doc C\npoison edge",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.8, 0.2, 0.9], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "base"},
+            1: {"base", "beta"},
+            2: {"poison", "target"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "base", 1.0, "rel")],
+            1: [("base", "beta", 1.0, "rel")],
+            2: [("poison", "target", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+        coverage_atom_source="baseline_prefix",
+        coverage_atom_positions=[0, 1, 2],
+    )
+
+    assert candidate_positions == [2, 0]
+    assert candidate_trace["atom_source_counts"] == {"A_Q": 1, "A_E": 3, "A_B": 4}
+    assert frozen_positions == [0, 1]
+    assert frozen_trace["atom_source_mode"] == "baseline_prefix"
+    assert frozen_trace["atom_source_is_frozen"] is True
+    assert frozen_trace["atom_source_positions"] == [0, 1]
+    assert frozen_trace["atom_source_titles"] == ["Doc A", "Doc B"]
+    assert frozen_trace["atom_source_counts"] == {"A_Q": 1, "A_E": 2, "A_B": 2}
+    assert frozen_trace["best_score"]["covE"] == 2
+    assert same_pool_positions == candidate_positions
+    assert same_pool_trace["atom_source_counts"] == candidate_trace["atom_source_counts"]
+
+
+def test_assemble_coverage_exact_search_budget_gap_admissibility_keeps_only_gap_filling_appended_docs():
+    selected_positions, trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to base",
+            "Doc B\nbase to beta",
+            "Doc C\nbeta to gamma",
+            "Doc D\nbeta to gamma",
+            "Doc E\npoison edge",
+        ],
+        pool_doc_ids=[0, 1, 2, 3, 4],
+        pool_doc_scores=np.asarray([0.9, 0.8, 0.1, 0.95, 0.7], dtype=float),
+        candidate_positions=[0, 1, 2, 3, 4],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "base"},
+            1: {"base", "beta"},
+            2: {"beta", "gamma"},
+            3: {"beta", "gamma"},
+            4: {"poison", "target"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "base", 1.0, "rel")],
+            1: [("base", "beta", 1.0, "rel")],
+            2: [("beta", "gamma", 1.0, "rel")],
+            3: [("beta", "gamma", 1.0, "rel")],
+            4: [("poison", "target", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={
+            0: "baseline_prefix",
+            1: "baseline_prefix",
+            2: "baseline_prefix",
+            3: "append_bridge",
+            4: "append_bridge",
+        },
+        coverage_score_variant="qe_ce",
+        coverage_atom_source="baseline_prefix",
+        coverage_atom_positions=[0, 1, 2],
+        coverage_admissibility_mode="budget_gap",
+    )
+
+    assert selected_positions == [3, 0]
+    assert trace["coverage_admissibility_mode"] == "budget_gap"
+    assert trace["final_candidate_positions"] == [0, 1, 2, 3]
+    assert trace["num_appended_selected"] == 1
+    assert trace["selected_appended_rows"][0]["title"] == "Doc D"
+    admissibility_trace = trace["admissibility_trace"]
+    assert admissibility_trace["reference_positions"] == [0, 1]
+    assert admissibility_trace["reference_gap_edge_count"] == 1
+    assert admissibility_trace["candidate_positions_before_filter"] == [0, 1, 2, 3, 4]
+    assert admissibility_trace["candidate_positions_after_filter"] == [0, 1, 2, 3]
+    assert admissibility_trace["appended_positions_after_filter"] == [3]
+    assert admissibility_trace["kept_appended_count"] == 1
+    assert admissibility_trace["dropped_appended_count"] == 1
+    rows_by_position = {
+        int(row["pool_position"]): row
+        for row in admissibility_trace["rows"]
+    }
+    assert rows_by_position[3]["kept"] is True
+    assert rows_by_position[3]["marginal_gap_edge_count"] == 1
+    assert rows_by_position[3]["marginal_gap_edges"] == [["beta", "gamma"]]
+    assert rows_by_position[3]["marginal_gap_edge_support_counts"] == [2]
+    assert rows_by_position[4]["kept"] is False
+    assert rows_by_position[4]["marginal_gap_edge_count"] == 0
+
+
+@pytest.mark.parametrize("atom_source", ["candidate_pool", "baseline_anchored"])
+def test_assemble_coverage_exact_search_budget_gap_requires_baseline_prefix_atom_source(atom_source):
+    with pytest.raises(ValueError, match="requires coverage_atom_source=baseline_prefix"):
+        assemble_coverage_exact_search(
+            query="where is alpha",
+            pool_docs=[
+                "Doc A\nalpha to base",
+                "Doc B\nbase to beta",
+                "Doc C\nbeta to gamma",
+            ],
+            pool_doc_ids=[0, 1, 2],
+            pool_doc_scores=np.asarray([0.9, 0.8, 0.7], dtype=float),
+            candidate_positions=[0, 1, 2],
+            qa_top_k=2,
+            seed_entities={"alpha"},
+            doc_idx_to_entities={
+                0: {"alpha", "base"},
+                1: {"base", "beta"},
+                2: {"beta", "gamma"},
+            },
+            doc_idx_to_edges={
+                0: [("alpha", "base", 1.0, "rel")],
+                1: [("base", "beta", 1.0, "rel")],
+                2: [("beta", "gamma", 1.0, "rel")],
+            },
+            ce_reranker=None,
+            position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+            coverage_score_variant="qe_ce",
+            coverage_atom_source=atom_source,
+            coverage_atom_positions=[0, 1],
+            coverage_admissibility_mode="budget_gap",
+        )
+
+
+def test_assemble_coverage_exact_search_baseline_anchored_admits_connected_novelty_only():
+    anchored_positions, anchored_trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to base",
+            "Doc B\nbase to beta",
+            "Doc C\nbeta to gamma",
+            "Doc D\npoison edge",
+        ],
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_scores=np.asarray([0.8, 0.2, 0.7, 0.9], dtype=float),
+        candidate_positions=[0, 1, 2, 3],
+        qa_top_k=3,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "base"},
+            1: {"base", "beta"},
+            2: {"beta", "gamma"},
+            3: {"poison", "target"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "base", 1.0, "rel")],
+            1: [("base", "beta", 1.0, "rel")],
+            2: [("beta", "gamma", 1.0, "rel")],
+            3: [("poison", "target", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge", 3: "append_bridge"},
+        coverage_score_variant="qe_ce",
+        coverage_atom_source="baseline_anchored",
+        coverage_atom_positions=[0, 1],
+    )
+
+    assert anchored_positions == [0, 2, 1]
+    assert anchored_trace["atom_source_mode"] == "baseline_anchored"
+    assert anchored_trace["atom_source_positions"] == [0, 1]
+    assert anchored_trace["atom_source_counts"] == {"A_Q": 1, "A_E": 3, "A_B": 3}
+    assert anchored_trace["best_score"]["covE"] == 3
+    assert anchored_trace["selected_appended_with_nonzero_unique_gain"] == 1
+    assert anchored_trace["selected_appended_rows"][0]["title"] == "Doc C"
+    assert anchored_trace["selected_appended_rows"][0]["unique_covE_gain"] == 1
+    assert anchored_trace["selected_appended_rows"][0]["covered_edge_support_counts"] == [1]
+
+
+def test_assemble_coverage_exact_search_baseline_anchored_matches_other_sources_when_append_is_zero():
+    kwargs = dict(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha to base",
+            "Doc B\nbase to beta",
+            "Doc C\nbeta to gamma",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.8, 0.2, 0.7], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha", "base"},
+            1: {"base", "beta"},
+            2: {"beta", "gamma"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "base", 1.0, "rel")],
+            1: [("base", "beta", 1.0, "rel")],
+            2: [("beta", "gamma", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "baseline_prefix"},
+        coverage_score_variant="qe_ce",
+        coverage_atom_positions=[0, 1, 2],
+    )
+
+    candidate_positions, candidate_trace = assemble_coverage_exact_search(
+        **kwargs,
+        coverage_atom_source="candidate_pool",
+    )
+    prefix_positions, prefix_trace = assemble_coverage_exact_search(
+        **kwargs,
+        coverage_atom_source="baseline_prefix",
+    )
+    anchored_positions, anchored_trace = assemble_coverage_exact_search(
+        **kwargs,
+        coverage_atom_source="baseline_anchored",
+    )
+
+    assert candidate_positions == prefix_positions == anchored_positions
+    assert candidate_trace["atom_source_counts"] == prefix_trace["atom_source_counts"] == anchored_trace["atom_source_counts"]
+    assert anchored_trace["atom_source_mode"] == "baseline_anchored"
+
+
+def test_assemble_coverage_exact_search_marks_covq_decision_layer_when_query_coverage_is_unique():
+    selected_positions, trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha beta",
+            "Doc B\nalpha",
+            "Doc C\nbeta",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.1, 0.9, 0.8], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=1,
+        seed_entities={"alpha", "beta"},
+        doc_idx_to_entities={
+            0: {"alpha", "beta"},
+            1: {"alpha"},
+            2: {"beta"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "beta", 1.0, "rel")],
+            1: [],
+            2: [],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "append_bridge", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+    )
+
+    assert selected_positions == [0]
+    assert trace["effective_decision_layer"] == "CovQ"
+    assert trace["max_covQ_subset_count"] == 1
+    assert trace["covQ_margin"] == 1.0
+    assert trace["covE_margin_within_max_covQ"] is None
+    assert trace["ce_margin_within_max_covQ_covE"] is None
+
+
+def test_assemble_coverage_exact_search_marks_cove_decision_layer_when_query_ties_but_edge_coverage_is_unique():
+    selected_positions, trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha bridge",
+            "Doc B\nbeta",
+            "Doc C\nbeta gamma",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.1, 0.9, 0.8], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha", "beta"},
+        doc_idx_to_entities={
+            0: {"alpha", "bridge"},
+            1: {"beta"},
+            2: {"beta", "gamma"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "bridge", 1.0, "rel")],
+            1: [],
+            2: [("beta", "gamma", 1.0, "rel")],
+        },
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "append_bridge", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+    )
+
+    assert selected_positions == [2, 0]
+    assert trace["effective_decision_layer"] == "CovE"
+    assert trace["max_covQ_subset_count"] == 2
+    assert trace["max_covQ_max_covE_subset_count"] == 1
+    assert trace["covQ_margin"] == 1.0
+    assert trace["covE_margin_within_max_covQ"] == 1.0
+    assert trace["ce_margin_within_max_covQ_covE"] is None
+
+
+def test_assemble_coverage_exact_search_marks_tie_after_ce_when_score_layers_do_not_break_the_tie():
+    selected_positions, trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Doc A\nalpha",
+            "Doc B\nalpha",
+        ],
+        pool_doc_ids=[0, 1],
+        pool_doc_scores=np.asarray([0.9, 0.8], dtype=float),
+        candidate_positions=[0, 1],
+        qa_top_k=1,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={
+            0: {"alpha"},
+            1: {"alpha"},
+        },
+        doc_idx_to_edges={
+            0: [],
+            1: [],
+        },
+        ce_reranker=DummyCrossEncoder([0.7, 0.7]),
+        position_sources={0: "baseline_prefix", 1: "append_bridge"},
+        coverage_score_variant="qe_ce",
+    )
+
+    assert selected_positions == [0]
+    assert trace["effective_decision_layer"] == "TIE_AFTER_CE"
+    assert trace["max_covQ_subset_count"] == 2
+    assert trace["max_covQ_max_covE_subset_count"] == 2
+    assert trace["max_covQ_max_covE_max_ce_subset_count"] == 2
+    assert trace["covQ_margin"] is None
+    assert trace["covE_margin_within_max_covQ"] is None
+    assert trace["ce_margin_within_max_covQ_covE"] is None
+
+
+def test_assemble_coverage_exact_search_falls_back_when_no_valid_subset_exists():
+    selected_positions, trace = assemble_coverage_exact_search(
+        query="where is alpha",
+        pool_docs=[
+            "Same Title\nalpha",
+            "Same Title\nbeta",
+            "Same Title\ngamma",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.2, 0.9, 0.5], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        seed_entities={"alpha"},
+        doc_idx_to_entities={0: {"alpha"}, 1: {"beta"}, 2: {"gamma"}},
+        doc_idx_to_edges={0: [], 1: [], 2: []},
+        ce_reranker=None,
+        position_sources={0: "baseline_prefix", 1: "append_bridge", 2: "append_bridge"},
+        coverage_score_variant="qe_ce",
+    )
+
+    assert selected_positions == [1, 2]
+    assert trace["fallback_reason"] == "no_valid_subset_under_title_dedup"
+    assert trace["effective_decision_layer"] == "fallback"
+    assert trace["total_valid_subsets"] == 0
+    assert trace["total_invalid_subsets_dedup"] == 3
+    assert len(trace["ranking_rows"]) == 2
+
+
 def test_build_expand_assemble_query_traces_surfaces_method_trace():
     config = type("Config", (), {"qa_top_k": 2, "causal_engine_version": "legacy"})()
     baseline_solution = QuerySolution(
@@ -4669,6 +5227,210 @@ def test_build_expand_assemble_query_traces_surfaces_method_trace():
     assert query_traces[0]["method_top_titles"] == ["Beta", "Gamma"]
     assert query_traces[0]["method_metrics"]["ExactMatch"] == 1.0
     assert query_traces[0]["expand_assemble_trace"]["assemble_mode"] == "cross_encoder"
+
+
+def test_load_and_hydrate_query_solutions_from_baseline_report(tmp_path):
+    report_path = tmp_path / "baseline_report.json"
+    report_path.write_text(
+        json.dumps(
+            {
+                "overall_recomputed": {
+                    "num_queries": 2,
+                    "ExactMatch": 0.5,
+                    "F1": 0.75,
+                },
+                "examples": [
+                    {
+                        "question": "Q1",
+                        "answer": "A1",
+                        "gold_answers": ["A1"],
+                    },
+                    {
+                        "question": "Q2",
+                        "answer": "A2",
+                        "gold_answers": ["A2"],
+                    },
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    payload = load_baseline_report_payload(report_path)
+    assert payload["overall_metrics"]["num_queries"] == 2
+
+    query_solutions = [
+        QuerySolution(question="Q1", docs=["Doc1"], doc_scores=np.asarray([1.0], dtype=float)),
+        QuerySolution(question="Q2", docs=["Doc2"], doc_scores=np.asarray([1.0], dtype=float)),
+    ]
+
+    hydrate_query_solutions_from_baseline_report(
+        query_solutions=query_solutions,
+        baseline_report_payload=payload,
+        gold_docs=[["Doc1"], ["Doc2"]],
+    )
+
+    assert query_solutions[0].answer == "A1"
+    assert query_solutions[1].gold_answers == ["A2"]
+    assert query_solutions[0].gold_docs == ["Doc1"]
+
+
+def test_compute_retrieval_recall_metrics_includes_recall_100():
+    query_solutions = [
+        QuerySolution(
+            question="Q1",
+            docs=["Doc1", "Doc2", "Doc3"],
+            doc_scores=np.asarray([0.9, 0.8, 0.7], dtype=float),
+        ),
+        QuerySolution(
+            question="Q2",
+            docs=["DocB", "DocC"],
+            doc_scores=np.asarray([0.6, 0.5], dtype=float),
+        ),
+    ]
+
+    metrics = compute_retrieval_recall_metrics(
+        query_solutions=query_solutions,
+        gold_docs=[["Doc2", "Doc9"], ["DocA"]],
+    )
+
+    assert metrics["Recall@5"] == 0.25
+    assert metrics["Recall@20"] == 0.25
+    assert metrics["Recall@100"] == 0.25
+
+
+def test_hydrate_query_solutions_from_baseline_report_aligns_by_question_when_order_differs():
+    payload = {
+        "examples": [
+            {"question": "Q2", "answer": "A2", "gold_answers": ["A2"]},
+            {"question": "Q1", "answer": "A1", "gold_answers": ["A1"]},
+        ],
+    }
+    query_solutions = [
+        QuerySolution(question="Q1", docs=["Doc1"], doc_scores=np.asarray([1.0], dtype=float)),
+        QuerySolution(question="Q2", docs=["Doc2"], doc_scores=np.asarray([1.0], dtype=float)),
+    ]
+
+    hydrate_query_solutions_from_baseline_report(
+        query_solutions=query_solutions,
+        baseline_report_payload=payload,
+        gold_docs=[["Doc1"], ["Doc2"]],
+    )
+
+    assert query_solutions[0].answer == "A1"
+    assert query_solutions[1].answer == "A2"
+
+
+def test_write_and_hydrate_query_solutions_from_retrieval_cache(tmp_path):
+    cache_path = tmp_path / "retrieval_cache.json"
+    doc_text_to_chunk_id = {
+        "Doc1\nAlpha evidence.": "chunk-doc1",
+        "Doc2\nBeta evidence.": "chunk-doc2",
+        "Doc3\nGamma evidence.": "chunk-doc3",
+    }
+    query_solutions = [
+        QuerySolution(
+            question="Q1",
+            docs=["Doc1\nAlpha evidence.", "Doc2\nBeta evidence."],
+            doc_scores=np.asarray([0.9, 0.4], dtype=float),
+            retrieval_trace={"router_label": "bridge"},
+        ),
+        QuerySolution(
+            question="Q2",
+            docs=["Doc3\nGamma evidence."],
+            doc_scores=np.asarray([0.7], dtype=float),
+            retrieval_trace={"router_label": "dense"},
+        ),
+    ]
+
+    write_retrieval_cache_payload(
+        output_path=cache_path,
+        query_solutions=query_solutions,
+        doc_text_to_chunk_id=doc_text_to_chunk_id,
+        overall_metrics={"Recall@5": 0.5, "num_queries": 2},
+    )
+
+    payload = load_retrieval_cache_payload(cache_path)
+    assert payload["overall_metrics"]["num_queries"] == 2
+    assert build_retrieval_cache_examples(query_solutions, doc_text_to_chunk_id)[0]["retrieved_doc_ids"] == [
+        "chunk-doc1",
+        "chunk-doc2",
+    ]
+
+    restored = [
+        QuerySolution(question="Q1", docs=[], doc_scores=np.asarray([], dtype=float)),
+        QuerySolution(question="Q2", docs=[], doc_scores=np.asarray([], dtype=float)),
+    ]
+    hydrate_query_solutions_from_retrieval_cache(
+        query_solutions=restored,
+        retrieval_cache_payload=payload,
+        chunk_id_to_doc_text={v: k for k, v in doc_text_to_chunk_id.items()},
+        gold_docs=[["Doc1\nAlpha evidence."], ["Doc3\nGamma evidence."]],
+    )
+
+    assert restored[0].docs == ["Doc1\nAlpha evidence.", "Doc2\nBeta evidence."]
+    assert restored[0].doc_scores.tolist() == [0.9, 0.4]
+    assert restored[0].retrieval_trace["router_label"] == "bridge"
+    assert restored[1].gold_docs == ["Doc3\nGamma evidence."]
+
+
+def test_hydrate_query_solutions_from_retrieval_cache_aligns_by_question_when_order_differs():
+    payload = {
+        "examples": [
+            {
+                "question": "Q2",
+                "retrieved_doc_ids": ["chunk-doc2"],
+                "retrieved_doc_scores": [0.2],
+                "retrieval_trace": {"router_label": "dense"},
+            },
+            {
+                "question": "Q1",
+                "retrieved_doc_ids": ["chunk-doc1"],
+                "retrieved_doc_scores": [0.8],
+                "retrieval_trace": {"router_label": "bridge"},
+            },
+        ],
+    }
+    restored = [
+        QuerySolution(question="Q1", docs=[], doc_scores=np.asarray([], dtype=float)),
+        QuerySolution(question="Q2", docs=[], doc_scores=np.asarray([], dtype=float)),
+    ]
+
+    hydrate_query_solutions_from_retrieval_cache(
+        query_solutions=restored,
+        retrieval_cache_payload=payload,
+        chunk_id_to_doc_text={
+            "chunk-doc1": "Doc1\nAlpha evidence.",
+            "chunk-doc2": "Doc2\nBeta evidence.",
+        },
+        gold_docs=[["Gold1"], ["Gold2"]],
+    )
+
+    assert restored[0].docs == ["Doc1\nAlpha evidence."]
+    assert restored[0].doc_scores.tolist() == [0.8]
+    assert restored[0].retrieval_trace["router_label"] == "bridge"
+    assert restored[1].docs == ["Doc2\nBeta evidence."]
+    assert restored[1].gold_docs == ["Gold2"]
+
+
+def test_ensure_runtime_objects_for_cached_retrieval_calls_prepare_once():
+    class DummyHippoRAG:
+        def __init__(self):
+            self.ready_to_retrieve = False
+            self.ready_to_retrieve_v2 = False
+            self.prepare_calls = 0
+
+        def prepare_retrieval_objects(self):
+            self.prepare_calls += 1
+            self.ready_to_retrieve = True
+            self.ready_to_retrieve_v2 = True
+
+    dummy = DummyHippoRAG()
+    ensure_runtime_objects_for_cached_retrieval(dummy)
+    ensure_runtime_objects_for_cached_retrieval(dummy)
+
+    assert dummy.prepare_calls == 1
 
 
 def test_build_requirement_reserve_ablation_jobs_maps_effective_prefix_sizes():

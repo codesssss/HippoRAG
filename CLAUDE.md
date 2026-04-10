@@ -20,12 +20,45 @@ Read order:
 3. `research_memory/emnlp_expand_then_compose/04_result_registry.md`
 4. `research_memory/emnlp_expand_then_compose/03_experiment_board.md`
 5. `research_memory/emnlp_expand_then_compose/02_decision_log.md`
+6. `research_memory/emnlp_expand_then_compose/10_coverage_probe_and_control_status_20260409.md` when touching coverage or width-matched control runs
 
 Rules:
 - Do not reframe the current paper as causal retrieval.
 - Do not reframe the current paper as pointwise reranking.
 - If the main framing changes, update the decision log first.
 - If a claim becomes supported or contradicted, update the claim ledger.
+
+## Width-Matched Control Workflow
+
+If you are running or rerunning the `bridge_append` / `random3_deep` / `baseline_top10_plus_ce` controls in `scripts/eval_causal_qwen3.py`, use the reuse path instead of paying duplicated reader and retrieval cost.
+
+Required rules:
+- Do not cite `run_logs/fullscale_width_matched_control_20260409.summary.md`. That was a fake full run caused by the old default `--limit 20`.
+- Treat `20260409fullfix` as the first valid full-scale tag for this control family.
+- Reuse baseline QA with `--baseline_report_json <baseline_report>`.
+- Reuse retrieval with `--retrieval_cache_json <retrieval_cache>` whenever the dataset and `qa_top_k` match.
+- When creating a fresh baseline, also write a retrieval cache with `--save_retrieval_cache_json <cache_path>`.
+
+Control-name clarification:
+- `baseline_top5_plus_ce` means baseline-only CE rerank. It uses `expand_base_k = qa_top_k` and `append_max_docs = 0`, so it is not a same-pool append control.
+- `baseline_top10_plus_ce` means CE rerank over a width-matched top-10 pool with no appended docs. It uses `expand_base_k = 10` and `append_max_docs = 0`.
+- `bridge_append_plus_ce` means same-pool pure CE rerank over `baseline top-10 + 3 bridge-appended docs`. It uses `setwise_selector = bridge_append`, `expand_base_k = 10`, `append_max_docs = 3`, `append_policy = bridge`, and `assemble_mode = cross_encoder`.
+- `random3_deep_plus_ce` is the matched random-append control with the same CE rerank stage and append width as `bridge_append_plus_ce`.
+- The `100`-query and `20260409fullfix` full-scale width-matched runs use the same method definition. The only intended difference is evaluation size: `--limit 100` vs full-scale.
+
+Current helper scripts already follow this pattern:
+- `run_logs/fullscale_width_matched_control_20260409.sh`
+- `run_logs/fullscale_width_matched_control_musique_top5_priority_20260409.sh`
+- `run_logs/fullscale_width_matched_control_musique_top5_remaining_20260409.sh`
+- `run_logs/switch_after_baseline_top10_to_remaining_20260409.sh`
+
+The intended sequence for repeated controls is:
+1. Run baseline once and save both the baseline report and retrieval cache.
+2. Run CE/control variants with `--baseline_report_json` to skip the baseline reader pass.
+3. Also pass `--retrieval_cache_json` so repeated controls skip retrieval too.
+
+If you are unsure which files are canonical, read:
+- `research_memory/emnlp_expand_then_compose/10_coverage_probe_and_control_status_20260409.md`
 
 ## Current Best Configuration
 

@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "qa_top_k": 5,
+      "append_max_docs": 3,
+      "atom_source": "baseline_prefix",
+      "coverage_admissibility_mode": "off",
+      "em": 0.32,
+      "f1": 0.404,
+      "delta_em": 0.05,
+      "delta_f1": 0.0692,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk5_atomsbaseline_prefix_admoff_20260409bg.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 5,
+      "append_max_docs": 3,
+      "atom_source": "baseline_prefix",
+      "coverage_admissibility_mode": "budget_gap",
+      "em": 0.33,
+      "f1": 0.4007,
+      "delta_em": 0.06,
+      "delta_f1": 0.0659,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk5_atomsbaseline_prefix_admbudget_gap_20260409bg.json"
+    }
+  ]
+}

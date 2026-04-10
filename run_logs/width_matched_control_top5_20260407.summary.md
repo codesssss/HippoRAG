@@ -1,5 +1,12 @@
 # Width-Matched Control: top-5
 
+Naming note:
+- `baseline_top5_plus_ce` = baseline-only CE rerank, not the same-pool append control.
+- `baseline_top10_plus_ce` = width-matched no-append CE control over the top-10 baseline prefix.
+- `bridge_append_plus_ce` = same-pool pure CE rerank over `top-10 baseline prefix + 3 bridge-appended docs`.
+- `random3_deep_plus_ce` = matched random-append CE control.
+- This `limit=100` summary is method-matched to the later valid `20260409fullfix` full-scale control family.
+
 | Dataset | Run | EM | F1 | ΔEM vs baseline top-5 | ΔEM vs baseline top-10+CE |
 |---|---|---:|---:|---:|---:|
 | musique | baseline_top5 | 0.2700 | 0.3348 | — | — |

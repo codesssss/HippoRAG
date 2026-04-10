@@ -7,8 +7,9 @@ import os
 import sys
 import types
 from collections import Counter
+from itertools import combinations
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Set, Tuple
+from typing import Any, Dict, List, Mapping, Sequence, Set, Tuple
 
 import joblib
 import numpy as np
@@ -109,6 +110,7 @@ DEFAULT_REQUIREMENT_EXPOSURE_WATCH_TITLES = (
 )
 DEFAULT_REQUIREMENT_SOURCE_SORT_MODE = "combined"
 DEFAULT_REQUIREMENT_SHORTLIST_SORT_MODE = "margin_first"
+REPORT_RECALL_CUTOFFS = (1, 2, 5, 10, 20, 100)
 
 SETWISE_LLM_JSON_START_TAG = "<JSON>"
 SETWISE_LLM_JSON_END_TAG = "</JSON>"
@@ -378,6 +380,13 @@ def build_doc_text_to_chunk_id(corpus: List[dict]) -> Dict[str, str]:
         doc_text = f"{row['title']}\n{row['text']}"
         doc_text_to_chunk_id[doc_text] = compute_mdhash_id(doc_text, prefix="chunk-")
     return doc_text_to_chunk_id
+
+
+def build_chunk_id_to_doc_text(corpus: List[dict]) -> Dict[str, str]:
+    return {
+        chunk_id: doc_text
+        for doc_text, chunk_id in build_doc_text_to_chunk_id(corpus).items()
+    }
 
 
 def serialize_retrieved_doc_ids(retrieved_docs: List[str], doc_text_to_chunk_id: Dict[str, str]) -> List[str | None]:
@@ -3321,6 +3330,28 @@ ASSEMBLE_MODES = {
     "base_score",
     "embedding_similarity",
     "cross_encoder",
+    "coverage",
+}
+
+ASSEMBLE_CE_ACTIVE_MODES = {
+    "cross_encoder",
+    "coverage",
+}
+
+COVERAGE_SCORE_VARIANTS = {
+    "qe_ce",
+    "qeb_ce",
+}
+
+COVERAGE_ATOM_SOURCES = {
+    "candidate_pool",
+    "baseline_prefix",
+    "baseline_anchored",
+}
+
+COVERAGE_ADMISSIBILITY_MODES = {
+    "off",
+    "budget_gap",
 }
 
 APPEND_POLICIES = {
@@ -3334,6 +3365,27 @@ def normalize_assemble_mode(mode: str | None) -> str:
     normalized = str(mode or "none").strip().lower()
     if normalized not in ASSEMBLE_MODES:
         raise ValueError(f"Unsupported assemble mode: {mode}")
+    return normalized
+
+
+def normalize_coverage_score_variant(variant: str | None) -> str:
+    normalized = str(variant or "qe_ce").strip().lower()
+    if normalized not in COVERAGE_SCORE_VARIANTS:
+        raise ValueError(f"Unsupported coverage score variant: {variant}")
+    return normalized
+
+
+def normalize_coverage_atom_source(atom_source: str | None) -> str:
+    normalized = str(atom_source or "candidate_pool").strip().lower()
+    if normalized not in COVERAGE_ATOM_SOURCES:
+        raise ValueError(f"Unsupported coverage atom source: {atom_source}")
+    return normalized
+
+
+def normalize_coverage_admissibility_mode(mode: str | None) -> str:
+    normalized = str(mode or "off").strip().lower()
+    if normalized not in COVERAGE_ADMISSIBILITY_MODES:
+        raise ValueError(f"Unsupported coverage admissibility mode: {mode}")
     return normalized
 
 
@@ -3356,6 +3408,826 @@ def format_doc_for_assemble_rerank(doc_text: str) -> str:
         return cleaned_doc
     remainder = cleaned_doc if normalize_structure_text(cleaned_doc) != normalize_structure_text(title) else ""
     return f"{title}\n{remainder}".strip()
+
+
+def _normalize_candidate_positions_for_assemble(candidate_positions: Sequence[int],
+                                                pool_docs: Sequence[str]) -> List[int]:
+    normalized_positions: List[int] = []
+    seen_positions: Set[int] = set()
+    for pos in candidate_positions:
+        normalized_pos = int(pos)
+        if normalized_pos < 0 or normalized_pos >= len(pool_docs) or normalized_pos in seen_positions:
+            continue
+        seen_positions.add(normalized_pos)
+        normalized_positions.append(normalized_pos)
+    return normalized_positions
+
+
+def _compute_assemble_score_rows(query: str,
+                                 pool_docs: Sequence[str],
+                                 pool_doc_ids: Sequence[int | None],
+                                 pool_doc_scores: Sequence[float],
+                                 candidate_positions: Sequence[int],
+                                 assemble_mode: str,
+                                 hipporag: HippoRAG,
+                                 ce_reranker: Any = None,
+                                 position_sources: Dict[int, str] | None = None) -> Tuple[List[Dict[str, object]], str, str]:
+    normalized_mode = normalize_assemble_mode(assemble_mode)
+    normalized_positions = _normalize_candidate_positions_for_assemble(candidate_positions, pool_docs)
+    rows: List[Dict[str, object]] = []
+    fallback_reason = ""
+
+    if normalized_mode == "cross_encoder":
+        if ce_reranker is None:
+            raise ValueError("cross_encoder assemble_mode requires a loaded ce_reranker")
+        pairs = [
+            [query, format_doc_for_assemble_rerank(pool_docs[pos])]
+            for pos in normalized_positions
+        ]
+        raw_scores = ce_reranker.compute_score(pairs)
+        if isinstance(raw_scores, (int, float)):
+            raw_scores = [raw_scores]
+        score_values = np.asarray(raw_scores, dtype=float)
+        score_field = "cross_encoder_score"
+    elif normalized_mode == "embedding_similarity":
+        query_embedding = None
+        query_embedding_store = getattr(hipporag, "query_to_embedding", {}) or {}
+        if isinstance(query_embedding_store, dict):
+            passage_query_embeddings = query_embedding_store.get("passage", {}) or {}
+            if isinstance(passage_query_embeddings, dict):
+                query_embedding = passage_query_embeddings.get(query)
+        if query_embedding is None and hasattr(hipporag, "_get_passage_query_embeddings"):
+            hipporag._get_passage_query_embeddings([query])
+            query_embedding = (
+                ((getattr(hipporag, "query_to_embedding", {}) or {}).get("passage", {}) or {}).get(query)
+            )
+        passage_embeddings = np.asarray(getattr(hipporag, "passage_embeddings", np.array([])))
+        if query_embedding is None or passage_embeddings.size == 0:
+            score_values = np.asarray([
+                float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0
+                for pos in normalized_positions
+            ], dtype=float)
+            fallback_reason = "missing_query_or_passage_embeddings"
+            score_field = "base_score_fallback"
+        else:
+            query_vector = np.asarray(query_embedding, dtype=float).reshape(-1)
+            similarity_scores: List[float] = []
+            for pos in normalized_positions:
+                doc_id = pool_doc_ids[pos]
+                if doc_id is None or int(doc_id) >= len(passage_embeddings):
+                    similarity_scores.append(float("-inf"))
+                    continue
+                passage_vector = np.asarray(passage_embeddings[int(doc_id)], dtype=float).reshape(-1)
+                if passage_vector.size == 0 or passage_vector.shape != query_vector.shape:
+                    similarity_scores.append(float("-inf"))
+                    continue
+                similarity_scores.append(float(np.dot(query_vector, passage_vector)))
+            score_values = np.asarray(similarity_scores, dtype=float)
+            score_field = "embedding_similarity"
+    else:
+        score_values = np.asarray([
+            float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0
+            for pos in normalized_positions
+        ], dtype=float)
+        score_field = "base_score"
+
+    for pos, score_value in zip(normalized_positions, score_values.tolist()):
+        rows.append({
+            "pool_position": int(pos),
+            "doc_id": int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None,
+            "title": extract_doc_title(pool_docs[pos]),
+            "source": str((position_sources or {}).get(int(pos), "candidate")),
+            "base_score": float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0,
+            "assemble_score": float(score_value),
+        })
+    return rows, str(score_field), str(fallback_reason)
+
+
+def _sort_assemble_score_rows(rows: Sequence[Dict[str, object]]) -> List[Dict[str, object]]:
+    sorted_rows = list(rows)
+    sorted_rows.sort(
+        key=lambda row: (
+            -float(row.get("assemble_score", float("-inf"))),
+            -float(row.get("base_score", 0.0) or 0.0),
+            int(row.get("pool_position", 0) or 0),
+        )
+    )
+    return sorted_rows
+
+
+def _normalize_structure_edges_for_doc(doc_id: int | None,
+                                       doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]]) -> Set[Tuple[str, str]]:
+    if doc_id is None:
+        return set()
+    return {
+        (normalize_structure_text(src), normalize_structure_text(tgt))
+        for src, tgt, _, _ in doc_idx_to_edges.get(int(doc_id), [])
+        if normalize_structure_text(src) and normalize_structure_text(tgt)
+    }
+
+
+def _normalize_structure_entities_for_doc(doc_id: int | None,
+                                          doc_idx_to_entities: Dict[int, Set[str]]) -> Set[str]:
+    if doc_id is None:
+        return set()
+    return normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set()))
+
+
+def _build_coverage_atom_maps(candidate_positions: Sequence[int],
+                              atom_source_positions: Sequence[int],
+                              normalized_atom_source: str,
+                              pool_doc_ids: Sequence[int | None],
+                              seed_entities: Set[str],
+                              doc_idx_to_entities: Dict[int, Set[str]],
+                              doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]]) -> Tuple[
+                                  Set[str],
+                                  Set[Tuple[str, str]],
+                                  Set[str],
+                                  Dict[int, Set[str]],
+                                  Dict[int, Set[Tuple[str, str]]],
+                                  Dict[int, Set[str]],
+                              ]:
+    a_q = normalize_entity_set(seed_entities)
+    a_e: Set[Tuple[str, str]] = set()
+    a_b: Set[str] = set()
+    base_entity_set: Set[str] = set()
+    doc_entities_by_position: Dict[int, Set[str]] = {}
+    doc_edges_by_position: Dict[int, Set[Tuple[str, str]]] = {}
+
+    for pos in candidate_positions:
+        doc_id = pool_doc_ids[pos]
+        doc_entities_by_position[int(pos)] = _normalize_structure_entities_for_doc(doc_id, doc_idx_to_entities)
+        doc_edges_by_position[int(pos)] = _normalize_structure_edges_for_doc(doc_id, doc_idx_to_edges)
+
+    for pos in atom_source_positions:
+        base_entity_set.update(doc_entities_by_position.get(int(pos), set()))
+
+    if normalized_atom_source == "baseline_anchored":
+        for pos in candidate_positions:
+            anchored_edges = {
+                edge for edge in doc_edges_by_position.get(int(pos), set())
+                if edge[0] in base_entity_set or edge[1] in base_entity_set
+            }
+            a_e.update(anchored_edges)
+            for src, tgt in anchored_edges:
+                a_b.add(src)
+                a_b.add(tgt)
+    else:
+        for pos in atom_source_positions:
+            a_b.update(doc_entities_by_position.get(int(pos), set()))
+            a_e.update(doc_edges_by_position.get(int(pos), set()))
+    a_b -= a_q
+
+    doc_covers_q: Dict[int, Set[str]] = {}
+    doc_covers_e: Dict[int, Set[Tuple[str, str]]] = {}
+    doc_covers_b: Dict[int, Set[str]] = {}
+    for pos in candidate_positions:
+        normalized_entities = doc_entities_by_position.get(int(pos), set())
+        normalized_edges = doc_edges_by_position.get(int(pos), set())
+        doc_covers_q[int(pos)] = normalized_entities & a_q
+        doc_covers_e[int(pos)] = normalized_edges & a_e
+        if normalized_atom_source == "baseline_anchored":
+            anchored_entities = {
+                entity
+                for src, tgt in doc_covers_e[int(pos)]
+                for entity in (src, tgt)
+            }
+            doc_covers_b[int(pos)] = (anchored_entities - a_q) & a_b
+        else:
+            doc_covers_b[int(pos)] = (normalized_entities - a_q) & a_b
+
+    return a_q, a_e, a_b, doc_covers_q, doc_covers_e, doc_covers_b
+
+
+def _numeric_margin(values: Sequence[float], ndigits: int = 4) -> float | None:
+    distinct_values = sorted({round(float(value), 8) for value in values}, reverse=True)
+    if len(distinct_values) < 2:
+        return None
+    return round(float(distinct_values[0] - distinct_values[1]), ndigits)
+
+
+def _safe_mean(values: Sequence[float]) -> float:
+    numeric = [float(value) for value in values]
+    if not numeric:
+        return 0.0
+    return round(float(sum(numeric) / len(numeric)), 4)
+
+
+def _compute_coverage_decision_layer(valid_subset_rows: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    default_payload = {
+        "effective_decision_layer": "fallback",
+        "max_covQ_subset_count": 0,
+        "max_covQ_max_covE_subset_count": 0,
+        "max_covQ_max_covE_max_ce_subset_count": 0,
+        "covQ_margin": None,
+        "covE_margin_within_max_covQ": None,
+        "ce_margin_within_max_covQ_covE": None,
+    }
+    if not valid_subset_rows:
+        return default_payload
+
+    max_covq = max(int(row["cov_q"]) for row in valid_subset_rows)
+    max_covq_rows = [row for row in valid_subset_rows if int(row["cov_q"]) == max_covq]
+    max_cove = max(int(row["cov_e"]) for row in max_covq_rows)
+    max_covq_cove_rows = [row for row in max_covq_rows if int(row["cov_e"]) == max_cove]
+    max_ce_sum = max(float(row["ce_sum"]) for row in max_covq_cove_rows)
+    max_covq_cove_ce_rows = [
+        row for row in max_covq_cove_rows
+        if abs(float(row["ce_sum"]) - max_ce_sum) <= 1e-9
+    ]
+
+    if len(max_covq_rows) == 1:
+        effective_decision_layer = "CovQ"
+    elif len(max_covq_cove_rows) == 1:
+        effective_decision_layer = "CovE"
+    elif len(max_covq_cove_ce_rows) == 1:
+        effective_decision_layer = "CE"
+    else:
+        effective_decision_layer = "TIE_AFTER_CE"
+
+    return {
+        "effective_decision_layer": str(effective_decision_layer),
+        "max_covQ_subset_count": int(len(max_covq_rows)),
+        "max_covQ_max_covE_subset_count": int(len(max_covq_cove_rows)),
+        "max_covQ_max_covE_max_ce_subset_count": int(len(max_covq_cove_ce_rows)),
+        "covQ_margin": _numeric_margin([float(row["cov_q"]) for row in valid_subset_rows]),
+        "covE_margin_within_max_covQ": _numeric_margin([float(row["cov_e"]) for row in max_covq_rows]),
+        "ce_margin_within_max_covQ_covE": _numeric_margin([float(row["ce_sum"]) for row in max_covq_cove_rows]),
+    }
+
+
+def _compute_coverage_score_tuple(normalized_variant: str,
+                                  cov_q: int,
+                                  cov_e: int,
+                                  cov_b: int,
+                                  ce_sum: float,
+                                  base_sum: float,
+                                  subset: Sequence[int]) -> Tuple[Any, ...]:
+    position_tiebreak = tuple(-int(pos) for pos in sorted(subset))
+    if normalized_variant == "qeb_ce":
+        return (cov_q, cov_e, cov_b, ce_sum, base_sum, position_tiebreak)
+    return (cov_q, cov_e, ce_sum, base_sum, position_tiebreak)
+
+
+def _compute_ce_only_score_tuple(ce_sum: float,
+                                 base_sum: float,
+                                 subset: Sequence[int]) -> Tuple[Any, ...]:
+    position_tiebreak = tuple(-int(pos) for pos in sorted(subset))
+    return (ce_sum, base_sum, position_tiebreak)
+
+
+def _run_coverage_exact_search(candidate_positions: Sequence[int],
+                               qa_top_k: int,
+                               pool_docs: Sequence[str],
+                               sorted_ce_rows: Sequence[Mapping[str, Any]],
+                               ce_rows_by_position: Mapping[int, Mapping[str, Any]],
+                               ce_scores: Mapping[int, float],
+                               pool_doc_scores: Sequence[float],
+                               doc_covers_q: Mapping[int, Set[str]],
+                               doc_covers_e: Mapping[int, Set[Tuple[str, str]]],
+                               doc_covers_b: Mapping[int, Set[str]],
+                               normalized_variant: str) -> Dict[str, Any]:
+    normalized_positions = [int(pos) for pos in candidate_positions]
+
+    def subset_stats(subset: Sequence[int]) -> Tuple[int, int, int, float, float]:
+        covered_q: Set[str] = set()
+        covered_e: Set[Tuple[str, str]] = set()
+        covered_b: Set[str] = set()
+        ce_sum = 0.0
+        base_sum = 0.0
+        for pos in subset:
+            covered_q.update(doc_covers_q.get(int(pos), set()))
+            covered_e.update(doc_covers_e.get(int(pos), set()))
+            covered_b.update(doc_covers_b.get(int(pos), set()))
+            ce_sum += float(ce_scores.get(int(pos), 0.0))
+            base_sum += float(pool_doc_scores[int(pos)]) if int(pos) < len(pool_doc_scores) else 0.0
+        return len(covered_q), len(covered_e), len(covered_b), float(ce_sum), float(base_sum)
+
+    total_subsets_enumerated = 0
+    total_valid_subsets = 0
+    total_invalid_subsets_dedup = 0
+    best_subset: List[int] = []
+    best_score_tuple: Tuple[Any, ...] | None = None
+    best_covq = 0
+    best_cove = 0
+    best_covb = 0
+    best_ce_sum = 0.0
+    best_ce_subset: List[int] = []
+    best_ce_tuple: Tuple[Any, ...] | None = None
+
+    covq_values: Set[float] = set()
+    cove_values_within_max_covq: Set[float] = set()
+    ce_values_within_max_covq_cove: Set[float] = set()
+    max_covq: int | None = None
+    max_covq_subset_count = 0
+    max_cove_within_max_covq: int | None = None
+    max_covq_max_cove_subset_count = 0
+    max_ce_within_max_covq_cove: float | None = None
+    max_covq_max_cove_max_ce_subset_count = 0
+
+    for subset_tuple in combinations(normalized_positions, int(qa_top_k)):
+        total_subsets_enumerated += 1
+        if not _is_valid_coverage_subset(subset_tuple, pool_docs):
+            total_invalid_subsets_dedup += 1
+            continue
+        total_valid_subsets += 1
+        cov_q, cov_e, cov_b, ce_sum, base_sum = subset_stats(subset_tuple)
+        covq_values.add(float(cov_q))
+
+        if max_covq is None or cov_q > max_covq:
+            max_covq = int(cov_q)
+            max_covq_subset_count = 1
+            cove_values_within_max_covq = {float(cov_e)}
+            max_cove_within_max_covq = int(cov_e)
+            max_covq_max_cove_subset_count = 1
+            ce_values_within_max_covq_cove = {float(ce_sum)}
+            max_ce_within_max_covq_cove = float(ce_sum)
+            max_covq_max_cove_max_ce_subset_count = 1
+        elif cov_q == max_covq:
+            max_covq_subset_count += 1
+            cove_values_within_max_covq.add(float(cov_e))
+            if max_cove_within_max_covq is None or cov_e > max_cove_within_max_covq:
+                max_cove_within_max_covq = int(cov_e)
+                max_covq_max_cove_subset_count = 1
+                ce_values_within_max_covq_cove = {float(ce_sum)}
+                max_ce_within_max_covq_cove = float(ce_sum)
+                max_covq_max_cove_max_ce_subset_count = 1
+            elif cov_e == max_cove_within_max_covq:
+                max_covq_max_cove_subset_count += 1
+                ce_values_within_max_covq_cove.add(float(ce_sum))
+                if max_ce_within_max_covq_cove is None or ce_sum > max_ce_within_max_covq_cove + 1e-9:
+                    max_ce_within_max_covq_cove = float(ce_sum)
+                    max_covq_max_cove_max_ce_subset_count = 1
+                elif abs(ce_sum - max_ce_within_max_covq_cove) <= 1e-9:
+                    max_covq_max_cove_max_ce_subset_count += 1
+
+        score_tuple = _compute_coverage_score_tuple(
+            normalized_variant=normalized_variant,
+            cov_q=int(cov_q),
+            cov_e=int(cov_e),
+            cov_b=int(cov_b),
+            ce_sum=float(ce_sum),
+            base_sum=float(base_sum),
+            subset=subset_tuple,
+        )
+        ce_tuple = _compute_ce_only_score_tuple(
+            ce_sum=float(ce_sum),
+            base_sum=float(base_sum),
+            subset=subset_tuple,
+        )
+        if best_score_tuple is None or score_tuple > best_score_tuple:
+            best_score_tuple = score_tuple
+            best_subset = list(subset_tuple)
+            best_covq = int(cov_q)
+            best_cove = int(cov_e)
+            best_covb = int(cov_b)
+            best_ce_sum = float(ce_sum)
+        if best_ce_tuple is None or ce_tuple > best_ce_tuple:
+            best_ce_tuple = ce_tuple
+            best_ce_subset = list(subset_tuple)
+
+    ranked_positions: List[int] = []
+    fallback_reason = ""
+    effective_decision_layer = "fallback"
+    if best_subset:
+        ranked_positions = [
+            int(row["pool_position"])
+            for row in _sort_assemble_score_rows([
+                ce_rows_by_position[int(pos)] for pos in best_subset
+            ])
+        ]
+        if max_covq_subset_count == 1:
+            effective_decision_layer = "CovQ"
+        elif max_covq_max_cove_subset_count == 1:
+            effective_decision_layer = "CovE"
+        elif max_covq_max_cove_max_ce_subset_count == 1:
+            effective_decision_layer = "CE"
+        else:
+            effective_decision_layer = "TIE_AFTER_CE"
+    else:
+        fallback_reason = "no_valid_subset_under_title_dedup"
+        deduped_positions: List[int] = []
+        seen_title_keys: Set[str] = set()
+        for row in sorted_ce_rows:
+            pos = int(row["pool_position"])
+            if pos not in normalized_positions:
+                continue
+            title_key = normalize_structure_text(str(row["title"]))
+            if title_key and title_key in seen_title_keys:
+                continue
+            deduped_positions.append(pos)
+            if title_key:
+                seen_title_keys.add(title_key)
+            if len(deduped_positions) >= int(qa_top_k):
+                break
+        if len(deduped_positions) < int(qa_top_k):
+            for row in sorted_ce_rows:
+                pos = int(row["pool_position"])
+                if pos not in normalized_positions or pos in deduped_positions:
+                    continue
+                deduped_positions.append(pos)
+                if len(deduped_positions) >= int(qa_top_k):
+                    break
+        ranked_positions = list(deduped_positions[:max(int(qa_top_k), 0)])
+        if ranked_positions:
+            best_subset = list(ranked_positions)
+            best_covq, best_cove, best_covb, best_ce_sum, _ = subset_stats(best_subset)
+
+    return {
+        "best_subset": list(best_subset),
+        "ranked_positions": list(ranked_positions),
+        "best_covq": int(best_covq),
+        "best_cove": int(best_cove),
+        "best_covb": int(best_covb),
+        "best_ce_sum": float(best_ce_sum),
+        "best_ce_subset": list(best_ce_subset),
+        "best_ce_subset_score": float(best_ce_tuple[0]) if best_ce_tuple is not None else 0.0,
+        "total_subsets_enumerated": int(total_subsets_enumerated),
+        "total_valid_subsets": int(total_valid_subsets),
+        "total_invalid_subsets_dedup": int(total_invalid_subsets_dedup),
+        "fallback_reason": str(fallback_reason),
+        "decision_trace": {
+            "effective_decision_layer": str(effective_decision_layer),
+            "max_covQ_subset_count": int(max_covq_subset_count),
+            "max_covQ_max_covE_subset_count": int(max_covq_max_cove_subset_count),
+            "max_covQ_max_covE_max_ce_subset_count": int(max_covq_max_cove_max_ce_subset_count),
+            "covQ_margin": _numeric_margin(list(covq_values)),
+            "covE_margin_within_max_covQ": _numeric_margin(list(cove_values_within_max_covq)),
+            "ce_margin_within_max_covQ_covE": _numeric_margin(list(ce_values_within_max_covq_cove)),
+        },
+    }
+
+
+def _build_budget_gap_admissibility_trace(normalized_positions: Sequence[int],
+                                          baseline_prefix_positions: Sequence[int],
+                                          position_sources: Mapping[int, str],
+                                          pool_docs: Sequence[str],
+                                          doc_covers_e: Mapping[int, Set[Tuple[str, str]]],
+                                          reference_subset: Sequence[int],
+                                          frozen_edge_universe: Set[Tuple[str, str]]) -> Tuple[List[int], Dict[str, Any]]:
+    appended_positions = [
+        int(pos) for pos in normalized_positions
+        if str(position_sources.get(int(pos), "")).startswith("append_")
+    ]
+    covered_0: Set[Tuple[str, str]] = set()
+    for pos in reference_subset:
+        covered_0.update(doc_covers_e.get(int(pos), set()))
+    gap_0 = set(frozen_edge_universe) - covered_0
+    edge_support_counter: Counter[Tuple[str, str]] = Counter()
+    for pos in normalized_positions:
+        for edge in doc_covers_e.get(int(pos), set()):
+            edge_support_counter[edge] += 1
+
+    baseline_prefix_set = {int(pos) for pos in baseline_prefix_positions}
+    kept_appended_positions: List[int] = []
+    rows: List[Dict[str, object]] = []
+    for pos in appended_positions:
+        marginal_edges = set(doc_covers_e.get(int(pos), set())) & gap_0
+        marginal_supports = sorted(int(edge_support_counter.get(edge, 0)) for edge in marginal_edges)
+        kept = bool(marginal_edges)
+        if kept:
+            kept_appended_positions.append(int(pos))
+        rows.append({
+            "pool_position": int(pos),
+            "title": extract_doc_title(pool_docs[int(pos)]),
+            "source": str(position_sources.get(int(pos), "")),
+            "frozen_edge_count": int(len(doc_covers_e.get(int(pos), set()))),
+            "marginal_gap_edge_count": int(len(marginal_edges)),
+            "kept": bool(kept),
+            "marginal_gap_edges": sorted([list(edge) for edge in marginal_edges]),
+            "marginal_gap_edge_support_counts": list(marginal_supports),
+            "marginal_gap_edge_support_mean": _safe_mean(marginal_supports),
+            "marginal_gap_edge_support_max": max(marginal_supports) if marginal_supports else 0,
+        })
+
+    filtered_positions = [
+        int(pos) for pos in normalized_positions
+        if int(pos) in baseline_prefix_set or int(pos) in set(kept_appended_positions)
+    ]
+    return filtered_positions, {
+        "coverage_admissibility_mode": "budget_gap",
+        "reference_subset_mode": "baseline_prefix_coverage",
+        "reference_positions": list(reference_subset),
+        "reference_titles": [extract_doc_title(pool_docs[int(pos)]) for pos in reference_subset],
+        "reference_gap_edge_count": int(len(gap_0)),
+        "candidate_positions_before_filter": list(normalized_positions),
+        "candidate_positions_after_filter": list(filtered_positions),
+        "appended_positions_before_filter": list(appended_positions),
+        "appended_positions_after_filter": list(kept_appended_positions),
+        "kept_appended_count": int(len(kept_appended_positions)),
+        "dropped_appended_count": int(len(appended_positions) - len(kept_appended_positions)),
+        "rows": rows,
+    }
+
+
+def _build_selected_appended_trace_rows(selected_positions: Sequence[int],
+                                        candidate_positions: Sequence[int],
+                                        appended_positions: Sequence[int],
+                                        pool_docs: Sequence[str],
+                                        doc_covers_e: Dict[int, Set[Tuple[str, str]]]) -> Tuple[
+                                            List[Dict[str, object]],
+                                            int,
+                                            int,
+                                        ]:
+    appended_position_set = {int(pos) for pos in appended_positions}
+    edge_support_counter: Counter[Tuple[str, str]] = Counter()
+    for pos in candidate_positions:
+        for edge in doc_covers_e.get(int(pos), set()):
+            edge_support_counter[edge] += 1
+
+    selected_rows: List[Dict[str, object]] = []
+    nonzero_unique_gain_count = 0
+    zero_unique_gain_count = 0
+    selected_set = {int(pos) for pos in selected_positions}
+    for pos in selected_positions:
+        if int(pos) not in appended_position_set:
+            continue
+        covered_edges = set(doc_covers_e.get(int(pos), set()))
+        other_edges: Set[Tuple[str, str]] = set()
+        for other_pos in selected_set:
+            if int(other_pos) == int(pos):
+                continue
+            other_edges.update(doc_covers_e.get(int(other_pos), set()))
+        unique_edges = covered_edges - other_edges
+        if unique_edges:
+            nonzero_unique_gain_count += 1
+        else:
+            zero_unique_gain_count += 1
+        selected_rows.append({
+            "pool_position": int(pos),
+            "title": extract_doc_title(pool_docs[int(pos)]),
+            "covered_edge_count": int(len(covered_edges)),
+            "unique_covE_gain": int(len(unique_edges)),
+            "has_nonzero_unique_covE_gain": bool(unique_edges),
+            "covered_edge_support_counts": sorted(int(edge_support_counter.get(edge, 0)) for edge in covered_edges),
+            "unique_edge_support_counts": sorted(int(edge_support_counter.get(edge, 0)) for edge in unique_edges),
+        })
+    return selected_rows, int(nonzero_unique_gain_count), int(zero_unique_gain_count)
+
+
+def _is_valid_coverage_subset(subset: Sequence[int], pool_docs: Sequence[str]) -> bool:
+    seen_title_keys: Set[str] = set()
+    for pos in subset:
+        title_key = normalize_structure_text(extract_doc_title(pool_docs[int(pos)]))
+        if title_key and title_key in seen_title_keys:
+            return False
+        if title_key:
+            seen_title_keys.add(title_key)
+    return True
+
+
+def assemble_coverage_exact_search(query: str,
+                                   pool_docs: Sequence[str],
+                                   pool_doc_ids: Sequence[int | None],
+                                   pool_doc_scores: Sequence[float],
+                                   candidate_positions: Sequence[int],
+                                   qa_top_k: int,
+                                   seed_entities: Set[str],
+                                   doc_idx_to_entities: Dict[int, Set[str]],
+                                   doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                   ce_reranker: Any | None = None,
+                                   position_sources: Dict[int, str] | None = None,
+                                   coverage_score_variant: str = "qe_ce",
+                                   coverage_atom_source: str = "candidate_pool",
+                                   coverage_atom_positions: Sequence[int] | None = None,
+                                   coverage_admissibility_mode: str = "off") -> Tuple[List[int], Dict[str, object]]:
+    normalized_variant = normalize_coverage_score_variant(coverage_score_variant)
+    normalized_atom_source = normalize_coverage_atom_source(coverage_atom_source)
+    normalized_admissibility_mode = normalize_coverage_admissibility_mode(coverage_admissibility_mode)
+    normalized_positions = _normalize_candidate_positions_for_assemble(candidate_positions, pool_docs)
+    atom_source_positions = list(normalized_positions)
+    if normalized_atom_source in {"baseline_prefix", "baseline_anchored"}:
+        if coverage_atom_positions is None:
+            atom_source_positions = _normalize_candidate_positions_for_assemble(
+                [
+                    int(pos) for pos in normalized_positions
+                    if str((position_sources or {}).get(int(pos), "")) == "baseline_prefix"
+                ],
+                pool_docs,
+            )
+        else:
+            atom_source_positions = _normalize_candidate_positions_for_assemble(coverage_atom_positions, pool_docs)
+    atom_source_titles = [extract_doc_title(pool_docs[pos]) for pos in atom_source_positions]
+    default_trace = {
+        "assemble_mode": "coverage",
+        "coverage_score_variant": normalized_variant,
+        "score_field": "coverage_lexicographic_v1",
+        "atom_source_mode": normalized_atom_source,
+        "coverage_admissibility_mode": normalized_admissibility_mode,
+        "atom_source_positions": list(atom_source_positions),
+        "atom_source_titles": list(atom_source_titles),
+        "atom_source_counts": {"A_Q": 0, "A_E": 0, "A_B": 0},
+        "atom_source_is_frozen": bool(normalized_atom_source == "baseline_prefix"),
+        "candidate_pool_positions": list(normalized_positions),
+        "candidate_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "final_candidate_positions": list(normalized_positions),
+        "final_candidate_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "selected_positions": [],
+        "ranked_pool_positions": [],
+        "ranked_titles": [],
+        "ranking_rows": [],
+        "atom_counts": {"A_Q": 0, "A_E": 0, "A_B": 0},
+        "best_score": {"covQ": 0, "covE": 0, "ce_sum": 0.0},
+        "best_covB_trace_only": 0,
+        "ce_score_source": "cross_encoder" if ce_reranker is not None else "base_score_fallback",
+        "best_ce_subset_by_true_ce": [],
+        "best_ce_subset_score": 0.0,
+        "coverage_vs_ce_overlap": 0,
+        "coverage_vs_baseline_overlap": 0,
+        "num_appended_selected": 0,
+        "num_baseline_selected": 0,
+        "total_subsets_enumerated": 0,
+        "total_valid_subsets": 0,
+        "total_invalid_subsets_dedup": 0,
+        "fallback_reason": "",
+        "effective_decision_layer": "fallback",
+        "max_covQ_subset_count": 0,
+        "max_covQ_max_covE_subset_count": 0,
+        "max_covQ_max_covE_max_ce_subset_count": 0,
+        "covQ_margin": None,
+        "covE_margin_within_max_covQ": None,
+        "ce_margin_within_max_covQ_covE": None,
+        "selected_appended_rows": [],
+        "selected_appended_with_nonzero_unique_gain": 0,
+        "selected_appended_with_zero_unique_gain": 0,
+        "admissibility_trace": {},
+    }
+    if not normalized_positions or qa_top_k <= 0:
+        default_trace["fallback_reason"] = "empty_candidate_pool"
+        return [], default_trace
+    if normalized_admissibility_mode != "off" and normalized_atom_source != "baseline_prefix":
+        raise ValueError(
+            f"coverage_admissibility_mode={normalized_admissibility_mode} requires coverage_atom_source=baseline_prefix"
+        )
+
+    ce_rows, ce_score_field, ce_fallback_reason = _compute_assemble_score_rows(
+        query=query,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=pool_doc_scores,
+        candidate_positions=normalized_positions,
+        assemble_mode="cross_encoder" if ce_reranker is not None else "base_score",
+        hipporag=types.SimpleNamespace(query_to_embedding={}, passage_embeddings=np.array([])),
+        ce_reranker=ce_reranker,
+        position_sources=position_sources,
+    )
+    ce_rows_by_position = {
+        int(row["pool_position"]): row
+        for row in ce_rows
+    }
+    ce_scores = {
+        pos: float(ce_rows_by_position[pos]["assemble_score"])
+        for pos in ce_rows_by_position
+    }
+    sorted_ce_rows = _sort_assemble_score_rows(ce_rows)
+
+    a_q, a_e, a_b, doc_covers_q, doc_covers_e, doc_covers_b = _build_coverage_atom_maps(
+        candidate_positions=normalized_positions,
+        atom_source_positions=atom_source_positions,
+        normalized_atom_source=normalized_atom_source,
+        pool_doc_ids=pool_doc_ids,
+        seed_entities=seed_entities,
+        doc_idx_to_entities=doc_idx_to_entities,
+        doc_idx_to_edges=doc_idx_to_edges,
+    )
+    baseline_prefix_positions = [
+        int(pos) for pos in atom_source_positions
+        if str((position_sources or {}).get(int(pos), "")) == "baseline_prefix"
+    ]
+    final_positions = list(normalized_positions)
+    admissibility_trace: Dict[str, Any] = {}
+    if normalized_admissibility_mode == "budget_gap":
+        reference_search = _run_coverage_exact_search(
+            candidate_positions=baseline_prefix_positions,
+            qa_top_k=int(qa_top_k),
+            pool_docs=pool_docs,
+            sorted_ce_rows=sorted_ce_rows,
+            ce_rows_by_position=ce_rows_by_position,
+            ce_scores=ce_scores,
+            pool_doc_scores=pool_doc_scores,
+            doc_covers_q=doc_covers_q,
+            doc_covers_e=doc_covers_e,
+            doc_covers_b=doc_covers_b,
+            normalized_variant=normalized_variant,
+        )
+        final_positions, admissibility_trace = _build_budget_gap_admissibility_trace(
+            normalized_positions=normalized_positions,
+            baseline_prefix_positions=baseline_prefix_positions,
+            position_sources=(position_sources or {}),
+            pool_docs=pool_docs,
+            doc_covers_e=doc_covers_e,
+            reference_subset=reference_search["best_subset"],
+            frozen_edge_universe=a_e,
+        )
+        admissibility_trace["reference_score"] = {
+            "covQ": int(reference_search["best_covq"]),
+            "covE": int(reference_search["best_cove"]),
+            "ce_sum": round(float(reference_search["best_ce_sum"]), 4),
+        }
+
+    search_result = _run_coverage_exact_search(
+        candidate_positions=final_positions,
+        qa_top_k=int(qa_top_k),
+        pool_docs=pool_docs,
+        sorted_ce_rows=sorted_ce_rows,
+        ce_rows_by_position=ce_rows_by_position,
+        ce_scores=ce_scores,
+        pool_doc_scores=pool_doc_scores,
+        doc_covers_q=doc_covers_q,
+        doc_covers_e=doc_covers_e,
+        doc_covers_b=doc_covers_b,
+        normalized_variant=normalized_variant,
+    )
+    best_subset = list(search_result["best_subset"])
+    ranked_positions = list(search_result["ranked_positions"])
+    best_covq = int(search_result["best_covq"])
+    best_cove = int(search_result["best_cove"])
+    best_covb = int(search_result["best_covb"])
+    best_ce_sum = float(search_result["best_ce_sum"])
+    best_ce_subset = list(search_result["best_ce_subset"])
+    fallback_reason = str(search_result["fallback_reason"])
+    coverage_selected_set = set(best_subset)
+    best_ce_selected_set = set(best_ce_subset)
+    baseline_ranked_positions = list(final_positions[:max(int(qa_top_k), 0)])
+    appended_positions = [
+        int(pos) for pos in final_positions
+        if str((position_sources or {}).get(int(pos), "")).startswith("append_")
+    ]
+    num_appended_selected = sum(
+        1 for pos in best_subset
+        if str((position_sources or {}).get(int(pos), "")).startswith("append_")
+    )
+    num_baseline_selected = sum(
+        1 for pos in best_subset
+        if str((position_sources or {}).get(int(pos), "")) == "baseline_prefix"
+    )
+    decision_layer_trace = dict(search_result["decision_trace"])
+    selected_appended_rows, selected_appended_nonzero_unique_gain, selected_appended_zero_unique_gain = (
+        _build_selected_appended_trace_rows(
+            selected_positions=best_subset,
+            candidate_positions=final_positions,
+            appended_positions=appended_positions,
+            pool_docs=pool_docs,
+            doc_covers_e=doc_covers_e,
+        )
+    )
+    default_trace.update({
+        "selected_positions": list(ranked_positions),
+        "ranked_pool_positions": list(ranked_positions),
+        "ranked_titles": [extract_doc_title(pool_docs[pos]) for pos in ranked_positions],
+        "final_candidate_positions": list(final_positions),
+        "final_candidate_titles": [extract_doc_title(pool_docs[pos]) for pos in final_positions],
+        "atom_counts": {
+            "A_Q": int(len(a_q)),
+            "A_E": int(len(a_e)),
+            "A_B": int(len(a_b)),
+        },
+        "atom_source_counts": {
+            "A_Q": int(len(a_q)),
+            "A_E": int(len(a_e)),
+            "A_B": int(len(a_b)),
+        },
+        "best_score": {
+            "covQ": int(best_covq),
+            "covE": int(best_cove),
+            "ce_sum": round(float(best_ce_sum), 4),
+        },
+        "best_covB_trace_only": int(best_covb),
+        "ce_score_source": "cross_encoder" if ce_reranker is not None else "base_score_fallback",
+        "ce_score_field": str(ce_score_field),
+        "ce_score_fallback_reason": str(ce_fallback_reason),
+        "best_ce_subset_by_true_ce": list(best_ce_subset),
+        "best_ce_subset_score": round(float(search_result["best_ce_subset_score"]), 4),
+        "coverage_vs_ce_overlap": int(len(coverage_selected_set & best_ce_selected_set)),
+        "coverage_vs_baseline_overlap": int(len(coverage_selected_set & set(baseline_ranked_positions))),
+        "num_appended_selected": int(num_appended_selected),
+        "num_baseline_selected": int(num_baseline_selected),
+        "total_subsets_enumerated": int(search_result["total_subsets_enumerated"]),
+        "total_valid_subsets": int(search_result["total_valid_subsets"]),
+        "total_invalid_subsets_dedup": int(search_result["total_invalid_subsets_dedup"]),
+        "fallback_reason": str(fallback_reason),
+        "selected_appended_rows": list(selected_appended_rows),
+        "selected_appended_with_nonzero_unique_gain": int(selected_appended_nonzero_unique_gain),
+        "selected_appended_with_zero_unique_gain": int(selected_appended_zero_unique_gain),
+        "admissibility_trace": admissibility_trace,
+    })
+    default_trace.update(decision_layer_trace)
+    default_trace["ranking_rows"] = [
+        {
+            "rank": int(rank + 1),
+            "pool_position": int(pos),
+            "doc_id": int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None,
+            "title": extract_doc_title(pool_docs[pos]),
+            "source": str((position_sources or {}).get(int(pos), "candidate")),
+            "covQ_contribution": int(len(doc_covers_q.get(pos, set()))),
+            "covE_contribution": int(len(doc_covers_e.get(pos, set()))),
+            "covB_contribution": int(len(doc_covers_b.get(pos, set()))),
+            "ce_score": round(float(ce_scores.get(pos, 0.0)), 4),
+            "base_score": round(float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0, 4),
+        }
+        for rank, pos in enumerate(ranked_positions)
+    ]
+    return list(ranked_positions), default_trace
 
 
 def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
@@ -3613,10 +4485,7 @@ def rerank_candidate_positions_for_assemble(query: str,
                                             ce_reranker: Any = None,
                                             position_sources: Dict[int, str] | None = None) -> Tuple[List[int], Dict[str, object]]:
     normalized_mode = normalize_assemble_mode(assemble_mode)
-    normalized_positions = [
-        int(pos) for pos in candidate_positions
-        if 0 <= int(pos) < len(pool_docs)
-    ]
+    normalized_positions = _normalize_candidate_positions_for_assemble(candidate_positions, pool_docs)
     default_trace = {
         "assemble_mode": normalized_mode,
         "candidate_pool_positions": list(normalized_positions),
@@ -3642,79 +4511,18 @@ def rerank_candidate_positions_for_assemble(query: str,
         ]
         return list(normalized_positions), default_trace
 
-    rows: List[Dict[str, object]] = []
-    fallback_reason = ""
-    if normalized_mode == "cross_encoder":
-        if ce_reranker is None:
-            raise ValueError("cross_encoder assemble_mode requires a loaded ce_reranker")
-        pairs = [
-            [query, format_doc_for_assemble_rerank(pool_docs[pos])]
-            for pos in normalized_positions
-        ]
-        raw_scores = ce_reranker.compute_score(pairs)
-        if isinstance(raw_scores, (int, float)):
-            raw_scores = [raw_scores]
-        score_values = np.asarray(raw_scores, dtype=float)
-        score_field = "cross_encoder_score"
-    elif normalized_mode == "embedding_similarity":
-        query_embedding = None
-        query_embedding_store = getattr(hipporag, "query_to_embedding", {}) or {}
-        if isinstance(query_embedding_store, dict):
-            passage_query_embeddings = query_embedding_store.get("passage", {}) or {}
-            if isinstance(passage_query_embeddings, dict):
-                query_embedding = passage_query_embeddings.get(query)
-        if query_embedding is None and hasattr(hipporag, "_get_passage_query_embeddings"):
-            hipporag._get_passage_query_embeddings([query])
-            query_embedding = (
-                ((getattr(hipporag, "query_to_embedding", {}) or {}).get("passage", {}) or {}).get(query)
-            )
-        passage_embeddings = np.asarray(getattr(hipporag, "passage_embeddings", np.array([])))
-        if query_embedding is None or passage_embeddings.size == 0:
-            score_values = np.asarray([
-                float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0
-                for pos in normalized_positions
-            ], dtype=float)
-            fallback_reason = "missing_query_or_passage_embeddings"
-            score_field = "base_score_fallback"
-        else:
-            query_vector = np.asarray(query_embedding, dtype=float).reshape(-1)
-            similarity_scores: List[float] = []
-            for pos in normalized_positions:
-                doc_id = pool_doc_ids[pos]
-                if doc_id is None or int(doc_id) >= len(passage_embeddings):
-                    similarity_scores.append(float("-inf"))
-                    continue
-                passage_vector = np.asarray(passage_embeddings[int(doc_id)], dtype=float).reshape(-1)
-                if passage_vector.size == 0 or passage_vector.shape != query_vector.shape:
-                    similarity_scores.append(float("-inf"))
-                    continue
-                similarity_scores.append(float(np.dot(query_vector, passage_vector)))
-            score_values = np.asarray(similarity_scores, dtype=float)
-            score_field = "embedding_similarity"
-    else:
-        score_values = np.asarray([
-            float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0
-            for pos in normalized_positions
-        ], dtype=float)
-        score_field = "base_score"
-
-    for pos, score_value in zip(normalized_positions, score_values.tolist()):
-        rows.append({
-            "pool_position": int(pos),
-            "doc_id": int(pool_doc_ids[pos]) if pool_doc_ids[pos] is not None else None,
-            "title": extract_doc_title(pool_docs[pos]),
-            "source": str((position_sources or {}).get(int(pos), "candidate")),
-            "base_score": float(pool_doc_scores[pos]) if pos < len(pool_doc_scores) else 0.0,
-            "assemble_score": float(score_value),
-        })
-
-    rows.sort(
-        key=lambda row: (
-            -float(row.get("assemble_score", float("-inf"))),
-            -float(row.get("base_score", 0.0) or 0.0),
-            int(row.get("pool_position", 0) or 0),
-        )
+    rows, score_field, fallback_reason = _compute_assemble_score_rows(
+        query=query,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=pool_doc_scores,
+        candidate_positions=normalized_positions,
+        assemble_mode=normalized_mode,
+        hipporag=hipporag,
+        ce_reranker=ce_reranker,
+        position_sources=position_sources,
     )
+    rows = _sort_assemble_score_rows(rows)
     ranked_positions = [int(row["pool_position"]) for row in rows]
     trace = {
         "assemble_mode": normalized_mode,
@@ -4745,6 +5553,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            expand_base_k: int = 10,
                            expand_min_structure_score: float = 0.35,
                            assemble_mode: str = "cross_encoder",
+                           coverage_score_variant: str = "qe_ce",
+                           coverage_atom_source: str = "candidate_pool",
+                           coverage_admissibility_mode: str = "off",
                            append_max_docs: int = 3,
                            append_policy: str = "bridge",
                            append_random_seed: int = 0,
@@ -4754,6 +5565,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
     normalized_assemble_mode = normalize_assemble_mode(assemble_mode)
+    normalized_coverage_score_variant = normalize_coverage_score_variant(coverage_score_variant)
+    normalized_coverage_atom_source = normalize_coverage_atom_source(coverage_atom_source)
+    normalized_coverage_admissibility_mode = normalize_coverage_admissibility_mode(coverage_admissibility_mode)
     normalized_append_policy = normalize_append_policy(append_policy)
     if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
@@ -4807,7 +5621,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
     if selector_name == "bridge_append" and normalized_assemble_mode == "embedding_similarity":
         if hasattr(hipporag, "_get_passage_query_embeddings"):
             hipporag._get_passage_query_embeddings(query_solutions)
-    if selector_name == "bridge_append" and normalized_assemble_mode == "cross_encoder":
+    if selector_name == "bridge_append" and normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES:
         from FlagEmbedding import FlagReranker
 
         logger.info("Loading assemble cross-encoder model: %s on %s", ce_model, ce_device)
@@ -5037,19 +5851,44 @@ def apply_setwise_selector(hipporag: HippoRAG,
             )
             for pos in selector_trace.get("appended_positions", []) or []:
                 position_sources[int(pos)] = f"append_{normalized_append_policy}"
-            reranked_positions, assemble_trace = rerank_candidate_positions_for_assemble(
-                query=qs.question,
-                pool_docs=pool_docs,
-                pool_doc_ids=pool_doc_ids,
-                pool_doc_scores=pool_scores,
-                candidate_positions=selected_positions,
-                assemble_mode=normalized_assemble_mode,
-                hipporag=hipporag,
-                ce_reranker=assemble_reranker,
-                position_sources=position_sources,
-            )
+            if normalized_assemble_mode == "coverage":
+                coverage_atom_positions = None
+                if normalized_coverage_atom_source in {"baseline_prefix", "baseline_anchored"}:
+                    coverage_atom_positions = selector_trace.get("baseline_prefix_positions", []) or []
+                reranked_positions, assemble_trace = assemble_coverage_exact_search(
+                    query=qs.question,
+                    pool_docs=pool_docs,
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_scores=pool_scores,
+                    candidate_positions=selected_positions,
+                    qa_top_k=qa_top_k,
+                    seed_entities=seed_entities,
+                    doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                    doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                    ce_reranker=assemble_reranker,
+                    position_sources=position_sources,
+                    coverage_score_variant=normalized_coverage_score_variant,
+                    coverage_atom_source=normalized_coverage_atom_source,
+                    coverage_atom_positions=coverage_atom_positions,
+                    coverage_admissibility_mode=normalized_coverage_admissibility_mode,
+                )
+            else:
+                reranked_positions, assemble_trace = rerank_candidate_positions_for_assemble(
+                    query=qs.question,
+                    pool_docs=pool_docs,
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_scores=pool_scores,
+                    candidate_positions=selected_positions,
+                    assemble_mode=normalized_assemble_mode,
+                    hipporag=hipporag,
+                    ce_reranker=assemble_reranker,
+                    position_sources=position_sources,
+                )
             selector_trace["assemble_trace"] = assemble_trace
             selector_trace["assemble_mode"] = normalized_assemble_mode
+            selector_trace["coverage_score_variant"] = normalized_coverage_score_variant
+            selector_trace["coverage_atom_source"] = normalized_coverage_atom_source
+            selector_trace["coverage_admissibility_mode"] = normalized_coverage_admissibility_mode
             selector_trace["selected_positions_before_assemble"] = list(selected_positions)
             selected_positions = list(reranked_positions)
         elif selector_name == "learned_greedy":
@@ -5489,8 +6328,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "append_random_seed": int(append_random_seed),
                 "expand_min_structure_score": round(float(expand_min_structure_score), 4),
                 "assemble_mode": normalized_assemble_mode,
-                "assemble_ce_model": str(ce_model) if normalized_assemble_mode == "cross_encoder" else None,
-                "assemble_ce_device": str(ce_device) if normalized_assemble_mode == "cross_encoder" else None,
+                "coverage_score_variant": normalized_coverage_score_variant,
+                "coverage_atom_source": normalized_coverage_atom_source,
+                "coverage_admissibility_mode": normalized_coverage_admissibility_mode,
+                "assemble_ce_model": str(ce_model) if normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES else None,
+                "assemble_ce_device": str(ce_device) if normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES else None,
                 "non_anchor_title_dedup": bool(non_anchor_title_dedup),
                 "query_entity_source": normalized_query_entity_source,
                 "seed_entities_preview": sorted(seed_entities)[:12],
@@ -5674,8 +6516,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "append_random_seed": int(append_random_seed),
             "expand_min_structure_score": round(float(expand_min_structure_score), 4),
             "assemble_mode": normalized_assemble_mode,
-            "assemble_ce_model": str(ce_model) if normalized_assemble_mode == "cross_encoder" else None,
-            "assemble_ce_device": str(ce_device) if normalized_assemble_mode == "cross_encoder" else None,
+            "coverage_score_variant": normalized_coverage_score_variant,
+            "coverage_atom_source": normalized_coverage_atom_source,
+            "coverage_admissibility_mode": normalized_coverage_admissibility_mode,
+            "assemble_ce_model": str(ce_model) if normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES else None,
+            "assemble_ce_device": str(ce_device) if normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES else None,
             "avg_appended_doc_count": round(float(np.mean(appended_doc_counts)) if appended_doc_counts else 0.0, 4),
             "avg_candidate_set_size": round(float(np.mean(expand_candidate_sizes)) if expand_candidate_sizes else 0.0, 4),
             "append_count_histogram": {
@@ -5763,6 +6608,212 @@ def build_report_examples(config: BaseConfig,
             "retrieval_trace": query_solution.retrieval_trace or {},
         })
     return examples
+
+
+def build_retrieval_cache_examples(query_solutions: Sequence[QuerySolution],
+                                   doc_text_to_chunk_id: Dict[str, str]) -> List[Dict[str, object]]:
+    examples: List[Dict[str, object]] = []
+    for query_solution in query_solutions:
+        doc_scores = query_solution.doc_scores
+        serialized_scores = (
+            [float(score) for score in np.asarray(doc_scores, dtype=float).tolist()]
+            if doc_scores is not None else
+            []
+        )
+        examples.append({
+            "question": query_solution.question,
+            "retrieved_doc_ids": serialize_retrieved_doc_ids(query_solution.docs, doc_text_to_chunk_id),
+            "retrieved_doc_scores": serialized_scores,
+            "retrieval_trace": query_solution.retrieval_trace or {},
+        })
+    return examples
+
+
+def write_retrieval_cache_payload(output_path: str | Path,
+                                  query_solutions: Sequence[QuerySolution],
+                                  doc_text_to_chunk_id: Dict[str, str],
+                                  overall_metrics: Mapping[str, object] | None) -> None:
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "overall_metrics": dict(overall_metrics or {}),
+        "examples": build_retrieval_cache_examples(
+            query_solutions=query_solutions,
+            doc_text_to_chunk_id=doc_text_to_chunk_id,
+        ),
+    }
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def load_baseline_report_payload(report_path: str | Path) -> Dict[str, object]:
+    path = Path(report_path)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    examples = list(payload.get("examples") or [])
+    if not examples:
+        raise ValueError(f"Baseline report has no examples: {path}")
+    overall_metrics = dict(payload.get("overall_recomputed") or payload.get("overall_from_pipeline") or {})
+    if not overall_metrics:
+        raise ValueError(f"Baseline report has no overall metrics: {path}")
+    return {
+        "path": str(path),
+        "overall_metrics": overall_metrics,
+        "examples": examples,
+    }
+
+
+def load_retrieval_cache_payload(cache_path: str | Path) -> Dict[str, object]:
+    path = Path(cache_path)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    examples = list(payload.get("examples") or [])
+    if not examples:
+        raise ValueError(f"Retrieval cache has no examples: {path}")
+    overall_metrics = dict(
+        payload.get("overall_metrics")
+        or payload.get("overall_recomputed")
+        or payload.get("overall_from_pipeline")
+        or {}
+    )
+    return {
+        "path": str(path),
+        "overall_metrics": overall_metrics,
+        "examples": examples,
+    }
+
+
+def ensure_runtime_objects_for_cached_retrieval(hipporag: HippoRAG) -> None:
+    """Initialize retrieval-time mappings/structure objects when retrieval is skipped."""
+    if getattr(hipporag, "ready_to_retrieve_v2", False) or getattr(hipporag, "ready_to_retrieve", False):
+        return
+    hipporag.prepare_retrieval_objects()
+
+
+def compute_retrieval_recall_metrics(
+    query_solutions: Sequence[QuerySolution],
+    gold_docs: Sequence[Sequence[str]],
+    ks: Sequence[int] = REPORT_RECALL_CUTOFFS,
+) -> Dict[str, float]:
+    metrics: Dict[str, float] = {}
+    for k in ks:
+        recalls = []
+        for q_idx, qs in enumerate(query_solutions):
+            gold_set = set(gold_docs[q_idx])
+            top_k_set = set(qs.docs[: int(k)])
+            recalls.append(len(gold_set & top_k_set) / max(1, len(gold_set)))
+        metrics[f"Recall@{int(k)}"] = round(float(np.mean(recalls)), 4)
+    return metrics
+
+
+def hydrate_query_solutions_from_baseline_report(query_solutions: Sequence[QuerySolution],
+                                                 baseline_report_payload: Mapping[str, object],
+                                                 gold_docs: Sequence[Sequence[str]] | None = None) -> None:
+    examples = list(baseline_report_payload.get("examples") or [])
+    if len(examples) != len(query_solutions):
+        raise ValueError(
+            "Baseline report example count does not match current query count: "
+            f"{len(examples)} != {len(query_solutions)}"
+        )
+
+    use_index_alignment = True
+    for idx, query_solution in enumerate(query_solutions):
+        report_question = str((examples[idx] or {}).get("question", "")).strip()
+        if report_question != str(query_solution.question).strip():
+            use_index_alignment = False
+            break
+
+    example_by_question: Dict[str, Dict[str, object]] = {}
+    if not use_index_alignment:
+        for example in examples:
+            question = str((example or {}).get("question", "")).strip()
+            if not question:
+                raise ValueError("Baseline report example is missing question text.")
+            if question in example_by_question:
+                raise ValueError(
+                    "Baseline report question alignment requires unique question text when order differs."
+                )
+            example_by_question[question] = dict(example)
+
+    for idx, query_solution in enumerate(query_solutions):
+        if use_index_alignment:
+            example = dict(examples[idx] or {})
+        else:
+            example = example_by_question.get(str(query_solution.question).strip())
+            if example is None:
+                raise ValueError(
+                    f"Could not align query_solution question to baseline report example: {query_solution.question!r}"
+                )
+        query_solution.answer = str(example.get("answer") or "")
+        query_solution.gold_answers = list(example.get("gold_answers") or query_solution.gold_answers or [])
+        if gold_docs is not None:
+            query_solution.gold_docs = list(gold_docs[idx])
+
+
+def hydrate_query_solutions_from_retrieval_cache(query_solutions: Sequence[QuerySolution],
+                                                 retrieval_cache_payload: Mapping[str, object],
+                                                 chunk_id_to_doc_text: Mapping[str, str],
+                                                 gold_docs: Sequence[Sequence[str]] | None = None) -> None:
+    examples = list(retrieval_cache_payload.get("examples") or [])
+    if len(examples) != len(query_solutions):
+        raise ValueError(
+            "Retrieval cache example count does not match current query count: "
+            f"{len(examples)} != {len(query_solutions)}"
+        )
+
+    use_index_alignment = True
+    for idx, query_solution in enumerate(query_solutions):
+        cached_question = str((examples[idx] or {}).get("question", "")).strip()
+        if cached_question != str(query_solution.question).strip():
+            use_index_alignment = False
+            break
+
+    example_by_question: Dict[str, Dict[str, object]] = {}
+    if not use_index_alignment:
+        for example in examples:
+            question = str((example or {}).get("question", "")).strip()
+            if not question:
+                raise ValueError("Retrieval cache example is missing question text.")
+            if question in example_by_question:
+                raise ValueError(
+                    "Retrieval cache question alignment requires unique question text when order differs."
+                )
+            example_by_question[question] = dict(example)
+
+    for idx, query_solution in enumerate(query_solutions):
+        if use_index_alignment:
+            example = dict(examples[idx] or {})
+        else:
+            example = example_by_question.get(str(query_solution.question).strip())
+            if example is None:
+                raise ValueError(
+                    f"Could not align query_solution question to retrieval cache example: {query_solution.question!r}"
+                )
+        retrieved_doc_ids = list(example.get("retrieved_doc_ids") or [])
+        retrieved_doc_scores = list(example.get("retrieved_doc_scores") or [])
+        if retrieved_doc_scores and len(retrieved_doc_ids) != len(retrieved_doc_scores):
+            raise ValueError(
+                "Retrieval cache example has mismatched doc ids and scores lengths "
+                f"for question {query_solution.question!r}: "
+                f"{len(retrieved_doc_ids)} != {len(retrieved_doc_scores)}"
+            )
+
+        docs: List[str] = []
+        for chunk_id in retrieved_doc_ids:
+            if chunk_id is None:
+                raise ValueError(
+                    f"Retrieval cache example contains null chunk id for question {query_solution.question!r}"
+                )
+            doc_text = chunk_id_to_doc_text.get(str(chunk_id))
+            if doc_text is None:
+                raise ValueError(
+                    f"Retrieval cache chunk id {chunk_id!r} is not present in current corpus "
+                    f"for question {query_solution.question!r}"
+                )
+            docs.append(doc_text)
+
+        query_solution.docs = docs
+        query_solution.doc_scores = np.asarray(retrieved_doc_scores, dtype=float)
+        query_solution.retrieval_trace = dict(example.get("retrieval_trace") or {})
+        if gold_docs is not None:
+            query_solution.gold_docs = list(gold_docs[idx])
 
 
 def build_setwise_selector_query_traces(config: BaseConfig,
@@ -6156,6 +7207,7 @@ def main():
     parser.add_argument("--dataset", type=str, default="hotpotqa")
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--save_dir", type=str, default="outputs")
+    parser.add_argument("--baseline_report_json", type=str, default="")
     parser.add_argument("--llm_base_url", type=str, default="http://localhost:8039/v1")
     parser.add_argument("--llm_name", type=str, default="qwen3-8b")
     parser.add_argument(
@@ -6252,6 +7304,12 @@ def main():
                         help="For --append_policy random_deep, deterministic seed used to sample deep-pool docs.")
     parser.add_argument("--assemble_mode", choices=sorted(ASSEMBLE_MODES), default="cross_encoder",
                         help="For --setwise_selector bridge_append, answer-oriented assembly rerank mode applied over the expanded candidate set.")
+    parser.add_argument("--coverage_score_variant", choices=sorted(COVERAGE_SCORE_VARIANTS), default="qe_ce",
+                        help="For --assemble_mode coverage, lexicographic score variant. qe_ce uses (CovQ, CovE, CE); qeb_ce adds CovB before CE.")
+    parser.add_argument("--coverage_atom_source", choices=sorted(COVERAGE_ATOM_SOURCES), default="candidate_pool",
+                        help="For --assemble_mode coverage, atom-universe source. candidate_pool preserves v1 behavior; baseline_prefix freezes A_E/A_B to the preserved baseline prefix; baseline_anchored keeps the baseline entity scaffold but admits candidate edges touching it.")
+    parser.add_argument("--coverage_admissibility_mode", choices=sorted(COVERAGE_ADMISSIBILITY_MODES), default="off",
+                        help="For --assemble_mode coverage with baseline_prefix atoms, optionally filter appended docs by frozen-structure marginal utility before exact search.")
     parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy", "set_closure"], default="bridge",
                         help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score centered on explicit path connectivity.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
@@ -6392,6 +7450,10 @@ def main():
                         help="Eval-only need-unit bridge bonus mode for requirement_beam. off preserves legacy scoring; variable_binding grants a small relation_hop override when predecessor coverage and entity-binding continuity are present.")
     parser.add_argument("--setwise_requirement_probe_bridge_bonus_weight", type=float, default=0.0,
                         help="Eval-only bridge bonus weight used when --setwise_requirement_probe_bridge_bonus_mode variable_binding.")
+    parser.add_argument("--retrieval_cache_json", type=str, default="",
+                        help="Optional retrieval cache used to reuse retrieved docs/doc_scores/retrieval traces and skip retrieval.")
+    parser.add_argument("--save_retrieval_cache_json", type=str, default="",
+                        help="Optional output path for writing a reusable retrieval cache after the baseline retrieval stage.")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -6413,6 +7475,7 @@ def main():
 
     docs = [f"{doc['title']}\n{doc['text']}" for doc in corpus]
     doc_text_to_chunk_id = build_doc_text_to_chunk_id(corpus)
+    chunk_id_to_doc_text = build_chunk_id_to_doc_text(corpus)
     queries = [sample["question"] for sample in samples]
     gold_answers = get_gold_answers(samples)
     gold_docs = get_gold_docs(samples, dataset_name, corpus=corpus)
@@ -6423,6 +7486,9 @@ def main():
 
     config = build_config(args, corpus_len=len(corpus))
     logging.basicConfig(level=logging.INFO)
+    baseline_report_path = str(args.baseline_report_json or "").strip()
+    retrieval_cache_path = str(args.retrieval_cache_json or "").strip()
+    save_retrieval_cache_path = str(args.save_retrieval_cache_json or "").strip()
 
     oracle_reorder_qa_results = None
     setwise_selector_results = None
@@ -6505,6 +7571,8 @@ def main():
         base_url=str(args.llm_base_url).strip() if args.llm_base_url else None,
         response_format=None,
     )
+    baseline_report_payload = load_baseline_report_payload(baseline_report_path) if baseline_report_path else None
+    retrieval_cache_payload = load_retrieval_cache_payload(retrieval_cache_path) if retrieval_cache_path else None
 
     if gold_doc_reader:
         # Exp2: Gold-doc reader — skip retrieval, feed gold docs to reader
@@ -6529,15 +7597,67 @@ def main():
     else:
         hipporag = HippoRAG(global_config=config)
         hipporag.index(docs)
-        if retrieval_only:
-            query_solutions, overall_retrieval_result = hipporag.retrieve(
-                queries=queries,
+        if retrieval_cache_payload is not None:
+            ensure_runtime_objects_for_cached_retrieval(hipporag)
+            query_solutions = [
+                QuerySolution(
+                    question=query,
+                    docs=[],
+                    doc_scores=np.asarray([], dtype=float),
+                )
+                for query in queries
+            ]
+            hydrate_query_solutions_from_retrieval_cache(
+                query_solutions=query_solutions,
+                retrieval_cache_payload=retrieval_cache_payload,
+                chunk_id_to_doc_text=chunk_id_to_doc_text,
                 gold_docs=gold_docs,
             )
+            overall_retrieval_result = dict(retrieval_cache_payload.get("overall_metrics") or {})
+            logging.getLogger(__name__).info(
+                "Reused retrieval from cache %s and skipped retrieval stage.",
+                retrieval_cache_payload.get("path"),
+            )
+        else:
+            query_solutions = None
+            overall_retrieval_result = None
+
+        if retrieval_only:
+            if query_solutions is None:
+                query_solutions, overall_retrieval_result = hipporag.retrieve(
+                    queries=queries,
+                    gold_docs=gold_docs,
+                )
             responses = []
             metadata = []
             overall_qa_results = {}
             effective_gold_answers = None
+        elif baseline_report_payload is not None:
+            if query_solutions is None:
+                query_solutions, overall_retrieval_result = hipporag.retrieve(
+                    queries=queries,
+                    gold_docs=gold_docs,
+                )
+            hydrate_query_solutions_from_baseline_report(
+                query_solutions=query_solutions,
+                baseline_report_payload=baseline_report_payload,
+                gold_docs=gold_docs,
+            )
+            responses = []
+            metadata = []
+            overall_qa_results = dict(baseline_report_payload.get("overall_metrics") or {})
+            effective_gold_answers = gold_answers
+            logging.getLogger(__name__).info(
+                "Reused baseline QA from report %s and skipped baseline reader pass.",
+                baseline_report_payload.get("path"),
+            )
+        elif query_solutions is not None:
+            query_solutions, responses, metadata, _, overall_qa_results = hipporag.rag_qa(
+                queries=query_solutions,
+                gold_docs=gold_docs,
+                gold_answers=gold_answers,
+            )
+            effective_gold_answers = gold_answers
         else:
             query_solutions, responses, metadata, overall_retrieval_result, overall_qa_results = hipporag.rag_qa(
                 queries=queries,
@@ -6545,6 +7665,18 @@ def main():
                 gold_answers=gold_answers,
             )
             effective_gold_answers = gold_answers
+
+        if save_retrieval_cache_path and query_solutions:
+            write_retrieval_cache_payload(
+                output_path=save_retrieval_cache_path,
+                query_solutions=query_solutions,
+                doc_text_to_chunk_id=doc_text_to_chunk_id,
+                overall_metrics=overall_retrieval_result,
+            )
+            logging.getLogger(__name__).info(
+                "Wrote retrieval cache to %s",
+                save_retrieval_cache_path,
+            )
 
         if bool(args.setwise_late_rerank_enabled) and setwise_selector == "bridge_beam":
             late_rerank_judge_bundle = build_setwise_late_rerank_judge_bundle(
@@ -6785,6 +7917,9 @@ def main():
             expand_base_k=int(args.expand_base_k),
             expand_min_structure_score=float(args.expand_min_structure_score),
             assemble_mode=str(args.assemble_mode),
+            coverage_score_variant=str(args.coverage_score_variant),
+            coverage_atom_source=str(args.coverage_atom_source),
+            coverage_admissibility_mode=str(args.coverage_admissibility_mode),
             append_max_docs=int(args.append_max_docs),
             append_policy=str(args.append_policy),
             append_random_seed=int(args.append_random_seed),
@@ -6835,14 +7970,10 @@ def main():
                 "F1_delta": round(float(np.mean(data["selector_f1"])) - float(np.mean(data["baseline_f1"])), 4),
             }
 
-        selector_retrieval_metrics = {}
-        for k in [1, 2, 5, 10, 20]:
-            recalls = []
-            for q_idx, qs in enumerate(selected_solutions):
-                gold_set = set(gold_docs[q_idx])
-                top_k_set = set(qs.docs[:k])
-                recalls.append(len(gold_set & top_k_set) / max(1, len(gold_set)))
-            selector_retrieval_metrics[f"Recall@{k}"] = round(float(np.mean(recalls)), 4)
+        selector_retrieval_metrics = compute_retrieval_recall_metrics(
+            query_solutions=selected_solutions,
+            gold_docs=gold_docs,
+        )
 
         selector_em = selector_qa_results.get("ExactMatch", 0.0)
         selector_f1 = selector_qa_results.get("F1", 0.0)
@@ -6859,8 +7990,11 @@ def main():
                 "append_random_seed": int(args.append_random_seed),
                 "expand_min_structure_score": round(float(args.expand_min_structure_score), 4),
                 "assemble_mode": normalize_assemble_mode(args.assemble_mode),
-                "assemble_ce_model": args.ce_model if normalize_assemble_mode(args.assemble_mode) == "cross_encoder" else None,
-                "assemble_ce_device": args.ce_device if normalize_assemble_mode(args.assemble_mode) == "cross_encoder" else None,
+                "coverage_score_variant": normalize_coverage_score_variant(args.coverage_score_variant),
+                "coverage_atom_source": normalize_coverage_atom_source(args.coverage_atom_source),
+                "coverage_admissibility_mode": normalize_coverage_admissibility_mode(args.coverage_admissibility_mode),
+                "assemble_ce_model": args.ce_model if normalize_assemble_mode(args.assemble_mode) in ASSEMBLE_CE_ACTIVE_MODES else None,
+                "assemble_ce_device": args.ce_device if normalize_assemble_mode(args.assemble_mode) in ASSEMBLE_CE_ACTIVE_MODES else None,
                 "structure_max_hops": int(args.setwise_structure_max_hops),
                 "base_weight": float(args.setwise_base_weight),
                 "structure_weight": float(args.setwise_structure_weight),
@@ -7058,14 +8192,10 @@ def main():
 
         # Compute retrieval metrics on reranked order
         retrieval_recall = RetrievalRecall(global_config=config)
-        ce_retrieval_metrics = {}
-        for k in [1, 2, 5, 10, 20]:
-            recalls = []
-            for q_idx, qs in enumerate(reranked_solutions):
-                gold_set = set(gold_docs[q_idx])
-                top_k_set = set(qs.docs[:k])
-                recalls.append(len(gold_set & top_k_set) / max(1, len(gold_set)))
-            ce_retrieval_metrics[f"Recall@{k}"] = round(float(np.mean(recalls)), 4)
+        ce_retrieval_metrics = compute_retrieval_recall_metrics(
+            query_solutions=reranked_solutions,
+            gold_docs=gold_docs,
+        )
 
         ce_em = ce_qa_results.get("ExactMatch", 0.0)
         ce_f1 = ce_qa_results.get("F1", 0.0)
@@ -7170,6 +8300,9 @@ def main():
             "append_policy": normalize_append_policy(args.append_policy),
             "append_random_seed": int(args.append_random_seed),
             "assemble_mode": normalize_assemble_mode(args.assemble_mode),
+            "baseline_report_json": args.baseline_report_json or None,
+            "retrieval_cache_json": args.retrieval_cache_json or None,
+            "save_retrieval_cache_json": args.save_retrieval_cache_json or None,
             "setwise_score_mode": str(args.setwise_score_mode),
             "setwise_pool_k": int(args.setwise_pool_k),
             "setwise_anchor_count": int(args.setwise_anchor_count),

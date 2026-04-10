@@ -1,0 +1,48 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "run_type": "baseline_top5",
+      "qa_top_k": 5,
+      "em": 0.27,
+      "f1": 0.33475506308718184,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk5_baseline_20260409smoke.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "baseline_top10_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.31,
+      "f1": 0.3698,
+      "delta_vs_baseline_em": 0.04,
+      "delta_vs_baseline_f1": 0.0339,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409smoke.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    },
+    {
+      "dataset": "musique",
+      "run_type": "random3_deep_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.29,
+      "f1": 0.3524,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.0176,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260409smoke.json",
+      "delta_vs_baseline_top10_plus_ce_em": -0.02,
+      "delta_vs_baseline_top10_plus_ce_f1": -0.0174
+    },
+    {
+      "dataset": "musique",
+      "run_type": "bridge_append_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.32,
+      "f1": 0.381,
+      "delta_vs_baseline_em": 0.05,
+      "delta_vs_baseline_f1": 0.0451,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409smoke.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.01,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0112
+    }
+  ]
+}

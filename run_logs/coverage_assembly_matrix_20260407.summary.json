@@ -1,0 +1,490 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "group": "append0_none_baseline",
+      "qa_top_k": 5,
+      "em": 0.27,
+      "f1": 0.33475506308718184,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 5,
+      "em": 0.31,
+      "f1": 0.3698,
+      "delta_em": 0.04,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 5,
+      "em": 0.33,
+      "f1": 0.4007,
+      "delta_em": 0.06,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_none",
+      "qa_top_k": 5,
+      "em": 0.27,
+      "f1": 0.3359,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_none_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 5,
+      "em": 0.32,
+      "f1": 0.381,
+      "delta_em": 0.05,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_coverage",
+      "qa_top_k": 5,
+      "em": 0.28,
+      "f1": 0.3538,
+      "delta_em": 0.01,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_none_baseline",
+      "qa_top_k": 7,
+      "em": 0.32,
+      "f1": 0.3924270132409666,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 7,
+      "em": 0.34,
+      "f1": 0.4034,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 7,
+      "em": 0.33,
+      "f1": 0.3907,
+      "delta_em": 0.01,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_none",
+      "qa_top_k": 7,
+      "em": 0.32,
+      "f1": 0.3924,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_none_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 7,
+      "em": 0.38,
+      "f1": 0.4385,
+      "delta_em": 0.06,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_coverage",
+      "qa_top_k": 7,
+      "em": 0.31,
+      "f1": 0.3881,
+      "delta_em": -0.01,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_none_baseline",
+      "qa_top_k": 10,
+      "em": 0.34,
+      "f1": 0.4235288129744652,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 10,
+      "em": 0.39,
+      "f1": 0.4412,
+      "delta_em": 0.05,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 10,
+      "em": 0.39,
+      "f1": 0.4464,
+      "delta_em": 0.05,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_none",
+      "qa_top_k": 10,
+      "em": 0.34,
+      "f1": 0.4235,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_none_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 10,
+      "em": 0.37,
+      "f1": 0.4422,
+      "delta_em": 0.03,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "musique",
+      "group": "append3_coverage",
+      "qa_top_k": 10,
+      "em": 0.33,
+      "f1": 0.4084,
+      "delta_em": -0.01,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_none_baseline",
+      "qa_top_k": 5,
+      "em": 0.58,
+      "f1": 0.6966664388243337,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 5,
+      "em": 0.62,
+      "f1": 0.7173,
+      "delta_em": 0.04,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 5,
+      "em": 0.54,
+      "f1": 0.6454,
+      "delta_em": -0.04,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_none",
+      "qa_top_k": 5,
+      "em": 0.58,
+      "f1": 0.6967,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_none_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 5,
+      "em": 0.62,
+      "f1": 0.7173,
+      "delta_em": 0.04,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_coverage",
+      "qa_top_k": 5,
+      "em": 0.51,
+      "f1": 0.6179,
+      "delta_em": -0.07,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_none_baseline",
+      "qa_top_k": 7,
+      "em": 0.58,
+      "f1": 0.6953155616313511,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 7,
+      "em": 0.6,
+      "f1": 0.7136,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 7,
+      "em": 0.58,
+      "f1": 0.6783,
+      "delta_em": 0.01,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_none",
+      "qa_top_k": 7,
+      "em": 0.58,
+      "f1": 0.6953,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_none_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 7,
+      "em": 0.6,
+      "f1": 0.7136,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_coverage",
+      "qa_top_k": 7,
+      "em": 0.6,
+      "f1": 0.6956,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_none_baseline",
+      "qa_top_k": 10,
+      "em": 0.6,
+      "f1": 0.7295200785473629,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/causal_eval_hotpotqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 10,
+      "em": 0.59,
+      "f1": 0.6981,
+      "delta_em": -0.01,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 10,
+      "em": 0.59,
+      "f1": 0.6981,
+      "delta_em": -0.01,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_none",
+      "qa_top_k": 10,
+      "em": 0.6,
+      "f1": 0.7295,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_none_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 10,
+      "em": 0.58,
+      "f1": 0.6881,
+      "delta_em": -0.02,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "group": "append3_coverage",
+      "qa_top_k": 10,
+      "em": 0.57,
+      "f1": 0.6715,
+      "delta_em": -0.03,
+      "report": "outputs_step0_general_hotpotqa/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_none_baseline",
+      "qa_top_k": 5,
+      "em": 0.36,
+      "f1": 0.4008283143012568,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk5_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 5,
+      "em": 0.42,
+      "f1": 0.4553,
+      "delta_em": 0.06,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 5,
+      "em": 0.39,
+      "f1": 0.4426,
+      "delta_em": 0.03,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_none",
+      "qa_top_k": 5,
+      "em": 0.36,
+      "f1": 0.4008,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_none_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 5,
+      "em": 0.43,
+      "f1": 0.4728,
+      "delta_em": 0.07,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk5_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_coverage",
+      "qa_top_k": 5,
+      "em": 0.38,
+      "f1": 0.4385,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk5_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_none_baseline",
+      "qa_top_k": 7,
+      "em": 0.42,
+      "f1": 0.4642319347319348,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk7_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 7,
+      "em": 0.44,
+      "f1": 0.5152,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 7,
+      "em": 0.42,
+      "f1": 0.474,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_none",
+      "qa_top_k": 7,
+      "em": 0.42,
+      "f1": 0.4642,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_none_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 7,
+      "em": 0.44,
+      "f1": 0.5192,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk7_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_coverage",
+      "qa_top_k": 7,
+      "em": 0.43,
+      "f1": 0.4835,
+      "delta_em": 0.01,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk7_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_none_baseline",
+      "qa_top_k": 10,
+      "em": 0.45,
+      "f1": 0.5118339105339105,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/causal_eval_2wikimultihopqa_100_qwen3-8b_qatopk10_baseline_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_cross_encoder_base10",
+      "qa_top_k": 10,
+      "em": 0.46,
+      "f1": 0.4992,
+      "delta_em": 0.02,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append0_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append0_coverage_base10",
+      "qa_top_k": 10,
+      "em": 0.45,
+      "f1": 0.4942,
+      "delta_em": 0.01,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk10_20260407.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_none",
+      "qa_top_k": 10,
+      "em": 0.45,
+      "f1": 0.5118,
+      "delta_em": 0.0,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_none_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_cross_encoder",
+      "qa_top_k": 10,
+      "em": 0.5,
+      "f1": 0.5403,
+      "delta_em": 0.06,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_cross_encoder_pool100_base10_append3_qatopk10_20260406.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "group": "append3_coverage",
+      "qa_top_k": 10,
+      "em": 0.48,
+      "f1": 0.5203,
+      "delta_em": 0.03,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk10_20260407.json"
+    }
+  ]
+}

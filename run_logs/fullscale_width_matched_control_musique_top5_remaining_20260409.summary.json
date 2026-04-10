@@ -1,0 +1,61 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "run_type": "baseline_top5",
+      "qa_top_k": 5,
+      "em": 0.265,
+      "f1": 0.34637158671569834,
+      "recall_at_5": 0.6196,
+      "recall_at_20": 0.7922,
+      "recall_at_100": 0.9033,
+      "num_queries": 1000,
+      "report": "outputs_step0_general_musique/eval_reports/causal_eval_musique_full_qwen3-8b_qatopk5_baseline_20260409fullfix.json"
+    },
+    {
+      "dataset": "musique",
+      "run_type": "baseline_top10_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.307,
+      "f1": 0.3882,
+      "recall_at_5": 0.6603,
+      "recall_at_20": 0.7923,
+      "recall_at_100": 0.9033,
+      "delta_vs_baseline_em": 0.041,
+      "delta_vs_baseline_f1": 0.0415,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409fullfix.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    },
+    {
+      "dataset": "musique",
+      "run_type": "random3_deep_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.304,
+      "f1": 0.3848,
+      "recall_at_5": 0.6548,
+      "recall_at_20": 0.795,
+      "recall_at_100": 0.9033,
+      "delta_vs_baseline_em": 0.039,
+      "delta_vs_baseline_f1": 0.0384,
+      "report": "outputs_step0_general_musique/eval_reports/random3_deep_plus_ce_qatopk5_20260409fullfix.json",
+      "delta_vs_baseline_top10_plus_ce_em": -0.003,
+      "delta_vs_baseline_top10_plus_ce_f1": -0.0034
+    },
+    {
+      "dataset": "musique",
+      "run_type": "bridge_append_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.311,
+      "f1": 0.3917,
+      "recall_at_5": 0.6603,
+      "recall_at_20": 0.7953,
+      "recall_at_100": 0.9033,
+      "delta_vs_baseline_em": 0.046,
+      "delta_vs_baseline_f1": 0.0453,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_plus_ce_qatopk5_20260409fullfix.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.004,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0035
+    }
+  ]
+}

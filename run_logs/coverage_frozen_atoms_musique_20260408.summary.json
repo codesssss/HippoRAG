@@ -1,0 +1,92 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "qa_top_k": 5,
+      "append_max_docs": 0,
+      "atom_source": "candidate_pool",
+      "em": 0.33,
+      "f1": 0.4007,
+      "delta_em": 0.06,
+      "delta_f1": 0.0659,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk5_atomscandidate_pool_20260408.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 5,
+      "append_max_docs": 0,
+      "atom_source": "baseline_prefix",
+      "em": 0.33,
+      "f1": 0.4007,
+      "delta_em": 0.06,
+      "delta_f1": 0.0659,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk5_atomsbaseline_prefix_20260408.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 5,
+      "append_max_docs": 3,
+      "atom_source": "candidate_pool",
+      "em": 0.28,
+      "f1": 0.3538,
+      "delta_em": 0.01,
+      "delta_f1": 0.019,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk5_atomscandidate_pool_20260408.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 5,
+      "append_max_docs": 3,
+      "atom_source": "baseline_prefix",
+      "em": 0.32,
+      "f1": 0.404,
+      "delta_em": 0.05,
+      "delta_f1": 0.0692,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk5_atomsbaseline_prefix_20260408.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 7,
+      "append_max_docs": 0,
+      "atom_source": "candidate_pool",
+      "em": 0.33,
+      "f1": 0.3907,
+      "delta_em": 0.01,
+      "delta_f1": -0.0017,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk7_atomscandidate_pool_20260408.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 7,
+      "append_max_docs": 0,
+      "atom_source": "baseline_prefix",
+      "em": 0.33,
+      "f1": 0.3907,
+      "delta_em": 0.01,
+      "delta_f1": -0.0017,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append0_qatopk7_atomsbaseline_prefix_20260408.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 7,
+      "append_max_docs": 3,
+      "atom_source": "candidate_pool",
+      "em": 0.31,
+      "f1": 0.3881,
+      "delta_em": -0.01,
+      "delta_f1": -0.0043,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk7_atomscandidate_pool_20260408.json"
+    },
+    {
+      "dataset": "musique",
+      "qa_top_k": 7,
+      "append_max_docs": 3,
+      "atom_source": "baseline_prefix",
+      "em": 0.33,
+      "f1": 0.4065,
+      "delta_em": 0.01,
+      "delta_f1": 0.0141,
+      "report": "outputs_step0_general_musique/eval_reports/bridge_append_coverage_pool100_base10_append3_qatopk7_atomsbaseline_prefix_20260408.json"
+    }
+  ]
+}

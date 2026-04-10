@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-07
+Last updated: 2026-04-09
 
 ## Canonical Outputs
 
@@ -24,6 +24,45 @@ Last updated: 2026-04-07
 - `Selector@10 expand probe summary`: `run_logs/selector_top10_expand_probe_20260406.summary.md`
 - `MuSiQue top-7 width-matched control`: `run_logs/width_matched_control_musique_top7_20260407.summary.md`
 - `Unified top-5 width-matched control`: `run_logs/width_matched_control_top5_20260407.summary.md`
+- `Coverage/control status memo`: `research_memory/emnlp_expand_then_compose/10_coverage_probe_and_control_status_20260409.md`
+- `Real full-scale width-matched control queue`: `run_logs/fullscale_width_matched_control_20260409.sh`
+- `MuSiQue top-5 remaining optimized queue`: `run_logs/fullscale_width_matched_control_musique_top5_remaining_20260409.sh`
+
+## Current Run Notes
+
+- Do not use `run_logs/fullscale_width_matched_control_20260409.summary.md` for paper claims. That run was accidentally limited to 20 queries.
+- Use the `20260409fullfix` tag for the real full-scale control family.
+- When rerunning width-matched controls on the same dataset and `qa_top_k`, reuse:
+  - `--baseline_report_json` to skip the baseline reader pass
+  - `--retrieval_cache_json` to skip duplicated retrieval
+  - `--save_retrieval_cache_json` when creating a fresh baseline
+
+## Width-Matched Control Definitions
+
+- `baseline_top5_plus_ce`:
+  - baseline-only CE rerank
+  - uses `expand_base_k = qa_top_k`
+  - uses `append_max_docs = 0`
+  - this is not the same-pool append control
+- `baseline_top10_plus_ce`:
+  - width-matched CE rerank over the top-10 baseline prefix
+  - uses `expand_base_k = 10`
+  - uses `append_max_docs = 0`
+- `bridge_append_plus_ce`:
+  - same-pool pure CE rerank over `top-10 baseline prefix + 3 bridge-appended docs`
+  - uses `setwise_selector = bridge_append`
+  - uses `expand_base_k = 10`
+  - uses `append_max_docs = 3`
+  - uses `append_policy = bridge`
+  - uses `assemble_mode = cross_encoder`
+- `random3_deep_plus_ce`:
+  - matched random-append control with the same CE rerank stage
+  - uses `append_policy = random_deep`
+  - uses `append_max_docs = 3`
+
+The `limit=100` width-matched controls and the valid `20260409fullfix` full-scale controls are method-matched.
+- They use the same selector, append width, and CE assemble definition.
+- The intended difference is only evaluation size and cache reuse.
 
 ## Done
 
