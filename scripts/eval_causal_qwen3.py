@@ -56,6 +56,8 @@ from requirement_beam_utils import (
 from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
 from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
+from src.hipporag_ext.strongest.shadow_entry import run_strongest_shadow_for_pool
+from src.hipporag_ext.strongest.types import StrongestConfig
 from src.hipporag.utils.causal_utils import (
     expand_directed_entities,
     normalize_structure_text,
@@ -4749,7 +4751,14 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            append_policy: str = "bridge",
                            append_random_seed: int = 0,
                            ce_model: str = "/mnt/nvme/bge-reranker-v2-m3",
-                           ce_device: str = "cuda:1") -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           ce_device: str = "cuda:1",
+                           strongest_shadow_enabled: bool = False,
+                           strongest_shadow_apply_to_pool: bool = False,
+                           strongest_candidate_k: int = 20,
+                           strongest_final_k: int = 10,
+                           strongest_hippo_head_k: int = 10,
+                           strongest_smoothed_union_k: int = 10,
+                           strongest_gamma: float = 0.15) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
@@ -4797,6 +4806,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
     appended_doc_counts: List[int] = []
     expand_candidate_sizes: List[int] = []
     append_stop_reason_counts: Counter[str] = Counter()
+    strongest_shadow_apply_count = 0
+    strongest_shadow_success_count = 0
+    strongest_shadow_error_count = 0
+    strongest_shadow_status_counts: Counter[str] = Counter()
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
     normalized_reader_order_probe_mode = normalize_setwise_reader_order_probe_mode(
         setwise_reader_order_probe_mode
@@ -5000,6 +5013,105 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     "state_score_weights": dict(resolve_set_closure_state_weight_config(state_weight_config)),
                 }
         elif selector_name == "bridge_append":
+            strongest_shadow_trace: Dict[str, object] = {
+                "enabled": bool(strongest_shadow_enabled),
+                "applied_to_pool": False,
+                "shadow_status": "disabled",
+                "candidate_indices": [],
+                "final_doc_indices": [],
+                "final_titles": [],
+                "pool_order_indices": [],
+                "source_commit_sha": None,
+                "error": None,
+            }
+            if strongest_shadow_enabled:
+                strongest_config = StrongestConfig(
+                    candidate_k=int(strongest_candidate_k),
+                    final_k=int(strongest_final_k),
+                    hippo_head_k=int(strongest_hippo_head_k),
+                    smoothed_union_k=int(strongest_smoothed_union_k),
+                    gamma=float(strongest_gamma),
+                    union_mode="standard",
+                    suppression_variant="topology",
+                )
+                try:
+                    strongest_result = run_strongest_shadow_for_pool(
+                        hipporag=hipporag,
+                        query=qs.question,
+                        pool_docs=pool_docs,
+                        pool_doc_ids=pool_doc_ids,
+                        pool_doc_scores=np.asarray(pool_scores, dtype=float),
+                        seed_entities=seed_entities,
+                        query_entities=proposal_query_entities,
+                        config=strongest_config,
+                    )
+                except Exception as exc:
+                    strongest_result = None
+                    strongest_shadow_trace.update({
+                        "shadow_status": "error",
+                        "source_commit_sha": str(strongest_config.source_commit_sha),
+                        "error": str(exc),
+                    })
+                    strongest_shadow_error_count += 1
+                else:
+                    if strongest_result is None:
+                        strongest_shadow_trace.update({
+                            "shadow_status": "unavailable",
+                            "source_commit_sha": str(strongest_config.source_commit_sha),
+                        })
+                    else:
+                        final_doc_indices = [
+                            int(idx) for idx in np.asarray(
+                                strongest_result.final_doc_indices,
+                                dtype=np.int64,
+                            ).tolist()
+                        ]
+                        pool_order_indices = [
+                            int(idx) for idx in np.asarray(
+                                strongest_result.pool_order_indices,
+                                dtype=np.int64,
+                            ).tolist()
+                            if 0 <= int(idx) < pool_limit
+                        ]
+                        strongest_shadow_trace.update({
+                            "shadow_status": str(
+                                (strongest_result.trace or {}).get("status", "ok")
+                            ),
+                            "candidate_indices": [
+                                int(idx) for idx in np.asarray(
+                                    strongest_result.candidate_indices,
+                                    dtype=np.int64,
+                                ).tolist()
+                            ],
+                            "final_doc_indices": final_doc_indices,
+                            "final_titles": [
+                                pool_titles[idx]
+                                for idx in final_doc_indices
+                                if 0 <= idx < len(pool_titles)
+                            ],
+                            "pool_order_indices": pool_order_indices,
+                            "source_commit_sha": str(strongest_config.source_commit_sha),
+                            "trace": dict(strongest_result.trace or {}),
+                        })
+                        strongest_shadow_success_count += 1
+                        if strongest_shadow_apply_to_pool and pool_order_indices:
+                            reordered_shadow_positions = list(dict.fromkeys(pool_order_indices))
+                            reordered_shadow_positions.extend(
+                                pos for pos in range(pool_limit)
+                                if pos not in set(reordered_shadow_positions)
+                            )
+                            pool_docs = [pool_docs[pos] for pos in reordered_shadow_positions]
+                            pool_titles = [pool_titles[pos] for pos in reordered_shadow_positions]
+                            pool_scores = np.asarray(
+                                [pool_scores[pos] for pos in reordered_shadow_positions],
+                                dtype=float,
+                            )
+                            pool_doc_ids = [pool_doc_ids[pos] for pos in reordered_shadow_positions]
+                            strongest_shadow_trace["applied_to_pool"] = True
+                            strongest_shadow_apply_count += 1
+                strongest_shadow_status_counts[
+                    str(strongest_shadow_trace.get("shadow_status", "unknown"))
+                ] += 1
             normalized_pool_scores = np.asarray(pool_scores, dtype=float)
             if normalized_pool_scores.size > 0:
                 score_range = float(normalized_pool_scores.max() - normalized_pool_scores.min())
@@ -5511,6 +5623,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     for pos in final_front_positions
                 ],
                 "final_front_titles": [pool_titles[pos] for pos in final_front_positions],
+                "strongest_shadow": strongest_shadow_trace,
                 **selector_trace,
             }
         else:
@@ -5676,6 +5789,17 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "assemble_mode": normalized_assemble_mode,
             "assemble_ce_model": str(ce_model) if normalized_assemble_mode == "cross_encoder" else None,
             "assemble_ce_device": str(ce_device) if normalized_assemble_mode == "cross_encoder" else None,
+            "strongest_shadow_enabled": bool(strongest_shadow_enabled),
+            "strongest_shadow_apply_to_pool": bool(strongest_shadow_apply_to_pool),
+            "strongest_candidate_k": int(strongest_candidate_k),
+            "strongest_final_k": int(strongest_final_k),
+            "strongest_hippo_head_k": int(strongest_hippo_head_k),
+            "strongest_smoothed_union_k": int(strongest_smoothed_union_k),
+            "strongest_gamma": round(float(strongest_gamma), 4),
+            "strongest_shadow_success_count": int(strongest_shadow_success_count),
+            "strongest_shadow_apply_count": int(strongest_shadow_apply_count),
+            "strongest_shadow_error_count": int(strongest_shadow_error_count),
+            "strongest_shadow_status_counts": dict(sorted(strongest_shadow_status_counts.items())),
             "avg_appended_doc_count": round(float(np.mean(appended_doc_counts)) if appended_doc_counts else 0.0, 4),
             "avg_candidate_set_size": round(float(np.mean(expand_candidate_sizes)) if expand_candidate_sizes else 0.0, 4),
             "append_count_histogram": {
@@ -6252,6 +6376,20 @@ def main():
                         help="For --append_policy random_deep, deterministic seed used to sample deep-pool docs.")
     parser.add_argument("--assemble_mode", choices=sorted(ASSEMBLE_MODES), default="cross_encoder",
                         help="For --setwise_selector bridge_append, answer-oriented assembly rerank mode applied over the expanded candidate set.")
+    parser.add_argument("--strongest_shadow_enabled", type=string_to_bool, default=False,
+                        help="Run strongest sidecar in bridge_append shadow mode and record its intermediate outputs without changing baseline behavior by default.")
+    parser.add_argument("--strongest_shadow_apply_to_pool", type=string_to_bool, default=False,
+                        help="If true, use strongest shadow pool order as the local candidate order before bridge_append expansion.")
+    parser.add_argument("--strongest_candidate_k", type=int, default=20,
+                        help="Candidate union size used by strongest shadow sidecar.")
+    parser.add_argument("--strongest_final_k", type=int, default=10,
+                        help="Final top-k size produced by strongest shadow sidecar.")
+    parser.add_argument("--strongest_hippo_head_k", type=int, default=10,
+                        help="Hippo head prefix width used by strongest shadow sidecar.")
+    parser.add_argument("--strongest_smoothed_union_k", type=int, default=10,
+                        help="Smoothed rank prefix width used when forming the strongest shadow candidate union.")
+    parser.add_argument("--strongest_gamma", type=float, default=0.15,
+                        help="Teleport / reset weight used by strongest shadow local PPR.")
     parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy", "set_closure"], default="bridge",
                         help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score centered on explicit path connectivity.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
@@ -6790,6 +6928,13 @@ def main():
             append_random_seed=int(args.append_random_seed),
             ce_model=str(args.ce_model),
             ce_device=str(args.ce_device),
+            strongest_shadow_enabled=bool(args.strongest_shadow_enabled),
+            strongest_shadow_apply_to_pool=bool(args.strongest_shadow_apply_to_pool),
+            strongest_candidate_k=int(args.strongest_candidate_k),
+            strongest_final_k=int(args.strongest_final_k),
+            strongest_hippo_head_k=int(args.strongest_hippo_head_k),
+            strongest_smoothed_union_k=int(args.strongest_smoothed_union_k),
+            strongest_gamma=float(args.strongest_gamma),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -6861,6 +7006,13 @@ def main():
                 "assemble_mode": normalize_assemble_mode(args.assemble_mode),
                 "assemble_ce_model": args.ce_model if normalize_assemble_mode(args.assemble_mode) == "cross_encoder" else None,
                 "assemble_ce_device": args.ce_device if normalize_assemble_mode(args.assemble_mode) == "cross_encoder" else None,
+                "strongest_shadow_enabled": bool(args.strongest_shadow_enabled),
+                "strongest_shadow_apply_to_pool": bool(args.strongest_shadow_apply_to_pool),
+                "strongest_candidate_k": int(args.strongest_candidate_k),
+                "strongest_final_k": int(args.strongest_final_k),
+                "strongest_hippo_head_k": int(args.strongest_hippo_head_k),
+                "strongest_smoothed_union_k": int(args.strongest_smoothed_union_k),
+                "strongest_gamma": round(float(args.strongest_gamma), 4),
                 "structure_max_hops": int(args.setwise_structure_max_hops),
                 "base_weight": float(args.setwise_base_weight),
                 "structure_weight": float(args.setwise_structure_weight),
@@ -7170,6 +7322,13 @@ def main():
             "append_policy": normalize_append_policy(args.append_policy),
             "append_random_seed": int(args.append_random_seed),
             "assemble_mode": normalize_assemble_mode(args.assemble_mode),
+            "strongest_shadow_enabled": bool(args.strongest_shadow_enabled),
+            "strongest_shadow_apply_to_pool": bool(args.strongest_shadow_apply_to_pool),
+            "strongest_candidate_k": int(args.strongest_candidate_k),
+            "strongest_final_k": int(args.strongest_final_k),
+            "strongest_hippo_head_k": int(args.strongest_hippo_head_k),
+            "strongest_smoothed_union_k": int(args.strongest_smoothed_union_k),
+            "strongest_gamma": float(args.strongest_gamma),
             "setwise_score_mode": str(args.setwise_score_mode),
             "setwise_pool_k": int(args.setwise_pool_k),
             "setwise_anchor_count": int(args.setwise_anchor_count),
