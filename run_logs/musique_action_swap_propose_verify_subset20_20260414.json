@@ -1,0 +1,1276 @@
+{
+  "summary": {
+    "dataset": "musique_subset20",
+    "selected_action_counts": {
+      "total": 20,
+      "oracle_positive": 10,
+      "oracle_negative": 10,
+      "dryrun_selected": 16,
+      "judge_selected": 2
+    },
+    "pass_stats": {
+      "oracle_positive": {
+        "count": 10,
+        "passed": 0,
+        "pass_rate": 0.0
+      },
+      "oracle_negative": {
+        "count": 10,
+        "passed": 0,
+        "pass_rate": 0.0
+      },
+      "dryrun_selected": {
+        "count": 16,
+        "passed": 0,
+        "pass_rate": 0.0
+      },
+      "judge_selected": {
+        "count": 2,
+        "passed": 0,
+        "pass_rate": 0.0
+      }
+    },
+    "oracle_delta_f1": {
+      "oracle_positive_median": 0.5834,
+      "oracle_negative_median": 0.0
+    },
+    "proposal_pass": {
+      "query_count": 20,
+      "proposal_passed": 0,
+      "proposal_pass_rate": 0.0
+    },
+    "reject_reason_counts": {
+      "gain_verifier_reject": 11,
+      "no_unsupported_claim": 9
+    }
+  },
+  "audit_rows": [
+    {
+      "dataset": "musique_subset20",
+      "question": "What year did the publisher of Labyrinth end?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 55,
+      "replace_pool_position": 8,
+      "candidate_title": "The Lord of the Rings",
+      "replace_incumbent_title": "Spectrum HoloByte",
+      "score_delta": 0.75,
+      "oracle_delta_em": 1.0,
+      "oracle_delta_f1": 1.0,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about labyrinth. Question: What year did the publisher of Labyrinth end?",
+          "claim_rank": 1,
+          "supported_positions": [
+            3
+          ],
+          "supported_titles": [
+            "Acornsoft"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What year did the publisher of Labyrinth end?",
+          "claim_rank": 2,
+          "supported_positions": [
+            3,
+            4
+          ],
+          "supported_titles": [
+            "Acornsoft",
+            "Spectrum HoloByte"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": true,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 67,
+      "replace_pool_position": 5,
+      "candidate_title": "New York City",
+      "replace_incumbent_title": "Richmond, Virginia",
+      "score_delta": 1.9922,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "v2",
+      "earliest_unsupported_claim_text": "Answer the question: When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet provides general historical information about New York City but does not mention Vilaiyaadu Mankatha's record label or the specific date the explorer reached the city.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "full_doc",
+        "unit_text": "New York City\nNew York City traces its roots to its 1624 founding as a trading post by colonists of the Dutch Republic and was named New Amsterdam in 1626. The city and its surroundings came under English control in 1664. New York served as the capital of the United States from 1785 until 1790. It has been the country's largest city since 1790. The Statue of Liberty greeted millions of immigrants as they came to the Americas by ship in the late 19th and early 20th centuries and is a globally recognized symbol of the United States and its democracy.",
+        "relevance_score": 0.0025
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about vilaiyaadu mankatha. Question: When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+          "claim_rank": 1,
+          "supported_positions": [
+            1
+          ],
+          "supported_titles": [
+            "Miami"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "heuristic_tiers",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 16,
+      "replace_pool_position": 6,
+      "candidate_title": "Portugal",
+      "replace_incumbent_title": "British Empire",
+      "score_delta": 1.168,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "t1_f1",
+      "earliest_unsupported_claim_text": "Identify the bridge entity or relation involving somali. Question: How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet does not mention the Somali Muslim Ajuran Empire, new coins, or the specific countries involved in the expulsion.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "title_plus_1sent",
+        "unit_text": "Portugal\nThese Muslim peoples were eventually expelled during the Christian Reconquista of the peninsula.",
+        "relevance_score": 0.0048
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "t1_f1",
+          "claim_text": "Identify the bridge entity or relation involving somali. Question: How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "t2_f1",
+          "claim_text": "Find the entity answer detail about somali muslim ajuran empire. Question: How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What is the birthplace of the person after whom São José dos Campos was named?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 99,
+      "replace_pool_position": 9,
+      "candidate_title": "Modern history",
+      "replace_incumbent_title": "Mission San Carlos Borromeo de Carmelo",
+      "score_delta": 1.5235,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about jos. Question: What is the birthplace of the person after whom São José dos Campos was named?",
+          "claim_rank": 1,
+          "supported_positions": [
+            2,
+            3
+          ],
+          "supported_titles": [
+            "Casa Natal del General Santander",
+            "José Pinto Coelho"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What is the birthplace of the person after whom São José dos Campos was named?",
+          "claim_rank": 2,
+          "supported_positions": [
+            1,
+            2,
+            3
+          ],
+          "supported_titles": [
+            "Pedro Álvares Cabral",
+            "Casa Natal del General Santander",
+            "José Pinto Coelho"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What company succeeded the owner of Empire Sports Network?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 59,
+      "replace_pool_position": 8,
+      "candidate_title": "Manchester City F.C.",
+      "replace_incumbent_title": "EA Sports",
+      "score_delta": 0.8984,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "v1",
+      "earliest_unsupported_claim_text": "Evidence about empire sports network. Question: What company succeeded the owner of Empire Sports Network?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet discusses Manchester City F.C. and does not mention Empire Sports Network or any company that succeeded its owner.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "full_doc",
+        "unit_text": "Manchester City F.C.\nThe club's most successful period was in the late 1960s and early 1970s, when they won the League Championship, FA Cup, League Cup and European Cup Winners' Cup under the management team of Joe Mercer and Malcolm Allison. After losing the 1981 FA Cup Final, the club went through a period of decline, culminating in relegation to the third tier of English football for the only time in their history in 1998. Having regained their Premier League status in the early 2000s, the club was purchased in 2008 by Abu Dhabi United Group and has since become one of the wealthiest in the world. Since 2011, the club have won five major honours, including the Premier League in 2012 and 2014.",
+        "relevance_score": 0.0054
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about empire sports network. Question: What company succeeded the owner of Empire Sports Network?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What company succeeded the owner of Empire Sports Network?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": false,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 71,
+      "replace_pool_position": 6,
+      "candidate_title": "Modern history",
+      "replace_incumbent_title": "Korean War",
+      "score_delta": -5.6719,
+      "oracle_delta_em": 1.0,
+      "oracle_delta_f1": 1.0,
+      "earliest_unsupported_claim_id": "v1",
+      "earliest_unsupported_claim_text": "Evidence about directive 10 2. Question: Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet does not mention Directive 10/2, the arguer, or any declaration of intervention in the Korean conflict.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "title_plus_1sent",
+        "unit_text": "Modern history\nThere was a shift in power from Western Europe and the British Empire to the two new superpowers, the United States and the Soviet Union.",
+        "relevance_score": 0.0024
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about directive 10 2. Question: Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "How did did the people fare during the reign of the abolisher of sati partha in India?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 45,
+      "replace_pool_position": 5,
+      "candidate_title": "British Empire",
+      "replace_incumbent_title": "Indian Rebellion of 1857",
+      "score_delta": 0.6914,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.1818,
+      "earliest_unsupported_claim_id": "v2",
+      "earliest_unsupported_claim_text": "Answer the question: How did did the people fare during the reign of the abolisher of sati partha in India?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet does not mention the abolisher of sati partha or provide information about how people fared during their reign.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "full_doc",
+        "unit_text": "British Empire\nThe pro-decolonisation Labour government, elected at the 1945 general election and led by Clement Attlee, moved quickly to tackle the most pressing issue facing the empire: that of Indian independence. India's two major political parties—the Indian National Congress and the Muslim League—had been campaigning for independence for decades, but disagreed as to how it should be implemented. Congress favoured a unified secular Indian state, whereas the League, fearing domination by the Hindu majority, desired a separate Islamic state for Muslim-majority regions. Increasing civil unrest and the mutiny of the Royal Indian Navy during 1946 led Attlee to promise independence no later than 1948. When the urgency of the situation and risk of civil war became apparent, the newly appointed (and last) Viceroy, Lord Mountbatten, hastily brought forward the date to 15 August 1947. The borders drawn by the British to broadly partition India into Hindu and Muslim areas left tens of millions as minorities in the newly independent states of India and Pakistan. Millions of Muslims subsequently crossed from India to Pakistan and Hindus vice versa, and violence between the two communities cost hundreds of thousands of lives. Burma, which had been administered as part of the British Raj, and Sri Lanka gained their independence the following year in 1948. India, Pakistan and Sri Lanka became members of the Commonwealth, while Burma chose not to join.",
+        "relevance_score": 0.0015
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about india. Question: How did did the people fare during the reign of the abolisher of sati partha in India?",
+          "claim_rank": 1,
+          "supported_positions": [
+            2
+          ],
+          "supported_titles": [
+            "Bengal Sati Regulation, 1829"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: How did did the people fare during the reign of the abolisher of sati partha in India?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring independence?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 48,
+      "replace_pool_position": 7,
+      "candidate_title": "Armenians",
+      "replace_incumbent_title": "Giorgi Chanturia",
+      "score_delta": 0.3008,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "v1",
+      "earliest_unsupported_claim_text": "Evidence about bustami. Question: The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring independence?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet does not mention the Commission of Truth and Friendship or a second country's president after independence.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "title_plus_1sent",
+        "unit_text": "Armenians\nIn 1991, Armenia declared independence from the USSR and established the second Republic of Armenia.",
+        "relevance_score": 0.0202
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about bustami. Question: The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring independence?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring independence?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": false,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 64,
+      "replace_pool_position": 5,
+      "candidate_title": "Myanmar",
+      "replace_incumbent_title": "1946 United States House of Representatives elections",
+      "score_delta": -2.5762,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "v1",
+      "earliest_unsupported_claim_text": "Evidence about house. Question: When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet discusses Myanmar and its ethnic conflicts, which is unrelated to the political party in question or the U.S. House of Representatives.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "full_doc",
+        "unit_text": "Myanmar\nFor most of its independent years, the country has been engrossed in rampant ethnic strife and Burma's myriad ethnic groups have been involved in one of the world's longest-running ongoing civil wars. During this time, the United Nations and several other organisations have reported consistent and systematic human rights violations in the country. In 2011, the military junta was officially dissolved following a 2010 general election, and a nominally civilian government was installed. While former military leaders still wield enormous power in the country, Burmese Military have taken steps toward relinquishing control of the government. This, along with the release of Aung San Suu Kyi and political prisoners, has improved the country's human rights record and foreign relations, and has led to the easing of trade and other economic sanctions. There is, however, continuing criticism of the government's treatment of the Muslim Rohingya minority and its poor response to the religious clashes. In the landmark 2015 election, Aung San Suu Kyi's party won a majority in both houses, ending military rule.",
+        "relevance_score": 0.0184
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about house. Question: When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What city is the star of Sous les pieds des femmes from?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": true,
+      "selected_by_judge": true,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 97,
+      "replace_pool_position": 8,
+      "candidate_title": "Claudia Cardinale",
+      "replace_incumbent_title": "C'est les vacances",
+      "score_delta": 6.377,
+      "oracle_delta_em": 1.0,
+      "oracle_delta_f1": 1.0,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about sous. Question: What city is the star of Sous les pieds des femmes from?",
+          "claim_rank": 1,
+          "supported_positions": [
+            0
+          ],
+          "supported_titles": [
+            "Sous les pieds des femmes"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What city is the star of Sous les pieds des femmes from?",
+          "claim_rank": 2,
+          "supported_positions": [
+            0
+          ],
+          "supported_titles": [
+            "Sous les pieds des femmes"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "heuristic_tiers",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 35,
+      "replace_pool_position": 4,
+      "candidate_title": "Gallia Belgica",
+      "replace_incumbent_title": "Nanjing",
+      "score_delta": 0.6993,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "t1_f1",
+      "earliest_unsupported_claim_text": "Identify the bridge entity or relation involving pfrang. Question: How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet provides information about Gallia Belgica and its capital cities but does not mention Pfrang Association, Guangling District, or any relevant time duration.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "full_doc",
+        "unit_text": "Gallia Belgica\nProvincia Belgica Province of the Roman Empire 22 BC -- 5th century Capital Durocortorum (modern Reims) Augusta Treverorum (modern Trier) Historical era Antiquity Established after the Gallic Wars 22 BC Ended with Frankish Kingdoms 5th century Today part of Belgium France Luxembourg Germany < 90 Netherlands < 90",
+        "relevance_score": 0.0004
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "t1_f1",
+          "claim_text": "Identify the bridge entity or relation involving pfrang. Question: How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "t2_f1",
+          "claim_text": "Find the entity answer detail about pfrang association. Question: How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "When did the 1979-80 European Cup winner win the FA Cup?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "heuristic_tiers",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 49,
+      "replace_pool_position": 8,
+      "candidate_title": "List of Chelsea F.C. managers",
+      "replace_incumbent_title": "History of Chelsea F.C.",
+      "score_delta": 0.7696,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.009,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "t1_f1",
+          "claim_text": "Identify the bridge entity or relation involving 1979 80 european cup. Question: When did the 1979-80 European Cup winner win the FA Cup?",
+          "claim_rank": 1,
+          "supported_positions": [
+            1,
+            2
+          ],
+          "supported_titles": [
+            "Nottingham Forest F.C.",
+            "Manchester United F.C."
+          ]
+        },
+        {
+          "claim_id": "t2_f1",
+          "claim_text": "Find the date answer detail about fa cup. Question: When did the 1979-80 European Cup winner win the FA Cup?",
+          "claim_rank": 2,
+          "supported_positions": [
+            1,
+            2,
+            4
+          ],
+          "supported_titles": [
+            "Nottingham Forest F.C.",
+            "Manchester United F.C.",
+            "History of Chelsea F.C."
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What was the 2018 population of the Italian city that's underwater?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": false,
+      "selected_by_judge": false,
+      "claim_mode": "heuristic_tiers",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 3,
+      "candidate_pool_position": 17,
+      "replace_pool_position": 3,
+      "candidate_title": "List of South American countries by population",
+      "replace_incumbent_title": "Valencia",
+      "score_delta": -0.5937,
+      "oracle_delta_em": 1.0,
+      "oracle_delta_f1": 1.0,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "t1_f1",
+          "claim_text": "Identify the bridge entity or relation involving 2018. Question: What was the 2018 population of the Italian city that's underwater?",
+          "claim_rank": 1,
+          "supported_positions": [
+            0,
+            1
+          ],
+          "supported_titles": [
+            "Venice",
+            "Venice"
+          ]
+        },
+        {
+          "claim_id": "t2_f1",
+          "claim_text": "Find the location answer detail about italian. Question: What was the 2018 population of the Italian city that's underwater?",
+          "claim_rank": 2,
+          "supported_positions": [
+            0,
+            1
+          ],
+          "supported_titles": [
+            "Venice",
+            "Venice"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What was the language from which the last name Sylvester originated during the era of the person crowned emperor of the west in 800 CE later known as?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": false,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 94,
+      "replace_pool_position": 7,
+      "candidate_title": "Modern history",
+      "replace_incumbent_title": "Holy Roman Empire",
+      "score_delta": -6.0878,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.6667,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about sylvester. Question: What was the language from which the last name Sylvester originated during the era of the person crowned emperor of the west in 800 CE later known as?",
+          "claim_rank": 1,
+          "supported_positions": [
+            1
+          ],
+          "supported_titles": [
+            "Sylvester"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What was the language from which the last name Sylvester originated during the era of the person crowned emperor of the west in 800 CE later known as?",
+          "claim_rank": 2,
+          "supported_positions": [
+            1
+          ],
+          "supported_titles": [
+            "Sylvester"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "Who is the head of the agency that created MYSTIC?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 58,
+      "replace_pool_position": 9,
+      "candidate_title": "YouTube",
+      "replace_incumbent_title": "Skynet (Terminator)",
+      "score_delta": 0.0469,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "v1",
+      "earliest_unsupported_claim_text": "Evidence about mystic. Question: Who is the head of the agency that created MYSTIC?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet does not mention MYSTIC or the agency that created it, nor does it provide information about the head of any agency related to MYSTIC.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "title_plus_1sent",
+        "unit_text": "YouTube\nIn a statement to the Financial Times in June 2014, Robert Kyncl confirmed that YouTube would block the content of labels who do not negotiate deals to be included in the paid service \"to ensure that all content on the platform is governed by its new contractual terms.\" Stating that 90% of labels had reached deals, he went on to say that \"while we wish that we had [a] 100% success rate, we understand that is not likely an achievable goal and therefore it is our responsibility to our users and the industry to launch the enhanced music experience.\" The Financial Times later reported that YouTube had reached an aggregate deal with Merlin Network—a trade group representing over 20,000 independent labels, for their inclusion in the service.",
+        "relevance_score": 0.0003
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about mystic. Question: Who is the head of the agency that created MYSTIC?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: Who is the head of the agency that created MYSTIC?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What does the river that Darling Mills Creek turns into flow into?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 84,
+      "replace_pool_position": 7,
+      "candidate_title": "Mississippi River",
+      "replace_incumbent_title": "Black Creek (Toronto)",
+      "score_delta": 5.6711,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about darling mills creek. Question: What does the river that Darling Mills Creek turns into flow into?",
+          "claim_rank": 1,
+          "supported_positions": [
+            1,
+            2
+          ],
+          "supported_titles": [
+            "Mamaroneck River",
+            "Murrah River"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What does the river that Darling Mills Creek turns into flow into?",
+          "claim_rank": 2,
+          "supported_positions": [
+            1,
+            4
+          ],
+          "supported_titles": [
+            "Mamaroneck River",
+            "Black Creek (Toronto)"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What is the meaning of the name of the city where the Yongle emperor greeted the person to whom the edict was addressed?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "negative",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 63,
+      "replace_pool_position": 8,
+      "candidate_title": "New York City",
+      "replace_incumbent_title": "Sino-Tibetan relations during the Ming dynasty",
+      "score_delta": 0.6152,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0,
+      "earliest_unsupported_claim_id": "v1",
+      "earliest_unsupported_claim_text": "Evidence about yongle. Question: What is the meaning of the name of the city where the Yongle emperor greeted the person to whom the edict was addressed?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet provides information about New York City's history but does not mention the Yongle emperor or any edict-related context.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "full_doc",
+        "unit_text": "New York City\nNew York City traces its roots to its 1624 founding as a trading post by colonists of the Dutch Republic and was named New Amsterdam in 1626. The city and its surroundings came under English control in 1664. New York served as the capital of the United States from 1785 until 1790. It has been the country's largest city since 1790. The Statue of Liberty greeted millions of immigrants as they came to the Americas by ship in the late 19th and early 20th centuries and is a globally recognized symbol of the United States and its democracy.",
+        "relevance_score": 0.0076
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about yongle. Question: What is the meaning of the name of the city where the Yongle emperor greeted the person to whom the edict was addressed?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What is the meaning of the name of the city where the Yongle emperor greeted the person to whom the edict was addressed?",
+          "claim_rank": 2,
+          "supported_positions": [
+            0
+          ],
+          "supported_titles": [
+            "Sino-Tibetan relations during the Ming dynasty"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What is the direction of flow of the body of water by the city where Write This Down was formed?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 27,
+      "replace_pool_position": 1,
+      "candidate_title": "Ohio River",
+      "replace_incumbent_title": "Boomi River",
+      "score_delta": 3.4805,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0571,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about write this down. Question: What is the direction of flow of the body of water by the city where Write This Down was formed?",
+          "claim_rank": 1,
+          "supported_positions": [
+            1,
+            4
+          ],
+          "supported_titles": [
+            "Willamette River",
+            "Boomi River"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What is the direction of flow of the body of water by the city where Write This Down was formed?",
+          "claim_rank": 2,
+          "supported_positions": [
+            1,
+            4
+          ],
+          "supported_titles": [
+            "Willamette River",
+            "Boomi River"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What administrative territorial entity contains the place where KPRM is licensed to broadcast to?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 35,
+      "replace_pool_position": 5,
+      "candidate_title": "University of Kansas",
+      "replace_incumbent_title": "KAPE",
+      "score_delta": 1.1445,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.5,
+      "earliest_unsupported_claim_id": null,
+      "earliest_unsupported_claim_text": null,
+      "gain_verifier_verdict": null,
+      "gain_verifier_reason": null,
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "no_unsupported_claim",
+      "candidate_best_witness": {},
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about kprm. Question: What administrative territorial entity contains the place where KPRM is licensed to broadcast to?",
+          "claim_rank": 1,
+          "supported_positions": [
+            0,
+            4
+          ],
+          "supported_titles": [
+            "KPRM",
+            "KAPE"
+          ]
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What administrative territorial entity contains the place where KPRM is licensed to broadcast to?",
+          "claim_rank": 2,
+          "supported_positions": [
+            0,
+            4
+          ],
+          "supported_titles": [
+            "KPRM",
+            "KAPE"
+          ]
+        }
+      ]
+    },
+    {
+      "dataset": "musique_subset20",
+      "question": "What is an example of a railroad line in the country first to invade Manchuria?",
+      "action_type": "swap",
+      "query_type": "standard",
+      "oracle_label": "positive",
+      "selected_by_dryrun": true,
+      "selected_by_judge": false,
+      "claim_mode": "flat_fallback",
+      "local_candidate_pool_position": 5,
+      "local_replace_pool_position": 4,
+      "candidate_pool_position": 26,
+      "replace_pool_position": 7,
+      "candidate_title": "Allies of World War II",
+      "replace_incumbent_title": "Pacific War",
+      "score_delta": 0.2891,
+      "oracle_delta_em": 0.0,
+      "oracle_delta_f1": 0.0435,
+      "earliest_unsupported_claim_id": "v1",
+      "earliest_unsupported_claim_text": "Evidence about manchuria. Question: What is an example of a railroad line in the country first to invade Manchuria?",
+      "gain_verifier_verdict": "not_supported",
+      "gain_verifier_reason": "The snippet does not mention any railroad line or country that invaded Manchuria.",
+      "preservation_unique_support_claim_ids": [],
+      "action_should_swap": false,
+      "action_skip_reason": "gain_verifier_reject",
+      "candidate_best_witness": {
+        "unit_type": "full_doc",
+        "unit_text": "Allies of World War II\nAt the start of the war on 1 September 1939, the Allies consisted of France, Poland and the United Kingdom, as well as their dependent states, such as British India. Within days they were joined by the independent Dominions of the British Commonwealth: Australia, Canada, New Zealand and South Africa. After the start of the German invasion of North Europe until the Balkan Campaign, the Netherlands, Belgium, Greece, and Yugoslavia joined the Allies. After first having cooperated with Germany in invading Poland whilst remaining neutral in the Allied - Axis conflict, the Soviet Union perforce joined the Allies in June 1941 after being invaded by Germany. The United States provided war materiel and money all along, and officially joined in December 1941 after the Japanese attack on Pearl Harbor. China had already been in a prolonged war with Japan since the Marco Polo Bridge Incident of 1937, but officially joined the Allies in 1941.",
+        "relevance_score": 0.0013
+      },
+      "claim_supports_before": [
+        {
+          "claim_id": "v1",
+          "claim_text": "Evidence about manchuria. Question: What is an example of a railroad line in the country first to invade Manchuria?",
+          "claim_rank": 1,
+          "supported_positions": [],
+          "supported_titles": []
+        },
+        {
+          "claim_id": "v2",
+          "claim_text": "Answer the question: What is an example of a railroad line in the country first to invade Manchuria?",
+          "claim_rank": 2,
+          "supported_positions": [],
+          "supported_titles": []
+        }
+      ]
+    }
+  ],
+  "query_summaries": [
+    {
+      "question": "What year did the publisher of Labyrinth end?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+      "claim_mode": "heuristic_tiers",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "What is the birthplace of the person after whom São José dos Campos was named?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "What company succeeded the owner of Empire Sports Network?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "How did did the people fare during the reign of the abolisher of sati partha in India?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring independence?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "What city is the star of Sous les pieds des femmes from?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?",
+      "claim_mode": "heuristic_tiers",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "When did the 1979-80 European Cup winner win the FA Cup?",
+      "claim_mode": "heuristic_tiers",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "What was the 2018 population of the Italian city that's underwater?",
+      "claim_mode": "heuristic_tiers",
+      "proposal_key": [
+        5,
+        3
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "What was the language from which the last name Sylvester originated during the era of the person crowned emperor of the west in 800 CE later known as?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "Who is the head of the agency that created MYSTIC?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "What does the river that Darling Mills Creek turns into flow into?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "What is the meaning of the name of the city where the Yongle emperor greeted the person to whom the edict was addressed?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    },
+    {
+      "question": "What is the direction of flow of the body of water by the city where Write This Down was formed?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "What administrative territorial entity contains the place where KPRM is licensed to broadcast to?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "no_unsupported_claim"
+    },
+    {
+      "question": "What is an example of a railroad line in the country first to invade Manchuria?",
+      "claim_mode": "flat_fallback",
+      "proposal_key": [
+        5,
+        4
+      ],
+      "proposal_passed": false,
+      "proposal_skip_reason": "gain_verifier_reject"
+    }
+  ],
+  "selection": {
+    "positive_target": 10,
+    "negative_target": 10,
+    "positive_selected": 10,
+    "negative_selected": 10,
+    "selected_questions": 20
+  }
+}

@@ -12,6 +12,7 @@ from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
 from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
 from src.hipporag.utils.config_utils import BaseConfig
 from src.hipporag.utils.causal_utils import route_query_type
+from src.hipporag.utils.dataset_utils import resolve_dataset_paths
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
@@ -445,8 +446,7 @@ def main():
 
     logging.basicConfig(level=logging.INFO)
 
-    corpus_path = Path(f"reproduce/dataset/{dataset_name}_corpus.json")
-    sample_path = Path(f"reproduce/dataset/{dataset_name}.json")
+    corpus_path, sample_path = resolve_dataset_paths(dataset_name)
     corpus = json.load(corpus_path.open())
     samples = json.load(sample_path.open())
     if args.limit and args.limit > 0:

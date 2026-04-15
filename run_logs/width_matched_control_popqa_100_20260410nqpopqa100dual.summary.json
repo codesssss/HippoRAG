@@ -1,0 +1,64 @@
+{
+  "rows": [
+    {
+      "dataset": "popqa",
+      "run_type": "baseline_top5",
+      "qa_top_k": 5,
+      "em": 0.18,
+      "f1": 0.4810769361173793,
+      "recall_at_5": 0.5,
+      "recall_at_20": 0.53,
+      "recall_at_100": 0.575,
+      "num_queries": 100,
+      "report": "outputs_step0_general_popqa/eval_reports/causal_eval_popqa_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json"
+    },
+    {
+      "dataset": "popqa",
+      "run_type": "baseline_top10_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.2,
+      "f1": 0.4819,
+      "recall_at_5": 0.5,
+      "recall_at_20": 0.53,
+      "recall_at_100": 0.575,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.0008,
+      "num_queries": 100,
+      "report": "outputs_step0_general_popqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa100dual.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    },
+    {
+      "dataset": "popqa",
+      "run_type": "random3_deep_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.2,
+      "f1": 0.4829,
+      "recall_at_5": 0.5,
+      "recall_at_20": 0.53,
+      "recall_at_100": 0.575,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.0018,
+      "num_queries": 100,
+      "report": "outputs_step0_general_popqa/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260410nqpopqa100dual.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.001
+    },
+    {
+      "dataset": "popqa",
+      "run_type": "bridge_append_plus_ce",
+      "qa_top_k": 5,
+      "em": 0.2,
+      "f1": 0.4819,
+      "recall_at_5": 0.5,
+      "recall_at_20": 0.53,
+      "recall_at_100": 0.575,
+      "delta_vs_baseline_em": 0.02,
+      "delta_vs_baseline_f1": 0.0008,
+      "num_queries": 100,
+      "report": "outputs_step0_general_popqa/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260410nqpopqa100dual.json",
+      "delta_vs_baseline_top10_plus_ce_em": 0.0,
+      "delta_vs_baseline_top10_plus_ce_f1": 0.0
+    }
+  ]
+}

@@ -1,8 +1,132 @@
 # Result Registry
 
-Last updated: 2026-03-30
+Last updated: 2026-04-14
 
 This file stores concrete results only. Every result must have a file path.
+
+## Actionized Interface Repair, limit=100
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/12_actionized_interface_repair_status_20260414.md`
+
+Core summaries:
+- `run_logs/action_swap_noisyor_smoke_20260414.summary.md`
+- `run_logs/musique_action_swap_oracle_current_20260413.md`
+- `run_logs/musique_action_swap_oracle_relaxed_20260413.md`
+- `run_logs/2wiki_action_swap_oracle_current_20260413.md`
+- `run_logs/2wiki_action_swap_oracle_relaxed_20260413.md`
+- `run_logs/musique_action_swap_noisyor_audit_20260414.md`
+- `run_logs/2wiki_action_swap_noisyor_audit_20260414.md`
+
+Implementation status:
+- `action_swap_v0_dryrun`, `action_swap_v0_judge`, `action_swap_noisyor_flat`, and `action_swap_noisyor_dep` are implemented inside:
+  - `scripts/eval_causal_qwen3.py`
+- local audit helper:
+  - `scripts/audit_action_swap_noisyor.py`
+- selector tests:
+  - `tests/test_setwise_selector.py`
+
+Smoke QA summary:
+
+MuSiQue:
+- `bridge_append_plus_ce`: `EM/F1 = 0.3200 / 0.3810`
+- `action_swap_v0_dryrun`: `EM/F1 = 0.3200 / 0.3900`
+- `action_swap_v0_judge`: `EM/F1 = 0.3200 / 0.3798`
+- `action_swap_noisyor_flat`: `EM/F1 = 0.3100 / 0.3698`
+- `action_swap_noisyor_dep`: `EM/F1 = 0.3100 / 0.3698`
+
+2Wiki:
+- `bridge_append_plus_ce`: `EM/F1 = 0.4300 / 0.4901`
+- `action_swap_v0_dryrun`: `EM/F1 = 0.4300 / 0.4658`
+- `action_swap_v0_judge`: `EM/F1 = 0.4400 / 0.4805`
+- `action_swap_noisyor_flat`: `EM/F1 = 0.4200 / 0.4553`
+- `action_swap_noisyor_dep`: `EM/F1 = 0.4200 / 0.4553`
+
+Oracle one-swap ceiling:
+
+MuSiQue:
+- current oracle `ΔF1 = +0.0211`
+- relaxed oracle `ΔF1 = +0.0961`
+- legality miss `= +0.0750`
+
+2Wiki:
+- current oracle `ΔF1 = +0.0407`
+- relaxed oracle `ΔF1 = +0.0489`
+- legality miss `= +0.0082`
+
+Interpretation:
+- `MuSiQue` is primarily limited by action-space recall under current legality.
+- `2Wiki` is primarily limited by policy selection among legal actions.
+
+Zero-shot NoisyOR audit:
+
+MuSiQue:
+- oracle-positive audited swaps: `148`
+- `flat_top2 <= 0`: `145 / 148`
+- `dep_top2 <= 0`: `145 / 148`
+- `flat_max <= 0`: `148 / 148`
+- dep-triggered queries: `30`
+- flat/dep ranking changed: `2`
+
+2Wiki:
+- oracle-positive audited swaps: `55`
+- `flat_top2 <= 0`: `55 / 55`
+- `dep_top2 <= 0`: `55 / 55`
+- `flat_max <= 0`: `55 / 55`
+- dep-triggered queries: `21`
+- flat/dep ranking changed: `1`
+
+Interpretation:
+- the current zero-shot support-to-utility surrogate does not recover positive-swap preference
+- dependency-aware NoisyOR currently behaves as a failed controller instance, not as a promotable method
+
+## NQ PopQA Bridge Threshold Diagnosis, limit=100
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/11_nq_popqa_bridge_threshold_diagnosis_20260410.md`
+- `run_logs/bridge_failure_diagnosis_nq_popqa_100_20260410bridge_diag.summary.md`
+
+Core reports:
+- `outputs_step0_general_nq/eval_reports/bridge_diag_nq_seed_thr000_20260410bridge_diag.json`
+- `outputs_step0_general_nq/eval_reports/bridge_diag_nq_question_thr035_20260410bridge_diag.json`
+- `outputs_step0_general_nq/eval_reports/bridge_diag_nq_question_thr000_20260410bridge_diag.json`
+- `outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_seed_thr000_20260410bridge_diag.json`
+- `outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_question_thr035_20260410bridge_diag.json`
+- `outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_question_thr000_20260410bridge_diag.json`
+
+NQ:
+- baseline top-10 + CE:
+  - `EM/F1 = 0.5300 / 0.6444`
+  - `R@5/R@20/R@100 = 0.6882 / 0.9872 / 1.0000`
+- default bridge (`threshold=0.35`):
+  - identical to baseline
+  - `append_query_rate = 0.0000`
+  - `stop_reason = structure_below_threshold:100`
+- threshold-unlocked bridge (`seed@0.0` and `question@0.0`):
+  - `EM/F1 = 0.5300 / 0.6444`
+  - `R@5 = 0.6922`
+  - `append_query_rate = 1.0000`
+  - `avg_append_count = 3.0000`
+  - `final_appended_rate = 0.1300`
+
+PopQA:
+- baseline top-10 + CE:
+  - `EM/F1 = 0.2000 / 0.4819`
+  - `R@5/R@20/R@100 = 0.5000 / 0.5300 / 0.5750`
+- default bridge (`threshold=0.35`):
+  - identical to baseline
+  - `append_query_rate = 0.0000`
+  - `stop_reason = structure_below_threshold:100`
+- threshold-unlocked bridge (`seed@0.0` and `question@0.0`):
+  - `EM/F1 = 0.2100 / 0.4853`
+  - `append_query_rate = 1.0000`
+  - `avg_append_count = 3.0000`
+  - `final_appended_rate = 0.2100`
+
+Interpretation:
+- On both datasets, the default bridge line is primarily threshold-gated.
+- `query_entity_source` is not the main explanation because `seed` and `question` match under fixed thresholds.
+- After threshold is removed, `nq` still has no QA gain, while `popqa` shows a small positive signal.
 
 ## Non-Oracle Pilot Summary
 

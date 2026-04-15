@@ -1,9 +1,11 @@
 import argparse
 import ast
+import copy
 from dataclasses import dataclass
 import json
 import logging
 import os
+import re
 import sys
 import types
 from collections import Counter
@@ -65,6 +67,7 @@ from src.hipporag.utils.causal_utils import (
     score_candidate_docs_by_structure,
 )
 from src.hipporag.utils.config_utils import BaseConfig
+from src.hipporag.utils.dataset_utils import resolve_dataset_paths
 from src.hipporag.utils.misc_utils import QuerySolution, compute_mdhash_id, string_to_bool
 
 LEARNED_SETWISE_FEATURE_NAMES = [
@@ -3325,18 +3328,1711 @@ def score_bridge_candidates(pool_doc_ids: Sequence[int | None],
     return scored_candidates
 
 
+def _entity_token_set(entities: Sequence[str] | Set[str] | None) -> Set[str]:
+    tokens: Set[str] = set()
+    for entity in normalize_entity_set(entities):
+        tokens.update(normalized_token_set(entity))
+    return tokens
+
+
+def _top_normalized_entities(entities: Sequence[str] | Set[str] | None,
+                             limit: int = 2) -> List[str]:
+    normalized = sorted(normalize_entity_set(entities), key=lambda item: (-len(item), item))
+    return [str(item) for item in normalized[:max(int(limit), 0)]]
+
+
+def _lexical_overlap_score(lhs_tokens: Sequence[str] | Set[str] | None,
+                           rhs_tokens: Sequence[str] | Set[str] | None) -> float:
+    lhs = set(lhs_tokens or [])
+    rhs = set(rhs_tokens or [])
+    if not lhs or not rhs:
+        return 0.0
+    return float(len(lhs & rhs)) / float(max(1, min(len(lhs), len(rhs))))
+
+
+_GAP_ROLE_RELATION_RULES: List[Dict[str, object]] = [
+    {
+        "slot": "director",
+        "patterns": (" director ", " directors ", " directed by ", "director of"),
+        "slot_cues": {"director", "directed"},
+        "query_template": "Find the director of {anchors}. Question: {query}",
+    },
+    {
+        "slot": "actor",
+        "patterns": (" actor ", " actors ", " actress ", " starring ", " starred ", " star of "),
+        "slot_cues": {"actor", "actors", "actress", "starring", "starred", "star"},
+        "query_template": "Find the starring actor or actress of {anchors}. Question: {query}",
+    },
+    {
+        "slot": "author",
+        "patterns": (" author ", " wrote ", " writer ", " written by "),
+        "slot_cues": {"author", "wrote", "writer", "written"},
+        "query_template": "Find the author or writer of {anchors}. Question: {query}",
+    },
+]
+
+_GAP_TARGET_ATTRIBUTE_RULES: List[Dict[str, object]] = [
+    {
+        "slot": "education",
+        "patterns": (" study", " studied ", " school ", " university ", " college ", " educated "),
+        "slot_cues": {"study", "studied", "school", "university", "college", "educated"},
+        "query_template": "Find where {anchor} studied. Question: {query}",
+    },
+    {
+        "slot": "birthplace",
+        "patterns": (" birthplace ", " born ", " where was ", " where were "),
+        "slot_cues": {"born", "birthplace", "where"},
+        "query_template": "Find the birthplace of {anchor}. Question: {query}",
+    },
+    {
+        "slot": "death_date",
+        "patterns": (" when did ", " died ", " die ", " death "),
+        "slot_cues": {"when", "die", "died", "death"},
+        "query_template": "Find when {anchor} died. Question: {query}",
+    },
+    {
+        "slot": "nationality",
+        "patterns": (" nationality", " same nationality", " what country", " which country"),
+        "slot_cues": {"nationality", "country"},
+        "query_template": "Find the nationality or country of {anchor}. Question: {query}",
+    },
+    {
+        "slot": "birth_date",
+        "patterns": (" when was ", " born "),
+        "slot_cues": {"when", "born"},
+        "query_template": "Find when {anchor} was born. Question: {query}",
+    },
+]
+
+_GAP_BRIDGE_ENTITY_RULES: List[Dict[str, object]] = [
+    {
+        "slot": "spouse",
+        "patterns": (" spouse ", " wife ", " husband "),
+        "slot_cues": {"spouse", "wife", "husband"},
+        "query_template": "Find who is the spouse of {anchor}. Question: {query}",
+    },
+    {
+        "slot": "mother",
+        "patterns": (" mother ",),
+        "slot_cues": {"mother"},
+        "query_template": "Find who is the mother of {anchor}. Question: {query}",
+    },
+    {
+        "slot": "father",
+        "patterns": (" father ",),
+        "slot_cues": {"father"},
+        "query_template": "Find who is the father of {anchor}. Question: {query}",
+    },
+]
+
+
+def _find_gap_rule(normalized_query: str,
+                   rules: Sequence[Mapping[str, object]]) -> Dict[str, object] | None:
+    padded_query = f" {normalized_query} "
+    for rule in rules:
+        patterns = tuple(str(pattern) for pattern in (rule.get("patterns") or ()))
+        if any(str(pattern) in padded_query for pattern in patterns):
+            return dict(rule)
+    return None
+
+
+def _resolve_gap_title_aligned_entities(query: str,
+                                        query_entities: Sequence[str] | Set[str] | None,
+                                        baseline_titles: Sequence[str] | None,
+                                        limit: int = 4) -> List[str]:
+    ordered_entities = _order_query_entities(query, query_entities, max_entities=max(int(limit), 1) * 2)
+    normalized_baseline_titles = [
+        normalize_structure_text(title)
+        for title in unique_ordered_titles(baseline_titles)
+        if normalize_structure_text(title)
+    ]
+    aligned_entities: List[str] = []
+    for entity in ordered_entities:
+        entity_key = normalize_structure_text(entity)
+        if not entity_key:
+            continue
+        if any(entity_key == title_key or entity_key in title_key or title_key in entity_key for title_key in normalized_baseline_titles):
+            aligned_entities.append(entity)
+        if len(aligned_entities) >= max(int(limit), 1):
+            break
+    return aligned_entities
+
+
+def _resolve_gap_anchor_entities(query: str,
+                                 gap_type: str,
+                                 slot: str | None,
+                                 baseline_titles: Sequence[str] | None,
+                                 query_entities: Sequence[str] | Set[str] | None,
+                                 covered_query_entities: Sequence[str] | Set[str] | None,
+                                 uncovered_query_entities: Sequence[str] | Set[str] | None) -> List[str]:
+    title_aligned_entities = _resolve_gap_title_aligned_entities(
+        query=query,
+        query_entities=query_entities,
+        baseline_titles=baseline_titles,
+        limit=4,
+    )
+    covered_ordered = [
+        entity for entity in _order_query_entities(query, covered_query_entities, max_entities=4)
+        if normalize_structure_text(entity)
+    ]
+    uncovered_ordered = [
+        entity for entity in _order_query_entities(query, uncovered_query_entities, max_entities=4)
+        if normalize_structure_text(entity)
+    ]
+
+    if gap_type == "bridge_entity":
+        if covered_ordered:
+            return covered_ordered[:1]
+        if title_aligned_entities:
+            return title_aligned_entities[:1]
+        return []
+
+    if gap_type == "role_relation":
+        if title_aligned_entities:
+            return title_aligned_entities[:2]
+        if covered_ordered:
+            return covered_ordered[:2]
+        return []
+
+    if gap_type == "target_attribute":
+        possessive_slots = {"spouse", "mother", "father"}
+        if slot in possessive_slots and len(title_aligned_entities) >= 2:
+            return [title_aligned_entities[-1]]
+        if uncovered_ordered:
+            return uncovered_ordered[:1]
+        if len(title_aligned_entities) == 1:
+            return [title_aligned_entities[0]]
+        if len(covered_ordered) == 1:
+            return [covered_ordered[0]]
+        if title_aligned_entities:
+            return [title_aligned_entities[-1]]
+        return []
+
+    return []
+
+
+def _build_gap_micro_queries(query: str,
+                             gap_type: str,
+                             slot_rule: Mapping[str, object] | None,
+                             anchors: Sequence[str],
+                             bridge_targets: Sequence[str],
+                             max_queries: int) -> List[str]:
+    query_variants: List[str] = [str(query).strip()]
+    slot_template = str((slot_rule or {}).get("query_template", "") or "").strip()
+    if gap_type == "bridge_entity" and anchors and slot_template:
+        query_variants.append(slot_template.format(anchor=anchors[0], anchors=", ".join(anchors), query=query))
+        if bridge_targets:
+            query_variants.append(
+                f"Connect {anchors[0]} to {bridge_targets[0]}. Question: {query}"
+            )
+    elif gap_type == "role_relation" and anchors and slot_template:
+        query_variants.append(slot_template.format(anchor=anchors[0], anchors=" and ".join(anchors), query=query))
+    elif gap_type == "target_attribute" and anchors and slot_template:
+        query_variants.append(slot_template.format(anchor=anchors[0], anchors=", ".join(anchors), query=query))
+
+    deduped_queries: List[str] = []
+    seen_queries: Set[str] = set()
+    for raw_query in query_variants:
+        cleaned = str(raw_query or "").strip()
+        if not cleaned:
+            continue
+        normalized = normalize_structure_text(cleaned)
+        if not normalized or normalized in seen_queries:
+            continue
+        deduped_queries.append(cleaned)
+        seen_queries.add(normalized)
+        if len(deduped_queries) >= max(int(max_queries), 1):
+            break
+    return deduped_queries
+
+
+def detect_gap_expand_state(query: str,
+                            baseline_prefix_positions: Sequence[int],
+                            pool_docs: Sequence[str] | None,
+                            pool_doc_ids: Sequence[int | None],
+                            doc_idx_to_entities: Mapping[int, Set[str]],
+                            query_entities: Sequence[str] | Set[str] | None,
+                            covered_entities: Sequence[str] | Set[str] | None,
+                            gap_expand_mode: str = "heuristic",
+                            gap_expand_max_queries: int | None = None) -> Dict[str, object]:
+    normalized_mode = normalize_gap_expand_mode(gap_expand_mode)
+    effective_gap_expand_max_queries = max(int(gap_expand_max_queries or DEFAULT_GAP_EXPAND_MAX_QUERIES), 1)
+    normalized_query_entities = normalize_entity_set(query_entities)
+    normalized_covered_entities = normalize_entity_set(covered_entities)
+    covered_query_entities = sorted(normalized_query_entities & normalized_covered_entities)
+    uncovered_query_entities = sorted(normalized_query_entities - normalized_covered_entities)
+    baseline_titles = [
+        extract_doc_title(pool_docs[int(pos)])
+        for pos in (baseline_prefix_positions or [])
+        if pool_docs is not None and 0 <= int(pos) < len(pool_docs)
+    ]
+    baseline_doc_entities: Set[str] = set()
+    for pos in baseline_prefix_positions or []:
+        if int(pos) < 0 or int(pos) >= len(pool_doc_ids):
+            continue
+        doc_id = pool_doc_ids[int(pos)]
+        if doc_id is None:
+            continue
+        baseline_doc_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+
+    query_tokens = normalized_token_set(query)
+    entity_tokens = _entity_token_set(normalized_query_entities)
+    relation_terms = sorted(
+        token for token in query_tokens
+        if token not in entity_tokens and token not in _ANSWER_SCENT_ENTITY_STOPWORDS and len(token) > 2
+    )
+    fallback_used = False
+    gap_type = "flat_fallback"
+    gap_slot = ""
+    gap_rule: Dict[str, object] | None = None
+    abstain_reason = ""
+    bridge_targets: List[str] = []
+
+    if normalized_mode == "flat_fallback_only":
+        gap_type = "abstain"
+        fallback_used = True
+        abstain_reason = "flat_fallback_only"
+    elif normalized_mode in {"typed_abstain", "unit_typed_abstain"}:
+        normalized_query = normalize_structure_text(query)
+        bridge_rule = _find_gap_rule(normalized_query, _GAP_BRIDGE_ENTITY_RULES)
+        role_rule = _find_gap_rule(normalized_query, _GAP_ROLE_RELATION_RULES)
+        attribute_rule = _find_gap_rule(normalized_query, _GAP_TARGET_ATTRIBUTE_RULES)
+        if normalized_mode == "typed_abstain" and bridge_rule is not None and uncovered_query_entities:
+            gap_type = "bridge_entity"
+            gap_rule = bridge_rule
+            gap_slot = str(bridge_rule.get("slot", "") or "")
+            bridge_targets = _top_normalized_entities(uncovered_query_entities, limit=1)
+        elif role_rule is not None:
+            gap_type = "role_relation"
+            gap_rule = role_rule
+            gap_slot = str(role_rule.get("slot", "") or "")
+        elif attribute_rule is not None:
+            gap_type = "target_attribute"
+            gap_rule = attribute_rule
+            gap_slot = str(attribute_rule.get("slot", "") or "")
+        else:
+            gap_type = "abstain"
+            fallback_used = True
+            abstain_reason = "no_typed_slot"
+    elif uncovered_query_entities:
+        gap_type = "bridge_entity"
+    elif len(covered_query_entities) >= 2 and relation_terms:
+        gap_type = "linking_relation"
+    elif covered_query_entities or baseline_doc_entities:
+        gap_type = "target_attribute"
+    else:
+        gap_type = "flat_fallback"
+        fallback_used = True
+
+    anchor_entities: List[str]
+    if normalized_mode in {"typed_abstain", "unit_typed_abstain"}:
+        anchor_entities = _resolve_gap_anchor_entities(
+            query=query,
+            gap_type=gap_type,
+            slot=gap_slot,
+            baseline_titles=baseline_titles,
+            query_entities=query_entities,
+            covered_query_entities=covered_query_entities,
+            uncovered_query_entities=uncovered_query_entities,
+        )
+        if gap_type != "abstain" and not anchor_entities:
+            gap_type = "abstain"
+            fallback_used = True
+            abstain_reason = "missing_anchor"
+        elif normalized_mode == "unit_typed_abstain" and gap_type == "target_attribute":
+            stable_anchor_candidates = normalize_entity_set(
+                _resolve_gap_title_aligned_entities(
+                    query=query,
+                    query_entities=query_entities,
+                    baseline_titles=baseline_titles,
+                    limit=4,
+                )
+            ) | normalize_entity_set(covered_query_entities)
+            if not normalize_entity_set(anchor_entities) or not normalize_entity_set(anchor_entities).issubset(stable_anchor_candidates):
+                gap_type = "abstain"
+                fallback_used = True
+                abstain_reason = "unstable_attribute_anchor"
+    elif gap_type == "bridge_entity":
+        anchor_entities = _top_normalized_entities(covered_query_entities or baseline_doc_entities, limit=2)
+    elif gap_type == "linking_relation":
+        anchor_entities = _top_normalized_entities(covered_query_entities or baseline_doc_entities, limit=2)
+    elif gap_type == "target_attribute":
+        anchor_entities = _top_normalized_entities(covered_query_entities or baseline_doc_entities, limit=1)
+    else:
+        anchor_entities = _top_normalized_entities(covered_query_entities or normalized_query_entities, limit=2)
+
+    if normalized_mode in {"typed_abstain", "unit_typed_abstain"}:
+        deduped_queries = _build_gap_micro_queries(
+            query=query,
+            gap_type=gap_type,
+            slot_rule=gap_rule,
+            anchors=anchor_entities,
+            bridge_targets=bridge_targets,
+            max_queries=effective_gap_expand_max_queries,
+        )
+    else:
+        query_variants: List[str] = [str(query).strip()]
+        if gap_type == "bridge_entity":
+            missing_text = ", ".join(_top_normalized_entities(uncovered_query_entities, limit=2))
+            anchor_text = ", ".join(anchor_entities)
+            if anchor_text and missing_text:
+                query_variants.append(
+                    f"Find the intermediate entity linking {anchor_text} to {missing_text}. Question: {query}"
+                )
+            elif missing_text:
+                query_variants.append(f"Identify the missing bridge entity for: {query}")
+        elif gap_type == "target_attribute":
+            anchor_text = ", ".join(anchor_entities)
+            if anchor_text:
+                query_variants.append(
+                    f"Find the target attribute or answer-bearing relation for {anchor_text}. Question: {query}"
+                )
+            else:
+                query_variants.append(f"Find the target attribute needed to answer: {query}")
+        elif gap_type == "linking_relation":
+            if len(anchor_entities) >= 2:
+                query_variants.append(
+                    f"Find the linking relation between {anchor_entities[0]} and {anchor_entities[1]}. Question: {query}"
+                )
+            elif anchor_entities:
+                query_variants.append(f"Find the linking relation involving {anchor_entities[0]}. Question: {query}")
+        deduped_queries = _build_gap_micro_queries(
+            query=query,
+            gap_type=gap_type,
+            slot_rule=None,
+            anchors=anchor_entities,
+            bridge_targets=[],
+            max_queries=effective_gap_expand_max_queries,
+        ) if False else []
+        if not deduped_queries:
+            deduped_queries = []
+            seen_queries: Set[str] = set()
+            for raw_query in query_variants:
+                cleaned = str(raw_query or "").strip()
+                if not cleaned:
+                    continue
+                normalized = normalize_structure_text(cleaned)
+                if not normalized or normalized in seen_queries:
+                    continue
+                deduped_queries.append(cleaned)
+                seen_queries.add(normalized)
+                if len(deduped_queries) >= effective_gap_expand_max_queries:
+                    break
+
+    return {
+        "gap_type": str(gap_type),
+        "gap_mode": str(normalized_mode),
+        "fallback_used": bool(fallback_used),
+        "abstain_reason": str(abstain_reason),
+        "gap_anchors": list(anchor_entities),
+        "gap_slot": str(gap_slot),
+        "gap_slot_cues": sorted(str(token) for token in (gap_rule or {}).get("slot_cues", set()) if str(token)),
+        "gap_bridge_targets": list(bridge_targets),
+        "covered_query_entities": list(covered_query_entities),
+        "uncovered_query_entities": list(uncovered_query_entities),
+        "covered_entities_snapshot": sorted(normalized_covered_entities)[:16],
+        "baseline_titles": list(unique_ordered_titles(baseline_titles)),
+        "baseline_entity_count": int(len(baseline_doc_entities)),
+        "relation_terms": list(relation_terms[:8]),
+        "micro_queries": list(deduped_queries),
+        "micro_query_count": int(len(deduped_queries)),
+    }
+
+
+def _score_gap_witness_units(doc_text: str,
+                             doc_entity_set: Sequence[str] | Set[str] | None,
+                             *,
+                             anchor_entity_set: Sequence[str] | Set[str] | None,
+                             covered_entity_set: Sequence[str] | Set[str] | None,
+                             slot_cue_set: Sequence[str] | Set[str] | None,
+                             micro_query_tokens: Sequence[Sequence[str] | Set[str]],
+                             bridge_target_set: Sequence[str] | Set[str] | None) -> Dict[str, object]:
+    normalized_doc_entities = normalize_entity_set(doc_entity_set)
+    normalized_anchor_entities = normalize_entity_set(anchor_entity_set)
+    normalized_covered_entities = normalize_entity_set(covered_entity_set)
+    normalized_bridge_targets = normalize_entity_set(bridge_target_set)
+    anchor_token_set = _entity_token_set(normalized_anchor_entities)
+    bridge_target_token_set = _entity_token_set(normalized_bridge_targets)
+    non_anchor_entity_set = normalized_doc_entities - normalized_anchor_entities - normalized_covered_entities
+    non_anchor_token_set = _entity_token_set(non_anchor_entity_set)
+
+    best_witness_anchor = 0.0
+    best_witness_slot = 0.0
+    best_witness_query = 0.0
+    best_witness_bridge_target = 0.0
+    best_role_joint = 0.0
+    best_role_anchor_slot = 0.0
+    best_role_non_anchor = 0.0
+    best_role_query = 0.0
+    best_role_unit_type = ""
+
+    for unit in build_witness_units(doc_text, max_sentences=6, max_windows=8, include_full_doc=True):
+        unit_text = str(unit.get("unit_text", "") or "")
+        unit_tokens = normalized_token_set(unit_text)
+        if not unit_tokens:
+            continue
+        unit_anchor = _lexical_overlap_score(unit_tokens, anchor_token_set)
+        unit_slot = _lexical_overlap_score(unit_tokens, slot_cue_set)
+        unit_query = max(
+            (_lexical_overlap_score(unit_tokens, query_tokens) for query_tokens in micro_query_tokens),
+            default=0.0,
+        )
+        unit_bridge_target = _lexical_overlap_score(unit_tokens, bridge_target_token_set)
+        best_witness_anchor = max(best_witness_anchor, unit_anchor)
+        best_witness_slot = max(best_witness_slot, unit_slot)
+        best_witness_query = max(best_witness_query, unit_query)
+        best_witness_bridge_target = max(best_witness_bridge_target, unit_bridge_target)
+
+        if str(unit.get("unit_type", "") or "") == "full_doc":
+            continue
+
+        unit_non_anchor = _lexical_overlap_score(unit_tokens, non_anchor_token_set)
+        unit_anchor_slot = min(unit_anchor, unit_slot)
+        unit_joint = min(unit_anchor, unit_slot, unit_non_anchor)
+        current_best_tuple = (
+            float(best_role_joint),
+            float(best_role_anchor_slot),
+            float(best_role_query),
+            float(best_role_non_anchor),
+        )
+        candidate_tuple = (
+            float(unit_joint),
+            float(unit_anchor_slot),
+            float(unit_query),
+            float(unit_non_anchor),
+        )
+        if candidate_tuple > current_best_tuple:
+            best_role_joint = unit_joint
+            best_role_anchor_slot = unit_anchor_slot
+            best_role_query = unit_query
+            best_role_non_anchor = unit_non_anchor
+            best_role_unit_type = str(unit.get("unit_type", "") or "")
+
+    return {
+        "gap_best_witness_anchor": float(best_witness_anchor),
+        "gap_best_witness_slot": float(best_witness_slot),
+        "gap_best_witness_query": float(best_witness_query),
+        "gap_best_witness_bridge_target": float(best_witness_bridge_target),
+        "gap_non_anchor_entity_gain": float(len(non_anchor_entity_set)),
+        "gap_non_anchor_entities": sorted(non_anchor_entity_set)[:6],
+        "gap_best_role_witness_joint": float(best_role_joint),
+        "gap_best_role_anchor_slot": float(best_role_anchor_slot),
+        "gap_best_role_non_anchor": float(best_role_non_anchor),
+        "gap_best_role_query": float(best_role_query),
+        "gap_best_role_unit_type": str(best_role_unit_type),
+    }
+
+
+def _role_relation_witness_tuple(payload: Mapping[str, object]) -> Tuple[float, float, float, float, float]:
+    return (
+        float(payload.get("gap_best_role_witness_joint", 0.0) or 0.0),
+        float(payload.get("gap_best_role_anchor_slot", 0.0) or 0.0),
+        float(payload.get("gap_best_role_non_anchor", 0.0) or 0.0),
+        float(payload.get("gap_best_witness_anchor", 0.0) or 0.0),
+        float(payload.get("gap_best_witness_slot", 0.0) or 0.0),
+    )
+
+
+def rerank_gap_expand_candidates(scored_candidates: Sequence[Mapping[str, object]],
+                                 pool_docs: Sequence[str] | None,
+                                 gap_state: Mapping[str, object],
+                                 covered_entities: Sequence[str] | Set[str] | None) -> List[Dict[str, object]]:
+    gap_type = str(gap_state.get("gap_type", "flat_fallback") or "flat_fallback")
+    gap_mode = str(gap_state.get("gap_mode", "heuristic") or "heuristic")
+    micro_query_tokens = [
+        normalized_token_set(str(query))
+        for query in (gap_state.get("micro_queries", []) or [])
+        if str(query).strip()
+    ]
+    covered_entity_set = normalize_entity_set(covered_entities)
+    anchor_entity_set = normalize_entity_set(gap_state.get("gap_anchors", []) or [])
+    uncovered_query_entity_set = normalize_entity_set(gap_state.get("uncovered_query_entities", []) or [])
+    relation_term_set = {str(token) for token in (gap_state.get("relation_terms", []) or []) if str(token)}
+    slot_cue_set = {normalize_structure_text(token) for token in (gap_state.get("gap_slot_cues", []) or []) if normalize_structure_text(token)}
+    bridge_target_set = normalize_entity_set(gap_state.get("gap_bridge_targets", []) or [])
+
+    reranked_rows: List[Dict[str, object]] = []
+    for raw_row in scored_candidates:
+        row = dict(raw_row)
+        pool_position = int(row.get("pool_position", -1) or -1)
+        doc_text = ""
+        if pool_docs is not None and 0 <= pool_position < len(pool_docs):
+            doc_text = str(pool_docs[pool_position] or "")
+        doc_tokens = normalized_token_set(doc_text)
+        doc_entity_set = normalize_entity_set(row.get("doc_entities", set()) or set())
+        micro_query_overlap = max(
+            (_lexical_overlap_score(doc_tokens, query_tokens) for query_tokens in micro_query_tokens),
+            default=0.0,
+        )
+        covered_overlap = _lexical_overlap_score(doc_entity_set, covered_entity_set)
+        uncovered_overlap = _lexical_overlap_score(doc_entity_set, uncovered_query_entity_set)
+        anchor_overlap = _lexical_overlap_score(doc_entity_set, anchor_entity_set or covered_entity_set)
+        relation_overlap = _lexical_overlap_score(doc_tokens, relation_term_set)
+        slot_overlap = _lexical_overlap_score(doc_tokens, slot_cue_set)
+        bridge_target_overlap = _lexical_overlap_score(doc_entity_set, bridge_target_set)
+        pair_bridge_score = min(
+            1.0,
+            min(
+                max(covered_overlap, anchor_overlap),
+                max(uncovered_overlap, micro_query_overlap),
+            ),
+        ) if (covered_entity_set or anchor_entity_set) and (uncovered_query_entity_set or micro_query_tokens) else 0.0
+        multi_anchor_overlap = (
+            float(len(doc_entity_set & (anchor_entity_set or covered_entity_set))) / float(max(1, min(2, len(anchor_entity_set or covered_entity_set))))
+            if (anchor_entity_set or covered_entity_set)
+            else 0.0
+        )
+        if gap_mode == "typed_abstain":
+            witness_stats = _score_gap_witness_units(
+                doc_text=doc_text,
+                doc_entity_set=doc_entity_set,
+                anchor_entity_set=anchor_entity_set,
+                covered_entity_set=covered_entity_set,
+                slot_cue_set=slot_cue_set,
+                micro_query_tokens=micro_query_tokens,
+                bridge_target_set=bridge_target_set,
+            )
+            best_witness_anchor = float(witness_stats.get("gap_best_witness_anchor", 0.0) or 0.0)
+            best_witness_slot = float(witness_stats.get("gap_best_witness_slot", 0.0) or 0.0)
+            best_witness_query = float(witness_stats.get("gap_best_witness_query", 0.0) or 0.0)
+            best_witness_bridge_target = float(witness_stats.get("gap_best_witness_bridge_target", 0.0) or 0.0)
+            non_anchor_entity_gain = float(witness_stats.get("gap_non_anchor_entity_gain", 0.0) or 0.0)
+            best_role_joint = float(witness_stats.get("gap_best_role_witness_joint", 0.0) or 0.0)
+            best_role_anchor_slot = float(witness_stats.get("gap_best_role_anchor_slot", 0.0) or 0.0)
+            best_role_non_anchor = float(witness_stats.get("gap_best_role_non_anchor", 0.0) or 0.0)
+            best_role_query = float(witness_stats.get("gap_best_role_query", 0.0) or 0.0)
+
+            if gap_type == "bridge_entity":
+                gap_filter_passed = bool(best_witness_anchor > 0.0 and best_witness_slot > 0.0 and max(best_witness_bridge_target, uncovered_overlap) > 0.0)
+                witness_score = max(
+                    min(best_witness_anchor, best_witness_slot, max(best_witness_bridge_target, uncovered_overlap)),
+                    min(anchor_overlap, max(best_witness_bridge_target, uncovered_overlap)),
+                )
+            elif gap_type == "role_relation":
+                gap_filter_passed = bool(
+                    best_role_joint > 0.0
+                    and best_role_anchor_slot > 0.0
+                    and best_role_non_anchor > 0.0
+                )
+                witness_score = max(
+                    best_role_joint,
+                    min(best_role_anchor_slot, max(best_role_query, best_witness_query)),
+                )
+            else:
+                gap_filter_passed = bool(best_witness_anchor > 0.0 and best_witness_slot > 0.0)
+                witness_score = max(
+                    min(best_witness_anchor, best_witness_slot),
+                    min(anchor_overlap, max(best_witness_slot, slot_overlap)),
+                )
+            gap_score = float(np.clip(max(witness_score, best_witness_query), 0.0, 1.0))
+            gap_gate_score = max(
+                float(row.get("structure_score", 0.0) or 0.0),
+                float(gap_score),
+            )
+            row.update({
+                "gap_type": gap_type,
+                "gap_mode": gap_mode,
+                "gap_slot_overlap": round(float(slot_overlap), 4),
+                "gap_bridge_target_overlap": round(float(bridge_target_overlap), 4),
+                "gap_best_witness_anchor": round(float(best_witness_anchor), 4),
+                "gap_best_witness_slot": round(float(best_witness_slot), 4),
+                "gap_best_witness_query": round(float(best_witness_query), 4),
+                "gap_best_witness_bridge_target": round(float(best_witness_bridge_target), 4),
+                "gap_non_anchor_entity_gain": round(float(non_anchor_entity_gain), 4),
+                "gap_non_anchor_entities": list(witness_stats.get("gap_non_anchor_entities", []) or []),
+                "gap_best_role_witness_joint": round(float(witness_stats.get("gap_best_role_witness_joint", 0.0) or 0.0), 4),
+                "gap_best_role_anchor_slot": round(float(witness_stats.get("gap_best_role_anchor_slot", 0.0) or 0.0), 4),
+                "gap_best_role_non_anchor": round(float(witness_stats.get("gap_best_role_non_anchor", 0.0) or 0.0), 4),
+                "gap_best_role_query": round(float(witness_stats.get("gap_best_role_query", 0.0) or 0.0), 4),
+                "gap_best_role_unit_type": str(witness_stats.get("gap_best_role_unit_type", "") or ""),
+                "gap_filter_passed": bool(gap_filter_passed),
+                "gap_score": round(float(gap_score), 4),
+                "gap_score_raw": float(gap_score),
+                "gap_gate_score": round(float(gap_gate_score), 4),
+                "gap_gate_score_raw": float(gap_gate_score),
+                "gap_combined_score": round(float(gap_score), 4),
+                "gap_combined_score_raw": float(gap_score),
+            })
+            reranked_rows.append(row)
+            continue
+
+        if gap_type == "bridge_entity":
+            gap_score = float(np.clip(
+                0.45 * pair_bridge_score
+                + 0.25 * uncovered_overlap
+                + 0.20 * micro_query_overlap
+                + 0.10 * float(row.get("query_anchor_score", 0.0) or 0.0),
+                0.0,
+                1.0,
+            ))
+        elif gap_type == "target_attribute":
+            gap_score = float(np.clip(
+                0.40 * anchor_overlap
+                + 0.35 * micro_query_overlap
+                + 0.15 * relation_overlap
+                + 0.10 * float(row.get("closure_score_raw", 0.0) or 0.0),
+                0.0,
+                1.0,
+            ))
+        elif gap_type == "linking_relation":
+            gap_score = float(np.clip(
+                0.35 * multi_anchor_overlap
+                + 0.30 * micro_query_overlap
+                + 0.20 * relation_overlap
+                + 0.15 * float(row.get("path_coherence_score", 0.0) or 0.0),
+                0.0,
+                1.0,
+            ))
+        else:
+            gap_score = float(np.clip(
+                0.70 * micro_query_overlap
+                + 0.30 * float(row.get("selection_score_raw", 0.0) or 0.0),
+                0.0,
+                1.0,
+            ))
+        gap_gate_score = max(
+            float(row.get("structure_score", 0.0) or 0.0),
+            float(gap_score),
+        )
+        gap_combined_score = (
+            0.55 * float(gap_score)
+            + 0.25 * float(row.get("selection_score_raw", 0.0) or 0.0)
+            + 0.10 * float(row.get("base_score", 0.0) or 0.0)
+            + 0.10 * float(row.get("novelty_score", 0.0) or 0.0)
+        )
+        row.update({
+            "gap_type": gap_type,
+            "gap_mode": gap_mode,
+            "gap_micro_query_overlap": round(float(micro_query_overlap), 4),
+            "gap_anchor_overlap": round(float(anchor_overlap), 4),
+            "gap_covered_overlap": round(float(covered_overlap), 4),
+            "gap_uncovered_overlap": round(float(uncovered_overlap), 4),
+            "gap_relation_overlap": round(float(relation_overlap), 4),
+            "gap_pair_bridge_score": round(float(pair_bridge_score), 4),
+            "gap_score": round(float(gap_score), 4),
+            "gap_score_raw": float(gap_score),
+            "gap_gate_score": round(float(gap_gate_score), 4),
+            "gap_gate_score_raw": float(gap_gate_score),
+            "gap_combined_score": round(float(gap_combined_score), 4),
+            "gap_combined_score_raw": float(gap_combined_score),
+        })
+        reranked_rows.append(row)
+
+    reranked_rows.sort(
+        key=lambda item: (
+            -int(bool(item.get("gap_filter_passed", True))),
+            -float(item.get("gap_best_role_witness_joint", 0.0) or 0.0),
+            -float(item.get("gap_best_role_anchor_slot", 0.0) or 0.0),
+            -float(item.get("gap_best_role_query", item.get("gap_best_witness_query", 0.0)) or 0.0),
+            -float(item.get("gap_best_role_non_anchor", 0.0) or 0.0),
+            -float(item.get("gap_non_anchor_entity_gain", 0.0) or 0.0),
+            -float(item.get("gap_combined_score_raw", 0.0) or 0.0),
+            -float(item.get("gap_best_witness_slot", item.get("gap_score_raw", 0.0)) or 0.0),
+            -float(item.get("gap_best_witness_anchor", item.get("gap_anchor_overlap", 0.0)) or 0.0),
+            -float(item.get("gap_score_raw", 0.0) or 0.0),
+            -float(item.get("combined_score_raw", 0.0) or 0.0),
+            -int(item.get("new_entity_count", 0) or 0),
+            int(item.get("pool_position", 0) or 0),
+        )
+    )
+    return reranked_rows
+
+
+def _build_gap_candidate_preview(ranked_candidates: Sequence[Mapping[str, object]],
+                                 *,
+                                 limit: int = 5) -> List[Dict[str, object]]:
+    preview_rows: List[Dict[str, object]] = []
+    for rank, row in enumerate(list(ranked_candidates)[:max(int(limit), 0)], start=1):
+        preview_rows.append({
+            "preview_rank": int(rank),
+            "pool_position": int(row.get("pool_position", -1) or -1),
+            "doc_id": int(row["doc_id"]) if row.get("doc_id") is not None else None,
+            "title": str(row.get("doc_title", "") or ""),
+            "structure_score": round(float(row.get("structure_score", 0.0) or 0.0), 4),
+            "closure_score": round(float(row.get("closure_score", 0.0) or 0.0), 4),
+            "novelty_score": round(float(row.get("novelty_score", 0.0) or 0.0), 4),
+            "combined_score": round(float(row.get("combined_score", 0.0) or 0.0), 4),
+            "gap_score": round(float(row.get("gap_score", 0.0) or 0.0), 4),
+            "gap_gate_score": round(float(row.get("gap_gate_score", 0.0) or 0.0), 4),
+            "gap_combined_score": round(float(row.get("gap_combined_score", 0.0) or 0.0), 4),
+            "gap_filter_passed": bool(row.get("gap_filter_passed", True)),
+            "gap_best_witness_anchor": round(float(row.get("gap_best_witness_anchor", 0.0) or 0.0), 4),
+            "gap_best_witness_slot": round(float(row.get("gap_best_witness_slot", 0.0) or 0.0), 4),
+            "gap_best_role_witness_joint": round(float(row.get("gap_best_role_witness_joint", 0.0) or 0.0), 4),
+            "gap_best_role_anchor_slot": round(float(row.get("gap_best_role_anchor_slot", 0.0) or 0.0), 4),
+            "gap_best_role_non_anchor": round(float(row.get("gap_best_role_non_anchor", 0.0) or 0.0), 4),
+            "gap_best_role_unit_type": str(row.get("gap_best_role_unit_type", "") or ""),
+            "gap_unit_eligible": bool(row.get("gap_unit_eligible", False)),
+            "gap_unit_anchor_pass": bool(row.get("gap_unit_anchor_pass", False)),
+            "gap_unit_slot_pass": bool(row.get("gap_unit_slot_pass", False)),
+            "gap_unit_non_anchor_pass": bool(row.get("gap_unit_non_anchor_pass", False)),
+            "gap_unit_value_pass": bool(row.get("gap_unit_value_pass", False)),
+            "gap_unit_query_score": round(float(row.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+            "gap_unit_type": str(row.get("gap_unit_type", "") or ""),
+            "gap_unit_sentence_span": list(row.get("gap_unit_sentence_span", []) or []),
+        })
+    return preview_rows
+
+
+def _build_gap_doc_rows_from_positions(positions: Sequence[int],
+                                       *,
+                                       pool_doc_ids: Sequence[int | None],
+                                       pool_doc_titles: Sequence[str] | None,
+                                       doc_idx_to_entities: Mapping[int, Set[str]]) -> List[Dict[str, object]]:
+    rows: List[Dict[str, object]] = []
+    for pos in positions:
+        pool_position = int(pos)
+        if pool_position < 0 or pool_position >= len(pool_doc_ids):
+            continue
+        doc_id = pool_doc_ids[pool_position]
+        doc_entities = normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())) if doc_id is not None else set()
+        rows.append({
+            "pool_position": int(pool_position),
+            "doc_id": int(doc_id) if doc_id is not None else None,
+            "doc_title": (
+                str(pool_doc_titles[pool_position]).strip()
+                if pool_doc_titles is not None and 0 <= pool_position < len(pool_doc_titles)
+                else ""
+            ),
+            "doc_entities": doc_entities,
+            "structure_score": 0.0,
+            "combined_score_raw": 0.0,
+        })
+    return rows
+
+
+def select_gap_expand_positions_unit_typed_abstain(pool_doc_ids: Sequence[int | None],
+                                                   normalized_base_scores: np.ndarray,
+                                                   pool_doc_titles: Sequence[str] | None,
+                                                   doc_idx_to_entities: Dict[int, Set[str]],
+                                                   doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                                   adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                                   initial_seed_entities: Sequence[str] | Set[str] | None,
+                                                   query_entities: Sequence[str] | Set[str] | None,
+                                                   pool_limit: int,
+                                                   expand_base_k: int,
+                                                   append_max_docs: int,
+                                                   expand_min_structure_score: float,
+                                                   structure_max_hops: int,
+                                                   structure_seed_target_bridge_mode: str,
+                                                   base_weight: float,
+                                                   structure_weight: float,
+                                                   novelty_weight: float,
+                                                   score_mode: str,
+                                                   non_anchor_title_dedup: bool,
+                                                   append_random_seed: int,
+                                                   query: str | None,
+                                                   pool_docs: Sequence[str] | None,
+                                                   gap_expand_max_queries: int | None,
+                                                   ce_reranker: Any | None = None) -> Tuple[List[int], Dict[str, object]]:
+    effective_pool_limit = max(int(pool_limit), 0)
+    effective_base_k = min(max(int(expand_base_k), 0), effective_pool_limit)
+    effective_append_max_docs = max(int(append_max_docs), 0)
+    effective_gap_expand_max_queries = max(int(gap_expand_max_queries or DEFAULT_GAP_EXPAND_MAX_QUERIES), 1)
+    baseline_prefix_positions = list(range(effective_base_k))
+    baseline_titles = [
+        str(pool_doc_titles[pos]).strip()
+        for pos in baseline_prefix_positions
+        if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+    ]
+    covered_entities = normalize_entity_set(initial_seed_entities)
+    for pos in baseline_prefix_positions:
+        doc_id = pool_doc_ids[pos] if pos < len(pool_doc_ids) else None
+        if doc_id is None:
+            continue
+        covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+
+    gap_state = detect_gap_expand_state(
+        query=str(query or ""),
+        baseline_prefix_positions=baseline_prefix_positions,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        doc_idx_to_entities=doc_idx_to_entities,
+        query_entities=query_entities,
+        covered_entities=covered_entities,
+        gap_expand_mode="unit_typed_abstain",
+        gap_expand_max_queries=effective_gap_expand_max_queries,
+    )
+
+    unit_trace_defaults = {
+        "gap_unit_count": 0,
+        "gap_unit_eligible_count": 0,
+        "gap_unit_score_source": "cross_encoder" if ce_reranker is not None else "lexical_fallback",
+        "gap_unit_top_text": "",
+        "gap_unit_top_parent_title": "",
+        "gap_unit_top_parent_doc_id": None,
+        "gap_unit_selected_parent_title": "",
+        "gap_unit_selected_parent_doc_id": None,
+        "gap_unit_selected_query_rate": 0.0,
+        "gap_unit_selected_query_score": 0.0,
+        "gap_unit_anchor_pass": False,
+        "gap_unit_slot_pass": False,
+        "gap_unit_non_anchor_pass": False,
+        "gap_unit_value_pass": False,
+        "gap_unit_selected_sentence_span": [],
+        "gap_unit_bridge_primary_query_score": 0.0,
+        "gap_unit_bridge_primary_parent_title": "",
+        "gap_unit_bridge_primary_parent_doc_id": None,
+    }
+
+    if str(gap_state.get("gap_type", "")) == "abstain":
+        fallback_positions, fallback_trace = select_bridge_append_positions(
+            pool_doc_ids=pool_doc_ids,
+            normalized_base_scores=normalized_base_scores,
+            pool_doc_titles=pool_doc_titles,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            adjacency=adjacency,
+            initial_seed_entities=initial_seed_entities,
+            query_entities=query_entities,
+            pool_limit=pool_limit,
+            expand_base_k=expand_base_k,
+            append_max_docs=append_max_docs,
+            expand_min_structure_score=expand_min_structure_score,
+            structure_max_hops=structure_max_hops,
+            structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+            base_weight=base_weight,
+            structure_weight=structure_weight,
+            novelty_weight=novelty_weight,
+            score_mode=score_mode,
+            non_anchor_title_dedup=non_anchor_title_dedup,
+            append_policy="bridge",
+            append_random_seed=append_random_seed,
+            query=query,
+            pool_docs=pool_docs,
+            gap_expand_mode="flat_fallback_only",
+            gap_expand_max_queries=effective_gap_expand_max_queries,
+            ce_reranker=ce_reranker,
+        )
+        trace = dict(fallback_trace)
+        trace.update({
+            "append_policy": "gap_expand",
+            "gap_expand_enabled": True,
+            "gap_expand_mode": "unit_typed_abstain",
+            "gap_type": "abstain",
+            "gap_mode": "unit_typed_abstain",
+            "gap_fallback_used": True,
+            "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+            "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+            "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+            "gap_micro_queries": list(gap_state.get("micro_queries", []) or []),
+            "gap_micro_query_count": int(gap_state.get("micro_query_count", 0) or 0),
+            "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+            "gap_candidate_positions": [],
+            "gap_candidate_doc_ids": [],
+            "gap_candidate_titles": [],
+            "gap_abstain_reason": str(gap_state.get("abstain_reason", "") or "abstain"),
+            "gap_steps": [{
+                "step": 1,
+                "gap_type": "abstain",
+                "gap_mode": "unit_typed_abstain",
+                "fallback_used": True,
+                "abstain_reason": str(gap_state.get("abstain_reason", "") or "abstain"),
+                "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+                "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+                "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+                "micro_queries": list(gap_state.get("micro_queries", []) or []),
+                "bridge_fallback_positions": list(fallback_trace.get("appended_positions", []) or []),
+                "bridge_fallback_titles": list(fallback_trace.get("appended_titles", []) or []),
+            }],
+            **unit_trace_defaults,
+        })
+        return fallback_positions, trace
+
+    bridge_primary_positions, bridge_primary_trace = select_bridge_append_positions(
+        pool_doc_ids=pool_doc_ids,
+        normalized_base_scores=normalized_base_scores,
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities=doc_idx_to_entities,
+        doc_idx_to_edges=doc_idx_to_edges,
+        adjacency=adjacency,
+        initial_seed_entities=initial_seed_entities,
+        query_entities=query_entities,
+        pool_limit=pool_limit,
+        expand_base_k=expand_base_k,
+        append_max_docs=min(effective_append_max_docs, 1),
+        expand_min_structure_score=expand_min_structure_score,
+        structure_max_hops=structure_max_hops,
+        structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+        base_weight=base_weight,
+        structure_weight=structure_weight,
+        novelty_weight=novelty_weight,
+        score_mode=score_mode,
+        non_anchor_title_dedup=non_anchor_title_dedup,
+        append_policy="bridge",
+        append_random_seed=append_random_seed,
+        query=query,
+        pool_docs=pool_docs,
+        gap_expand_mode="flat_fallback_only",
+        gap_expand_max_queries=effective_gap_expand_max_queries,
+        ce_reranker=ce_reranker,
+    )
+
+    candidate_positions = list(bridge_primary_trace.get("candidate_set_positions", baseline_prefix_positions) or baseline_prefix_positions)
+    appended_positions = list(bridge_primary_trace.get("appended_positions", []) or [])
+    append_steps: List[Dict[str, object]] = []
+    gap_steps: List[Dict[str, object]] = [{
+        "step": 1,
+        "gap_type": str(gap_state.get("gap_type", "abstain") or "abstain"),
+        "gap_mode": "unit_typed_abstain",
+        "fallback_used": False,
+        "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+        "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+        "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+        "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+        "micro_queries": list(gap_state.get("micro_queries", []) or []),
+        "baseline_titles": list(baseline_titles),
+    }]
+    if bridge_primary_trace.get("append_steps"):
+        primary_step = dict((bridge_primary_trace.get("append_steps") or [])[0])
+        primary_step["selection_policy"] = "bridge_primary"
+        primary_step["gap_source"] = "bridge_primary"
+        append_steps.append(primary_step)
+
+    if effective_append_max_docs <= 0:
+        append_stop_reason = "append_cap_zero"
+        unit_summary = dict(unit_trace_defaults)
+        bridge_primary_unit_summary = {}
+        bridge_primary_unit_row: Dict[str, object] = {}
+    elif not appended_positions:
+        append_stop_reason = str(bridge_primary_trace.get("append_stop_reason", "bridge_primary_unavailable") or "bridge_primary_unavailable")
+        unit_summary = dict(unit_trace_defaults)
+        bridge_primary_unit_summary = {}
+        bridge_primary_unit_row = {}
+    elif effective_append_max_docs == 1:
+        append_stop_reason = "bridge_primary_only"
+        unit_summary = dict(unit_trace_defaults)
+        bridge_primary_unit_summary = {}
+        bridge_primary_unit_row = {}
+    else:
+        current_covered_entities = normalize_entity_set(initial_seed_entities)
+        for pos in candidate_positions:
+            if pos < 0 or pos >= len(pool_doc_ids):
+                continue
+            doc_id = pool_doc_ids[pos]
+            if doc_id is None:
+                continue
+            current_covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+
+        seen_title_keys = normalize_title_set([
+            str(pool_doc_titles[pos]).strip()
+            for pos in candidate_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ]) if non_anchor_title_dedup else set()
+
+        bridge_primary_rows = _build_gap_doc_rows_from_positions(
+            appended_positions[:1],
+            pool_doc_ids=pool_doc_ids,
+            pool_doc_titles=pool_doc_titles,
+            doc_idx_to_entities=doc_idx_to_entities,
+        )
+        bridge_primary_reference_covered = normalize_entity_set(current_covered_entities)
+        for bridge_primary_row in bridge_primary_rows:
+            bridge_primary_reference_covered -= normalize_entity_set(bridge_primary_row.get("doc_entities", set()) or set())
+        bridge_primary_ranked_rows, bridge_primary_unit_summary = rerank_gap_expand_units(
+            bridge_primary_rows,
+            pool_docs=pool_docs,
+            gap_state=gap_state,
+            covered_entities=bridge_primary_reference_covered,
+            ce_reranker=ce_reranker,
+        )
+        bridge_primary_unit_row = dict(bridge_primary_ranked_rows[0]) if bridge_primary_ranked_rows else {}
+
+        remaining_positions = [
+            pos for pos in range(effective_base_k, effective_pool_limit)
+            if pos not in set(appended_positions)
+        ]
+        if not remaining_positions:
+            append_stop_reason = "no_candidate_remaining"
+            unit_summary = dict(unit_trace_defaults)
+        else:
+            scored_candidates = score_bridge_candidates(
+                pool_doc_ids=pool_doc_ids,
+                normalized_base_scores=normalized_base_scores,
+                pool_doc_titles=pool_doc_titles,
+                doc_idx_to_entities=doc_idx_to_entities,
+                doc_idx_to_edges=doc_idx_to_edges,
+                adjacency=adjacency,
+                remaining_positions=remaining_positions,
+                covered_entities=current_covered_entities,
+                structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                query_entities=query_entities,
+                score_mode=score_mode,
+            )
+            if not scored_candidates:
+                append_stop_reason = "no_scored_candidate"
+                unit_summary = dict(unit_trace_defaults)
+            else:
+                ranked_candidates, unit_summary = rerank_gap_expand_units(
+                    scored_candidates=scored_candidates,
+                    pool_docs=pool_docs,
+                    gap_state=gap_state,
+                    covered_entities=current_covered_entities,
+                    ce_reranker=ce_reranker,
+                )
+                gap_steps.append({
+                    "step": 2,
+                    "gap_type": str(gap_state.get("gap_type", "abstain") or "abstain"),
+                    "gap_mode": "unit_typed_abstain",
+                    "fallback_used": False,
+                    "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                    "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+                    "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+                    "micro_queries": list(gap_state.get("micro_queries", []) or []),
+                    "candidate_preview": _build_gap_candidate_preview(ranked_candidates),
+                    **unit_summary,
+                })
+
+                selected_row = None
+                duplicate_skip_count = 0
+                not_better_skip_count = 0
+                ineligible_skip_count = 0
+                primary_rank_tuple = _gap_unit_rank_tuple(bridge_primary_unit_row, str(gap_state.get("gap_type", "") or "abstain"))
+                for row in ranked_candidates:
+                    if not bool(row.get("gap_unit_eligible", False)):
+                        ineligible_skip_count += 1
+                        continue
+                    title_key = normalize_structure_text(str(row.get("doc_title", "")).strip())
+                    if non_anchor_title_dedup and title_key and title_key in seen_title_keys:
+                        duplicate_skip_count += 1
+                        continue
+                    if _gap_unit_rank_tuple(row, str(gap_state.get("gap_type", "") or "abstain")) <= primary_rank_tuple:
+                        not_better_skip_count += 1
+                        continue
+                    selected_row = dict(row)
+                    break
+
+                if selected_row is None:
+                    if ineligible_skip_count > 0 and ineligible_skip_count == len(ranked_candidates):
+                        append_stop_reason = "no_eligible_gap_units"
+                    elif not_better_skip_count > 0:
+                        append_stop_reason = "gap_unit_not_better_than_bridge_primary"
+                    elif duplicate_skip_count > 0:
+                        append_stop_reason = "duplicate_title_only"
+                    else:
+                        append_stop_reason = "no_unit_alternate"
+                else:
+                    selected_position = int(selected_row["pool_position"])
+                    candidate_positions.append(selected_position)
+                    appended_positions.append(selected_position)
+                    selected_doc_id = selected_row.get("doc_id")
+                    if selected_doc_id is not None:
+                        current_covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(selected_doc_id), set())))
+                    selected_title_key = normalize_structure_text(str(selected_row.get("doc_title", "")).strip())
+                    if non_anchor_title_dedup and selected_title_key:
+                        seen_title_keys.add(selected_title_key)
+                    append_steps.append({
+                        "step": 2,
+                        "selection_policy": "gap_unit_alternate",
+                        "gap_source": "unit_typed_alternate",
+                        "selected_pool_position": int(selected_position),
+                        "selected_doc_id": int(selected_doc_id) if selected_doc_id is not None else None,
+                        "selected_title": str(selected_row.get("doc_title", "") or ""),
+                        "gap_type": str(gap_state.get("gap_type", "") or ""),
+                        "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+                        "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                        "gap_micro_queries": list(gap_state.get("micro_queries", []) or []),
+                        "gap_unit_text": str(selected_row.get("gap_unit_text", "") or ""),
+                        "gap_unit_type": str(selected_row.get("gap_unit_type", "") or ""),
+                        "gap_unit_sentence_span": list(selected_row.get("gap_unit_sentence_span", []) or []),
+                        "gap_unit_query_score": round(float(selected_row.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+                        "gap_unit_anchor_pass": bool(selected_row.get("gap_unit_anchor_pass", False)),
+                        "gap_unit_slot_pass": bool(selected_row.get("gap_unit_slot_pass", False)),
+                        "gap_unit_non_anchor_pass": bool(selected_row.get("gap_unit_non_anchor_pass", False)),
+                        "gap_unit_value_pass": bool(selected_row.get("gap_unit_value_pass", False)),
+                        "gap_unit_bridge_primary_query_score": round(float(bridge_primary_unit_row.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+                        "gap_unit_bridge_primary_title": str(bridge_primary_unit_row.get("doc_title", "") or ""),
+                        "candidate_preview": _build_gap_candidate_preview(ranked_candidates),
+                    })
+                    append_stop_reason = "unit_alternate_added"
+
+        covered_entities = current_covered_entities if 'current_covered_entities' in locals() else covered_entities
+
+    gap_candidate_positions = appended_positions[1:] if len(appended_positions) >= 2 else []
+    selected_gap_row = None
+    if gap_candidate_positions:
+        selected_gap_row = next(
+            (
+                row for row in ([] if 'ranked_candidates' not in locals() else ranked_candidates)
+                if int(row.get("pool_position", -1) or -1) == int(gap_candidate_positions[0])
+            ),
+            None,
+        )
+    unit_trace = dict(unit_trace_defaults)
+    unit_trace.update(dict(unit_summary if 'unit_summary' in locals() else {}))
+    unit_trace.update({
+        "gap_unit_selected_parent_title": str((selected_gap_row or {}).get("doc_title", "") or ""),
+        "gap_unit_selected_parent_doc_id": (
+            int((selected_gap_row or {}).get("doc_id"))
+            if (selected_gap_row or {}).get("doc_id") is not None else None
+        ),
+        "gap_unit_selected_query_rate": round(float((selected_gap_row or {}).get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+        "gap_unit_selected_query_score": round(float((selected_gap_row or {}).get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+        "gap_unit_anchor_pass": bool((selected_gap_row or {}).get("gap_unit_anchor_pass", False)),
+        "gap_unit_slot_pass": bool((selected_gap_row or {}).get("gap_unit_slot_pass", False)),
+        "gap_unit_non_anchor_pass": bool((selected_gap_row or {}).get("gap_unit_non_anchor_pass", False)),
+        "gap_unit_value_pass": bool((selected_gap_row or {}).get("gap_unit_value_pass", False)),
+        "gap_unit_selected_sentence_span": list((selected_gap_row or {}).get("gap_unit_sentence_span", []) or []),
+        "gap_unit_bridge_primary_query_score": round(float((bridge_primary_unit_row or {}).get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+        "gap_unit_bridge_primary_parent_title": str((bridge_primary_unit_row or {}).get("doc_title", "") or ""),
+        "gap_unit_bridge_primary_parent_doc_id": (
+            int((bridge_primary_unit_row or {}).get("doc_id"))
+            if (bridge_primary_unit_row or {}).get("doc_id") is not None else None
+        ),
+    })
+
+    trace = {
+        "selector": "bridge_append",
+        "expand_base_k": int(effective_base_k),
+        "append_max_docs": int(effective_append_max_docs),
+        "append_policy": "gap_expand",
+        "append_random_seed": int(append_random_seed),
+        "gap_expand_mode": "unit_typed_abstain",
+        "gap_expand_max_queries": int(effective_gap_expand_max_queries),
+        "expand_min_structure_score": round(float(expand_min_structure_score), 4),
+        "score_mode": normalize_setwise_score_mode(score_mode),
+        "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+        "gap_expand_enabled": True,
+        "baseline_prefix_positions": list(baseline_prefix_positions),
+        "baseline_prefix_titles": list(baseline_titles),
+        "appended_positions": list(appended_positions),
+        "appended_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in appended_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "append_count": int(len(appended_positions)),
+        "append_stop_reason": str(append_stop_reason),
+        "append_steps": append_steps,
+        "gap_steps": gap_steps,
+        "gap_type": str(gap_state.get("gap_type", "abstain") or "abstain"),
+        "gap_mode": "unit_typed_abstain",
+        "gap_fallback_used": False,
+        "gap_abstain_reason": str(gap_state.get("abstain_reason", "") or ""),
+        "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+        "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+        "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+        "gap_micro_queries": list(gap_state.get("micro_queries", []) or []),
+        "gap_micro_query_count": int(len(gap_state.get("micro_queries", []) or [])),
+        "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+        "gap_candidate_positions": list(gap_candidate_positions),
+        "gap_candidate_doc_ids": [
+            int(pool_doc_ids[pos]) if pos < len(pool_doc_ids) and pool_doc_ids[pos] is not None else None
+            for pos in gap_candidate_positions
+        ],
+        "gap_candidate_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in gap_candidate_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "candidate_set_positions": list(candidate_positions),
+        "candidate_set_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in candidate_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "candidate_set_size": int(len(candidate_positions)),
+        "covered_entity_count_after_expand": int(len(covered_entities)),
+        "bridge_primary_positions": list(appended_positions[:1]),
+        "bridge_primary_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in appended_positions[:1]
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        **unit_trace,
+    }
+    return candidate_positions, trace
+
+
+def select_gap_expand_positions_typed_abstain(pool_doc_ids: Sequence[int | None],
+                                              normalized_base_scores: np.ndarray,
+                                              pool_doc_titles: Sequence[str] | None,
+                                              doc_idx_to_entities: Dict[int, Set[str]],
+                                              doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                                              adjacency: Dict[str, List[Tuple[str, float, str]]],
+                                              initial_seed_entities: Sequence[str] | Set[str] | None,
+                                              query_entities: Sequence[str] | Set[str] | None,
+                                              pool_limit: int,
+                                              expand_base_k: int,
+                                              append_max_docs: int,
+                                              expand_min_structure_score: float,
+                                              structure_max_hops: int,
+                                              structure_seed_target_bridge_mode: str,
+                                              base_weight: float,
+                                              structure_weight: float,
+                                              novelty_weight: float,
+                                              score_mode: str,
+                                              non_anchor_title_dedup: bool,
+                                              append_random_seed: int,
+                                              query: str | None,
+                                              pool_docs: Sequence[str] | None,
+                                              gap_expand_max_queries: int | None,
+                                              ce_reranker: Any | None = None) -> Tuple[List[int], Dict[str, object]]:
+    effective_pool_limit = max(int(pool_limit), 0)
+    effective_base_k = min(max(int(expand_base_k), 0), effective_pool_limit)
+    effective_append_max_docs = max(int(append_max_docs), 0)
+    effective_gap_expand_max_queries = max(int(gap_expand_max_queries or DEFAULT_GAP_EXPAND_MAX_QUERIES), 1)
+    baseline_prefix_positions = list(range(effective_base_k))
+    baseline_titles = [
+        str(pool_doc_titles[pos]).strip()
+        for pos in baseline_prefix_positions
+        if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+    ]
+    covered_entities = normalize_entity_set(initial_seed_entities)
+    for pos in baseline_prefix_positions:
+        doc_id = pool_doc_ids[pos] if pos < len(pool_doc_ids) else None
+        if doc_id is None:
+            continue
+        covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+
+    gap_state = detect_gap_expand_state(
+        query=str(query or ""),
+        baseline_prefix_positions=baseline_prefix_positions,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        doc_idx_to_entities=doc_idx_to_entities,
+        query_entities=query_entities,
+        covered_entities=covered_entities,
+        gap_expand_mode="typed_abstain",
+        gap_expand_max_queries=effective_gap_expand_max_queries,
+    )
+
+    if str(gap_state.get("gap_type", "")) == "abstain":
+        fallback_positions, fallback_trace = select_bridge_append_positions(
+            pool_doc_ids=pool_doc_ids,
+            normalized_base_scores=normalized_base_scores,
+            pool_doc_titles=pool_doc_titles,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            adjacency=adjacency,
+            initial_seed_entities=initial_seed_entities,
+            query_entities=query_entities,
+            pool_limit=pool_limit,
+            expand_base_k=expand_base_k,
+            append_max_docs=append_max_docs,
+            expand_min_structure_score=expand_min_structure_score,
+            structure_max_hops=structure_max_hops,
+            structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+            base_weight=base_weight,
+            structure_weight=structure_weight,
+            novelty_weight=novelty_weight,
+            score_mode=score_mode,
+            non_anchor_title_dedup=non_anchor_title_dedup,
+            append_policy="bridge",
+            append_random_seed=append_random_seed,
+            query=query,
+            pool_docs=pool_docs,
+            gap_expand_mode="flat_fallback_only",
+            gap_expand_max_queries=effective_gap_expand_max_queries,
+        )
+        trace = dict(fallback_trace)
+        trace.update({
+            "append_policy": "gap_expand",
+            "gap_expand_enabled": True,
+            "gap_expand_mode": "typed_abstain",
+            "gap_type": "abstain",
+            "gap_mode": "typed_abstain",
+            "gap_fallback_used": True,
+            "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+            "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+            "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+            "gap_micro_queries": list(gap_state.get("micro_queries", []) or []),
+            "gap_micro_query_count": int(gap_state.get("micro_query_count", 0) or 0),
+            "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+            "gap_candidate_positions": [],
+            "gap_candidate_doc_ids": [],
+            "gap_candidate_titles": [],
+            "gap_abstain_reason": str(gap_state.get("abstain_reason", "") or "abstain"),
+            "gap_steps": [{
+                "step": 1,
+                "gap_type": "abstain",
+                "gap_mode": "typed_abstain",
+                "fallback_used": True,
+                "abstain_reason": str(gap_state.get("abstain_reason", "") or "abstain"),
+                "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+                "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+                "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+                "micro_queries": list(gap_state.get("micro_queries", []) or []),
+                "bridge_fallback_positions": list(fallback_trace.get("appended_positions", []) or []),
+                "bridge_fallback_titles": list(fallback_trace.get("appended_titles", []) or []),
+            }],
+        })
+        return fallback_positions, trace
+
+    bridge_primary_positions, bridge_primary_trace = select_bridge_append_positions(
+        pool_doc_ids=pool_doc_ids,
+        normalized_base_scores=normalized_base_scores,
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities=doc_idx_to_entities,
+        doc_idx_to_edges=doc_idx_to_edges,
+        adjacency=adjacency,
+        initial_seed_entities=initial_seed_entities,
+        query_entities=query_entities,
+        pool_limit=pool_limit,
+        expand_base_k=expand_base_k,
+        append_max_docs=min(effective_append_max_docs, 1),
+        expand_min_structure_score=expand_min_structure_score,
+        structure_max_hops=structure_max_hops,
+        structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+        base_weight=base_weight,
+        structure_weight=structure_weight,
+        novelty_weight=novelty_weight,
+        score_mode=score_mode,
+        non_anchor_title_dedup=non_anchor_title_dedup,
+        append_policy="bridge",
+        append_random_seed=append_random_seed,
+        query=query,
+        pool_docs=pool_docs,
+        gap_expand_mode="flat_fallback_only",
+        gap_expand_max_queries=effective_gap_expand_max_queries,
+    )
+
+    candidate_positions = list(bridge_primary_trace.get("candidate_set_positions", baseline_prefix_positions) or baseline_prefix_positions)
+    appended_positions = list(bridge_primary_trace.get("appended_positions", []) or [])
+    append_steps: List[Dict[str, object]] = []
+    gap_steps: List[Dict[str, object]] = [{
+        "step": 1,
+        "gap_type": str(gap_state.get("gap_type", "abstain") or "abstain"),
+        "gap_mode": "typed_abstain",
+        "fallback_used": False,
+        "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+        "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+        "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+        "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+        "micro_queries": list(gap_state.get("micro_queries", []) or []),
+        "baseline_titles": list(baseline_titles),
+    }]
+    if bridge_primary_trace.get("append_steps"):
+        primary_step = dict((bridge_primary_trace.get("append_steps") or [])[0])
+        primary_step["selection_policy"] = "bridge_primary"
+        primary_step["gap_source"] = "bridge_primary"
+        append_steps.append(primary_step)
+
+    if effective_append_max_docs <= 0:
+        append_stop_reason = "append_cap_zero"
+    elif not appended_positions:
+        append_stop_reason = str(bridge_primary_trace.get("append_stop_reason", "bridge_primary_unavailable") or "bridge_primary_unavailable")
+    elif effective_append_max_docs == 1:
+        append_stop_reason = "bridge_primary_only"
+    else:
+        current_covered_entities = normalize_entity_set(initial_seed_entities)
+        for pos in candidate_positions:
+            if pos < 0 or pos >= len(pool_doc_ids):
+                continue
+            doc_id = pool_doc_ids[pos]
+            if doc_id is None:
+                continue
+            current_covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set())))
+
+        seen_title_keys = normalize_title_set([
+            str(pool_doc_titles[pos]).strip()
+            for pos in candidate_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ]) if non_anchor_title_dedup else set()
+
+        remaining_positions = [
+            pos for pos in range(effective_base_k, effective_pool_limit)
+            if pos not in set(appended_positions)
+        ]
+        if not remaining_positions:
+            append_stop_reason = "no_candidate_remaining"
+        else:
+            scored_candidates = score_bridge_candidates(
+                pool_doc_ids=pool_doc_ids,
+                normalized_base_scores=normalized_base_scores,
+                pool_doc_titles=pool_doc_titles,
+                doc_idx_to_entities=doc_idx_to_entities,
+                doc_idx_to_edges=doc_idx_to_edges,
+                adjacency=adjacency,
+                remaining_positions=remaining_positions,
+                covered_entities=current_covered_entities,
+                structure_max_hops=structure_max_hops,
+                structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+                base_weight=base_weight,
+                structure_weight=structure_weight,
+                novelty_weight=novelty_weight,
+                query_entities=query_entities,
+                score_mode=score_mode,
+            )
+            if not scored_candidates:
+                append_stop_reason = "no_scored_candidate"
+            else:
+                ranked_candidates = rerank_gap_expand_candidates(
+                    scored_candidates=scored_candidates,
+                    pool_docs=pool_docs,
+                    gap_state=gap_state,
+                    covered_entities=current_covered_entities,
+                )
+                gap_steps.append({
+                    "step": 2,
+                    "gap_type": str(gap_state.get("gap_type", "abstain") or "abstain"),
+                    "gap_mode": "typed_abstain",
+                    "fallback_used": False,
+                    "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                    "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+                    "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+                    "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+                    "micro_queries": list(gap_state.get("micro_queries", []) or []),
+                    "candidate_preview": _build_gap_candidate_preview(ranked_candidates),
+                })
+
+                selected_row = None
+                duplicate_skip_count = 0
+                filtered_below_threshold = 0
+                role_reference_skip_count = 0
+                role_reference_trace: Dict[str, object] = {}
+                role_reference_tuple: Tuple[float, float, float, float, float] | None = None
+                if str(gap_state.get("gap_type", "")) == "role_relation" and pool_docs is not None:
+                    role_reference_rows: List[Dict[str, object]] = []
+                    for reference_position in candidate_positions:
+                        if reference_position < 0 or reference_position >= len(pool_docs) or reference_position >= len(pool_doc_ids):
+                            continue
+                        reference_doc_id = pool_doc_ids[reference_position]
+                        if reference_doc_id is None:
+                            continue
+                        reference_doc_entities = normalize_entity_set(doc_idx_to_entities.get(int(reference_doc_id), set()))
+                        reference_witness_stats = _score_gap_witness_units(
+                            doc_text=str(pool_docs[reference_position] or ""),
+                            doc_entity_set=reference_doc_entities,
+                            anchor_entity_set=gap_state.get("gap_anchors", []) or [],
+                            covered_entity_set=(current_covered_entities - reference_doc_entities),
+                            slot_cue_set=gap_state.get("gap_slot_cues", []) or [],
+                            micro_query_tokens=[
+                                normalized_token_set(str(micro_query))
+                                for micro_query in (gap_state.get("micro_queries", []) or [])
+                                if str(micro_query).strip()
+                            ],
+                            bridge_target_set=gap_state.get("gap_bridge_targets", []) or [],
+                        )
+                        role_reference_rows.append({
+                            "pool_position": int(reference_position),
+                            "doc_id": int(reference_doc_id),
+                            "title": extract_doc_title(str(pool_docs[reference_position] or "")),
+                            "role_tuple": list(_role_relation_witness_tuple(reference_witness_stats)),
+                            "gap_best_role_witness_joint": round(float(reference_witness_stats.get("gap_best_role_witness_joint", 0.0) or 0.0), 4),
+                            "gap_best_role_anchor_slot": round(float(reference_witness_stats.get("gap_best_role_anchor_slot", 0.0) or 0.0), 4),
+                            "gap_best_role_non_anchor": round(float(reference_witness_stats.get("gap_best_role_non_anchor", 0.0) or 0.0), 4),
+                            "gap_best_role_query": round(float(reference_witness_stats.get("gap_best_role_query", 0.0) or 0.0), 4),
+                            "gap_best_role_unit_type": str(reference_witness_stats.get("gap_best_role_unit_type", "") or ""),
+                        })
+                    if role_reference_rows:
+                        role_reference_rows.sort(
+                            key=lambda item: (
+                                -float((item.get("role_tuple") or [0.0])[0]),
+                                -float((item.get("role_tuple") or [0.0, 0.0])[1]),
+                                -float((item.get("role_tuple") or [0.0, 0.0, 0.0])[2]),
+                                -float((item.get("role_tuple") or [0.0, 0.0, 0.0, 0.0])[3]),
+                                int(item.get("pool_position", 0) or 0),
+                            )
+                        )
+                        role_reference_trace = dict(role_reference_rows[0])
+                        role_reference_tuple = tuple(float(value or 0.0) for value in role_reference_trace.get("role_tuple", []))
+                        gap_steps[-1]["role_reference_witness"] = dict(role_reference_trace)
+
+                for row in ranked_candidates:
+                    if not bool(row.get("gap_filter_passed", False)):
+                        continue
+                    if float(row.get("gap_gate_score_raw", 0.0) or 0.0) < float(expand_min_structure_score):
+                        filtered_below_threshold += 1
+                        continue
+                    title_key = normalize_structure_text(str(row.get("doc_title", "")).strip())
+                    if non_anchor_title_dedup and title_key and title_key in seen_title_keys:
+                        duplicate_skip_count += 1
+                        continue
+                    if (
+                        str(gap_state.get("gap_type", "")) == "role_relation"
+                        and role_reference_tuple is not None
+                        and _role_relation_witness_tuple(row) <= role_reference_tuple
+                    ):
+                        role_reference_skip_count += 1
+                        continue
+                    selected_row = dict(row)
+                    break
+
+                if selected_row is None:
+                    if filtered_below_threshold > 0:
+                        append_stop_reason = "typed_alternate_below_threshold"
+                    elif role_reference_skip_count > 0:
+                        append_stop_reason = "role_reference_not_better"
+                    elif duplicate_skip_count > 0:
+                        append_stop_reason = "duplicate_title_only"
+                    else:
+                        append_stop_reason = "no_typed_alternate"
+                else:
+                    selected_position = int(selected_row["pool_position"])
+                    candidate_positions.append(selected_position)
+                    appended_positions.append(selected_position)
+                    selected_doc_id = selected_row.get("doc_id")
+                    if selected_doc_id is not None:
+                        current_covered_entities.update(normalize_entity_set(doc_idx_to_entities.get(int(selected_doc_id), set())))
+                    selected_title_key = normalize_structure_text(str(selected_row.get("doc_title", "")).strip())
+                    if non_anchor_title_dedup and selected_title_key:
+                        seen_title_keys.add(selected_title_key)
+                    append_steps.append({
+                        "step": 2,
+                        "selection_policy": "gap_alternate",
+                        "gap_source": "typed_alternate",
+                        "selected_pool_position": int(selected_position),
+                        "selected_doc_id": int(selected_doc_id) if selected_doc_id is not None else None,
+                        "selected_title": str(selected_row.get("doc_title", "") or ""),
+                        "selected_structure_score": round(float(selected_row.get("structure_score", 0.0) or 0.0), 4),
+                        "selected_closure_score": round(float(selected_row.get("closure_score", 0.0) or 0.0), 4),
+                        "selected_novelty_score": round(float(selected_row.get("novelty_score", 0.0) or 0.0), 4),
+                        "selected_combined_score": round(float(selected_row.get("combined_score", 0.0) or 0.0), 4),
+                        "selected_gap_score": round(float(selected_row.get("gap_score", 0.0) or 0.0), 4),
+                        "selected_gap_gate_score": round(float(selected_row.get("gap_gate_score", 0.0) or 0.0), 4),
+                        "selected_gap_combined_score": round(float(selected_row.get("gap_combined_score", 0.0) or 0.0), 4),
+                        "gap_type": str(gap_state.get("gap_type", "") or ""),
+                        "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+                        "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                        "gap_micro_queries": list(gap_state.get("micro_queries", []) or []),
+                        "candidate_pool_size": int(len(scored_candidates)),
+                        "duplicate_skip_count": int(duplicate_skip_count),
+                        "role_reference_skip_count": int(role_reference_skip_count),
+                        "role_reference_witness": dict(role_reference_trace),
+                        "selected_gap_best_role_witness_joint": round(float(selected_row.get("gap_best_role_witness_joint", 0.0) or 0.0), 4),
+                        "selected_gap_best_role_anchor_slot": round(float(selected_row.get("gap_best_role_anchor_slot", 0.0) or 0.0), 4),
+                        "selected_gap_best_role_non_anchor": round(float(selected_row.get("gap_best_role_non_anchor", 0.0) or 0.0), 4),
+                        "selected_gap_best_role_unit_type": str(selected_row.get("gap_best_role_unit_type", "") or ""),
+                        "candidate_preview": _build_gap_candidate_preview(ranked_candidates),
+                    })
+                    append_stop_reason = "alternate_only_complete"
+
+        covered_entities = current_covered_entities if 'current_covered_entities' in locals() else covered_entities
+
+    gap_candidate_positions = appended_positions[1:] if len(appended_positions) >= 2 else []
+    trace = {
+        "selector": "bridge_append",
+        "expand_base_k": int(effective_base_k),
+        "append_max_docs": int(effective_append_max_docs),
+        "append_policy": "gap_expand",
+        "append_random_seed": int(append_random_seed),
+        "gap_expand_mode": "typed_abstain",
+        "gap_expand_max_queries": int(effective_gap_expand_max_queries),
+        "expand_min_structure_score": round(float(expand_min_structure_score), 4),
+        "score_mode": normalize_setwise_score_mode(score_mode),
+        "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+        "gap_expand_enabled": True,
+        "baseline_prefix_positions": list(baseline_prefix_positions),
+        "baseline_prefix_titles": list(baseline_titles),
+        "appended_positions": list(appended_positions),
+        "appended_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in appended_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "append_count": int(len(appended_positions)),
+        "append_stop_reason": str(append_stop_reason),
+        "append_steps": append_steps,
+        "gap_steps": gap_steps,
+        "gap_type": str(gap_state.get("gap_type", "abstain") or "abstain"),
+        "gap_mode": "typed_abstain",
+        "gap_fallback_used": False,
+        "gap_abstain_reason": str(gap_state.get("abstain_reason", "") or ""),
+        "gap_slot": str(gap_state.get("gap_slot", "") or ""),
+        "gap_slot_cues": list(gap_state.get("gap_slot_cues", []) or []),
+        "gap_bridge_targets": list(gap_state.get("gap_bridge_targets", []) or []),
+        "gap_micro_queries": list(gap_state.get("micro_queries", []) or []),
+        "gap_micro_query_count": int(len(gap_state.get("micro_queries", []) or [])),
+        "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+        "gap_candidate_positions": list(gap_candidate_positions),
+        "gap_candidate_doc_ids": [
+            int(pool_doc_ids[pos]) if pos < len(pool_doc_ids) and pool_doc_ids[pos] is not None else None
+            for pos in gap_candidate_positions
+        ],
+        "gap_candidate_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in gap_candidate_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "candidate_set_positions": list(candidate_positions),
+        "candidate_set_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in candidate_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+        "candidate_set_size": int(len(candidate_positions)),
+        "covered_entity_count_after_expand": int(len(covered_entities)),
+        "bridge_primary_positions": list(appended_positions[:1]),
+        "bridge_primary_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in appended_positions[:1]
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
+    }
+    return candidate_positions, trace
+
+
 ASSEMBLE_MODES = {
     "none",
     "base_score",
     "embedding_similarity",
     "cross_encoder",
     "coverage",
+    "ce_local_repair",
+    "action_swap_v0_dryrun",
+    "action_swap_v0_judge",
+    "action_swap_v0_judge_relaxed",
+    "action_swap_noisyor_flat",
+    "action_swap_noisyor_dep",
+    "action_swap_tiered_witness",
+    "action_swap_propose_verify",
 }
 
 ASSEMBLE_CE_ACTIVE_MODES = {
     "cross_encoder",
     "coverage",
+    "ce_local_repair",
+    "action_swap_v0_dryrun",
+    "action_swap_v0_judge",
+    "action_swap_v0_judge_relaxed",
+    "action_swap_noisyor_flat",
+    "action_swap_noisyor_dep",
+    "action_swap_tiered_witness",
+    "action_swap_propose_verify",
 }
+
+ACTION_SWAP_V0_MODES = {
+    "action_swap_v0_dryrun",
+    "action_swap_v0_judge",
+    "action_swap_v0_judge_relaxed",
+}
+
+ACTION_SWAP_V0_JUDGE_MODES = {
+    "action_swap_v0_judge",
+    "action_swap_v0_judge_relaxed",
+}
+
+ACTION_SWAP_V0_RELAXED_MODES = {
+    "action_swap_v0_judge_relaxed",
+}
+
+ACTION_SWAP_NOISYOR_MODES = {
+    "action_swap_noisyor_flat",
+    "action_swap_noisyor_dep",
+}
+
+ACTION_SWAP_TIERED_WITNESS_MODES = {
+    "action_swap_tiered_witness",
+}
+
+ACTION_SWAP_PROPOSE_VERIFY_MODES = {
+    "action_swap_propose_verify",
+}
+
+ACTION_CONTROLLER_MODES = (
+    ACTION_SWAP_V0_MODES
+    | ACTION_SWAP_NOISYOR_MODES
+    | ACTION_SWAP_TIERED_WITNESS_MODES
+    | ACTION_SWAP_PROPOSE_VERIFY_MODES
+)
+DEFAULT_ACTION_SWAP_NOISYOR_MARGIN = 0.05
 
 COVERAGE_SCORE_VARIANTS = {
     "qe_ce",
@@ -3356,9 +5052,18 @@ COVERAGE_ADMISSIBILITY_MODES = {
 
 APPEND_POLICIES = {
     "bridge",
+    "gap_expand",
     "next_deep",
     "random_deep",
 }
+
+GAP_EXPAND_MODES = {
+    "heuristic",
+    "typed_abstain",
+    "unit_typed_abstain",
+    "flat_fallback_only",
+}
+DEFAULT_GAP_EXPAND_MAX_QUERIES = 2
 
 
 def normalize_assemble_mode(mode: str | None) -> str:
@@ -3366,6 +5071,11 @@ def normalize_assemble_mode(mode: str | None) -> str:
     if normalized not in ASSEMBLE_MODES:
         raise ValueError(f"Unsupported assemble mode: {mode}")
     return normalized
+
+
+def resolve_action_swap_v0_legality_mode(action_mode: str | None) -> str:
+    normalized_mode = str(action_mode or "").strip().lower()
+    return "relaxed" if normalized_mode in ACTION_SWAP_V0_RELAXED_MODES else "current"
 
 
 def normalize_coverage_score_variant(variant: str | None) -> str:
@@ -3393,6 +5103,13 @@ def normalize_append_policy(policy: str | None) -> str:
     normalized = str(policy or "bridge").strip().lower()
     if normalized not in APPEND_POLICIES:
         raise ValueError(f"Unsupported append policy: {policy}")
+    return normalized
+
+
+def normalize_gap_expand_mode(mode: str | None) -> str:
+    normalized = str(mode or "heuristic").strip().lower()
+    if normalized not in GAP_EXPAND_MODES:
+        raise ValueError(f"Unsupported gap expand mode: {mode}")
     return normalized
 
 
@@ -3531,6 +5248,2899 @@ def _normalize_structure_entities_for_doc(doc_id: int | None,
     if doc_id is None:
         return set()
     return normalize_entity_set(doc_idx_to_entities.get(int(doc_id), set()))
+
+
+def extract_baseline_scaffold_positions_from_ranking_rows(
+    ranking_rows: Sequence[Mapping[str, object]],
+    baseline_prefix_positions: Sequence[int],
+    qa_top_k: int,
+) -> List[int]:
+    baseline_position_set = {
+        int(pos)
+        for pos in baseline_prefix_positions
+    }
+    scaffold_positions: List[int] = []
+    seen_positions: Set[int] = set()
+    for row in ranking_rows:
+        raw_pool_position = row.get("pool_position", -1)
+        pool_position = int(raw_pool_position) if raw_pool_position is not None else -1
+        if pool_position < 0 or pool_position in seen_positions:
+            continue
+        if baseline_position_set and pool_position not in baseline_position_set:
+            continue
+        scaffold_positions.append(pool_position)
+        seen_positions.add(pool_position)
+        if len(scaffold_positions) >= max(int(qa_top_k), 0):
+            break
+    if scaffold_positions or not ranking_rows:
+        return scaffold_positions
+
+    for row in ranking_rows:
+        raw_pool_position = row.get("pool_position", -1)
+        pool_position = int(raw_pool_position) if raw_pool_position is not None else -1
+        if pool_position < 0 or pool_position in seen_positions:
+            continue
+        scaffold_positions.append(pool_position)
+        seen_positions.add(pool_position)
+        if len(scaffold_positions) >= max(int(qa_top_k), 0):
+            break
+    return scaffold_positions
+
+
+def resolve_pool_position_identity(pool_position: int,
+                                   *,
+                                   pool_docs: Sequence[str],
+                                   pool_doc_ids: Sequence[int | None],
+                                   doc_text_to_chunk_id: Mapping[str, str] | None = None) -> Dict[str, object]:
+    normalized_position = int(pool_position)
+    doc_text = str(pool_docs[normalized_position]) if 0 <= normalized_position < len(pool_docs) else ""
+    raw_doc_id = pool_doc_ids[normalized_position] if 0 <= normalized_position < len(pool_doc_ids) else None
+    doc_id = int(raw_doc_id) if raw_doc_id is not None else None
+    chunk_id = None
+    if doc_text and doc_text_to_chunk_id:
+        chunk_id = str(doc_text_to_chunk_id.get(doc_text, "") or "").strip() or None
+    text_hash = compute_mdhash_id(doc_text) if doc_text else None
+    return {
+        "pool_position": normalized_position,
+        "doc_id": doc_id,
+        "chunk_id": chunk_id,
+        "text_hash": text_hash,
+    }
+
+
+def _pool_positions_are_duplicate(pool_position_a: int,
+                                  pool_position_b: int,
+                                  *,
+                                  pool_docs: Sequence[str],
+                                  pool_doc_ids: Sequence[int | None],
+                                  doc_text_to_chunk_id: Mapping[str, str] | None = None) -> bool:
+    identity_a = resolve_pool_position_identity(
+        pool_position_a,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        doc_text_to_chunk_id=doc_text_to_chunk_id,
+    )
+    identity_b = resolve_pool_position_identity(
+        pool_position_b,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        doc_text_to_chunk_id=doc_text_to_chunk_id,
+    )
+    doc_id_a = identity_a.get("doc_id")
+    doc_id_b = identity_b.get("doc_id")
+    if doc_id_a is not None and doc_id_b is not None:
+        return int(doc_id_a) == int(doc_id_b)
+    chunk_id_a = identity_a.get("chunk_id")
+    chunk_id_b = identity_b.get("chunk_id")
+    if chunk_id_a and chunk_id_b:
+        return str(chunk_id_a) == str(chunk_id_b)
+    text_hash_a = identity_a.get("text_hash")
+    text_hash_b = identity_b.get("text_hash")
+    return bool(text_hash_a and text_hash_b and str(text_hash_a) == str(text_hash_b))
+
+
+def build_action_swap_jobs(query: str,
+                           scaffold_positions: Sequence[int],
+                           appended_positions: Sequence[int],
+                           ranking_rows: Sequence[Mapping[str, object]],
+                           *,
+                           pool_docs: Sequence[str],
+                           pool_doc_ids: Sequence[int | None],
+                           doc_text_to_chunk_id: Mapping[str, str] | None = None,
+                           replace_bottom_n: int = 2) -> List[Dict[str, object]]:
+    scaffold_list = [int(pos) for pos in scaffold_positions]
+    if not scaffold_list or not appended_positions:
+        return []
+
+    score_row_by_position = {
+        int(row.get("pool_position")): dict(row)
+        for row in ranking_rows
+        if row.get("pool_position") is not None and int(row.get("pool_position")) >= 0
+    }
+    replace_candidates = scaffold_list[-max(int(replace_bottom_n), 0):]
+    scaffold_docs = [str(pool_docs[pos]) for pos in scaffold_list]
+    jobs: List[Dict[str, object]] = []
+
+    for candidate_position in [int(pos) for pos in appended_positions]:
+        candidate_duplicate = any(
+            _pool_positions_are_duplicate(
+                candidate_position,
+                scaffold_position,
+                pool_docs=pool_docs,
+                pool_doc_ids=pool_doc_ids,
+                doc_text_to_chunk_id=doc_text_to_chunk_id,
+            )
+            for scaffold_position in scaffold_list
+        )
+        candidate_identity = resolve_pool_position_identity(
+            candidate_position,
+            pool_docs=pool_docs,
+            pool_doc_ids=pool_doc_ids,
+            doc_text_to_chunk_id=doc_text_to_chunk_id,
+        )
+        candidate_row = score_row_by_position.get(candidate_position, {})
+        candidate_score_value = candidate_row.get("assemble_score")
+        candidate_score = float(candidate_score_value) if candidate_score_value is not None else float("-inf")
+        for replace_position in replace_candidates:
+            replace_index = next(
+                (idx for idx, pos in enumerate(scaffold_list) if int(pos) == int(replace_position)),
+                -1,
+            )
+            if replace_index < 0:
+                continue
+            swapped_positions = list(scaffold_list)
+            swapped_positions[replace_index] = int(candidate_position)
+            replace_identity = resolve_pool_position_identity(
+                replace_position,
+                pool_docs=pool_docs,
+                pool_doc_ids=pool_doc_ids,
+                doc_text_to_chunk_id=doc_text_to_chunk_id,
+            )
+            replace_row = score_row_by_position.get(int(replace_position), {})
+            replace_score_value = replace_row.get("assemble_score")
+            replace_score = float(replace_score_value) if replace_score_value is not None else float("-inf")
+            jobs.append({
+                "question": str(query),
+                "baseline_positions": list(scaffold_list),
+                "baseline_docs": list(scaffold_docs),
+                "docs": [str(pool_docs[pos]) for pos in swapped_positions],
+                "candidate_pool_position": int(candidate_position),
+                "candidate_doc_id": candidate_identity.get("doc_id"),
+                "candidate_chunk_id": candidate_identity.get("chunk_id"),
+                "candidate_title": extract_doc_title(pool_docs[int(candidate_position)]),
+                "candidate_assemble_score": float(candidate_score),
+                "replace_pool_position": int(replace_position),
+                "replace_doc_id": replace_identity.get("doc_id"),
+                "replace_chunk_id": replace_identity.get("chunk_id"),
+                "replace_incumbent_index": int(replace_index),
+                "replace_incumbent_rank": int(replace_index + 1),
+                "replace_incumbent_title": extract_doc_title(pool_docs[int(replace_position)]),
+                "replace_incumbent_assemble_score": float(replace_score),
+                "score_delta": float(candidate_score - replace_score),
+                "swapped_positions": list(swapped_positions),
+                "is_duplicate_with_scaffold": bool(candidate_duplicate),
+            })
+    return jobs
+
+
+def apply_single_slot_preserving_swap(scaffold_positions: Sequence[int],
+                                      candidate_position: int,
+                                      replace_position: int) -> List[int]:
+    replaced_positions: List[int] = []
+    replaced = False
+    for pool_position in scaffold_positions:
+        normalized_position = int(pool_position)
+        if not replaced and normalized_position == int(replace_position):
+            replaced_positions.append(int(candidate_position))
+            replaced = True
+        else:
+            replaced_positions.append(normalized_position)
+    return replaced_positions
+
+
+def filter_action_swap_legal_jobs(action_jobs: Sequence[Mapping[str, object]],
+                                  *,
+                                  legality_mode: str = "current") -> List[Dict[str, object]]:
+    normalized_legality_mode = str(legality_mode or "current").strip().lower()
+    legal_jobs: List[Dict[str, object]] = []
+    for job in action_jobs:
+        if bool(job.get("is_duplicate_with_scaffold", False)):
+            continue
+        if normalized_legality_mode == "current":
+            if job.get("score_delta") is None or float(job.get("score_delta")) <= 0.0:
+                continue
+        legal_jobs.append(dict(job))
+    return legal_jobs
+
+
+def select_action_swap_v0_dryrun(action_jobs: Sequence[Mapping[str, object]],
+                                 *,
+                                 scaffold_positions: Sequence[int],
+                                 action_mode: str = "action_swap_v0_dryrun") -> Dict[str, object]:
+    before_positions = [int(pos) for pos in scaffold_positions]
+    legality_mode = resolve_action_swap_v0_legality_mode(action_mode)
+    decision: Dict[str, object] = {
+        "action_mode": str(action_mode),
+        "action_legality_mode": str(legality_mode),
+        "action_executed": False,
+        "action_type": "keep",
+        "action_candidate_pool_position": None,
+        "action_candidate_doc_id": None,
+        "action_replace_pool_position": None,
+        "action_replace_doc_id": None,
+        "action_score_delta": None,
+        "action_legal_action_count": 0,
+        "action_total_jobs": int(len(action_jobs)),
+        "action_skip_reason": "no_legal_actions",
+        "final_front_positions_before_action": list(before_positions),
+        "final_front_positions_after_action": list(before_positions),
+    }
+
+    legal_jobs = filter_action_swap_legal_jobs(action_jobs, legality_mode=legality_mode)
+    decision["action_legal_action_count"] = int(len(legal_jobs))
+    if not legal_jobs:
+        return decision
+
+    best_job = max(
+        legal_jobs,
+        key=lambda job: (
+            float(job.get("score_delta")) if job.get("score_delta") is not None else float("-inf"),
+            float(job.get("candidate_assemble_score")) if job.get("candidate_assemble_score") is not None else float("-inf"),
+            -int(job.get("candidate_pool_position", 0) or 0),
+            -int(job.get("replace_pool_position", 0) or 0),
+        ),
+    )
+    final_positions = apply_single_slot_preserving_swap(
+        scaffold_positions=before_positions,
+        candidate_position=int(best_job["candidate_pool_position"]),
+        replace_position=int(best_job["replace_pool_position"]),
+    )
+    decision.update({
+        "action_executed": True,
+        "action_type": "swap",
+        "action_candidate_pool_position": int(best_job["candidate_pool_position"]),
+        "action_candidate_doc_id": best_job.get("candidate_doc_id"),
+        "action_replace_pool_position": int(best_job["replace_pool_position"]),
+        "action_replace_doc_id": best_job.get("replace_doc_id"),
+        "action_score_delta": round(float(best_job.get("score_delta", 0.0) or 0.0), 4),
+        "action_skip_reason": None,
+        "final_front_positions_after_action": list(final_positions),
+    })
+    return decision
+
+
+def _run_action_swap_v0_judge_jobs(action_jobs: Sequence[Mapping[str, object]],
+                                   *,
+                                   judge_bundle: SetwiseLateRerankJudgeBundle,
+                                   qa_top_k: int,
+                                   max_doc_chars: int,
+                                   max_completion_tokens: int = SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS) -> List[Dict[str, object]]:
+    from run_swap_utility_judge import build_swap_utility_messages, parse_swap_utility_judge_response
+
+    judged_rows: List[Dict[str, object]] = []
+    for job in action_jobs:
+        response_text = ""
+        metadata: Dict[str, object] = {}
+        judge_error = None
+        try:
+            response_text, metadata = judge_bundle.infer_fn(
+                messages=build_swap_utility_messages(dict(job), qa_top_k=int(qa_top_k), max_doc_chars=int(max_doc_chars)),
+                model=judge_bundle.model_name,
+                response_format=judge_bundle.response_format,
+                max_completion_tokens=int(max_completion_tokens),
+                temperature=0.0,
+                top_p=1.0,
+            )
+        except Exception as exc:  # pragma: no cover - runtime guard
+            judge_error = str(exc)
+            metadata = {
+                "judge_status": "judge_exception",
+                "judge_error": judge_error,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "finish_reason": "exception",
+                "backend": judge_bundle.backend,
+                "model": judge_bundle.model_name,
+            }
+        judged_rows.append({
+            **dict(job),
+            "judge_response": str(response_text or ""),
+            "judge_trace": {
+                "judge_status": str(metadata.get("judge_status", "ok")),
+                "judge_error": metadata.get("judge_error") or judge_error,
+                "prompt_tokens": int(metadata.get("prompt_tokens", 0) or 0),
+                "completion_tokens": int(metadata.get("completion_tokens", 0) or 0),
+                "finish_reason": str(metadata.get("finish_reason", "")),
+                "backend": metadata.get("backend"),
+                "model": metadata.get("model"),
+                "response_text_source": metadata.get("response_text_source"),
+            },
+            "judge_parsed": parse_swap_utility_judge_response(str(response_text or "")),
+        })
+    return judged_rows
+
+
+def select_action_swap_v0_judge(action_jobs: Sequence[Mapping[str, object]],
+                                *,
+                                scaffold_positions: Sequence[int],
+                                judge_bundle: SetwiseLateRerankJudgeBundle,
+                                qa_top_k: int,
+                                max_doc_chars: int,
+                                judge_results: Sequence[Mapping[str, object]] | None = None,
+                                action_mode: str = "action_swap_v0_judge") -> Dict[str, object]:
+    before_positions = [int(pos) for pos in scaffold_positions]
+    legality_mode = resolve_action_swap_v0_legality_mode(action_mode)
+    decision: Dict[str, object] = {
+        "action_mode": str(action_mode),
+        "action_legality_mode": str(legality_mode),
+        "action_executed": False,
+        "action_type": "keep",
+        "action_candidate_pool_position": None,
+        "action_candidate_doc_id": None,
+        "action_replace_pool_position": None,
+        "action_replace_doc_id": None,
+        "action_score_delta": None,
+        "action_legal_action_count": 0,
+        "action_total_jobs": int(len(action_jobs)),
+        "action_skip_reason": "no_legal_actions",
+        "action_gate_verdict": None,
+        "action_gate_confidence": None,
+        "action_gate_reason": None,
+        "final_front_positions_before_action": list(before_positions),
+        "final_front_positions_after_action": list(before_positions),
+    }
+
+    legal_jobs = filter_action_swap_legal_jobs(action_jobs, legality_mode=legality_mode)
+    decision["action_legal_action_count"] = int(len(legal_jobs))
+    if not legal_jobs:
+        return decision
+
+    evaluated_jobs = [
+        dict(row)
+        for row in (
+            judge_results
+            if judge_results is not None else
+            _run_action_swap_v0_judge_jobs(
+                legal_jobs,
+                judge_bundle=judge_bundle,
+                qa_top_k=qa_top_k,
+                max_doc_chars=max_doc_chars,
+            )
+        )
+    ]
+    helpful_jobs = [
+        row for row in evaluated_jobs
+        if str(((row.get("judge_parsed") or {}).get("verdict") or "")).strip().lower() == "helpful"
+    ]
+    if not helpful_jobs:
+        decision["action_skip_reason"] = "no_helpful_actions"
+        return decision
+
+    best_job = max(
+        helpful_jobs,
+        key=lambda row: (
+            (
+                float((row.get("judge_parsed") or {}).get("confidence"))
+                if (row.get("judge_parsed") or {}).get("confidence") is not None else
+                float("-inf")
+            ),
+            float(row.get("score_delta")) if row.get("score_delta") is not None else float("-inf"),
+            float(row.get("candidate_assemble_score")) if row.get("candidate_assemble_score") is not None else float("-inf"),
+            -int(row.get("candidate_pool_position", 0) or 0),
+            -int(row.get("replace_pool_position", 0) or 0),
+        ),
+    )
+    final_positions = apply_single_slot_preserving_swap(
+        scaffold_positions=before_positions,
+        candidate_position=int(best_job["candidate_pool_position"]),
+        replace_position=int(best_job["replace_pool_position"]),
+    )
+    judge_parsed = dict(best_job.get("judge_parsed") or {})
+    decision.update({
+        "action_executed": True,
+        "action_type": "swap",
+        "action_candidate_pool_position": int(best_job["candidate_pool_position"]),
+        "action_candidate_doc_id": best_job.get("candidate_doc_id"),
+        "action_replace_pool_position": int(best_job["replace_pool_position"]),
+        "action_replace_doc_id": best_job.get("replace_doc_id"),
+        "action_score_delta": round(float(best_job.get("score_delta", 0.0) or 0.0), 4),
+        "action_skip_reason": None,
+        "action_gate_verdict": str(judge_parsed.get("verdict") or "") or None,
+        "action_gate_confidence": (
+            round(float(judge_parsed.get("confidence", 0.0) or 0.0), 2)
+            if judge_parsed.get("confidence") is not None else None
+        ),
+        "action_gate_reason": str(judge_parsed.get("reason") or "") or None,
+        "final_front_positions_after_action": list(final_positions),
+    })
+    return decision
+
+
+def _tokenize_support_text(text: str) -> Set[str]:
+    normalized = normalize_structure_text(text)
+    if not normalized:
+        return set()
+    return {
+        token
+        for token in normalized.split()
+        if len(token) > 1
+    }
+
+
+def _sigmoid_support_score(value: float) -> float:
+    clipped = float(np.clip(float(value), -30.0, 30.0))
+    return float(1.0 / (1.0 + np.exp(-clipped)))
+
+
+def _compute_lexical_support_score(facet_text: str, window_text: str) -> float:
+    facet_tokens = _tokenize_support_text(facet_text)
+    if not facet_tokens:
+        return 0.0
+    window_tokens = _tokenize_support_text(window_text)
+    if not window_tokens:
+        return 0.0
+    return float(len(facet_tokens & window_tokens) / max(len(facet_tokens), 1))
+
+
+def _order_query_entities(query: str,
+                          query_entities: Sequence[str] | Set[str] | None,
+                          *,
+                          max_entities: int = 4) -> List[str]:
+    normalized_query = normalize_structure_text(query)
+    unique_entities: List[str] = []
+    seen_keys: Set[str] = set()
+    for entity in query_entities or []:
+        entity_text = " ".join(str(entity or "").split()).strip()
+        entity_key = normalize_structure_text(entity_text)
+        if not entity_text or not entity_key or entity_key in seen_keys:
+            continue
+        unique_entities.append(entity_text)
+        seen_keys.add(entity_key)
+
+    def _sort_key(entity_text: str) -> Tuple[int, int, str]:
+        entity_key = normalize_structure_text(entity_text)
+        index = normalized_query.find(entity_key) if normalized_query and entity_key else -1
+        return (0 if index >= 0 else 1, index if index >= 0 else 10**9, entity_key)
+
+    unique_entities.sort(key=_sort_key)
+    return unique_entities[:max(int(max_entities), 0)]
+
+
+def build_query_dependency_graph(query: str,
+                                 *,
+                                 query_entities: Sequence[str] | Set[str] | None = None,
+                                 action_mode: str = "action_swap_noisyor_dep",
+                                 max_facets: int = 4) -> Dict[str, object]:
+    normalized_mode = str(action_mode or "action_swap_noisyor_dep").strip().lower()
+    ordered_entities = _order_query_entities(query, query_entities, max_entities=max_facets)
+    nodes: List[Dict[str, object]] = []
+    dependency_mode = "flat_fallback"
+
+    if normalized_mode == "action_swap_noisyor_dep" and len(ordered_entities) >= 2:
+        head_entity = ordered_entities[0]
+        tail_entity = ordered_entities[1]
+        nodes = [
+            {
+                "id": "v1",
+                "facet": f"Identify evidence about {head_entity}. Question: {query}",
+                "parents": [],
+            },
+            {
+                "id": "v2",
+                "facet": f"Find evidence connecting {head_entity} and {tail_entity}. Question: {query}",
+                "parents": ["v1"],
+            },
+            {
+                "id": "v3",
+                "facet": f"Resolve the part of the question about {tail_entity}. Question: {query}",
+                "parents": ["v2"],
+            },
+        ]
+        if len(ordered_entities) >= 3 and int(max_facets) >= 4:
+            extra_entity = ordered_entities[2]
+            nodes.append({
+                "id": "v4",
+                "facet": f"Resolve the remaining question detail about {extra_entity}. Question: {query}",
+                "parents": ["v2"],
+            })
+        dependency_mode = "dependency"
+    else:
+        facet_texts: List[str] = []
+        for entity_text in ordered_entities[: max(int(max_facets) - 1, 0)]:
+            facet_texts.append(f"Evidence about {entity_text}. Question: {query}")
+        if not facet_texts or len(facet_texts) < int(max_facets):
+            facet_texts.append(f"Answer the question: {query}")
+        facet_texts = facet_texts[:max(int(max_facets), 1)]
+        nodes = [
+            {
+                "id": f"v{index + 1}",
+                "facet": facet_text,
+                "parents": [],
+            }
+            for index, facet_text in enumerate(facet_texts)
+        ]
+
+    normalized_nodes: List[Dict[str, object]] = []
+    valid_ids: Set[str] = set()
+    for node in nodes[:max(int(max_facets), 1)]:
+        facet_id = str(node.get("id") or "").strip() or f"v{len(normalized_nodes) + 1}"
+        if facet_id in valid_ids:
+            facet_id = f"v{len(normalized_nodes) + 1}"
+        valid_ids.add(facet_id)
+        normalized_nodes.append({
+            "id": facet_id,
+            "facet": " ".join(str(node.get("facet") or "").split()).strip() or f"Answer the question: {query}",
+            "parents": [],
+        })
+    valid_ids = {str(node["id"]) for node in normalized_nodes}
+    for node, original_node in zip(normalized_nodes, nodes[:len(normalized_nodes)]):
+        parents: List[str] = []
+        for raw_parent in original_node.get("parents") or []:
+            parent = str(raw_parent or "").strip()
+            if parent and parent in valid_ids and parent != str(node["id"]) and parent not in parents:
+                parents.append(parent)
+        node["parents"] = parents
+
+    return {
+        "mode": dependency_mode,
+        "nodes": normalized_nodes,
+        "ordered_entities": ordered_entities,
+    }
+
+
+def split_doc_body_sentences(doc_text: str,
+                             *,
+                             max_sentences: int = 8) -> List[str]:
+    full_text = str(doc_text or "").strip()
+    body = full_text.split("\n", 1)[1] if "\n" in full_text else full_text
+    if not body.strip():
+        return []
+
+    raw_segments: List[str] = []
+    for line in body.splitlines():
+        cleaned_line = " ".join(line.split()).strip()
+        if not cleaned_line:
+            continue
+        parts = re.split(r"(?<=[.!?。！？])\s+", cleaned_line)
+        raw_segments.extend(parts if parts else [cleaned_line])
+
+    sentences: List[str] = []
+    for segment in raw_segments:
+        cleaned_segment = " ".join(str(segment or "").split()).strip()
+        if not cleaned_segment:
+            continue
+        sentences.append(cleaned_segment)
+        if len(sentences) >= max(int(max_sentences), 1):
+            break
+    if sentences:
+        return sentences
+    return [" ".join(body.split()).strip()]
+
+
+def build_title_prefixed_windows(doc_text: str,
+                                 *,
+                                 max_sentences: int = 8,
+                                 max_windows: int = 16) -> List[str]:
+    title = extract_doc_title(doc_text)
+    sentences = split_doc_body_sentences(doc_text, max_sentences=max_sentences)
+    windows: List[str] = []
+
+    def _append_window(text: str) -> None:
+        cleaned_text = " ".join(str(text or "").split()).strip()
+        if not cleaned_text:
+            return
+        window_text = f"{title}\n{cleaned_text}".strip() if title else cleaned_text
+        if window_text not in windows:
+            windows.append(window_text)
+
+    for sentence in sentences:
+        _append_window(sentence)
+        if len(windows) >= int(max_windows):
+            return windows[:int(max_windows)]
+
+    for first_sentence, second_sentence in zip(sentences, sentences[1:]):
+        _append_window(f"{first_sentence} {second_sentence}")
+        if len(windows) >= int(max_windows):
+            return windows[:int(max_windows)]
+
+    if not windows:
+        _append_window(doc_text)
+    return windows[:int(max_windows)]
+
+
+_ANSWER_SCENT_MONTH_TOKENS = {
+    "january", "february", "march", "april", "may", "june",
+    "july", "august", "september", "october", "november", "december",
+}
+_ANSWER_SCENT_LOCATION_TOKENS = {
+    "city", "country", "state", "province", "county", "river", "gulf",
+    "lake", "island", "region", "capital", "place", "town", "village",
+    "located", "born", "from", "north", "south", "east", "west",
+}
+_ANSWER_SCENT_PERSON_TOKENS = {
+    "person", "actor", "actress", "director", "singer", "player", "author",
+    "writer", "president", "minister", "scientist", "artist", "founder",
+    "wife", "husband", "father", "mother", "spouse",
+}
+_ANSWER_SCENT_ENTITY_STOPWORDS = {
+    "answer", "question", "evidence", "identify", "find", "resolve", "detail",
+    "target", "property", "bridge", "entity", "relation", "needed", "about",
+}
+
+
+def _guess_answer_type_label(query: str) -> str:
+    normalized_query = normalize_structure_text(query)
+    if not normalized_query:
+        return "entity"
+    if normalized_query.startswith("how many") or normalized_query.startswith("how much"):
+        return "count"
+    if normalized_query.startswith("when") or " year " in f" {normalized_query} " or " date " in f" {normalized_query} ":
+        return "date"
+    if normalized_query.startswith("where") or " place of birth " in f" {normalized_query} ":
+        return "location"
+    if normalized_query.startswith("who") or normalized_query.startswith("whom"):
+        return "person"
+    if normalized_query.startswith("which") or normalized_query.startswith("what"):
+        if any(token in f" {normalized_query} " for token in (" city ", " country ", " county ", " river ", " gulf ", " state ")):
+            return "location"
+        if any(token in f" {normalized_query} " for token in (" year ", " date ", " month ", " day ")):
+            return "date"
+        if any(token in f" {normalized_query} " for token in (" person ", " actor ", " director ", " singer ", " player ", " wife ", " husband ", " father ", " mother ", " spouse ")):
+            return "person"
+    return "entity"
+
+
+def _build_flat_query_tiers(query: str,
+                            *,
+                            query_entities: Sequence[str] | Set[str] | None = None,
+                            max_facets: int = 3) -> Dict[str, object]:
+    fallback_graph = build_query_dependency_graph(
+        query,
+        query_entities=query_entities,
+        action_mode="action_swap_noisyor_flat",
+        max_facets=max(int(max_facets), 1),
+    )
+    facets = [
+        {
+            "facet_id": str(node.get("id") or f"f{idx + 1}"),
+            "facet_text": str(node.get("facet") or "").strip() or f"Answer the question: {query}",
+            "facet_type": "flat",
+            "tier_index": 0,
+        }
+        for idx, node in enumerate(list(fallback_graph.get("nodes") or [])[:max(int(max_facets), 1)])
+    ]
+    return {
+        "mode": "flat_fallback",
+        "answer_type": _guess_answer_type_label(query),
+        "ordered_entities": list(fallback_graph.get("ordered_entities") or []),
+        "tiers": [
+            {
+                "tier_id": "t1",
+                "tier_index": 0,
+                "tier_type": "flat",
+                "facets": facets,
+            },
+        ],
+    }
+
+
+def build_query_tiers(query: str,
+                      *,
+                      query_entities: Sequence[str] | Set[str] | None = None,
+                      max_facets: int = 3,
+                      max_tiers: int = 2) -> Dict[str, object]:
+    ordered_entities = _order_query_entities(query, query_entities, max_entities=max(max_facets, 1))
+    normalized_query = normalize_structure_text(query)
+    answer_type = _guess_answer_type_label(query)
+    tier_limit = max(int(max_tiers), 1)
+    facet_limit = max(int(max_facets), 1)
+
+    if tier_limit < 2 or len(ordered_entities) < 2 or len(ordered_entities) > facet_limit:
+        return _build_flat_query_tiers(query, query_entities=query_entities, max_facets=facet_limit)
+
+    bridge_markers = (
+        " of ", " by ", " after ", " before ", " where ", " when ", " whose ",
+        " spouse ", " wife ", " husband ", " father ", " mother ", " director ",
+        " publisher ", " performer ", " singer ", " actor ", " team ", " city ",
+    )
+    if not any(marker in f" {normalized_query} " for marker in bridge_markers):
+        return _build_flat_query_tiers(query, query_entities=query_entities, max_facets=facet_limit)
+
+    if len(ordered_entities) > 3:
+        return _build_flat_query_tiers(query, query_entities=query_entities, max_facets=facet_limit)
+
+    head_entity = ordered_entities[0]
+    tail_entity = ordered_entities[1]
+    tier1_facets: List[Dict[str, object]] = [
+        {
+            "facet_id": "t1_f1",
+            "facet_text": f"Identify the bridge entity or relation involving {head_entity}. Question: {query}",
+            "facet_type": "bridge_identification",
+            "tier_index": 0,
+        },
+    ]
+    if " and " in f" {normalized_query} " and len(ordered_entities) >= 3:
+        tier1_facets.append({
+            "facet_id": "t1_f2",
+            "facet_text": f"Identify the parallel prerequisite involving {tail_entity}. Question: {query}",
+            "facet_type": "parallel_prerequisite",
+            "tier_index": 0,
+        })
+
+    target_entity = ordered_entities[-1]
+    tier2_facets = [
+        {
+            "facet_id": "t2_f1",
+            "facet_text": f"Find the {answer_type} answer detail about {target_entity}. Question: {query}",
+            "facet_type": "target_property",
+            "tier_index": 1,
+        },
+    ]
+
+    tiers = [
+        {
+            "tier_id": "t1",
+            "tier_index": 0,
+            "tier_type": "heuristic_bridge",
+            "facets": tier1_facets[:facet_limit],
+        },
+        {
+            "tier_id": "t2",
+            "tier_index": 1,
+            "tier_type": "answer_slot",
+            "facets": tier2_facets[:1],
+        },
+    ]
+    total_facet_count = sum(len(tier.get("facets") or []) for tier in tiers)
+    if total_facet_count <= 0 or total_facet_count > facet_limit:
+        return _build_flat_query_tiers(query, query_entities=query_entities, max_facets=facet_limit)
+
+    return {
+        "mode": "heuristic_tiers",
+        "answer_type": answer_type,
+        "ordered_entities": ordered_entities,
+        "tiers": tiers[:tier_limit],
+    }
+
+
+def _flatten_query_tiers(query_tiers: Mapping[str, object]) -> List[Dict[str, object]]:
+    flattened: List[Dict[str, object]] = []
+    for tier_index, tier in enumerate(list(query_tiers.get("tiers") or [])):
+        for facet in list(tier.get("facets") or []):
+            flattened.append({
+                "facet_id": str(facet.get("facet_id") or f"t{tier_index + 1}_f{len(flattened) + 1}"),
+                "facet_text": str(facet.get("facet_text") or "").strip(),
+                "facet_type": str(facet.get("facet_type") or "unknown"),
+                "tier_index": int(facet.get("tier_index", tier_index) or tier_index),
+            })
+    return flattened
+
+
+def build_witness_units(doc_text: str,
+                        *,
+                        max_sentences: int = 8,
+                        max_windows: int = 16,
+                        include_full_doc: bool = True) -> List[Dict[str, str]]:
+    units: List[Dict[str, str]] = []
+    seen_units: Set[Tuple[str, str]] = set()
+
+    def _append_unit(unit_type: str, unit_text: str) -> None:
+        normalized_text = " ".join(str(unit_text or "").split()).strip()
+        normalized_key = (str(unit_type), normalized_text)
+        if not normalized_text or normalized_key in seen_units:
+            return
+        seen_units.add(normalized_key)
+        units.append({
+            "unit_type": str(unit_type),
+            "unit_text": str(unit_text).strip(),
+        })
+
+    for window_text in build_title_prefixed_windows(
+        doc_text,
+        max_sentences=max_sentences,
+        max_windows=max_windows,
+    ):
+        sentence_count = len(split_doc_body_sentences(window_text, max_sentences=max_sentences))
+        _append_unit("title_plus_2sent" if sentence_count >= 2 else "title_plus_1sent", window_text)
+
+    if include_full_doc:
+        _append_unit("full_doc", format_doc_for_assemble_rerank(doc_text))
+    if not units:
+        _append_unit("full_doc", format_doc_for_assemble_rerank(doc_text))
+    return units
+
+
+_GAP_DATE_VALUE_PATTERN = re.compile(
+    r"\b(?:\d{4}|\d{1,2}\s+[a-z]+\s+\d{4}|[a-z]+\s+\d{1,2},?\s+\d{4})\b",
+    re.IGNORECASE,
+)
+
+
+def _normalized_text_contains_phrase(text: str, phrase: str) -> bool:
+    normalized_text = normalize_structure_text(text)
+    normalized_phrase = normalize_structure_text(phrase)
+    if not normalized_text or not normalized_phrase:
+        return False
+    return normalized_phrase in normalized_text
+
+
+def _matching_gap_entities_in_text(text: str,
+                                   entities: Sequence[str] | Set[str] | None,
+                                   *,
+                                   exclude_entities: Sequence[str] | Set[str] | None = None) -> List[str]:
+    normalized_excluded = normalize_entity_set(exclude_entities)
+    matches: List[str] = []
+    for entity in sorted(normalize_entity_set(entities)):
+        if entity in normalized_excluded:
+            continue
+        if _normalized_text_contains_phrase(text, entity):
+            matches.append(entity)
+    return matches
+
+
+def _gap_target_value_pattern_pass(slot: str, unit_text: str) -> bool:
+    normalized_slot = normalize_structure_text(slot)
+    normalized_text = normalize_structure_text(unit_text)
+    token_set = normalized_token_set(unit_text)
+    if not normalized_text:
+        return False
+    if normalized_slot in {"birth_date", "death_date"}:
+        return bool(_GAP_DATE_VALUE_PATTERN.search(normalized_text)) or bool(token_set & _ANSWER_SCENT_MONTH_TOKENS)
+    if normalized_slot == "birthplace":
+        return (
+            " born in " in f" {normalized_text} "
+            or " from " in f" {normalized_text} "
+            or bool(token_set & _ANSWER_SCENT_LOCATION_TOKENS)
+        )
+    if normalized_slot == "nationality":
+        return (
+            " nationality " in f" {normalized_text} "
+            or " citizen " in f" {normalized_text} "
+            or " country " in f" {normalized_text} "
+            or bool(token_set & {"american", "british", "french", "german", "italian", "canadian"})
+        )
+    if normalized_slot == "education":
+        return bool(token_set & {"school", "university", "college", "educated", "studied"})
+    return False
+
+
+def build_gap_evidence_units(doc_text: str,
+                             *,
+                             parent_doc_id: int | None = None,
+                             parent_title: str | None = None,
+                             doc_entities: Sequence[str] | Set[str] | None = None,
+                             anchor_entities: Sequence[str] | Set[str] | None = None,
+                             covered_entities: Sequence[str] | Set[str] | None = None,
+                             slot_cues: Sequence[str] | Set[str] | None = None,
+                             max_sentences: int = 8,
+                             max_windows: int = 16) -> List[Dict[str, object]]:
+    title = str(parent_title or extract_doc_title(doc_text) or "").strip()
+    sentences = split_doc_body_sentences(doc_text, max_sentences=max_sentences)
+    if not sentences:
+        sentences = [" ".join(str(doc_text or "").split()).strip()]
+
+    normalized_anchor_entities = normalize_entity_set(anchor_entities)
+    normalized_covered_entities = normalize_entity_set(covered_entities)
+    normalized_slot_cues = {
+        normalize_structure_text(slot_cue)
+        for slot_cue in (slot_cues or [])
+        if normalize_structure_text(slot_cue)
+    }
+    units: List[Dict[str, object]] = []
+    seen_units: Set[Tuple[str, str]] = set()
+
+    def _append_unit(unit_type: str, unit_body: str, start_index: int, end_index: int) -> None:
+        cleaned_body = " ".join(str(unit_body or "").split()).strip()
+        if not cleaned_body:
+            return
+        unit_text = f"{title}\n{cleaned_body}".strip() if title else cleaned_body
+        normalized_unit = normalize_structure_text(unit_text)
+        unit_key = (str(unit_type), normalized_unit)
+        if not normalized_unit or unit_key in seen_units:
+            return
+        seen_units.add(unit_key)
+        matched_anchors = _matching_gap_entities_in_text(unit_text, normalized_anchor_entities)
+        matched_non_anchor_entities = _matching_gap_entities_in_text(
+            unit_text,
+            doc_entities,
+            exclude_entities=normalized_anchor_entities | normalized_covered_entities,
+        )
+        matched_slot_cues = [
+            slot_cue
+            for slot_cue in sorted(normalized_slot_cues)
+            if _normalized_text_contains_phrase(unit_text, slot_cue)
+        ]
+        units.append({
+            "unit_type": str(unit_type),
+            "unit_text": unit_text,
+            "sentence_span": [int(start_index + 1), int(end_index + 1)],
+            "parent_doc_id": int(parent_doc_id) if parent_doc_id is not None else None,
+            "parent_title": title,
+            "contains_anchor": bool(matched_anchors),
+            "contains_slot_cue": bool(matched_slot_cues),
+            "contains_non_anchor_entity": bool(matched_non_anchor_entities),
+            "matched_anchor_entities": list(matched_anchors),
+            "matched_slot_cues": list(matched_slot_cues),
+            "matched_non_anchor_entities": list(matched_non_anchor_entities),
+        })
+
+    for sentence_index, sentence in enumerate(sentences[:max(int(max_sentences), 1)]):
+        _append_unit("title_plus_1sent", sentence, sentence_index, sentence_index)
+        if len(units) >= int(max_windows):
+            return units[:int(max_windows)]
+
+    for sentence_index in range(max(len(sentences) - 1, 0)):
+        _append_unit(
+            "title_plus_2sent",
+            f"{sentences[sentence_index]} {sentences[sentence_index + 1]}",
+            sentence_index,
+            sentence_index + 1,
+        )
+        if len(units) >= int(max_windows):
+            return units[:int(max_windows)]
+
+    return units[:int(max_windows)]
+
+
+def _gap_unit_rank_tuple(payload: Mapping[str, object], gap_type: str) -> Tuple[int, int, int, int, float, int]:
+    if str(gap_type or "") == "role_relation":
+        return (
+            1 if bool(payload.get("gap_unit_eligible", False)) else 0,
+            1 if bool(payload.get("gap_unit_anchor_pass", False)) else 0,
+            1 if bool(payload.get("gap_unit_slot_pass", False)) else 0,
+            1 if bool(payload.get("gap_unit_non_anchor_pass", False)) else 0,
+            float(payload.get("gap_unit_query_score_raw", 0.0) or 0.0),
+            1 if str(payload.get("gap_unit_type", "") or "") == "title_plus_2sent" else 0,
+        )
+    return (
+        1 if bool(payload.get("gap_unit_eligible", False)) else 0,
+        1 if bool(payload.get("gap_unit_anchor_pass", False)) else 0,
+        1 if bool(payload.get("gap_unit_slot_or_value_pass", False)) else 0,
+        1 if bool(payload.get("gap_unit_value_pass", False)) else 0,
+        float(payload.get("gap_unit_query_score_raw", 0.0) or 0.0),
+        1 if str(payload.get("gap_unit_type", "") or "") == "title_plus_2sent" else 0,
+    )
+
+
+def rerank_gap_expand_units(scored_candidates: Sequence[Mapping[str, object]],
+                            *,
+                            pool_docs: Sequence[str] | None,
+                            gap_state: Mapping[str, object],
+                            covered_entities: Sequence[str] | Set[str] | None,
+                            ce_reranker: Any = None,
+                            max_sentences: int = 8,
+                            max_windows: int = 16) -> Tuple[List[Dict[str, object]], Dict[str, object]]:
+    gap_type = str(gap_state.get("gap_type", "abstain") or "abstain")
+    micro_queries = [
+        str(micro_query).strip()
+        for micro_query in (gap_state.get("micro_queries", []) or [])
+        if str(micro_query).strip()
+    ]
+    slot_name = str(gap_state.get("gap_slot", "") or "")
+    slot_cues = list(gap_state.get("gap_slot_cues", []) or [])
+    unit_rows: List[Dict[str, object]] = []
+
+    for raw_row in scored_candidates:
+        row = dict(raw_row)
+        pool_position = int(row.get("pool_position", -1) or -1)
+        if pool_docs is None or pool_position < 0 or pool_position >= len(pool_docs):
+            continue
+        doc_text = str(pool_docs[pool_position] or "")
+        doc_id = int(row["doc_id"]) if row.get("doc_id") is not None else None
+        doc_title = str(row.get("doc_title", "") or extract_doc_title(doc_text))
+        doc_entities = normalize_entity_set(row.get("doc_entities", set()) or set())
+        doc_units = build_gap_evidence_units(
+            doc_text,
+            parent_doc_id=doc_id,
+            parent_title=doc_title,
+            doc_entities=doc_entities,
+            anchor_entities=gap_state.get("gap_anchors", []) or [],
+            covered_entities=covered_entities,
+            slot_cues=slot_cues,
+            max_sentences=max_sentences,
+            max_windows=max_windows,
+        )
+        for unit in doc_units:
+            unit_rows.append({
+                "pool_position": int(pool_position),
+                "doc_id": doc_id,
+                "doc_title": doc_title,
+                "structure_score": float(row.get("structure_score", 0.0) or 0.0),
+                "combined_score_raw": float(row.get("combined_score_raw", row.get("combined_score", 0.0)) or 0.0),
+                "gap_type": gap_type,
+                "gap_slot": slot_name,
+                **dict(unit),
+            })
+
+    if ce_reranker is not None and unit_rows and micro_queries:
+        pairs = [
+            [micro_query, str(unit_row.get("unit_text", "") or "")]
+            for unit_row in unit_rows
+            for micro_query in micro_queries
+        ]
+        raw_scores = ce_reranker.compute_score(pairs) if pairs else []
+        if isinstance(raw_scores, (int, float)):
+            raw_scores = [float(raw_scores)]
+        score_values = [_sigmoid_support_score(float(score)) for score in list(raw_scores)]
+    else:
+        score_values = []
+
+    score_index = 0
+    for unit_row in unit_rows:
+        best_query = ""
+        best_score = 0.0
+        if micro_queries:
+            for micro_query in micro_queries:
+                if score_values:
+                    query_score = float(score_values[score_index]) if score_index < len(score_values) else 0.0
+                    score_index += 1
+                else:
+                    query_score = _compute_lexical_support_score(micro_query, str(unit_row.get("unit_text", "") or ""))
+                if query_score > best_score:
+                    best_score = float(query_score)
+                    best_query = str(micro_query)
+
+        anchor_pass = bool(unit_row.get("contains_anchor", False))
+        slot_pass = bool(unit_row.get("contains_slot_cue", False))
+        non_anchor_pass = bool(unit_row.get("contains_non_anchor_entity", False))
+        value_pass = _gap_target_value_pattern_pass(slot_name, str(unit_row.get("unit_text", "") or ""))
+        slot_or_value_pass = bool(slot_pass or value_pass)
+        eligible = bool(anchor_pass and slot_or_value_pass and (non_anchor_pass if gap_type == "role_relation" else True))
+
+        unit_row.update({
+            "gap_unit_anchor_pass": bool(anchor_pass),
+            "gap_unit_slot_pass": bool(slot_pass),
+            "gap_unit_non_anchor_pass": bool(non_anchor_pass),
+            "gap_unit_value_pass": bool(value_pass),
+            "gap_unit_slot_or_value_pass": bool(slot_or_value_pass),
+            "gap_unit_eligible": bool(eligible),
+            "gap_unit_best_query": str(best_query),
+            "gap_unit_query_score": round(float(best_score), 4),
+            "gap_unit_query_score_raw": float(best_score),
+            "gap_unit_query_rate": round(float(best_score), 4),
+            "gap_unit_type": str(unit_row.get("unit_type", "") or ""),
+            "gap_unit_text": str(unit_row.get("unit_text", "") or ""),
+        })
+
+    best_unit_by_position: Dict[int, Dict[str, object]] = {}
+    for unit_row in unit_rows:
+        pool_position = int(unit_row.get("pool_position", -1) or -1)
+        current_best = best_unit_by_position.get(pool_position)
+        if current_best is None or _gap_unit_rank_tuple(unit_row, gap_type) > _gap_unit_rank_tuple(current_best, gap_type):
+            best_unit_by_position[pool_position] = dict(unit_row)
+
+    collapsed_rows: List[Dict[str, object]] = []
+    for raw_row in scored_candidates:
+        row = dict(raw_row)
+        pool_position = int(row.get("pool_position", -1) or -1)
+        best_unit = dict(best_unit_by_position.get(pool_position, {}))
+        collapsed_rows.append({
+            **row,
+            "gap_type": gap_type,
+            "gap_mode": str(gap_state.get("gap_mode", "") or ""),
+            "gap_filter_passed": bool(best_unit.get("gap_unit_eligible", False)),
+            "gap_score": round(float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+            "gap_score_raw": float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0),
+            "gap_gate_score": round(float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+            "gap_gate_score_raw": float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0),
+            "gap_combined_score": round(float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+            "gap_combined_score_raw": float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0),
+            "gap_unit_anchor_pass": bool(best_unit.get("gap_unit_anchor_pass", False)),
+            "gap_unit_slot_pass": bool(best_unit.get("gap_unit_slot_pass", False)),
+            "gap_unit_non_anchor_pass": bool(best_unit.get("gap_unit_non_anchor_pass", False)),
+            "gap_unit_value_pass": bool(best_unit.get("gap_unit_value_pass", False)),
+            "gap_unit_slot_or_value_pass": bool(best_unit.get("gap_unit_slot_or_value_pass", False)),
+            "gap_unit_eligible": bool(best_unit.get("gap_unit_eligible", False)),
+            "gap_unit_best_query": str(best_unit.get("gap_unit_best_query", "") or ""),
+            "gap_unit_query_score": round(float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+            "gap_unit_query_score_raw": float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0),
+            "gap_unit_query_rate": round(float(best_unit.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+            "gap_unit_type": str(best_unit.get("gap_unit_type", "") or ""),
+            "gap_unit_text": str(best_unit.get("gap_unit_text", "") or ""),
+            "gap_unit_sentence_span": list(best_unit.get("sentence_span", []) or []),
+            "gap_unit_matched_anchor_entities": list(best_unit.get("matched_anchor_entities", []) or []),
+            "gap_unit_matched_slot_cues": list(best_unit.get("matched_slot_cues", []) or []),
+            "gap_unit_matched_non_anchor_entities": list(best_unit.get("matched_non_anchor_entities", []) or []),
+        })
+
+    collapsed_rows.sort(
+        key=lambda item: (
+            _gap_unit_rank_tuple(item, gap_type),
+            float(item.get("combined_score_raw", 0.0) or 0.0),
+            float(item.get("structure_score", 0.0) or 0.0),
+            -int(item.get("pool_position", 0) or 0),
+        ),
+        reverse=True,
+    )
+
+    overall_top_unit = None
+    for candidate_unit in unit_rows:
+        if overall_top_unit is None or _gap_unit_rank_tuple(candidate_unit, gap_type) > _gap_unit_rank_tuple(overall_top_unit, gap_type):
+            overall_top_unit = dict(candidate_unit)
+
+    summary = {
+        "gap_unit_count": int(len(unit_rows)),
+        "gap_unit_eligible_count": int(sum(1 for unit_row in unit_rows if bool(unit_row.get("gap_unit_eligible", False)))),
+        "gap_unit_score_source": "cross_encoder" if ce_reranker is not None else "lexical_fallback",
+        "gap_unit_top_text": str((overall_top_unit or {}).get("unit_text", "") or ""),
+        "gap_unit_top_parent_title": str((overall_top_unit or {}).get("parent_title", "") or ""),
+        "gap_unit_top_parent_doc_id": (
+            int((overall_top_unit or {}).get("parent_doc_id"))
+            if (overall_top_unit or {}).get("parent_doc_id") is not None else None
+        ),
+        "gap_unit_top_anchor_pass": bool((overall_top_unit or {}).get("gap_unit_anchor_pass", False)),
+        "gap_unit_top_slot_pass": bool((overall_top_unit or {}).get("gap_unit_slot_pass", False)),
+        "gap_unit_top_non_anchor_pass": bool((overall_top_unit or {}).get("gap_unit_non_anchor_pass", False)),
+        "gap_unit_top_query_score": round(float((overall_top_unit or {}).get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+        "gap_unit_preview": [
+            {
+                "preview_rank": int(rank + 1),
+                "pool_position": int(unit_row.get("pool_position", -1) or -1),
+                "parent_title": str(unit_row.get("parent_title", "") or ""),
+                "unit_type": str(unit_row.get("unit_type", "") or ""),
+                "sentence_span": list(unit_row.get("sentence_span", []) or []),
+                "gap_unit_anchor_pass": bool(unit_row.get("gap_unit_anchor_pass", False)),
+                "gap_unit_slot_pass": bool(unit_row.get("gap_unit_slot_pass", False)),
+                "gap_unit_non_anchor_pass": bool(unit_row.get("gap_unit_non_anchor_pass", False)),
+                "gap_unit_eligible": bool(unit_row.get("gap_unit_eligible", False)),
+                "gap_unit_query_score": round(float(unit_row.get("gap_unit_query_score_raw", 0.0) or 0.0), 4),
+                "unit_text": str(unit_row.get("unit_text", "") or ""),
+            }
+            for rank, unit_row in enumerate(unit_rows[:5])
+        ],
+    }
+    return collapsed_rows, summary
+
+
+def build_propose_verify_claims(query: str,
+                                *,
+                                query_entities: Sequence[str] | Set[str] | None = None,
+                                max_claims: int = 2,
+                                query_tiers_override: Mapping[str, object] | None = None) -> Dict[str, object]:
+    claim_limit = max(int(max_claims), 1)
+    query_tiers = dict(query_tiers_override or build_query_tiers(
+        query,
+        query_entities=query_entities,
+        max_facets=claim_limit,
+        max_tiers=2,
+    ))
+    claims: List[Dict[str, object]] = []
+    for claim_rank, facet in enumerate(_flatten_query_tiers(query_tiers)[:claim_limit], start=1):
+        claims.append({
+            "claim_id": str(facet.get("facet_id") or f"c{claim_rank}"),
+            "claim_text": str(facet.get("facet_text") or "").strip() or f"Answer the question: {query}",
+            "claim_rank": int(claim_rank),
+            "claim_type": str(facet.get("facet_type") or "unknown"),
+            "tier_index": int(facet.get("tier_index", claim_rank - 1) or 0),
+        })
+    if not claims:
+        claims = [{
+            "claim_id": "c1",
+            "claim_text": f"Answer the question: {query}",
+            "claim_rank": 1,
+            "claim_type": "fallback",
+            "tier_index": 0,
+        }]
+        query_tiers = {
+            "mode": "flat_fallback",
+            "tiers": [
+                {
+                    "tier_id": "t1",
+                    "tier_index": 0,
+                    "tier_type": "flat",
+                    "facets": [
+                        {
+                            "facet_id": "c1",
+                            "facet_text": f"Answer the question: {query}",
+                            "facet_type": "fallback",
+                            "tier_index": 0,
+                        }
+                    ],
+                }
+            ],
+        }
+    return {
+        "claim_mode": str(query_tiers.get("mode") or "flat_fallback"),
+        "query_tiers": copy.deepcopy(list(query_tiers.get("tiers") or [])),
+        "claims": claims,
+    }
+
+
+def compute_claim_ce_witness_details(claims: Sequence[Mapping[str, object]],
+                                     *,
+                                     doc_positions: Sequence[int],
+                                     pool_docs: Sequence[str],
+                                     ce_reranker: Any = None,
+                                     max_sentences: int = 8,
+                                     max_windows: int = 16,
+                                     include_full_doc: bool = True) -> Dict[str, Dict[int, Dict[str, object]]]:
+    claim_list = [dict(claim) for claim in claims]
+    witness_units_by_doc = {
+        int(pos): build_witness_units(
+            pool_docs[int(pos)],
+            max_sentences=max_sentences,
+            max_windows=max_windows,
+            include_full_doc=include_full_doc,
+        )
+        for pos in doc_positions
+    }
+    witness_details: Dict[str, Dict[int, Dict[str, object]]] = {
+        str(claim.get("claim_id") or f"c{idx + 1}"): {
+            int(pos): {
+                "unit_type": None,
+                "unit_text": "",
+                "relevance_score": 0.0,
+            }
+            for pos in doc_positions
+        }
+        for idx, claim in enumerate(claim_list)
+    }
+
+    raw_scores: List[float] = []
+    if ce_reranker is not None:
+        pairs: List[List[str]] = []
+        for claim in claim_list:
+            claim_text = str(claim.get("claim_text") or "")
+            for pos in doc_positions:
+                for unit in witness_units_by_doc.get(int(pos), []):
+                    pairs.append([claim_text, str(unit.get("unit_text") or "")])
+        raw_scores = ce_reranker.compute_score(pairs) if pairs else []
+        if isinstance(raw_scores, (int, float)):
+            raw_scores = [float(raw_scores)]
+        raw_scores = [
+            _sigmoid_support_score(float(score))
+            for score in list(raw_scores)
+        ]
+
+    score_index = 0
+    for claim in claim_list:
+        claim_id = str(claim.get("claim_id") or "")
+        claim_text = str(claim.get("claim_text") or "")
+        for pos in doc_positions:
+            for unit in witness_units_by_doc.get(int(pos), []):
+                unit_text = str(unit.get("unit_text") or "")
+                relevance_score = (
+                    float(raw_scores[score_index])
+                    if ce_reranker is not None and score_index < len(raw_scores) else
+                    _compute_lexical_support_score(claim_text, unit_text)
+                )
+                if ce_reranker is not None:
+                    score_index += 1
+                current_best = float(witness_details[claim_id][int(pos)].get("relevance_score", 0.0) or 0.0)
+                if relevance_score > current_best:
+                    witness_details[claim_id][int(pos)] = {
+                        "unit_type": unit.get("unit_type"),
+                        "unit_text": unit_text,
+                        "relevance_score": round(float(relevance_score), 4),
+                    }
+    return witness_details
+
+
+def _select_action_swap_proposal_job(action_jobs: Sequence[Mapping[str, object]]) -> Dict[str, object] | None:
+    legal_jobs = filter_action_swap_legal_jobs(action_jobs, legality_mode="relaxed")
+    if not legal_jobs:
+        return None
+    return max(
+        legal_jobs,
+        key=lambda job: (
+            float(job.get("score_delta")) if job.get("score_delta") is not None else float("-inf"),
+            float(job.get("candidate_assemble_score")) if job.get("candidate_assemble_score") is not None else float("-inf"),
+            -int(job.get("candidate_pool_position", 0) or 0),
+            -int(job.get("replace_pool_position", 0) or 0),
+        ),
+    )
+
+
+def _run_claim_support_verifier_jobs(
+    support_jobs: Sequence[Mapping[str, object]],
+    *,
+    verifier_bundle: SetwiseLateRerankJudgeBundle | None,
+    max_doc_chars: int,
+    claim_support_results: Mapping[Tuple[str, int], Mapping[str, object]] | None = None,
+    max_completion_tokens: int = SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS,
+) -> List[Dict[str, object]]:
+    from run_swap_utility_judge import build_claim_support_messages, parse_claim_support_verifier_response
+
+    cached_results = {
+        (str(claim_id), int(doc_position)): dict(result)
+        for (claim_id, doc_position), result in (claim_support_results or {}).items()
+    }
+    verified_rows: List[Dict[str, object]] = []
+    for job in support_jobs:
+        raw_doc_position = job.get("doc_position", -1)
+        key = (
+            str(job.get("claim_id") or ""),
+            int(raw_doc_position) if raw_doc_position is not None else -1,
+        )
+        if key in cached_results:
+            parsed = dict(cached_results[key])
+            parsed.setdefault("parse_succeeded", parsed.get("verdict") is not None)
+            parsed.setdefault("reason", None)
+            parsed.setdefault("supported", str(parsed.get("verdict") or "").strip().lower() == "supported")
+            verified_rows.append({
+                **dict(job),
+                "verifier_response": "",
+                "verifier_trace": {
+                    "judge_status": "cached",
+                    "judge_error": None,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "finish_reason": "cached",
+                    "backend": "cached",
+                    "model": None,
+                },
+                "verifier_parsed": parsed,
+            })
+            continue
+
+        if verifier_bundle is None or verifier_bundle.infer_fn is None:
+            verified_rows.append({
+                **dict(job),
+                "verifier_response": "",
+                "verifier_trace": {
+                    "judge_status": "missing_verifier_bundle",
+                    "judge_error": "missing_verifier_bundle",
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "finish_reason": "missing_verifier_bundle",
+                    "backend": None,
+                    "model": None,
+                },
+                "verifier_parsed": {
+                    "raw_response": "",
+                    "parse_succeeded": False,
+                    "parse_errors": ["missing_verifier_bundle"],
+                    "verdict": None,
+                    "reason": None,
+                    "supported": False,
+                },
+            })
+            continue
+
+        response_text = ""
+        metadata: Dict[str, object] = {}
+        verifier_error = None
+        try:
+            response_text, metadata = verifier_bundle.infer_fn(
+                messages=build_claim_support_messages(
+                    question=str(job.get("question") or ""),
+                    claim_text=str(job.get("claim_text") or ""),
+                    doc_title=str(job.get("doc_title") or ""),
+                    witness_text=str(job.get("witness_text") or ""),
+                    witness_unit_type=str(job.get("witness_unit_type") or ""),
+                    max_doc_chars=int(max_doc_chars),
+                ),
+                model=verifier_bundle.model_name,
+                response_format=verifier_bundle.response_format,
+                max_completion_tokens=int(max_completion_tokens),
+                temperature=0.0,
+                top_p=1.0,
+            )
+        except Exception as exc:  # pragma: no cover - runtime guard
+            verifier_error = str(exc)
+            metadata = {
+                "judge_status": "verifier_exception",
+                "judge_error": verifier_error,
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "finish_reason": "exception",
+                "backend": verifier_bundle.backend,
+                "model": verifier_bundle.model_name,
+            }
+        verified_rows.append({
+            **dict(job),
+            "verifier_response": str(response_text or ""),
+            "verifier_trace": {
+                "judge_status": str(metadata.get("judge_status", "ok")),
+                "judge_error": metadata.get("judge_error") or verifier_error,
+                "prompt_tokens": int(metadata.get("prompt_tokens", 0) or 0),
+                "completion_tokens": int(metadata.get("completion_tokens", 0) or 0),
+                "finish_reason": str(metadata.get("finish_reason", "")),
+                "backend": metadata.get("backend"),
+                "model": metadata.get("model"),
+                "response_text_source": metadata.get("response_text_source"),
+            },
+            "verifier_parsed": parse_claim_support_verifier_response(str(response_text or "")),
+        })
+    return verified_rows
+
+
+def score_action_swap_propose_verify_jobs(
+    action_jobs: Sequence[Mapping[str, object]],
+    *,
+    query: str,
+    scaffold_positions: Sequence[int],
+    pool_docs: Sequence[str],
+    query_entities: Sequence[str] | Set[str] | None = None,
+    ce_reranker: Any = None,
+    verifier_bundle: SetwiseLateRerankJudgeBundle | None = None,
+    max_doc_chars: int = 320,
+    claim_support_results: Mapping[Tuple[str, int], Mapping[str, object]] | None = None,
+    query_tiers_override: Mapping[str, object] | None = None,
+) -> Dict[str, object]:
+    proposal_job = _select_action_swap_proposal_job(action_jobs)
+    claim_bundle = build_propose_verify_claims(
+        query,
+        query_entities=query_entities,
+        max_claims=2,
+        query_tiers_override=query_tiers_override,
+    )
+    claims = [dict(claim) for claim in list(claim_bundle.get("claims") or [])]
+    scaffold_list = [int(pos) for pos in scaffold_positions]
+    legal_jobs = filter_action_swap_legal_jobs(action_jobs, legality_mode="relaxed")
+    candidate_positions = sorted({
+        int(job.get("candidate_pool_position", -1))
+        for job in legal_jobs
+        if job.get("candidate_pool_position") is not None and int(job.get("candidate_pool_position", -1)) >= 0
+    })
+    doc_positions = sorted(set(scaffold_list) | set(candidate_positions))
+    witness_details = compute_claim_ce_witness_details(
+        claims,
+        doc_positions=doc_positions,
+        pool_docs=pool_docs,
+        ce_reranker=ce_reranker,
+    )
+
+    scaffold_support_jobs: List[Dict[str, object]] = []
+    for claim in claims:
+        claim_id = str(claim.get("claim_id") or "")
+        claim_text = str(claim.get("claim_text") or "")
+        for pos in scaffold_list:
+            witness = dict(witness_details.get(claim_id, {}).get(int(pos), {}))
+            scaffold_support_jobs.append({
+                "verification_type": "claim_support",
+                "question": str(query),
+                "claim_id": claim_id,
+                "claim_text": claim_text,
+                "doc_position": int(pos),
+                "doc_title": extract_doc_title(pool_docs[int(pos)]),
+                "witness_text": str(witness.get("unit_text") or ""),
+                "witness_unit_type": str(witness.get("unit_type") or ""),
+                "witness_relevance_score": float(witness.get("relevance_score", 0.0) or 0.0),
+            })
+    scaffold_support_rows = _run_claim_support_verifier_jobs(
+        scaffold_support_jobs,
+        verifier_bundle=verifier_bundle,
+        max_doc_chars=max_doc_chars,
+        claim_support_results=claim_support_results,
+    )
+    scaffold_support_lookup: Dict[Tuple[str, int], Dict[str, object]] = {
+        (
+            str(row.get("claim_id") or ""),
+            int(row.get("doc_position")) if row.get("doc_position") is not None else -1,
+        ): dict(row)
+        for row in scaffold_support_rows
+    }
+
+    claim_supports_before: List[Dict[str, object]] = []
+    earliest_unsupported_claim: Dict[str, object] | None = None
+    for claim in claims:
+        claim_id = str(claim.get("claim_id") or "")
+        supported_positions = [
+            int(pos)
+            for pos in scaffold_list
+            if bool(((scaffold_support_lookup.get((claim_id, int(pos)), {}).get("verifier_parsed") or {}).get("supported")))
+        ]
+        claim_supports_before.append({
+            "claim_id": claim_id,
+            "claim_text": str(claim.get("claim_text") or ""),
+            "claim_rank": int(claim.get("claim_rank", 0) or 0),
+            "supported_positions": list(supported_positions),
+            "supported_titles": [extract_doc_title(pool_docs[int(pos)]) for pos in supported_positions],
+        })
+        if earliest_unsupported_claim is None and not supported_positions:
+            earliest_unsupported_claim = dict(claim)
+
+    candidate_support_lookup: Dict[Tuple[str, int], Dict[str, object]] = {}
+    if earliest_unsupported_claim is not None and candidate_positions:
+        target_claim_id = str(earliest_unsupported_claim.get("claim_id") or "")
+        target_claim_text = str(earliest_unsupported_claim.get("claim_text") or "")
+        candidate_support_jobs: List[Dict[str, object]] = []
+        for pos in candidate_positions:
+            witness = dict(witness_details.get(target_claim_id, {}).get(int(pos), {}))
+            candidate_support_jobs.append({
+                "verification_type": "claim_support",
+                "question": str(query),
+                "claim_id": target_claim_id,
+                "claim_text": target_claim_text,
+                "doc_position": int(pos),
+                "doc_title": extract_doc_title(pool_docs[int(pos)]),
+                "witness_text": str(witness.get("unit_text") or ""),
+                "witness_unit_type": str(witness.get("unit_type") or ""),
+                "witness_relevance_score": float(witness.get("relevance_score", 0.0) or 0.0),
+            })
+        candidate_support_rows = _run_claim_support_verifier_jobs(
+            candidate_support_jobs,
+            verifier_bundle=verifier_bundle,
+            max_doc_chars=max_doc_chars,
+            claim_support_results=claim_support_results,
+        )
+        candidate_support_lookup = {
+            (
+                str(row.get("claim_id") or ""),
+                int(row.get("doc_position")) if row.get("doc_position") is not None else -1,
+            ): dict(row)
+            for row in candidate_support_rows
+        }
+
+    earlier_claim_ids: List[str] = []
+    if earliest_unsupported_claim is not None:
+        earliest_rank = int(earliest_unsupported_claim.get("claim_rank", 0) or 0)
+        earlier_claim_ids = [
+            str(claim.get("claim_id") or "")
+            for claim in claims
+            if int(claim.get("claim_rank", 0) or 0) < earliest_rank
+        ]
+
+    scored_jobs: List[Dict[str, object]] = []
+    for job in legal_jobs:
+        raw_candidate_position = job.get("candidate_pool_position", -1)
+        raw_replace_position = job.get("replace_pool_position", -1)
+        candidate_position = int(raw_candidate_position) if raw_candidate_position is not None else -1
+        replace_position = int(raw_replace_position) if raw_replace_position is not None else -1
+        candidate_claim_row = (
+            dict(candidate_support_lookup.get((str(earliest_unsupported_claim.get("claim_id") or ""), candidate_position), {}))
+            if earliest_unsupported_claim is not None else
+            {}
+        )
+        candidate_verifier_parsed = dict(candidate_claim_row.get("verifier_parsed") or {})
+        candidate_supported = bool(candidate_verifier_parsed.get("supported"))
+        unique_support_claim_ids: List[str] = []
+        for claim_id in earlier_claim_ids:
+            replace_row = dict(scaffold_support_lookup.get((claim_id, replace_position), {}))
+            replace_supported = bool((replace_row.get("verifier_parsed") or {}).get("supported"))
+            if not replace_supported:
+                continue
+            other_supported = any(
+                bool((scaffold_support_lookup.get((claim_id, int(pos)), {}).get("verifier_parsed") or {}).get("supported"))
+                for pos in scaffold_list
+                if int(pos) != int(replace_position)
+            )
+            if not other_supported:
+                unique_support_claim_ids.append(str(claim_id))
+
+        if earliest_unsupported_claim is None:
+            skip_reason = "no_unsupported_claim"
+        elif not candidate_supported:
+            skip_reason = "gain_verifier_reject"
+        elif unique_support_claim_ids:
+            skip_reason = "preservation_verifier_reject"
+        else:
+            skip_reason = None
+        scored_jobs.append({
+            **dict(job),
+            "claim_mode": str(claim_bundle.get("claim_mode") or "flat_fallback"),
+            "claims": copy.deepcopy(claims),
+            "query_tiers": copy.deepcopy(list(claim_bundle.get("query_tiers") or [])),
+            "query_tier_mode": str(claim_bundle.get("claim_mode") or "flat_fallback"),
+            "earliest_unsupported_claim_id": (
+                str(earliest_unsupported_claim.get("claim_id") or "")
+                if earliest_unsupported_claim is not None else None
+            ),
+            "earliest_unsupported_claim_text": (
+                str(earliest_unsupported_claim.get("claim_text") or "")
+                if earliest_unsupported_claim is not None else None
+            ),
+            "claim_supports_before": copy.deepcopy(claim_supports_before),
+            "candidate_best_witness": copy.deepcopy(dict(
+                witness_details.get(
+                    str(earliest_unsupported_claim.get("claim_id") or ""),
+                    {},
+                ).get(candidate_position, {})
+            )) if earliest_unsupported_claim is not None else {},
+            "gain_verifier_parsed": candidate_verifier_parsed,
+            "gain_verifier_verdict": str(candidate_verifier_parsed.get("verdict") or "") or None,
+            "gain_verifier_reason": str(candidate_verifier_parsed.get("reason") or "") or None,
+            "preservation_unique_support_claim_ids": list(unique_support_claim_ids),
+            "action_should_swap": skip_reason is None,
+            "action_skip_reason": skip_reason,
+        })
+
+    proposal_key = None
+    if proposal_job is not None:
+        proposal_key = (
+            int(proposal_job.get("candidate_pool_position")) if proposal_job.get("candidate_pool_position") is not None else -1,
+            int(proposal_job.get("replace_pool_position")) if proposal_job.get("replace_pool_position") is not None else -1,
+        )
+    return {
+        "claim_mode": str(claim_bundle.get("claim_mode") or "flat_fallback"),
+        "claims": claims,
+        "query_tiers": copy.deepcopy(list(claim_bundle.get("query_tiers") or [])),
+        "proposal_key": proposal_key,
+        "scaffold_support_rows": scaffold_support_rows,
+        "claim_supports_before": claim_supports_before,
+        "scored_jobs": scored_jobs,
+    }
+
+
+def select_action_swap_propose_verify(
+    action_jobs: Sequence[Mapping[str, object]],
+    *,
+    query: str,
+    scaffold_positions: Sequence[int],
+    pool_docs: Sequence[str],
+    query_entities: Sequence[str] | Set[str] | None = None,
+    ce_reranker: Any = None,
+    verifier_bundle: SetwiseLateRerankJudgeBundle | None = None,
+    max_doc_chars: int = 320,
+    claim_support_results: Mapping[Tuple[str, int], Mapping[str, object]] | None = None,
+    query_tiers_override: Mapping[str, object] | None = None,
+    action_mode: str = "action_swap_propose_verify",
+) -> Dict[str, object]:
+    before_positions = [int(pos) for pos in scaffold_positions]
+    decision: Dict[str, object] = {
+        "action_mode": str(action_mode),
+        "action_legality_mode": "dedup_only",
+        "action_executed": False,
+        "action_type": "keep",
+        "action_candidate_pool_position": None,
+        "action_candidate_doc_id": None,
+        "action_replace_pool_position": None,
+        "action_replace_doc_id": None,
+        "action_score_delta": None,
+        "action_legal_action_count": 0,
+        "action_total_jobs": int(len(action_jobs)),
+        "action_skip_reason": "no_legal_actions",
+        "action_gate_verdict": None,
+        "action_gate_confidence": None,
+        "action_gate_reason": None,
+        "action_gate_source": "propose_verify_claim_support",
+        "action_gate_score": None,
+        "action_margin": None,
+        "query_dependency_graph": {},
+        "query_dependency_mode": None,
+        "query_tiers": [],
+        "query_tier_mode": "flat_fallback",
+        "claims": [],
+        "claim_mode": "flat_fallback",
+        "proposal_action_present": False,
+        "proposal_candidate_pool_position": None,
+        "proposal_replace_pool_position": None,
+        "earliest_unsupported_claim_id": None,
+        "earliest_unsupported_claim_text": None,
+        "gain_verifier_verdict": None,
+        "gain_verifier_reason": None,
+        "preservation_unique_support_claim_ids": [],
+        "candidate_best_witness": {},
+        "claim_supports_before": [],
+        "final_front_positions_before_action": list(before_positions),
+        "final_front_positions_after_action": list(before_positions),
+    }
+    legal_jobs = filter_action_swap_legal_jobs(action_jobs, legality_mode="relaxed")
+    decision["action_legal_action_count"] = int(len(legal_jobs))
+    if not legal_jobs:
+        return decision
+
+    score_bundle = score_action_swap_propose_verify_jobs(
+        legal_jobs,
+        query=query,
+        scaffold_positions=before_positions,
+        pool_docs=pool_docs,
+        query_entities=query_entities,
+        ce_reranker=ce_reranker,
+        verifier_bundle=verifier_bundle,
+        max_doc_chars=max_doc_chars,
+        claim_support_results=claim_support_results,
+        query_tiers_override=query_tiers_override,
+    )
+    decision["claims"] = copy.deepcopy(list(score_bundle.get("claims") or []))
+    decision["claim_mode"] = str(score_bundle.get("claim_mode") or "flat_fallback")
+    decision["query_tier_mode"] = str(score_bundle.get("claim_mode") or "flat_fallback")
+    decision["query_tiers"] = copy.deepcopy(list(score_bundle.get("query_tiers") or []))
+    decision["claim_supports_before"] = copy.deepcopy(list(score_bundle.get("claim_supports_before") or []))
+
+    proposal_key = score_bundle.get("proposal_key")
+    if proposal_key is None:
+        return decision
+    decision["proposal_action_present"] = True
+    decision["proposal_candidate_pool_position"] = int(proposal_key[0])
+    decision["proposal_replace_pool_position"] = int(proposal_key[1])
+
+    scored_jobs = {
+        (
+            int(job.get("candidate_pool_position")) if job.get("candidate_pool_position") is not None else -1,
+            int(job.get("replace_pool_position")) if job.get("replace_pool_position") is not None else -1,
+        ): dict(job)
+        for job in list(score_bundle.get("scored_jobs") or [])
+    }
+    proposal_job = dict(scored_jobs.get(tuple(proposal_key), {}))
+    if not proposal_job:
+        decision["action_skip_reason"] = "proposal_missing"
+        return decision
+
+    decision["earliest_unsupported_claim_id"] = proposal_job.get("earliest_unsupported_claim_id")
+    decision["earliest_unsupported_claim_text"] = proposal_job.get("earliest_unsupported_claim_text")
+    decision["gain_verifier_verdict"] = proposal_job.get("gain_verifier_verdict")
+    decision["gain_verifier_reason"] = proposal_job.get("gain_verifier_reason")
+    decision["candidate_best_witness"] = copy.deepcopy(dict(proposal_job.get("candidate_best_witness") or {}))
+    decision["preservation_unique_support_claim_ids"] = list(proposal_job.get("preservation_unique_support_claim_ids") or [])
+    decision["action_gate_verdict"] = (
+        str(proposal_job.get("gain_verifier_verdict") or "") or None
+        if proposal_job.get("action_skip_reason") != "preservation_verifier_reject" else
+        "preservation_reject"
+    )
+    decision["action_gate_reason"] = (
+        proposal_job.get("gain_verifier_reason")
+        if proposal_job.get("action_skip_reason") != "preservation_verifier_reject" else
+        f"replacee_is_unique_supporter:{','.join(decision['preservation_unique_support_claim_ids'])}"
+    )
+
+    if not bool(proposal_job.get("action_should_swap")):
+        decision["action_skip_reason"] = str(proposal_job.get("action_skip_reason") or "verifier_reject")
+        return decision
+
+    final_positions = apply_single_slot_preserving_swap(
+        scaffold_positions=before_positions,
+        candidate_position=int(proposal_job["candidate_pool_position"]),
+        replace_position=int(proposal_job["replace_pool_position"]),
+    )
+    decision.update({
+        "action_executed": True,
+        "action_type": "swap",
+        "action_candidate_pool_position": int(proposal_job["candidate_pool_position"]),
+        "action_candidate_doc_id": proposal_job.get("candidate_doc_id"),
+        "action_replace_pool_position": int(proposal_job["replace_pool_position"]),
+        "action_replace_doc_id": proposal_job.get("replace_doc_id"),
+        "action_score_delta": round(float(proposal_job.get("score_delta", 0.0) or 0.0), 4),
+        "action_skip_reason": None,
+        "final_front_positions_after_action": list(final_positions),
+    })
+    return decision
+
+
+def _focus_facet_tokens(facet_text: str) -> Set[str]:
+    facet_tokens = _tokenize_support_text(facet_text)
+    return {
+        token
+        for token in facet_tokens
+        if token not in _ANSWER_SCENT_ENTITY_STOPWORDS
+    }
+
+
+def _compute_answer_type_cue_score(answer_type: str, unit_text: str) -> float:
+    normalized_unit = normalize_structure_text(unit_text)
+    if not normalized_unit:
+        return 0.0
+    unit_tokens = _tokenize_support_text(unit_text)
+    if answer_type == "count":
+        return 1.0 if re.search(r"\b\d+\b", unit_text) else 0.0
+    if answer_type == "date":
+        if re.search(r"\b(1[0-9]{3}|20[0-9]{2}|21[0-9]{2})\b", unit_text):
+            return 1.0
+        if unit_tokens & _ANSWER_SCENT_MONTH_TOKENS:
+            return 0.9
+        if any(token in unit_tokens for token in {"year", "date", "born", "died", "released", "signed", "founded"}):
+            return 0.6
+        return 0.0
+    if answer_type == "location":
+        if " born in " in f" {normalized_unit} " or " located in " in f" {normalized_unit} ":
+            return 1.0
+        if unit_tokens & _ANSWER_SCENT_LOCATION_TOKENS:
+            return 0.75
+        return 0.0
+    if answer_type == "person":
+        if unit_tokens & _ANSWER_SCENT_PERSON_TOKENS:
+            return 0.75
+        if re.search(r"\b[A-Z][\w'.-]*(?:\s+[A-Z][\w'.-]*)+\b", unit_text):
+            return 0.6
+        return 0.0
+    if re.search(r"\b[A-Z][\w'.-]*(?:\s+[A-Z][\w'.-]*)+\b", unit_text):
+        return 0.55
+    return 0.2 if unit_tokens else 0.0
+
+
+def compute_answer_scent_score(facet_text: str, unit_text: str) -> float:
+    focus_tokens = _focus_facet_tokens(facet_text)
+    unit_tokens = _tokenize_support_text(unit_text)
+    overlap = float(len(focus_tokens & unit_tokens) / max(len(focus_tokens), 1)) if focus_tokens else 0.0
+    answer_type = _guess_answer_type_label(facet_text)
+    cue_score = _compute_answer_type_cue_score(answer_type, unit_text)
+    return float(np.clip(0.45 * overlap + 0.55 * cue_score, 0.0, 1.0))
+
+
+def compute_doc_facet_witness_matrix(query_tiers: Mapping[str, object],
+                                     *,
+                                     doc_positions: Sequence[int],
+                                     pool_docs: Sequence[str],
+                                     ce_reranker: Any = None,
+                                     max_sentences: int = 8,
+                                     max_windows: int = 16,
+                                     include_full_doc: bool = True) -> Tuple[Dict[str, Dict[int, float]], Dict[str, Dict[int, Dict[str, object]]]]:
+    facets = _flatten_query_tiers(query_tiers)
+    witness_units_by_doc = {
+        int(pos): build_witness_units(
+            pool_docs[int(pos)],
+            max_sentences=max_sentences,
+            max_windows=max_windows,
+            include_full_doc=include_full_doc,
+        )
+        for pos in doc_positions
+    }
+    witness_scores: Dict[str, Dict[int, float]] = {
+        str(facet["facet_id"]): {int(pos): 0.0 for pos in doc_positions}
+        for facet in facets
+    }
+    witness_details: Dict[str, Dict[int, Dict[str, object]]] = {
+        str(facet["facet_id"]): {
+            int(pos): {
+                "unit_type": None,
+                "unit_text": "",
+                "witness_score": 0.0,
+                "relevance_score": 0.0,
+                "answerability_score": 0.0,
+            }
+            for pos in doc_positions
+        }
+        for facet in facets
+    }
+
+    relevance_scores_by_pair: List[float] = []
+    pair_index: List[Tuple[str, int, int]] = []
+    if ce_reranker is not None:
+        pairs: List[List[str]] = []
+        for facet in facets:
+            facet_id = str(facet["facet_id"])
+            facet_text = str(facet["facet_text"])
+            for pos in doc_positions:
+                for unit_index, unit in enumerate(witness_units_by_doc.get(int(pos), [])):
+                    pairs.append([facet_text, str(unit.get("unit_text") or "")])
+                    pair_index.append((facet_id, int(pos), int(unit_index)))
+        raw_scores = ce_reranker.compute_score(pairs) if pairs else []
+        if isinstance(raw_scores, (int, float)):
+            raw_scores = [raw_scores]
+        relevance_scores_by_pair = [
+            _sigmoid_support_score(float(score))
+            for score in list(raw_scores)
+        ]
+
+    relevance_index = 0
+    for facet in facets:
+        facet_id = str(facet["facet_id"])
+        facet_text = str(facet["facet_text"])
+        for pos in doc_positions:
+            for unit in witness_units_by_doc.get(int(pos), []):
+                unit_text = str(unit.get("unit_text") or "")
+                relevance_score = (
+                    float(relevance_scores_by_pair[relevance_index])
+                    if ce_reranker is not None and relevance_index < len(relevance_scores_by_pair) else
+                    _compute_lexical_support_score(facet_text, unit_text)
+                )
+                if ce_reranker is not None:
+                    relevance_index += 1
+                answerability_score = compute_answer_scent_score(facet_text, unit_text)
+                witness_score = float(min(relevance_score, answerability_score))
+                if witness_score > float(witness_scores[facet_id].get(int(pos), 0.0) or 0.0):
+                    witness_scores[facet_id][int(pos)] = witness_score
+                    witness_details[facet_id][int(pos)] = {
+                        "unit_type": unit.get("unit_type"),
+                        "unit_text": unit_text,
+                        "witness_score": round(float(witness_score), 4),
+                        "relevance_score": round(float(relevance_score), 4),
+                        "answerability_score": round(float(answerability_score), 4),
+                    }
+            if ce_reranker is None:
+                continue
+    return witness_scores, witness_details
+
+
+def summarize_query_tier_supports(query_tiers: Mapping[str, object],
+                                  *,
+                                  positions: Sequence[int],
+                                  witness_scores: Mapping[str, Mapping[int, float]],
+                                  witness_details: Mapping[str, Mapping[int, Mapping[str, object]]],
+                                  pool_docs: Sequence[str]) -> List[Dict[str, object]]:
+    summaries: List[Dict[str, object]] = []
+    for facet in _flatten_query_tiers(query_tiers):
+        facet_id = str(facet["facet_id"])
+        ranked_positions = sorted(
+            [int(pos) for pos in positions],
+            key=lambda pos: (
+                -float(witness_scores.get(facet_id, {}).get(int(pos), 0.0) or 0.0),
+                int(pos),
+            ),
+        )
+        top_position = ranked_positions[0] if ranked_positions else None
+        second_position = ranked_positions[1] if len(ranked_positions) >= 2 else None
+        summaries.append({
+            "facet_id": facet_id,
+            "facet_text": str(facet["facet_text"]),
+            "facet_type": str(facet.get("facet_type") or "unknown"),
+            "tier_index": int(facet.get("tier_index", 0) or 0),
+            "best_support": round(float(witness_scores.get(facet_id, {}).get(int(top_position), 0.0) or 0.0), 4) if top_position is not None else 0.0,
+            "backup_support": round(float(witness_scores.get(facet_id, {}).get(int(second_position), 0.0) or 0.0), 4) if second_position is not None else 0.0,
+            "best_position": int(top_position) if top_position is not None else None,
+            "backup_position": int(second_position) if second_position is not None else None,
+            "best_title": extract_doc_title(pool_docs[int(top_position)]) if top_position is not None else None,
+            "backup_title": extract_doc_title(pool_docs[int(second_position)]) if second_position is not None else None,
+            "best_witness": dict(witness_details.get(facet_id, {}).get(int(top_position), {})) if top_position is not None else {},
+        })
+    return summaries
+
+
+def _compute_facet_backup_values(scaffold_positions: Sequence[int],
+                                 *,
+                                 query_tiers: Mapping[str, object],
+                                 witness_scores: Mapping[str, Mapping[int, float]]) -> Dict[str, Dict[str, object]]:
+    backup_values: Dict[str, Dict[str, object]] = {}
+    for facet in _flatten_query_tiers(query_tiers):
+        facet_id = str(facet["facet_id"])
+        ranked = sorted(
+            [
+                (int(pos), float(witness_scores.get(facet_id, {}).get(int(pos), 0.0) or 0.0))
+                for pos in scaffold_positions
+            ],
+            key=lambda item: (-float(item[1]), int(item[0])),
+        )
+        best_position = ranked[0][0] if ranked else None
+        best_support = ranked[0][1] if ranked else 0.0
+        second_position = ranked[1][0] if len(ranked) >= 2 else None
+        second_support = ranked[1][1] if len(ranked) >= 2 else 0.0
+        backup_values[facet_id] = {
+            "best_position": best_position,
+            "best_support": float(best_support),
+            "backup_position": second_position,
+            "backup_support": float(second_support),
+        }
+    return backup_values
+
+
+def _compute_facet_incumbent_loss(facet_id: str,
+                                  incumbent_position: int,
+                                  *,
+                                  scaffold_positions: Sequence[int],
+                                  witness_scores: Mapping[str, Mapping[int, float]]) -> float:
+    ranked = sorted(
+        [
+            (int(pos), float(witness_scores.get(facet_id, {}).get(int(pos), 0.0) or 0.0))
+            for pos in scaffold_positions
+        ],
+        key=lambda item: (-float(item[1]), int(item[0])),
+    )
+    if not ranked:
+        return 0.0
+    best_support = float(ranked[0][1])
+    incumbent_support = float(witness_scores.get(facet_id, {}).get(int(incumbent_position), 0.0) or 0.0)
+    if incumbent_support + 1e-9 < best_support:
+        return 0.0
+    best_other = max(
+        [
+            float(score)
+            for pos, score in ranked
+            if int(pos) != int(incumbent_position)
+        ] or [0.0]
+    )
+    return float(max(best_support - best_other, 0.0))
+
+
+def score_action_swap_tiered_witness_jobs(action_jobs: Sequence[Mapping[str, object]],
+                                          *,
+                                          query: str,
+                                          scaffold_positions: Sequence[int],
+                                          pool_docs: Sequence[str],
+                                          query_entities: Sequence[str] | Set[str] | None = None,
+                                          ce_reranker: Any = None,
+                                          query_tiers_override: Mapping[str, object] | None = None) -> Dict[str, object]:
+    query_tiers = dict(query_tiers_override or build_query_tiers(query, query_entities=query_entities))
+    scaffold_list = [int(pos) for pos in scaffold_positions]
+    candidate_positions = sorted({
+        int(job.get("candidate_pool_position", -1))
+        for job in action_jobs
+        if job.get("candidate_pool_position") is not None and int(job.get("candidate_pool_position", -1)) >= 0
+    })
+    doc_positions = sorted(set(scaffold_list) | set(candidate_positions))
+    witness_scores, witness_details = compute_doc_facet_witness_matrix(
+        query_tiers,
+        doc_positions=doc_positions,
+        pool_docs=pool_docs,
+        ce_reranker=ce_reranker,
+    )
+    scaffold_backups = _compute_facet_backup_values(
+        scaffold_list,
+        query_tiers=query_tiers,
+        witness_scores=witness_scores,
+    )
+    before_supports = summarize_query_tier_supports(
+        query_tiers,
+        positions=scaffold_list,
+        witness_scores=witness_scores,
+        witness_details=witness_details,
+        pool_docs=pool_docs,
+    )
+
+    facets = _flatten_query_tiers(query_tiers)
+    candidate_best_by_position: Dict[int, Dict[str, object]] = {}
+    for candidate_position in candidate_positions:
+        chosen_facet: Dict[str, object] | None = None
+        for tier in list(query_tiers.get("tiers") or []):
+            tier_index = int(tier.get("tier_index", 0) or 0)
+            tier_facets = [
+                facet for facet in facets
+                if int(facet.get("tier_index", 0) or 0) == tier_index
+            ]
+            tier_rows: List[Dict[str, object]] = []
+            for facet in tier_facets:
+                facet_id = str(facet["facet_id"])
+                best_support = float(scaffold_backups.get(facet_id, {}).get("best_support", 0.0) or 0.0)
+                candidate_support = float(witness_scores.get(facet_id, {}).get(int(candidate_position), 0.0) or 0.0)
+                gain = float(candidate_support - best_support)
+                tier_rows.append({
+                    "facet_id": facet_id,
+                    "facet_text": str(facet["facet_text"]),
+                    "facet_type": str(facet.get("facet_type") or "unknown"),
+                    "tier_index": tier_index,
+                    "candidate_support": candidate_support,
+                    "best_support": best_support,
+                    "backup_support": float(scaffold_backups.get(facet_id, {}).get("backup_support", 0.0) or 0.0),
+                    "gain": gain,
+                    "best_witness": dict(witness_details.get(facet_id, {}).get(int(candidate_position), {})),
+                })
+            positive_rows = [row for row in tier_rows if float(row["gain"]) > 0.0]
+            if not positive_rows:
+                continue
+            chosen_facet = max(
+                positive_rows,
+                key=lambda row: (
+                    float(row["gain"]),
+                    float(row["candidate_support"]),
+                    str(row["facet_id"]),
+                ),
+            )
+            break
+        if chosen_facet is None:
+            candidate_best_by_position[int(candidate_position)] = {
+                "candidate_pool_position": int(candidate_position),
+                "bottleneck_tier_index": None,
+                "target_facet_id": None,
+                "target_facet_text": None,
+                "target_facet_type": None,
+                "target_candidate_gain": 0.0,
+                "target_candidate_support": 0.0,
+                "target_best_support": 0.0,
+                "target_backup_support": 0.0,
+                "candidate_best_witness": {},
+            }
+            continue
+        candidate_best_by_position[int(candidate_position)] = {
+            "candidate_pool_position": int(candidate_position),
+            "bottleneck_tier_index": int(chosen_facet["tier_index"]),
+            "target_facet_id": str(chosen_facet["facet_id"]),
+            "target_facet_text": str(chosen_facet["facet_text"]),
+            "target_facet_type": str(chosen_facet["facet_type"]),
+            "target_candidate_gain": round(float(chosen_facet["gain"]), 4),
+            "target_candidate_support": round(float(chosen_facet["candidate_support"]), 4),
+            "target_best_support": round(float(chosen_facet["best_support"]), 4),
+            "target_backup_support": round(float(chosen_facet["backup_support"]), 4),
+            "candidate_best_witness": dict(chosen_facet["best_witness"]),
+        }
+
+    scored_jobs: List[Dict[str, object]] = []
+    for job in action_jobs:
+        candidate_position = int(job["candidate_pool_position"])
+        replace_position = int(job["replace_pool_position"])
+        candidate_summary = dict(candidate_best_by_position.get(candidate_position, {}))
+        target_facet_id = candidate_summary.get("target_facet_id")
+        bottleneck_tier_index = candidate_summary.get("bottleneck_tier_index")
+        earlier_tier_losses = 0.0
+        same_tier_collateral = 0.0
+        target_loss = 0.0
+        replacee_rows: List[Dict[str, object]] = []
+        if target_facet_id is not None and bottleneck_tier_index is not None:
+            for facet in facets:
+                facet_id = str(facet["facet_id"])
+                facet_loss = _compute_facet_incumbent_loss(
+                    facet_id,
+                    replace_position,
+                    scaffold_positions=scaffold_list,
+                    witness_scores=witness_scores,
+                )
+                replacee_rows.append({
+                    "facet_id": facet_id,
+                    "tier_index": int(facet.get("tier_index", 0) or 0),
+                    "loss": round(float(facet_loss), 4),
+                })
+                if int(facet.get("tier_index", 0) or 0) < int(bottleneck_tier_index):
+                    earlier_tier_losses += float(facet_loss)
+                elif facet_id == str(target_facet_id):
+                    target_loss += float(facet_loss)
+                elif int(facet.get("tier_index", 0) or 0) == int(bottleneck_tier_index):
+                    same_tier_collateral += float(facet_loss)
+        gain = float(candidate_summary.get("target_candidate_gain", 0.0) or 0.0)
+        should_swap = (
+            bool(target_facet_id)
+            and gain > float(earlier_tier_losses + target_loss)
+        )
+        after_positions = list(job.get("swapped_positions") or apply_single_slot_preserving_swap(
+            scaffold_list,
+            candidate_position,
+            replace_position,
+        ))
+        after_supports = summarize_query_tier_supports(
+            query_tiers,
+            positions=after_positions,
+            witness_scores=witness_scores,
+            witness_details=witness_details,
+            pool_docs=pool_docs,
+        )
+        scored_jobs.append({
+            **dict(job),
+            "query_tier_mode": str(query_tiers.get("mode") or "flat_fallback"),
+            "query_tiers": copy.deepcopy(list(query_tiers.get("tiers") or [])),
+            "bottleneck_tier_index": bottleneck_tier_index,
+            "target_facet_id": target_facet_id,
+            "target_facet_text": candidate_summary.get("target_facet_text"),
+            "target_facet_type": candidate_summary.get("target_facet_type"),
+            "target_candidate_gain": round(float(gain), 4),
+            "target_candidate_support": candidate_summary.get("target_candidate_support"),
+            "target_best_support": candidate_summary.get("target_best_support"),
+            "target_backup_support": candidate_summary.get("target_backup_support"),
+            "candidate_best_witness": copy.deepcopy(dict(candidate_summary.get("candidate_best_witness") or {})),
+            "replacee_loss_earlier_tiers": round(float(earlier_tier_losses), 4),
+            "replacee_loss_same_tier": round(float(same_tier_collateral), 4),
+            "replacee_loss_target_facet": round(float(target_loss), 4),
+            "replacee_facet_losses": replacee_rows,
+            "swap_gain_vs_loss": round(float(gain - (earlier_tier_losses + target_loss)), 4),
+            "action_should_swap": bool(should_swap),
+            "facet_supports_before": copy.deepcopy(before_supports),
+            "facet_supports_after": copy.deepcopy(after_supports),
+        })
+
+    return {
+        "query_tiers": query_tiers,
+        "query_tier_mode": str(query_tiers.get("mode") or "flat_fallback"),
+        "scored_jobs": scored_jobs,
+        "facet_supports_before": before_supports,
+        "witness_scores": witness_scores,
+        "witness_details": witness_details,
+    }
+
+
+def select_action_swap_tiered_witness(action_jobs: Sequence[Mapping[str, object]],
+                                      *,
+                                      query: str,
+                                      scaffold_positions: Sequence[int],
+                                      pool_docs: Sequence[str],
+                                      query_entities: Sequence[str] | Set[str] | None = None,
+                                      ce_reranker: Any = None,
+                                      action_mode: str = "action_swap_tiered_witness",
+                                      query_tiers_override: Mapping[str, object] | None = None) -> Dict[str, object]:
+    before_positions = [int(pos) for pos in scaffold_positions]
+    decision: Dict[str, object] = {
+        "action_mode": str(action_mode),
+        "action_legality_mode": "dedup_only",
+        "action_executed": False,
+        "action_type": "keep",
+        "action_candidate_pool_position": None,
+        "action_candidate_doc_id": None,
+        "action_replace_pool_position": None,
+        "action_replace_doc_id": None,
+        "action_score_delta": None,
+        "action_legal_action_count": 0,
+        "action_total_jobs": int(len(action_jobs)),
+        "action_skip_reason": "no_legal_actions",
+        "action_gate_source": "tier_aware_bottleneck_witness",
+        "action_gate_score": None,
+        "action_margin": None,
+        "query_dependency_graph": {},
+        "query_dependency_mode": None,
+        "query_tiers": [],
+        "query_tier_mode": "flat_fallback",
+        "facet_supports_before": [],
+        "facet_supports_after": [],
+        "incumbent_attributions": [],
+        "executed_action_delta": None,
+        "bottleneck_tier_index": None,
+        "target_facet_id": None,
+        "target_facet_text": None,
+        "target_candidate_gain": None,
+        "replacee_loss_earlier_tiers": None,
+        "replacee_loss_same_tier": None,
+        "replacee_loss_target_facet": None,
+        "swap_gain_vs_loss": None,
+        "candidate_best_witness": {},
+        "final_front_positions_before_action": list(before_positions),
+        "final_front_positions_after_action": list(before_positions),
+    }
+
+    legal_jobs = filter_action_swap_legal_jobs(action_jobs, legality_mode="relaxed")
+    decision["action_legal_action_count"] = int(len(legal_jobs))
+    if not legal_jobs:
+        return decision
+
+    score_bundle = score_action_swap_tiered_witness_jobs(
+        legal_jobs,
+        query=query,
+        scaffold_positions=before_positions,
+        pool_docs=pool_docs,
+        query_entities=query_entities,
+        ce_reranker=ce_reranker,
+        query_tiers_override=query_tiers_override,
+    )
+    decision["query_tiers"] = copy.deepcopy(list((score_bundle.get("query_tiers") or {}).get("tiers") or []))
+    decision["query_tier_mode"] = str(score_bundle.get("query_tier_mode") or "flat_fallback")
+    decision["facet_supports_before"] = copy.deepcopy(list(score_bundle.get("facet_supports_before") or []))
+
+    actionable_jobs = [
+        dict(job)
+        for job in list(score_bundle.get("scored_jobs") or [])
+        if bool(job.get("action_should_swap"))
+    ]
+    if not actionable_jobs:
+        decision["action_skip_reason"] = "no_positive_witness_gain"
+        return decision
+
+    best_job = min(
+        actionable_jobs,
+        key=lambda row: (
+            int(row.get("bottleneck_tier_index")) if row.get("bottleneck_tier_index") is not None else 10**6,
+            -float(row.get("target_candidate_gain", 0.0) or 0.0),
+            float(row.get("replacee_loss_earlier_tiers", 0.0) or 0.0),
+            float(row.get("replacee_loss_target_facet", 0.0) or 0.0),
+            -float(row.get("candidate_assemble_score", float("-inf")) or float("-inf")),
+            int(row.get("candidate_pool_position", 0) or 0),
+            int(row.get("replace_pool_position", 0) or 0),
+        ),
+    )
+    decision.update({
+        "action_executed": True,
+        "action_type": "swap",
+        "action_candidate_pool_position": int(best_job["candidate_pool_position"]),
+        "action_candidate_doc_id": best_job.get("candidate_doc_id"),
+        "action_replace_pool_position": int(best_job["replace_pool_position"]),
+        "action_replace_doc_id": best_job.get("replace_doc_id"),
+        "action_score_delta": round(float(best_job.get("score_delta", 0.0) or 0.0), 4),
+        "action_skip_reason": None,
+        "action_gate_score": round(float(best_job.get("swap_gain_vs_loss", 0.0) or 0.0), 4),
+        "executed_action_delta": round(float(best_job.get("swap_gain_vs_loss", 0.0) or 0.0), 4),
+        "bottleneck_tier_index": best_job.get("bottleneck_tier_index"),
+        "target_facet_id": best_job.get("target_facet_id"),
+        "target_facet_text": best_job.get("target_facet_text"),
+        "target_candidate_gain": best_job.get("target_candidate_gain"),
+        "replacee_loss_earlier_tiers": best_job.get("replacee_loss_earlier_tiers"),
+        "replacee_loss_same_tier": best_job.get("replacee_loss_same_tier"),
+        "replacee_loss_target_facet": best_job.get("replacee_loss_target_facet"),
+        "swap_gain_vs_loss": best_job.get("swap_gain_vs_loss"),
+        "candidate_best_witness": copy.deepcopy(dict(best_job.get("candidate_best_witness") or {})),
+        "facet_supports_after": copy.deepcopy(list(best_job.get("facet_supports_after") or [])),
+        "final_front_positions_after_action": list(best_job.get("swapped_positions") or apply_single_slot_preserving_swap(
+            before_positions,
+            int(best_job["candidate_pool_position"]),
+            int(best_job["replace_pool_position"]),
+        )),
+    })
+    decision["incumbent_attributions"] = [
+        {
+            "pool_position": int(job.get("replace_pool_position", -1)),
+            "replacee_loss_earlier_tiers": job.get("replacee_loss_earlier_tiers"),
+            "replacee_loss_same_tier": job.get("replacee_loss_same_tier"),
+            "replacee_loss_target_facet": job.get("replacee_loss_target_facet"),
+        }
+        for job in list(score_bundle.get("scored_jobs") or [])
+        if int(job.get("candidate_pool_position", -1)) == int(best_job.get("candidate_pool_position", -1))
+    ]
+    return decision
+
+
+def compute_truncated_noisyor_support(doc_support_by_position: Mapping[int, float],
+                                      set_positions: Sequence[int],
+                                      *,
+                                      top_n: int = 2) -> float:
+    support_values = sorted(
+        [
+            float(np.clip(float(doc_support_by_position.get(int(pos), 0.0) or 0.0), 0.0, 1.0))
+            for pos in set_positions
+        ],
+        reverse=True,
+    )[:max(int(top_n), 1)]
+    if not support_values:
+        return 0.0
+    residual = 1.0
+    for support_value in support_values:
+        residual *= 1.0 - support_value
+    return float(1.0 - residual)
+
+
+def _collect_query_dependency_ancestors(query_graph: Mapping[str, object]) -> Dict[str, List[str]]:
+    parent_map = {
+        str(node.get("id")): [str(parent) for parent in (node.get("parents") or []) if str(parent)]
+        for node in query_graph.get("nodes", []) or []
+    }
+    ancestor_map: Dict[str, List[str]] = {}
+
+    def _dfs(node_id: str, trail: Set[str]) -> List[str]:
+        if node_id in ancestor_map:
+            return list(ancestor_map[node_id])
+        ancestors: List[str] = []
+        for parent_id in parent_map.get(node_id, []):
+            if parent_id in trail:
+                continue
+            if parent_id not in ancestors:
+                ancestors.append(parent_id)
+            for ancestor_id in _dfs(parent_id, trail | {parent_id}):
+                if ancestor_id not in ancestors:
+                    ancestors.append(ancestor_id)
+        ancestor_map[node_id] = list(ancestors)
+        return list(ancestors)
+
+    for node_id in parent_map:
+        _dfs(node_id, {node_id})
+    return ancestor_map
+
+
+def compute_dependency_aware_set_utility(set_positions: Sequence[int],
+                                         *,
+                                         query_graph: Mapping[str, object],
+                                         doc_support_matrix: Mapping[str, Mapping[int, float]],
+                                         pool_docs: Sequence[str] | None = None) -> Tuple[float, List[Dict[str, object]]]:
+    ancestor_map = _collect_query_dependency_ancestors(query_graph)
+    facet_support_rows: List[Dict[str, object]] = []
+    truncated_support_by_facet: Dict[str, float] = {}
+
+    for node in query_graph.get("nodes", []) or []:
+        facet_id = str(node.get("id") or "")
+        support_value = compute_truncated_noisyor_support(
+            doc_support_matrix.get(facet_id, {}),
+            set_positions,
+            top_n=2,
+        )
+        truncated_support_by_facet[facet_id] = float(support_value)
+
+    total_utility = 0.0
+    for node in query_graph.get("nodes", []) or []:
+        facet_id = str(node.get("id") or "")
+        parent_ids = [str(parent) for parent in (node.get("parents") or []) if str(parent)]
+        ancestor_ids = list(ancestor_map.get(facet_id, []))
+        effective_support = float(truncated_support_by_facet.get(facet_id, 0.0))
+        for ancestor_id in ancestor_ids:
+            effective_support *= float(truncated_support_by_facet.get(ancestor_id, 0.0))
+        total_utility += float(effective_support)
+
+        ranked_positions = sorted(
+            [int(pos) for pos in set_positions],
+            key=lambda pos: (
+                -float(doc_support_matrix.get(facet_id, {}).get(int(pos), 0.0) or 0.0),
+                int(pos),
+            ),
+        )
+        top_positions = ranked_positions[:2]
+        facet_support_rows.append({
+            "facet_id": facet_id,
+            "facet": str(node.get("facet") or ""),
+            "parents": list(parent_ids),
+            "ancestors": list(ancestor_ids),
+            "support": round(float(truncated_support_by_facet.get(facet_id, 0.0)), 4),
+            "effective_support": round(float(effective_support), 4),
+            "top_support_positions": list(top_positions),
+            "top_support_titles": [
+                extract_doc_title(pool_docs[int(pos)])
+                for pos in top_positions
+            ] if pool_docs is not None else [],
+        })
+
+    return float(total_utility), facet_support_rows
+
+
+def compute_incumbent_attributions(scaffold_positions: Sequence[int],
+                                   *,
+                                   baseline_utility: float,
+                                   query_graph: Mapping[str, object],
+                                   doc_support_matrix: Mapping[str, Mapping[int, float]],
+                                   pool_docs: Sequence[str]) -> List[Dict[str, object]]:
+    attribution_rows: List[Dict[str, object]] = []
+    scaffold_list = [int(pos) for pos in scaffold_positions]
+    for incumbent_position in scaffold_list:
+        reduced_positions = [
+            int(pos)
+            for pos in scaffold_list
+            if int(pos) != int(incumbent_position)
+        ]
+        reduced_utility, _ = compute_dependency_aware_set_utility(
+            reduced_positions,
+            query_graph=query_graph,
+            doc_support_matrix=doc_support_matrix,
+            pool_docs=pool_docs,
+        )
+        attribution_rows.append({
+            "pool_position": int(incumbent_position),
+            "title": extract_doc_title(pool_docs[int(incumbent_position)]),
+            "leave_one_out_delta": round(float(baseline_utility - reduced_utility), 4),
+        })
+    return attribution_rows
+
+
+def compute_doc_facet_support_matrix(query_graph: Mapping[str, object],
+                                     *,
+                                     doc_positions: Sequence[int],
+                                     pool_docs: Sequence[str],
+                                     ce_reranker: Any = None,
+                                     max_sentences: int = 8,
+                                     max_windows: int = 16) -> Dict[str, Dict[int, float]]:
+    doc_windows: Dict[int, List[str]] = {
+        int(pos): build_title_prefixed_windows(
+            pool_docs[int(pos)],
+            max_sentences=max_sentences,
+            max_windows=max_windows,
+        )
+        for pos in doc_positions
+    }
+    support_matrix: Dict[str, Dict[int, float]] = {
+        str(node.get("id")): {
+            int(pos): 0.0
+            for pos in doc_positions
+        }
+        for node in query_graph.get("nodes", []) or []
+    }
+
+    if ce_reranker is None:
+        for node in query_graph.get("nodes", []) or []:
+            facet_id = str(node.get("id") or "")
+            facet_text = str(node.get("facet") or "")
+            for pos in doc_positions:
+                best_score = 0.0
+                for window_text in doc_windows.get(int(pos), []) or []:
+                    best_score = max(best_score, _compute_lexical_support_score(facet_text, window_text))
+                support_matrix[facet_id][int(pos)] = float(np.clip(best_score, 0.0, 1.0))
+        return support_matrix
+
+    pairs: List[List[str]] = []
+    pair_index: List[Tuple[str, int]] = []
+    for node in query_graph.get("nodes", []) or []:
+        facet_id = str(node.get("id") or "")
+        facet_text = str(node.get("facet") or "")
+        for pos in doc_positions:
+            windows = doc_windows.get(int(pos), []) or []
+            if not windows:
+                windows = [pool_docs[int(pos)]]
+            for window_text in windows:
+                pairs.append([facet_text, window_text])
+                pair_index.append((facet_id, int(pos)))
+
+    raw_scores = ce_reranker.compute_score(pairs) if pairs else []
+    if isinstance(raw_scores, (int, float)):
+        raw_scores = [raw_scores]
+    for (facet_id, pos), raw_score in zip(pair_index, list(raw_scores)):
+        support_matrix[facet_id][int(pos)] = max(
+            float(support_matrix[facet_id].get(int(pos), 0.0) or 0.0),
+            _sigmoid_support_score(float(raw_score)),
+        )
+    return support_matrix
+
+
+def select_action_swap_noisyor(action_jobs: Sequence[Mapping[str, object]],
+                               *,
+                               query: str,
+                               scaffold_positions: Sequence[int],
+                               pool_docs: Sequence[str],
+                               query_entities: Sequence[str] | Set[str] | None = None,
+                               ce_reranker: Any = None,
+                               action_mode: str = "action_swap_noisyor_dep",
+                               action_margin: float = DEFAULT_ACTION_SWAP_NOISYOR_MARGIN) -> Dict[str, object]:
+    before_positions = [int(pos) for pos in scaffold_positions]
+    decision: Dict[str, object] = {
+        "action_mode": str(action_mode),
+        "action_legality_mode": "dedup_only",
+        "action_executed": False,
+        "action_type": "keep",
+        "action_candidate_pool_position": None,
+        "action_candidate_doc_id": None,
+        "action_replace_pool_position": None,
+        "action_replace_doc_id": None,
+        "action_score_delta": None,
+        "action_legal_action_count": 0,
+        "action_total_jobs": int(len(action_jobs)),
+        "action_skip_reason": "no_legal_actions",
+        "action_gate_source": "dependency_aware_noisyor",
+        "action_gate_score": None,
+        "action_margin": round(float(action_margin), 4),
+        "query_dependency_graph": {},
+        "query_dependency_mode": "flat_fallback",
+        "facet_supports_before": [],
+        "facet_supports_after": [],
+        "incumbent_attributions": [],
+        "executed_action_delta": None,
+        "final_front_positions_before_action": list(before_positions),
+        "final_front_positions_after_action": list(before_positions),
+    }
+
+    legal_jobs = filter_action_swap_legal_jobs(action_jobs, legality_mode="relaxed")
+    decision["action_legal_action_count"] = int(len(legal_jobs))
+    if not legal_jobs:
+        return decision
+
+    query_graph = build_query_dependency_graph(
+        query,
+        query_entities=query_entities,
+        action_mode=action_mode,
+    )
+    decision["query_dependency_graph"] = dict(query_graph)
+    decision["query_dependency_mode"] = str(query_graph.get("mode", "flat_fallback"))
+
+    candidate_positions = {
+        int(job.get("candidate_pool_position", -1))
+        for job in legal_jobs
+        if job.get("candidate_pool_position") is not None and int(job.get("candidate_pool_position", -1)) >= 0
+    }
+    doc_positions = sorted(set(before_positions) | set(candidate_positions))
+    doc_support_matrix = compute_doc_facet_support_matrix(
+        query_graph,
+        doc_positions=doc_positions,
+        pool_docs=pool_docs,
+        ce_reranker=ce_reranker,
+    )
+    baseline_utility, facet_supports_before = compute_dependency_aware_set_utility(
+        before_positions,
+        query_graph=query_graph,
+        doc_support_matrix=doc_support_matrix,
+        pool_docs=pool_docs,
+    )
+    decision["facet_supports_before"] = list(facet_supports_before)
+    decision["incumbent_attributions"] = compute_incumbent_attributions(
+        before_positions,
+        baseline_utility=baseline_utility,
+        query_graph=query_graph,
+        doc_support_matrix=doc_support_matrix,
+        pool_docs=pool_docs,
+    )
+
+    scored_jobs: List[Dict[str, object]] = []
+    for job in legal_jobs:
+        swapped_positions = [
+            int(pos)
+            for pos in (
+                job.get("swapped_positions")
+                or apply_single_slot_preserving_swap(
+                    before_positions,
+                    int(job["candidate_pool_position"]),
+                    int(job["replace_pool_position"]),
+                )
+            )
+        ]
+        swapped_utility, facet_supports_after = compute_dependency_aware_set_utility(
+            swapped_positions,
+            query_graph=query_graph,
+            doc_support_matrix=doc_support_matrix,
+            pool_docs=pool_docs,
+        )
+        scored_jobs.append({
+            **dict(job),
+            "swapped_positions": list(swapped_positions),
+            "utility_before": float(baseline_utility),
+            "utility_after": float(swapped_utility),
+            "utility_delta": float(swapped_utility - baseline_utility),
+            "facet_supports_after": list(facet_supports_after),
+        })
+
+    best_job = max(
+        scored_jobs,
+        key=lambda row: (
+            float(row.get("utility_delta", float("-inf"))),
+            float(row.get("score_delta")) if row.get("score_delta") is not None else float("-inf"),
+            float(row.get("candidate_assemble_score")) if row.get("candidate_assemble_score") is not None else float("-inf"),
+            -int(row.get("candidate_pool_position", 0) or 0),
+            -int(row.get("replace_pool_position", 0) or 0),
+        ),
+    )
+    best_delta = float(best_job.get("utility_delta", 0.0) or 0.0)
+    decision["action_gate_score"] = round(float(best_delta), 4)
+    if best_delta <= float(action_margin):
+        decision["action_skip_reason"] = "margin_not_met"
+        decision["facet_supports_after"] = list(facet_supports_before)
+        return decision
+
+    decision.update({
+        "action_executed": True,
+        "action_type": "swap",
+        "action_candidate_pool_position": int(best_job["candidate_pool_position"]),
+        "action_candidate_doc_id": best_job.get("candidate_doc_id"),
+        "action_replace_pool_position": int(best_job["replace_pool_position"]),
+        "action_replace_doc_id": best_job.get("replace_doc_id"),
+        "action_score_delta": round(float(best_job.get("score_delta", 0.0) or 0.0), 4),
+        "action_skip_reason": None,
+        "facet_supports_after": list(best_job.get("facet_supports_after") or []),
+        "executed_action_delta": round(float(best_delta), 4),
+        "final_front_positions_after_action": list(best_job.get("swapped_positions") or before_positions),
+    })
+    return decision
+
+
+def _build_undirected_component_map(nodes: Set[str],
+                                    edges: Set[Tuple[str, str]]) -> Dict[str, int]:
+    adjacency: Dict[str, Set[str]] = {
+        str(node): set()
+        for node in nodes
+        if str(node).strip()
+    }
+    for src, tgt in edges:
+        normalized_src = normalize_structure_text(src)
+        normalized_tgt = normalize_structure_text(tgt)
+        if not normalized_src or not normalized_tgt:
+            continue
+        if normalized_src not in adjacency or normalized_tgt not in adjacency:
+            continue
+        adjacency[normalized_src].add(normalized_tgt)
+        adjacency[normalized_tgt].add(normalized_src)
+
+    component_by_node: Dict[str, int] = {}
+    next_component_id = 0
+    for node in sorted(adjacency):
+        if node in component_by_node:
+            continue
+        next_component_id += 1
+        stack = [node]
+        component_by_node[node] = int(next_component_id)
+        while stack:
+            current = stack.pop()
+            for neighbor in adjacency.get(current, set()):
+                if neighbor in component_by_node:
+                    continue
+                component_by_node[neighbor] = int(next_component_id)
+                stack.append(neighbor)
+    return component_by_node
+
+
+def _build_candidate_component_pairs(candidate_edges: Set[Tuple[str, str]],
+                                     scaffold_component_by_node: Mapping[str, int]) -> Set[Tuple[int, int]]:
+    adjacency: Dict[str, Set[str]] = {}
+    for src, tgt in candidate_edges:
+        normalized_src = normalize_structure_text(src)
+        normalized_tgt = normalize_structure_text(tgt)
+        if not normalized_src or not normalized_tgt:
+            continue
+        adjacency.setdefault(normalized_src, set()).add(normalized_tgt)
+        adjacency.setdefault(normalized_tgt, set()).add(normalized_src)
+
+    bridged_component_pairs: Set[Tuple[int, int]] = set()
+    visited: Set[str] = set()
+    for node in sorted(adjacency):
+        if node in visited:
+            continue
+        stack = [node]
+        component_nodes: Set[str] = set()
+        visited.add(node)
+        while stack:
+            current = stack.pop()
+            component_nodes.add(current)
+            for neighbor in adjacency.get(current, set()):
+                if neighbor in visited:
+                    continue
+                visited.add(neighbor)
+                stack.append(neighbor)
+
+        touched_components = sorted({
+            int(scaffold_component_by_node[current])
+            for current in component_nodes
+            if current in scaffold_component_by_node
+        })
+        if len(touched_components) < 2:
+            continue
+        for comp_a, comp_b in combinations(touched_components, 2):
+            bridged_component_pairs.add((int(comp_a), int(comp_b)))
+    return bridged_component_pairs
+
+
+def assemble_ce_local_repair(query: str,
+                             pool_docs: Sequence[str],
+                             pool_doc_ids: Sequence[int | None],
+                             pool_doc_scores: Sequence[float],
+                             candidate_positions: Sequence[int],
+                             qa_top_k: int,
+                             query_entities: Set[str],
+                             seed_entities: Set[str],
+                             doc_idx_to_entities: Dict[int, Set[str]],
+                             doc_idx_to_edges: Dict[int, List[Tuple[str, str, float, str]]],
+                             hipporag: HippoRAG,
+                             ce_reranker: Any,
+                             position_sources: Dict[int, str] | None = None,
+                             replace_bottom_n: int = 2) -> Tuple[List[int], Dict[str, object]]:
+    normalized_positions = _normalize_candidate_positions_for_assemble(candidate_positions, pool_docs)
+    normalized_query_entities = normalize_entity_set(query_entities) or normalize_entity_set(seed_entities)
+    default_trace: Dict[str, object] = {
+        "assemble_mode": "ce_local_repair",
+        "repair_mode": "ce_local_repair",
+        "candidate_pool_positions": list(normalized_positions),
+        "candidate_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "ranked_pool_positions": list(normalized_positions),
+        "ranked_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "ranking_rows": [],
+        "score_field": "cross_encoder_score",
+        "fallback_reason": "",
+        "scaffold_positions": [],
+        "scaffold_titles": [],
+        "scaffold_ce_sum": 0.0,
+        "missing_query_anchor_entities": [],
+        "missing_query_anchor_count": 0,
+        "scaffold_component_count": 0,
+        "repair_candidate_rows": [],
+        "best_repair_swap": {},
+        "repair_applied": False,
+        "final_positions_before_repair": [],
+        "final_positions_after_repair": [],
+    }
+    if not normalized_positions or qa_top_k <= 0:
+        default_trace["fallback_reason"] = "empty_candidate_pool"
+        return [], default_trace
+    if ce_reranker is None:
+        raise ValueError("ce_local_repair assemble_mode requires a loaded ce_reranker")
+
+    ce_rows, score_field, fallback_reason = _compute_assemble_score_rows(
+        query=query,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=pool_doc_scores,
+        candidate_positions=normalized_positions,
+        assemble_mode="cross_encoder",
+        hipporag=hipporag,
+        ce_reranker=ce_reranker,
+        position_sources=position_sources,
+    )
+    sorted_ce_rows = _sort_assemble_score_rows(ce_rows)
+    ce_rows_by_position = {
+        int(row["pool_position"]): dict(row)
+        for row in sorted_ce_rows
+    }
+    rank_by_position = {
+        int(row["pool_position"]): int(rank + 1)
+        for rank, row in enumerate(sorted_ce_rows)
+    }
+    baseline_prefix_positions = [
+        int(row["pool_position"])
+        for row in sorted_ce_rows
+        if str(row.get("source", "")) == "baseline_prefix"
+    ]
+    scaffold_positions = list(baseline_prefix_positions[:max(int(qa_top_k), 0)])
+    if not scaffold_positions:
+        scaffold_positions = [
+            int(row["pool_position"])
+            for row in sorted_ce_rows[:max(int(qa_top_k), 0)]
+        ]
+    appended_positions = [
+        int(pos) for pos in normalized_positions
+        if str((position_sources or {}).get(int(pos), "")).startswith("append_")
+    ]
+
+    doc_entities_by_position: Dict[int, Set[str]] = {}
+    doc_edges_by_position: Dict[int, Set[Tuple[str, str]]] = {}
+    for pos in normalized_positions:
+        doc_id = pool_doc_ids[int(pos)]
+        doc_entities_by_position[int(pos)] = _normalize_structure_entities_for_doc(doc_id, doc_idx_to_entities)
+        doc_edges_by_position[int(pos)] = _normalize_structure_edges_for_doc(doc_id, doc_idx_to_edges)
+
+    scaffold_entities: Set[str] = set()
+    scaffold_edges: Set[Tuple[str, str]] = set()
+    for pos in scaffold_positions:
+        scaffold_entities.update(doc_entities_by_position.get(int(pos), set()))
+        scaffold_edges.update(doc_edges_by_position.get(int(pos), set()))
+    scaffold_node_universe = set(normalized_query_entities) | set(scaffold_entities)
+    filtered_scaffold_edges = {
+        (src, tgt) for src, tgt in scaffold_edges
+        if src in scaffold_node_universe and tgt in scaffold_node_universe
+    }
+    scaffold_component_by_node = _build_undirected_component_map(
+        scaffold_node_universe,
+        filtered_scaffold_edges,
+    )
+    missing_query_anchor_entities = sorted(set(normalized_query_entities) - set(scaffold_entities))
+    scaffold_ce_sum = float(sum(
+        float(ce_rows_by_position[int(pos)]["assemble_score"])
+        for pos in scaffold_positions
+        if int(pos) in ce_rows_by_position
+    ))
+
+    replace_candidates = list(scaffold_positions[-max(int(replace_bottom_n), 0):])
+    repair_candidate_rows: List[Dict[str, object]] = []
+    best_swap: Dict[str, object] | None = None
+    best_key: Tuple[Any, ...] | None = None
+
+    for appended_pos in appended_positions:
+        candidate_entities = doc_entities_by_position.get(int(appended_pos), set())
+        candidate_edges = doc_edges_by_position.get(int(appended_pos), set())
+        anchor_gain_entities = sorted(candidate_entities & set(missing_query_anchor_entities))
+        bridged_component_pairs = sorted(
+            list(_build_candidate_component_pairs(candidate_edges, scaffold_component_by_node))
+        )
+        connector_gain_count = int(len(bridged_component_pairs))
+        anchor_gain_count = int(len(anchor_gain_entities))
+        candidate_ce_row = ce_rows_by_position.get(int(appended_pos), {})
+        candidate_ce_score = float(candidate_ce_row.get("assemble_score", 0.0) or 0.0)
+        candidate_ce_rank = int(rank_by_position.get(int(appended_pos), 0))
+
+        for replace_pos in replace_candidates:
+            replaced_ce_row = ce_rows_by_position.get(int(replace_pos), {})
+            replaced_ce_score = float(replaced_ce_row.get("assemble_score", 0.0) or 0.0)
+            ce_sum_after_swap = float(scaffold_ce_sum - replaced_ce_score + candidate_ce_score)
+            ce_drop_vs_scaffold = float(scaffold_ce_sum - ce_sum_after_swap)
+            row = {
+                "appended_pool_position": int(appended_pos),
+                "candidate_title": extract_doc_title(pool_docs[int(appended_pos)]),
+                "candidate_ce_rank": int(candidate_ce_rank),
+                "candidate_ce_score": round(float(candidate_ce_score), 4),
+                "replace_pool_position": int(replace_pos),
+                "replace_title": extract_doc_title(pool_docs[int(replace_pos)]),
+                "connector_gain_count": int(connector_gain_count),
+                "anchor_gain_count": int(anchor_gain_count),
+                "ce_sum_after_swap": round(float(ce_sum_after_swap), 4),
+                "ce_drop_vs_scaffold": round(float(ce_drop_vs_scaffold), 4),
+                "accepted_by_req_gain": bool(connector_gain_count > 0 or anchor_gain_count > 0),
+            }
+            repair_candidate_rows.append(row)
+            row_key = (
+                int(connector_gain_count),
+                int(anchor_gain_count),
+                float(ce_sum_after_swap),
+                float(candidate_ce_score),
+                -int(appended_pos),
+                -int(replace_pos),
+            )
+            if not row["accepted_by_req_gain"]:
+                continue
+            if best_key is None or row_key > best_key:
+                best_key = row_key
+                best_swap = {
+                    **row,
+                    "replaced_incumbent_ce_rank": int(rank_by_position.get(int(replace_pos), 0)),
+                    "component_pairs": [
+                        [int(comp_a), int(comp_b)]
+                        for comp_a, comp_b in bridged_component_pairs
+                    ],
+                    "anchor_gain_entities": list(anchor_gain_entities),
+                }
+
+    final_front_positions = list(scaffold_positions)
+    if best_swap is not None:
+        replace_pos = int(best_swap["replace_pool_position"])
+        appended_pos = int(best_swap["appended_pool_position"])
+        final_front_positions = [
+            appended_pos if int(pos) == replace_pos else int(pos)
+            for pos in scaffold_positions
+        ]
+
+    seen_final_positions: Set[int] = set()
+    ranked_positions: List[int] = []
+    for pos in final_front_positions:
+        if int(pos) in seen_final_positions:
+            continue
+        ranked_positions.append(int(pos))
+        seen_final_positions.add(int(pos))
+    for row in sorted_ce_rows:
+        pos = int(row["pool_position"])
+        if pos in seen_final_positions:
+            continue
+        ranked_positions.append(pos)
+        seen_final_positions.add(pos)
+
+    trace = {
+        "assemble_mode": "ce_local_repair",
+        "repair_mode": "ce_local_repair",
+        "candidate_pool_positions": list(normalized_positions),
+        "candidate_titles": [extract_doc_title(pool_docs[pos]) for pos in normalized_positions],
+        "ranked_pool_positions": list(ranked_positions),
+        "ranked_titles": [extract_doc_title(pool_docs[pos]) for pos in ranked_positions],
+        "ranking_rows": [
+            {
+                "rank": int(rank + 1),
+                "pool_position": int(row["pool_position"]),
+                "doc_id": row["doc_id"],
+                "title": str(row["title"]),
+                "source": str(row["source"]),
+                "base_score": round(float(row["base_score"]), 4),
+                "assemble_score": None if not np.isfinite(float(row["assemble_score"])) else round(float(row["assemble_score"]), 4),
+            }
+            for rank, row in enumerate(sorted_ce_rows)
+        ],
+        "score_field": str(score_field),
+        "fallback_reason": str(fallback_reason),
+        "scaffold_positions": list(scaffold_positions),
+        "scaffold_titles": [extract_doc_title(pool_docs[pos]) for pos in scaffold_positions],
+        "scaffold_ce_sum": round(float(scaffold_ce_sum), 4),
+        "missing_query_anchor_entities": list(missing_query_anchor_entities),
+        "missing_query_anchor_count": int(len(missing_query_anchor_entities)),
+        "scaffold_component_count": int(len(set(scaffold_component_by_node.values()))),
+        "repair_candidate_rows": list(repair_candidate_rows),
+        "best_repair_swap": dict(best_swap or {}),
+        "repair_applied": bool(best_swap is not None),
+        "final_positions_before_repair": list(scaffold_positions),
+        "final_positions_after_repair": list(final_front_positions),
+    }
+    return list(ranked_positions), trace
 
 
 def _build_coverage_atom_maps(candidate_positions: Sequence[int],
@@ -4250,15 +8860,77 @@ def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
                                    score_mode: str = "bridge",
                                    non_anchor_title_dedup: bool = True,
                                    append_policy: str = "bridge",
-                                   append_random_seed: int = 0) -> Tuple[List[int], Dict[str, object]]:
+                                   append_random_seed: int = 0,
+                                   query: str | None = None,
+                                   pool_docs: Sequence[str] | None = None,
+                                   gap_expand_mode: str = "heuristic",
+                                   gap_expand_max_queries: int | None = None,
+                                   ce_reranker: Any | None = None) -> Tuple[List[int], Dict[str, object]]:
     effective_pool_limit = max(int(pool_limit), 0)
     effective_base_k = min(max(int(expand_base_k), 0), effective_pool_limit)
     effective_append_max_docs = max(int(append_max_docs), 0)
     normalized_append_policy = normalize_append_policy(append_policy)
+    normalized_gap_expand_mode = normalize_gap_expand_mode(gap_expand_mode)
+    effective_gap_expand_max_queries = max(int(gap_expand_max_queries or DEFAULT_GAP_EXPAND_MAX_QUERIES), 1)
+    if normalized_append_policy == "gap_expand" and normalized_gap_expand_mode == "unit_typed_abstain":
+        return select_gap_expand_positions_unit_typed_abstain(
+            pool_doc_ids=pool_doc_ids,
+            normalized_base_scores=normalized_base_scores,
+            pool_doc_titles=pool_doc_titles,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            adjacency=adjacency,
+            initial_seed_entities=initial_seed_entities,
+            query_entities=query_entities,
+            pool_limit=pool_limit,
+            expand_base_k=expand_base_k,
+            append_max_docs=append_max_docs,
+            expand_min_structure_score=expand_min_structure_score,
+            structure_max_hops=structure_max_hops,
+            structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+            base_weight=base_weight,
+            structure_weight=structure_weight,
+            novelty_weight=novelty_weight,
+            score_mode=score_mode,
+            non_anchor_title_dedup=non_anchor_title_dedup,
+            append_random_seed=append_random_seed,
+            query=query,
+            pool_docs=pool_docs,
+            gap_expand_max_queries=effective_gap_expand_max_queries,
+            ce_reranker=ce_reranker,
+        )
+    if normalized_append_policy == "gap_expand" and normalized_gap_expand_mode == "typed_abstain":
+        return select_gap_expand_positions_typed_abstain(
+            pool_doc_ids=pool_doc_ids,
+            normalized_base_scores=normalized_base_scores,
+            pool_doc_titles=pool_doc_titles,
+            doc_idx_to_entities=doc_idx_to_entities,
+            doc_idx_to_edges=doc_idx_to_edges,
+            adjacency=adjacency,
+            initial_seed_entities=initial_seed_entities,
+            query_entities=query_entities,
+            pool_limit=pool_limit,
+            expand_base_k=expand_base_k,
+            append_max_docs=append_max_docs,
+            expand_min_structure_score=expand_min_structure_score,
+            structure_max_hops=structure_max_hops,
+            structure_seed_target_bridge_mode=structure_seed_target_bridge_mode,
+            base_weight=base_weight,
+            structure_weight=structure_weight,
+            novelty_weight=novelty_weight,
+            score_mode=score_mode,
+            non_anchor_title_dedup=non_anchor_title_dedup,
+            append_random_seed=append_random_seed,
+            query=query,
+            pool_docs=pool_docs,
+            gap_expand_max_queries=effective_gap_expand_max_queries,
+            ce_reranker=ce_reranker,
+        )
     baseline_prefix_positions = list(range(effective_base_k))
     candidate_positions = list(baseline_prefix_positions)
     appended_positions: List[int] = []
     append_steps: List[Dict[str, object]] = []
+    gap_steps: List[Dict[str, object]] = []
     append_stop_reason = "append_cap_zero" if effective_append_max_docs == 0 else "unknown"
     covered_entities = normalize_entity_set(initial_seed_entities)
     for pos in baseline_prefix_positions:
@@ -4364,23 +9036,88 @@ def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
                 append_stop_reason = "no_scored_candidate"
                 break
 
-            ranked_by_structure = sorted(
-                scored_candidates,
-                key=lambda row: (
-                    -float(row.get("structure_score", 0.0) or 0.0),
-                    -float(row.get("closure_score", 0.0) or 0.0),
-                    -float(row.get("novelty_score", 0.0) or 0.0),
-                    int(row.get("pool_position", 0) or 0),
-                ),
+            gap_state = {
+                "gap_type": "none",
+                "gap_mode": normalized_gap_expand_mode,
+                "fallback_used": False,
+                "gap_anchors": [],
+                "covered_query_entities": [],
+                "uncovered_query_entities": [],
+                "covered_entities_snapshot": sorted(normalize_entity_set(covered_entities))[:16],
+                "baseline_titles": [],
+                "baseline_entity_count": 0,
+                "relation_terms": [],
+                "micro_queries": [str(query or "").strip()] if str(query or "").strip() else [],
+                "micro_query_count": 1 if str(query or "").strip() else 0,
+            }
+            if normalized_append_policy == "gap_expand":
+                gap_state = detect_gap_expand_state(
+                    query=str(query or ""),
+                    baseline_prefix_positions=baseline_prefix_positions,
+                    pool_docs=pool_docs,
+                    pool_doc_ids=pool_doc_ids,
+                    doc_idx_to_entities=doc_idx_to_entities,
+                    query_entities=query_entities,
+                    covered_entities=covered_entities,
+                    gap_expand_mode=normalized_gap_expand_mode,
+                    gap_expand_max_queries=effective_gap_expand_max_queries,
+                )
+                ranked_candidates = rerank_gap_expand_candidates(
+                    scored_candidates=scored_candidates,
+                    pool_docs=pool_docs,
+                    gap_state=gap_state,
+                    covered_entities=covered_entities,
+                )
+            else:
+                ranked_candidates = sorted(
+                    scored_candidates,
+                    key=lambda row: (
+                        -float(row.get("structure_score", 0.0) or 0.0),
+                        -float(row.get("closure_score", 0.0) or 0.0),
+                        -float(row.get("novelty_score", 0.0) or 0.0),
+                        int(row.get("pool_position", 0) or 0),
+                    ),
+                )
+
+            best_threshold_score = float(
+                ranked_candidates[0].get(
+                    "gap_gate_score_raw" if normalized_append_policy == "gap_expand" else "structure_score",
+                    0.0,
+                ) or 0.0
             )
-            best_structure_score = float(ranked_by_structure[0].get("structure_score", 0.0) or 0.0)
-            if best_structure_score < float(expand_min_structure_score):
+            if best_threshold_score < float(expand_min_structure_score):
+                if normalized_append_policy == "gap_expand":
+                    gap_steps.append({
+                        "step": int(step_index + 1),
+                        "gap_type": str(gap_state.get("gap_type", "none") or "none"),
+                        "gap_mode": str(gap_state.get("gap_mode", normalized_gap_expand_mode) or normalized_gap_expand_mode),
+                        "fallback_used": bool(gap_state.get("fallback_used", False)),
+                        "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                        "covered_query_entities": list(gap_state.get("covered_query_entities", []) or []),
+                        "uncovered_query_entities": list(gap_state.get("uncovered_query_entities", []) or []),
+                        "relation_terms": list(gap_state.get("relation_terms", []) or []),
+                        "micro_queries": list(gap_state.get("micro_queries", []) or []),
+                        "selection_blocked_by_threshold": True,
+                        "candidate_preview": [
+                            {
+                                "preview_rank": int(rank + 1),
+                                "pool_position": int(row.get("pool_position", -1) or -1),
+                                "doc_id": int(row["doc_id"]) if row.get("doc_id") is not None else None,
+                                "title": str(row.get("doc_title", "") or ""),
+                                "gap_score": round(float(row.get("gap_score", 0.0) or 0.0), 4),
+                                "gap_gate_score": round(float(row.get("gap_gate_score", 0.0) or 0.0), 4),
+                                "gap_combined_score": round(float(row.get("gap_combined_score", 0.0) or 0.0), 4),
+                                "structure_score": round(float(row.get("structure_score", 0.0) or 0.0), 4),
+                            }
+                            for rank, row in enumerate(ranked_candidates[:5])
+                        ],
+                    })
                 append_stop_reason = "structure_below_threshold"
                 break
 
             selected_row = None
             duplicate_skip_count = 0
-            for row in ranked_by_structure:
+            for row in ranked_candidates:
                 title_key = normalize_structure_text(str(row.get("doc_title", "")).strip())
                 if non_anchor_title_dedup and title_key and title_key in seen_title_keys:
                     duplicate_skip_count += 1
@@ -4406,6 +9143,32 @@ def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
             if non_anchor_title_dedup and selected_title_key:
                 seen_title_keys.add(selected_title_key)
 
+            gap_steps.append({
+                "step": int(step_index + 1),
+                "gap_type": str(gap_state.get("gap_type", "none") or "none"),
+                "gap_mode": str(gap_state.get("gap_mode", normalized_gap_expand_mode) or normalized_gap_expand_mode),
+                "fallback_used": bool(gap_state.get("fallback_used", False)),
+                "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
+                "covered_query_entities": list(gap_state.get("covered_query_entities", []) or []),
+                "uncovered_query_entities": list(gap_state.get("uncovered_query_entities", []) or []),
+                "relation_terms": list(gap_state.get("relation_terms", []) or []),
+                "micro_queries": list(gap_state.get("micro_queries", []) or []),
+                "candidate_preview": [
+                    {
+                        "preview_rank": int(rank + 1),
+                        "pool_position": int(row.get("pool_position", -1) or -1),
+                        "doc_id": int(row["doc_id"]) if row.get("doc_id") is not None else None,
+                        "title": str(row.get("doc_title", "") or ""),
+                        "gap_score": round(float(row.get("gap_score", 0.0) or 0.0), 4),
+                        "gap_gate_score": round(float(row.get("gap_gate_score", 0.0) or 0.0), 4),
+                        "gap_combined_score": round(float(row.get("gap_combined_score", 0.0) or 0.0), 4),
+                        "structure_score": round(float(row.get("structure_score", 0.0) or 0.0), 4),
+                        "closure_score": round(float(row.get("closure_score", 0.0) or 0.0), 4),
+                        "novelty_score": round(float(row.get("novelty_score", 0.0) or 0.0), 4),
+                    }
+                    for rank, row in enumerate(ranked_candidates[:5])
+                ],
+            })
             append_steps.append({
                 "step": int(step_index + 1),
                 "selection_policy": normalized_append_policy,
@@ -4416,8 +9179,16 @@ def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
                 "selected_closure_score": round(float(selected_row.get("closure_score", 0.0) or 0.0), 4),
                 "selected_novelty_score": round(float(selected_row.get("novelty_score", 0.0) or 0.0), 4),
                 "selected_combined_score": round(float(selected_row.get("combined_score", 0.0) or 0.0), 4),
+                "selected_gap_score": round(float(selected_row.get("gap_score", 0.0) or 0.0), 4),
+                "selected_gap_gate_score": round(float(selected_row.get("gap_gate_score", 0.0) or 0.0), 4),
+                "selected_gap_combined_score": round(float(selected_row.get("gap_combined_score", 0.0) or 0.0), 4),
+                "gap_type": str(gap_state.get("gap_type", "none") or "none"),
+                "gap_mode": str(gap_state.get("gap_mode", normalized_gap_expand_mode) or normalized_gap_expand_mode),
+                "gap_fallback_used": bool(gap_state.get("fallback_used", False)),
+                "gap_micro_queries": list(gap_state.get("micro_queries", []) or []),
+                "gap_anchors": list(gap_state.get("gap_anchors", []) or []),
                 "candidate_pool_size": int(len(scored_candidates)),
-                "best_structure_score": round(best_structure_score, 4),
+                "best_structure_score": round(best_threshold_score, 4),
                 "duplicate_skip_count": int(duplicate_skip_count),
                 "candidate_preview": [
                     {
@@ -4429,8 +9200,11 @@ def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
                         "closure_score": round(float(row.get("closure_score", 0.0) or 0.0), 4),
                         "novelty_score": round(float(row.get("novelty_score", 0.0) or 0.0), 4),
                         "combined_score": round(float(row.get("combined_score", 0.0) or 0.0), 4),
+                        "gap_score": round(float(row.get("gap_score", 0.0) or 0.0), 4),
+                        "gap_gate_score": round(float(row.get("gap_gate_score", 0.0) or 0.0), 4),
+                        "gap_combined_score": round(float(row.get("gap_combined_score", 0.0) or 0.0), 4),
                     }
-                    for rank, row in enumerate(ranked_by_structure[:5])
+                    for rank, row in enumerate(ranked_candidates[:5])
                 ],
             })
 
@@ -4445,9 +9219,12 @@ def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
         "append_max_docs": int(effective_append_max_docs),
         "append_policy": normalized_append_policy,
         "append_random_seed": int(append_random_seed),
+        "gap_expand_mode": normalized_gap_expand_mode,
+        "gap_expand_max_queries": int(effective_gap_expand_max_queries),
         "expand_min_structure_score": round(float(expand_min_structure_score), 4),
         "score_mode": normalize_setwise_score_mode(score_mode),
         "non_anchor_title_dedup": bool(non_anchor_title_dedup),
+        "gap_expand_enabled": bool(normalized_append_policy == "gap_expand"),
         "baseline_prefix_positions": list(baseline_prefix_positions),
         "baseline_prefix_titles": [
             str(pool_doc_titles[pos]).strip()
@@ -4463,6 +9240,23 @@ def select_bridge_append_positions(pool_doc_ids: Sequence[int | None],
         "append_count": int(len(appended_positions)),
         "append_stop_reason": str(append_stop_reason),
         "append_steps": append_steps,
+        "gap_steps": gap_steps,
+        "gap_type": str(gap_steps[0].get("gap_type", "none")) if gap_steps else "none",
+        "gap_mode": str(gap_steps[0].get("gap_mode", normalized_gap_expand_mode)) if gap_steps else str(normalized_gap_expand_mode),
+        "gap_fallback_used": bool(any(bool(step.get("fallback_used", False)) for step in gap_steps)),
+        "gap_micro_queries": list(gap_steps[0].get("micro_queries", []) or []) if gap_steps else [],
+        "gap_micro_query_count": int(len(gap_steps[0].get("micro_queries", []) or [])) if gap_steps else 0,
+        "gap_anchors": list(gap_steps[0].get("gap_anchors", []) or []) if gap_steps else [],
+        "gap_candidate_positions": list(appended_positions),
+        "gap_candidate_doc_ids": [
+            int(pool_doc_ids[pos]) if pos < len(pool_doc_ids) and pool_doc_ids[pos] is not None else None
+            for pos in appended_positions
+        ],
+        "gap_candidate_titles": [
+            str(pool_doc_titles[pos]).strip()
+            for pos in appended_positions
+            if pool_doc_titles is not None and 0 <= pos < len(pool_doc_titles)
+        ],
         "candidate_set_positions": list(candidate_positions),
         "candidate_set_titles": [
             str(pool_doc_titles[pos]).strip()
@@ -5559,6 +10353,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            append_max_docs: int = 3,
                            append_policy: str = "bridge",
                            append_random_seed: int = 0,
+                           gap_expand_mode: str = "heuristic",
+                           gap_expand_max_queries: int | None = None,
                            ce_model: str = "/mnt/nvme/bge-reranker-v2-m3",
                            ce_device: str = "cuda:1") -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
@@ -5569,6 +10365,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
     normalized_coverage_atom_source = normalize_coverage_atom_source(coverage_atom_source)
     normalized_coverage_admissibility_mode = normalize_coverage_admissibility_mode(coverage_admissibility_mode)
     normalized_append_policy = normalize_append_policy(append_policy)
+    normalized_gap_expand_mode = normalize_gap_expand_mode(gap_expand_mode)
+    effective_gap_expand_max_queries = max(int(gap_expand_max_queries or DEFAULT_GAP_EXPAND_MAX_QUERIES), 1)
     if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
@@ -5587,6 +10385,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
     late_rerank_block_count = 0
     late_rerank_parse_failure_count = 0
     late_rerank_error_count = 0
+    action_swap_apply_count = 0
+    action_swap_keep_count = 0
+    action_swap_judge_count = 0
     reader_order_probe_apply_count = 0
     reader_order_probe_skip_count = 0
     reader_order_probe_reason_counts: Counter[str] = Counter()
@@ -5611,6 +10412,14 @@ def apply_setwise_selector(hipporag: HippoRAG,
     appended_doc_counts: List[int] = []
     expand_candidate_sizes: List[int] = []
     append_stop_reason_counts: Counter[str] = Counter()
+    gap_type_counts: Counter[str] = Counter()
+    gap_slot_counts: Counter[str] = Counter()
+    gap_abstain_reason_counts: Counter[str] = Counter()
+    gap_expand_query_count = 0
+    gap_expand_fallback_query_count = 0
+    gap_micro_query_counts: List[int] = []
+    gap_candidate_counts: List[int] = []
+    gap_candidates_selected_into_final_counts: List[int] = []
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
     normalized_reader_order_probe_mode = normalize_setwise_reader_order_probe_mode(
         setwise_reader_order_probe_mode
@@ -5618,14 +10427,26 @@ def apply_setwise_selector(hipporag: HippoRAG,
 
     chunk_text_to_hash = getattr(hipporag.chunk_embedding_store, "text_to_hash_id", {}) or {}
     assemble_reranker = None
+    bridge_append_unit_gap_needs_ce = (
+        selector_name == "bridge_append"
+        and normalized_append_policy == "gap_expand"
+        and normalized_gap_expand_mode == "unit_typed_abstain"
+    )
     if selector_name == "bridge_append" and normalized_assemble_mode == "embedding_similarity":
         if hasattr(hipporag, "_get_passage_query_embeddings"):
             hipporag._get_passage_query_embeddings(query_solutions)
-    if selector_name == "bridge_append" and normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES:
+    if selector_name == "bridge_append" and (
+        normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES
+        or bridge_append_unit_gap_needs_ce
+    ):
         from FlagEmbedding import FlagReranker
 
         logger.info("Loading assemble cross-encoder model: %s on %s", ce_model, ce_device)
-        assemble_reranker = FlagReranker(ce_model, use_fp16=True, device=ce_device)
+        assemble_reranker = FlagReranker(
+            ce_model,
+            use_fp16=True,
+            devices=[str(ce_device)],
+        )
 
     for q_idx, qs in enumerate(query_solutions):
         pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
@@ -5829,6 +10650,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selected_positions, selector_trace = select_bridge_append_positions(
                 pool_doc_ids=pool_doc_ids,
                 normalized_base_scores=normalized_pool_scores,
+                query=qs.question,
+                pool_docs=pool_docs,
                 pool_doc_titles=pool_titles,
                 doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
                 doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
@@ -5848,6 +10671,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 non_anchor_title_dedup=non_anchor_title_dedup,
                 append_policy=normalized_append_policy,
                 append_random_seed=append_random_seed,
+                gap_expand_mode=normalized_gap_expand_mode,
+                gap_expand_max_queries=int(effective_gap_expand_max_queries),
+                ce_reranker=assemble_reranker,
             )
             for pos in selector_trace.get("appended_positions", []) or []:
                 position_sources[int(pos)] = f"append_{normalized_append_policy}"
@@ -5872,14 +10698,35 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     coverage_atom_positions=coverage_atom_positions,
                     coverage_admissibility_mode=normalized_coverage_admissibility_mode,
                 )
+            elif normalized_assemble_mode == "ce_local_repair":
+                reranked_positions, assemble_trace = assemble_ce_local_repair(
+                    query=qs.question,
+                    pool_docs=pool_docs,
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_scores=pool_scores,
+                    candidate_positions=selected_positions,
+                    qa_top_k=qa_top_k,
+                    query_entities=grounded_question_entities or question_entities or seed_entities,
+                    seed_entities=seed_entities,
+                    doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                    doc_idx_to_edges=hipporag.doc_idx_to_structure_edges,
+                    hipporag=hipporag,
+                    ce_reranker=assemble_reranker,
+                    position_sources=position_sources,
+                )
             else:
+                score_assemble_mode = (
+                    "cross_encoder"
+                    if normalized_assemble_mode in ACTION_CONTROLLER_MODES else
+                    normalized_assemble_mode
+                )
                 reranked_positions, assemble_trace = rerank_candidate_positions_for_assemble(
                     query=qs.question,
                     pool_docs=pool_docs,
                     pool_doc_ids=pool_doc_ids,
                     pool_doc_scores=pool_scores,
                     candidate_positions=selected_positions,
-                    assemble_mode=normalized_assemble_mode,
+                    assemble_mode=score_assemble_mode,
                     hipporag=hipporag,
                     ce_reranker=assemble_reranker,
                     position_sources=position_sources,
@@ -6127,11 +10974,172 @@ def apply_setwise_selector(hipporag: HippoRAG,
         else:
             heuristic_selected_positions = [int(pos) for pos in selected_positions]
 
-        final_front_positions = materialize_reader_top_positions(
-            selected_positions=heuristic_selected_positions,
-            pool_limit=pool_limit,
-            qa_top_k=qa_top_k,
-        )
+        action_trace: Dict[str, object] = {
+            "action_mode": (
+                normalized_assemble_mode
+                if normalized_assemble_mode in ACTION_CONTROLLER_MODES else
+                "off"
+            ),
+            "action_legality_mode": (
+                resolve_action_swap_v0_legality_mode(normalized_assemble_mode)
+                if normalized_assemble_mode in ACTION_SWAP_V0_MODES else
+                ("dedup_only" if normalized_assemble_mode in ACTION_SWAP_NOISYOR_MODES else "off")
+            ),
+            "action_executed": False,
+            "action_type": "keep" if normalized_assemble_mode in ACTION_CONTROLLER_MODES else "off",
+            "action_candidate_pool_position": None,
+            "action_candidate_doc_id": None,
+            "action_replace_pool_position": None,
+            "action_replace_doc_id": None,
+            "action_score_delta": None,
+            "action_gate_verdict": None,
+            "action_gate_confidence": None,
+            "action_gate_reason": None,
+            "action_gate_source": None,
+            "action_gate_score": None,
+            "action_margin": None,
+            "query_dependency_graph": {},
+            "query_dependency_mode": None,
+            "query_tiers": [],
+            "query_tier_mode": None,
+            "claims": [],
+            "claim_mode": None,
+            "proposal_action_present": False,
+            "proposal_candidate_pool_position": None,
+            "proposal_replace_pool_position": None,
+            "earliest_unsupported_claim_id": None,
+            "earliest_unsupported_claim_text": None,
+            "gain_verifier_verdict": None,
+            "gain_verifier_reason": None,
+            "preservation_unique_support_claim_ids": [],
+            "claim_supports_before": [],
+            "facet_supports_before": [],
+            "facet_supports_after": [],
+            "incumbent_attributions": [],
+            "executed_action_delta": None,
+            "bottleneck_tier_index": None,
+            "target_facet_id": None,
+            "target_facet_text": None,
+            "target_candidate_gain": None,
+            "replacee_loss_earlier_tiers": None,
+            "replacee_loss_same_tier": None,
+            "replacee_loss_target_facet": None,
+            "swap_gain_vs_loss": None,
+            "candidate_best_witness": {},
+            "action_legal_action_count": 0,
+            "action_total_jobs": 0,
+            "action_skip_reason": "disabled" if normalized_assemble_mode not in ACTION_CONTROLLER_MODES else "uninitialized",
+            "final_front_positions_before_action": [],
+            "final_front_positions_after_action": [],
+        }
+        if selector_name == "bridge_append" and normalized_assemble_mode in ACTION_CONTROLLER_MODES:
+            ranking_rows = list((assemble_trace or {}).get("ranking_rows") or [])
+            baseline_scaffold_positions = extract_baseline_scaffold_positions_from_ranking_rows(
+                ranking_rows=ranking_rows,
+                baseline_prefix_positions=selector_trace.get("baseline_prefix_positions", []) or [],
+                qa_top_k=qa_top_k,
+            )
+            action_jobs = build_action_swap_jobs(
+                query=qs.question,
+                scaffold_positions=baseline_scaffold_positions,
+                appended_positions=selector_trace.get("appended_positions", []) or [],
+                ranking_rows=ranking_rows,
+                pool_docs=pool_docs,
+                pool_doc_ids=pool_doc_ids,
+                doc_text_to_chunk_id=doc_text_to_chunk_id,
+                replace_bottom_n=2,
+            )
+            if normalized_assemble_mode in ACTION_SWAP_V0_JUDGE_MODES:
+                action_swap_judge_count += 1
+                if late_rerank_judge_bundle is not None and late_rerank_judge_bundle.infer_fn is not None:
+                    judge_bundle = late_rerank_judge_bundle
+                else:
+                    judge_bundle = SetwiseLateRerankJudgeBundle(
+                        infer_fn=hipporag.llm_model.infer,
+                        model_name=(
+                            getattr(hipporag.global_config, "llm_request_name", None)
+                            or hipporag.global_config.llm_name
+                        ),
+                        backend="inherit",
+                        base_url=hipporag.global_config.llm_base_url,
+                        response_format=None,
+                    )
+                action_trace = select_action_swap_v0_judge(
+                    action_jobs=action_jobs,
+                    scaffold_positions=baseline_scaffold_positions,
+                    judge_bundle=judge_bundle,
+                    qa_top_k=qa_top_k,
+                    max_doc_chars=late_rerank_doc_char_limit,
+                    action_mode=normalized_assemble_mode,
+                )
+            elif normalized_assemble_mode in ACTION_SWAP_PROPOSE_VERIFY_MODES:
+                action_swap_judge_count += 1
+                if late_rerank_judge_bundle is not None and late_rerank_judge_bundle.infer_fn is not None:
+                    judge_bundle = late_rerank_judge_bundle
+                else:
+                    judge_bundle = SetwiseLateRerankJudgeBundle(
+                        infer_fn=hipporag.llm_model.infer,
+                        model_name=(
+                            getattr(hipporag.global_config, "llm_request_name", None)
+                            or hipporag.global_config.llm_name
+                        ),
+                        backend="inherit",
+                        base_url=hipporag.global_config.llm_base_url,
+                        response_format=None,
+                    )
+                action_trace = select_action_swap_propose_verify(
+                    action_jobs=action_jobs,
+                    query=qs.question,
+                    scaffold_positions=baseline_scaffold_positions,
+                    pool_docs=pool_docs,
+                    query_entities=grounded_question_entities or question_entities or seed_entities,
+                    ce_reranker=assemble_reranker,
+                    verifier_bundle=judge_bundle,
+                    max_doc_chars=late_rerank_doc_char_limit,
+                    action_mode=normalized_assemble_mode,
+                )
+            elif normalized_assemble_mode in ACTION_SWAP_NOISYOR_MODES:
+                action_trace = select_action_swap_noisyor(
+                    action_jobs=action_jobs,
+                    query=qs.question,
+                    scaffold_positions=baseline_scaffold_positions,
+                    pool_docs=pool_docs,
+                    query_entities=grounded_question_entities or question_entities or seed_entities,
+                    ce_reranker=assemble_reranker,
+                    action_mode=normalized_assemble_mode,
+                    action_margin=DEFAULT_ACTION_SWAP_NOISYOR_MARGIN,
+                )
+            elif normalized_assemble_mode in ACTION_SWAP_TIERED_WITNESS_MODES:
+                action_trace = select_action_swap_tiered_witness(
+                    action_jobs=action_jobs,
+                    query=qs.question,
+                    scaffold_positions=baseline_scaffold_positions,
+                    pool_docs=pool_docs,
+                    query_entities=grounded_question_entities or question_entities or seed_entities,
+                    ce_reranker=assemble_reranker,
+                    action_mode=normalized_assemble_mode,
+                )
+            else:
+                action_trace = select_action_swap_v0_dryrun(
+                    action_jobs=action_jobs,
+                    scaffold_positions=baseline_scaffold_positions,
+                    action_mode=normalized_assemble_mode,
+                )
+            selector_trace.update(action_trace)
+            final_front_positions = [
+                int(pos)
+                for pos in action_trace.get("final_front_positions_after_action", [])
+            ]
+            if bool(action_trace.get("action_executed", False)):
+                action_swap_apply_count += 1
+            else:
+                action_swap_keep_count += 1
+        else:
+            final_front_positions = materialize_reader_top_positions(
+                selected_positions=heuristic_selected_positions,
+                pool_limit=pool_limit,
+                qa_top_k=qa_top_k,
+            )
         late_rerank_trace: Dict[str, object] = {
             "enabled": bool(late_rerank_enabled),
             "applied": False,
@@ -6304,6 +11312,45 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 ] += 1
 
         selected_position_set = set(final_front_positions)
+        if selector_name == "bridge_append" and normalized_append_policy == "gap_expand":
+            gap_expand_query_count += 1
+            gap_type = str(selector_trace.get("gap_type", "none") or "none")
+            gap_type_counts[gap_type] += 1
+            gap_slot = str(selector_trace.get("gap_slot", "") or "")
+            if gap_slot:
+                gap_slot_counts[gap_slot] += 1
+            if bool(selector_trace.get("gap_fallback_used", False)):
+                gap_expand_fallback_query_count += 1
+            gap_abstain_reason = str(selector_trace.get("gap_abstain_reason", "") or "")
+            if gap_abstain_reason:
+                gap_abstain_reason_counts[gap_abstain_reason] += 1
+            gap_micro_query_counts.append(int(selector_trace.get("gap_micro_query_count", 0) or 0))
+            gap_candidate_positions = [int(pos) for pos in selector_trace.get("gap_candidate_positions", []) or []]
+            gap_candidate_position_set = set(gap_candidate_positions)
+            gap_selected_positions = [
+                int(pos) for pos in final_front_positions
+                if int(pos) in gap_candidate_position_set
+            ]
+            selector_trace["gap_candidate_selected_into_final"] = list(gap_selected_positions)
+            selector_trace["gap_candidate_selected_count"] = int(len(gap_selected_positions))
+            selector_trace["gap_candidate_final_front_rate"] = round(
+                float(len(gap_selected_positions)) / float(max(len(gap_candidate_positions), 1)),
+                4,
+            )
+            ranking_rows = list((selector_trace.get("assemble_trace") or {}).get("ranking_rows") or [])
+            ce_score_by_position = {
+                int(row.get("pool_position", -1) or -1): float(row.get("assemble_score", row.get("ce_score", 0.0)) or 0.0)
+                for row in ranking_rows
+            }
+            selector_trace["gap_candidate_ce_scores"] = [
+                {
+                    "pool_position": int(pos),
+                    "ce_score": round(float(ce_score_by_position.get(int(pos), 0.0)), 4),
+                }
+                for pos in gap_candidate_positions
+            ]
+            gap_candidate_counts.append(int(len(gap_candidate_positions)))
+            gap_candidates_selected_into_final_counts.append(int(len(gap_selected_positions)))
         reordered_pool_positions = final_front_positions + [
             pos for pos in range(pool_limit)
             if pos not in selected_position_set
@@ -6326,6 +11373,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "append_max_docs": int(max(0, append_max_docs)),
                 "append_policy": normalized_append_policy,
                 "append_random_seed": int(append_random_seed),
+                "gap_expand_mode": normalized_gap_expand_mode,
+                "gap_expand_max_queries": int(effective_gap_expand_max_queries),
                 "expand_min_structure_score": round(float(expand_min_structure_score), 4),
                 "assemble_mode": normalized_assemble_mode,
                 "coverage_score_variant": normalized_coverage_score_variant,
@@ -6514,6 +11563,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "append_max_docs": int(max(int(append_max_docs), 0)),
             "append_policy": normalized_append_policy,
             "append_random_seed": int(append_random_seed),
+            "gap_expand_mode": normalized_gap_expand_mode,
+            "gap_expand_max_queries": int(effective_gap_expand_max_queries),
             "expand_min_structure_score": round(float(expand_min_structure_score), 4),
             "assemble_mode": normalized_assemble_mode,
             "coverage_score_variant": normalized_coverage_score_variant,
@@ -6521,6 +11572,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "coverage_admissibility_mode": normalized_coverage_admissibility_mode,
             "assemble_ce_model": str(ce_model) if normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES else None,
             "assemble_ce_device": str(ce_device) if normalized_assemble_mode in ASSEMBLE_CE_ACTIVE_MODES else None,
+            "action_swap_apply_count": int(action_swap_apply_count),
+            "action_swap_keep_count": int(action_swap_keep_count),
+            "action_swap_judge_count": int(action_swap_judge_count),
             "avg_appended_doc_count": round(float(np.mean(appended_doc_counts)) if appended_doc_counts else 0.0, 4),
             "avg_candidate_set_size": round(float(np.mean(expand_candidate_sizes)) if expand_candidate_sizes else 0.0, 4),
             "append_count_histogram": {
@@ -6529,6 +11583,25 @@ def apply_setwise_selector(hipporag: HippoRAG,
             },
             "append_stop_reason_counts": dict(sorted(append_stop_reason_counts.items())),
         })
+        if normalized_append_policy == "gap_expand":
+            summary.update({
+                "gap_expand_query_count": int(gap_expand_query_count),
+                "gap_expand_fallback_query_count": int(gap_expand_fallback_query_count),
+                "gap_expand_fallback_rate": round(
+                    float(gap_expand_fallback_query_count) / float(max(gap_expand_query_count, 1)),
+                    4,
+                ),
+                "gap_type_distribution": dict(sorted(gap_type_counts.items())),
+                "gap_slot_distribution": dict(sorted(gap_slot_counts.items())),
+                "gap_abstain_reason_counts": dict(sorted(gap_abstain_reason_counts.items())),
+                "avg_gap_micro_query_count": round(float(np.mean(gap_micro_query_counts)) if gap_micro_query_counts else 0.0, 4),
+                "avg_gap_candidate_count": round(float(np.mean(gap_candidate_counts)) if gap_candidate_counts else 0.0, 4),
+                "avg_gap_candidates_selected_into_final": round(float(np.mean(gap_candidates_selected_into_final_counts)) if gap_candidates_selected_into_final_counts else 0.0, 4),
+                "gap_candidate_selected_query_rate": round(
+                    float(sum(1 for count in gap_candidates_selected_into_final_counts if count > 0)) / float(max(len(gap_candidates_selected_into_final_counts), 1)),
+                    4,
+                ),
+            })
     if selector_name == "requirement_beam":
         summary.update({
             "requirement_mode": str((requirement_selector_bundle or {}).get("mode", "oracle")),
@@ -6653,6 +11726,20 @@ def load_baseline_report_payload(report_path: str | Path) -> Dict[str, object]:
         raise ValueError(f"Baseline report has no examples: {path}")
     overall_metrics = dict(payload.get("overall_recomputed") or payload.get("overall_from_pipeline") or {})
     if not overall_metrics:
+        report_metrics = dict(payload.get("report_metrics") or {})
+        primary_retrieval_metrics = dict(report_metrics.get("primary_retrieval_metrics") or {})
+        primary_qa_metrics = dict(report_metrics.get("primary_qa_metrics") or {})
+        if primary_retrieval_metrics or primary_qa_metrics:
+            overall_metrics = {
+                **primary_retrieval_metrics,
+                **primary_qa_metrics,
+                **(
+                    {"num_queries": int(report_metrics["num_queries"])}
+                    if report_metrics.get("num_queries") is not None
+                    else {}
+                ),
+            }
+    if not overall_metrics:
         raise ValueError(f"Baseline report has no overall metrics: {path}")
     return {
         "path": str(path),
@@ -6701,6 +11788,76 @@ def compute_retrieval_recall_metrics(
             recalls.append(len(gold_set & top_k_set) / max(1, len(gold_set)))
         metrics[f"Recall@{int(k)}"] = round(float(np.mean(recalls)), 4)
     return metrics
+
+
+def extract_retrieval_metrics(metrics: Mapping[str, object] | None) -> Dict[str, object]:
+    return {
+        str(key): value
+        for key, value in dict(metrics or {}).items()
+        if str(key).startswith("Recall@")
+    }
+
+
+def extract_qa_metrics(metrics: Mapping[str, object] | None) -> Dict[str, object]:
+    return {
+        str(key): value
+        for key, value in dict(metrics or {}).items()
+        if str(key) in {"ExactMatch", "F1"}
+    }
+
+
+def build_report_metrics_summary(
+    overall_metrics: Mapping[str, object] | None,
+    *,
+    expand_assemble_results: Mapping[str, object] | None = None,
+    setwise_selector_results: Mapping[str, object] | None = None,
+    cross_encoder_rerank_results: Mapping[str, object] | None = None,
+) -> Dict[str, object]:
+    baseline_retrieval_metrics = extract_retrieval_metrics(overall_metrics)
+    baseline_qa_metrics = extract_qa_metrics(overall_metrics)
+    num_queries = (
+        int(dict(overall_metrics or {}).get("num_queries", 0))
+        if dict(overall_metrics or {}).get("num_queries") is not None
+        else None
+    )
+
+    primary_run_type = "baseline"
+    primary_retrieval_metrics = dict(baseline_retrieval_metrics)
+    primary_qa_metrics = dict(baseline_qa_metrics)
+
+    if expand_assemble_results:
+        primary_run_type = "expand_assemble"
+        primary_retrieval_metrics = dict(expand_assemble_results.get("method_retrieval_metrics") or {})
+        primary_qa_metrics = {
+            "ExactMatch": expand_assemble_results.get("method_EM"),
+            "F1": expand_assemble_results.get("method_F1"),
+        }
+    elif setwise_selector_results:
+        primary_run_type = "setwise_selector"
+        primary_retrieval_metrics = dict(setwise_selector_results.get("selector_retrieval_metrics") or {})
+        primary_qa_metrics = {
+            "ExactMatch": setwise_selector_results.get("selector_EM"),
+            "F1": setwise_selector_results.get("selector_F1"),
+        }
+    elif cross_encoder_rerank_results:
+        primary_run_type = "cross_encoder_rerank"
+        primary_retrieval_metrics = dict(cross_encoder_rerank_results.get("ce_retrieval_metrics") or {})
+        primary_qa_metrics = {
+            "ExactMatch": cross_encoder_rerank_results.get("ce_rerank_EM"),
+            "F1": cross_encoder_rerank_results.get("ce_rerank_F1"),
+        }
+
+    summary: Dict[str, object] = {
+        "primary_run_type": primary_run_type,
+        "primary_retrieval_metrics": primary_retrieval_metrics,
+        "primary_qa_metrics": primary_qa_metrics,
+    }
+    if num_queries is not None:
+        summary["num_queries"] = num_queries
+    if primary_run_type != "baseline":
+        summary["baseline_retrieval_metrics"] = baseline_retrieval_metrics
+        summary["baseline_qa_metrics"] = baseline_qa_metrics
+    return summary
 
 
 def hydrate_query_solutions_from_baseline_report(query_solutions: Sequence[QuerySolution],
@@ -7302,6 +12459,10 @@ def main():
                         help="For --setwise_selector bridge_append, how deep-pool docs are proposed before answer-oriented assembly.")
     parser.add_argument("--append_random_seed", type=int, default=0,
                         help="For --append_policy random_deep, deterministic seed used to sample deep-pool docs.")
+    parser.add_argument("--gap_expand_mode", choices=sorted(GAP_EXPAND_MODES), default="heuristic",
+                        help="For --append_policy gap_expand, heuristic gap detector mode. heuristic infers one gap type from the scaffold; flat_fallback_only always uses the raw query.")
+    parser.add_argument("--gap_expand_max_queries", type=int, default=DEFAULT_GAP_EXPAND_MAX_QUERIES,
+                        help="For --append_policy gap_expand, maximum number of scaffold-conditioned micro-queries emitted per query.")
     parser.add_argument("--assemble_mode", choices=sorted(ASSEMBLE_MODES), default="cross_encoder",
                         help="For --setwise_selector bridge_append, answer-oriented assembly rerank mode applied over the expanded candidate set.")
     parser.add_argument("--coverage_score_variant", choices=sorted(COVERAGE_SCORE_VARIANTS), default="qe_ce",
@@ -7465,8 +12626,7 @@ def main():
         save_dir = f"{save_dir}_{dataset_name}"
     args.save_dir = save_dir
 
-    corpus_path = Path(f"reproduce/dataset/{dataset_name}_corpus.json")
-    sample_path = Path(f"reproduce/dataset/{dataset_name}.json")
+    corpus_path, sample_path = resolve_dataset_paths(dataset_name)
     corpus = json.load(corpus_path.open())
     samples = json.load(sample_path.open())
 
@@ -7678,7 +12838,14 @@ def main():
                 save_retrieval_cache_path,
             )
 
-        if bool(args.setwise_late_rerank_enabled) and setwise_selector == "bridge_beam":
+        should_build_external_judge_bundle = (
+            (bool(args.setwise_late_rerank_enabled) and setwise_selector == "bridge_beam")
+            or (
+                setwise_selector == "bridge_append"
+                and normalize_assemble_mode(args.assemble_mode) in ACTION_SWAP_V0_JUDGE_MODES
+            )
+        )
+        if should_build_external_judge_bundle:
             late_rerank_judge_bundle = build_setwise_late_rerank_judge_bundle(
                 args=args,
                 fallback_model_name=(
@@ -7923,6 +13090,8 @@ def main():
             append_max_docs=int(args.append_max_docs),
             append_policy=str(args.append_policy),
             append_random_seed=int(args.append_random_seed),
+            gap_expand_mode=str(args.gap_expand_mode),
+            gap_expand_max_queries=int(args.gap_expand_max_queries),
             ce_model=str(args.ce_model),
             ce_device=str(args.ce_device),
         )
@@ -7988,6 +13157,8 @@ def main():
                 "append_max_docs": int(args.append_max_docs),
                 "append_policy": normalize_append_policy(args.append_policy),
                 "append_random_seed": int(args.append_random_seed),
+                "gap_expand_mode": normalize_gap_expand_mode(args.gap_expand_mode),
+                "gap_expand_max_queries": int(max(int(args.gap_expand_max_queries), 1)),
                 "expand_min_structure_score": round(float(args.expand_min_structure_score), 4),
                 "assemble_mode": normalize_assemble_mode(args.assemble_mode),
                 "coverage_score_variant": normalize_coverage_score_variant(args.coverage_score_variant),
@@ -8260,6 +13431,12 @@ def main():
         hipporag=hipporag,
         query_solutions=query_solutions,
     )
+    report_metrics = build_report_metrics_summary(
+        slice_metrics["overall"],
+        expand_assemble_results=expand_assemble_results,
+        setwise_selector_results=setwise_selector_results,
+        cross_encoder_rerank_results=cross_encoder_rerank_results,
+    )
     result = {
         "dataset": dataset_name,
         "limit": len(samples),
@@ -8299,6 +13476,8 @@ def main():
             "append_max_docs": int(args.append_max_docs),
             "append_policy": normalize_append_policy(args.append_policy),
             "append_random_seed": int(args.append_random_seed),
+            "gap_expand_mode": normalize_gap_expand_mode(args.gap_expand_mode),
+            "gap_expand_max_queries": int(max(int(args.gap_expand_max_queries), 1)),
             "assemble_mode": normalize_assemble_mode(args.assemble_mode),
             "baseline_report_json": args.baseline_report_json or None,
             "retrieval_cache_json": args.retrieval_cache_json or None,
@@ -8370,6 +13549,7 @@ def main():
             **(overall_qa_results or {}),
         },
         "overall_recomputed": slice_metrics["overall"],
+        "report_metrics": report_metrics,
         "causal_slice": slice_metrics["causal_slice"],
         "nonempty_subgraph_slice": slice_metrics["nonempty_subgraph_slice"],
         "v2_metrics": v2_metrics,
@@ -8403,6 +13583,7 @@ def main():
     print_result = {
         "output_json": str(output_json),
         "overall_recomputed": result["overall_recomputed"],
+        "report_metrics": result["report_metrics"],
         "causal_slice": result["causal_slice"],
         "nonempty_subgraph_slice": result["nonempty_subgraph_slice"],
         "v2_metrics": result["v2_metrics"],

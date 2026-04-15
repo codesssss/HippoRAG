@@ -27,6 +27,7 @@ from requirement_beam_utils import (
     save_requirement_cache,
 )
 from src.hipporag.HippoRAG import HippoRAG
+from src.hipporag.utils.dataset_utils import resolve_dataset_paths
 
 
 def resolve_save_dir(save_dir: str, dataset: str) -> str:
@@ -36,8 +37,7 @@ def resolve_save_dir(save_dir: str, dataset: str) -> str:
 
 
 def load_dataset(dataset: str, limit: int) -> tuple[list[dict], list[dict]]:
-    corpus_path = Path(f"reproduce/dataset/{dataset}_corpus.json")
-    sample_path = Path(f"reproduce/dataset/{dataset}.json")
+    corpus_path, sample_path = resolve_dataset_paths(dataset)
     corpus = json.loads(corpus_path.read_text())
     samples = json.loads(sample_path.read_text())
     if limit and limit > 0:

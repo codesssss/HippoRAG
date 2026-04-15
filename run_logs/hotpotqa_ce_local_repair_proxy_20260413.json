@@ -1,0 +1,131 @@
+{
+  "metadata": {
+    "dataset": "hotpotqa",
+    "baseline_report": "outputs_step0_general_hotpotqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260407.json",
+    "repair_report": "outputs_step0_general_hotpotqa/eval_reports/width_match_bridge_append_plus_ce_local_repair_qatopk5_20260413smoke.json",
+    "swap_report": null,
+    "qa_top_k": 5,
+    "aligned_queries": 100
+  },
+  "proxy_sanity": {
+    "queries_with_positive_req_swap": 8,
+    "positive_req_swap_rate": 8.0,
+    "mean_missing_anchor_count": 0.86,
+    "median_missing_anchor_count": 0.0,
+    "mean_scaffold_component_count": 57.69,
+    "median_scaffold_component_count": 57.0,
+    "queries_with_positive_connector_gain": 6,
+    "queries_with_positive_anchor_gain": 2,
+    "queries_with_positive_both": 0,
+    "anchor_only_rate": 2.0,
+    "connector_only_rate": 6.0,
+    "connector_gain_histogram": {
+      "0": 108,
+      "1": 10,
+      "3": 2
+    },
+    "anchor_gain_histogram": {
+      "0": 116,
+      "1": 4
+    }
+  },
+  "repair_effect": {
+    "repair_applied_queries": 8,
+    "repair_applied_query_rate": 8.0,
+    "applied_swap_positive_em_rate": 0.0,
+    "applied_swap_positive_f1_rate": 0.0,
+    "applied_swap_avg_ce_drop_vs_scaffold": 4.7931,
+    "applied_swap_median_ce_drop_vs_scaffold": 4.2217,
+    "applied_swap_mean_delta_em": 0.0,
+    "applied_swap_mean_delta_f1": 0.0
+  },
+  "swap_overlap": {
+    "oracle_positive_queries": 0,
+    "proxy_positive_and_oracle_positive": 0,
+    "proxy_positive_and_oracle_positive_rate": 0.0,
+    "proxy_positive_but_oracle_negative": 8,
+    "oracle_positive_but_proxy_negative": 0
+  },
+  "top_repair_cases": [
+    {
+      "question": "The fourth episode The Simpsons' seventh season has what kind of theme?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 1.3945,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "The Food Wife",
+      "replace_title": "The Itchy &amp; Scratchy &amp; Poochie Show"
+    },
+    {
+      "question": "What 1944 Bollywood film was the mother of Bollywood actor Govinda in?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 2.3789,
+      "connector_gain_count": 0,
+      "anchor_gain_count": 1,
+      "candidate_title": "Adnan Siddiqui",
+      "replace_title": "Naach Govinda Naach"
+    },
+    {
+      "question": "What is the current home arena of the NHL team Chris Summers plays for?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 3.3164,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "1966–67 NHL season",
+      "replace_title": "San Antonio Rampage"
+    },
+    {
+      "question": "Of four Harry S. Truman Supreme Court candidates, who was the 53rd United States Secretary of the Treasury and the 13th Chief Justice of the United States?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 3.457,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Supreme Court of Nepal",
+      "replace_title": "Taft Court"
+    },
+    {
+      "question": "What movie did Chris Duesterdiek work on that was directed by Seth Rogen and Evan Goldberg?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 4.9863,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Bigfoot (TV series)",
+      "replace_title": "Pineapple Express (film)"
+    },
+    {
+      "question": "This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 5.4429,
+      "connector_gain_count": 0,
+      "anchor_gain_count": 1,
+      "candidate_title": "1982 Detroit Lions season",
+      "replace_title": "LaDainian Tomlinson"
+    },
+    {
+      "question": "Where is the ice hockey team based that Zdeno Chára currently serving as captain of?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 8.6211,
+      "connector_gain_count": 3,
+      "anchor_gain_count": 0,
+      "candidate_title": "1966–67 NHL season",
+      "replace_title": "Al Iafrate"
+    },
+    {
+      "question": "In what year was the Golden State NBA player, who was part of the Cavaliers-Warriors rivalry, named NBA Finals Most Valuable Player?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 8.748,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "2003 NBA draft",
+      "replace_title": "Kevin Durant"
+    }
+  ]
+}

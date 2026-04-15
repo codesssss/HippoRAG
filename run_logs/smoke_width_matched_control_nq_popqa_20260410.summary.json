@@ -1,0 +1,18 @@
+{
+  "rows": [
+    {
+      "dataset": "nq",
+      "run_type": "width_match_baseline_top10_plus_ce_qatopk5",
+      "em": 0.6,
+      "f1": 0.68,
+      "report": "outputs_step0_general_nq/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa_lightsmoke.json"
+    },
+    {
+      "dataset": "popqa",
+      "run_type": "width_match_baseline_top10_plus_ce_qatopk5",
+      "em": 0.0,
+      "f1": 0.4152,
+      "report": "outputs_step0_general_popqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa_lightsmoke.json"
+    }
+  ]
+}

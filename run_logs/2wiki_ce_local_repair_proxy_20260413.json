@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "dataset": "2wikimultihopqa",
+    "baseline_report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260407.json",
+    "repair_report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_ce_local_repair_qatopk5_20260413smoke.json",
+    "swap_report": "run_logs/2wiki_swap_value_smoke_20260411.json",
+    "qa_top_k": 5,
+    "aligned_queries": 100
+  },
+  "proxy_sanity": {
+    "queries_with_positive_req_swap": 5,
+    "positive_req_swap_rate": 5.0,
+    "mean_missing_anchor_count": 0.34,
+    "median_missing_anchor_count": 0.0,
+    "mean_scaffold_component_count": 86.79,
+    "median_scaffold_component_count": 76.0,
+    "queries_with_positive_connector_gain": 5,
+    "queries_with_positive_anchor_gain": 0,
+    "queries_with_positive_both": 0,
+    "anchor_only_rate": 0.0,
+    "connector_only_rate": 5.0,
+    "connector_gain_histogram": {
+      "0": 108,
+      "1": 10,
+      "3": 2,
+      "4": 2
+    },
+    "anchor_gain_histogram": {
+      "0": 122
+    }
+  },
+  "repair_effect": {
+    "repair_applied_queries": 5,
+    "repair_applied_query_rate": 5.0,
+    "applied_swap_positive_em_rate": 0.0,
+    "applied_swap_positive_f1_rate": 20.0,
+    "applied_swap_avg_ce_drop_vs_scaffold": -1.0876,
+    "applied_swap_median_ce_drop_vs_scaffold": -0.8271,
+    "applied_swap_mean_delta_em": -0.2,
+    "applied_swap_mean_delta_f1": -0.2309
+  },
+  "swap_overlap": {
+    "oracle_positive_queries": 7,
+    "proxy_positive_and_oracle_positive": 0,
+    "proxy_positive_and_oracle_positive_rate": 0.0,
+    "proxy_positive_but_oracle_negative": 5,
+    "oracle_positive_but_proxy_negative": 7
+  },
+  "top_repair_cases": [
+    {
+      "question": "Which country the performer of song I Like Control is from?",
+      "delta_em": 0.0,
+      "delta_f1": 0.05,
+      "ce_drop_vs_scaffold": -0.8271,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Alicia Keys",
+      "replace_title": "Nathan Sykes"
+    },
+    {
+      "question": "What nationality is the performer of song When The Stars Go Blue?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": -1.8834,
+      "connector_gain_count": 3,
+      "anchor_gain_count": 0,
+      "candidate_title": "Alicia Keys",
+      "replace_title": "Astrid North"
+    },
+    {
+      "question": "Which country Aleksander Koniecpolski (1620–1659)'s father is from?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": -0.4453,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Roman Polanski",
+      "replace_title": "Aleksander Ford"
+    },
+    {
+      "question": "What is the place of birth of the performer of song Changed It?",
+      "delta_em": 0.0,
+      "delta_f1": -0.2045,
+      "ce_drop_vs_scaffold": -0.4033,
+      "connector_gain_count": 4,
+      "anchor_gain_count": 0,
+      "candidate_title": "Alicia Keys",
+      "replace_title": "Alex da Kid"
+    },
+    {
+      "question": "Are both movies, Naked Tango and Algiers (Film), from the same country?",
+      "delta_em": -1.0,
+      "delta_f1": -1.0,
+      "ce_drop_vs_scaffold": -1.8789,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Alain Corneau",
+      "replace_title": "A Night at the Moulin Rouge"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "runs": [
+    {
+      "dataset": "2wikimultihopqa",
+      "cache_path": "research_memory/emnlp_expand_then_compose/models/2wikimultihopqa_requirement_cache_pool100_ann50_limit40.json",
+      "output_json": "outputs_step0_general_2wikimultihopqa/eval_reports/requirement_beam_oracle_smoke40_v2_legacyfact_pool100_ann50_reserve3_dedup.json",
+      "baseline_EM": 0.375,
+      "baseline_F1": 0.442,
+      "selector_EM": 0.425,
+      "selector_F1": 0.5307,
+      "avg_support_completeness": 0.6177,
+      "avg_counterfactual_leakage": 0.9704,
+      "avg_frontier_size": 3.225,
+      "requirement_mode": "oracle",
+      "requirement_cache_hit_count": 40,
+      "EM_delta": 0.05,
+      "F1_delta": 0.0887
+    },
+    {
+      "dataset": "musique",
+      "cache_path": "research_memory/emnlp_expand_then_compose/models/musique_requirement_cache_pool100_ann50_limit40.json",
+      "output_json": "outputs_step0_general_musique/eval_reports/requirement_beam_oracle_smoke40_v2_legacyfact_pool100_ann50_reserve3_dedup.json",
+      "baseline_EM": 0.375,
+      "baseline_F1": 0.4016,
+      "selector_EM": 0.325,
+      "selector_F1": 0.3361,
+      "avg_support_completeness": 0.5065,
+      "avg_counterfactual_leakage": 0.9517,
+      "avg_frontier_size": 3.2375,
+      "requirement_mode": "oracle",
+      "requirement_cache_hit_count": 40,
+      "EM_delta": -0.05,
+      "F1_delta": -0.0655
+    }
+  ]
+}

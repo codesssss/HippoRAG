@@ -3,6 +3,7 @@ from typing import List
 import json
 
 from src.hipporag.HippoRAG import HippoRAG
+from src.hipporag.utils.dataset_utils import resolve_dataset_paths
 from src.hipporag.utils.misc_utils import string_to_bool
 from src.hipporag.utils.config_utils import BaseConfig
 
@@ -97,7 +98,7 @@ def main():
     azure_endpoint = args.azure_endpoint
     azure_embedding_endpoint = args.azure_embedding_endpoint
 
-    corpus_path = f"reproduce/dataset/{dataset_name}_corpus.json"
+    corpus_path, sample_path = resolve_dataset_paths(dataset_name)
     with open(corpus_path, "r") as f:
         corpus = json.load(f)
 
@@ -107,7 +108,7 @@ def main():
     force_openie_from_scratch = string_to_bool(args.force_openie_from_scratch)
 
     # Prepare datasets and evaluation
-    samples = json.load(open(f"reproduce/dataset/{dataset_name}.json", "r"))
+    samples = json.load(open(sample_path, "r"))
     all_queries = [s['question'] for s in samples]
 
     gold_answers = get_gold_answers(samples)

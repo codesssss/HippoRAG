@@ -26,13 +26,14 @@ from eval_causal_qwen3 import (  # noqa: E402
     normalize_structure_text,
 )
 from src.hipporag.HippoRAG import HippoRAG  # noqa: E402
+from src.hipporag.utils.dataset_utils import resolve_dataset_paths  # noqa: E402
 
 
 LOGGER = logging.getLogger(__name__)
 
 
 def load_corpus(dataset: str) -> List[dict]:
-    corpus_path = ROOT_DIR / "reproduce" / "dataset" / f"{dataset}_corpus.json"
+    corpus_path, _ = resolve_dataset_paths(dataset, ROOT_DIR / "reproduce" / "dataset")
     return json.loads(corpus_path.read_text(encoding="utf-8"))
 
 

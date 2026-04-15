@@ -1,0 +1,2412 @@
+{
+  "shared_query_count": 40,
+  "control_report": "",
+  "candidate_report": "",
+  "overall": {
+    "f1": {
+      "win": 1,
+      "tie": 37,
+      "lose": 2,
+      "mean_delta": -0.0125
+    },
+    "em": {
+      "win": 1,
+      "tie": 38,
+      "lose": 1,
+      "mean_delta": 0.0
+    }
+  },
+  "subsets": {
+    "all": {
+      "count": 40,
+      "f1": {
+        "win": 1,
+        "tie": 37,
+        "lose": 2,
+        "mean_delta": -0.0125
+      },
+      "em": {
+        "win": 1,
+        "tie": 38,
+        "lose": 1,
+        "mean_delta": 0.0
+      },
+      "changed_evidence_rate": 0.15,
+      "selected_gap_rate": 0.125
+    },
+    "selected_gap": {
+      "count": 5,
+      "f1": {
+        "win": 1,
+        "tie": 2,
+        "lose": 2,
+        "mean_delta": -0.1
+      },
+      "em": {
+        "win": 1,
+        "tie": 3,
+        "lose": 1,
+        "mean_delta": 0.0
+      },
+      "changed_evidence_rate": 1.0,
+      "selected_gap_rate": 1.0
+    },
+    "non_selected_gap": {
+      "count": 35,
+      "f1": {
+        "win": 0,
+        "tie": 35,
+        "lose": 0,
+        "mean_delta": 0.0
+      },
+      "em": {
+        "win": 0,
+        "tie": 35,
+        "lose": 0,
+        "mean_delta": 0.0
+      },
+      "changed_evidence_rate": 0.0286,
+      "selected_gap_rate": 0.0
+    },
+    "changed_evidence": {
+      "count": 6,
+      "f1": {
+        "win": 1,
+        "tie": 3,
+        "lose": 2,
+        "mean_delta": -0.0833
+      },
+      "em": {
+        "win": 1,
+        "tie": 4,
+        "lose": 1,
+        "mean_delta": 0.0
+      },
+      "changed_evidence_rate": 1.0,
+      "selected_gap_rate": 0.8333
+    },
+    "unchanged_evidence": {
+      "count": 34,
+      "f1": {
+        "win": 0,
+        "tie": 34,
+        "lose": 0,
+        "mean_delta": 0.0
+      },
+      "em": {
+        "win": 0,
+        "tie": 34,
+        "lose": 0,
+        "mean_delta": 0.0
+      },
+      "changed_evidence_rate": 0.0,
+      "selected_gap_rate": 0.0
+    },
+    "improvements": {
+      "count": 1,
+      "f1": {
+        "win": 1,
+        "tie": 0,
+        "lose": 0,
+        "mean_delta": 1.0
+      },
+      "em": {
+        "win": 1,
+        "tie": 0,
+        "lose": 0,
+        "mean_delta": 1.0
+      },
+      "changed_evidence_rate": 1.0,
+      "selected_gap_rate": 1.0
+    },
+    "regressions": {
+      "count": 2,
+      "f1": {
+        "win": 0,
+        "tie": 0,
+        "lose": 2,
+        "mean_delta": -0.75
+      },
+      "em": {
+        "win": 0,
+        "tie": 1,
+        "lose": 1,
+        "mean_delta": -0.5
+      },
+      "changed_evidence_rate": 1.0,
+      "selected_gap_rate": 1.0
+    }
+  },
+  "by_bucket": {
+    "2_doc": {
+      "count": 32,
+      "f1": {
+        "win": 0,
+        "tie": 31,
+        "lose": 1,
+        "mean_delta": -0.0156
+      },
+      "em": {
+        "win": 0,
+        "tie": 32,
+        "lose": 0,
+        "mean_delta": 0.0
+      },
+      "changed_evidence_rate": 0.125,
+      "selected_gap_rate": 0.0938
+    },
+    "4_doc": {
+      "count": 8,
+      "f1": {
+        "win": 1,
+        "tie": 6,
+        "lose": 1,
+        "mean_delta": 0.0
+      },
+      "em": {
+        "win": 1,
+        "tie": 6,
+        "lose": 1,
+        "mean_delta": 0.0
+      },
+      "changed_evidence_rate": 0.25,
+      "selected_gap_rate": 0.25
+    }
+  },
+  "by_stop_reason": {
+    "alternate_only_complete": {
+      "count": 7,
+      "mean_delta_f1": -0.0714,
+      "win": 1,
+      "lose": 2
+    },
+    "append_cap_reached": {
+      "count": 2,
+      "mean_delta_f1": 0.0,
+      "win": 0,
+      "lose": 0
+    },
+    "no_typed_alternate": {
+      "count": 4,
+      "mean_delta_f1": 0.0,
+      "win": 0,
+      "lose": 0
+    },
+    "structure_below_threshold": {
+      "count": 26,
+      "mean_delta_f1": 0.0,
+      "win": 0,
+      "lose": 0
+    },
+    "typed_alternate_below_threshold": {
+      "count": 1,
+      "mean_delta_f1": 0.0,
+      "win": 0,
+      "lose": 0
+    }
+  },
+  "gap_summary": {
+    "gap_type_distribution": {
+      "target_attribute": 14,
+      "abstain": 12,
+      "role_relation": 14
+    },
+    "fallback_used_count": 12,
+    "selected_gap_count": 5,
+    "selected_gap_rate": 0.125,
+    "top_selected_gap_titles_in_regressions": [
+      {
+        "title": "Roman Polanski",
+        "count": 2
+      }
+    ],
+    "top_selected_gap_titles_in_improvements": [
+      {
+        "title": "Kenneth Branagh",
+        "count": 1
+      }
+    ]
+  },
+  "cases": {
+    "improvements": [
+      {
+        "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+        "query_type": "standard",
+        "gold_doc_count": 4,
+        "bucket": "4_doc",
+        "control_f1": 0.0,
+        "candidate_f1": 1.0,
+        "delta_f1": 1.0,
+        "control_em": 0.0,
+        "candidate_em": 1.0,
+        "delta_em": 1.0,
+        "f1_outcome": "win",
+        "em_outcome": "win",
+        "control_answer": "Aldri Annet Enn Bråk\" because Edith Carlmar was born in 1",
+        "candidate_answer": "God's Gift to Women.",
+        "control_titles": [
+          "God's Gift to Women",
+          "Aldri annet enn bråk",
+          "Edith Carlmar",
+          "Altid ballade",
+          "Ingmar Bergman"
+        ],
+        "candidate_titles": [
+          "God's Gift to Women",
+          "Aldri annet enn bråk",
+          "Edith Carlmar",
+          "Altid ballade",
+          "Kenneth Branagh"
+        ],
+        "added_titles": [
+          "Kenneth Branagh"
+        ],
+        "removed_titles": [
+          "Ingmar Bergman"
+        ],
+        "gap_type": "role_relation",
+        "gap_fallback_used": false,
+        "append_stop_reason": "alternate_only_complete",
+        "gap_micro_queries": [
+          "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+          "Find the director of film and god s gift to women. Question: Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?"
+        ],
+        "gap_candidate_titles": [
+          "Kenneth Branagh"
+        ],
+        "gap_candidate_positions": [
+          84
+        ],
+        "gap_candidate_selected_count": 1,
+        "gap_candidate_selected_into_final": true,
+        "gap_candidate_final_front_rate": 1.0,
+        "selected_gap_titles": [
+          "Kenneth Branagh"
+        ],
+        "changed_evidence": true
+      }
+    ],
+    "regressions": [
+      {
+        "question": "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+        "query_type": "standard",
+        "gold_doc_count": 4,
+        "bucket": "4_doc",
+        "control_f1": 1.0,
+        "candidate_f1": 0.0,
+        "delta_f1": -1.0,
+        "control_em": 1.0,
+        "candidate_em": 0.0,
+        "delta_em": -1.0,
+        "f1_outcome": "lose",
+        "em_outcome": "lose",
+        "control_answer": "45 Fathers.",
+        "candidate_answer": "Cannot be determined from the provided evidence.",
+        "control_titles": [
+          "45 Fathers",
+          "Christ Walking on the Water",
+          "Chris Matheson (screenwriter)",
+          "Marcelino Manuel da Graça",
+          "James Tinling"
+        ],
+        "candidate_titles": [
+          "45 Fathers",
+          "Christ Walking on the Water",
+          "Roman Polanski",
+          "Chris Matheson (screenwriter)",
+          "Marcelino Manuel da Graça"
+        ],
+        "added_titles": [
+          "Roman Polanski"
+        ],
+        "removed_titles": [
+          "James Tinling"
+        ],
+        "gap_type": "role_relation",
+        "gap_fallback_used": false,
+        "append_stop_reason": "alternate_only_complete",
+        "gap_micro_queries": [
+          "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+          "Find the director of christ walking on the water and 45 fathers. Question: Which film has the director born later, Christ Walking On The Water or 45 Fathers?"
+        ],
+        "gap_candidate_titles": [
+          "Roman Polanski"
+        ],
+        "gap_candidate_positions": [
+          47
+        ],
+        "gap_candidate_selected_count": 1,
+        "gap_candidate_selected_into_final": true,
+        "gap_candidate_final_front_rate": 1.0,
+        "selected_gap_titles": [
+          "Roman Polanski"
+        ],
+        "changed_evidence": true
+      },
+      {
+        "question": "What is the place of birth of the director of film The Return Of Swamp Thing?",
+        "query_type": "standard",
+        "gold_doc_count": 2,
+        "bucket": "2_doc",
+        "control_f1": 0.5,
+        "candidate_f1": 0.0,
+        "delta_f1": -0.5,
+        "control_em": 0.0,
+        "candidate_em": 0.0,
+        "delta_em": 0.0,
+        "f1_outcome": "lose",
+        "em_outcome": "tie",
+        "control_answer": "Glen Cove, Long Island, New York.",
+        "candidate_answer": "Not mentioned.",
+        "control_titles": [
+          "The Return of Swamp Thing",
+          "Swamp Thing (film)",
+          "Dick Durock",
+          "Roger Corman",
+          "Jim Wynorski"
+        ],
+        "candidate_titles": [
+          "The Return of Swamp Thing",
+          "Swamp Thing (film)",
+          "Dick Durock",
+          "Roman Polanski",
+          "Roger Corman"
+        ],
+        "added_titles": [
+          "Roman Polanski"
+        ],
+        "removed_titles": [
+          "Jim Wynorski"
+        ],
+        "gap_type": "role_relation",
+        "gap_fallback_used": false,
+        "append_stop_reason": "alternate_only_complete",
+        "gap_micro_queries": [
+          "What is the place of birth of the director of film The Return Of Swamp Thing?",
+          "Find the director of the return of swamp thing and swamp thing. Question: What is the place of birth of the director of film The Return Of Swamp Thing?"
+        ],
+        "gap_candidate_titles": [
+          "Roman Polanski"
+        ],
+        "gap_candidate_positions": [
+          35
+        ],
+        "gap_candidate_selected_count": 1,
+        "gap_candidate_selected_into_final": true,
+        "gap_candidate_final_front_rate": 1.0,
+        "selected_gap_titles": [
+          "Roman Polanski"
+        ],
+        "changed_evidence": true
+      }
+    ],
+    "regressions_with_selected_gap": [
+      {
+        "question": "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+        "query_type": "standard",
+        "gold_doc_count": 4,
+        "bucket": "4_doc",
+        "control_f1": 1.0,
+        "candidate_f1": 0.0,
+        "delta_f1": -1.0,
+        "control_em": 1.0,
+        "candidate_em": 0.0,
+        "delta_em": -1.0,
+        "f1_outcome": "lose",
+        "em_outcome": "lose",
+        "control_answer": "45 Fathers.",
+        "candidate_answer": "Cannot be determined from the provided evidence.",
+        "control_titles": [
+          "45 Fathers",
+          "Christ Walking on the Water",
+          "Chris Matheson (screenwriter)",
+          "Marcelino Manuel da Graça",
+          "James Tinling"
+        ],
+        "candidate_titles": [
+          "45 Fathers",
+          "Christ Walking on the Water",
+          "Roman Polanski",
+          "Chris Matheson (screenwriter)",
+          "Marcelino Manuel da Graça"
+        ],
+        "added_titles": [
+          "Roman Polanski"
+        ],
+        "removed_titles": [
+          "James Tinling"
+        ],
+        "gap_type": "role_relation",
+        "gap_fallback_used": false,
+        "append_stop_reason": "alternate_only_complete",
+        "gap_micro_queries": [
+          "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+          "Find the director of christ walking on the water and 45 fathers. Question: Which film has the director born later, Christ Walking On The Water or 45 Fathers?"
+        ],
+        "gap_candidate_titles": [
+          "Roman Polanski"
+        ],
+        "gap_candidate_positions": [
+          47
+        ],
+        "gap_candidate_selected_count": 1,
+        "gap_candidate_selected_into_final": true,
+        "gap_candidate_final_front_rate": 1.0,
+        "selected_gap_titles": [
+          "Roman Polanski"
+        ],
+        "changed_evidence": true
+      },
+      {
+        "question": "What is the place of birth of the director of film The Return Of Swamp Thing?",
+        "query_type": "standard",
+        "gold_doc_count": 2,
+        "bucket": "2_doc",
+        "control_f1": 0.5,
+        "candidate_f1": 0.0,
+        "delta_f1": -0.5,
+        "control_em": 0.0,
+        "candidate_em": 0.0,
+        "delta_em": 0.0,
+        "f1_outcome": "lose",
+        "em_outcome": "tie",
+        "control_answer": "Glen Cove, Long Island, New York.",
+        "candidate_answer": "Not mentioned.",
+        "control_titles": [
+          "The Return of Swamp Thing",
+          "Swamp Thing (film)",
+          "Dick Durock",
+          "Roger Corman",
+          "Jim Wynorski"
+        ],
+        "candidate_titles": [
+          "The Return of Swamp Thing",
+          "Swamp Thing (film)",
+          "Dick Durock",
+          "Roman Polanski",
+          "Roger Corman"
+        ],
+        "added_titles": [
+          "Roman Polanski"
+        ],
+        "removed_titles": [
+          "Jim Wynorski"
+        ],
+        "gap_type": "role_relation",
+        "gap_fallback_used": false,
+        "append_stop_reason": "alternate_only_complete",
+        "gap_micro_queries": [
+          "What is the place of birth of the director of film The Return Of Swamp Thing?",
+          "Find the director of the return of swamp thing and swamp thing. Question: What is the place of birth of the director of film The Return Of Swamp Thing?"
+        ],
+        "gap_candidate_titles": [
+          "Roman Polanski"
+        ],
+        "gap_candidate_positions": [
+          35
+        ],
+        "gap_candidate_selected_count": 1,
+        "gap_candidate_selected_into_final": true,
+        "gap_candidate_final_front_rate": 1.0,
+        "selected_gap_titles": [
+          "Roman Polanski"
+        ],
+        "changed_evidence": true
+      }
+    ]
+  },
+  "query_rows": [
+    {
+      "question": "When did Lothair Ii's mother die?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Not mentioned.",
+      "candidate_answer": "Not mentioned.",
+      "control_titles": [
+        "Lothair II",
+        "Lambert, Margrave of Tuscany",
+        "Bertha, daughter of Lothair II",
+        "Teutberga",
+        "Louis the Pious"
+      ],
+      "candidate_titles": [
+        "Lothair II",
+        "Lambert, Margrave of Tuscany",
+        "Bertha, daughter of Lothair II",
+        "Teutberga",
+        "Louis the Pious"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "alternate_only_complete",
+      "gap_micro_queries": [
+        "When did Lothair Ii's mother die?",
+        "Find when lothair ii of lotharingia died. Question: When did Lothair Ii's mother die?"
+      ],
+      "gap_candidate_titles": [
+        "Wilbert (archbishop of Cologne)"
+      ],
+      "gap_candidate_positions": [
+        61
+      ],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Phoolwari.",
+      "candidate_answer": "Phoolwari.",
+      "control_titles": [
+        "Aas Ka Panchhi",
+        "Phoolwari",
+        "Rani Mukerji",
+        "Har Dil Jo Pyar Karega",
+        "Aa Naluguru"
+      ],
+      "candidate_titles": [
+        "Aas Ka Panchhi",
+        "Phoolwari",
+        "Rani Mukerji",
+        "Har Dil Jo Pyar Karega",
+        "Aa Naluguru"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "append_cap_reached",
+      "gap_micro_queries": [
+        "Which film was released first, Aas Ka Panchhi or Phoolwari?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What is the place of birth of the performer of song Changed It?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.5455,
+      "candidate_f1": 0.5455,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Saint James, Port of Spain, Trinidad and Tobago.",
+      "candidate_answer": "Saint James, Port of Spain, Trinidad and Tobago.",
+      "control_titles": [
+        "Changed It",
+        "Nicki Minaj",
+        "Chris Brown",
+        "Jay-Z",
+        "Alicia Keys"
+      ],
+      "candidate_titles": [
+        "Changed It",
+        "Nicki Minaj",
+        "Chris Brown",
+        "Jay-Z",
+        "Alicia Keys"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "append_cap_reached",
+      "gap_micro_queries": [
+        "What is the place of birth of the performer of song Changed It?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "No.",
+      "candidate_answer": "No.",
+      "control_titles": [
+        "Marufabad",
+        "Nasamkhrali",
+        "Muhammad ibn Musafir",
+        "'Adud al-Dawla",
+        "Radisele"
+      ],
+      "candidate_titles": [
+        "Marufabad",
+        "Nasamkhrali",
+        "Muhammad ibn Musafir",
+        "'Adud al-Dawla",
+        "Radisele"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Are Marufabad and Nasamkhrali both located in the same country?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 1.0,
+      "control_em": 0.0,
+      "candidate_em": 1.0,
+      "delta_em": 1.0,
+      "f1_outcome": "win",
+      "em_outcome": "win",
+      "control_answer": "Aldri Annet Enn Bråk\" because Edith Carlmar was born in 1",
+      "candidate_answer": "God's Gift to Women.",
+      "control_titles": [
+        "God's Gift to Women",
+        "Aldri annet enn bråk",
+        "Edith Carlmar",
+        "Altid ballade",
+        "Ingmar Bergman"
+      ],
+      "candidate_titles": [
+        "God's Gift to Women",
+        "Aldri annet enn bråk",
+        "Edith Carlmar",
+        "Altid ballade",
+        "Kenneth Branagh"
+      ],
+      "added_titles": [
+        "Kenneth Branagh"
+      ],
+      "removed_titles": [
+        "Ingmar Bergman"
+      ],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "alternate_only_complete",
+      "gap_micro_queries": [
+        "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+        "Find the director of film and god s gift to women. Question: Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?"
+      ],
+      "gap_candidate_titles": [
+        "Kenneth Branagh"
+      ],
+      "gap_candidate_positions": [
+        84
+      ],
+      "gap_candidate_selected_count": 1,
+      "gap_candidate_selected_into_final": true,
+      "gap_candidate_final_front_rate": 1.0,
+      "selected_gap_titles": [
+        "Kenneth Branagh"
+      ],
+      "changed_evidence": true
+    },
+    {
+      "question": "Which film whose director was born first, El Tonto or The Heart Of Doreon?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "that the information is not available.",
+      "candidate_answer": "that the information is not available.",
+      "control_titles": [
+        "The Heart of Doreon",
+        "El Tonto",
+        "Thomas Doret",
+        "To the Heart",
+        "Arne Toonen"
+      ],
+      "candidate_titles": [
+        "The Heart of Doreon",
+        "El Tonto",
+        "Thomas Doret",
+        "To the Heart",
+        "Arne Toonen"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Which film whose director was born first, El Tonto or The Heart Of Doreon?",
+        "Find the director of the heart of doreon and in the heart of doreon. Question: Which film whose director was born first, El Tonto or The Heart Of Doreon?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Who was born first out of Aivar Kuusmaa and Andy Summers?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Andy Summers.",
+      "candidate_answer": "Andy Summers.",
+      "control_titles": [
+        "Andy Summers",
+        "Aivar Kuusmaa",
+        "Aki Kaurismäki",
+        "Andrea Corr",
+        "John Kastner"
+      ],
+      "candidate_titles": [
+        "Andy Summers",
+        "Aivar Kuusmaa",
+        "Aki Kaurismäki",
+        "Andrea Corr",
+        "John Kastner"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Who was born first out of Aivar Kuusmaa and Andy Summers?",
+        "Find the birthplace of aivar kuusmaa. Question: Who was born first out of Aivar Kuusmaa and Andy Summers?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Who is Raghnall Mac Ruaidhrí's paternal grandfather?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Ailéan mac Ruaidhrí.",
+      "candidate_answer": "Ailéan mac Ruaidhrí.",
+      "control_titles": [
+        "Raghnall Mac Ruaidhrí",
+        "Ruaidhrí Mac Ruaidhrí",
+        "Lugaid Íardonn",
+        "Dáire Drechlethan",
+        "Conall mac Comgaill"
+      ],
+      "candidate_titles": [
+        "Raghnall Mac Ruaidhrí",
+        "Ruaidhrí Mac Ruaidhrí",
+        "Lugaid Íardonn",
+        "Dáire Drechlethan",
+        "Conall mac Comgaill"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Who is Raghnall Mac Ruaidhrí's paternal grandfather?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Do both films Interview With A Hitman and The Last Coupon have the directors from the same country?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Yes.",
+      "candidate_answer": "Yes.",
+      "control_titles": [
+        "Interview with a Hitman",
+        "The Last Coupon",
+        "Perry Bhandal",
+        "Luke Goss",
+        "Andrew Lau"
+      ],
+      "candidate_titles": [
+        "Interview with a Hitman",
+        "The Last Coupon",
+        "Perry Bhandal",
+        "Luke Goss",
+        "Andrew Lau"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Do both films Interview With A Hitman and The Last Coupon have the directors from the same country?",
+        "Find the director of interview with a hitman and perry bhandal. Question: Do both films Interview With A Hitman and The Last Coupon have the directors from the same country?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What nationality is the director of film Blood Street?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Not specified.",
+      "candidate_answer": "Not specified.",
+      "control_titles": [
+        "Blood Street",
+        "The Blood Demon",
+        "Jackie Kong",
+        "Wrong Turn 5: Bloodlines",
+        "The Camp on Blood Island"
+      ],
+      "candidate_titles": [
+        "Blood Street",
+        "The Blood Demon",
+        "Jackie Kong",
+        "Wrong Turn 5: Bloodlines",
+        "The Camp on Blood Island"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "What nationality is the director of film Blood Street?",
+        "Find the director of film and blood street. Question: What nationality is the director of film Blood Street?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What is the place of birth of the director of film Gaby: A True Story?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Mexico City.",
+      "candidate_answer": "Mexico City.",
+      "control_titles": [
+        "Gaby: A True Story",
+        "Luis Mandoki",
+        "Charles Giblyn",
+        "Gracia Querejeta",
+        "Gérard Oury"
+      ],
+      "candidate_titles": [
+        "Gaby: A True Story",
+        "Luis Mandoki",
+        "Charles Giblyn",
+        "Gracia Querejeta",
+        "Gérard Oury"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "What is the place of birth of the director of film Gaby: A True Story?",
+        "Find the director of gaby a true story and luis mandoki. Question: What is the place of birth of the director of film Gaby: A True Story?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Are Vasilyevsky Island and Preobrazheniya Island located in the same country?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Yes.",
+      "candidate_answer": "Yes.",
+      "control_titles": [
+        "Vasilyevsky Island",
+        "Preobrazheniya Island",
+        "Ingmarsö",
+        "Runmarö",
+        "Henry Island (Nova Scotia)"
+      ],
+      "candidate_titles": [
+        "Vasilyevsky Island",
+        "Preobrazheniya Island",
+        "Ingmarsö",
+        "Runmarö",
+        "Henry Island (Nova Scotia)"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Are Vasilyevsky Island and Preobrazheniya Island located in the same country?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What nationality is the performer of song When The Stars Go Blue?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "American.",
+      "candidate_answer": "American.",
+      "control_titles": [
+        "When the Stars Go Blue",
+        "Andrea Corr",
+        "Alicia Keys",
+        "Bing Crosby",
+        "Frank Sinatra"
+      ],
+      "candidate_titles": [
+        "When the Stars Go Blue",
+        "Andrea Corr",
+        "Bing Crosby",
+        "Ryan Adams",
+        "Elan Atias"
+      ],
+      "added_titles": [
+        "Ryan Adams",
+        "Elan Atias"
+      ],
+      "removed_titles": [
+        "Alicia Keys",
+        "Frank Sinatra"
+      ],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "no_typed_alternate",
+      "gap_micro_queries": [
+        "What nationality is the performer of song When The Stars Go Blue?",
+        "Find the nationality or country of ryan adams. Question: What nationality is the performer of song When The Stars Go Blue?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": true
+    },
+    {
+      "question": "Who is the child of the performer of song Me And Bobby Mcgee?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "The child of the performer of \"Me and Bobby McGee\" is not mentioned in the provided text.",
+      "candidate_answer": "The child of the performer of \"Me and Bobby McGee\" is not mentioned in the provided text.",
+      "control_titles": [
+        "Me and Bobby McGee",
+        "Janis Joplin",
+        "Fred Foster",
+        "Chuck Berry",
+        "David Williams (guitarist)"
+      ],
+      "candidate_titles": [
+        "Me and Bobby McGee",
+        "Janis Joplin",
+        "Fred Foster",
+        "Chuck Berry",
+        "David Williams (guitarist)"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Who is the child of the performer of song Me And Bobby Mcgee?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Where was the place of death of Maurice, Prince Of Orange's father?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Delft.",
+      "candidate_answer": "Delft.",
+      "control_titles": [
+        "Maurice, Prince of Orange",
+        "William of Nassau (1601–1627)",
+        "Margaretha van Mechelen",
+        "Louis of Nassau, Lord of De Lek and Beverweerd",
+        "William the Silent"
+      ],
+      "candidate_titles": [
+        "Maurice, Prince of Orange",
+        "William of Nassau (1601–1627)",
+        "Margaretha van Mechelen",
+        "Louis of Nassau, Lord of De Lek and Beverweerd",
+        "William the Silent"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "alternate_only_complete",
+      "gap_micro_queries": [
+        "Where was the place of death of Maurice, Prince Of Orange's father?",
+        "Find the birthplace of william the silent. Question: Where was the place of death of Maurice, Prince Of Orange's father?"
+      ],
+      "gap_candidate_titles": [
+        "John Ernest, Duke of Saxe-Eisenach"
+      ],
+      "gap_candidate_positions": [
+        41
+      ],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Which country Aleksander Koniecpolski (1620–1659)'s father is from?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Poland.",
+      "candidate_answer": "Poland.",
+      "control_titles": [
+        "Aleksander Koniecpolski (1620–1659)",
+        "Stanisław Koniecpolski",
+        "Aleksander Koniecpolski (1555–1609)",
+        "Alexander of Masovia",
+        "Roman Polanski"
+      ],
+      "candidate_titles": [
+        "Aleksander Koniecpolski (1620–1659)",
+        "Stanisław Koniecpolski",
+        "Aleksander Koniecpolski (1555–1609)",
+        "Alexander of Masovia",
+        "Roman Polanski"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "no_typed_alternate",
+      "gap_micro_queries": [
+        "Which country Aleksander Koniecpolski (1620–1659)'s father is from?",
+        "Find the nationality or country of stanis aw koniecpolski. Question: Which country Aleksander Koniecpolski (1620–1659)'s father is from?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What is the date of death of the director of film Madame La Presidente?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "10 August 1960.",
+      "candidate_answer": "10 August 1960.",
+      "control_titles": [
+        "Madame la Presidente",
+        "Frank Lloyd",
+        "Alain Corneau",
+        "Alice Guy-Blaché",
+        "Albert Parker (director)"
+      ],
+      "candidate_titles": [
+        "Madame la Presidente",
+        "Frank Lloyd",
+        "Alain Corneau",
+        "Alice Guy-Blaché",
+        "Albert Parker (director)"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "What is the date of death of the director of film Madame La Presidente?",
+        "Find the director of madame la presidente and frank lloyd. Question: What is the date of death of the director of film Madame La Presidente?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Do both directors of films Wrong Turn 5: Bloodlines and Dark River (2017 Film) have the same nationality?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "No.",
+      "candidate_answer": "No.",
+      "control_titles": [
+        "Dark River (2017 film)",
+        "Wrong Turn 5: Bloodlines",
+        "Declan O'Brien",
+        "Dark River (1990 film)",
+        "Wrong Turn: The Foundation"
+      ],
+      "candidate_titles": [
+        "Dark River (2017 film)",
+        "Wrong Turn 5: Bloodlines",
+        "Declan O'Brien",
+        "Dark River (1990 film)",
+        "Wrong Turn: The Foundation"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Do both directors of films Wrong Turn 5: Bloodlines and Dark River (2017 Film) have the same nationality?",
+        "Find the director of wrong turn 5 and wrong turn 5 bloodlines. Question: Do both directors of films Wrong Turn 5: Bloodlines and Dark River (2017 Film) have the same nationality?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "The Goose Woman\" because the director's name is Clarence Brown, and if I can't find his death date, but the other director's death date isn't mentioned.",
+      "candidate_answer": "The Goose Woman\" because the director's name is Clarence Brown, and if I can't find his death date, but the other director's death date isn't mentioned.",
+      "control_titles": [
+        "You Can No Longer Remain Silent",
+        "The Goose Woman",
+        "The Past of Mary Holmes",
+        "Doris Wishman",
+        "Victor Sjöström"
+      ],
+      "candidate_titles": [
+        "You Can No Longer Remain Silent",
+        "The Goose Woman",
+        "The Past of Mary Holmes",
+        "Doris Wishman",
+        "Victor Sjöström"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?",
+        "Find the director of the goose woman. Question: Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Where was the director of film The Private Life Of Cinema born?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.6667,
+      "candidate_f1": 0.6667,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Quebec.",
+      "candidate_answer": "Quebec.",
+      "control_titles": [
+        "The Private Life of Cinema",
+        "Alexander Korda",
+        "Roman Polanski",
+        "Kim Ki-young",
+        "Roger Corman"
+      ],
+      "candidate_titles": [
+        "The Private Life of Cinema",
+        "Alexander Korda",
+        "Roman Polanski",
+        "Satyajit Ray",
+        "Kim Ki-young"
+      ],
+      "added_titles": [
+        "Satyajit Ray"
+      ],
+      "removed_titles": [
+        "Roger Corman"
+      ],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "alternate_only_complete",
+      "gap_micro_queries": [
+        "Where was the director of film The Private Life Of Cinema born?",
+        "Find the director of the private life of cinema and denys desjardins. Question: Where was the director of film The Private Life Of Cinema born?"
+      ],
+      "gap_candidate_titles": [
+        "Satyajit Ray"
+      ],
+      "gap_candidate_positions": [
+        45
+      ],
+      "gap_candidate_selected_count": 1,
+      "gap_candidate_selected_into_final": true,
+      "gap_candidate_final_front_rate": 1.0,
+      "selected_gap_titles": [
+        "Satyajit Ray"
+      ],
+      "changed_evidence": true
+    },
+    {
+      "question": "Where did Coulson Wallop's father study?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Not mentioned.",
+      "candidate_answer": "Not mentioned.",
+      "control_titles": [
+        "Coulson Wallop",
+        "John Wallop, 2nd Earl of Portsmouth",
+        "Theodore Salisbury Woolsey",
+        "Wale Adebanwi",
+        "Lolo Soetoro"
+      ],
+      "candidate_titles": [
+        "Coulson Wallop",
+        "John Wallop, 2nd Earl of Portsmouth",
+        "Theodore Salisbury Woolsey",
+        "Wale Adebanwi",
+        "Lolo Soetoro"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Where did Coulson Wallop's father study?",
+        "Find where john wallop studied. Question: Where did Coulson Wallop's father study?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Why did John Middleton Murry's wife die?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Tuberculosis.",
+      "candidate_answer": "Tuberculosis.",
+      "control_titles": [
+        "John Middleton Murry",
+        "Katherine Mansfield",
+        "John Middleton Murry Jr.",
+        "Anne Estelle Rice",
+        "Eddie Murray (rugby league)"
+      ],
+      "candidate_titles": [
+        "John Middleton Murry",
+        "Katherine Mansfield",
+        "John Middleton Murry Jr.",
+        "Anne Estelle Rice",
+        "Eddie Murray (rugby league)"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Why did John Middleton Murry's wife die?",
+        "Find when katherine mansfield died. Question: Why did John Middleton Murry's wife die?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Where was the composer of film Billy Elliot born?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Southampton, Hampshire.",
+      "candidate_answer": "Southampton, Hampshire.",
+      "control_titles": [
+        "Billy Elliot",
+        "Billy Elliot the Musical Live",
+        "Lee Hall (playwright)",
+        "Stephen Warbeck",
+        "Aram Khachaturian"
+      ],
+      "candidate_titles": [
+        "Billy Elliot",
+        "Billy Elliot the Musical Live",
+        "Lee Hall (playwright)",
+        "Stephen Warbeck",
+        "Aram Khachaturian"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Where was the composer of film Billy Elliot born?",
+        "Find the birthplace of stephen warbeck. Question: Where was the composer of film Billy Elliot born?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What is the place of birth of Lisbeth Palme's husband?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Stockholm.",
+      "candidate_answer": "Stockholm.",
+      "control_titles": [
+        "Lisbeth Palme",
+        "Magdalena Graaf",
+        "Jonas Malmsjö",
+        "Peter Emanuel Falck",
+        "Olof Palme"
+      ],
+      "candidate_titles": [
+        "Lisbeth Palme",
+        "Magdalena Graaf",
+        "Jonas Malmsjö",
+        "Peter Emanuel Falck",
+        "Olof Palme"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "What is the place of birth of Lisbeth Palme's husband?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Which film came out first, 3 Dots or Dying God?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Dying God.",
+      "candidate_answer": "Dying God.",
+      "control_titles": [
+        "Dying God",
+        "3 Dots",
+        "Traces of Death",
+        "Bangalore Naatkal",
+        "Night of the Living Dead: Darkest Dawn"
+      ],
+      "candidate_titles": [
+        "Dying God",
+        "3 Dots",
+        "Traces of Death",
+        "Bangalore Naatkal",
+        "Night of the Living Dead: Darkest Dawn"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Which film came out first, 3 Dots or Dying God?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Who is the father-in-law of Sisowath Kossamak?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.8,
+      "candidate_f1": 0.8,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Prince Norodom Sutharot.",
+      "candidate_answer": "Prince Norodom Sutharot.",
+      "control_titles": [
+        "Sisowath Kossamak",
+        "Norodom Suramarit",
+        "Ludwig von Westphalen",
+        "Ogawa Mataji",
+        "Mongkut"
+      ],
+      "candidate_titles": [
+        "Sisowath Kossamak",
+        "Norodom Suramarit",
+        "Ludwig von Westphalen",
+        "Ogawa Mataji",
+        "Mongkut"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Who is the father-in-law of Sisowath Kossamak?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Who is Mugain's mother-in-law?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Not mentioned.",
+      "candidate_answer": "Not mentioned.",
+      "control_titles": [
+        "Mugain",
+        "Doria Ragland",
+        "Maria Thins",
+        "Fujiwara no Otomuro",
+        "Marian Montagu Douglas Scott"
+      ],
+      "candidate_titles": [
+        "Mugain",
+        "Doria Ragland",
+        "Maria Thins",
+        "Fujiwara no Otomuro",
+        "Marian Montagu Douglas Scott"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Who is Mugain's mother-in-law?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Where did Theodore Salisbury Woolsey's father study?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Yale College.",
+      "candidate_answer": "Yale College.",
+      "control_titles": [
+        "Theodore Salisbury Woolsey",
+        "Theodore Salisbury Woolsey Jr.",
+        "Theodore Dwight Woolsey",
+        "Hywel Teifi Edwards",
+        "Edward Wingfield, 2nd Viscount Powerscourt"
+      ],
+      "candidate_titles": [
+        "Theodore Salisbury Woolsey",
+        "Theodore Salisbury Woolsey Jr.",
+        "Theodore Dwight Woolsey",
+        "Hywel Teifi Edwards",
+        "Edward Wingfield, 2nd Viscount Powerscourt"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Where did Theodore Salisbury Woolsey's father study?",
+        "Find where theodore salisbury woolsey jr studied. Question: Where did Theodore Salisbury Woolsey's father study?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What is the place of birth of the director of film The Return Of Swamp Thing?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.5,
+      "candidate_f1": 0.0,
+      "delta_f1": -0.5,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "lose",
+      "em_outcome": "tie",
+      "control_answer": "Glen Cove, Long Island, New York.",
+      "candidate_answer": "Not mentioned.",
+      "control_titles": [
+        "The Return of Swamp Thing",
+        "Swamp Thing (film)",
+        "Dick Durock",
+        "Roger Corman",
+        "Jim Wynorski"
+      ],
+      "candidate_titles": [
+        "The Return of Swamp Thing",
+        "Swamp Thing (film)",
+        "Dick Durock",
+        "Roman Polanski",
+        "Roger Corman"
+      ],
+      "added_titles": [
+        "Roman Polanski"
+      ],
+      "removed_titles": [
+        "Jim Wynorski"
+      ],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "alternate_only_complete",
+      "gap_micro_queries": [
+        "What is the place of birth of the director of film The Return Of Swamp Thing?",
+        "Find the director of the return of swamp thing and swamp thing. Question: What is the place of birth of the director of film The Return Of Swamp Thing?"
+      ],
+      "gap_candidate_titles": [
+        "Roman Polanski"
+      ],
+      "gap_candidate_positions": [
+        35
+      ],
+      "gap_candidate_selected_count": 1,
+      "gap_candidate_selected_into_final": true,
+      "gap_candidate_final_front_rate": 1.0,
+      "selected_gap_titles": [
+        "Roman Polanski"
+      ],
+      "changed_evidence": true
+    },
+    {
+      "question": "Where was the place of death of the performer of song I Can'T See Myself Leaving You?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Not specified in the provided text.",
+      "candidate_answer": "Not specified in the provided text.",
+      "control_titles": [
+        "I Can't See Myself Leaving You",
+        "Sam Cooke",
+        "Elvis Presley",
+        "I Never Cry",
+        "Can't Remember to Forget You"
+      ],
+      "candidate_titles": [
+        "I Can't See Myself Leaving You",
+        "Sam Cooke",
+        "Elvis Presley",
+        "Chuck Berry",
+        "I Never Cry"
+      ],
+      "added_titles": [
+        "Chuck Berry"
+      ],
+      "removed_titles": [
+        "Can't Remember to Forget You"
+      ],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "alternate_only_complete",
+      "gap_micro_queries": [
+        "Where was the place of death of the performer of song I Can'T See Myself Leaving You?",
+        "Find the birthplace of i can t see myself leaving you. Question: Where was the place of death of the performer of song I Can'T See Myself Leaving You?"
+      ],
+      "gap_candidate_titles": [
+        "Chuck Berry"
+      ],
+      "gap_candidate_positions": [
+        51
+      ],
+      "gap_candidate_selected_count": 1,
+      "gap_candidate_selected_into_final": true,
+      "gap_candidate_final_front_rate": 1.0,
+      "selected_gap_titles": [
+        "Chuck Berry"
+      ],
+      "changed_evidence": true
+    },
+    {
+      "question": "Which film has the director who was born later, Playing It Wild or I'Ll Be Going Now?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 0.5714,
+      "candidate_f1": 0.5714,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "I'll Be Going Now\" because the director's name is Dino R",
+      "candidate_answer": "I'll Be Going Now\" because the director's name is Dino R",
+      "control_titles": [
+        "Playing It Wild",
+        "I'll Be Going Now",
+        "Roman Polanski",
+        "Going All the Way",
+        "Ildikó Enyedi"
+      ],
+      "candidate_titles": [
+        "Playing It Wild",
+        "I'll Be Going Now",
+        "Roman Polanski",
+        "Going All the Way",
+        "Ildikó Enyedi"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Which film has the director who was born later, Playing It Wild or I'Ll Be Going Now?",
+        "Find the director of playing it wild. Question: Which film has the director who was born later, Playing It Wild or I'Ll Be Going Now?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What nationality is Beatrice I, Countess Of Burgundy's husband?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "German.",
+      "candidate_answer": "German.",
+      "control_titles": [
+        "Beatrice I, Countess of Burgundy",
+        "Otto I, Count of Burgundy",
+        "Beatrice of Coimbra",
+        "Beatrice of Bourbon, Queen of Bohemia",
+        "Beatrice of Navarre, Duchess of Burgundy"
+      ],
+      "candidate_titles": [
+        "Beatrice I, Countess of Burgundy",
+        "Otto I, Count of Burgundy",
+        "Beatrice of Coimbra",
+        "Beatrice of Bourbon, Queen of Bohemia",
+        "Beatrice of Navarre, Duchess of Burgundy"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "no_typed_alternate",
+      "gap_micro_queries": [
+        "What nationality is Beatrice I, Countess Of Burgundy's husband?",
+        "Find the nationality or country of countess of burgundy. Question: What nationality is Beatrice I, Countess Of Burgundy's husband?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 0.0,
+      "delta_f1": -1.0,
+      "control_em": 1.0,
+      "candidate_em": 0.0,
+      "delta_em": -1.0,
+      "f1_outcome": "lose",
+      "em_outcome": "lose",
+      "control_answer": "45 Fathers.",
+      "candidate_answer": "Cannot be determined from the provided evidence.",
+      "control_titles": [
+        "45 Fathers",
+        "Christ Walking on the Water",
+        "Chris Matheson (screenwriter)",
+        "Marcelino Manuel da Graça",
+        "James Tinling"
+      ],
+      "candidate_titles": [
+        "45 Fathers",
+        "Christ Walking on the Water",
+        "Roman Polanski",
+        "Chris Matheson (screenwriter)",
+        "Marcelino Manuel da Graça"
+      ],
+      "added_titles": [
+        "Roman Polanski"
+      ],
+      "removed_titles": [
+        "James Tinling"
+      ],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "alternate_only_complete",
+      "gap_micro_queries": [
+        "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+        "Find the director of christ walking on the water and 45 fathers. Question: Which film has the director born later, Christ Walking On The Water or 45 Fathers?"
+      ],
+      "gap_candidate_titles": [
+        "Roman Polanski"
+      ],
+      "gap_candidate_positions": [
+        47
+      ],
+      "gap_candidate_selected_count": 1,
+      "gap_candidate_selected_into_final": true,
+      "gap_candidate_final_front_rate": 1.0,
+      "selected_gap_titles": [
+        "Roman Polanski"
+      ],
+      "changed_evidence": true
+    },
+    {
+      "question": "Where was the performer of song Come Dance With Me (Song) born?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.5,
+      "candidate_f1": 0.5,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Hoboken, New Jersey.",
+      "candidate_answer": "Hoboken, New Jersey.",
+      "control_titles": [
+        "Come Dance with Me (song)",
+        "Elvis Presley",
+        "Frank Sinatra",
+        "Ven a bailar conmigo",
+        "Alicia Keys"
+      ],
+      "candidate_titles": [
+        "Come Dance with Me (song)",
+        "Elvis Presley",
+        "Frank Sinatra",
+        "Ven a bailar conmigo",
+        "Alicia Keys"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "no_typed_alternate",
+      "gap_micro_queries": [
+        "Where was the performer of song Come Dance With Me (Song) born?",
+        "Find the birthplace of frank sinatra. Question: Where was the performer of song Come Dance With Me (Song) born?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Where does the director of film Talk About A Stranger work at?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Not specified.",
+      "candidate_answer": "Not specified.",
+      "control_titles": [
+        "Talk About a Stranger",
+        "Shawn Levy",
+        "The Silent Stranger",
+        "The Stranger",
+        "Strangers of the Night"
+      ],
+      "candidate_titles": [
+        "Talk About a Stranger",
+        "Shawn Levy",
+        "The Silent Stranger",
+        "The Stranger",
+        "Strangers of the Night"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Where does the director of film Talk About A Stranger work at?",
+        "Find the director of talk about a stranger and the silent stranger. Question: Where does the director of film Talk About A Stranger work at?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Who was born later, Gideon Johnson Pillow or Holm Jølsen?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Holm Jølsen.",
+      "candidate_answer": "Holm Jølsen.",
+      "control_titles": [
+        "Holm Jølsen",
+        "Gideon Johnson Pillow",
+        "Gideon and Samson: Great Leaders of the Bible",
+        "Allan Gilmour Sr.",
+        "Barthold A. Butenschøn Sr."
+      ],
+      "candidate_titles": [
+        "Holm Jølsen",
+        "Gideon Johnson Pillow",
+        "Gideon and Samson: Great Leaders of the Bible",
+        "Allan Gilmour Sr.",
+        "Barthold A. Butenschøn Sr."
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "typed_alternate_below_threshold",
+      "gap_micro_queries": [
+        "Who was born later, Gideon Johnson Pillow or Holm Jølsen?",
+        "Find the birthplace of gideon johnson pillow. Question: Who was born later, Gideon Johnson Pillow or Holm Jølsen?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "What is the place of birth of the composer of film Inherent Vice (Film)?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Abingdon, England.",
+      "candidate_answer": "Abingdon, England.",
+      "control_titles": [
+        "Inherent Vice (film)",
+        "Jonny Greenwood",
+        "Roman Polanski",
+        "Thomas H. Ince",
+        "Place of birth"
+      ],
+      "candidate_titles": [
+        "Inherent Vice (film)",
+        "Jonny Greenwood",
+        "Roman Polanski",
+        "Thomas H. Ince",
+        "Place of birth"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "What is the place of birth of the composer of film Inherent Vice (Film)?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Which film whose director is younger, Dangerously They Live or Salad By The Roots?",
+      "query_type": "standard",
+      "gold_doc_count": 4,
+      "bucket": "4_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Dangerously They Live.",
+      "candidate_answer": "Dangerously They Live.",
+      "control_titles": [
+        "Salad by the Roots",
+        "Dangerously They Live",
+        "David Gordon Green",
+        "Lasse Hallström",
+        "Radha Bharadwaj"
+      ],
+      "candidate_titles": [
+        "Salad by the Roots",
+        "Dangerously They Live",
+        "David Gordon Green",
+        "Lasse Hallström",
+        "Radha Bharadwaj"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "role_relation",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Which film whose director is younger, Dangerously They Live or Salad By The Roots?",
+        "Find the director of dangerously they live and salad by the roots. Question: Which film whose director is younger, Dangerously They Live or Salad By The Roots?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Where did Sylvia Burka's husband die?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 0.0,
+      "candidate_f1": 0.0,
+      "delta_f1": 0.0,
+      "control_em": 0.0,
+      "candidate_em": 0.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Not mentioned.",
+      "candidate_answer": "Not mentioned.",
+      "control_titles": [
+        "Sylvia Burka",
+        "The Hideout (film)",
+        "Princess Maria of Greece and Denmark",
+        "Dudley Beaumont",
+        "Juan Carlos Gumucio"
+      ],
+      "candidate_titles": [
+        "Sylvia Burka",
+        "The Hideout (film)",
+        "Princess Maria of Greece and Denmark",
+        "Dudley Beaumont",
+        "Juan Carlos Gumucio"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "target_attribute",
+      "gap_fallback_used": false,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Where did Sylvia Burka's husband die?",
+        "Find when sylvia burka died. Question: Where did Sylvia Burka's husband die?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    },
+    {
+      "question": "Who lived longer, Ludwig Elsbett or Pamela Ann Rymer?",
+      "query_type": "standard",
+      "gold_doc_count": 2,
+      "bucket": "2_doc",
+      "control_f1": 1.0,
+      "candidate_f1": 1.0,
+      "delta_f1": 0.0,
+      "control_em": 1.0,
+      "candidate_em": 1.0,
+      "delta_em": 0.0,
+      "f1_outcome": "tie",
+      "em_outcome": "tie",
+      "control_answer": "Ludwig Elsbett.",
+      "candidate_answer": "Ludwig Elsbett.",
+      "control_titles": [
+        "Pamela Ann Rymer",
+        "Ludwig Elsbett",
+        "Pamela Bach",
+        "Pamela Des Barres",
+        "Carol Rymer Davis"
+      ],
+      "candidate_titles": [
+        "Pamela Ann Rymer",
+        "Ludwig Elsbett",
+        "Pamela Bach",
+        "Pamela Des Barres",
+        "Carol Rymer Davis"
+      ],
+      "added_titles": [],
+      "removed_titles": [],
+      "gap_type": "abstain",
+      "gap_fallback_used": true,
+      "append_stop_reason": "structure_below_threshold",
+      "gap_micro_queries": [
+        "Who lived longer, Ludwig Elsbett or Pamela Ann Rymer?"
+      ],
+      "gap_candidate_titles": [],
+      "gap_candidate_positions": [],
+      "gap_candidate_selected_count": 0,
+      "gap_candidate_selected_into_final": false,
+      "gap_candidate_final_front_rate": 0.0,
+      "selected_gap_titles": [],
+      "changed_evidence": false
+    }
+  ]
+}

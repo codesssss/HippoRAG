@@ -18,6 +18,7 @@ Current active direction:
 
 If you touch the current `coverage` or `width-matched CE control` line, read this note before launching new runs:
 - `emnlp_expand_then_compose/10_coverage_probe_and_control_status_20260409.md`
+- `emnlp_expand_then_compose/11_nq_popqa_bridge_threshold_diagnosis_20260410.md`
 
 Operational rules for the current full-scale control family:
 - Ignore the old `20260409` pseudo-full outputs. They accidentally inherited `--limit 20`.
@@ -38,3 +39,14 @@ The current reusable runners are:
 - `run_logs/fullscale_width_matched_control_20260409.sh`
 - `run_logs/fullscale_width_matched_control_musique_top5_priority_20260409.sh`
 - `run_logs/fullscale_width_matched_control_musique_top5_remaining_20260409.sh`
+
+External LLM endpoint note:
+- Public Qwen3 mirrors verified from outside the host on 2026-04-10:
+  - `http://36.133.236.142:8002/v1`
+  - `http://36.133.236.142:8003/v1`
+- Both return `qwen3-8b` from `/v1/models` and produce valid `/v1/chat/completions` responses.
+- Current generation format still includes a lightweight `<think>...</think>` wrapper before the visible answer text, so future agents should not assume raw plain-text completions.
+
+Dataset naming note:
+- `nq` in this repo resolves to the packaged `nq_rear` files already stored under `reproduce/dataset/`.
+- `popqa` and `nq_rear` here are packaged `1000`-query evaluation subsets shipped with the HippoRAG data bundle, not the raw full upstream benchmarks.

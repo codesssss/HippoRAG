@@ -52,6 +52,14 @@ from eval_causal_qwen3 import (
     LEARNED_SETWISE_FEATURE_NAMES,
     OpenAICompatibleLateRerankJudge,
     SetwiseLateRerankResponseModel,
+    apply_single_slot_preserving_swap,
+    build_action_swap_jobs,
+    build_gap_evidence_units,
+    build_propose_verify_claims,
+    build_query_dependency_graph,
+    build_query_tiers,
+    build_title_prefixed_windows,
+    build_witness_units,
     build_expand_assemble_query_traces,
     hydrate_query_solutions_from_baseline_report,
     build_requirement_title_exposure_summary,
@@ -63,16 +71,22 @@ from eval_causal_qwen3 import (
     collect_grounded_question_query_entities,
     collect_lexical_query_seed_entities,
     collect_question_query_entities,
+    compute_dependency_aware_set_utility,
     compute_bridge_gate_decision,
     compute_candidate_feature_rows,
     compute_retrieval_recall_metrics,
+    compute_truncated_noisyor_support,
+    detect_gap_expand_state,
+    build_report_metrics_summary,
     ensure_runtime_objects_for_cached_retrieval,
     load_baseline_report_payload,
     load_retrieval_cache_payload,
     maybe_apply_bridge_saturation_guard,
     maybe_apply_setwise_reader_order_probe,
+    assemble_ce_local_repair,
     assemble_coverage_exact_search,
     compute_state_path_connectivity_metrics,
+    extract_baseline_scaffold_positions_from_ranking_rows,
     hydrate_query_solutions_from_retrieval_cache,
     materialize_reader_top_positions,
     normalize_setwise_late_rerank_policy,
@@ -82,8 +96,16 @@ from eval_causal_qwen3 import (
     resolve_reserved_positions,
     resolve_query_pool_gold_titles,
     resolve_setwise_query_targets,
+    rerank_gap_expand_candidates,
     rerank_candidate_positions_for_assemble,
     score_evidence_state,
+    score_action_swap_propose_verify_jobs,
+    rerank_gap_expand_units,
+    select_action_swap_noisyor,
+    select_action_swap_propose_verify,
+    select_action_swap_tiered_witness,
+    select_action_swap_v0_dryrun,
+    select_action_swap_v0_judge,
     select_bridge_append_positions,
     select_bridge_beam_positions,
     select_bridge_greedy_positions,
@@ -115,6 +137,7 @@ from requirement_beam_utils import (
     score_need_unit_support,
 )
 from annotate_need_unit_support import resolve_atomic_annotation_bundle
+from analyze_ce_local_repair_proxy import analyze_reports as analyze_ce_local_repair_reports
 from train_need_unit_scorer import build_need_unit_atomic_training_rows
 from run_requirement_beam_reserve_ablation import (
     build_requirement_reserve_ablation_jobs,
@@ -357,6 +380,856 @@ def test_materialize_reader_top_positions_can_force_prefix_positions():
     )
 
     assert top_positions == [5, 1, 3, 0, 2]
+
+
+def test_extract_baseline_scaffold_positions_from_ranking_rows_filters_to_baseline_prefix():
+    scaffold_positions = extract_baseline_scaffold_positions_from_ranking_rows(
+        ranking_rows=[
+            {"pool_position": 4, "source": "append_bridge", "assemble_score": 2.0},
+            {"pool_position": 1, "source": "baseline_prefix", "assemble_score": 1.9},
+            {"pool_position": 3, "source": "append_bridge", "assemble_score": 1.8},
+            {"pool_position": 0, "source": "baseline_prefix", "assemble_score": 1.7},
+            {"pool_position": 2, "source": "baseline_prefix", "assemble_score": 1.6},
+        ],
+        baseline_prefix_positions=[0, 1, 2],
+        qa_top_k=2,
+    )
+
+    assert scaffold_positions == [1, 0]
+
+
+def test_build_action_swap_jobs_marks_duplicate_candidates_from_doc_id():
+    jobs = build_action_swap_jobs(
+        query="Where is alpha?",
+        scaffold_positions=[0, 1, 2],
+        appended_positions=[3, 4],
+        ranking_rows=[
+            {"pool_position": 0, "assemble_score": 1.2},
+            {"pool_position": 1, "assemble_score": 1.1},
+            {"pool_position": 2, "assemble_score": 0.8},
+            {"pool_position": 3, "assemble_score": 1.3},
+            {"pool_position": 4, "assemble_score": 0.95},
+        ],
+        pool_docs=[
+            "Doc A\nalpha",
+            "Doc B\nbeta",
+            "Doc C\ngamma",
+            "Doc B Dup\nbeta duplicate",
+            "Doc D\ndelta",
+        ],
+        pool_doc_ids=[10, 11, 12, 11, 14],
+        replace_bottom_n=2,
+    )
+
+    duplicate_jobs = [job for job in jobs if job["candidate_pool_position"] == 3]
+    nonduplicate_jobs = [job for job in jobs if job["candidate_pool_position"] == 4]
+
+    assert len(duplicate_jobs) == 2
+    assert all(job["is_duplicate_with_scaffold"] is True for job in duplicate_jobs)
+    assert len(nonduplicate_jobs) == 2
+    assert all(job["is_duplicate_with_scaffold"] is False for job in nonduplicate_jobs)
+
+
+def test_select_action_swap_v0_dryrun_chooses_best_bottom2_score_delta():
+    decision = select_action_swap_v0_dryrun(
+        action_jobs=[
+            {
+                "candidate_pool_position": 7,
+                "candidate_doc_id": 107,
+                "replace_pool_position": 2,
+                "replace_doc_id": 102,
+                "candidate_assemble_score": 1.2,
+                "score_delta": 0.25,
+                "is_duplicate_with_scaffold": False,
+            },
+            {
+                "candidate_pool_position": 8,
+                "candidate_doc_id": 108,
+                "replace_pool_position": 3,
+                "replace_doc_id": 103,
+                "candidate_assemble_score": 1.4,
+                "score_delta": 0.40,
+                "is_duplicate_with_scaffold": False,
+            },
+            {
+                "candidate_pool_position": 9,
+                "candidate_doc_id": 109,
+                "replace_pool_position": 3,
+                "replace_doc_id": 103,
+                "candidate_assemble_score": 1.5,
+                "score_delta": 0.60,
+                "is_duplicate_with_scaffold": True,
+            },
+        ],
+        scaffold_positions=[0, 1, 2, 3, 4],
+    )
+
+    assert decision["action_executed"] is True
+    assert decision["action_candidate_pool_position"] == 8
+    assert decision["action_replace_pool_position"] == 3
+    assert decision["final_front_positions_after_action"] == [0, 1, 2, 8, 4]
+
+
+def test_apply_single_slot_preserving_swap_preserves_order():
+    assert apply_single_slot_preserving_swap([10, 11, 12, 13, 14], 99, 13) == [10, 11, 12, 99, 14]
+
+
+def test_select_action_swap_v0_judge_keeps_when_no_helpful_actions():
+    decision = select_action_swap_v0_judge(
+        action_jobs=[
+            {
+                "candidate_pool_position": 7,
+                "candidate_doc_id": 107,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.1,
+                "score_delta": 0.20,
+                "is_duplicate_with_scaffold": False,
+            }
+        ],
+        scaffold_positions=[0, 1, 2, 3, 4],
+        judge_bundle=types.SimpleNamespace(infer_fn=lambda **kwargs: ("", {}), model_name="judge", response_format=None, backend="inherit"),
+        qa_top_k=5,
+        max_doc_chars=200,
+        judge_results=[
+            {
+                "candidate_pool_position": 7,
+                "candidate_doc_id": 107,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.1,
+                "score_delta": 0.20,
+                "judge_parsed": {"verdict": "neutral", "confidence": 61.0, "reason": "Mostly redundant."},
+            }
+        ],
+    )
+
+    assert decision["action_executed"] is False
+    assert decision["action_skip_reason"] == "no_helpful_actions"
+    assert decision["final_front_positions_after_action"] == [0, 1, 2, 3, 4]
+
+
+def test_select_action_swap_v0_judge_prefers_highest_confidence_helpful_action():
+    decision = select_action_swap_v0_judge(
+        action_jobs=[
+            {
+                "candidate_pool_position": 7,
+                "candidate_doc_id": 107,
+                "replace_pool_position": 3,
+                "replace_doc_id": 103,
+                "candidate_assemble_score": 1.2,
+                "score_delta": 0.20,
+                "is_duplicate_with_scaffold": False,
+            },
+            {
+                "candidate_pool_position": 8,
+                "candidate_doc_id": 108,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.15,
+                "score_delta": 0.25,
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        scaffold_positions=[0, 1, 2, 3, 4],
+        judge_bundle=types.SimpleNamespace(infer_fn=lambda **kwargs: ("", {}), model_name="judge", response_format=None, backend="inherit"),
+        qa_top_k=5,
+        max_doc_chars=200,
+        judge_results=[
+            {
+                "candidate_pool_position": 7,
+                "candidate_doc_id": 107,
+                "replace_pool_position": 3,
+                "replace_doc_id": 103,
+                "candidate_assemble_score": 1.2,
+                "score_delta": 0.20,
+                "judge_parsed": {"verdict": "helpful", "confidence": 72.0, "reason": "Good bridge."},
+            },
+            {
+                "candidate_pool_position": 8,
+                "candidate_doc_id": 108,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.15,
+                "score_delta": 0.25,
+                "judge_parsed": {"verdict": "helpful", "confidence": 88.0, "reason": "Better swap."},
+            },
+        ],
+    )
+
+    assert decision["action_executed"] is True
+    assert decision["action_candidate_pool_position"] == 8
+    assert decision["action_replace_pool_position"] == 4
+    assert decision["action_gate_verdict"] == "helpful"
+    assert decision["action_gate_confidence"] == 88.0
+    assert decision["final_front_positions_after_action"] == [0, 1, 2, 3, 8]
+
+
+def test_select_action_swap_v0_judge_current_rejects_nonpositive_score_delta():
+    decision = select_action_swap_v0_judge(
+        action_jobs=[
+            {
+                "candidate_pool_position": 8,
+                "candidate_doc_id": 108,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.15,
+                "score_delta": -0.25,
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        scaffold_positions=[0, 1, 2, 3, 4],
+        judge_bundle=types.SimpleNamespace(infer_fn=lambda **kwargs: ("", {}), model_name="judge", response_format=None, backend="inherit"),
+        qa_top_k=5,
+        max_doc_chars=200,
+        judge_results=[
+            {
+                "candidate_pool_position": 8,
+                "candidate_doc_id": 108,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.15,
+                "score_delta": -0.25,
+                "judge_parsed": {"verdict": "helpful", "confidence": 90.0, "reason": "Would help."},
+            },
+        ],
+    )
+
+    assert decision["action_executed"] is False
+    assert decision["action_legal_action_count"] == 0
+    assert decision["action_legality_mode"] == "current"
+    assert decision["action_skip_reason"] == "no_legal_actions"
+
+
+def test_select_action_swap_v0_judge_relaxed_allows_nonpositive_score_delta():
+    decision = select_action_swap_v0_judge(
+        action_jobs=[
+            {
+                "candidate_pool_position": 8,
+                "candidate_doc_id": 108,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.15,
+                "score_delta": -0.25,
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        scaffold_positions=[0, 1, 2, 3, 4],
+        judge_bundle=types.SimpleNamespace(infer_fn=lambda **kwargs: ("", {}), model_name="judge", response_format=None, backend="inherit"),
+        qa_top_k=5,
+        max_doc_chars=200,
+        judge_results=[
+            {
+                "candidate_pool_position": 8,
+                "candidate_doc_id": 108,
+                "replace_pool_position": 4,
+                "replace_doc_id": 104,
+                "candidate_assemble_score": 1.15,
+                "score_delta": -0.25,
+                "judge_parsed": {"verdict": "helpful", "confidence": 90.0, "reason": "Would help."},
+            },
+        ],
+        action_mode="action_swap_v0_judge_relaxed",
+    )
+
+    assert decision["action_executed"] is True
+    assert decision["action_legal_action_count"] == 1
+    assert decision["action_legality_mode"] == "relaxed"
+    assert decision["action_candidate_pool_position"] == 8
+    assert decision["action_replace_pool_position"] == 4
+    assert decision["final_front_positions_after_action"] == [0, 1, 2, 3, 8]
+
+
+def test_build_title_prefixed_windows_includes_single_and_two_sentence_views():
+    windows = build_title_prefixed_windows(
+        "Alpha Title\nAlice was born in Paris. She later moved to London.",
+        max_sentences=4,
+        max_windows=8,
+    )
+
+    assert windows[0] == "Alpha Title\nAlice was born in Paris."
+    assert "Alpha Title\nShe later moved to London." in windows
+    assert "Alpha Title\nAlice was born in Paris. She later moved to London." in windows
+
+
+def test_build_witness_units_includes_full_doc_fallback():
+    units = build_witness_units(
+        "Alpha Title\nAlice was born in Paris. She later moved to London.",
+        max_sentences=4,
+        max_windows=8,
+        include_full_doc=True,
+    )
+
+    unit_types = [unit["unit_type"] for unit in units]
+    assert "title_plus_1sent" in unit_types
+    assert "title_plus_2sent" in unit_types
+    assert "full_doc" in unit_types
+
+
+def test_build_gap_evidence_units_tracks_parent_and_sentence_spans():
+    units = build_gap_evidence_units(
+        "Christ Walking On The Water\nJames Tinling directed Christ Walking On The Water. He was born in Seattle.",
+        parent_doc_id=42,
+        parent_title="Christ Walking On The Water",
+        doc_entities={"james tinling"},
+        anchor_entities={"christ walking on the water"},
+        covered_entities={"christ walking on the water"},
+        slot_cues={"director", "directed"},
+        max_sentences=4,
+        max_windows=8,
+    )
+
+    assert units
+    assert units[0]["parent_doc_id"] == 42
+    assert units[0]["parent_title"] == "Christ Walking On The Water"
+    assert units[0]["sentence_span"] == [1, 1]
+    assert any(unit["sentence_span"] == [1, 2] for unit in units)
+    assert any(unit["contains_anchor"] for unit in units)
+    assert any(unit["contains_slot_cue"] for unit in units)
+
+
+def test_build_query_dependency_graph_dep_uses_entity_chain():
+    graph = build_query_dependency_graph(
+        "Where was Alice born and where did she later move?",
+        query_entities={"Alice", "Paris", "London"},
+        action_mode="action_swap_noisyor_dep",
+    )
+
+    assert graph["mode"] == "dependency"
+    assert [node["id"] for node in graph["nodes"]] == ["v1", "v2", "v3", "v4"]
+    assert graph["nodes"][1]["parents"] == ["v1"]
+    assert graph["nodes"][2]["parents"] == ["v2"]
+
+
+def test_build_query_tiers_prefers_heuristic_two_tier_when_bridge_like():
+    tier_graph = build_query_tiers(
+        "Where was the director of Alice in Wonderland born?",
+        query_entities=["director", "Alice in Wonderland"],
+    )
+
+    assert tier_graph["mode"] == "heuristic_tiers"
+    assert len(tier_graph["tiers"]) == 2
+    assert tier_graph["tiers"][0]["tier_type"] == "heuristic_bridge"
+    assert tier_graph["tiers"][1]["tier_type"] == "answer_slot"
+
+
+def test_build_query_tiers_falls_back_to_flat_when_fragmented():
+    tier_graph = build_query_tiers(
+        "Tell me something about Alice and Bob and Carol and Dave",
+        query_entities=["Alice", "Bob", "Carol", "Dave"],
+    )
+
+    assert tier_graph["mode"] == "flat_fallback"
+    assert len(tier_graph["tiers"]) == 1
+    assert tier_graph["tiers"][0]["tier_type"] == "flat"
+
+
+def test_compute_truncated_noisyor_support_uses_top2_only():
+    support = compute_truncated_noisyor_support(
+        {0: 0.8, 1: 0.4, 2: 0.3},
+        [0, 1, 2],
+        top_n=2,
+    )
+
+    assert support == pytest.approx(0.88, rel=1e-6)
+
+
+def test_compute_dependency_aware_set_utility_gates_child_by_ancestor():
+    utility, facet_rows = compute_dependency_aware_set_utility(
+        [1],
+        query_graph={
+            "nodes": [
+                {"id": "v1", "facet": "entity facet", "parents": []},
+                {"id": "v2", "facet": "bridge facet", "parents": ["v1"]},
+            ]
+        },
+        doc_support_matrix={
+            "v1": {1: 0.2},
+            "v2": {1: 0.9},
+        },
+        pool_docs=["Doc A\nalpha", "Doc B\nalpha beta"],
+    )
+
+    assert utility == pytest.approx(0.38, rel=1e-6)
+    assert facet_rows[0]["support"] == 0.2
+    assert facet_rows[1]["support"] == 0.9
+    assert facet_rows[1]["effective_support"] == 0.18
+
+
+def test_select_action_swap_noisyor_keeps_when_margin_not_met():
+    decision = select_action_swap_noisyor(
+        action_jobs=[
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 1,
+                "replace_doc_id": 101,
+                "candidate_assemble_score": 0.7,
+                "score_delta": -0.1,
+                "swapped_positions": [0, 2],
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        query="Where was Alice born?",
+        scaffold_positions=[0, 1],
+        pool_docs=[
+            "Doc A\nAlice was born in Paris.",
+            "Doc B\nParis is a city in France.",
+            "Doc C\nLondon is rainy in winter.",
+        ],
+        query_entities={"Alice", "Paris"},
+        ce_reranker=None,
+        action_mode="action_swap_noisyor_dep",
+        action_margin=0.05,
+    )
+
+    assert decision["action_executed"] is False
+    assert decision["action_skip_reason"] == "margin_not_met"
+    assert decision["query_dependency_mode"] == "dependency"
+    assert decision["final_front_positions_after_action"] == [0, 1]
+
+
+def test_select_action_swap_noisyor_executes_best_slot_preserving_swap():
+    decision = select_action_swap_noisyor(
+        action_jobs=[
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 1,
+                "replace_doc_id": 101,
+                "candidate_assemble_score": 0.8,
+                "score_delta": -0.2,
+                "swapped_positions": [0, 2],
+                "is_duplicate_with_scaffold": False,
+            },
+            {
+                "candidate_pool_position": 3,
+                "candidate_doc_id": 103,
+                "replace_pool_position": 1,
+                "replace_doc_id": 101,
+                "candidate_assemble_score": 0.75,
+                "score_delta": -0.25,
+                "swapped_positions": [0, 3],
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        query="Where was Alice born?",
+        scaffold_positions=[0, 1],
+        pool_docs=[
+            "Doc A\nAlice is a scientist.",
+            "Doc B\nAlice won several awards.",
+            "Doc C\nAlice was born in Paris.",
+            "Doc D\nAlice studied chemistry.",
+        ],
+        query_entities={"Alice", "Paris"},
+        ce_reranker=None,
+        action_mode="action_swap_noisyor_dep",
+        action_margin=0.05,
+    )
+
+    assert decision["action_executed"] is True
+    assert decision["action_candidate_pool_position"] == 2
+    assert decision["action_replace_pool_position"] == 1
+    assert decision["final_front_positions_after_action"] == [0, 2]
+    assert decision["executed_action_delta"] is not None
+    assert decision["action_gate_source"] == "dependency_aware_noisyor"
+
+
+def test_select_action_swap_tiered_witness_protects_earlier_tier_and_replaces_weaker_suffix():
+    decision = select_action_swap_tiered_witness(
+        action_jobs=[
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 0,
+                "replace_doc_id": 100,
+                "candidate_assemble_score": 0.7,
+                "score_delta": -0.1,
+                "swapped_positions": [2, 1],
+                "is_duplicate_with_scaffold": False,
+            },
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 1,
+                "replace_doc_id": 101,
+                "candidate_assemble_score": 0.7,
+                "score_delta": -0.1,
+                "swapped_positions": [0, 2],
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        query="Where was Alice born?",
+        scaffold_positions=[0, 1],
+        pool_docs=[
+            "Doc A\nAlice is a scientist.",
+            "Doc B\nAlice won several awards.",
+            "Doc C\nAlice was born in Paris.",
+        ],
+        query_entities=["Alice", "Paris"],
+        ce_reranker=None,
+        query_tiers_override={
+            "mode": "heuristic_tiers",
+            "tiers": [
+                {
+                    "tier_id": "t1",
+                    "tier_index": 0,
+                    "tier_type": "heuristic_bridge",
+                    "facets": [
+                        {
+                            "facet_id": "t1_f1",
+                            "facet_text": "Alice scientist",
+                            "facet_type": "bridge_identification",
+                            "tier_index": 0,
+                        },
+                    ],
+                },
+                {
+                    "tier_id": "t2",
+                    "tier_index": 1,
+                    "tier_type": "answer_slot",
+                    "facets": [
+                        {
+                            "facet_id": "t2_f1",
+                            "facet_text": "Where was Alice born?",
+                            "facet_type": "target_property",
+                            "tier_index": 1,
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    assert decision["action_executed"] is True
+    assert decision["query_tier_mode"] == "heuristic_tiers"
+    assert decision["bottleneck_tier_index"] == 1
+    assert decision["target_facet_id"] == "t2_f1"
+    assert decision["action_candidate_pool_position"] == 2
+    assert decision["action_replace_pool_position"] == 1
+    assert decision["final_front_positions_after_action"] == [0, 2]
+    assert float(decision["replacee_loss_earlier_tiers"]) == pytest.approx(0.0, rel=1e-6)
+
+
+def test_build_propose_verify_claims_uses_heuristic_tiers_when_bridge_like():
+    claim_bundle = build_propose_verify_claims(
+        "Where was the director of Alice in Wonderland born?",
+        query_entities=["director", "Alice in Wonderland"],
+        max_claims=2,
+    )
+
+    assert claim_bundle["claim_mode"] == "heuristic_tiers"
+    assert len(claim_bundle["claims"]) == 2
+    assert claim_bundle["claims"][0]["tier_index"] == 0
+    assert claim_bundle["claims"][1]["tier_index"] == 1
+
+
+def test_build_propose_verify_claims_falls_back_to_answer_claim_when_no_facets():
+    claim_bundle = build_propose_verify_claims(
+        "Where was Alice born?",
+        query_tiers_override={"mode": "flat_fallback", "tiers": []},
+    )
+
+    assert claim_bundle["claim_mode"] == "flat_fallback"
+    assert len(claim_bundle["claims"]) == 1
+    assert claim_bundle["claims"][0]["claim_id"] == "c1"
+    assert claim_bundle["claims"][0]["claim_text"] == "Answer the question: Where was Alice born?"
+
+
+def test_score_action_swap_propose_verify_jobs_marks_gain_and_preservation_per_action():
+    score_bundle = score_action_swap_propose_verify_jobs(
+        action_jobs=[
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 0,
+                "replace_doc_id": 100,
+                "candidate_assemble_score": 0.8,
+                "score_delta": 0.3,
+                "is_duplicate_with_scaffold": False,
+            },
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 1,
+                "replace_doc_id": 101,
+                "candidate_assemble_score": 0.7,
+                "score_delta": 0.2,
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        query="Where was Alice born?",
+        scaffold_positions=[0, 1],
+        pool_docs=[
+            "Doc A\nAlice is a scientist.",
+            "Doc B\nAlice won an award.",
+            "Doc C\nAlice was born in Paris.",
+        ],
+        ce_reranker=None,
+        claim_support_results={
+            ("c1", 0): {"verdict": "supported", "reason": "Doc A supports claim 1."},
+            ("c1", 1): {"verdict": "not_supported", "reason": "Doc B does not support claim 1."},
+            ("c2", 0): {"verdict": "not_supported", "reason": "Doc A does not support claim 2."},
+            ("c2", 1): {"verdict": "not_supported", "reason": "Doc B does not support claim 2."},
+            ("c2", 2): {"verdict": "supported", "reason": "Doc C supports claim 2."},
+        },
+        query_tiers_override={
+            "mode": "heuristic_tiers",
+            "tiers": [
+                {
+                    "tier_id": "t1",
+                    "tier_index": 0,
+                    "tier_type": "heuristic_bridge",
+                    "facets": [
+                        {
+                            "facet_id": "c1",
+                            "facet_text": "Identify Alice.",
+                            "facet_type": "bridge_identification",
+                            "tier_index": 0,
+                        },
+                    ],
+                },
+                {
+                    "tier_id": "t2",
+                    "tier_index": 1,
+                    "tier_type": "answer_slot",
+                    "facets": [
+                        {
+                            "facet_id": "c2",
+                            "facet_text": "Where was Alice born?",
+                            "facet_type": "target_property",
+                            "tier_index": 1,
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    assert score_bundle["proposal_key"] == (2, 0)
+    assert score_bundle["claim_mode"] == "heuristic_tiers"
+    assert score_bundle["claim_supports_before"][0]["supported_positions"] == [0]
+    assert score_bundle["claim_supports_before"][1]["supported_positions"] == []
+
+    scored_jobs = {
+        (job["candidate_pool_position"], job["replace_pool_position"]): job
+        for job in score_bundle["scored_jobs"]
+    }
+    assert scored_jobs[(2, 0)]["gain_verifier_verdict"] == "supported"
+    assert scored_jobs[(2, 0)]["action_should_swap"] is False
+    assert scored_jobs[(2, 0)]["action_skip_reason"] == "preservation_verifier_reject"
+    assert scored_jobs[(2, 0)]["preservation_unique_support_claim_ids"] == ["c1"]
+    assert scored_jobs[(2, 1)]["gain_verifier_verdict"] == "supported"
+    assert scored_jobs[(2, 1)]["action_should_swap"] is True
+    assert scored_jobs[(2, 1)]["action_skip_reason"] is None
+
+
+def test_select_action_swap_propose_verify_executes_when_gain_passes_and_preservation_passes():
+    decision = select_action_swap_propose_verify(
+        action_jobs=[
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 1,
+                "replace_doc_id": 101,
+                "candidate_assemble_score": 0.7,
+                "score_delta": 0.2,
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        query="Where was Alice born?",
+        scaffold_positions=[0, 1],
+        pool_docs=[
+            "Doc A\nAlice is a scientist.",
+            "Doc B\nAlice won an award.",
+            "Doc C\nAlice was born in Paris.",
+        ],
+        ce_reranker=None,
+        claim_support_results={
+            ("c1", 0): {"verdict": "supported", "reason": "Doc A supports claim 1."},
+            ("c1", 1): {"verdict": "not_supported", "reason": "Doc B does not support claim 1."},
+            ("c2", 0): {"verdict": "not_supported", "reason": "Doc A does not support claim 2."},
+            ("c2", 1): {"verdict": "not_supported", "reason": "Doc B does not support claim 2."},
+            ("c2", 2): {"verdict": "supported", "reason": "Doc C supports claim 2."},
+        },
+        query_tiers_override={
+            "mode": "heuristic_tiers",
+            "tiers": [
+                {
+                    "tier_id": "t1",
+                    "tier_index": 0,
+                    "tier_type": "heuristic_bridge",
+                    "facets": [
+                        {
+                            "facet_id": "c1",
+                            "facet_text": "Identify Alice.",
+                            "facet_type": "bridge_identification",
+                            "tier_index": 0,
+                        },
+                    ],
+                },
+                {
+                    "tier_id": "t2",
+                    "tier_index": 1,
+                    "tier_type": "answer_slot",
+                    "facets": [
+                        {
+                            "facet_id": "c2",
+                            "facet_text": "Where was Alice born?",
+                            "facet_type": "target_property",
+                            "tier_index": 1,
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    assert decision["action_executed"] is True
+    assert decision["action_type"] == "swap"
+    assert decision["proposal_action_present"] is True
+    assert decision["action_candidate_pool_position"] == 2
+    assert decision["action_replace_pool_position"] == 1
+    assert decision["gain_verifier_verdict"] == "supported"
+    assert decision["action_gate_verdict"] == "supported"
+    assert decision["action_skip_reason"] is None
+    assert decision["final_front_positions_after_action"] == [0, 2]
+
+
+def test_select_action_swap_propose_verify_keeps_when_replacee_is_unique_supporter():
+    decision = select_action_swap_propose_verify(
+        action_jobs=[
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 0,
+                "replace_doc_id": 100,
+                "candidate_assemble_score": 0.8,
+                "score_delta": 0.3,
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        query="Where was Alice born?",
+        scaffold_positions=[0, 1],
+        pool_docs=[
+            "Doc A\nAlice is a scientist.",
+            "Doc B\nAlice won an award.",
+            "Doc C\nAlice was born in Paris.",
+        ],
+        ce_reranker=None,
+        claim_support_results={
+            ("c1", 0): {"verdict": "supported", "reason": "Doc A supports claim 1."},
+            ("c1", 1): {"verdict": "not_supported", "reason": "Doc B does not support claim 1."},
+            ("c2", 0): {"verdict": "not_supported", "reason": "Doc A does not support claim 2."},
+            ("c2", 1): {"verdict": "not_supported", "reason": "Doc B does not support claim 2."},
+            ("c2", 2): {"verdict": "supported", "reason": "Doc C supports claim 2."},
+        },
+        query_tiers_override={
+            "mode": "heuristic_tiers",
+            "tiers": [
+                {
+                    "tier_id": "t1",
+                    "tier_index": 0,
+                    "tier_type": "heuristic_bridge",
+                    "facets": [
+                        {
+                            "facet_id": "c1",
+                            "facet_text": "Identify Alice.",
+                            "facet_type": "bridge_identification",
+                            "tier_index": 0,
+                        },
+                    ],
+                },
+                {
+                    "tier_id": "t2",
+                    "tier_index": 1,
+                    "tier_type": "answer_slot",
+                    "facets": [
+                        {
+                            "facet_id": "c2",
+                            "facet_text": "Where was Alice born?",
+                            "facet_type": "target_property",
+                            "tier_index": 1,
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    assert decision["action_executed"] is False
+    assert decision["proposal_action_present"] is True
+    assert decision["action_skip_reason"] == "preservation_verifier_reject"
+    assert decision["action_gate_verdict"] == "preservation_reject"
+    assert decision["preservation_unique_support_claim_ids"] == ["c1"]
+    assert decision["final_front_positions_after_action"] == [0, 1]
+
+
+def test_select_action_swap_propose_verify_keeps_when_no_unsupported_claim():
+    decision = select_action_swap_propose_verify(
+        action_jobs=[
+            {
+                "candidate_pool_position": 2,
+                "candidate_doc_id": 102,
+                "replace_pool_position": 1,
+                "replace_doc_id": 101,
+                "candidate_assemble_score": 0.7,
+                "score_delta": 0.2,
+                "is_duplicate_with_scaffold": False,
+            },
+        ],
+        query="Where was Alice born?",
+        scaffold_positions=[0, 1],
+        pool_docs=[
+            "Doc A\nAlice is a scientist.",
+            "Doc B\nAlice was born in Paris.",
+            "Doc C\nAlice was born in Paris.",
+        ],
+        ce_reranker=None,
+        claim_support_results={
+            ("c1", 0): {"verdict": "supported", "reason": "Doc A supports claim 1."},
+            ("c1", 1): {"verdict": "not_supported", "reason": "Doc B does not support claim 1."},
+            ("c2", 0): {"verdict": "not_supported", "reason": "Doc A does not support claim 2."},
+            ("c2", 1): {"verdict": "supported", "reason": "Doc B supports claim 2."},
+        },
+        query_tiers_override={
+            "mode": "heuristic_tiers",
+            "tiers": [
+                {
+                    "tier_id": "t1",
+                    "tier_index": 0,
+                    "tier_type": "heuristic_bridge",
+                    "facets": [
+                        {
+                            "facet_id": "c1",
+                            "facet_text": "Identify Alice.",
+                            "facet_type": "bridge_identification",
+                            "tier_index": 0,
+                        },
+                    ],
+                },
+                {
+                    "tier_id": "t2",
+                    "tier_index": 1,
+                    "tier_type": "answer_slot",
+                    "facets": [
+                        {
+                            "facet_id": "c2",
+                            "facet_text": "Where was Alice born?",
+                            "facet_type": "target_property",
+                            "tier_index": 1,
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    assert decision["action_executed"] is False
+    assert decision["proposal_action_present"] is True
+    assert decision["action_skip_reason"] == "no_unsupported_claim"
+    assert decision["earliest_unsupported_claim_id"] is None
+    assert decision["final_front_positions_after_action"] == [0, 1]
 
 
 def test_maybe_apply_setwise_reader_order_probe_promotes_best_bridge_to_slot3():
@@ -4597,6 +5470,857 @@ def test_select_bridge_append_positions_supports_random_deep_policy():
     assert trace["append_steps"][0]["selection_policy"] == "random_deep"
 
 
+def test_detect_gap_expand_state_prefers_bridge_entity_when_query_entity_missing():
+    gap_state = detect_gap_expand_state(
+        query="Where was the wife of Barack Obama born?",
+        baseline_prefix_positions=[0, 1],
+        pool_docs=[
+            "Barack Obama\nBarack Obama served as president.",
+            "United States\nThe United States is a country.",
+        ],
+        pool_doc_ids=[10, 11],
+        doc_idx_to_entities={
+            10: {"Barack Obama"},
+            11: {"United States"},
+        },
+        query_entities={"Barack Obama", "Michelle Obama"},
+        covered_entities={"Barack Obama", "United States"},
+        gap_expand_mode="heuristic",
+        gap_expand_max_queries=2,
+    )
+
+    assert gap_state["gap_type"] == "bridge_entity"
+    assert gap_state["fallback_used"] is False
+    assert "michelle obama" in gap_state["uncovered_query_entities"]
+    assert len(gap_state["micro_queries"]) >= 1
+
+
+def test_rerank_gap_expand_candidates_prefers_bridge_doc_with_anchor_and_missing_entity():
+    ranked = rerank_gap_expand_candidates(
+        scored_candidates=[
+            {
+                "pool_position": 2,
+                "doc_id": 12,
+                "doc_title": "Michelle Obama",
+                "doc_entities": {"barack obama", "michelle obama"},
+                "structure_score": 0.20,
+                "closure_score": 0.20,
+                "closure_score_raw": 0.20,
+                "novelty_score": 0.60,
+                "base_score": 0.10,
+                "query_anchor_score": 0.25,
+                "path_coherence_score": 0.10,
+                "selection_score_raw": 0.20,
+                "combined_score_raw": 0.18,
+                "new_entity_count": 1,
+            },
+            {
+                "pool_position": 3,
+                "doc_id": 13,
+                "doc_title": "Paris",
+                "doc_entities": {"paris"},
+                "structure_score": 0.40,
+                "closure_score": 0.30,
+                "closure_score_raw": 0.30,
+                "novelty_score": 0.50,
+                "base_score": 0.20,
+                "query_anchor_score": 0.10,
+                "path_coherence_score": 0.05,
+                "selection_score_raw": 0.40,
+                "combined_score_raw": 0.35,
+                "new_entity_count": 1,
+            },
+        ],
+        pool_docs=[
+            "Barack Obama\nBarack Obama served as president.",
+            "United States\nThe United States is a country.",
+            "Michelle Obama\nMichelle Obama is the wife of Barack Obama.",
+            "Paris\nParis is the capital of France.",
+        ],
+        gap_state={
+            "gap_type": "bridge_entity",
+            "micro_queries": [
+                "Where was the wife of Barack Obama born?",
+                "Find the intermediate entity linking Barack Obama to Michelle Obama. Question: Where was the wife of Barack Obama born?",
+            ],
+            "gap_anchors": ["barack obama"],
+            "uncovered_query_entities": ["michelle obama"],
+            "relation_terms": ["wife", "born"],
+        },
+        covered_entities={"barack obama", "united states"},
+    )
+
+    assert ranked[0]["pool_position"] == 2
+    assert ranked[0]["gap_type"] == "bridge_entity"
+    assert ranked[0]["gap_score_raw"] > ranked[1]["gap_score_raw"]
+
+
+def test_detect_gap_expand_state_typed_abstain_prefers_role_relation_with_slot_and_anchor():
+    gap_state = detect_gap_expand_state(
+        query="Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+        baseline_prefix_positions=[0, 1],
+        pool_docs=[
+            "Christ Walking On The Water\nA film entry.",
+            "45 Fathers\nAnother film entry.",
+        ],
+        pool_doc_ids=[10, 11],
+        doc_idx_to_entities={
+            10: {"Christ Walking On The Water"},
+            11: {"45 Fathers"},
+        },
+        query_entities={"Christ Walking On The Water", "45 Fathers", "director"},
+        covered_entities={"Christ Walking On The Water", "45 Fathers"},
+        gap_expand_mode="typed_abstain",
+        gap_expand_max_queries=2,
+    )
+
+    assert gap_state["gap_type"] == "role_relation"
+    assert gap_state["gap_slot"] == "director"
+    assert gap_state["fallback_used"] is False
+    assert gap_state["gap_anchors"] == ["Christ Walking On The Water", "45 Fathers"]
+
+
+def test_detect_gap_expand_state_typed_abstain_abstains_when_slot_is_unclear():
+    gap_state = detect_gap_expand_state(
+        query="Tell me something about Alice and Bob and Carol",
+        baseline_prefix_positions=[0, 1],
+        pool_docs=[
+            "Alice\nAlice is a person.",
+            "Bob\nBob is another person.",
+        ],
+        pool_doc_ids=[10, 11],
+        doc_idx_to_entities={
+            10: {"Alice"},
+            11: {"Bob"},
+        },
+        query_entities={"Alice", "Bob", "Carol"},
+        covered_entities={"Alice", "Bob"},
+        gap_expand_mode="typed_abstain",
+        gap_expand_max_queries=2,
+    )
+
+    assert gap_state["gap_type"] == "abstain"
+    assert gap_state["fallback_used"] is True
+    assert gap_state["abstain_reason"] == "no_typed_slot"
+
+
+def test_detect_gap_expand_state_unit_typed_abstain_abstains_on_bridge_entity_queries():
+    gap_state = detect_gap_expand_state(
+        query="Where was the wife of Barack Obama born?",
+        baseline_prefix_positions=[0, 1],
+        pool_docs=[
+            "Barack Obama\nBarack Obama served as president.",
+            "United States\nThe United States is a country.",
+        ],
+        pool_doc_ids=[10, 11],
+        doc_idx_to_entities={
+            10: {"Barack Obama"},
+            11: {"United States"},
+        },
+        query_entities={"Barack Obama", "Michelle Obama"},
+        covered_entities={"Barack Obama"},
+        gap_expand_mode="unit_typed_abstain",
+        gap_expand_max_queries=2,
+    )
+
+    assert gap_state["gap_type"] == "abstain"
+    assert gap_state["fallback_used"] is True
+
+
+def test_rerank_gap_expand_candidates_typed_abstain_role_relation_requires_local_anchor_role_and_filler():
+    ranked = rerank_gap_expand_candidates(
+        scored_candidates=[
+            {
+                "pool_position": 2,
+                "doc_id": 12,
+                "doc_title": "Roman Polanski",
+                "doc_entities": {"roman polanski"},
+                "structure_score": 0.40,
+                "closure_score": 0.20,
+                "closure_score_raw": 0.20,
+                "novelty_score": 0.30,
+                "base_score": 0.10,
+                "query_anchor_score": 0.08,
+                "path_coherence_score": 0.05,
+                "selection_score_raw": 0.35,
+                "combined_score_raw": 0.35,
+                "new_entity_count": 1,
+            },
+            {
+                "pool_position": 3,
+                "doc_id": 13,
+                "doc_title": "James Tinling",
+                "doc_entities": {"james tinling"},
+                "structure_score": 0.30,
+                "closure_score": 0.18,
+                "closure_score_raw": 0.18,
+                "novelty_score": 0.55,
+                "base_score": 0.12,
+                "query_anchor_score": 0.10,
+                "path_coherence_score": 0.08,
+                "selection_score_raw": 0.22,
+                "combined_score_raw": 0.22,
+                "new_entity_count": 1,
+            },
+        ],
+        pool_docs=[
+            "Christ Walking On The Water\nA film entry.",
+            "45 Fathers\nAnother film entry.",
+            "Roman Polanski\nRoman Polanski is a film director and screenwriter.",
+            "James Tinling\nJames Tinling directed Christ Walking On The Water.",
+        ],
+        gap_state={
+            "gap_type": "role_relation",
+            "gap_mode": "typed_abstain",
+            "gap_anchors": ["Christ Walking On The Water", "45 Fathers"],
+            "gap_slot_cues": ["director", "directed"],
+            "gap_bridge_targets": [],
+            "micro_queries": [
+                "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+                "Find the director of Christ Walking On The Water and 45 Fathers. Question: Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+            ],
+        },
+        covered_entities={"christ walking on the water", "45 fathers"},
+    )
+
+    ranked_by_position = {int(row["pool_position"]): row for row in ranked}
+    assert ranked[0]["pool_position"] == 3
+    assert ranked_by_position[3]["gap_filter_passed"] is True
+    assert ranked_by_position[2]["gap_filter_passed"] is False
+    assert ranked_by_position[3]["gap_best_role_witness_joint"] > 0.0
+    assert ranked_by_position[2]["gap_best_role_witness_joint"] == 0.0
+
+
+def test_rerank_gap_expand_units_prefers_local_role_witness_parent():
+    class DummyCEReranker:
+        def compute_score(self, pairs):
+            scores = []
+            for query, text in pairs:
+                normalized_text = str(text).lower()
+                if "james tinling directed christ walking on the water" in normalized_text:
+                    scores.append(8.0)
+                elif "roman polanski is a film director" in normalized_text:
+                    scores.append(3.0)
+                else:
+                    scores.append(-2.0)
+            return scores
+
+    ranked_rows, unit_summary = rerank_gap_expand_units(
+        scored_candidates=[
+            {
+                "pool_position": 2,
+                "doc_id": 12,
+                "doc_title": "Roman Polanski",
+                "doc_entities": {"roman polanski"},
+                "structure_score": 0.40,
+                "combined_score_raw": 0.40,
+            },
+            {
+                "pool_position": 3,
+                "doc_id": 13,
+                "doc_title": "James Tinling",
+                "doc_entities": {"james tinling"},
+                "structure_score": 0.20,
+                "combined_score_raw": 0.20,
+            },
+        ],
+        pool_docs=[
+            "Christ Walking On The Water\nA film entry.",
+            "45 Fathers\nAnother film entry.",
+            "Roman Polanski\nRoman Polanski is a film director and screenwriter.",
+            "James Tinling\nJames Tinling directed Christ Walking On The Water.",
+        ],
+        gap_state={
+            "gap_type": "role_relation",
+            "gap_mode": "unit_typed_abstain",
+            "gap_slot": "director",
+            "gap_slot_cues": ["director", "directed"],
+            "gap_anchors": ["Christ Walking On The Water", "45 Fathers"],
+            "micro_queries": [
+                "director of Christ Walking On The Water",
+                "who directed Christ Walking On The Water",
+            ],
+        },
+        covered_entities={"christ walking on the water", "45 fathers"},
+        ce_reranker=DummyCEReranker(),
+    )
+
+    assert ranked_rows[0]["pool_position"] == 3
+    assert ranked_rows[0]["gap_unit_eligible"] is True
+    assert ranked_rows[0]["gap_unit_anchor_pass"] is True
+    assert ranked_rows[0]["gap_unit_slot_pass"] is True
+    assert ranked_rows[0]["gap_unit_non_anchor_pass"] is True
+    assert ranked_rows[1]["gap_unit_eligible"] is False
+    assert unit_summary["gap_unit_eligible_count"] >= 1
+
+
+def test_select_bridge_append_positions_supports_gap_expand_policy(monkeypatch):
+    def fake_score_bridge_candidates(**kwargs):
+        return [
+            {
+                "pool_position": 2,
+                "doc_id": 12,
+                "doc_title": "Michelle Obama",
+                "doc_entities": {"barack obama", "michelle obama"},
+                "structure_score": 0.18,
+                "closure_score": 0.18,
+                "closure_score_raw": 0.18,
+                "novelty_score": 0.60,
+                "base_score": 0.10,
+                "query_anchor_score": 0.20,
+                "path_coherence_score": 0.10,
+                "selection_score_raw": 0.18,
+                "combined_score": 0.18,
+                "combined_score_raw": 0.18,
+                "new_entity_count": 1,
+            },
+            {
+                "pool_position": 3,
+                "doc_id": 13,
+                "doc_title": "Distractor",
+                "doc_entities": {"paris"},
+                "structure_score": 0.40,
+                "closure_score": 0.30,
+                "closure_score_raw": 0.30,
+                "novelty_score": 0.20,
+                "base_score": 0.10,
+                "query_anchor_score": 0.10,
+                "path_coherence_score": 0.05,
+                "selection_score_raw": 0.40,
+                "combined_score": 0.31,
+                "combined_score_raw": 0.31,
+                "new_entity_count": 1,
+            },
+        ]
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13],
+        normalized_base_scores=np.asarray([1.0, 0.9, 0.2, 0.3], dtype=float),
+        query="Where was the wife of Barack Obama born?",
+        pool_docs=[
+            "Barack Obama\nBarack Obama served as president.",
+            "United States\nThe United States is a country.",
+            "Michelle Obama\nMichelle Obama is the wife of Barack Obama.",
+            "Distractor\nParis is the capital of France.",
+        ],
+        pool_doc_titles=["Barack Obama", "United States", "Michelle Obama", "Distractor"],
+        doc_idx_to_entities={
+            10: {"barack obama"},
+            11: {"united states"},
+            12: {"barack obama", "michelle obama"},
+            13: {"paris"},
+        },
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"barack obama"},
+        query_entities={"barack obama", "michelle obama"},
+        pool_limit=4,
+        expand_base_k=2,
+        append_max_docs=1,
+        expand_min_structure_score=0.35,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="gap_expand",
+        gap_expand_mode="heuristic",
+        gap_expand_max_queries=2,
+    )
+
+    assert selected_positions == [0, 1, 2]
+    assert trace["append_policy"] == "gap_expand"
+    assert trace["gap_expand_enabled"] is True
+    assert trace["gap_type"] == "bridge_entity"
+    assert trace["gap_candidate_positions"] == [2]
+    assert trace["append_steps"][0]["selected_pool_position"] == 2
+
+
+def test_select_bridge_append_positions_typed_abstain_preserves_bridge_primary_and_adds_gap_alternate(monkeypatch):
+    def fake_score_bridge_candidates(**kwargs):
+        remaining_positions = list(kwargs["remaining_positions"])
+        rows = []
+        for pool_position in remaining_positions:
+            if pool_position == 2:
+                rows.append({
+                    "pool_position": 2,
+                    "doc_id": 12,
+                    "doc_title": "Cinema Bridge",
+                    "doc_entities": {"cinema bridge"},
+                    "structure_score": 0.92,
+                    "closure_score": 0.60,
+                    "closure_score_raw": 0.60,
+                    "novelty_score": 0.30,
+                    "base_score": 0.20,
+                    "query_anchor_score": 0.15,
+                    "path_coherence_score": 0.12,
+                    "selection_score_raw": 0.92,
+                    "combined_score": 0.88,
+                    "combined_score_raw": 0.88,
+                    "new_entity_count": 1,
+                })
+            elif pool_position == 3:
+                rows.append({
+                    "pool_position": 3,
+                    "doc_id": 13,
+                    "doc_title": "Generic Director Page",
+                    "doc_entities": {"generic director"},
+                    "structure_score": 0.45,
+                    "closure_score": 0.30,
+                    "closure_score_raw": 0.30,
+                    "novelty_score": 0.32,
+                    "base_score": 0.15,
+                    "query_anchor_score": 0.14,
+                    "path_coherence_score": 0.11,
+                    "selection_score_raw": 0.40,
+                    "combined_score": 0.40,
+                    "combined_score_raw": 0.40,
+                    "new_entity_count": 1,
+                })
+            elif pool_position == 4:
+                rows.append({
+                    "pool_position": 4,
+                    "doc_id": 14,
+                    "doc_title": "James Tinling",
+                    "doc_entities": {"james tinling"},
+                    "structure_score": 0.22,
+                    "closure_score": 0.18,
+                    "closure_score_raw": 0.18,
+                    "novelty_score": 0.70,
+                    "base_score": 0.09,
+                    "query_anchor_score": 0.10,
+                    "path_coherence_score": 0.08,
+                    "selection_score_raw": 0.20,
+                    "combined_score": 0.20,
+                    "combined_score_raw": 0.20,
+                    "new_entity_count": 1,
+                })
+        return rows
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13, 14],
+        normalized_base_scores=np.asarray([1.0, 0.95, 0.40, 0.38, 0.25], dtype=float),
+        query="Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+        pool_docs=[
+            "Christ Walking On The Water\nChrist Walking On The Water is a film.",
+            "45 Fathers\n45 Fathers is a film.",
+            "Cinema Bridge\nCinema Bridge is a page about comparative film metadata.",
+            "Generic Director Page\nA generic director page without the needed film anchor.",
+            "James Tinling\nJames Tinling directed Christ Walking On The Water.",
+        ],
+        pool_doc_titles=["Christ Walking On The Water", "45 Fathers", "Cinema Bridge", "Generic Director Page", "James Tinling"],
+        doc_idx_to_entities={
+            10: {"christ walking on the water"},
+            11: {"45 fathers"},
+            12: {"cinema bridge"},
+            13: {"generic director"},
+            14: {"james tinling"},
+        },
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"christ walking on the water", "45 fathers"},
+        query_entities={"Christ Walking On The Water", "45 Fathers", "director"},
+        pool_limit=5,
+        expand_base_k=2,
+        append_max_docs=3,
+        expand_min_structure_score=0.15,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="gap_expand",
+        gap_expand_mode="typed_abstain",
+        gap_expand_max_queries=2,
+    )
+
+    assert selected_positions == [0, 1, 2, 4]
+    assert trace["append_policy"] == "gap_expand"
+    assert trace["gap_expand_mode"] == "typed_abstain"
+    assert trace["gap_type"] == "role_relation"
+    assert trace["bridge_primary_positions"] == [2]
+    assert trace["gap_candidate_positions"] == [4]
+    assert trace["append_steps"][0]["selection_policy"] == "bridge_primary"
+    assert trace["append_steps"][1]["selection_policy"] == "gap_alternate"
+
+
+def test_select_bridge_append_positions_unit_typed_abstain_preserves_bridge_primary_and_adds_unit_alternate(monkeypatch):
+    class DummyCEReranker:
+        def compute_score(self, pairs):
+            scores = []
+            for query, text in pairs:
+                normalized_text = str(text).lower()
+                if "james tinling directed christ walking on the water" in normalized_text:
+                    scores.append(8.0)
+                elif "cinema bridge" in normalized_text:
+                    scores.append(1.0)
+                else:
+                    scores.append(-2.0)
+            return scores
+
+    def fake_score_bridge_candidates(**kwargs):
+        remaining_positions = list(kwargs["remaining_positions"])
+        rows = []
+        for pool_position in remaining_positions:
+            if pool_position == 2:
+                rows.append({
+                    "pool_position": 2,
+                    "doc_id": 12,
+                    "doc_title": "Cinema Bridge",
+                    "doc_entities": {"cinema bridge"},
+                    "structure_score": 0.92,
+                    "closure_score": 0.60,
+                    "closure_score_raw": 0.60,
+                    "novelty_score": 0.30,
+                    "base_score": 0.20,
+                    "query_anchor_score": 0.15,
+                    "path_coherence_score": 0.12,
+                    "selection_score_raw": 0.92,
+                    "combined_score": 0.88,
+                    "combined_score_raw": 0.88,
+                    "new_entity_count": 1,
+                })
+            elif pool_position == 3:
+                rows.append({
+                    "pool_position": 3,
+                    "doc_id": 13,
+                    "doc_title": "Roman Polanski",
+                    "doc_entities": {"roman polanski"},
+                    "structure_score": 0.40,
+                    "closure_score": 0.20,
+                    "closure_score_raw": 0.20,
+                    "novelty_score": 0.30,
+                    "base_score": 0.10,
+                    "query_anchor_score": 0.08,
+                    "path_coherence_score": 0.05,
+                    "selection_score_raw": 0.35,
+                    "combined_score_raw": 0.35,
+                    "new_entity_count": 1,
+                })
+            elif pool_position == 4:
+                rows.append({
+                    "pool_position": 4,
+                    "doc_id": 14,
+                    "doc_title": "James Tinling",
+                    "doc_entities": {"james tinling"},
+                    "structure_score": 0.22,
+                    "closure_score": 0.18,
+                    "closure_score_raw": 0.18,
+                    "novelty_score": 0.70,
+                    "base_score": 0.09,
+                    "query_anchor_score": 0.10,
+                    "path_coherence_score": 0.08,
+                    "selection_score_raw": 0.20,
+                    "combined_score_raw": 0.20,
+                    "new_entity_count": 1,
+                })
+        return rows
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13, 14],
+        normalized_base_scores=np.asarray([1.0, 0.95, 0.40, 0.38, 0.25], dtype=float),
+        query="Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+        pool_docs=[
+            "Christ Walking On The Water\nChrist Walking On The Water is a film.",
+            "45 Fathers\n45 Fathers is a film.",
+            "Cinema Bridge\nCinema Bridge is a page about comparative film metadata.",
+            "Roman Polanski\nRoman Polanski is a film director and screenwriter.",
+            "James Tinling\nJames Tinling directed Christ Walking On The Water.",
+        ],
+        pool_doc_titles=["Christ Walking On The Water", "45 Fathers", "Cinema Bridge", "Roman Polanski", "James Tinling"],
+        doc_idx_to_entities={
+            10: {"christ walking on the water"},
+            11: {"45 fathers"},
+            12: {"cinema bridge"},
+            13: {"roman polanski"},
+            14: {"james tinling"},
+        },
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"christ walking on the water", "45 fathers"},
+        query_entities={"Christ Walking On The Water", "45 Fathers", "director"},
+        pool_limit=5,
+        expand_base_k=2,
+        append_max_docs=3,
+        expand_min_structure_score=0.15,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="gap_expand",
+        gap_expand_mode="unit_typed_abstain",
+        gap_expand_max_queries=2,
+        ce_reranker=DummyCEReranker(),
+    )
+
+    assert selected_positions == [0, 1, 2, 4]
+    assert trace["gap_expand_mode"] == "unit_typed_abstain"
+    assert trace["bridge_primary_positions"] == [2]
+    assert trace["gap_candidate_positions"] == [4]
+    assert trace["append_steps"][0]["selection_policy"] == "bridge_primary"
+    assert trace["append_steps"][1]["selection_policy"] == "gap_unit_alternate"
+    assert trace["gap_unit_selected_parent_title"] == "James Tinling"
+    assert trace["gap_unit_anchor_pass"] is True
+    assert trace["gap_unit_slot_pass"] is True
+    assert trace["gap_unit_non_anchor_pass"] is True
+
+
+def test_select_bridge_append_positions_unit_typed_abstain_requires_better_witness_than_bridge_primary(monkeypatch):
+    class DummyCEReranker:
+        def compute_score(self, pairs):
+            scores = []
+            for query, text in pairs:
+                normalized_text = str(text).lower()
+                if "jim wynorski directed the return of swamp thing" in normalized_text:
+                    scores.append(8.0)
+                elif "roman polanski is a film director" in normalized_text:
+                    scores.append(3.0)
+                else:
+                    scores.append(-2.0)
+            return scores
+
+    def fake_score_bridge_candidates(**kwargs):
+        remaining_positions = list(kwargs["remaining_positions"])
+        rows = []
+        for pool_position in remaining_positions:
+            if pool_position == 2:
+                rows.append({
+                    "pool_position": 2,
+                    "doc_id": 12,
+                    "doc_title": "Jim Wynorski",
+                    "doc_entities": {"jim wynorski"},
+                    "structure_score": 0.90,
+                    "closure_score": 0.45,
+                    "closure_score_raw": 0.45,
+                    "novelty_score": 0.32,
+                    "base_score": 0.18,
+                    "query_anchor_score": 0.16,
+                    "path_coherence_score": 0.12,
+                    "selection_score_raw": 0.85,
+                    "combined_score": 0.85,
+                    "combined_score_raw": 0.85,
+                    "new_entity_count": 1,
+                })
+            elif pool_position == 3:
+                rows.append({
+                    "pool_position": 3,
+                    "doc_id": 13,
+                    "doc_title": "Roman Polanski",
+                    "doc_entities": {"roman polanski"},
+                    "structure_score": 0.40,
+                    "closure_score": 0.22,
+                    "closure_score_raw": 0.22,
+                    "novelty_score": 0.42,
+                    "base_score": 0.13,
+                    "query_anchor_score": 0.10,
+                    "path_coherence_score": 0.09,
+                    "selection_score_raw": 0.36,
+                    "combined_score": 0.36,
+                    "combined_score_raw": 0.36,
+                    "new_entity_count": 1,
+                })
+        return rows
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13],
+        normalized_base_scores=np.asarray([1.0, 0.95, 0.45, 0.20], dtype=float),
+        query="What is the place of birth of the director of film The Return Of Swamp Thing?",
+        pool_docs=[
+            "The Return Of Swamp Thing\nThe Return Of Swamp Thing is a film.",
+            "Birthplace\nBirthplace is an attribute.",
+            "Jim Wynorski\nJim Wynorski directed The Return Of Swamp Thing.",
+            "Roman Polanski\nRoman Polanski is a film director, but not the director of The Return Of Swamp Thing.",
+        ],
+        pool_doc_titles=["The Return Of Swamp Thing", "Birthplace", "Jim Wynorski", "Roman Polanski"],
+        doc_idx_to_entities={
+            10: {"the return of swamp thing"},
+            11: {"birthplace"},
+            12: {"jim wynorski"},
+            13: {"roman polanski"},
+        },
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"the return of swamp thing"},
+        query_entities={"The Return Of Swamp Thing", "director", "birthplace"},
+        pool_limit=4,
+        expand_base_k=2,
+        append_max_docs=3,
+        expand_min_structure_score=0.15,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="gap_expand",
+        gap_expand_mode="unit_typed_abstain",
+        gap_expand_max_queries=2,
+        ce_reranker=DummyCEReranker(),
+    )
+
+    assert selected_positions == [0, 1, 2]
+    assert trace["gap_candidate_positions"] == []
+    assert trace["append_stop_reason"] == "gap_unit_not_better_than_bridge_primary"
+
+
+def test_select_bridge_append_positions_typed_abstain_falls_back_to_bridge(monkeypatch):
+    def fake_score_bridge_candidates(**kwargs):
+        return [
+            {
+                "pool_position": 2,
+                "doc_id": 12,
+                "doc_title": "Bridge Doc",
+                "doc_entities": {"bridge doc"},
+                "structure_score": 0.7,
+                "closure_score": 0.3,
+                "closure_score_raw": 0.3,
+                "novelty_score": 0.4,
+                "base_score": 0.2,
+                "query_anchor_score": 0.1,
+                "path_coherence_score": 0.1,
+                "selection_score_raw": 0.6,
+                "combined_score": 0.6,
+                "combined_score_raw": 0.6,
+                "new_entity_count": 1,
+            },
+        ]
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12],
+        normalized_base_scores=np.asarray([1.0, 0.9, 0.2], dtype=float),
+        query="Tell me something about Alice and Bob and Carol",
+        pool_docs=[
+            "Alice\nAlice is a person.",
+            "Bob\nBob is a person.",
+            "Bridge Doc\nCarol is also mentioned here.",
+        ],
+        pool_doc_titles=["Alice", "Bob", "Bridge Doc"],
+        doc_idx_to_entities={
+            10: {"alice"},
+            11: {"bob"},
+            12: {"carol"},
+        },
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"alice"},
+        query_entities={"Alice", "Bob", "Carol"},
+        pool_limit=3,
+        expand_base_k=2,
+        append_max_docs=1,
+        expand_min_structure_score=0.15,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="gap_expand",
+        gap_expand_mode="typed_abstain",
+        gap_expand_max_queries=2,
+    )
+
+    assert selected_positions == [0, 1, 2]
+    assert trace["gap_type"] == "abstain"
+    assert trace["gap_fallback_used"] is True
+    assert trace["gap_candidate_positions"] == []
+    assert trace["append_steps"][0]["selection_policy"] == "bridge"
+
+
+def test_select_bridge_append_positions_typed_abstain_role_relation_requires_better_witness_than_current(monkeypatch):
+    def fake_score_bridge_candidates(**kwargs):
+        remaining_positions = list(kwargs["remaining_positions"])
+        rows = []
+        for pool_position in remaining_positions:
+            if pool_position == 2:
+                rows.append({
+                    "pool_position": 2,
+                    "doc_id": 12,
+                    "doc_title": "Jim Wynorski",
+                    "doc_entities": {"jim wynorski"},
+                    "structure_score": 0.90,
+                    "closure_score": 0.45,
+                    "closure_score_raw": 0.45,
+                    "novelty_score": 0.32,
+                    "base_score": 0.18,
+                    "query_anchor_score": 0.16,
+                    "path_coherence_score": 0.12,
+                    "selection_score_raw": 0.85,
+                    "combined_score": 0.85,
+                    "combined_score_raw": 0.85,
+                    "new_entity_count": 1,
+                })
+            elif pool_position == 3:
+                rows.append({
+                    "pool_position": 3,
+                    "doc_id": 13,
+                    "doc_title": "Roman Polanski",
+                    "doc_entities": {"roman polanski"},
+                    "structure_score": 0.40,
+                    "closure_score": 0.22,
+                    "closure_score_raw": 0.22,
+                    "novelty_score": 0.42,
+                    "base_score": 0.13,
+                    "query_anchor_score": 0.10,
+                    "path_coherence_score": 0.09,
+                    "selection_score_raw": 0.36,
+                    "combined_score": 0.36,
+                    "combined_score_raw": 0.36,
+                    "new_entity_count": 1,
+                })
+        return rows
+
+    monkeypatch.setattr(eval_causal_qwen3_module, "score_bridge_candidates", fake_score_bridge_candidates)
+
+    selected_positions, trace = select_bridge_append_positions(
+        pool_doc_ids=[10, 11, 12, 13],
+        normalized_base_scores=np.asarray([1.0, 0.95, 0.45, 0.20], dtype=float),
+        query="What is the place of birth of the director of film The Return Of Swamp Thing?",
+        pool_docs=[
+            "The Return Of Swamp Thing\nThe Return Of Swamp Thing is a film.",
+            "Birthplace\nBirthplace is an attribute.",
+            "Jim Wynorski\nJim Wynorski directed The Return Of Swamp Thing.",
+            "Roman Polanski\nRoman Polanski is a film director, but not the director of The Return Of Swamp Thing.",
+        ],
+        pool_doc_titles=["The Return Of Swamp Thing", "Birthplace", "Jim Wynorski", "Roman Polanski"],
+        doc_idx_to_entities={
+            10: {"the return of swamp thing"},
+            11: {"birthplace"},
+            12: {"jim wynorski"},
+            13: {"roman polanski"},
+        },
+        doc_idx_to_edges={},
+        adjacency={},
+        initial_seed_entities={"the return of swamp thing"},
+        query_entities={"The Return Of Swamp Thing", "director", "birthplace"},
+        pool_limit=4,
+        expand_base_k=2,
+        append_max_docs=3,
+        expand_min_structure_score=0.15,
+        structure_max_hops=2,
+        structure_seed_target_bridge_mode="off",
+        base_weight=0.25,
+        structure_weight=0.60,
+        novelty_weight=0.15,
+        append_policy="gap_expand",
+        gap_expand_mode="typed_abstain",
+        gap_expand_max_queries=2,
+    )
+
+    assert selected_positions == [0, 1, 2]
+    assert trace["gap_type"] == "role_relation"
+    assert trace["gap_candidate_positions"] == []
+    assert trace["append_stop_reason"] == "role_reference_not_better"
+
+
 def test_rerank_candidate_positions_for_assemble_supports_similarity_and_ce():
     hipporag = DummyHippoRAGForAssemble(
         query_embeddings={"where is alpha": np.asarray([1.0, 0.0], dtype=float)},
@@ -4716,7 +6440,121 @@ def test_assemble_coverage_exact_search_supports_qeb_ce_variant():
     assert selected_positions == [0, 2]
     assert trace["coverage_score_variant"] == "qeb_ce"
     assert trace["best_covB_trace_only"] == 3
-    assert trace["ce_score_source"] == "base_score_fallback"
+
+
+def test_assemble_ce_local_repair_keeps_scaffold_when_no_requirement_gain():
+    ranked_positions, trace = assemble_ce_local_repair(
+        query="where is alpha beta",
+        pool_docs=[
+            "Doc A\nalpha beta",
+            "Doc B\nbeta support",
+            "Doc C\ngamma delta",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.9, 0.8, 0.2], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        query_entities={"alpha", "beta"},
+        seed_entities={"alpha", "beta"},
+        doc_idx_to_entities={
+            0: {"alpha", "beta"},
+            1: {"beta", "support"},
+            2: {"gamma", "delta"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "beta", 1.0, "rel")],
+            1: [("beta", "support", 1.0, "rel")],
+            2: [("gamma", "delta", 1.0, "rel")],
+        },
+        hipporag=types.SimpleNamespace(),
+        ce_reranker=DummyCrossEncoder([0.9, 0.8, 0.95]),
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+    )
+
+    assert ranked_positions[:2] == [0, 1]
+    assert trace["repair_applied"] is False
+    assert trace["final_positions_before_repair"] == [0, 1]
+    assert trace["final_positions_after_repair"] == [0, 1]
+    assert trace["missing_query_anchor_count"] == 0
+    assert trace["best_repair_swap"] == {}
+
+
+def test_assemble_ce_local_repair_prefers_connector_gain_swap():
+    ranked_positions, trace = assemble_ce_local_repair(
+        query="connect alpha and beta",
+        pool_docs=[
+            "Doc A\nalpha side",
+            "Doc B\nbeta side",
+            "Doc C\nalpha bridge beta",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.9, 0.8, 0.3], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        query_entities={"alpha", "beta"},
+        seed_entities={"alpha", "beta"},
+        doc_idx_to_entities={
+            0: {"alpha", "left"},
+            1: {"beta", "right"},
+            2: {"alpha", "beta", "bridge"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "left", 1.0, "rel")],
+            1: [("beta", "right", 1.0, "rel")],
+            2: [("alpha", "bridge", 1.0, "rel"), ("bridge", "beta", 1.0, "rel")],
+        },
+        hipporag=types.SimpleNamespace(),
+        ce_reranker=DummyCrossEncoder([0.9, 0.7, 0.6]),
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+    )
+
+    assert trace["repair_applied"] is True
+    assert trace["scaffold_positions"] == [0, 1]
+    assert trace["scaffold_component_count"] == 2
+    assert trace["best_repair_swap"]["connector_gain_count"] == 1
+    assert trace["best_repair_swap"]["anchor_gain_count"] == 0
+    assert trace["best_repair_swap"]["replace_pool_position"] == 1
+    assert trace["best_repair_swap"]["ce_drop_vs_scaffold"] == 0.1
+    assert trace["final_positions_after_repair"] == [0, 2]
+    assert ranked_positions[:2] == [0, 2]
+
+
+def test_assemble_ce_local_repair_supports_anchor_only_fallback():
+    ranked_positions, trace = assemble_ce_local_repair(
+        query="where is gamma",
+        pool_docs=[
+            "Doc A\nalpha side",
+            "Doc B\nbeta side",
+            "Doc C\ngamma fact",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([0.9, 0.8, 0.3], dtype=float),
+        candidate_positions=[0, 1, 2],
+        qa_top_k=2,
+        query_entities={"alpha", "gamma"},
+        seed_entities={"alpha", "gamma"},
+        doc_idx_to_entities={
+            0: {"alpha", "left"},
+            1: {"beta", "right"},
+            2: {"gamma"},
+        },
+        doc_idx_to_edges={
+            0: [("alpha", "left", 1.0, "rel")],
+            1: [("beta", "right", 1.0, "rel")],
+            2: [],
+        },
+        hipporag=types.SimpleNamespace(),
+        ce_reranker=DummyCrossEncoder([0.9, 0.7, 0.6]),
+        position_sources={0: "baseline_prefix", 1: "baseline_prefix", 2: "append_bridge"},
+    )
+
+    assert trace["repair_applied"] is True
+    assert trace["missing_query_anchor_entities"] == ["gamma"]
+    assert trace["best_repair_swap"]["connector_gain_count"] == 0
+    assert trace["best_repair_swap"]["anchor_gain_count"] == 1
+    assert trace["best_repair_swap"]["replace_pool_position"] == 1
+    assert ranked_positions[:2] == [0, 2]
+    assert trace["score_field"] == "cross_encoder_score"
 
 
 def test_assemble_coverage_exact_search_candidate_pool_atom_source_matches_default():
@@ -5274,6 +7112,164 @@ def test_load_and_hydrate_query_solutions_from_baseline_report(tmp_path):
     assert query_solutions[0].answer == "A1"
     assert query_solutions[1].gold_answers == ["A2"]
     assert query_solutions[0].gold_docs == ["Doc1"]
+
+
+def test_build_report_metrics_summary_for_baseline():
+    summary = build_report_metrics_summary(
+        {
+            "Recall@5": 0.71,
+            "Recall@20": 0.98,
+            "ExactMatch": 0.52,
+            "F1": 0.65,
+            "num_queries": 100,
+        }
+    )
+
+    assert summary == {
+        "primary_run_type": "baseline",
+        "primary_retrieval_metrics": {
+            "Recall@5": 0.71,
+            "Recall@20": 0.98,
+        },
+        "primary_qa_metrics": {
+            "ExactMatch": 0.52,
+            "F1": 0.65,
+        },
+        "num_queries": 100,
+    }
+
+
+def test_build_report_metrics_summary_for_expand_assemble_includes_baseline_and_method():
+    summary = build_report_metrics_summary(
+        {
+            "Recall@5": 0.71,
+            "Recall@20": 0.98,
+            "ExactMatch": 0.52,
+            "F1": 0.65,
+            "num_queries": 100,
+        },
+        expand_assemble_results={
+            "method_retrieval_metrics": {
+                "Recall@5": 0.75,
+                "Recall@20": 0.99,
+                "Recall@100": 1.0,
+            },
+            "method_EM": 0.53,
+            "method_F1": 0.6444,
+        },
+    )
+
+    assert summary == {
+        "primary_run_type": "expand_assemble",
+        "primary_retrieval_metrics": {
+            "Recall@5": 0.75,
+            "Recall@20": 0.99,
+            "Recall@100": 1.0,
+        },
+        "primary_qa_metrics": {
+            "ExactMatch": 0.53,
+            "F1": 0.6444,
+        },
+        "num_queries": 100,
+        "baseline_retrieval_metrics": {
+            "Recall@5": 0.71,
+            "Recall@20": 0.98,
+        },
+        "baseline_qa_metrics": {
+            "ExactMatch": 0.52,
+            "F1": 0.65,
+        },
+    }
+
+
+def test_analyze_ce_local_repair_reports_summarizes_proxy_and_delta():
+    baseline_payload = {
+        "dataset": "musique",
+        "expand_assemble_query_traces": [
+            {
+                "question": "Q1?",
+                "method_metrics": {"ExactMatch": 0.0, "F1": 0.2},
+            },
+            {
+                "question": "Q2?",
+                "method_metrics": {"ExactMatch": 1.0, "F1": 1.0},
+            },
+        ],
+    }
+    repair_payload = {
+        "dataset": "musique",
+        "expand_assemble_query_traces": [
+            {
+                "question": "Q1?",
+                "method_metrics": {"ExactMatch": 1.0, "F1": 1.0},
+                "expand_assemble_trace": {
+                    "assemble_trace": {
+                        "repair_applied": True,
+                        "missing_query_anchor_count": 1,
+                        "scaffold_component_count": 2,
+                        "repair_candidate_rows": [
+                            {
+                                "connector_gain_count": 1,
+                                "anchor_gain_count": 0,
+                            }
+                        ],
+                        "best_repair_swap": {
+                            "ce_drop_vs_scaffold": 0.1,
+                            "connector_gain_count": 1,
+                            "anchor_gain_count": 0,
+                            "candidate_title": "Doc X",
+                            "replace_title": "Doc Y",
+                        },
+                    }
+                },
+            },
+            {
+                "question": "Q2?",
+                "method_metrics": {"ExactMatch": 1.0, "F1": 1.0},
+                "expand_assemble_trace": {
+                    "assemble_trace": {
+                        "repair_applied": False,
+                        "missing_query_anchor_count": 0,
+                        "scaffold_component_count": 1,
+                        "repair_candidate_rows": [],
+                        "best_repair_swap": {},
+                    }
+                },
+            },
+        ],
+    }
+    swap_payload = {
+        "queries": [
+            {
+                "question": "Q1?",
+                "has_positive_swap_em": True,
+                "has_positive_swap_f1": True,
+            },
+            {
+                "question": "Q2?",
+                "has_positive_swap_em": False,
+                "has_positive_swap_f1": False,
+            },
+        ]
+    }
+
+    summary = analyze_ce_local_repair_reports(
+        baseline_payload=baseline_payload,
+        repair_payload=repair_payload,
+        swap_payload=swap_payload,
+        baseline_path="baseline.json",
+        repair_path="repair_qatopk5.json",
+        swap_path="swap.json",
+    )
+
+    assert summary["metadata"]["dataset"] == "musique"
+    assert summary["metadata"]["qa_top_k"] == 5
+    assert summary["proxy_sanity"]["queries_with_positive_req_swap"] == 1
+    assert summary["proxy_sanity"]["queries_with_positive_connector_gain"] == 1
+    assert summary["repair_effect"]["repair_applied_queries"] == 1
+    assert summary["repair_effect"]["applied_swap_positive_em_rate"] == 100.0
+    assert summary["repair_effect"]["applied_swap_avg_ce_drop_vs_scaffold"] == 0.1
+    assert summary["swap_overlap"]["proxy_positive_and_oracle_positive"] == 1
 
 
 def test_compute_retrieval_recall_metrics_includes_recall_100():

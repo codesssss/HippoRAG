@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "dataset": "musique",
+    "baseline_report": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409smoke.json",
+    "repair_report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_ce_local_repair_qatopk5_20260413smoke.json",
+    "swap_report": "run_logs/musique_swap_value_smoke_20260411.json",
+    "qa_top_k": 5,
+    "aligned_queries": 100
+  },
+  "proxy_sanity": {
+    "queries_with_positive_req_swap": 18,
+    "positive_req_swap_rate": 18.0,
+    "mean_missing_anchor_count": 0.52,
+    "median_missing_anchor_count": 0.0,
+    "mean_scaffold_component_count": 65.73,
+    "median_scaffold_component_count": 60.5,
+    "queries_with_positive_connector_gain": 16,
+    "queries_with_positive_anchor_gain": 4,
+    "queries_with_positive_both": 2,
+    "anchor_only_rate": 2.0,
+    "connector_only_rate": 14.0,
+    "connector_gain_histogram": {
+      "0": 288,
+      "1": 24,
+      "2": 2,
+      "6": 8,
+      "10": 4,
+      "66": 2
+    },
+    "anchor_gain_histogram": {
+      "0": 320,
+      "1": 8
+    }
+  },
+  "repair_effect": {
+    "repair_applied_queries": 18,
+    "repair_applied_query_rate": 18.0,
+    "applied_swap_positive_em_rate": 5.5556,
+    "applied_swap_positive_f1_rate": 16.6667,
+    "applied_swap_avg_ce_drop_vs_scaffold": 3.2454,
+    "applied_swap_median_ce_drop_vs_scaffold": 2.7485,
+    "applied_swap_mean_delta_em": 0.0556,
+    "applied_swap_mean_delta_f1": 0.0285
+  },
+  "swap_overlap": {
+    "oracle_positive_queries": 14,
+    "proxy_positive_and_oracle_positive": 3,
+    "proxy_positive_and_oracle_positive_rate": 3.0,
+    "proxy_positive_but_oracle_negative": 15,
+    "oracle_positive_but_proxy_negative": 11
+  },
+  "top_repair_cases": [
+    {
+      "question": "Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+      "delta_em": 1.0,
+      "delta_f1": 1.0,
+      "ce_drop_vs_scaffold": 5.6719,
+      "connector_gain_count": 2,
+      "anchor_gain_count": 0,
+      "candidate_title": "Modern history",
+      "replace_title": "Korean War"
+    },
+    {
+      "question": "How did did the people fare during the reign of the abolisher of sati partha in India?",
+      "delta_em": 0.0,
+      "delta_f1": 0.1407,
+      "ce_drop_vs_scaffold": 1.0391,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Delhi",
+      "replace_title": "Indian Rebellion of 1857"
+    },
+    {
+      "question": "What is an example of a railroad line in the country first to invade Manchuria?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0385,
+      "ce_drop_vs_scaffold": -0.2891,
+      "connector_gain_count": 10,
+      "anchor_gain_count": 0,
+      "candidate_title": "Allies of World War II",
+      "replace_title": "Pacific War"
+    },
+    {
+      "question": "When did the person chosen to be president of the confederacy end his fight in the Mexican-American war?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 1.1768,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Military leadership in the American Civil War",
+      "replace_title": "Jefferson Davis"
+    },
+    {
+      "question": "How many times did the plague occur in the birth place of Concerto in C Major Op 3 6's composer?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 2.0742,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Giuseppe Demachi",
+      "replace_title": "Black Death"
+    },
+    {
+      "question": "What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities commonwealth, the top-ranking Warsaw Pact operatives originated?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 2.3457,
+      "connector_gain_count": 6,
+      "anchor_gain_count": 0,
+      "candidate_title": "Cold War",
+      "replace_title": "Warsaw Pact"
+    },
+    {
+      "question": "How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 2.5859,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_title": "Estonia",
+      "replace_title": "British Empire"
+    },
+    {
+      "question": "Who was second pick in the 1999 draft of the league that has a competition where they give out the MLB MVP award after it?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 2.6035,
+      "connector_gain_count": 10,
+      "anchor_gain_count": 1,
+      "candidate_title": "Houston Astros",
+      "replace_title": "NBA high school draftees"
+    },
+    {
+      "question": "When did Nissan, the Acura Legend maker and the Scion Fuse manufacturer open US assembly plants?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 2.6895,
+      "connector_gain_count": 6,
+      "anchor_gain_count": 0,
+      "candidate_title": "IPod",
+      "replace_title": "Nissan Rogue"
+    },
+    {
+      "question": "what is meaning of the word that is a majority religion of the area that became India when the country origin of Mizraab was created in Arabic dictionary?",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "ce_drop_vs_scaffold": 2.7363,
+      "connector_gain_count": 0,
+      "anchor_gain_count": 1,
+      "candidate_title": "History of science",
+      "replace_title": "Hindus"
+    }
+  ]
+}

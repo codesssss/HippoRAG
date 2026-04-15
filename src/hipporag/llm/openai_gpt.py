@@ -23,6 +23,21 @@ from .base import BaseLLM, LLMConfig
 
 logger = get_logger(__name__)
 
+NO_THINK_PREFIX = "/no_think"
+
+
+def _env_enabled(raw_value: str | None, default: bool) -> bool:
+    if raw_value is None:
+        return default
+    normalized = str(raw_value).strip().lower()
+    if normalized in {"", "default"}:
+        return default
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    return default
+
 def cache_response(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
@@ -40,10 +55,15 @@ def cache_response(func):
         seed = kwargs.get("seed", gen_params.get("seed"))
         temperature = kwargs.get("temperature", gen_params.get("temperature"))
         response_format = kwargs.get("response_format", gen_params.get("response_format"))
+        normalized_messages = (
+            self._normalize_messages_for_request(messages=messages, model=model)
+            if hasattr(self, "_normalize_messages_for_request")
+            else messages
+        )
 
         # build key data, convert to JSON string and hash to generate key_hash
         key_data = {
-            "messages": messages,  # messages requires JSON serializable
+            "messages": normalized_messages,  # messages requires JSON serializable
             "model": model,
             "seed": seed,
             "temperature": temperature,
@@ -76,6 +96,11 @@ def cache_response(func):
                 metadata = json.loads(metadata_str)
                 # return cached result and mark as hit
                 return message, metadata, True
+
+        if args:
+            args = (normalized_messages, *args[1:])
+        else:
+            kwargs["messages"] = normalized_messages
 
         # if cache miss, call the original function to get the result
         result = func(self, *args, **kwargs)
@@ -172,6 +197,39 @@ class CacheOpenAI(BaseLLM):
 
         self.llm_config = LLMConfig.from_dict(config_dict=config_dict)
         logger.debug(f"Init {self.__class__.__name__}'s llm_config: {self.llm_config}")
+
+    def _should_force_no_think(self, model: str | None = None) -> bool:
+        llm_names = [
+            str(model or "").strip().lower(),
+            str(getattr(self.global_config, "llm_name", "") or "").strip().lower(),
+            str(getattr(self.global_config, "llm_request_name", "") or "").strip().lower(),
+        ]
+        is_qwen = any("qwen" in name for name in llm_names if name)
+        if not is_qwen:
+            return False
+        return _env_enabled(os.getenv("HIPPORAG_QWEN_FORCE_NO_THINK"), default=True)
+
+    def _normalize_messages_for_request(
+        self,
+        messages: List[TextChatMessage],
+        model: str | None = None,
+    ) -> List[TextChatMessage]:
+        if not self._should_force_no_think(model=model):
+            return messages
+        normalized_messages = deepcopy(messages)
+        for idx in range(len(normalized_messages) - 1, -1, -1):
+            message = normalized_messages[idx]
+            if message.get("role") != "user":
+                continue
+            content = message.get("content")
+            if not isinstance(content, str):
+                break
+            stripped = content.lstrip()
+            if stripped.startswith(NO_THINK_PREFIX) or stripped.startswith("/nothink"):
+                break
+            normalized_messages[idx]["content"] = f"{NO_THINK_PREFIX}\n{content}"
+            break
+        return normalized_messages
 
     @cache_response
     @dynamic_retry_decorator

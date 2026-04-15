@@ -1,0 +1,147 @@
+{
+  "metadata": {
+    "dataset": "musique",
+    "baseline_report": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409smoke.json",
+    "candidate_report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409smoke.json",
+    "output_json": "run_logs/musique_swap_value_smoke_dryrun_20260411.json",
+    "qa_top_k": 5,
+    "llm_name": "qwen3-8b",
+    "llm_request_name": "qwen3-8b-train",
+    "llm_base_url": "http://localhost:8043/v1"
+  },
+  "generation": {
+    "aligned_queries": 100,
+    "queries_with_swap_jobs": 69,
+    "total_swap_jobs": 1,
+    "queries_without_appended_candidates": 31
+  },
+  "all_swaps": {
+    "count": 1,
+    "positive_swap_count_em": 0,
+    "positive_swap_rate_em": 0.0,
+    "positive_swap_count_f1": 0,
+    "positive_swap_rate_f1": 0.0,
+    "mean_delta_em": 0.0,
+    "median_delta_em": 0.0,
+    "mean_delta_f1": 0.0,
+    "median_delta_f1": 0.0,
+    "mean_candidate_ce_rank": 13.0,
+    "mean_positive_candidate_ce_rank": null
+  },
+  "best_swap_oracle": {
+    "num_queries_with_candidates": 1,
+    "queries_with_positive_em": 0,
+    "queries_with_positive_em_rate": 0.0,
+    "queries_with_positive_f1": 0,
+    "queries_with_positive_f1_rate": 0.0,
+    "baseline_em": 1.0,
+    "oracle_em": 1.0,
+    "oracle_delta_em": 0.0,
+    "baseline_f1": 1.0,
+    "oracle_f1": 1.0,
+    "oracle_delta_f1": 0.0
+  },
+  "queries": [
+    {
+      "question": "When was the person who Messi's goals in Copa del Rey compared to get signed by Barcelona?",
+      "query_type": "standard",
+      "baseline_answer": "June 1982.",
+      "baseline_metrics": {
+        "ExactMatch": 1.0,
+        "F1": 1.0
+      },
+      "best_swap": {
+        "candidate_title": "List of UEFA club competition winners",
+        "candidate_ce_rank": 13,
+        "candidate_ce_score": -7.6875,
+        "swap_answer": "June 1982.",
+        "swap_metrics": {
+          "ExactMatch": 1.0,
+          "F1": 1.0
+        },
+        "delta_metrics": {
+          "ExactMatch": 0.0,
+          "F1": 0.0
+        },
+        "weakest_incumbent_title": "FC Barcelona",
+        "candidate_entered_method_topk": false
+      },
+      "num_swap_candidates": 1,
+      "has_positive_swap_em": false,
+      "has_positive_swap_f1": false
+    }
+  ],
+  "swap_results": [
+    {
+      "dataset": "musique",
+      "question": "When was the person who Messi's goals in Copa del Rey compared to get signed by Barcelona?",
+      "query_type": "standard",
+      "gold_answers": [
+        "June 1982"
+      ],
+      "baseline_answer": "June 1982.",
+      "baseline_metrics": {
+        "ExactMatch": 1.0,
+        "F1": 1.0
+      },
+      "baseline_top_titles": [
+        "FC Barcelona",
+        "Lionel Messi",
+        "FC Barcelona",
+        "FC Barcelona",
+        "FC Barcelona"
+      ],
+      "baseline_final_doc_ids": [
+        1,
+        0,
+        2,
+        4814,
+        4049
+      ],
+      "weakest_incumbent_index": 4,
+      "weakest_incumbent_doc_id": 4049,
+      "weakest_incumbent_title": "FC Barcelona",
+      "candidate_doc_id": 4157,
+      "candidate_title": "List of UEFA club competition winners",
+      "candidate_source": "append_bridge",
+      "candidate_pool_position": 57,
+      "candidate_ce_rank": 13,
+      "candidate_ce_score": -7.6875,
+      "candidate_base_score": 0.0001,
+      "candidate_entered_method_topk": false,
+      "docs": [
+        "FC Barcelona\nDespite being the favourites and starting strongly, Barcelona finished the 2006–07 season without trophies. A pre-season US tour was later blamed for a string of injuries to key players, including leading scorer Eto'o and rising star Lionel Messi. There was open feuding as Eto'o publicly criticized coach Frank Rijkaard and Ronaldinho. Ronaldinho also admitted that a lack of fitness affected his form. In La Liga, Barcelona were in first place for much of the season, but inconsistency in the New Year saw Real Madrid overtake them to become champions. Barcelona advanced to the semi-finals of the Copa del Rey, winning the first leg against Getafe 5–2, with a goal from Messi bringing comparison to Diego Maradona's goal of the century, but then lost the second leg 4–0. They took part in the 2006 FIFA Club World Cup, but were beaten by a late goal in the final against Brazilian side Internacional. In the Champions League, Barcelona were knocked out of the competition in the last 16 by eventual runners-up Liverpool on away goals.",
+        "Lionel Messi\nAfter a year at Barcelona's youth academy, La Masia, Messi was finally enrolled in the Royal Spanish Football Federation (RFEF) in February 2002. Now playing in all competitions, he befriended his teammates, among whom were Cesc Fàbregas and Gerard Piqué. After completing his growth hormone treatment aged 14, Messi became an integral part of the ``Baby Dream Team '', Barcelona's greatest - ever youth side. During his first full season (2002 -- 03), he was top scorer with 36 goals in 30 games for the Cadetes A, who won an unprecedented treble of the league and both the Spanish and Catalan cups. The Copa Catalunya final, a 4 -- 1 victory over Espanyol, became known in club lore as the partido de la máscara, the final of the mask. A week after suffering a broken cheekbone during a league match, Messi was allowed to start the game on the condition that he wear a plastic protector; soon hindered by the mask, he took it off and scored two goals in 10 minutes before his substitution. At the close of the season, he received an offer to join Arsenal, his first from a foreign club, but while Fàbregas and Piqué soon left for England, he chose to remain in Barcelona.",
+        "FC Barcelona\nIn June 1982, Diego Maradona was signed for a world record fee of £5 million from Boca Juniors. In the following season, under coach Luis, Barcelona won the Copa del Rey, beating Real Madrid. However, Maradona's time with Barcelona was short-lived and he soon left for Napoli. At the start of the 1984–85 season, Terry Venables was hired as manager and he won La Liga with noteworthy displays by German midfielder Bernd Schuster. The next season, he took the team to their second European Cup final, only to lose on penalties to Steaua Bucureşti during a dramatic evening in Seville.",
+        "FC Barcelona\nAfter the construction was complete there was no further room for expansion at Les Corts. Back-to-back La Liga titles in 1948 and 1949 and the signing of László Kubala in June 1950, who would later go on to score 196 goals in 256 matches, drew larger crowds to the games. The club began to make plans for a new stadium. The building of Camp Nou commenced on 28 March 1954, before a crowd of 60,000 Barça fans. The first stone of the future stadium was laid in place under the auspices of Governor Felipe Acedo Colunga and with the blessing of Archbishop of Barcelona Gregorio Modrego. Construction took three years and ended on 24 September 1957 with a final cost of 288 million pesetas, 336% over budget.",
+        "List of UEFA club competition winners\nSpanish side Real Madrid have won a record total of 21 titles in UEFA competitions, four more than Milan (Italy) and seven more than Barcelona (Spain). The only team to have won every UEFA club competition is Juventus (Italy). They received The UEFA Plaque on 12 July 1988, in recognition of winning the three seasonal confederation trophies -- UEFA Cup in 1977, Cup Winners' Cup in 1984, and European Cup in 1985. Juventus then won their first Super Cup in 1984, their first Intercontinental Cup in 1985, and the Intertoto Cup in 1999."
+      ],
+      "swapped_top_titles": [
+        "FC Barcelona",
+        "Lionel Messi",
+        "FC Barcelona",
+        "FC Barcelona",
+        "List of UEFA club competition winners"
+      ],
+      "swap_answer": "June 1982.",
+      "swap_metrics": {
+        "ExactMatch": 1.0,
+        "F1": 1.0
+      },
+      "delta_metrics": {
+        "ExactMatch": 0.0,
+        "F1": 0.0
+      },
+      "reader_trace": {
+        "reader_status": "ok",
+        "reader_error": null,
+        "reader_cache_hit": false,
+        "answer_parser_used_fallback": false,
+        "answer_parser_error_type": null,
+        "prompt_tokens": 1829,
+        "completion_tokens": 314,
+        "finish_reason": "stop"
+      }
+    }
+  ]
+}

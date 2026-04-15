@@ -63,3 +63,52 @@ def test_dspy_filter_uses_request_name_for_rerank_and_repair_calls():
     reranker = DSPyFilter(hipporag)
 
     assert reranker.model_name == "qwen3-8b-train"
+
+
+def test_cache_openai_qwen_requests_are_prefixed_with_no_think(tmp_path, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    monkeypatch.delenv("HIPPORAG_QWEN_FORCE_NO_THINK", raising=False)
+    config = BaseConfig(
+        save_dir=str(tmp_path),
+        llm_name="qwen3-8b",
+        llm_request_name="qwen3-8b-train",
+        llm_base_url="http://localhost:8043/v1",
+        embedding_model_name="VLLM//mnt/nvme/Qwen3-Embedding-8B",
+        embedding_base_url="http://localhost:8018/v1/embeddings",
+    )
+    llm = CacheOpenAI.from_experiment_config(config)
+
+    messages = [
+        {"role": "system", "content": "You are helpful."},
+        {"role": "assistant", "content": "Example answer."},
+        {"role": "user", "content": "Question: Who directed Billy Elliot?\nThought: "},
+    ]
+
+    normalized = llm._normalize_messages_for_request(messages, model="qwen3-8b-train")
+
+    assert normalized[-1]["content"].startswith("/no_think\n")
+    assert normalized[-1]["content"].count("/no_think") == 1
+    assert messages[-1]["content"].startswith("Question:")
+
+
+def test_cache_openai_no_think_can_be_disabled_for_qwen(tmp_path, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    monkeypatch.setenv("HIPPORAG_QWEN_FORCE_NO_THINK", "0")
+    config = BaseConfig(
+        save_dir=str(tmp_path),
+        llm_name="qwen3-8b",
+        llm_request_name="qwen3-8b-train",
+        llm_base_url="http://localhost:8043/v1",
+        embedding_model_name="VLLM//mnt/nvme/Qwen3-Embedding-8B",
+        embedding_base_url="http://localhost:8018/v1/embeddings",
+    )
+    llm = CacheOpenAI.from_experiment_config(config)
+
+    messages = [
+        {"role": "system", "content": "You are helpful."},
+        {"role": "user", "content": "Question: Who directed Billy Elliot?\nThought: "},
+    ]
+
+    normalized = llm._normalize_messages_for_request(messages, model="qwen3-8b-train")
+
+    assert normalized[-1]["content"] == messages[-1]["content"]

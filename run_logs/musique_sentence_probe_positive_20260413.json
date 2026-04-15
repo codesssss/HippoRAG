@@ -1,0 +1,604 @@
+{
+  "metadata": {
+    "dataset": "musique",
+    "repair_report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_ce_local_repair_qatopk5_20260413smoke.json",
+    "case_mode": "applied_positive",
+    "ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "ce_device": "cuda:7"
+  },
+  "summary": {
+    "num_cases": 4,
+    "candidate_top2_softmax_mass_mean": 0.7954,
+    "candidate_top2_softmax_mass_median": 0.7989,
+    "candidate_top2_token_share_mean": 0.3004,
+    "candidate_localized_rate_top2_mass_ge_0_6": 100.0,
+    "candidate_any_goldish_sentence_rate": 75.0,
+    "candidate_top2_goldish_sentence_rate": 75.0,
+    "candidate_goldish_only_outside_top2_rate": 0.0
+  },
+  "cases": [
+    {
+      "question": "Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Imperialism",
+        "Korean War",
+        "Central Intelligence Agency"
+      ],
+      "gold_answers": [
+        "Politburo",
+        "the Politburo"
+      ],
+      "question_entities_preview": [
+        "covert action against ussr",
+        "directive 10 2",
+        "intervention in korea",
+        "korean war",
+        "mao zedong",
+        "north korea",
+        "state of war",
+        "united states"
+      ],
+      "candidate_title": "Modern history",
+      "replace_title": "Korean War",
+      "candidate_doc_text": "Modern history\nAfter World War II, Europe was informally split into Western and Soviet spheres of influence. Western Europe later aligned as the North Atlantic Treaty Organization (NATO) and Eastern Europe as the Warsaw Pact. There was a shift in power from Western Europe and the British Empire to the two new superpowers, the United States and the Soviet Union. These two rivals would later face off in the Cold War. In Asia, the defeat of Japan led to its democratization. China's civil war continued through and after the war, resulting eventually in the establishment of the People's Republic of China. The former colonies of the European powers began their road to independence.",
+      "replaced_doc_text": "Korean War\nIn April 1950, Stalin gave Kim permission to invade the South under the condition that Mao would agree to send reinforcements if they became needed. Stalin made it clear that Soviet forces would not openly engage in combat, to avoid a direct war with the Americans. Kim met with Mao in May 1950. Mao was concerned that the Americans would intervene but agreed to support the North Korean invasion. China desperately needed the economic and military aid promised by the Soviets. At that time, the Chinese were in the process of demobilizing half of the PLA's 5.6 million soldiers. However, Mao sent more ethnic Korean PLA veterans to Korea and promised to move an army closer to the Korean border. Once Mao's commitment was secured, preparations for war accelerated.",
+      "delta_em": 1.0,
+      "delta_f1": 1.0,
+      "connector_gain_count": 2,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 11,
+      "replaced_ce_rank": 5,
+      "candidate_ce_score": -7.8164,
+      "replaced_ce_score": -2.1445,
+      "ce_score_gap_candidate_minus_replaced": -5.6719,
+      "scaffold_titles": [
+        "Central Intelligence Agency",
+        "Korean War",
+        "Imperialism",
+        "Korean War",
+        "Korean War"
+      ],
+      "final_titles_after_repair": [
+        "Central Intelligence Agency",
+        "Korean War",
+        "Imperialism",
+        "Korean War",
+        "Modern history"
+      ],
+      "candidate_summary": {
+        "title": "Modern history",
+        "sentence_count": 7,
+        "doc_token_count": 113,
+        "top1_softmax_mass": 0.8825,
+        "top2_softmax_mass": 0.9672,
+        "top2_token_share": 0.3186,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 3,
+            "sentence_text": "There was a shift in power from Western Europe and the British Empire to the two new superpowers, the United States and the Soviet Union.",
+            "score": -4.6758,
+            "softmax_mass": 0.8825,
+            "token_count": 25,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 3,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 4,
+            "sentence_text": "These two rivals would later face off in the Cold War.",
+            "score": -7.0195,
+            "softmax_mass": 0.0847,
+            "token_count": 11,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 7,
+            "sentence_text": "The former colonies of the European powers began their road to independence.",
+            "score": -9.2344,
+            "softmax_mass": 0.0092,
+            "token_count": 12,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "Korean War",
+        "sentence_count": 8,
+        "doc_token_count": 132,
+        "top1_softmax_mass": 0.6859,
+        "top2_softmax_mass": 0.922,
+        "top2_token_share": 0.197,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 4,
+            "sentence_text": "Mao was concerned that the Americans would intervene but agreed to support the North Korean invasion.",
+            "score": -4.3828,
+            "softmax_mass": 0.6859,
+            "token_count": 16,
+            "question_overlap_tokens": 5,
+            "query_entity_overlap_tokens": 3,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 8,
+            "sentence_text": "Once Mao's commitment was secured, preparations for war accelerated.",
+            "score": -5.4492,
+            "softmax_mass": 0.2361,
+            "token_count": 10,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 7,
+            "sentence_text": "However, Mao sent more ethnic Korean PLA veterans to Korea and promised to move an army closer to the Korean border.",
+            "score": -7.2812,
+            "softmax_mass": 0.0378,
+            "token_count": 21,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 3,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          }
+        ]
+      }
+    },
+    {
+      "question": "How did did the people fare during the reign of the abolisher of sati partha in India?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Modern history",
+        "Sati (practice)"
+      ],
+      "gold_answers": [
+        "a long period of prosperity for the British people"
+      ],
+      "question_entities_preview": [
+        "1988",
+        "glorifying",
+        "indian sati prevention act"
+      ],
+      "candidate_title": "Delhi",
+      "replace_title": "Indian Rebellion of 1857",
+      "candidate_doc_text": "Delhi\nDuring the Indian Rebellion of 1857, Delhi fell to the forces of East India Company after a bloody fight known as the Siege of Delhi. The city came under the direct control of the British Government in 1858. It was made a district province of the Punjab. In 1911, it was announced that the capital of British held territories in India was to be transferred from Calcutta to Delhi. The name ``New Delhi ''was given in 1927, and the new capital was inaugurated on 13 February 1931. New Delhi, also known as Lutyens' Delhi, was officially declared as the capital of the Union of India after the country gained independence on 15 August 1947. During the partition of India, thousands of Hindu and Sikh refugees, mainly from West Punjab fled to Delhi, while many Muslim residents of the city migrated to Pakistan. Migration to Delhi from the rest of India continues (as of 2013), contributing more to the rise of Delhi's population than the birth rate, which is declining.",
+      "replaced_doc_text": "Indian Rebellion of 1857\nAfter the outbreak of the mutiny in Meerut, the rebels very quickly reached Delhi and declared its 81 - year - old Mughal ruler, Bahadur Shah Zafar, as Emperor of Hindustan. Soon, they also captured large tracts of the North - Western Provinces and Awadh (Oudh). The East India Company's response came rapidly as well. With help from reinforcements, Kanpur was retaken by mid-July 1857 and Delhi by the end of September. Even so, it then took the remainder of 1857 and the better part of 1858 for the rebellion to be suppressed in Jhansi, Lucknow, and especially the Awadh countryside. Other regions of Company - controlled India -- the Bengal Presidency, the Bombay Presidency and the Madras Presidency -- remained largely calm. In the Punjab, the Sikhs crucially helped the British by providing both soldiers and support. The large princely states (Hyderabad, Mysore, Travancore, and Kashmir), as well as the smaller ones of Rajputana, did not join the rebellion, serving the British, in the words of Governor - General Lord Canning, as ``breakwaters in a storm. ''",
+      "delta_em": 0.0,
+      "delta_f1": 0.1667,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 10,
+      "replaced_ce_rank": 6,
+      "candidate_ce_score": -8.2656,
+      "replaced_ce_score": -7.2266,
+      "ce_score_gap_candidate_minus_replaced": -1.039,
+      "scaffold_titles": [
+        "Sati (practice)",
+        "History of India",
+        "Bengal Sati Regulation, 1829",
+        "Nawabs of Bengal and Murshidabad",
+        "Indian Rebellion of 1857"
+      ],
+      "final_titles_after_repair": [
+        "Sati (practice)",
+        "History of India",
+        "Bengal Sati Regulation, 1829",
+        "Nawabs of Bengal and Murshidabad",
+        "Delhi"
+      ],
+      "candidate_summary": {
+        "title": "Delhi",
+        "sentence_count": 8,
+        "doc_token_count": 170,
+        "top1_softmax_mass": 0.9421,
+        "top2_softmax_mass": 0.9624,
+        "top2_token_share": 0.3118,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 7,
+            "sentence_text": "During the partition of India, thousands of Hindu and Sikh refugees, mainly from West Punjab fled to Delhi, while many Muslim residents of the city migrated to Pakistan.",
+            "score": -5.2812,
+            "softmax_mass": 0.9421,
+            "token_count": 28,
+            "question_overlap_tokens": 4,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 2,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 1,
+            "sentence_text": "During the Indian Rebellion of 1857, Delhi fell to the forces of East India Company after a bloody fight known as the Siege of Delhi.",
+            "score": -9.1172,
+            "softmax_mass": 0.0203,
+            "token_count": 25,
+            "question_overlap_tokens": 4,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 3,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 6,
+            "sentence_text": "New Delhi, also known as Lutyens' Delhi, was officially declared as the capital of the Union of India after the country gained independence on 15 August 1947.",
+            "score": -9.2344,
+            "softmax_mass": 0.0181,
+            "token_count": 27,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 2,
+            "has_goldish_signal": true
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "Indian Rebellion of 1857",
+        "sentence_count": 9,
+        "doc_token_count": 172,
+        "top1_softmax_mass": 0.4763,
+        "top2_softmax_mass": 0.691,
+        "top2_token_share": 0.2791,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 6,
+            "sentence_text": "Other regions of Company - controlled India -- the Bengal Presidency, the Bombay Presidency and the Madras Presidency -- remained largely calm.",
+            "score": -6.9844,
+            "softmax_mass": 0.4763,
+            "token_count": 19,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 2,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 1,
+            "sentence_text": "After the outbreak of the mutiny in Meerut, the rebels very quickly reached Delhi and declared its 81 - year - old Mughal ruler, Bahadur Shah Zafar, as Emperor of Hindustan.",
+            "score": -7.7812,
+            "softmax_mass": 0.2147,
+            "token_count": 29,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 2,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 8,
+            "sentence_text": "The large princely states (Hyderabad, Mysore, Travancore, and Kashmir), as well as the smaller ones of Rajputana, did not join the rebellion, serving the British, in the words of Governor - General Lord Canning, as ``breakwaters in a storm.",
+            "score": -8.0781,
+            "softmax_mass": 0.1595,
+            "token_count": 38,
+            "question_overlap_tokens": 4,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 4,
+            "has_goldish_signal": true
+          }
+        ]
+      }
+    },
+    {
+      "question": "Who had the lowest batting average in the league where the team with the most games in the series after which the MLB MVP is awarded played?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Major League Baseball Most Valuable Player Award",
+        "World Series",
+        "New York Yankees",
+        "Batting average"
+      ],
+      "gold_answers": [
+        "Bill Bergen"
+      ],
+      "question_entities_preview": [
+        "los angeles angels of anaheim",
+        "los angeles dodgers",
+        "major league baseball",
+        "major league baseball all star game most valuable player award",
+        "major league baseball most valuable player award",
+        "mvp",
+        "world series most valuable player award"
+      ],
+      "candidate_title": "Houston Astros",
+      "replace_title": "2017 World Series",
+      "candidate_doc_text": "Houston Astros\nThe Astros clinched their first division title as a member of the American League West division, and first division title overall since 2001. They also became the first team in Major League history to win three different divisions, the National League West in 1980 and 1986, the National League Central from 1997 -- 1999 and 2001, and now the American League West in 2017. On September 29, the Astros won their 100th game of the season, the second time the Astros finished a season with over 100 wins (the other time was in 1998). They finished 101 -- 61 (with a 21 - game lead in the division), and faced the Red Sox in the second round of the AL playoffs. The Astros defeated the Red Sox three games to one, and advanced to the American League Championship Series against the New York Yankees. The Astros won the ALCS four games to three, and advanced to the World Series to play against the Los Angeles Dodgers. The Astros defeated the Dodgers in the deciding seventh game of the World Series, winning the first championship in franchise history.",
+      "replaced_doc_text": "2017 World Series\nThe 2017 World Series was the championship series of Major League Baseball's (MLB) 2017 season. The 113th edition of the World Series, it was played between October 24 and November 1. The series was a best - of - seven playoff between the National League (NL) champion Los Angeles Dodgers and the American League (AL) champion Houston Astros. It was sponsored by the Internet television service YouTube TV and officially known as the World Series presented by YouTube TV.",
+      "delta_em": 1.0,
+      "delta_f1": 1.0,
+      "connector_gain_count": 6,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 12,
+      "replaced_ce_rank": 5,
+      "candidate_ce_score": -5.5,
+      "replaced_ce_score": -1.7783,
+      "ce_score_gap_candidate_minus_replaced": -3.7217,
+      "scaffold_titles": [
+        "Batting average",
+        "Major League Baseball All-Star Game Most Valuable Player Award",
+        "Miguel Cabrera",
+        "World Series Most Valuable Player Award",
+        "2017 World Series"
+      ],
+      "final_titles_after_repair": [
+        "Batting average",
+        "Major League Baseball All-Star Game Most Valuable Player Award",
+        "Miguel Cabrera",
+        "World Series Most Valuable Player Award",
+        "Houston Astros"
+      ],
+      "candidate_summary": {
+        "title": "Houston Astros",
+        "sentence_count": 7,
+        "doc_token_count": 184,
+        "top1_softmax_mass": 0.3418,
+        "top2_softmax_mass": 0.6353,
+        "top2_token_share": 0.2446,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 5,
+            "sentence_text": "The Astros defeated the Red Sox three games to one, and advanced to the American League Championship Series against the New York Yankees.",
+            "score": -5.2617,
+            "softmax_mass": 0.3418,
+            "token_count": 23,
+            "question_overlap_tokens": 4,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 3,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 6,
+            "sentence_text": "The Astros won the ALCS four games to three, and advanced to the World Series to play against the Los Angeles Dodgers.",
+            "score": -5.4141,
+            "softmax_mass": 0.2935,
+            "token_count": 22,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 5,
+            "gold_title_overlap_tokens": 2,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 1,
+            "sentence_text": "The Astros clinched their first division title as a member of the American League West division, and first division title overall since 2001.",
+            "score": -6.332,
+            "softmax_mass": 0.1172,
+            "token_count": 23,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "2017 World Series",
+        "sentence_count": 4,
+        "doc_token_count": 78,
+        "top1_softmax_mass": 0.5158,
+        "top2_softmax_mass": 0.9587,
+        "top2_token_share": 0.5256,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "The 2017 World Series was the championship series of Major League Baseball's (MLB) 2017 season.",
+            "score": -3.1777,
+            "softmax_mass": 0.5158,
+            "token_count": 16,
+            "question_overlap_tokens": 4,
+            "query_entity_overlap_tokens": 6,
+            "gold_title_overlap_tokens": 3,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 3,
+            "sentence_text": "The series was a best - of - seven playoff between the National League (NL) champion Los Angeles Dodgers and the American League (AL) champion Houston Astros.",
+            "score": -3.3301,
+            "softmax_mass": 0.4429,
+            "token_count": 25,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 6,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 2,
+            "sentence_text": "The 113th edition of the World Series, it was played between October 24 and November 1.",
+            "score": -6.1602,
+            "softmax_mass": 0.0261,
+            "token_count": 16,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 3,
+            "gold_title_overlap_tokens": 2,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          }
+        ]
+      }
+    },
+    {
+      "question": "What is an example of a railroad line in the country first to invade Manchuria?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Modern history",
+        "Tokyo"
+      ],
+      "gold_answers": [
+        "Yamanote Line",
+        "Yamanote Line loop"
+      ],
+      "question_entities_preview": [
+        "empire of japan",
+        "invasion of manchuria by japan",
+        "league",
+        "manchukuo",
+        "manchuria",
+        "northeast china",
+        "second sino japanese war",
+        "soviet union"
+      ],
+      "candidate_title": "Allies of World War II",
+      "replace_title": "Pacific War",
+      "candidate_doc_text": "Allies of World War II\nAt the start of the war on 1 September 1939, the Allies consisted of France, Poland and the United Kingdom, as well as their dependent states, such as British India. Within days they were joined by the independent Dominions of the British Commonwealth: Australia, Canada, New Zealand and South Africa. After the start of the German invasion of North Europe until the Balkan Campaign, the Netherlands, Belgium, Greece, and Yugoslavia joined the Allies. After first having cooperated with Germany in invading Poland whilst remaining neutral in the Allied - Axis conflict, the Soviet Union perforce joined the Allies in June 1941 after being invaded by Germany. The United States provided war materiel and money all along, and officially joined in December 1941 after the Japanese attack on Pearl Harbor. China had already been in a prolonged war with Japan since the Marco Polo Bridge Incident of 1937, but officially joined the Allies in 1941.",
+      "replaced_doc_text": "Pacific War\nIn September 1940, Japan decided to cut China's only land line to the outside world by seizing Indochina, which was controlled at the time by Vichy France. Japanese forces broke their agreement with the Vichy administration and fighting broke out, ending in a Japanese victory. On 27 September Japan signed a military alliance with Germany and Italy, becoming one of the three Axis Powers. In practice, there was little coordination between Japan and Germany until 1944, by which time the U.S. was deciphering their secret diplomatic correspondence.",
+      "delta_em": 0.0,
+      "delta_f1": 0.0385,
+      "connector_gain_count": 10,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 5,
+      "replaced_ce_rank": 6,
+      "candidate_ce_score": -7.0898,
+      "replaced_ce_score": -7.3789,
+      "ce_score_gap_candidate_minus_replaced": 0.2891,
+      "scaffold_titles": [
+        "Modern history",
+        "Pacific War",
+        "Pacific War",
+        "Pacific War",
+        "Pacific War"
+      ],
+      "final_titles_after_repair": [
+        "Modern history",
+        "Pacific War",
+        "Pacific War",
+        "Pacific War",
+        "Allies of World War II"
+      ],
+      "candidate_summary": {
+        "title": "Allies of World War II",
+        "sentence_count": 6,
+        "doc_token_count": 153,
+        "top1_softmax_mass": 0.3572,
+        "top2_softmax_mass": 0.6165,
+        "top2_token_share": 0.3268,
+        "any_goldish_sentence": false,
+        "top2_has_goldish_sentence": false,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "At the start of the war on 1 September 1939, the Allies consisted of France, Poland and the United Kingdom, as well as their dependent states, such as British India.",
+            "score": -8.7578,
+            "softmax_mass": 0.3572,
+            "token_count": 30,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 2,
+            "sentence_text": "Within days they were joined by the independent Dominions of the British Commonwealth: Australia, Canada, New Zealand and South Africa.",
+            "score": -9.0781,
+            "softmax_mass": 0.2593,
+            "token_count": 20,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 3,
+            "sentence_text": "After the start of the German invasion of North Europe until the Balkan Campaign, the Netherlands, Belgium, Greece, and Yugoslavia joined the Allies.",
+            "score": -9.7578,
+            "softmax_mass": 0.1314,
+            "token_count": 23,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "Pacific War",
+        "sentence_count": 5,
+        "doc_token_count": 89,
+        "top1_softmax_mass": 0.8387,
+        "top2_softmax_mass": 0.9114,
+        "top2_token_share": 0.5169,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "In September 1940, Japan decided to cut China's only land line to the outside world by seizing Indochina, which was controlled at the time by Vichy France.",
+            "score": -7.5703,
+            "softmax_mass": 0.8387,
+            "token_count": 28,
+            "question_overlap_tokens": 4,
+            "query_entity_overlap_tokens": 3,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 4,
+            "sentence_text": "In practice, there was little coordination between Japan and Germany until 1944, by which time the U.S.",
+            "score": -10.0156,
+            "softmax_mass": 0.0727,
+            "token_count": 18,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 3,
+            "sentence_text": "On 27 September Japan signed a military alliance with Germany and Italy, becoming one of the three Axis Powers.",
+            "score": -10.7812,
+            "softmax_mass": 0.0338,
+            "token_count": 19,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 2,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          }
+        ]
+      }
+    }
+  ]
+}

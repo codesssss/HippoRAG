@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-09
+Last updated: 2026-04-14
 
 ## Canonical Outputs
 
@@ -25,8 +25,13 @@ Last updated: 2026-04-09
 - `MuSiQue top-7 width-matched control`: `run_logs/width_matched_control_musique_top7_20260407.summary.md`
 - `Unified top-5 width-matched control`: `run_logs/width_matched_control_top5_20260407.summary.md`
 - `Coverage/control status memo`: `research_memory/emnlp_expand_then_compose/10_coverage_probe_and_control_status_20260409.md`
+- `NQ/PopQA bridge-threshold diagnosis memo`: `research_memory/emnlp_expand_then_compose/11_nq_popqa_bridge_threshold_diagnosis_20260410.md`
+- `Actionized interface repair status memo`: `research_memory/emnlp_expand_then_compose/12_actionized_interface_repair_status_20260414.md`
 - `Real full-scale width-matched control queue`: `run_logs/fullscale_width_matched_control_20260409.sh`
 - `MuSiQue top-5 remaining optimized queue`: `run_logs/fullscale_width_matched_control_musique_top5_remaining_20260409.sh`
+- `Actionized NoisyOR smoke summary`: `run_logs/action_swap_noisyor_smoke_20260414.summary.md`
+- `MuSiQue actionized NoisyOR audit`: `run_logs/musique_action_swap_noisyor_audit_20260414.md`
+- `2Wiki actionized NoisyOR audit`: `run_logs/2wiki_action_swap_noisyor_audit_20260414.md`
 
 ## Current Run Notes
 
@@ -111,6 +116,19 @@ The `limit=100` width-matched controls and the valid `20260409fullfix` full-scal
 - Ran the ungated `selector@10` expand probe and confirmed the beam-fill failure mode
 - Ran the width-matched attribution control on `MuSiQue top-7`
 - Ran the unified width-matched attribution control on `top-5` for `MuSiQue / HotpotQA / 2Wiki`
+- Ran the focused `nq/popqa` bridge failure diagnosis at `limit=100`:
+  - varied `setwise_query_entity_source in {seed, question}`
+  - varied `expand_min_structure_score in {0.35, 0.0}`
+  - reused baseline QA and retrieval cache to isolate bridge proposal effects
+- Implemented `action_swap_v0_dryrun` and `action_swap_v0_judge` inside the existing `bridge_append` assemble path
+- Ran current and relaxed one-swap oracle ceilings on `MuSiQue` and `2Wiki`
+- Added the zero-shot controller family:
+  - `action_swap_noisyor_flat`
+  - `action_swap_noisyor_dep`
+- Ran the `limit=100` `action_swap_noisyor` smoke on `MuSiQue` and `2Wiki`
+- Added `scripts/audit_action_swap_noisyor.py` for offline action-level postmortem
+- Ran action-level NoisyOR audits on `MuSiQue` and `2Wiki`
+- Froze the conclusion that the current `noisyor` line is a failed zero-shot controller instance, not the next controller to iterate
 
 ## Running
 
@@ -118,17 +136,22 @@ The `limit=100` width-matched controls and the valid `20260409fullfix` full-scal
 
 ## Next Wave
 
-1. Implement the parser/compiler spec in `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
-2. Rebuild a small `MuSiQue` need-unit cache with the new step-plan compiler
-3. Rerun offline diagnostics before paying reader cost
-4. Only rerun QA if the upstream diagnostics improve materially:
-   - suspicious anchor rate drops
-   - positive-vs-negative separation rises above random
-   - finalist leakage range stops collapsing
-5. Keep the current simple `pathcore_guard` line as the paper-facing default unless the new branch clearly wins
-6. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs current simple selector
-7. Use the locked `bridge_append` line as the frozen expand baseline for new expand exploration
-8. If expand exploration continues, compare against the locked width-matched controls rather than rerunning ad hoc probes
+1. Keep `bridge-aware Expand + CE-centered Assemble` as the frozen paper-facing mainline
+2. Use `action_swap_v0_*`, current/relaxed oracle decomposition, and the `noisyor` audit as analysis evidence for interface mismatch
+3. Do not expand the `noisyor` controller family with more thresholds, more gates, or more zero-shot variants
+4. Add one compact paper table for the actionized line:
+  - `bridge_append_plus_ce`
+  - `action_swap_v0_dryrun`
+  - `action_swap_v0_judge`
+  - oracle current
+  - oracle relaxed
+5. If controller work is revisited later, treat it as a future scaffold-conditional utility project rather than a continuation of the current `noisyor` branch
+6. Use the locked `bridge_append` line as the frozen expand baseline for new expand exploration
+7. If expand exploration continues, compare against the locked width-matched controls rather than rerunning ad hoc probes
+8. For `nq/popqa` specifically, remember the new diagnosis:
+  - default bridge failure is threshold-gated
+  - `query_entity_source` is not the primary fix lever
+  - threshold-unlocked bridge has no QA gain on `nq` and only a small gain on `popqa`
 
 ## Method Priority
 
@@ -150,6 +173,8 @@ Method implementation order should be:
 - The new `PCRS-RAG V1` branch now has implementation and initial smoke evidence, but not promotion-quality cross-dataset wins
 - The biggest technical risk on the new branch is upstream signal quality, not beam search mechanics
 - Current `MuSiQue` failure appears to come from requirement and counterfactual construction rather than reserve tuning
+- On the `action_swap` line, the current zero-shot support-to-utility surrogate fails to assign positive value to most oracle-positive swaps
+- The current dependency-aware NoisyOR controller should be treated as a stopped branch, not an active optimization target
 
 ## Do Not Drift
 

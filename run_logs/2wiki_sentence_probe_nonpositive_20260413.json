@@ -1,0 +1,579 @@
+{
+  "metadata": {
+    "dataset": "2wikimultihopqa",
+    "repair_report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_ce_local_repair_qatopk5_20260413smoke.json",
+    "case_mode": "applied_nonpositive",
+    "ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "ce_device": "cuda:7"
+  },
+  "summary": {
+    "num_cases": 4,
+    "candidate_top2_softmax_mass_mean": 0.8704,
+    "candidate_top2_softmax_mass_median": 0.9241,
+    "candidate_top2_token_share_mean": 0.2273,
+    "candidate_localized_rate_top2_mass_ge_0_6": 100.0,
+    "candidate_any_goldish_sentence_rate": 100.0,
+    "candidate_top2_goldish_sentence_rate": 75.0,
+    "candidate_goldish_only_outside_top2_rate": 25.0
+  },
+  "cases": [
+    {
+      "question": "What is the place of birth of the performer of song Changed It?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Nicki Minaj",
+        "Changed It"
+      ],
+      "gold_answers": [
+        "Port of Spain"
+      ],
+      "question_entities_preview": [
+        "cash money records",
+        "changed it",
+        "lil wayne",
+        "nicki minaj",
+        "young money entertainment"
+      ],
+      "candidate_title": "Alicia Keys",
+      "replace_title": "Alex da Kid",
+      "candidate_doc_text": "Alicia Keys\nAlicia Augello Cook Dean (born January 25, 1981), known professionally as Alicia Keys, is an American musician, singer, and songwriter. A classically-trained pianist, Keys was composing songs by age 12 and was signed at 15 years old by Columbia Records. After disputes with the label, she signed with Arista Records, and later released her debut album, \"Songs in A Minor\", with J Records in 2001. The album was critically and commercially successful, producing her first \"Billboard\" Hot 100 number-one single \"Fallin'\" and selling over 16 million copies worldwide. The album earned Keys five Grammy Awards in 2002. Her second album, \"The Diary of Alicia Keys\" (2003), was also a critical and commercial success, spawning successful singles \"You Don't Know My NameIf I Ain't Got You\", and \"Diary\", and selling eight million copies worldwide. The album garnered her an additional four Grammy Awards. Her duet \" My Boo\" with Usher became her second number-one single in 2004. Keys released her first live album, \"Unplugged\" (2005), and became the first woman to have an \"MTV Unplugged\" album debut at number one. Her third album, \" As I Am\" (2007), produced the Hot 100 number-one single \"No One\", selling 7 million copies worldwide and earning an additional three Grammy Awards. In 2007, Keys made her film debut in the action-thriller film \"Smokin' Aces\". She, along with Jack White, recorded \"Another Way to Die\" (the title song to the 22nd official James Bond film, \"Quantum of Solace\"). Her fourth album, \"The Element of Freedom\" (2009), became her first chart-topping album in the UK, and sold 4 million copies worldwide. In 2009, Keys also collaborated with Jay Z on \"Empire State of Mind\", which became her fourth number-one single and won the Grammy Award for Best Rap/Sung Collaboration. \" Girl on Fire\" (2012) was her fifth \"Billboard\" 200 topping album, spawning the successful title track, and won the Grammy Award for Best R&B Album. In 2013, \"VH1 Storytellers\" was released as her second live album. Her sixth studio album, \"Here\" (2016), became her seventh US R&B/ Hip-Hop chart topping album. Keys has received numerous accolades in her career, including 15 competitive Grammy Awards, 17 NAACP Image Awards, 12 ASCAP Awards, and an award from the Songwriters Hall of Fame and National Music Publishers Association. She has sold over 65 million records worldwide. Considered a musical icon, Keys was named by \"Billboard\" the top R&B artist of the 2000s decade and placed number 10 on their list of Top 50 R&B/ Hip-Hop Artists of the Past 25 Years. VH1 also included her on their 100 Greatest Artists of All Time and 100 Greatest Women in Music lists, while \"Time\" has named her in their 100 list of most influential people in 2005 and 2017. Keys is also acclaimed for her humanitarian work, philanthropy and activism. She co-founded and is the Global Ambassador of the nonprofit HIV/AIDS-fighting organization Keep a Child Alive.",
+      "replaced_doc_text": "Alex da Kid\nAlexander Junior Grant (born 7 August 1982), professionally known as Alex da Kid, is a British record producer, songwriter, and record executive from Wood Green, London. He has gained recognition for producing several hit singles for a plethora of artists in various music genres, such as Dr. Dre (\"I Need a Doctor\"), Nicki Minaj (\"Massive Attack\"), B.o. B (\"Airplanes\" featuring Hayley Williams), Eminem (\"Love the Way You Lie\" featuring Rihanna), Diddy (\"Coming Home\" with Dirty Money featuring Skylar Grey), Imagine Dragons (\"Radioactive\") and Cheryl (\" Under The Sun\"). Even though he now lives in Los Angeles, the \"Evening Standard\" named him one of \"London's Most Influential People in 2011. \" He has been nominated for numerous Grammy Awards including \"Album of the Year\" for his work on Rihanna's \"Loud\". His record label, KIDinaKORNER, is a subdivision of Interscope Records. In both 2013 and 2014, Grant (as owner of KIDinaKORNER Records) was chosen by Billboard Magazine for their \"Top 40 Under 40.\" In 2016, Grant released his first solo project as an artist. The single, “Not Easy” features X Ambassadors, Elle King and Wiz Khalifa via KIDinaKORNER/RCA Records. The track was written and produced by Alex da Kid for KIDinaKORNER, Sam Harris, Casey Harris, Adam Levin, Elle King, and Wiz Khalifa. In 2017, Grant released his second track, \"American Funeral\" which was a co-written collaboration with Joseph Angel. In a Music Connection magazine cover story from January 2015, Grant said, as a producer, he co-writes everything that he works on with the artists.",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "connector_gain_count": 4,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 5,
+      "replaced_ce_rank": 7,
+      "candidate_ce_score": -0.8135,
+      "replaced_ce_score": -1.2168,
+      "ce_score_gap_candidate_minus_replaced": 0.4033,
+      "scaffold_titles": [
+        "Changed It",
+        "Nicki Minaj",
+        "Chris Brown",
+        "2 Chainz",
+        "Alex da Kid"
+      ],
+      "final_titles_after_repair": [
+        "Changed It",
+        "Nicki Minaj",
+        "Chris Brown",
+        "2 Chainz",
+        "Alicia Keys"
+      ],
+      "candidate_summary": {
+        "title": "Alicia Keys",
+        "sentence_count": 23,
+        "doc_token_count": 501,
+        "top1_softmax_mass": 0.9842,
+        "top2_softmax_mass": 0.9882,
+        "top2_token_share": 0.1158,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "Alicia Augello Cook Dean (born January 25, 1981), known professionally as Alicia Keys, is an American musician, singer, and songwriter.",
+            "score": -1.2793,
+            "softmax_mass": 0.9842,
+            "token_count": 20,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 6,
+            "sentence_text": "Her second album, \"The Diary of Alicia Keys\" (2003), was also a critical and commercial success, spawning successful singles \"You Don't Know My NameIf I Ain't Got You\", and \"Diary\", and selling eight million copies worldwide.",
+            "score": -6.793,
+            "softmax_mass": 0.004,
+            "token_count": 38,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 18,
+            "sentence_text": "Keys has received numerous accolades in her career, including 15 competitive Grammy Awards, 17 NAACP Image Awards, 12 ASCAP Awards, and an award from the Songwriters Hall of Fame and National Music Publishers Association.",
+            "score": -7.6719,
+            "softmax_mass": 0.0016,
+            "token_count": 34,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "Alex da Kid",
+        "sentence_count": 12,
+        "doc_token_count": 256,
+        "top1_softmax_mass": 0.8765,
+        "top2_softmax_mass": 0.9275,
+        "top2_token_share": 0.1875,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "Alexander Junior Grant (born 7 August 1982), professionally known as Alex da Kid, is a British record producer, songwriter, and record executive from Wood Green, London.",
+            "score": -2.9648,
+            "softmax_mass": 0.8765,
+            "token_count": 26,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 5,
+            "sentence_text": "Even though he now lives in Los Angeles, the \"Evening Standard\" named him one of \"London's Most Influential People in 2011.",
+            "score": -5.8086,
+            "softmax_mass": 0.051,
+            "token_count": 22,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 10,
+            "sentence_text": "The track was written and produced by Alex da Kid for KIDinaKORNER, Sam Harris, Casey Harris, Adam Levin, Elle King, and Wiz Khalifa.",
+            "score": -6.2852,
+            "softmax_mass": 0.0317,
+            "token_count": 23,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          }
+        ]
+      }
+    },
+    {
+      "question": "What nationality is the performer of song When The Stars Go Blue?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Ryan Adams",
+        "When the Stars Go Blue"
+      ],
+      "gold_answers": [
+        "America"
+      ],
+      "question_entities_preview": [
+        "bono",
+        "ryan adams",
+        "tim mcgraw",
+        "when the stars go blue"
+      ],
+      "candidate_title": "Alicia Keys",
+      "replace_title": "Astrid North",
+      "candidate_doc_text": "Alicia Keys\nAlicia Augello Cook Dean (born January 25, 1981), known professionally as Alicia Keys, is an American musician, singer, and songwriter. A classically-trained pianist, Keys was composing songs by age 12 and was signed at 15 years old by Columbia Records. After disputes with the label, she signed with Arista Records, and later released her debut album, \"Songs in A Minor\", with J Records in 2001. The album was critically and commercially successful, producing her first \"Billboard\" Hot 100 number-one single \"Fallin'\" and selling over 16 million copies worldwide. The album earned Keys five Grammy Awards in 2002. Her second album, \"The Diary of Alicia Keys\" (2003), was also a critical and commercial success, spawning successful singles \"You Don't Know My NameIf I Ain't Got You\", and \"Diary\", and selling eight million copies worldwide. The album garnered her an additional four Grammy Awards. Her duet \" My Boo\" with Usher became her second number-one single in 2004. Keys released her first live album, \"Unplugged\" (2005), and became the first woman to have an \"MTV Unplugged\" album debut at number one. Her third album, \" As I Am\" (2007), produced the Hot 100 number-one single \"No One\", selling 7 million copies worldwide and earning an additional three Grammy Awards. In 2007, Keys made her film debut in the action-thriller film \"Smokin' Aces\". She, along with Jack White, recorded \"Another Way to Die\" (the title song to the 22nd official James Bond film, \"Quantum of Solace\"). Her fourth album, \"The Element of Freedom\" (2009), became her first chart-topping album in the UK, and sold 4 million copies worldwide. In 2009, Keys also collaborated with Jay Z on \"Empire State of Mind\", which became her fourth number-one single and won the Grammy Award for Best Rap/Sung Collaboration. \" Girl on Fire\" (2012) was her fifth \"Billboard\" 200 topping album, spawning the successful title track, and won the Grammy Award for Best R&B Album. In 2013, \"VH1 Storytellers\" was released as her second live album. Her sixth studio album, \"Here\" (2016), became her seventh US R&B/ Hip-Hop chart topping album. Keys has received numerous accolades in her career, including 15 competitive Grammy Awards, 17 NAACP Image Awards, 12 ASCAP Awards, and an award from the Songwriters Hall of Fame and National Music Publishers Association. She has sold over 65 million records worldwide. Considered a musical icon, Keys was named by \"Billboard\" the top R&B artist of the 2000s decade and placed number 10 on their list of Top 50 R&B/ Hip-Hop Artists of the Past 25 Years. VH1 also included her on their 100 Greatest Artists of All Time and 100 Greatest Women in Music lists, while \"Time\" has named her in their 100 list of most influential people in 2005 and 2017. Keys is also acclaimed for her humanitarian work, philanthropy and activism. She co-founded and is the Global Ambassador of the nonprofit HIV/AIDS-fighting organization Keep a Child Alive.",
+      "replaced_doc_text": "Astrid North\nAstrid North( Astrid Karina North Radmann; 24 August 1973, Berlin – 25 June 2019, Berlin) was a German soul singer and songwriter. She was the singer of the German band, with whom she released five Albums. As guest singer of the band she published three albums.",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "connector_gain_count": 3,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 3,
+      "replaced_ce_rank": 8,
+      "candidate_ce_score": -0.0903,
+      "replaced_ce_score": -1.9736,
+      "ce_score_gap_candidate_minus_replaced": 1.8833,
+      "scaffold_titles": [
+        "When the Stars Go Blue",
+        "Andrea Corr",
+        "Ryan Adams",
+        "Elan Atias",
+        "Astrid North"
+      ],
+      "final_titles_after_repair": [
+        "When the Stars Go Blue",
+        "Andrea Corr",
+        "Ryan Adams",
+        "Elan Atias",
+        "Alicia Keys"
+      ],
+      "candidate_summary": {
+        "title": "Alicia Keys",
+        "sentence_count": 23,
+        "doc_token_count": 501,
+        "top1_softmax_mass": 0.9905,
+        "top2_softmax_mass": 0.9932,
+        "top2_token_share": 0.1158,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "Alicia Augello Cook Dean (born January 25, 1981), known professionally as Alicia Keys, is an American musician, singer, and songwriter.",
+            "score": 0.0184,
+            "softmax_mass": 0.9905,
+            "token_count": 20,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 6,
+            "sentence_text": "Her second album, \"The Diary of Alicia Keys\" (2003), was also a critical and commercial success, spawning successful singles \"You Don't Know My NameIf I Ain't Got You\", and \"Diary\", and selling eight million copies worldwide.",
+            "score": -5.8945,
+            "softmax_mass": 0.0027,
+            "token_count": 38,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 17,
+            "sentence_text": "Her sixth studio album, \"Here\" (2016), became her seventh US R&B/ Hip-Hop chart topping album.",
+            "score": -6.2031,
+            "softmax_mass": 0.002,
+            "token_count": 17,
+            "question_overlap_tokens": 0,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "Astrid North",
+        "sentence_count": 3,
+        "doc_token_count": 45,
+        "top1_softmax_mass": 0.9769,
+        "top2_softmax_mass": 0.9997,
+        "top2_token_share": 0.7778,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "Astrid North( Astrid Karina North Radmann; 24 August 1973, Berlin – 25 June 2019, Berlin) was a German soul singer and songwriter.",
+            "score": -2.3301,
+            "softmax_mass": 0.9769,
+            "token_count": 21,
+            "question_overlap_tokens": 0,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 2,
+            "sentence_text": "She was the singer of the German band, with whom she released five Albums.",
+            "score": -6.0898,
+            "softmax_mass": 0.0228,
+            "token_count": 14,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 3,
+            "sentence_text": "As guest singer of the band she published three albums.",
+            "score": -10.4141,
+            "softmax_mass": 0.0003,
+            "token_count": 10,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          }
+        ]
+      }
+    },
+    {
+      "question": "Which country Aleksander Koniecpolski (1620–1659)'s father is from?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Stanisław Koniecpolski",
+        "Aleksander Koniecpolski (1620–1659)"
+      ],
+      "gold_answers": [
+        "Polish-Lithuanian Commonwealth"
+      ],
+      "question_entities_preview": [
+        "1620 1659",
+        "aleksander koniecpolski",
+        "podolia",
+        "stanis aw koniecpolski",
+        "stanis aw przedb r koniecpolski"
+      ],
+      "candidate_title": "Roman Polanski",
+      "replace_title": "Aleksander Ford",
+      "candidate_doc_text": "Roman Polanski\nRoman Polański( born 18 August 1933 in Paris; original name Raymond Thierry Liebling) is a French- Polish film director, producer, writer, and actor. Since 1978, Polanski has been a fugitive from the U.S. criminal justice system; he fled the country while awaiting sentencing in his sexual abuse case, in which he pleaded guilty to statutory rape. His Polish- Jewish parents moved the family back from Paris to Kraków in 1937. Two years later, Poland was invaded by Nazi Germany starting World War II and the Polanskis found themselves trapped in the Kraków Ghetto. After his mother and father were taken in raids, Polanski spent his formative years in foster homes under an adopted identity, trying to survive the Holocaust. Polanski's first feature- length film,\" Knife in the Water\"( 1962), was made in Poland and was nominated for a United States Academy Award for Best Foreign Language Film. He has since received five more Oscar nominations, along with two BAFTAs, four Césars, a Golden Globe Award and the Palme d' Or of the Cannes Film Festival in France. In the United Kingdom he directed three films, beginning with\" Repulsion\"( 1965). In 1968, he moved to the United States and cemented his status by directing the horror film\" Rosemary's Baby\"( 1968). A turning point in his life took place in 1969, when his pregnant wife, Sharon Tate, and four friends were brutally murdered by members of the Manson Family. Following her death, Polanski returned to Europe and eventually continued directing. He made\" Macbeth\"( 1971) in England and back in Hollywood,\" Chinatown\"( 1974), which was nominated for eleven Academy Awards. In 1977, Polanski was arrested and charged with drugging and raping a 13- year- old girl. He subsequently pled guilty to the lesser offence of unlawful sex with a minor. After spending 42 days undergoing psychiatric evaluation in prison in preparation for sentencing, Polanski, who had expected to be put on probation, fled to Paris after learning that the judge planned to reject his plea deal and impose a prison term. In Europe, Polanski continued to make films, including\" Tess\"( 1979), starring Nastassja Kinski. It won France's César Awards for Best Picture and Best Director, and received three Oscars. He later produced and directed\" The Pianist\"( 2002), a drama about a Jewish- Polish musician escaping Nazi persecution, starring Adrien Brody and Emilia Fox. The film won three Academy Awards including Best Director, along with numerous international awards. He also directed\" Oliver Twist\"( 2005), a story which parallels his own life as a\" young boy attempting to triumph over adversity\". He was awarded Best Director for\" The Ghost Writer\"( 2010) at the 23rd European Film Awards. He also received Best Screenwriter nomination at the aforementioned awards for\" Carnage\"( 2011). In 2018, the Academy of Motion Picture Arts and Sciences voted to expel Polanski from its membership.",
+      "replaced_doc_text": "Aleksander Ford\nAleksander Ford (born Mosze Lifszyc; 24 November 1908 in Kiev, Russian Empire – 4 April 1980 in Naples, Florida, United States) was a Polish film director; and head of the Polish People's Army Film Crew in the Soviet Union during World War II. Following the war he was appointed director of the Film Polski company. In 1948 he was appointed as a professor of the National Film School in Łódź (Państwowa Wyższa Szkoła Filmowa). Roman Polanski was among his students. Another of Ford's protégés was the Polish film director Andrzej Wajda. Following the anti-Semitic purge in the communist party in Poland, in 1968 Ford emigrated to Israel and from there through Germany and Denmark, to the United States. He committed suicide in 1980 in Naples, Florida.",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 5,
+      "replaced_ce_rank": 6,
+      "candidate_ce_score": -4.8047,
+      "replaced_ce_score": -5.25,
+      "ce_score_gap_candidate_minus_replaced": 0.4453,
+      "scaffold_titles": [
+        "Aleksander Koniecpolski (1620–1659)",
+        "Stanisław Koniecpolski",
+        "Aleksander Koniecpolski (1555–1609)",
+        "Alexander of Masovia",
+        "Aleksander Ford"
+      ],
+      "final_titles_after_repair": [
+        "Aleksander Koniecpolski (1620–1659)",
+        "Stanisław Koniecpolski",
+        "Aleksander Koniecpolski (1555–1609)",
+        "Alexander of Masovia",
+        "Roman Polanski"
+      ],
+      "candidate_summary": {
+        "title": "Roman Polanski",
+        "sentence_count": 24,
+        "doc_token_count": 481,
+        "top1_softmax_mass": 0.4556,
+        "top2_softmax_mass": 0.6403,
+        "top2_token_share": 0.1102,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": false,
+        "goldish_only_outside_top2": true,
+        "top_sentences": [
+          {
+            "sentence_rank": 5,
+            "sentence_text": "Two years later, Poland was invaded by Nazi Germany starting World War II and the Polanskis found themselves trapped in the Kraków Ghetto.",
+            "score": -5.0586,
+            "softmax_mass": 0.4556,
+            "token_count": 24,
+            "question_overlap_tokens": 0,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 7,
+            "sentence_text": "Polanski's first feature- length film,\" Knife in the Water\"( 1962), was made in Poland and was nominated for a United States Academy Award for Best Foreign Language Film.",
+            "score": -5.9609,
+            "softmax_mass": 0.1848,
+            "token_count": 29,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 1,
+            "sentence_text": "Roman Polański( born 18 August 1933 in Paris; original name Raymond Thierry Liebling) is a French- Polish film director, producer, writer, and actor.",
+            "score": -6.0234,
+            "softmax_mass": 0.1736,
+            "token_count": 24,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "Aleksander Ford",
+        "sentence_count": 7,
+        "doc_token_count": 133,
+        "top1_softmax_mass": 0.8807,
+        "top2_softmax_mass": 0.9806,
+        "top2_token_share": 0.5338,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 6,
+            "sentence_text": "Following the anti-Semitic purge in the communist party in Poland, in 1968 Ford emigrated to Israel and from there through Germany and Denmark, to the United States.",
+            "score": -5.4141,
+            "softmax_mass": 0.8807,
+            "token_count": 28,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 1,
+            "sentence_text": "Aleksander Ford (born Mosze Lifszyc; 24 November 1908 in Kiev, Russian Empire – 4 April 1980 in Naples, Florida, United States) was a Polish film director; and head of the Polish People's Army Film Crew in the Soviet Union during World War II.",
+            "score": -7.5898,
+            "softmax_mass": 0.1,
+            "token_count": 43,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 1,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 7,
+            "sentence_text": "He committed suicide in 1980 in Naples, Florida.",
+            "score": -10.7109,
+            "softmax_mass": 0.0044,
+            "token_count": 8,
+            "question_overlap_tokens": 0,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          }
+        ]
+      }
+    },
+    {
+      "question": "Are both movies, Naked Tango and Algiers (Film), from the same country?",
+      "query_type": "standard",
+      "gold_titles": [
+        "Naked Tango",
+        "Algiers (film)"
+      ],
+      "gold_answers": [
+        "yes"
+      ],
+      "question_entities_preview": [
+        "fernando rey",
+        "film",
+        "mathilda may",
+        "naked tango"
+      ],
+      "candidate_title": "Alain Corneau",
+      "replace_title": "A Night at the Moulin Rouge",
+      "candidate_doc_text": "Alain Corneau\nAlain Corneau (7 August 1943 – 30 August 2010) was a French film director and writer. Corneau was born in Meung-sur-Loire, Loiret. Originally a musician, he worked with Costa-Gavras as an assistant, which was also his first opportunity to work with the actor Yves Montand, with whom he would collaborate three times later in his career, including \"Police Python 357 \" (1976) and \"La Menace\" (1977). He directed Gérard Depardieu in the screen adaptation of \"Tous les matins du monde\" in 1991. Corneau died in Paris on 30 August 2010 from cancer, aged 67 and was interred at Père Lachaise Cemetery.",
+      "replaced_doc_text": "A Night at the Moulin Rouge\nA Night at the Moulin Rouge( French: Une nuit au Moulin- Rouge) is a 1957 French comedy film directed by Jean- Claude Roy and starring Tilda Thamar, Noël Roquevert and Jean Tissier. Much of the film is portrayed as taking place in the Moulin Rouge cabaret nightclub in Paris.",
+      "delta_em": 0.0,
+      "delta_f1": 0.0,
+      "connector_gain_count": 1,
+      "anchor_gain_count": 0,
+      "candidate_ce_rank": 3,
+      "replaced_ce_rank": 6,
+      "candidate_ce_score": -6.0742,
+      "replaced_ce_score": -7.9531,
+      "ce_score_gap_candidate_minus_replaced": 1.8789,
+      "scaffold_titles": [
+        "Naked Tango",
+        "Algiers (film)",
+        "New World (1995 film)",
+        "Last Tango in Paris",
+        "A Night at the Moulin Rouge"
+      ],
+      "final_titles_after_repair": [
+        "Naked Tango",
+        "Algiers (film)",
+        "New World (1995 film)",
+        "Last Tango in Paris",
+        "Alain Corneau"
+      ],
+      "candidate_summary": {
+        "title": "Alain Corneau",
+        "sentence_count": 5,
+        "doc_token_count": 104,
+        "top1_softmax_mass": 0.7476,
+        "top2_softmax_mass": 0.86,
+        "top2_token_share": 0.5673,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 1,
+            "sentence_text": "Alain Corneau (7 August 1943 – 30 August 2010) was a French film director and writer.",
+            "score": -7.9492,
+            "softmax_mass": 0.7476,
+            "token_count": 15,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 3,
+            "sentence_text": "Originally a musician, he worked with Costa-Gavras as an assistant, which was also his first opportunity to work with the actor Yves Montand, with whom he would collaborate three times later in his career, including \"Police Python 357 \" (1976) and \"La Menace\" (1977).",
+            "score": -9.8438,
+            "softmax_mass": 0.1124,
+            "token_count": 44,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          },
+          {
+            "sentence_rank": 4,
+            "sentence_text": "He directed Gérard Depardieu in the screen adaptation of \"Tous les matins du monde\" in 1991.",
+            "score": -10.5,
+            "softmax_mass": 0.0583,
+            "token_count": 17,
+            "question_overlap_tokens": 1,
+            "query_entity_overlap_tokens": 0,
+            "gold_title_overlap_tokens": 0,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": false
+          }
+        ]
+      },
+      "replaced_summary": {
+        "title": "A Night at the Moulin Rouge",
+        "sentence_count": 2,
+        "doc_token_count": 50,
+        "top1_softmax_mass": 0.9743,
+        "top2_softmax_mass": 1.0,
+        "top2_token_share": 1.0,
+        "any_goldish_sentence": true,
+        "top2_has_goldish_sentence": true,
+        "goldish_only_outside_top2": false,
+        "top_sentences": [
+          {
+            "sentence_rank": 2,
+            "sentence_text": "Much of the film is portrayed as taking place in the Moulin Rouge cabaret nightclub in Paris.",
+            "score": -5.3867,
+            "softmax_mass": 0.9743,
+            "token_count": 17,
+            "question_overlap_tokens": 2,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          },
+          {
+            "sentence_rank": 1,
+            "sentence_text": "A Night at the Moulin Rouge( French: Une nuit au Moulin- Rouge) is a 1957 French comedy film directed by Jean- Claude Roy and starring Tilda Thamar, Noël Roquevert and Jean Tissier.",
+            "score": -9.0234,
+            "softmax_mass": 0.0257,
+            "token_count": 33,
+            "question_overlap_tokens": 3,
+            "query_entity_overlap_tokens": 1,
+            "gold_title_overlap_tokens": 1,
+            "gold_answer_overlap_tokens": 0,
+            "has_goldish_signal": true
+          }
+        ]
+      }
+    }
+  ]
+}

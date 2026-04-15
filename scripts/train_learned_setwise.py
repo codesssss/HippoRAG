@@ -13,6 +13,7 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 
 from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
+from src.hipporag.utils.dataset_utils import resolve_dataset_paths
 from src.hipporag.utils.misc_utils import QuerySolution, string_to_bool
 
 from eval_causal_qwen3 import (
@@ -37,8 +38,7 @@ def resolve_save_dir(save_dir: str, dataset: str) -> str:
 
 
 def load_dataset(dataset: str, limit: int) -> tuple[list[dict], list[dict]]:
-    corpus_path = Path(f"reproduce/dataset/{dataset}_corpus.json")
-    sample_path = Path(f"reproduce/dataset/{dataset}.json")
+    corpus_path, sample_path = resolve_dataset_paths(dataset)
     corpus = json.load(corpus_path.open())
     samples = json.load(sample_path.open())
     if limit and limit > 0:

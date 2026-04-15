@@ -1,0 +1,94 @@
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "run_type": "bridge_append_plus_ce",
+      "em": 0.32,
+      "f1": 0.381,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409smoke.json",
+      "delta_vs_bridge_em": 0.0,
+      "delta_vs_bridge_f1": 0.0
+    },
+    {
+      "dataset": "musique",
+      "run_type": "action_swap_v0_dryrun",
+      "em": 0.32,
+      "f1": 0.39,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_action_swap_v0_dryrun_qatopk5_20260413impl.json",
+      "delta_vs_bridge_em": 0.0,
+      "delta_vs_bridge_f1": 0.009
+    },
+    {
+      "dataset": "musique",
+      "run_type": "action_swap_v0_judge",
+      "em": 0.32,
+      "f1": 0.3798,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_action_swap_v0_judge_qatopk5_20260413impl.json",
+      "delta_vs_bridge_em": 0.0,
+      "delta_vs_bridge_f1": -0.0012
+    },
+    {
+      "dataset": "musique",
+      "run_type": "action_swap_noisyor_flat",
+      "em": 0.31,
+      "f1": 0.3698,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_flat_qatopk5_20260414noisyor.json",
+      "delta_vs_bridge_em": -0.01,
+      "delta_vs_bridge_f1": -0.0112
+    },
+    {
+      "dataset": "musique",
+      "run_type": "action_swap_noisyor_dep",
+      "em": 0.31,
+      "f1": 0.3698,
+      "report": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_dep_qatopk5_20260414noisyor.json",
+      "delta_vs_bridge_em": -0.01,
+      "delta_vs_bridge_f1": -0.0112
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "bridge_append_plus_ce",
+      "em": 0.43,
+      "f1": 0.4901,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409fullfix.json",
+      "delta_vs_bridge_em": 0.0,
+      "delta_vs_bridge_f1": 0.0
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "action_swap_v0_dryrun",
+      "em": 0.43,
+      "f1": 0.4658,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_action_swap_v0_dryrun_qatopk5_20260413impl.json",
+      "delta_vs_bridge_em": 0.0,
+      "delta_vs_bridge_f1": -0.0243
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "action_swap_v0_judge",
+      "em": 0.44,
+      "f1": 0.4805,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_action_swap_v0_judge_qatopk5_20260413impl.json",
+      "delta_vs_bridge_em": 0.01,
+      "delta_vs_bridge_f1": -0.0096
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "action_swap_noisyor_flat",
+      "em": 0.42,
+      "f1": 0.4553,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_flat_qatopk5_20260414noisyor.json",
+      "delta_vs_bridge_em": -0.01,
+      "delta_vs_bridge_f1": -0.0348
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "run_type": "action_swap_noisyor_dep",
+      "em": 0.42,
+      "f1": 0.4553,
+      "report": "outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_dep_qatopk5_20260414noisyor.json",
+      "delta_vs_bridge_em": -0.01,
+      "delta_vs_bridge_f1": -0.0348
+    }
+  ]
+}

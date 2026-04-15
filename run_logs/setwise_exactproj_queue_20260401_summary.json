@@ -1,0 +1,112 @@
+{
+  "runs": [
+    {
+      "dataset": "2wikimultihopqa",
+      "phase": "smoke40",
+      "factor": 1,
+      "output_json": "outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_set_closure_exactonly_smoke40_legacy_reserve3_dedup.json",
+      "selector_EM": 0.425,
+      "selector_F1": 0.51,
+      "baseline_EM": 0.375,
+      "baseline_F1": 0.442,
+      "EM_delta": 0.05,
+      "F1_delta": 0.068
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "phase": "smoke40",
+      "factor": 3,
+      "output_json": "outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_set_closure_exactproj3_smoke40_legacy_reserve3_dedup.json",
+      "selector_EM": 0.425,
+      "selector_F1": 0.51,
+      "baseline_EM": 0.375,
+      "baseline_F1": 0.442,
+      "EM_delta": 0.05,
+      "F1_delta": 0.068
+    },
+    {
+      "dataset": "musique",
+      "phase": "smoke40",
+      "factor": 1,
+      "output_json": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactonly_smoke40_legacy_reserve3_dedup.json",
+      "selector_EM": 0.4,
+      "selector_F1": 0.4319,
+      "baseline_EM": 0.375,
+      "baseline_F1": 0.4016,
+      "EM_delta": 0.025,
+      "F1_delta": 0.0303
+    },
+    {
+      "dataset": "musique",
+      "phase": "smoke40",
+      "factor": 3,
+      "output_json": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactproj3_smoke40_legacy_reserve3_dedup.json",
+      "selector_EM": 0.4,
+      "selector_F1": 0.4236,
+      "baseline_EM": 0.375,
+      "baseline_F1": 0.4016,
+      "EM_delta": 0.025,
+      "F1_delta": 0.022
+    },
+    {
+      "dataset": "hotpotqa",
+      "phase": "smoke40",
+      "factor": 1,
+      "output_json": "outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_set_closure_exactonly_smoke40_legacy_reserve3_dedup.json",
+      "selector_EM": 0.575,
+      "selector_F1": 0.7339,
+      "baseline_EM": 0.575,
+      "baseline_F1": 0.7506,
+      "EM_delta": 0.0,
+      "F1_delta": -0.0167
+    },
+    {
+      "dataset": "hotpotqa",
+      "phase": "smoke40",
+      "factor": 3,
+      "output_json": "outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_set_closure_exactproj3_smoke40_legacy_reserve3_dedup.json",
+      "selector_EM": 0.575,
+      "selector_F1": 0.7339,
+      "baseline_EM": 0.575,
+      "baseline_F1": 0.7506,
+      "EM_delta": 0.0,
+      "F1_delta": -0.0167
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "phase": "full100",
+      "factor": 1,
+      "output_json": "outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_set_closure_exactonly_100_legacy_reserve3_dedup.json",
+      "selector_EM": 0.46,
+      "selector_F1": 0.5083,
+      "baseline_EM": 0.38,
+      "baseline_F1": 0.4332,
+      "EM_delta": 0.08,
+      "F1_delta": 0.0751
+    },
+    {
+      "dataset": "musique",
+      "phase": "full100",
+      "factor": 1,
+      "output_json": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactonly_100_legacy_reserve3_dedup.json",
+      "selector_EM": 0.26,
+      "selector_F1": 0.3312,
+      "baseline_EM": 0.25,
+      "baseline_F1": 0.3366,
+      "EM_delta": 0.01,
+      "F1_delta": -0.0054
+    },
+    {
+      "dataset": "hotpotqa",
+      "phase": "full100",
+      "factor": 1,
+      "output_json": "outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_set_closure_exactonly_100_legacy_reserve3_dedup.json",
+      "selector_EM": 0.59,
+      "selector_F1": 0.7014,
+      "baseline_EM": 0.59,
+      "baseline_F1": 0.7114,
+      "EM_delta": 0.0,
+      "F1_delta": -0.01
+    }
+  ]
+}
