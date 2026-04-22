@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Iterable, Sequence, Set
+from typing import Dict, Iterable, List, Sequence, Set
 
 import numpy as np
 from scipy import sparse as sp
@@ -88,6 +88,73 @@ def _build_pool_trace_state(
     )
 
 
+def _normalize_triples(raw_triples: Sequence[object]) -> List[tuple[str, str, str]]:
+    triples: List[tuple[str, str, str]] = []
+    for triple in raw_triples:
+        if not isinstance(triple, (list, tuple)) or len(triple) != 3:
+            continue
+        subject = normalize_entity_text(str(triple[0]))
+        relation = " ".join(str(triple[1] or "").strip().lower().split())
+        obj = normalize_entity_text(str(triple[2]))
+        if not subject or not relation or not obj:
+            continue
+        triples.append((subject, relation, obj))
+    return triples
+
+
+def _get_chunk_triples_map(hipporag) -> Dict[str, List[tuple[str, str, str]]]:
+    cached = getattr(hipporag, "_strongest_chunk_triples_map", None)
+    if isinstance(cached, dict):
+        return cached
+
+    if not hasattr(hipporag, "load_existing_openie"):
+        return {}
+
+    try:
+        all_openie_info, _chunk_keys_to_process = hipporag.load_existing_openie([])
+    except Exception:
+        return {}
+
+    chunk_triples_map: Dict[str, List[tuple[str, str, str]]] = {}
+    for doc in all_openie_info or []:
+        chunk_id = doc.get("idx")
+        if chunk_id is None:
+            continue
+        chunk_triples_map[str(chunk_id)] = _normalize_triples(doc.get("extracted_triples", []) or [])
+    setattr(hipporag, "_strongest_chunk_triples_map", chunk_triples_map)
+    return chunk_triples_map
+
+
+def _build_passage_chunk_ids_for_pool(
+    hipporag,
+    pool_doc_ids: Sequence[int | None],
+) -> List[str | None]:
+    passage_node_keys = list(getattr(hipporag, "passage_node_keys", []) or [])
+    if not passage_node_keys and hasattr(hipporag, "passage_node_key_to_doc_idx"):
+        inverse = {
+            int(doc_idx): str(chunk_id)
+            for chunk_id, doc_idx in (getattr(hipporag, "passage_node_key_to_doc_idx", {}) or {}).items()
+            if doc_idx is not None
+        }
+        return [inverse.get(int(doc_id)) if doc_id is not None else None for doc_id in pool_doc_ids]
+
+    chunk_ids: List[str | None] = []
+    for doc_id in pool_doc_ids:
+        if doc_id is None:
+            chunk_ids.append(None)
+            continue
+        if int(doc_id) < 0 or int(doc_id) >= len(passage_node_keys):
+            chunk_ids.append(None)
+            continue
+        chunk_ids.append(str(passage_node_keys[int(doc_id)]))
+    return chunk_ids
+
+
+def _extract_doc_title(doc_text: str) -> str:
+    lines = str(doc_text or "").splitlines()
+    return lines[0].strip() if lines else str(doc_text or "").strip()
+
+
 def run_strongest_shadow_for_pool(
     hipporag,
     query: str,
@@ -148,6 +215,29 @@ def run_strongest_shadow_for_pool(
 
     pool_limit = len(pool_docs)
     pool_order = np.argsort(np.asarray(pool_doc_scores, dtype=np.float32))[::-1].tolist()
+    passage_chunk_ids = _build_passage_chunk_ids_for_pool(hipporag=hipporag, pool_doc_ids=pool_doc_ids)
+    passage_titles = [_extract_doc_title(doc_text) for doc_text in pool_docs]
+    passage_texts = [str(doc_text) for doc_text in pool_docs]
+    doc_idx_to_entities = getattr(hipporag, "doc_idx_to_structure_entities", {}) or {}
+    passage_structure_entities = [
+        sorted(
+            {
+                normalize_entity_text(entity)
+                for entity in doc_idx_to_entities.get(int(doc_id), set())
+                if doc_id is not None and normalize_entity_text(entity)
+            }
+        )
+        if doc_id is not None
+        else []
+        for doc_id in pool_doc_ids
+    ]
+    baseline_prefix_local_indices = pool_order[: min(max(int(config.ras_prefix_guard_k), 0), pool_limit)]
+    chunk_triples_cache = _get_chunk_triples_map(hipporag)
+    chunk_triples_map = {
+        str(chunk_id): list(chunk_triples_cache.get(str(chunk_id), []))
+        for chunk_id in passage_chunk_ids
+        if chunk_id is not None
+    }
     state = StrongestBaselineState(
         query=query,
         docs=pool_docs,
@@ -162,7 +252,44 @@ def run_strongest_shadow_for_pool(
         dense_scores=np.asarray(pool_doc_scores, dtype=np.float32),
         metadata={
             "entity_vocab_size": len(entity_vocab),
+            "entity_vocab": list(entity_vocab),
             "pool_doc_ids": [None if doc_id is None else int(doc_id) for doc_id in pool_doc_ids],
+            "passage_chunk_ids": list(passage_chunk_ids),
+            "passage_titles": list(passage_titles),
+            "passage_texts": list(passage_texts),
+            "passage_structure_entities": list(passage_structure_entities),
+            "chunk_triples_map": dict(chunk_triples_map),
+            "baseline_prefix_local_indices": [int(idx) for idx in baseline_prefix_local_indices],
+            "baseline_prefix_titles": [
+                passage_titles[int(idx)]
+                for idx in baseline_prefix_local_indices
+                if 0 <= int(idx) < len(passage_titles)
+            ],
+            "baseline_prefix_doc_ids": [
+                None if pool_doc_ids[int(idx)] is None else int(pool_doc_ids[int(idx)])
+                for idx in baseline_prefix_local_indices
+                if 0 <= int(idx) < len(pool_doc_ids)
+            ],
+            "query_text": str(query),
+            "seed_entities": sorted(
+                {
+                    normalize_entity_text(entity)
+                    for entity in seed_entities
+                    if normalize_entity_text(entity)
+                }
+            ),
+            "query_entities": sorted(
+                {
+                    normalize_entity_text(entity)
+                    for entity in query_entities
+                    if normalize_entity_text(entity)
+                }
+            ),
+            "ras_extractor_mode": str(config.ras_extractor_mode),
+            "ras_support_mode": str(config.ras_support_mode),
+            "ras_embedding_probe_threshold": float(config.ras_embedding_probe_threshold),
+            "_ras_embedding_model": getattr(hipporag, "embedding_model", None),
+            "_ras_passage_embeddings": np.asarray(local_passage_embeddings, dtype=np.float32),
         },
     )
     return run_strongest_sidecar(state=state, config=config)

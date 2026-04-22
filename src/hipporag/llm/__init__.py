@@ -12,7 +12,12 @@ logger = get_logger(__name__)
 
 
 def _get_llm_class(config: BaseConfig):
-    if config.llm_base_url is not None and 'localhost' in config.llm_base_url and os.getenv('OPENAI_API_KEY') is None:
+    local_base_url = str(config.llm_base_url or "")
+    if (
+        config.llm_base_url is not None
+        and any(host in local_base_url for host in ("localhost", "127.0.0.1", "0.0.0.0"))
+        and os.getenv('OPENAI_API_KEY') is None
+    ):
         os.environ['OPENAI_API_KEY'] = 'sk-'
 
     if config.llm_name.startswith('bedrock'):

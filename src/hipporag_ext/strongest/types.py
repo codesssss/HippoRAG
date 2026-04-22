@@ -20,6 +20,21 @@ class StrongestConfig:
     gamma: float = 0.15
     union_mode: str = "standard"
     suppression_variant: str = "topology"
+    rerank_mode: str = "standard"
+    gbc_protected_anchor_k: int = 2
+    gbc_head_coverage_k: int = 5
+    gbc_top_passage_pool_k: int = 24
+    gbc_frontier_bonus_k: int = 6
+    gbc_bonus_weight: float = 1.0
+    ras_enabled: bool = False
+    ras_prefix_guard_k: int = 3
+    ras_requirement_max_units: int = 4
+    ras_enable_conflict_veto: bool = True
+    ras_core_support_min_eligible: bool = True
+    ras_extractor_mode: str = "rule"
+    ras_support_mode: str = "lexical"
+    ras_embedding_probe_threshold: float = 0.35
+    ras_trace_enabled: bool = True
     source_repo_path: str = SOURCE_REPO_PATH
     source_commit_sha: str = SOURCE_COMMIT_SHA
 
@@ -71,3 +86,56 @@ class StrongestAnalysisModule:
     max_iter: int = 64
     tol: float = 1e-6
 
+
+@dataclass
+class RequirementUnit:
+    unit_id: str
+    tier: str
+    anchor_entities: List[str]
+    slot_family: str
+    expected_answer_type: str
+    bridge_targets: List[str] = field(default_factory=list)
+    lexical_cues: List[str] = field(default_factory=list)
+    is_single_valued: bool = True
+    comparator: str | None = None
+    raw_slot_family: str = ""
+    raw_anchor: str = ""
+    anchor_status: str = "grounded"
+    bridge_ref_label: str | None = None
+
+
+@dataclass
+class RequirementCoverageTrace:
+    unit_id: str
+    tier: str
+    slot_family: str
+    head_coverage: float
+    final_coverage: float
+    unmet_mass: float
+
+
+@dataclass
+class RequirementConflictTrace:
+    local_idx: int
+    unit_id: str
+    slot_family: str
+    head_filler: str
+    candidate_filler: str
+    conflict_kind: str = "single_value_conflict"
+
+
+@dataclass
+class RASReadoutTrace:
+    extractor_trace: Dict[str, Any]
+    requirement_units: List[RequirementUnit]
+    coverage: List[RequirementCoverageTrace]
+    conflicts: List[RequirementConflictTrace]
+    g_core_by_local_idx: Dict[int, float]
+    g_support_by_local_idx: Dict[int, float]
+    anchor_support_by_local_idx: Dict[int, float]
+    base_score_by_local_idx: Dict[int, float]
+    prefix_disruption_by_local_idx: Dict[int, float]
+    prefix_guard_triggered: bool
+    protected_prefix_before: List[int]
+    protected_prefix_after: List[int]
+    query_level_repair: bool

@@ -5,6 +5,7 @@ import os
 import sqlite3
 from copy import deepcopy
 from typing import List, Tuple
+from urllib.parse import urlparse
 
 import httpx
 import openai
@@ -22,6 +23,16 @@ from ..utils.logging_utils import get_logger
 from .base import BaseLLM, LLMConfig
 
 logger = get_logger(__name__)
+
+
+def _is_local_base_url(base_url: str | None) -> bool:
+    if not base_url:
+        return False
+    try:
+        hostname = (urlparse(str(base_url)).hostname or "").strip().lower()
+    except Exception:
+        return False
+    return hostname in {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
 
 def cache_response(func):
     @functools.wraps(func)
@@ -138,16 +149,30 @@ class CacheOpenAI(BaseLLM):
         self.cache_file_name = os.path.join(self.cache_dir, cache_filename)
 
         self._init_llm_config()
+        is_local_base_url = _is_local_base_url(self.llm_base_url)
+        trust_env = not is_local_base_url
         if high_throughput:
             limits = httpx.Limits(max_connections=500, max_keepalive_connections=100)
-            client = httpx.Client(limits=limits, timeout=httpx.Timeout(5*60, read=5*60))
+            client = httpx.Client(
+                limits=limits,
+                timeout=httpx.Timeout(5 * 60, read=5 * 60),
+                trust_env=trust_env,
+            )
         else:
-            client = None
+            client = httpx.Client(trust_env=trust_env) if self.global_config.azure_endpoint is None else None
 
         self.max_retries = kwargs.get("max_retries", 2)
+        api_key = os.getenv("OPENAI_API_KEY")
+        if is_local_base_url and not api_key:
+            api_key = "sk-"
 
         if self.global_config.azure_endpoint is None:
-            self.openai_client = OpenAI(base_url=self.llm_base_url, http_client=client, max_retries=self.max_retries)
+            self.openai_client = OpenAI(
+                base_url=self.llm_base_url,
+                http_client=client,
+                max_retries=self.max_retries,
+                api_key=api_key,
+            )
         else:
             self.openai_client = AzureOpenAI(api_version=self.global_config.azure_endpoint.split('api-version=')[1],
                                              azure_endpoint=self.global_config.azure_endpoint, max_retries=self.max_retries)

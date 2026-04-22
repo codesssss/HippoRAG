@@ -6,6 +6,7 @@ import numpy as np
 from scipy import sparse as sp
 
 from .candidates import select_union_candidate_indices
+from .gbc import apply_clean_gbc_rerank
 from .graph import (
     add_anchor_self_loops,
     apply_topology_suppression,
@@ -255,13 +256,36 @@ def rank_hippo_head_query_conditioned(
     )
     rerank_order = np.argsort(ppr_scores)[::-1]
     ranked_candidate_indices = candidate_indices[rerank_order]
-    final_indices = ranked_candidate_indices[:final_k]
-    final_scores = ppr_scores[rerank_order][:final_k].astype(np.float32)
     ranked_candidate_scores = ppr_scores[rerank_order].astype(np.float32)
+    final_rerank_order = np.asarray(rerank_order, dtype=np.int64)
+    final_candidate_scores = np.asarray(ppr_scores, dtype=np.float32)
 
-    seen = set(ranked_candidate_indices.tolist())
-    pool_order = list(ranked_candidate_indices.tolist()) + [idx for idx in hippo_rank + dense_rank if idx not in seen]
-    score_map = {int(idx): float(score) for idx, score in zip(ranked_candidate_indices.tolist(), ranked_candidate_scores.tolist())}
+    gbc_trace: Dict[str, object] = {"rerank_mode": str(config.rerank_mode or "standard")}
+    if str(config.rerank_mode or "standard").strip().lower() == "gbc":
+        final_rerank_order, final_candidate_scores, gbc_trace = apply_clean_gbc_rerank(
+            config=config,
+            strongest_scores=ppr_scores,
+            strongest_order=rerank_order,
+            candidate_indices=candidate_indices,
+            final_k=final_k,
+            local_passage_prior=local_passage_prior,
+            local_reset_scores=local_reset_scores,
+            trace_state=trace_state,
+            metadata=state.metadata,
+        )
+    elif str(config.rerank_mode or "standard").strip().lower() == "standard":
+        pass
+    else:
+        raise ValueError(f"Unsupported strongest rerank_mode: {config.rerank_mode}")
+
+    reranked_candidate_indices = candidate_indices[final_rerank_order]
+    reranked_candidate_scores = final_candidate_scores[final_rerank_order].astype(np.float32)
+    final_indices = reranked_candidate_indices[:final_k]
+    final_scores = reranked_candidate_scores[:final_k]
+
+    seen = set(reranked_candidate_indices.tolist())
+    pool_order = list(reranked_candidate_indices.tolist()) + [idx for idx in hippo_rank + dense_rank if idx not in seen]
+    score_map = {int(idx): float(score) for idx, score in zip(reranked_candidate_indices.tolist(), reranked_candidate_scores.tolist())}
     return StrongestResult(
         final_doc_indices=np.asarray(final_indices, dtype=np.int64),
         final_scores=np.asarray(final_scores, dtype=np.float32),
@@ -275,7 +299,7 @@ def rank_hippo_head_query_conditioned(
         trace={
             "status": "ok",
             "candidate_indices": candidate_indices.tolist(),
-            "reranked_candidate_indices": ranked_candidate_indices.tolist(),
+            "reranked_candidate_indices": reranked_candidate_indices.tolist(),
             "final_doc_indices": np.asarray(final_indices, dtype=np.int64).tolist(),
             "dense_rank_head": dense_rank[: min(len(dense_rank), 10)],
             "smoothed_rank_head": smoothed_rank[: min(len(smoothed_rank), 10)],
@@ -283,6 +307,8 @@ def rank_hippo_head_query_conditioned(
             "anchor_prior_mass": float(np.sum(anchor_prior)),
             "suppression_variant": str(config.suppression_variant),
             "union_mode": str(config.union_mode),
+            "rerank_mode": str(config.rerank_mode),
+            "gbc": dict(gbc_trace),
         },
     )
 

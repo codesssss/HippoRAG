@@ -1,4 +1,4 @@
-from src.hipporag.utils.misc_utils import extract_answer_from_response
+from src.hipporag.utils.misc_utils import extract_answer_from_response, strip_reasoning_content
 
 
 def test_extract_answer_from_standard_marker():
@@ -63,6 +63,25 @@ def test_extract_answer_prefers_explicit_answer_marker():
     assert info["error_type"] is None
 
 
+def test_strip_reasoning_content_recovers_payload_after_closed_think_block():
+    cleaned = strip_reasoning_content("<think>reasoning</think>\nAnswer: Paris")
+
+    assert cleaned == "Answer: Paris"
+
+
+def test_strip_reasoning_content_recovers_structured_payload_after_unclosed_think_block():
+    cleaned = strip_reasoning_content('<think>reasoning [{"a": 1}]')
+
+    assert cleaned == '[{"a": 1}]'
+
+
+def test_extract_answer_from_response_strips_think_block_before_parsing():
+    answer, info = extract_answer_from_response("<think>reasoning</think>\nAnswer: 20 March 851")
+
+    assert answer == "20 March 851"
+    assert info["used_fallback"] is False
+
+
 if __name__ == "__main__":
     test_extract_answer_from_standard_marker()
     test_extract_answer_from_final_answer_marker()
@@ -71,3 +90,6 @@ if __name__ == "__main__":
     test_extract_answer_handles_non_string_responses()
     test_extract_answer_from_weak_answer_marker()
     test_extract_answer_prefers_explicit_answer_marker()
+    test_strip_reasoning_content_recovers_payload_after_closed_think_block()
+    test_strip_reasoning_content_recovers_structured_payload_after_unclosed_think_block()
+    test_extract_answer_from_response_strips_think_block_before_parsing()

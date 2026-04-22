@@ -1,5 +1,6 @@
 from copy import deepcopy
 from typing import List, Optional
+from urllib.parse import urlparse
 
 import numpy as np
 import torch
@@ -7,12 +8,23 @@ from tqdm import tqdm
 from transformers import AutoModel
 from openai import OpenAI
 from openai import AzureOpenAI
+import httpx
 
 from ..utils.config_utils import BaseConfig
 from ..utils.logging_utils import get_logger
 from .base import BaseEmbeddingModel, EmbeddingConfig, make_cache_embed
 
 logger = get_logger(__name__)
+
+
+def _is_local_base_url(base_url: str | None) -> bool:
+    if not base_url:
+        return False
+    try:
+        hostname = (urlparse(str(base_url)).hostname or "").strip().lower()
+    except Exception:
+        return False
+    return hostname in {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
 
 class OpenAIEmbeddingModel(BaseEmbeddingModel):
 
@@ -31,8 +43,10 @@ class OpenAIEmbeddingModel(BaseEmbeddingModel):
             f"Initializing {self.__class__.__name__}'s embedding model with params: {self.embedding_config.model_init_params}")
 
         if self.global_config.azure_embedding_endpoint is None:
+            trust_env = not _is_local_base_url(self.global_config.embedding_base_url)
             self.client = OpenAI(
-                base_url=self.global_config.embedding_base_url
+                base_url=self.global_config.embedding_base_url,
+                http_client=httpx.Client(trust_env=trust_env),
             )
         else:
             self.client = AzureOpenAI(api_version=self.global_config.azure_embedding_endpoint.split('api-version=')[1],

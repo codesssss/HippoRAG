@@ -90,6 +90,32 @@ _WEAK_ANSWER_PATTERNS = (
     re.compile(r"(?is)\bso\s+the\s+answer\s+is\s+([^\n.?!]+(?:[.?!])?)"),
     re.compile(r"(?is)\bthe\s+answer\s+is\s+([^\n.?!]+(?:[.?!])?)"),
 )
+_THINK_BLOCK_PATTERN = re.compile(r"(?is)<think>.*?</think>")
+_THINK_PAYLOAD_MARKERS = ("Final Answer:", "Answer:", "So the answer is", "The answer is", "[", "{")
+
+
+def strip_reasoning_content(response_content: Any) -> str:
+    if response_content is None:
+        return ""
+    if not isinstance(response_content, str):
+        response_content = str(response_content)
+    if not response_content:
+        return response_content
+
+    stripped = _THINK_BLOCK_PATTERN.sub("", response_content)
+    stripped = stripped.replace("</think>", "")
+    if "<think>" not in stripped:
+        return stripped.strip()
+
+    prefix, remainder = stripped.split("<think>", 1)
+    marker_positions = [
+        pos
+        for marker in _THINK_PAYLOAD_MARKERS
+        if (pos := remainder.find(marker)) >= 0
+    ]
+    if marker_positions:
+        return (prefix + remainder[min(marker_positions):]).strip()
+    return (prefix + remainder).strip()
 
 
 def extract_answer_from_response(response_content: Any) -> Tuple[str, Dict[str, Any]]:
@@ -108,8 +134,7 @@ def extract_answer_from_response(response_content: Any) -> Tuple[str, Dict[str, 
             "response_type": response_type,
         }
 
-    raw_text = response_content
-    raw_text = raw_text.strip()
+    raw_text = strip_reasoning_content(response_content).strip()
     if not raw_text:
         return "", {
             "used_fallback": True,

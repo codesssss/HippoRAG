@@ -53,6 +53,12 @@ from requirement_beam_utils import (
     resolve_requirement_cache_entry,
     validate_requirement_cache_entry,
 )
+from dtc_embed_utils import (
+    DTCRequirement,
+    build_fallback_dtc_requirements,
+    parse_dtc_decomposition_response,
+    select_dtc_embed_positions,
+)
 from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
 from src.hipporag.evaluation.retrieval_eval import RetrievalRecall
@@ -117,6 +123,141 @@ SETWISE_LLM_JSON_END_TAG = "</JSON>"
 SETWISE_LLM_LATE_RERANK_MAX_COMPLETION_TOKENS = 256
 SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS = 96
 SETWISE_LLM_NO_THINK_PREFIX = "/no_think"
+DEFAULT_CE_BATCH_SIZE = 8
+DEFAULT_CE_MAX_LENGTH = 1024
+
+
+_CROSS_ENCODER_RERANKER_CACHE: Dict[Tuple[str, str, bool, int, int], "TransformersCrossEncoderReranker"] = {}
+
+
+class TransformersCrossEncoderReranker:
+    def __init__(self,
+                 model_name_or_path: str,
+                 device: str = "cpu",
+                 use_fp16: bool = True,
+                 batch_size: int = DEFAULT_CE_BATCH_SIZE,
+                 max_length: int = DEFAULT_CE_MAX_LENGTH,
+                 logger: logging.Logger | None = None) -> None:
+        try:
+            import torch
+            from transformers import AutoModelForSequenceClassification, AutoTokenizer
+        except ImportError as exc:
+            raise ImportError(
+                "Cross-encoder reranking requires `torch` and `transformers`, but one of them is not installed."
+            ) from exc
+
+        self._torch = torch
+        self.logger = logger or logging.getLogger(__name__)
+        self.model_name_or_path = str(model_name_or_path)
+        self.requested_device = str(device or "cpu")
+        self.device = self._resolve_device(self.requested_device)
+        self.batch_size = max(1, int(batch_size))
+        self.max_length = max(16, int(max_length))
+
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path)
+        self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name_or_path)
+        if bool(use_fp16) and self.device.type == "cuda":
+            self.model = self.model.half()
+        self.model.to(self.device)
+        self.model.eval()
+
+    def _resolve_device(self, requested_device: str):
+        torch = self._torch
+        normalized = str(requested_device or "cpu").strip() or "cpu"
+        if not normalized.startswith("cuda"):
+            return torch.device(normalized)
+        if not torch.cuda.is_available():
+            self.logger.warning(
+                "Cross-encoder requested CUDA device %s, but CUDA is unavailable; falling back to CPU.",
+                normalized,
+            )
+            return torch.device("cpu")
+        device_index = 0
+        if ":" in normalized:
+            _, _, suffix = normalized.partition(":")
+            try:
+                device_index = int(suffix)
+            except ValueError:
+                self.logger.warning(
+                    "Cross-encoder device %s is invalid; falling back to CPU.",
+                    normalized,
+                )
+                return torch.device("cpu")
+        if device_index >= torch.cuda.device_count():
+            self.logger.warning(
+                "Cross-encoder requested CUDA device %s, but only %d device(s) are visible; falling back to CPU.",
+                normalized,
+                torch.cuda.device_count(),
+            )
+            return torch.device("cpu")
+        return torch.device(normalized)
+
+    def _extract_scores(self, logits):
+        if logits.ndim == 0:
+            return logits.reshape(1)
+        if logits.ndim == 1:
+            return logits
+        if logits.shape[-1] == 1:
+            return logits.squeeze(-1)
+        return logits[..., -1]
+
+    def compute_score(self, pairs: Sequence[Sequence[str]]) -> List[float]:
+        torch = self._torch
+        if not pairs:
+            return []
+
+        all_scores: List[float] = []
+        for start_idx in range(0, len(pairs), self.batch_size):
+            batch_pairs = pairs[start_idx:start_idx + self.batch_size]
+            queries = [str(pair[0]) for pair in batch_pairs]
+            passages = [str(pair[1]) for pair in batch_pairs]
+            encoded = self.tokenizer(
+                queries,
+                passages,
+                padding=True,
+                truncation=True,
+                max_length=self.max_length,
+                return_tensors="pt",
+            )
+            encoded = {key: value.to(self.device) for key, value in encoded.items()}
+            with torch.inference_mode():
+                logits = self.model(**encoded).logits
+            batch_scores = self._extract_scores(logits).detach().float().cpu().tolist()
+            all_scores.extend(float(score) for score in batch_scores)
+        return all_scores
+
+
+def load_cross_encoder_reranker(model_name_or_path: str,
+                                device: str,
+                                use_fp16: bool = True,
+                                batch_size: int = DEFAULT_CE_BATCH_SIZE,
+                                max_length: int = DEFAULT_CE_MAX_LENGTH,
+                                logger: logging.Logger | None = None) -> TransformersCrossEncoderReranker:
+    cache_key = (
+        str(model_name_or_path),
+        str(device or "cpu"),
+        bool(use_fp16),
+        int(batch_size),
+        int(max_length),
+    )
+    reranker = _CROSS_ENCODER_RERANKER_CACHE.get(cache_key)
+    if reranker is None:
+        active_logger = logger or logging.getLogger(__name__)
+        active_logger.info(
+            "Loading transformers cross-encoder model: %s on %s",
+            model_name_or_path,
+            device,
+        )
+        reranker = TransformersCrossEncoderReranker(
+            model_name_or_path=model_name_or_path,
+            device=device,
+            use_fp16=use_fp16,
+            batch_size=batch_size,
+            max_length=max_length,
+            logger=active_logger,
+        )
+        _CROSS_ENCODER_RERANKER_CACHE[cache_key] = reranker
+    return reranker
 
 
 class SetwiseLateRerankResponseModel(pydantic.BaseModel):
@@ -1293,6 +1434,124 @@ def rerank_completed_evidence_sets_with_llm(query: str,
         int(parse_info["best_id"]) if parse_info["best_id"] is not None else None,
         trace,
     )
+
+
+def request_dtc_requirements_from_llm(query: str,
+                                      infer_fn,
+                                      model_name: str,
+                                      max_steps: int = 4,
+                                      max_completion_tokens: int = 512) -> Tuple[List[DTCRequirement], Dict[str, object]]:
+    trace: Dict[str, object] = {
+        "mode": "llm",
+        "llm_model": str(model_name or ""),
+        "max_steps": int(max_steps),
+        "llm_error": None,
+        "fallback_used": False,
+        "raw_output_preview": "",
+    }
+    if infer_fn is None:
+        requirements = build_fallback_dtc_requirements(query)
+        trace.update({
+            "llm_error": "infer_fn_unavailable",
+            "fallback_used": True,
+            "parse_succeeded": False,
+            "active_step_count": len(requirements),
+        })
+        return requirements, trace
+
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You decompose multi-hop QA questions into evidence requirements for fixed-pool passage selection. "
+                "Do not answer the question and do not fill unknown entities from world knowledge. "
+                "Return JSON only: an array of 1-4 objects. Each object must have keys: "
+                "id, subquery, depends_on, expected_answer_type, anchor_mentions, role. "
+                "Use ids like s1, s2. depends_on is a list of previous ids. "
+                "A subquery should describe the evidence needed, not the final answer."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
+                f"Question: {query}\n\n"
+                "Return JSON array only. Example:\n"
+                "[{\"id\":\"s1\",\"subquery\":\"Who directed film X?\",\"depends_on\":[],"
+                "\"expected_answer_type\":\"person\",\"anchor_mentions\":[\"film X\"],\"role\":\"bridge\"},"
+                "{\"id\":\"s2\",\"subquery\":\"What is the birthplace of that director?\","
+                "\"depends_on\":[\"s1\"],\"expected_answer_type\":\"location\","
+                "\"anchor_mentions\":[],\"role\":\"answer\"}]"
+            ),
+        },
+    ]
+    try:
+        response = infer_fn(
+            messages=messages,
+            model=model_name,
+            max_completion_tokens=int(max_completion_tokens),
+            temperature=0,
+            top_p=1,
+        )
+        raw_output, metadata = normalize_llm_result(response)
+    except Exception as exc:
+        requirements = build_fallback_dtc_requirements(query)
+        trace.update({
+            "llm_error": f"{type(exc).__name__}: {exc}",
+            "fallback_used": True,
+            "parse_succeeded": False,
+            "active_step_count": len(requirements),
+        })
+        return requirements, trace
+
+    requirements, parse_trace = parse_dtc_decomposition_response(
+        raw_output,
+        max_steps=max_steps,
+    )
+    if not requirements:
+        requirements = build_fallback_dtc_requirements(query)
+        trace["fallback_used"] = True
+    trace.update(parse_trace)
+    trace["raw_output_preview"] = truncate_prompt_text(raw_output, 500)
+    trace["metadata"] = metadata
+    trace["active_step_count"] = int(len(requirements))
+    return requirements, trace
+
+
+def build_dtc_requirement_embeddings(hipporag: HippoRAG,
+                                     requirements: Sequence[DTCRequirement]) -> Dict[str, np.ndarray]:
+    subqueries = [req.subquery for req in requirements if str(req.subquery or "").strip()]
+    return build_dtc_text_embeddings(hipporag=hipporag, texts=subqueries, keys=[req.unit_id for req in requirements if str(req.subquery or "").strip()])
+
+
+def build_dtc_text_embeddings(hipporag: HippoRAG,
+                              texts: Sequence[str],
+                              keys: Sequence[str] | None = None) -> Dict[str, np.ndarray]:
+    items: List[Tuple[str, str]] = []
+    unique_texts: List[str] = []
+    seen_texts: Set[str] = set()
+    for idx, text in enumerate(texts):
+        clean_text = str(text or "").strip()
+        if not clean_text:
+            continue
+        key = str(keys[idx]) if keys is not None and idx < len(keys) else clean_text
+        items.append((key, clean_text))
+        if clean_text not in seen_texts:
+            unique_texts.append(clean_text)
+            seen_texts.add(clean_text)
+    if unique_texts and hasattr(hipporag, "_get_passage_query_embeddings"):
+        hipporag._get_passage_query_embeddings(unique_texts)
+    passage_query_embeddings = (
+        ((getattr(hipporag, "query_to_embedding", {}) or {}).get("passage", {}) or {})
+        if isinstance(getattr(hipporag, "query_to_embedding", {}), dict)
+        else {}
+    )
+    embeddings: Dict[str, np.ndarray] = {}
+    for key, text in items:
+        vector = passage_query_embeddings.get(text)
+        if vector is not None:
+            embeddings[str(key)] = np.asarray(vector, dtype=float)
+    return embeddings
 
 
 def resolve_reserved_positions(candidate_count: int,
@@ -4758,13 +5017,41 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            strongest_final_k: int = 10,
                            strongest_hippo_head_k: int = 10,
                            strongest_smoothed_union_k: int = 10,
-                           strongest_gamma: float = 0.15) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           strongest_gamma: float = 0.15,
+                           strongest_rerank_mode: str = "standard",
+                           strongest_gbc_protected_anchor_k: int = 2,
+                           strongest_gbc_head_coverage_k: int = 5,
+                           strongest_gbc_top_passage_pool_k: int = 24,
+                           strongest_gbc_frontier_bonus_k: int = 6,
+                           strongest_gbc_bonus_weight: float = 1.0,
+                           strongest_ras_enabled: bool = False,
+                           strongest_ras_prefix_guard_k: int = 3,
+                           strongest_ras_requirement_max_units: int = 4,
+                           strongest_ras_enable_conflict_veto: bool = True,
+                           strongest_ras_core_support_min_eligible: bool = True,
+                           strongest_ras_extractor_mode: str = "rule",
+                           strongest_ras_support_mode: str = "lexical",
+                           strongest_ras_embedding_probe_threshold: float = 0.35,
+                           strongest_ras_trace_enabled: bool = True,
+                           dtc_max_steps: int = 4,
+                           dtc_match_threshold: float = 0.35,
+                           dtc_redundancy_weight: float = 0.10,
+                           dtc_base_weight: float = 0.05,
+                           dtc_anchor_bonus_weight: float = 0.10,
+                           dtc_dependency_bonus_weight: float = 0.10,
+                           dtc_max_completion_tokens: int = 512,
+                           dtc_decomposition_mode: str = "llm",
+                           dtc_enforce_dependencies: bool = True,
+                           dtc_require_new_crossing: bool = False,
+                           dtc_enable_dependency_binding: bool = False,
+                           dtc_binding_max_candidates: int = 4,
+                           dtc_binding_entity_hit_required: bool = True) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
     normalized_assemble_mode = normalize_assemble_mode(assemble_mode)
     normalized_append_policy = normalize_append_policy(append_policy)
-    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam"}:
+    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -4810,6 +5097,27 @@ def apply_setwise_selector(hipporag: HippoRAG,
     strongest_shadow_success_count = 0
     strongest_shadow_error_count = 0
     strongest_shadow_status_counts: Counter[str] = Counter()
+    strongest_ras_extractor_fallback_count = 0
+    strongest_ras_empty_requirement_query_count = 0
+    strongest_ras_queries_with_core_unit_count = 0
+    strongest_ras_queries_with_support_unit_count = 0
+    strongest_ras_queries_with_nonzero_g_core_count = 0
+    strongest_ras_query_level_repair_count = 0
+    strongest_ras_slot_family_counts: Counter[str] = Counter()
+    strongest_ras_core_requirement_coverage_at5: List[float] = []
+    strongest_ras_support_requirement_coverage_at5: List[float] = []
+    strongest_ras_unmet_core_mass_reduction: List[float] = []
+    strongest_ras_protected_anchor_retention_at3: List[float] = []
+    strongest_ras_protected_anchor_retention_at5: List[float] = []
+    strongest_ras_prefix_disruption_count_at3: List[float] = []
+    strongest_ras_prefix_disruption_count_at5: List[float] = []
+    strongest_ras_single_value_conflict_rate_at5: List[float] = []
+    strongest_ras_new_conflict_introduced_rate: List[float] = []
+    dtc_parse_success_count = 0
+    dtc_fallback_count = 0
+    dtc_requirement_counts: List[int] = []
+    dtc_covered_requirement_rates: List[float] = []
+    dtc_embedding_available_requirement_counts: List[int] = []
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
     normalized_reader_order_probe_mode = normalize_setwise_reader_order_probe_mode(
         setwise_reader_order_probe_mode
@@ -4821,10 +5129,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
         if hasattr(hipporag, "_get_passage_query_embeddings"):
             hipporag._get_passage_query_embeddings(query_solutions)
     if selector_name == "bridge_append" and normalized_assemble_mode == "cross_encoder":
-        from FlagEmbedding import FlagReranker
-
-        logger.info("Loading assemble cross-encoder model: %s on %s", ce_model, ce_device)
-        assemble_reranker = FlagReranker(ce_model, use_fp16=True, device=ce_device)
+        assemble_reranker = load_cross_encoder_reranker(
+            model_name_or_path=ce_model,
+            device=ce_device,
+            use_fp16=True,
+            logger=logger,
+        )
 
     for q_idx, qs in enumerate(query_solutions):
         pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
@@ -5033,6 +5343,21 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     gamma=float(strongest_gamma),
                     union_mode="standard",
                     suppression_variant="topology",
+                    rerank_mode=str(strongest_rerank_mode),
+                    gbc_protected_anchor_k=int(strongest_gbc_protected_anchor_k),
+                    gbc_head_coverage_k=int(strongest_gbc_head_coverage_k),
+                    gbc_top_passage_pool_k=int(strongest_gbc_top_passage_pool_k),
+                    gbc_frontier_bonus_k=int(strongest_gbc_frontier_bonus_k),
+                    gbc_bonus_weight=float(strongest_gbc_bonus_weight),
+                    ras_enabled=bool(strongest_ras_enabled),
+                    ras_prefix_guard_k=int(strongest_ras_prefix_guard_k),
+                    ras_requirement_max_units=int(strongest_ras_requirement_max_units),
+                    ras_enable_conflict_veto=bool(strongest_ras_enable_conflict_veto),
+                    ras_core_support_min_eligible=bool(strongest_ras_core_support_min_eligible),
+                    ras_extractor_mode=str(strongest_ras_extractor_mode),
+                    ras_support_mode=str(strongest_ras_support_mode),
+                    ras_embedding_probe_threshold=float(strongest_ras_embedding_probe_threshold),
+                    ras_trace_enabled=bool(strongest_ras_trace_enabled),
                 )
                 try:
                     strongest_result = run_strongest_shadow_for_pool(
@@ -5094,6 +5419,38 @@ def apply_setwise_selector(hipporag: HippoRAG,
                             "trace": dict(strongest_result.trace or {}),
                         })
                         strongest_shadow_success_count += 1
+                        if strongest_config.ras_enabled:
+                            ras_trace = dict(((strongest_result.trace or {}).get("gbc", {}) or {}).get("ras", {}) or {})
+                            extractor_trace = dict(ras_trace.get("extractor_trace", {}) or {})
+                            if bool(extractor_trace.get("extractor_fallback", False)):
+                                strongest_ras_extractor_fallback_count += 1
+                            if bool(extractor_trace.get("empty_requirement_query", False)):
+                                strongest_ras_empty_requirement_query_count += 1
+                            if int(extractor_trace.get("core_unit_count", 0) or 0) > 0:
+                                strongest_ras_queries_with_core_unit_count += 1
+                            if int(extractor_trace.get("support_unit_count", 0) or 0) > 0:
+                                strongest_ras_queries_with_support_unit_count += 1
+                            if bool(ras_trace.get("queries_with_nonzero_g_core", False)):
+                                strongest_ras_queries_with_nonzero_g_core_count += 1
+                            if bool(ras_trace.get("query_level_repair", False)):
+                                strongest_ras_query_level_repair_count += 1
+                            for slot_family in extractor_trace.get("slot_families", []) or []:
+                                normalized_slot_family = str(slot_family or "").strip().lower()
+                                if normalized_slot_family:
+                                    strongest_ras_slot_family_counts[normalized_slot_family] += 1
+                            for metric_key, metric_values in (
+                                ("core_requirement_coverage_at5", strongest_ras_core_requirement_coverage_at5),
+                                ("support_requirement_coverage_at5", strongest_ras_support_requirement_coverage_at5),
+                                ("unmet_core_mass_reduction", strongest_ras_unmet_core_mass_reduction),
+                                ("protected_anchor_retention_at3", strongest_ras_protected_anchor_retention_at3),
+                                ("protected_anchor_retention_at5", strongest_ras_protected_anchor_retention_at5),
+                                ("prefix_disruption_count_at3", strongest_ras_prefix_disruption_count_at3),
+                                ("prefix_disruption_count_at5", strongest_ras_prefix_disruption_count_at5),
+                                ("single_value_conflict_rate_at5", strongest_ras_single_value_conflict_rate_at5),
+                                ("new_conflict_introduced_rate", strongest_ras_new_conflict_introduced_rate),
+                            ):
+                                if metric_key in ras_trace:
+                                    metric_values.append(float(ras_trace.get(metric_key, 0.0) or 0.0))
                         if strongest_shadow_apply_to_pool and pool_order_indices:
                             reordered_shadow_positions = list(dict.fromkeys(pool_order_indices))
                             reordered_shadow_positions.extend(
@@ -5164,6 +5521,82 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["assemble_mode"] = normalized_assemble_mode
             selector_trace["selected_positions_before_assemble"] = list(selected_positions)
             selected_positions = list(reranked_positions)
+        elif selector_name == "dtc_embed":
+            normalized_dtc_decomposition_mode = str(dtc_decomposition_mode or "llm").strip().lower()
+            if normalized_dtc_decomposition_mode == "query":
+                requirements = build_fallback_dtc_requirements(qs.question)
+                decomposition_trace = {
+                    "mode": "query",
+                    "llm_model": "",
+                    "max_steps": int(dtc_max_steps),
+                    "llm_error": None,
+                    "fallback_used": False,
+                    "parse_succeeded": bool(requirements),
+                    "parse_error": None,
+                    "raw_output_preview": "",
+                    "active_step_count": int(len(requirements)),
+                }
+            else:
+                requirements, decomposition_trace = request_dtc_requirements_from_llm(
+                    query=qs.question,
+                    infer_fn=getattr(getattr(hipporag, "llm_model", None), "infer", None),
+                    model_name=str(
+                        getattr(getattr(hipporag, "global_config", None), "llm_request_name", None)
+                        or getattr(getattr(hipporag, "global_config", None), "llm_name", "")
+                        or ""
+                    ),
+                    max_steps=int(dtc_max_steps),
+                    max_completion_tokens=int(dtc_max_completion_tokens),
+                )
+            requirement_embeddings = build_dtc_requirement_embeddings(
+                hipporag=hipporag,
+                requirements=requirements,
+            )
+            def embed_dtc_bound_texts(texts: Sequence[str]) -> Dict[str, np.ndarray]:
+                return build_dtc_text_embeddings(hipporag=hipporag, texts=texts)
+
+            effective_dtc_reserve_top_m = max(int(anchor_count), int(reserve_top_m))
+            selected_positions, selector_trace = select_dtc_embed_positions(
+                query=qs.question,
+                requirements=requirements,
+                requirement_embeddings=requirement_embeddings,
+                pool_docs=pool_docs,
+                pool_doc_ids=pool_doc_ids,
+                pool_doc_scores=pool_scores,
+                pool_doc_titles=pool_titles,
+                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                passage_embeddings=np.asarray(getattr(hipporag, "passage_embeddings", np.array([]))),
+                qa_top_k=qa_top_k,
+                reserve_top_m=effective_dtc_reserve_top_m,
+                match_threshold=float(dtc_match_threshold),
+                redundancy_weight=float(dtc_redundancy_weight),
+                base_weight=float(dtc_base_weight),
+                anchor_bonus_weight=float(dtc_anchor_bonus_weight),
+                dependency_bonus_weight=float(dtc_dependency_bonus_weight),
+                non_anchor_title_dedup=bool(non_anchor_title_dedup),
+                enable_dependency_binding=bool(dtc_enable_dependency_binding),
+                enforce_dependencies=bool(dtc_enforce_dependencies),
+                binding_max_candidates=int(dtc_binding_max_candidates),
+                binding_entity_hit_required=bool(dtc_binding_entity_hit_required),
+                require_new_crossing=bool(dtc_require_new_crossing),
+                embed_texts_fn=embed_dtc_bound_texts if bool(dtc_enable_dependency_binding) else None,
+            )
+            selector_trace["decomposition_trace"] = decomposition_trace
+            selector_trace["dtc_max_steps"] = int(dtc_max_steps)
+            selector_trace["dtc_max_completion_tokens"] = int(dtc_max_completion_tokens)
+            selector_trace["dtc_decomposition_mode"] = normalized_dtc_decomposition_mode
+            selector_trace["dtc_enforce_dependencies"] = bool(dtc_enforce_dependencies)
+            selector_trace["dtc_require_new_crossing"] = bool(dtc_require_new_crossing)
+            selector_trace["dtc_enable_dependency_binding"] = bool(dtc_enable_dependency_binding)
+            selector_trace["dtc_binding_max_candidates"] = int(dtc_binding_max_candidates)
+            selector_trace["dtc_binding_entity_hit_required"] = bool(dtc_binding_entity_hit_required)
+            dtc_parse_success_count += int(bool(decomposition_trace.get("parse_succeeded", False)))
+            dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
+            dtc_requirement_counts.append(int(selector_trace.get("requirement_count", 0) or 0))
+            dtc_covered_requirement_rates.append(float(selector_trace.get("covered_requirement_rate", 0.0) or 0.0))
+            dtc_embedding_available_requirement_counts.append(
+                int(selector_trace.get("embedding_available_requirement_count", 0) or 0)
+            )
         elif selector_name == "learned_greedy":
             if learned_model_bundle is None:
                 raise ValueError("learned_greedy selector requires a loaded model bundle")
@@ -5780,6 +6213,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
     }
     if selector_name == "bridge_append":
         append_count_histogram = Counter(appended_doc_counts)
+        strongest_ras_query_count = max(int(strongest_shadow_success_count), 1)
         summary.update({
             "expand_base_k": int(max(int(expand_base_k), 0)),
             "append_max_docs": int(max(int(append_max_docs), 0)),
@@ -5796,10 +6230,42 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "strongest_hippo_head_k": int(strongest_hippo_head_k),
             "strongest_smoothed_union_k": int(strongest_smoothed_union_k),
             "strongest_gamma": round(float(strongest_gamma), 4),
+            "strongest_rerank_mode": str(strongest_rerank_mode),
+            "strongest_gbc_protected_anchor_k": int(strongest_gbc_protected_anchor_k),
+            "strongest_gbc_head_coverage_k": int(strongest_gbc_head_coverage_k),
+            "strongest_gbc_top_passage_pool_k": int(strongest_gbc_top_passage_pool_k),
+            "strongest_gbc_frontier_bonus_k": int(strongest_gbc_frontier_bonus_k),
+            "strongest_gbc_bonus_weight": round(float(strongest_gbc_bonus_weight), 4),
+            "strongest_ras_enabled": bool(strongest_ras_enabled),
+            "strongest_ras_prefix_guard_k": int(strongest_ras_prefix_guard_k),
+            "strongest_ras_requirement_max_units": int(strongest_ras_requirement_max_units),
+            "strongest_ras_enable_conflict_veto": bool(strongest_ras_enable_conflict_veto),
+            "strongest_ras_core_support_min_eligible": bool(strongest_ras_core_support_min_eligible),
+            "strongest_ras_extractor_mode": str(strongest_ras_extractor_mode),
+            "strongest_ras_support_mode": str(strongest_ras_support_mode),
+            "strongest_ras_embedding_probe_threshold": float(strongest_ras_embedding_probe_threshold),
+            "strongest_ras_trace_enabled": bool(strongest_ras_trace_enabled),
             "strongest_shadow_success_count": int(strongest_shadow_success_count),
             "strongest_shadow_apply_count": int(strongest_shadow_apply_count),
             "strongest_shadow_error_count": int(strongest_shadow_error_count),
             "strongest_shadow_status_counts": dict(sorted(strongest_shadow_status_counts.items())),
+            "strongest_ras_extractor_fallback_count": int(strongest_ras_extractor_fallback_count),
+            "strongest_ras_extractor_fallback_rate": round(float(strongest_ras_extractor_fallback_count) / float(strongest_ras_query_count), 4),
+            "strongest_ras_empty_requirement_query_rate": round(float(strongest_ras_empty_requirement_query_count) / float(strongest_ras_query_count), 4),
+            "strongest_ras_queries_with_core_unit_rate": round(float(strongest_ras_queries_with_core_unit_count) / float(strongest_ras_query_count), 4),
+            "strongest_ras_queries_with_support_unit_rate": round(float(strongest_ras_queries_with_support_unit_count) / float(strongest_ras_query_count), 4),
+            "strongest_ras_queries_with_nonzero_g_core_rate": round(float(strongest_ras_queries_with_nonzero_g_core_count) / float(strongest_ras_query_count), 4),
+            "strongest_ras_query_level_repair_count": int(strongest_ras_query_level_repair_count),
+            "strongest_ras_slot_family_distribution": dict(sorted(strongest_ras_slot_family_counts.items())),
+            "strongest_ras_core_requirement_coverage_at5": round(float(np.mean(strongest_ras_core_requirement_coverage_at5)) if strongest_ras_core_requirement_coverage_at5 else 0.0, 4),
+            "strongest_ras_support_requirement_coverage_at5": round(float(np.mean(strongest_ras_support_requirement_coverage_at5)) if strongest_ras_support_requirement_coverage_at5 else 0.0, 4),
+            "strongest_ras_unmet_core_mass_reduction": round(float(np.mean(strongest_ras_unmet_core_mass_reduction)) if strongest_ras_unmet_core_mass_reduction else 0.0, 4),
+            "strongest_ras_protected_anchor_retention_at3": round(float(np.mean(strongest_ras_protected_anchor_retention_at3)) if strongest_ras_protected_anchor_retention_at3 else 0.0, 4),
+            "strongest_ras_protected_anchor_retention_at5": round(float(np.mean(strongest_ras_protected_anchor_retention_at5)) if strongest_ras_protected_anchor_retention_at5 else 0.0, 4),
+            "strongest_ras_prefix_disruption_count_at3": round(float(np.mean(strongest_ras_prefix_disruption_count_at3)) if strongest_ras_prefix_disruption_count_at3 else 0.0, 4),
+            "strongest_ras_prefix_disruption_count_at5": round(float(np.mean(strongest_ras_prefix_disruption_count_at5)) if strongest_ras_prefix_disruption_count_at5 else 0.0, 4),
+            "strongest_ras_single_value_conflict_rate_at5": round(float(np.mean(strongest_ras_single_value_conflict_rate_at5)) if strongest_ras_single_value_conflict_rate_at5 else 0.0, 4),
+            "strongest_ras_new_conflict_introduced_rate": round(float(np.mean(strongest_ras_new_conflict_introduced_rate)) if strongest_ras_new_conflict_introduced_rate else 0.0, 4),
             "avg_appended_doc_count": round(float(np.mean(appended_doc_counts)) if appended_doc_counts else 0.0, 4),
             "avg_candidate_set_size": round(float(np.mean(expand_candidate_sizes)) if expand_candidate_sizes else 0.0, 4),
             "append_count_histogram": {
@@ -5807,6 +6273,31 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 for k, v in sorted(append_count_histogram.items())
             },
             "append_stop_reason_counts": dict(sorted(append_stop_reason_counts.items())),
+        })
+    if selector_name == "dtc_embed":
+        summary.update({
+            "dtc_max_steps": int(dtc_max_steps),
+            "dtc_match_threshold": round(float(dtc_match_threshold), 4),
+            "dtc_redundancy_weight": round(float(dtc_redundancy_weight), 4),
+            "dtc_base_weight": round(float(dtc_base_weight), 4),
+            "dtc_anchor_bonus_weight": round(float(dtc_anchor_bonus_weight), 4),
+            "dtc_dependency_bonus_weight": round(float(dtc_dependency_bonus_weight), 4),
+            "dtc_max_completion_tokens": int(dtc_max_completion_tokens),
+            "dtc_decomposition_mode": str(dtc_decomposition_mode),
+            "dtc_enforce_dependencies": bool(dtc_enforce_dependencies),
+            "dtc_require_new_crossing": bool(dtc_require_new_crossing),
+            "dtc_enable_dependency_binding": bool(dtc_enable_dependency_binding),
+            "dtc_binding_max_candidates": int(dtc_binding_max_candidates),
+            "dtc_binding_entity_hit_required": bool(dtc_binding_entity_hit_required),
+            "dtc_parse_success_count": int(dtc_parse_success_count),
+            "dtc_fallback_count": int(dtc_fallback_count),
+            "avg_dtc_requirement_count": round(float(np.mean(dtc_requirement_counts)) if dtc_requirement_counts else 0.0, 4),
+            "avg_dtc_covered_requirement_rate": round(float(np.mean(dtc_covered_requirement_rates)) if dtc_covered_requirement_rates else 0.0, 4),
+            "avg_dtc_embedding_available_requirement_count": round(
+                float(np.mean(dtc_embedding_available_requirement_counts))
+                if dtc_embedding_available_requirement_counts else 0.0,
+                4,
+            ),
         })
     if selector_name == "requirement_beam":
         summary.update({
@@ -6288,8 +6779,8 @@ def main():
         default=None,
         help="Optional API-side model name. Use this to hit a renamed service while reusing llm_name-keyed artifacts.",
     )
-    parser.add_argument("--embedding_name", type=str, default="VLLM//mnt/nvme/Qwen3-Embedding-8B")
-    parser.add_argument("--embedding_base_url", type=str, default="http://localhost:8018/v1/embeddings")
+    parser.add_argument("--embedding_name", type=str, default="VLLM/nvidia/NV-Embed-v2")
+    parser.add_argument("--embedding_base_url", type=str, default="http://localhost:8019/v1/embeddings")
     parser.add_argument("--max_retry_attempts", type=int, default=5)
     parser.add_argument("--force_index_from_scratch", type=str, default="false")
     parser.add_argument("--force_openie_from_scratch", type=str, default="false")
@@ -6355,14 +6846,14 @@ def main():
     parser.add_argument("--cross_encoder_rerank", type=str, default="false",
                         help="Apply cross-encoder rerank on baseline top-K docs. Eval-time only.")
     parser.add_argument("--ce_model", type=str, default="/mnt/nvme/bge-reranker-v2-m3",
-                        help="Cross-encoder model path or HF name for FlagEmbedding.")
+                        help="Cross-encoder model path or HF name for a transformers sequence-classification reranker.")
     parser.add_argument("--ce_alpha", type=float, default=0.7,
                         help="Hybrid weight: alpha * ppr_norm + (1-alpha) * ce_norm. 1.0 = pure PPR.")
     parser.add_argument("--ce_window", type=int, default=20,
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--expand_base_k", type=int, default=10,
                         help="For --setwise_selector bridge_append, preserve baseline top-B before appending deep-pool bridge candidates.")
@@ -6390,6 +6881,36 @@ def main():
                         help="Smoothed rank prefix width used when forming the strongest shadow candidate union.")
     parser.add_argument("--strongest_gamma", type=float, default=0.15,
                         help="Teleport / reset weight used by strongest shadow local PPR.")
+    parser.add_argument("--strongest_rerank_mode", choices=["standard", "gbc"], default="standard",
+                        help="Strongest shadow rerank mode. `standard` keeps the migrated baseline; `gbc` adds guarded boundary completion on top of strongest local PPR.")
+    parser.add_argument("--strongest_gbc_protected_anchor_k", type=int, default=2,
+                        help="When --strongest_rerank_mode=gbc, number of early anchors protected during guarded readout.")
+    parser.add_argument("--strongest_gbc_head_coverage_k", type=int, default=5,
+                        help="When --strongest_rerank_mode=gbc, fallback head width used to estimate covered support if protected anchors are unavailable.")
+    parser.add_argument("--strongest_gbc_top_passage_pool_k", type=int, default=24,
+                        help="When --strongest_rerank_mode=gbc, strongest-ranked candidate pool size exposed to boundary completion scoring.")
+    parser.add_argument("--strongest_gbc_frontier_bonus_k", type=int, default=6,
+                        help="When --strongest_rerank_mode=gbc, maximum number of boundary frontier passages eligible for completion bonus.")
+    parser.add_argument("--strongest_gbc_bonus_weight", type=float, default=1.0,
+                        help="When --strongest_rerank_mode=gbc, multiplicative weight applied to the deficit-scaled completion bonus.")
+    parser.add_argument("--strongest_ras_enabled", type=string_to_bool, default=False,
+                        help="Enable requirement-aware completion readout on top of strongest GBC reranking.")
+    parser.add_argument("--strongest_ras_prefix_guard_k", type=int, default=3,
+                        help="Baseline prefix width protected unless a frontier passage has positive core requirement gain.")
+    parser.add_argument("--strongest_ras_requirement_max_units", type=int, default=4,
+                        help="Maximum number of rule-extracted requirement units used by strongest RAS readout.")
+    parser.add_argument("--strongest_ras_enable_conflict_veto", type=string_to_bool, default=True,
+                        help="When strongest RAS is enabled, hard-veto frontier passages that conflict with single-valued head fillers.")
+    parser.add_argument("--strongest_ras_core_support_min_eligible", type=string_to_bool, default=True,
+                        help="When strongest RAS is enabled, require anchor and slot-family support before awarding requirement gain.")
+    parser.add_argument("--strongest_ras_extractor_mode", choices=["rule", "llm", "llm_grounded", "llm_closed_grounded"], default="rule",
+                        help="Requirement extractor used by strongest RAS. llm_grounded keeps only locally grounded units and bridge refs with resolved support dependencies; llm_closed_grounded further constrains slot_family to the supported closed ontology.")
+    parser.add_argument("--strongest_ras_support_mode", choices=["lexical", "embedding_probe"], default="lexical",
+                        help="Support matcher used by strongest RAS. lexical preserves current string/triple matching; embedding_probe adds an opt-in semantic probe on top.")
+    parser.add_argument("--strongest_ras_embedding_probe_threshold", type=float, default=0.35,
+                        help="Minimum cosine-style similarity required before strongest RAS embedding_probe contributes anchor/slot support.")
+    parser.add_argument("--strongest_ras_trace_enabled", type=string_to_bool, default=True,
+                        help="Persist strongest RAS diagnostic traces in retrieval summaries.")
     parser.add_argument("--setwise_score_mode", choices=["bridge", "closure_proxy", "set_closure"], default="bridge",
                         help="Scoring mode used by bridge_greedy / bridge_beam. bridge preserves the original structure score; closure_proxy uses a frontier-aware evidence-closure proxy; set_closure uses closure-aware proposals and re-ranks beam states with a set-level evidence score centered on explicit path connectivity.")
     parser.add_argument("--setwise_pool_k", type=int, default=20,
@@ -6440,6 +6961,32 @@ def main():
                         help="Number of candidates expanded per beam state for --setwise_selector bridge_beam.")
     parser.add_argument("--setwise_beam_projected_shortlist_factor", type=int, default=DEFAULT_SET_CLOSURE_PROJECTED_SHORTLIST_FACTOR,
                         help="When --setwise_score_mode set_closure, evaluate projected set-level state scores for up to beam_expand_per_state * factor doc-level proposals before keeping the final beam expansions. 1 preserves the legacy behavior.")
+    parser.add_argument("--dtc_max_steps", type=int, default=4,
+                        help="For --setwise_selector dtc_embed, maximum LLM-decomposed evidence requirements per query.")
+    parser.add_argument("--dtc_match_threshold", type=float, default=0.35,
+                        help="For --setwise_selector dtc_embed, normalized requirement coverage score required to mark a requirement covered.")
+    parser.add_argument("--dtc_redundancy_weight", type=float, default=0.10,
+                        help="For --setwise_selector dtc_embed, penalty on selecting embedding-redundant documents.")
+    parser.add_argument("--dtc_base_weight", type=float, default=0.05,
+                        help="For --setwise_selector dtc_embed, small baseline-score tie-break weight.")
+    parser.add_argument("--dtc_anchor_bonus_weight", type=float, default=0.10,
+                        help="For --setwise_selector dtc_embed, bonus for local anchor mention support.")
+    parser.add_argument("--dtc_dependency_bonus_weight", type=float, default=0.10,
+                        help="For --setwise_selector dtc_embed, bonus for candidates grounded in already covered dependency evidence.")
+    parser.add_argument("--dtc_max_completion_tokens", type=int, default=512,
+                        help="For --setwise_selector dtc_embed, max tokens for the one-shot decomposition LLM call.")
+    parser.add_argument("--dtc_decomposition_mode", choices=["llm", "query"], default="llm",
+                        help="For --setwise_selector dtc_embed, use LLM requirements or a query-only single-requirement ablation.")
+    parser.add_argument("--dtc_enforce_dependencies", type=string_to_bool, default=True,
+                        help="For --setwise_selector dtc_embed, enforce LLM-declared requirement dependencies before downstream coverage.")
+    parser.add_argument("--dtc_require_new_crossing", type=string_to_bool, default=False,
+                        help="For --setwise_selector dtc_embed, require a candidate to newly cross at least one requirement threshold before replacing baseline fill.")
+    parser.add_argument("--dtc_enable_dependency_binding", type=string_to_bool, default=False,
+                        help="For --setwise_selector dtc_embed, bind dependent subqueries to pool titles mentioned by upstream evidence.")
+    parser.add_argument("--dtc_binding_max_candidates", type=int, default=4,
+                        help="For --setwise_selector dtc_embed, max title candidates used to bind each dependent requirement.")
+    parser.add_argument("--dtc_binding_entity_hit_required", type=string_to_bool, default=True,
+                        help="For --setwise_selector dtc_embed, require a dependent candidate doc to mention the selected binding title.")
     parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
                         help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
     parser.add_argument("--setwise_late_rerank_candidate_count", type=int, default=4,
@@ -6935,6 +7482,34 @@ def main():
             strongest_hippo_head_k=int(args.strongest_hippo_head_k),
             strongest_smoothed_union_k=int(args.strongest_smoothed_union_k),
             strongest_gamma=float(args.strongest_gamma),
+            strongest_rerank_mode=str(args.strongest_rerank_mode),
+            strongest_gbc_protected_anchor_k=int(args.strongest_gbc_protected_anchor_k),
+            strongest_gbc_head_coverage_k=int(args.strongest_gbc_head_coverage_k),
+            strongest_gbc_top_passage_pool_k=int(args.strongest_gbc_top_passage_pool_k),
+            strongest_gbc_frontier_bonus_k=int(args.strongest_gbc_frontier_bonus_k),
+            strongest_gbc_bonus_weight=float(args.strongest_gbc_bonus_weight),
+            strongest_ras_enabled=bool(args.strongest_ras_enabled),
+            strongest_ras_prefix_guard_k=int(args.strongest_ras_prefix_guard_k),
+            strongest_ras_requirement_max_units=int(args.strongest_ras_requirement_max_units),
+            strongest_ras_enable_conflict_veto=bool(args.strongest_ras_enable_conflict_veto),
+            strongest_ras_core_support_min_eligible=bool(args.strongest_ras_core_support_min_eligible),
+            strongest_ras_extractor_mode=str(args.strongest_ras_extractor_mode),
+            strongest_ras_support_mode=str(args.strongest_ras_support_mode),
+            strongest_ras_embedding_probe_threshold=float(args.strongest_ras_embedding_probe_threshold),
+            strongest_ras_trace_enabled=bool(args.strongest_ras_trace_enabled),
+            dtc_max_steps=int(args.dtc_max_steps),
+            dtc_match_threshold=float(args.dtc_match_threshold),
+            dtc_redundancy_weight=float(args.dtc_redundancy_weight),
+            dtc_base_weight=float(args.dtc_base_weight),
+            dtc_anchor_bonus_weight=float(args.dtc_anchor_bonus_weight),
+            dtc_dependency_bonus_weight=float(args.dtc_dependency_bonus_weight),
+            dtc_max_completion_tokens=int(args.dtc_max_completion_tokens),
+            dtc_decomposition_mode=str(args.dtc_decomposition_mode),
+            dtc_enforce_dependencies=bool(args.dtc_enforce_dependencies),
+            dtc_require_new_crossing=bool(args.dtc_require_new_crossing),
+            dtc_enable_dependency_binding=bool(args.dtc_enable_dependency_binding),
+            dtc_binding_max_candidates=int(args.dtc_binding_max_candidates),
+            dtc_binding_entity_hit_required=bool(args.dtc_binding_entity_hit_required),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -7013,6 +7588,21 @@ def main():
                 "strongest_hippo_head_k": int(args.strongest_hippo_head_k),
                 "strongest_smoothed_union_k": int(args.strongest_smoothed_union_k),
                 "strongest_gamma": round(float(args.strongest_gamma), 4),
+                "strongest_rerank_mode": str(args.strongest_rerank_mode),
+                "strongest_gbc_protected_anchor_k": int(args.strongest_gbc_protected_anchor_k),
+                "strongest_gbc_head_coverage_k": int(args.strongest_gbc_head_coverage_k),
+                "strongest_gbc_top_passage_pool_k": int(args.strongest_gbc_top_passage_pool_k),
+                "strongest_gbc_frontier_bonus_k": int(args.strongest_gbc_frontier_bonus_k),
+                "strongest_gbc_bonus_weight": round(float(args.strongest_gbc_bonus_weight), 4),
+                "strongest_ras_enabled": bool(args.strongest_ras_enabled),
+                "strongest_ras_prefix_guard_k": int(args.strongest_ras_prefix_guard_k),
+                "strongest_ras_requirement_max_units": int(args.strongest_ras_requirement_max_units),
+                "strongest_ras_enable_conflict_veto": bool(args.strongest_ras_enable_conflict_veto),
+                "strongest_ras_core_support_min_eligible": bool(args.strongest_ras_core_support_min_eligible),
+                "strongest_ras_extractor_mode": str(args.strongest_ras_extractor_mode),
+                "strongest_ras_support_mode": str(args.strongest_ras_support_mode),
+                "strongest_ras_embedding_probe_threshold": float(args.strongest_ras_embedding_probe_threshold),
+                "strongest_ras_trace_enabled": bool(args.strongest_ras_trace_enabled),
                 "structure_max_hops": int(args.setwise_structure_max_hops),
                 "base_weight": float(args.setwise_base_weight),
                 "structure_weight": float(args.setwise_structure_weight),
@@ -7153,16 +7743,18 @@ def main():
     cross_encoder_rerank_results = None
     cross_encoder_rerank = string_to_bool(args.cross_encoder_rerank) if not gold_doc_reader else False
     if cross_encoder_rerank and not retrieval_only and query_solutions:
-        from FlagEmbedding import FlagReranker
-
         ce_window = int(args.ce_window)
         ce_alpha = float(args.ce_alpha)
         ce_model_name = args.ce_model
         ce_device = args.ce_device
 
         logger = logging.getLogger(__name__)
-        logger.info(f"Loading cross-encoder model: {ce_model_name} on {ce_device}")
-        ce_reranker = FlagReranker(ce_model_name, use_fp16=True, device=ce_device)
+        ce_reranker = load_cross_encoder_reranker(
+            model_name_or_path=ce_model_name,
+            device=ce_device,
+            use_fp16=True,
+            logger=logger,
+        )
 
         reranked_solutions = []
         for q_idx, qs in enumerate(query_solutions):
@@ -7329,6 +7921,21 @@ def main():
             "strongest_hippo_head_k": int(args.strongest_hippo_head_k),
             "strongest_smoothed_union_k": int(args.strongest_smoothed_union_k),
             "strongest_gamma": float(args.strongest_gamma),
+            "strongest_rerank_mode": str(args.strongest_rerank_mode),
+            "strongest_gbc_protected_anchor_k": int(args.strongest_gbc_protected_anchor_k),
+            "strongest_gbc_head_coverage_k": int(args.strongest_gbc_head_coverage_k),
+            "strongest_gbc_top_passage_pool_k": int(args.strongest_gbc_top_passage_pool_k),
+            "strongest_gbc_frontier_bonus_k": int(args.strongest_gbc_frontier_bonus_k),
+            "strongest_gbc_bonus_weight": float(args.strongest_gbc_bonus_weight),
+            "strongest_ras_enabled": bool(args.strongest_ras_enabled),
+            "strongest_ras_prefix_guard_k": int(args.strongest_ras_prefix_guard_k),
+            "strongest_ras_requirement_max_units": int(args.strongest_ras_requirement_max_units),
+            "strongest_ras_enable_conflict_veto": bool(args.strongest_ras_enable_conflict_veto),
+            "strongest_ras_core_support_min_eligible": bool(args.strongest_ras_core_support_min_eligible),
+            "strongest_ras_extractor_mode": str(args.strongest_ras_extractor_mode),
+            "strongest_ras_support_mode": str(args.strongest_ras_support_mode),
+            "strongest_ras_embedding_probe_threshold": float(args.strongest_ras_embedding_probe_threshold),
+            "strongest_ras_trace_enabled": bool(args.strongest_ras_trace_enabled),
             "setwise_score_mode": str(args.setwise_score_mode),
             "setwise_pool_k": int(args.setwise_pool_k),
             "setwise_anchor_count": int(args.setwise_anchor_count),
@@ -7339,6 +7946,19 @@ def main():
             "setwise_beam_width": int(args.setwise_beam_width),
             "setwise_beam_expand_per_state": int(args.setwise_beam_expand_per_state),
             "setwise_beam_projected_shortlist_factor": int(args.setwise_beam_projected_shortlist_factor),
+            "dtc_max_steps": int(args.dtc_max_steps),
+            "dtc_match_threshold": float(args.dtc_match_threshold),
+            "dtc_redundancy_weight": float(args.dtc_redundancy_weight),
+            "dtc_base_weight": float(args.dtc_base_weight),
+            "dtc_anchor_bonus_weight": float(args.dtc_anchor_bonus_weight),
+            "dtc_dependency_bonus_weight": float(args.dtc_dependency_bonus_weight),
+            "dtc_max_completion_tokens": int(args.dtc_max_completion_tokens),
+            "dtc_decomposition_mode": str(args.dtc_decomposition_mode),
+            "dtc_enforce_dependencies": bool(args.dtc_enforce_dependencies),
+            "dtc_require_new_crossing": bool(args.dtc_require_new_crossing),
+            "dtc_enable_dependency_binding": bool(args.dtc_enable_dependency_binding),
+            "dtc_binding_max_candidates": int(args.dtc_binding_max_candidates),
+            "dtc_binding_entity_hit_required": bool(args.dtc_binding_entity_hit_required),
             "setwise_late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
             "setwise_late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "setwise_late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),

@@ -7,7 +7,13 @@ logger = get_logger(__name__)
 
 
 def _get_embedding_model_class(embedding_model_name: str = "nvidia/NV-Embed-v2"):
-    if "GritLM" in embedding_model_name:
+    if embedding_model_name.startswith("Transformers/"):
+        from .Transformers import TransformersEmbeddingModel
+        return TransformersEmbeddingModel
+    elif embedding_model_name.startswith("VLLM/"):
+        from .VLLM import VLLMEmbeddingModel
+        return VLLMEmbeddingModel
+    elif "GritLM" in embedding_model_name:
         from .GritLM import GritLMEmbeddingModel
         return GritLMEmbeddingModel
     elif "NV-Embed-v2" in embedding_model_name:
@@ -22,10 +28,4 @@ def _get_embedding_model_class(embedding_model_name: str = "nvidia/NV-Embed-v2")
     elif "cohere" in embedding_model_name:
         from .Cohere import CohereEmbeddingModel
         return CohereEmbeddingModel
-    elif embedding_model_name.startswith("Transformers/"):
-        from .Transformers import TransformersEmbeddingModel
-        return TransformersEmbeddingModel
-    elif embedding_model_name.startswith("VLLM/"):
-        from .VLLM import VLLMEmbeddingModel
-        return VLLMEmbeddingModel
     assert False, f"Unknown embedding model name: {embedding_model_name}"
