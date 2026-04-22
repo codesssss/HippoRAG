@@ -5037,6 +5037,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            dtc_match_threshold: float = 0.35,
                            dtc_redundancy_weight: float = 0.10,
                            dtc_base_weight: float = 0.05,
+                           dtc_rank_weight: float = 0.0,
                            dtc_anchor_bonus_weight: float = 0.10,
                            dtc_dependency_bonus_weight: float = 0.10,
                            dtc_max_completion_tokens: int = 512,
@@ -5571,6 +5572,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 match_threshold=float(dtc_match_threshold),
                 redundancy_weight=float(dtc_redundancy_weight),
                 base_weight=float(dtc_base_weight),
+                rank_weight=float(dtc_rank_weight),
                 anchor_bonus_weight=float(dtc_anchor_bonus_weight),
                 dependency_bonus_weight=float(dtc_dependency_bonus_weight),
                 non_anchor_title_dedup=bool(non_anchor_title_dedup),
@@ -5587,6 +5589,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["dtc_decomposition_mode"] = normalized_dtc_decomposition_mode
             selector_trace["dtc_enforce_dependencies"] = bool(dtc_enforce_dependencies)
             selector_trace["dtc_require_new_crossing"] = bool(dtc_require_new_crossing)
+            selector_trace["dtc_rank_weight"] = float(dtc_rank_weight)
             selector_trace["dtc_enable_dependency_binding"] = bool(dtc_enable_dependency_binding)
             selector_trace["dtc_binding_max_candidates"] = int(dtc_binding_max_candidates)
             selector_trace["dtc_binding_entity_hit_required"] = bool(dtc_binding_entity_hit_required)
@@ -6280,6 +6283,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "dtc_match_threshold": round(float(dtc_match_threshold), 4),
             "dtc_redundancy_weight": round(float(dtc_redundancy_weight), 4),
             "dtc_base_weight": round(float(dtc_base_weight), 4),
+            "dtc_rank_weight": round(float(dtc_rank_weight), 4),
             "dtc_anchor_bonus_weight": round(float(dtc_anchor_bonus_weight), 4),
             "dtc_dependency_bonus_weight": round(float(dtc_dependency_bonus_weight), 4),
             "dtc_max_completion_tokens": int(dtc_max_completion_tokens),
@@ -6969,6 +6973,8 @@ def main():
                         help="For --setwise_selector dtc_embed, penalty on selecting embedding-redundant documents.")
     parser.add_argument("--dtc_base_weight", type=float, default=0.05,
                         help="For --setwise_selector dtc_embed, small baseline-score tie-break weight.")
+    parser.add_argument("--dtc_rank_weight", type=float, default=0.0,
+                        help="For --setwise_selector dtc_embed, penalty weight for deeper pool positions: -weight * normalized_rank.")
     parser.add_argument("--dtc_anchor_bonus_weight", type=float, default=0.10,
                         help="For --setwise_selector dtc_embed, bonus for local anchor mention support.")
     parser.add_argument("--dtc_dependency_bonus_weight", type=float, default=0.10,
@@ -7501,6 +7507,7 @@ def main():
             dtc_match_threshold=float(args.dtc_match_threshold),
             dtc_redundancy_weight=float(args.dtc_redundancy_weight),
             dtc_base_weight=float(args.dtc_base_weight),
+            dtc_rank_weight=float(args.dtc_rank_weight),
             dtc_anchor_bonus_weight=float(args.dtc_anchor_bonus_weight),
             dtc_dependency_bonus_weight=float(args.dtc_dependency_bonus_weight),
             dtc_max_completion_tokens=int(args.dtc_max_completion_tokens),
@@ -7950,6 +7957,7 @@ def main():
             "dtc_match_threshold": float(args.dtc_match_threshold),
             "dtc_redundancy_weight": float(args.dtc_redundancy_weight),
             "dtc_base_weight": float(args.dtc_base_weight),
+            "dtc_rank_weight": float(args.dtc_rank_weight),
             "dtc_anchor_bonus_weight": float(args.dtc_anchor_bonus_weight),
             "dtc_dependency_bonus_weight": float(args.dtc_dependency_bonus_weight),
             "dtc_max_completion_tokens": int(args.dtc_max_completion_tokens),

@@ -340,6 +340,7 @@ def select_dtc_embed_positions(
     match_threshold: float = 0.35,
     redundancy_weight: float = 0.10,
     base_weight: float = 0.05,
+    rank_weight: float = 0.0,
     anchor_bonus_weight: float = 0.10,
     dependency_bonus_weight: float = 0.10,
     non_anchor_title_dedup: bool = True,
@@ -402,6 +403,11 @@ def select_dtc_embed_positions(
         raw_match_scores[req.unit_id] = _min_max(np.asarray(values, dtype=float))
 
     normalized_base_scores = _min_max(np.asarray(pool_doc_scores[:pool_limit], dtype=float))
+    normalized_ranks = (
+        np.asarray([float(pos) / float(max(pool_limit - 1, 1)) for pos in range(pool_limit)], dtype=float)
+        if pool_limit > 0
+        else np.asarray([], dtype=float)
+    )
     normalized_query = normalize_structure_text(query)
     query_anchor_keys = {
         normalize_structure_text(anchor)
@@ -673,6 +679,7 @@ def select_dtc_embed_positions(
                 float(coverage_gain)
                 + 0.25 * float(len(newly_crossed))
                 + float(base_weight) * float(normalized_base_scores[pos])
+                - float(rank_weight) * float(normalized_ranks[pos])
                 - float(redundancy_weight) * max(0.0, float(redundancy))
             )
             row = {
@@ -682,6 +689,8 @@ def select_dtc_embed_positions(
                 "new_requirement_count": int(len(newly_crossed)),
                 "new_requirement_ids": list(newly_crossed),
                 "base_score": float(normalized_base_scores[pos]),
+                "normalized_rank": float(normalized_ranks[pos]),
+                "rank_penalty": float(rank_weight) * float(normalized_ranks[pos]),
                 "redundancy": float(redundancy),
                 "total_gain": float(total_gain),
                 "requirement_scores": req_rows,
@@ -745,6 +754,8 @@ def select_dtc_embed_positions(
             "new_requirement_count": int(best_row["new_requirement_count"]),
             "new_requirement_ids": list(best_row["new_requirement_ids"]),
             "base_score": round(float(best_row["base_score"]), 4),
+            "normalized_rank": round(float(best_row["normalized_rank"]), 4),
+            "rank_penalty": round(float(best_row["rank_penalty"]), 4),
             "redundancy": round(float(best_row["redundancy"]), 4),
             "total_gain": round(float(best_row["total_gain"]), 4),
             "requirement_scores": best_row["requirement_scores"],
@@ -769,6 +780,7 @@ def select_dtc_embed_positions(
         "requirement_count": int(len(active_requirements)),
         "requirements": [req.to_trace() for req in active_requirements],
         "match_threshold": round(float(match_threshold), 4),
+        "rank_weight": round(float(rank_weight), 4),
         "reserve_top_m": int(reserve_count),
         "dependency_binding_enabled": bool(enable_dependency_binding),
         "dependency_enforced": bool(enforce_dependencies),
