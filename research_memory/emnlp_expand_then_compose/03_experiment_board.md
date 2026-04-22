@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-02
+Last updated: 2026-04-22
 
 ## Canonical Outputs
 
@@ -18,6 +18,13 @@ Last updated: 2026-04-02
 - `Requirement matcher trainer`: `scripts/train_requirement_setwise.py`
 - `Requirement beam diagnostics script`: `scripts/analyze_requirement_beam_report.py`
 - `MuSiQue requirement beam diagnostic note`: `research_memory/emnlp_expand_then_compose/musique_requirement_beam_reserve_diagnostics_20260402.md`
+- `2Wiki strongest smoke note`: `outputs_step0_general_2wikimultihopqa/eval_reports/strongest_bridge_append_none_applypool_smoke40_20260416.md`
+- `HotpotQA strongest GBC audit`: `outputs_step0_general_hotpotqa/eval_reports/strongest_gbc_e2e_audit_hotpotqa20_20260416.md`
+- `Requirement-Aware Strongest backup memo`: `research_memory/emnlp_expand_then_compose/10_requirement_aware_strongest_backup.md`
+- `Diversity selector baseline memo`: `research_memory/emnlp_expand_then_compose/11_diversity_selector_baselines_20260421.md`
+- `DtC supplemental experiment memo`: `research_memory/emnlp_expand_then_compose/12_dtc_supplemental_experiments_20260421.md`
+- `MuSiQue 4-doc DtC regression memo`: `research_memory/emnlp_expand_then_compose/13_musique_4doc_regression_analysis_20260421.md`
+- `DtC NV full1000 + rank-prior direction memo`: `research_memory/emnlp_expand_then_compose/14_dtc_nv_full1000_rank_prior_20260422.md`
 
 ## Done
 
@@ -59,43 +66,57 @@ Last updated: 2026-04-02
   - near-collapsed leakage axis
 - Added a full implementation spec for the next V2 parser/compiler rebuild:
   - `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
+- Migrated a clean strongest sidecar plus `GBC` guardrail into the current codebase
+- Ran a positive `2Wiki` strongest apply-to-pool smoke and saved the summary note
+- Ran a `HotpotQA` end-to-end strongest/GBC audit and recorded the query-level failure pattern
+- Preserved `Requirement-Aware Strongest` as a documented backup method line
+- Ran fixed-pool MMR/DPP diversity baselines at 1000-query scale on `2Wiki`, `HotpotQA`, and `MuSiQue`
+- Implemented and tested `DtC-Embed` as a demand-aware fixed-pool evidence composition selector
+- Ran aligned NV-Embed non-instruction DtC full1000 on all three datasets
+- Ran hard-crossing pilot100 ablation and rejected it as the main fix
+- Diagnosed deep-pool false positives as the next DtC scoring problem
 
 ## Running
 
-- None
+- PropRAG aligned same-protocol comparison is running in `/mnt/nvme/code/PropRAG`:
+  - script: `run_logs/run_proprag_aligned_qwenopenie_top100_8042_20260422.sh`
+  - log: `run_logs/proprag_aligned_qwenopenie_top100_maxtok2048_nothinkopenie_propcap12_8042_20260422.log`
+  - output root: `outputs_aligned_qwenopenie_top100_maxtok2048_nothinkopenie_propcap12`
 
 ## Next Wave
 
-1. Implement the parser/compiler spec in `research_memory/emnlp_expand_then_compose/08_pcrs_v2_parser_compiler_spec.md`
-2. Rebuild a small `MuSiQue` need-unit cache with the new step-plan compiler
-3. Rerun offline diagnostics before paying reader cost
-4. Only rerun QA if the upstream diagnostics improve materially:
-   - suspicious anchor rate drops
-   - positive-vs-negative separation rises above random
-   - finalist leakage range stops collapsing
-5. Keep the current simple `pathcore_guard` line as the paper-facing default unless the new branch clearly wins
-6. Add one compact paper table: baseline vs CE rerank vs oracle reorder vs oracle select vs current simple selector
+1. Implement rank-regularized DtC scoring:
+   - add `--dtc_rank_weight`
+   - use `normalized_rank = pool_position / max(pool_k - 1, 1)`
+   - subtract `rank_weight * normalized_rank` in the greedy gain
+2. Sweep `rank_weight in {0.1, 0.2, 0.3, 0.6, 1.0}` on pilot100 for all three datasets
+3. Promote to full1000 only if the sweep preserves most wins while reducing losses
+4. Keep hard-crossing as a negative ablation, not a main method
+5. Finish the PropRAG aligned comparison after its 8B OpenIE assets finish building
 
 ## Method Priority
 
 Method implementation order should be:
 
-1. Paper mainline:
-   - keep `bridge_beam + set_closure + pathcore_guard + reserve3 + dedup` frozen as the current simple story
-2. Parallel branch:
-   - treat `feature/pcrs-rag-v1` as the default development branch
-   - fix upstream requirement and counterfactual construction first
-   - only revisit matcher training after the oracle signal stops collapsing
-3. Only after those gates clear should the new branch be considered for promotion
-4. Do not jump to more complex repair loops, online judges, or planner-style control before the branch clears the oracle gate
+1. Active paper method candidate:
+   - `DtC-Embed` under fixed-pool evidence composition
+   - next variant: rank-regularized demand coverage
+2. Baselines and controls:
+   - baseline top-5
+   - MMR/DPP structure-blind diversity
+   - oracle select@100
+   - PropRAG aligned comparison when assets complete
+3. Backup line:
+   - keep `Requirement-Aware Strongest` documented and runnable as a reserve option
+   - do not promote it without at least `HotpotQA` baseline parity plus retained `2Wiki` gains
+4. Do not jump to open iterative retrieval, online judges, or planner-style control before the fixed-pool DtC objective is fully tested
 
 ## Blockers
 
-- The current non-oracle heuristic is not robust on the canonical backbone
-- It helps some easy `2-doc` cases but does not yet improve hard `4-doc` composition
-- The new `PCRS-RAG V1` branch now has implementation and initial smoke evidence, but not promotion-quality cross-dataset wins
-- The biggest technical risk on the new branch is upstream signal quality, not beam search mechanics
-- Current `MuSiQue` failure appears to come from requirement and counterfactual construction rather than reserve tuning
+- Full1000 DtC is positive but still leaves most oracle headroom unused
+- `2Wiki` full1000 gain is weak because wins and losses are nearly balanced
+- Hard-crossing cuts wins more than losses, so the next fix must target scoring false positives rather than acceptance thresholds
+- The strongest/GBC backup line is coherent, but it still lacks a positive shallow-dataset end-to-end result
 
 ## Do Not Drift
 
@@ -103,4 +124,6 @@ Method implementation order should be:
 - Do not re-open reader-side graph context
 - Do not re-open causal-only framing
 - Do not pitch this as a generic reranking paper
-- Do not let the unvalidated `PCRS-RAG V1` branch overwrite the current simple paper line by default
+- Do not pitch DtC as open iterative retrieval; the protocol is fixed-pool post-retrieval composition
+- Do not let the old unvalidated `PCRS-RAG V1` branch overwrite the active DtC line by default
+- Do not let the current strongest/GBC backup line overwrite the paper mainline based on smoke-scale evidence

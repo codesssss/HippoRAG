@@ -1,6 +1,6 @@
 # Decision Log
 
-Last updated: 2026-04-02
+Last updated: 2026-04-22
 
 ## 2026-03-26: Freeze the retrieval backbone
 
@@ -100,3 +100,48 @@ Consequence:
 - Branch operating status and diagnostics should be documented in:
   - `research_memory/emnlp_expand_then_compose/07_pcrs_rag_v1.md`
   - `research_memory/emnlp_expand_then_compose/03_experiment_board.md`
+
+## 2026-04-17: Preserve Requirement-Aware Strongest as a documented backup line
+
+Decision:
+- Keep `Requirement-Aware Strongest` as a documented backup method line.
+- Do not promote it over the current `Expand-then-Compose` mainline.
+- Do not let it displace `PCRS-RAG` as the main requirement-first development branch.
+
+Reason:
+- The migrated strongest sidecar plus `clean GBC` now forms a coherent, runnable graph-side reserve path.
+- The current evidence is mixed:
+  - positive smoke-scale signal on `2Wiki`
+  - stabilizing but still sub-baseline end-to-end behavior on `HotpotQA`
+- This makes it valuable as a backup idea, but not yet honest to present as the new default story.
+
+Consequence:
+- Keep the line alive as a recoverable option if the current mainline stalls or if a graph-specific backup story is needed.
+- Document the method, current evidence, and promotion gates in:
+  - `research_memory/emnlp_expand_then_compose/10_requirement_aware_strongest_backup.md`
+  - `outputs_step0_general_hotpotqa/eval_reports/strongest_gbc_e2e_audit_hotpotqa20_20260416.md`
+
+## 2026-04-22: Promote DtC as the active fixed-pool composition line
+
+Decision:
+- Treat `DtC-Embed` as the active method branch for `Expand-then-Compose`.
+- Keep the canonical method as fixed-pool post-retrieval composition, not open iterative retrieval.
+- Use NV-Embed-v2 without instruction prefixes for the aligned paper protocol.
+- Do not promote hard-crossing or a fixed depth cutoff as the main method.
+- Next implementation target: rank-regularized demand coverage.
+
+Reason:
+- Full1000 NV non-instruction DtC is positive on all three datasets:
+  - `2Wiki`: `F1 +0.0082`
+  - `HotpotQA`: `F1 +0.0175`
+  - `MuSiQue`: `F1 +0.0245`
+- MMR/DPP structure-blind diversity does not recover the oracle gap.
+- Hard-crossing ablation removes too many wins and does not meaningfully reduce losses.
+- Depth analysis shows losses disproportionately pull from deeper pool positions, but a fixed `D` gate is too brittle for a paper-facing method.
+
+Consequence:
+- Mainline method work should modify the DtC objective, not add another hard per-candidate gate.
+- Implement `rank_weight` as a rank prior inside DtC scoring and sweep on pilot100 before full1000.
+- Keep all claims tied to same-pool, same-reader evidence composition.
+- Canonical note:
+  - `research_memory/emnlp_expand_then_compose/14_dtc_nv_full1000_rank_prior_20260422.md`

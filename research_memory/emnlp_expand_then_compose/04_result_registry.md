@@ -1,6 +1,6 @@
 # Result Registry
 
-Last updated: 2026-03-30
+Last updated: 2026-04-22
 
 This file stores concrete results only. Every result must have a file path.
 
@@ -18,6 +18,55 @@ Key status:
 - The new shared closure-only selector keeps a positive `2Wiki` gain while removing the earlier `HotpotQA` failure and neutralizing the overall `MuSiQue` loss.
 - The tradeoff is that the closure-only selector is more conservative on the hardest cases, especially `2Wiki 4-doc`.
 - The failed `seed union + title dedup` tweak has been recorded and reverted.
+- A separate strongest-sidecar backup line now exists:
+  - positive `2Wiki` smoke signal
+  - stabilizing but still sub-baseline `HotpotQA` end-to-end behavior
+  - see the report paths below
+- `DtC-Embed` is now the active fixed-pool composition method candidate:
+  - aligned NV-Embed non-instruction full1000 is positive on all three datasets
+  - hard-crossing ablation is negative as a main fix
+  - rank-regularized demand coverage is the next implementation target
+
+## Fixed-Pool Composition Baselines and DtC
+
+Diversity baseline memo:
+- `research_memory/emnlp_expand_then_compose/11_diversity_selector_baselines_20260421.md`
+
+DtC direction memo:
+- `research_memory/emnlp_expand_then_compose/14_dtc_nv_full1000_rank_prior_20260422.md`
+
+Structure-blind diversity baselines:
+
+| Dataset | Baseline F1 | MMR F1 | DPP F1 | Oracle@100 F1 |
+|---|---:|---:|---:|---:|
+| 2Wiki | 0.4868 | 0.4805 | 0.4863 | 0.6318 |
+| HotpotQA | 0.6839 | 0.6830 | 0.6829 | 0.7707 |
+| MuSiQue | 0.3439 | 0.3545 | 0.3569 | 0.5401 |
+
+Interpretation:
+- MMR/DPP do not recover the fixed-pool oracle gap.
+- Generic embedding diversity is not enough for the `Assemble` part of `Expand-then-Compose`.
+
+Aligned NV-Embed non-instruction DtC full1000:
+
+| Dataset | Report | Baseline EM/F1 | DtC EM/F1 | Delta EM/F1 |
+|---|---|---:|---:|---:|
+| 2Wiki | `outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_noninstr_soft_limit1000_anchor2_8043.json` | 0.475 / 0.5413 | 0.481 / 0.5495 | +0.006 / +0.0082 |
+| HotpotQA | `outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_noninstr_soft_limit1000_anchor2_8042.json` | 0.574 / 0.7050 | 0.590 / 0.7225 | +0.016 / +0.0175 |
+| MuSiQue | `outputs_step0_general_nvembed_musique/eval_reports/dtc_embed_nvembed_noninstr_soft_limit1000_anchor2_8041.json` | 0.307 / 0.4051 | 0.332 / 0.4296 | +0.025 / +0.0245 |
+
+Hard-crossing pilot100 ablation:
+
+| Dataset | Soft Delta F1 | Hard-Cross Delta F1 | Result |
+|---|---:|---:|---|
+| 2Wiki | +0.0256 | +0.0157 | weaker |
+| HotpotQA | +0.0310 | +0.0010 | much weaker |
+| MuSiQue | +0.0497 | +0.0023 | much weaker |
+
+Interpretation:
+- Hard-crossing removes wins but does not remove losses.
+- Losses are better explained by false-positive requirement coverage, especially from deeper pool positions.
+- The next method should regularize coverage by base retriever rank instead of adding a hard acceptance gate.
 
 ## 2WikiMultihopQA-1000
 
@@ -130,6 +179,19 @@ Failed micro-tweak:
 - `4-doc EM delta = -0.4000`
 - status: reverted from code
 
+Strongest backup smoke:
+- summary note: `outputs_step0_general_2wikimultihopqa/eval_reports/strongest_bridge_append_none_applypool_smoke40_20260416.md`
+- setup: `bridge_append`, `assemble_mode=none`, `strongest_shadow_apply_to_pool=true`
+- control `EM/F1 = 0.3500 / 0.4170`
+- strongest `EM/F1 = 0.4000 / 0.4824`
+- delta `EM/F1 = +0.0500 / +0.0654`
+- control `Recall@5 = 0.7937`
+- strongest `Recall@5 = 0.8375`
+
+Interpretation:
+- This is enough to keep strongest as a live backup candidate on a harder dataset.
+- It is not enough to promote it to the paper mainline by itself.
+
 ## HotpotQA-1000
 
 Report:
@@ -191,6 +253,18 @@ Interpretation:
 - The closure-only gate removes the earlier destructive `HotpotQA` drop.
 - This makes the shared setting effectively non-destructive on the shallow dataset, with only a very small `F1` loss.
 - The result supports a narrow claim: shallow datasets should mostly skip bridge exploration unless there is strong off-prefix structure.
+
+Strongest / GBC end-to-end audit:
+- audit note: `outputs_step0_general_hotpotqa/eval_reports/strongest_gbc_e2e_audit_hotpotqa20_20260416.md`
+- setup: `bridge_append`, `assemble_mode=none`, strongest sidecar applied to pool
+- baseline `EM/F1 = 0.5500 / 0.6568`
+- standard strongest `EM/F1 = 0.4500 / 0.5568`
+- clean GBC `EM/F1 = 0.5000 / 0.6068`
+
+Interpretation:
+- Raw strongest is too aggressive on the shallow dataset.
+- `clean GBC` recovers part of the loss and keeps the line interesting as a backup.
+- The line is still below baseline end-to-end, so it should remain a reserve option only.
 
 ## MuSiQue-1000
 
