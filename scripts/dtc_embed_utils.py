@@ -349,6 +349,8 @@ def select_dtc_embed_positions(
     binding_max_candidates: int = 4,
     binding_entity_hit_required: bool = True,
     require_new_crossing: bool = False,
+    demand_gate_enabled: bool = False,
+    demand_gate_alpha: float = 1.0,
     embed_texts_fn: Callable[[Sequence[str]], Dict[str, np.ndarray]] | None = None,
 ) -> Tuple[List[int], Dict[str, object]]:
     pool_limit = len(pool_docs)
@@ -444,13 +446,18 @@ def select_dtc_embed_positions(
             return set()
         return set(doc_idx_to_entities.get(int(doc_id), set()) or set())
 
-    def collect_binding_candidates(req: DTCRequirement, dep_entities: set[str]) -> List[Dict[str, object]]:
+    def collect_binding_candidates(
+        req: DTCRequirement,
+        dep_entities: set[str],
+        cover_positions: Dict[str, int] | None = None,
+    ) -> List[Dict[str, object]]:
         if not enable_dependency_binding or not req.depends_on:
             return []
+        resolved_cover_positions = cover_position_by_req if cover_positions is None else cover_positions
         rows: List[Dict[str, object]] = []
         seen_keys: set[str] = set()
         for dep in req.depends_on:
-            dep_pos = cover_position_by_req.get(dep)
+            dep_pos = resolved_cover_positions.get(dep)
             if dep_pos is None or dep_pos < 0 or dep_pos >= pool_limit:
                 continue
             dep_req = req_by_id.get(dep)
@@ -515,8 +522,18 @@ def select_dtc_embed_positions(
         binding_score_cache[cache_key] = scores
         return scores
 
-    def score_requirement_for_position(req: DTCRequirement, pos: int) -> Tuple[float, Dict[str, object]]:
-        dep_entities = dependency_entities_by_req.get(req.unit_id, set())
+    def score_requirement_for_position(
+        req: DTCRequirement,
+        pos: int,
+        *,
+        dependency_entities: set[str] | None = None,
+        binding_candidates_override: List[Dict[str, object]] | None = None,
+    ) -> Tuple[float, Dict[str, object]]:
+        dep_entities = (
+            dependency_entities
+            if dependency_entities is not None
+            else dependency_entities_by_req.get(req.unit_id, set())
+        )
         req_score = float(raw_match_scores.get(req.unit_id, np.zeros(pool_limit))[pos])
         anchor_score = _anchor_hit_score(
             req.anchor_mentions,
@@ -529,7 +546,11 @@ def select_dtc_embed_positions(
             doc_entities_for_pos(pos),
             pool_doc_titles[pos],
         )
-        binding_candidates = binding_candidates_by_req.get(req.unit_id, [])
+        binding_candidates = (
+            binding_candidates_override
+            if binding_candidates_override is not None
+            else binding_candidates_by_req.get(req.unit_id, [])
+        )
         binding_rows: List[Dict[str, object]] = []
         best_binding_score = 0.0
         best_binding_hit = 0.0
@@ -633,6 +654,134 @@ def select_dtc_embed_positions(
                             "previous_coverage_score": round(float(previous_score), 4),
                             "binding_title": score_trace.get("binding_title", ""),
                         })
+
+    def compute_demand_assessment(positions: Sequence[int]) -> Dict[str, object]:
+        local_coverage_by_req = {req.unit_id: 0.0 for req in active_requirements}
+        local_cover_position_by_req: Dict[str, int] = {}
+        local_binding_candidates_by_req: Dict[str, List[Dict[str, object]]] = {}
+        local_steps: List[Dict[str, object]] = []
+        valid_positions = [
+            int(pos)
+            for pos in positions
+            if 0 <= int(pos) < pool_limit
+        ]
+        for pos in valid_positions:
+            made_progress = True
+            while made_progress:
+                made_progress = False
+                for req in active_requirements:
+                    if any(dep not in local_cover_position_by_req for dep in req.depends_on):
+                        continue
+                    dep_entities: set[str] = set()
+                    for dep in req.depends_on:
+                        dep_pos = local_cover_position_by_req.get(dep)
+                        if dep_pos is None:
+                            continue
+                        dep_entities.update(
+                            normalize_structure_text(entity)
+                            for entity in doc_entities_for_pos(dep_pos)
+                        )
+                        dep_title = normalize_structure_text(pool_doc_titles[dep_pos])
+                        if dep_title:
+                            dep_entities.add(dep_title)
+                    local_binding_candidates_by_req[req.unit_id] = collect_binding_candidates(
+                        req,
+                        dep_entities,
+                        cover_positions=local_cover_position_by_req,
+                    )
+                    score, score_trace = score_requirement_for_position(
+                        req,
+                        pos,
+                        dependency_entities=dep_entities,
+                        binding_candidates_override=local_binding_candidates_by_req.get(req.unit_id, []),
+                    )
+                    previous_score = float(local_coverage_by_req.get(req.unit_id, 0.0))
+                    previous_cover_position = local_cover_position_by_req.get(req.unit_id)
+                    if score <= previous_score:
+                        continue
+                    local_coverage_by_req[req.unit_id] = score
+                    should_set_cover = score >= float(match_threshold) and (
+                        req.unit_id not in local_cover_position_by_req
+                        or bool(enable_dependency_binding)
+                    )
+                    if should_set_cover:
+                        local_cover_position_by_req[req.unit_id] = int(pos)
+                        if previous_cover_position != int(pos):
+                            made_progress = True
+                        local_steps.append({
+                            "unit_id": req.unit_id,
+                            "pool_position": int(pos),
+                            "title": pool_doc_titles[pos],
+                            "coverage_score": round(float(score), 4),
+                            "previous_coverage_score": round(float(previous_score), 4),
+                            "cover_update": previous_cover_position is not None,
+                            "binding_title": score_trace.get("binding_title", ""),
+                        })
+        covered_count = sum(
+            1 for value in local_coverage_by_req.values()
+            if float(value) >= float(match_threshold)
+        )
+        return {
+            "positions": list(valid_positions),
+            "covered_requirement_count": int(covered_count),
+            "covered_requirement_rate": round(float(covered_count) / float(max(len(active_requirements), 1)), 4),
+            "coverage_by_requirement": {
+                req_id: round(float(score), 4)
+                for req_id, score in local_coverage_by_req.items()
+            },
+            "cover_position_by_requirement": dict(local_cover_position_by_req),
+            "coverage_steps": local_steps,
+        }
+
+    baseline_demand_assessment = compute_demand_assessment(range(target_k))
+    demand_gate = {
+        "enabled": bool(demand_gate_enabled),
+        "alpha": round(float(demand_gate_alpha), 4),
+        "baseline_covered_requirement_rate": float(
+            baseline_demand_assessment.get("covered_requirement_rate", 0.0) or 0.0
+        ),
+        "preserve": False,
+        "reason": "disabled",
+    }
+    if bool(demand_gate_enabled):
+        demand_gate["preserve"] = (
+            float(baseline_demand_assessment.get("covered_requirement_rate", 0.0) or 0.0)
+            >= float(demand_gate_alpha)
+        )
+        demand_gate["reason"] = (
+            "baseline_demand_satisfied"
+            if bool(demand_gate["preserve"])
+            else "baseline_demand_incomplete"
+        )
+    if bool(demand_gate.get("preserve", False)):
+        baseline_positions = list(range(target_k))
+        return baseline_positions, {
+            "selector": "dtc_embed",
+            "status": "demand_gate_preserve",
+            "query": str(query),
+            "requirement_count": int(len(active_requirements)),
+            "requirements": [req.to_trace() for req in active_requirements],
+            "match_threshold": round(float(match_threshold), 4),
+            "rank_weight": round(float(rank_weight), 4),
+            "reserve_top_m": int(reserve_count),
+            "dependency_binding_enabled": bool(enable_dependency_binding),
+            "dependency_enforced": bool(enforce_dependencies),
+            "binding_max_candidates": int(binding_max_candidates),
+            "binding_entity_hit_required": bool(binding_entity_hit_required),
+            "require_new_crossing": bool(require_new_crossing),
+            "demand_gate": demand_gate,
+            "baseline_demand_assessment": baseline_demand_assessment,
+            "binding_candidates_by_requirement": {},
+            "covered_requirement_count": int(baseline_demand_assessment["covered_requirement_count"]),
+            "covered_requirement_rate": float(baseline_demand_assessment["covered_requirement_rate"]),
+            "coverage_by_requirement": dict(baseline_demand_assessment["coverage_by_requirement"]),
+            "cover_position_by_requirement": dict(baseline_demand_assessment["cover_position_by_requirement"]),
+            "selected_positions": baseline_positions,
+            "selected_titles": [pool_doc_titles[pos] for pos in baseline_positions],
+            "selection_steps": [],
+            "embedding_available_requirement_count": int(sum(req_vectors.get(req.unit_id, np.array([])).size > 0 for req in active_requirements)),
+            "embedding_available_doc_count": int(len(doc_vectors)),
+        }
 
     for reserved_pos in list(selected_positions):
         mark_coverage_from_position(reserved_pos, mode="reserve")
@@ -787,6 +936,8 @@ def select_dtc_embed_positions(
         "binding_max_candidates": int(binding_max_candidates),
         "binding_entity_hit_required": bool(binding_entity_hit_required),
         "require_new_crossing": bool(require_new_crossing),
+        "demand_gate": demand_gate,
+        "baseline_demand_assessment": baseline_demand_assessment,
         "binding_candidates_by_requirement": {
             req_id: [
                 {

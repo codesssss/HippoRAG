@@ -369,3 +369,54 @@ def test_rank_weight_keeps_deep_soft_gain_from_replacing_baseline_fill():
     assert rank_trace["rank_weight"] == 1.0
     assert rank_trace["selection_steps"][-1]["mode"] == "baseline_fill"
     assert rank_trace["selection_steps"][-1]["reason"] == "no_positive_requirement_gain"
+
+
+def test_demand_gate_preserves_baseline_when_requirements_already_satisfied():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Who directed Film X?",
+            anchor_mentions=("Film X",),
+            role="bridge",
+        ),
+    ]
+    requirement_embeddings = {"s1": np.asarray([1.0, 0.0])}
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Baseline Fill\nA high-ranked page that should be preserved.",
+        "Soft Gain\nThis page is slightly more similar but covers no new requirement.",
+    ]
+    pool_doc_ids = [0, 1, 2]
+    pool_doc_scores = np.asarray([1.0, 0.9, 0.1])
+    pool_doc_titles = ["Film X", "Baseline Fill", "Soft Gain"]
+    passage_embeddings = np.asarray([
+        [0.8, 0.2],
+        [0.0, 1.0],
+        [0.9, 0.1],
+    ])
+
+    selected, trace = select_dtc_embed_positions(
+        query="Who directed Film X?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=pool_doc_scores,
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"baseline"}, 2: {"soft"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.0,
+        dependency_bonus_weight=0.0,
+        demand_gate_enabled=True,
+        demand_gate_alpha=1.0,
+    )
+
+    assert selected == [0, 1]
+    assert trace["status"] == "demand_gate_preserve"
+    assert trace["demand_gate"]["preserve"] is True
+    assert trace["baseline_demand_assessment"]["covered_requirement_rate"] == 1.0

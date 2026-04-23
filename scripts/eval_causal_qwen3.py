@@ -5044,6 +5044,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            dtc_decomposition_mode: str = "llm",
                            dtc_enforce_dependencies: bool = True,
                            dtc_require_new_crossing: bool = False,
+                           dtc_demand_gate_enabled: bool = False,
+                           dtc_demand_gate_alpha: float = 1.0,
                            dtc_enable_dependency_binding: bool = False,
                            dtc_binding_max_candidates: int = 4,
                            dtc_binding_entity_hit_required: bool = True) -> Tuple[List[QuerySolution], Dict[str, object]]:
@@ -5119,6 +5121,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
     dtc_requirement_counts: List[int] = []
     dtc_covered_requirement_rates: List[float] = []
     dtc_embedding_available_requirement_counts: List[int] = []
+    dtc_baseline_demand_satisfaction_rates: List[float] = []
+    dtc_demand_gate_preserve_count = 0
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
     normalized_reader_order_probe_mode = normalize_setwise_reader_order_probe_mode(
         setwise_reader_order_probe_mode
@@ -5581,6 +5585,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 binding_max_candidates=int(dtc_binding_max_candidates),
                 binding_entity_hit_required=bool(dtc_binding_entity_hit_required),
                 require_new_crossing=bool(dtc_require_new_crossing),
+                demand_gate_enabled=bool(dtc_demand_gate_enabled),
+                demand_gate_alpha=float(dtc_demand_gate_alpha),
                 embed_texts_fn=embed_dtc_bound_texts if bool(dtc_enable_dependency_binding) else None,
             )
             selector_trace["decomposition_trace"] = decomposition_trace
@@ -5589,6 +5595,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["dtc_decomposition_mode"] = normalized_dtc_decomposition_mode
             selector_trace["dtc_enforce_dependencies"] = bool(dtc_enforce_dependencies)
             selector_trace["dtc_require_new_crossing"] = bool(dtc_require_new_crossing)
+            selector_trace["dtc_demand_gate_enabled"] = bool(dtc_demand_gate_enabled)
+            selector_trace["dtc_demand_gate_alpha"] = float(dtc_demand_gate_alpha)
             selector_trace["dtc_rank_weight"] = float(dtc_rank_weight)
             selector_trace["dtc_enable_dependency_binding"] = bool(dtc_enable_dependency_binding)
             selector_trace["dtc_binding_max_candidates"] = int(dtc_binding_max_candidates)
@@ -5597,6 +5605,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
             dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
             dtc_requirement_counts.append(int(selector_trace.get("requirement_count", 0) or 0))
             dtc_covered_requirement_rates.append(float(selector_trace.get("covered_requirement_rate", 0.0) or 0.0))
+            demand_gate_trace = dict(selector_trace.get("demand_gate", {}) or {})
+            baseline_assessment = dict(selector_trace.get("baseline_demand_assessment", {}) or {})
+            dtc_demand_gate_preserve_count += int(bool(demand_gate_trace.get("preserve", False)))
+            dtc_baseline_demand_satisfaction_rates.append(
+                float(baseline_assessment.get("covered_requirement_rate", 0.0) or 0.0)
+            )
             dtc_embedding_available_requirement_counts.append(
                 int(selector_trace.get("embedding_available_requirement_count", 0) or 0)
             )
@@ -6290,6 +6304,14 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "dtc_decomposition_mode": str(dtc_decomposition_mode),
             "dtc_enforce_dependencies": bool(dtc_enforce_dependencies),
             "dtc_require_new_crossing": bool(dtc_require_new_crossing),
+            "dtc_demand_gate_enabled": bool(dtc_demand_gate_enabled),
+            "dtc_demand_gate_alpha": round(float(dtc_demand_gate_alpha), 4),
+            "dtc_demand_gate_preserve_count": int(dtc_demand_gate_preserve_count),
+            "avg_dtc_baseline_demand_satisfaction_rate": round(
+                float(np.mean(dtc_baseline_demand_satisfaction_rates))
+                if dtc_baseline_demand_satisfaction_rates else 0.0,
+                4,
+            ),
             "dtc_enable_dependency_binding": bool(dtc_enable_dependency_binding),
             "dtc_binding_max_candidates": int(dtc_binding_max_candidates),
             "dtc_binding_entity_hit_required": bool(dtc_binding_entity_hit_required),
@@ -6987,6 +7009,10 @@ def main():
                         help="For --setwise_selector dtc_embed, enforce LLM-declared requirement dependencies before downstream coverage.")
     parser.add_argument("--dtc_require_new_crossing", type=string_to_bool, default=False,
                         help="For --setwise_selector dtc_embed, require a candidate to newly cross at least one requirement threshold before replacing baseline fill.")
+    parser.add_argument("--dtc_demand_gate_enabled", type=string_to_bool, default=False,
+                        help="For --setwise_selector dtc_embed, preserve the baseline top-k when it already satisfies enough decomposed evidence demands.")
+    parser.add_argument("--dtc_demand_gate_alpha", type=float, default=1.0,
+                        help="For --setwise_selector dtc_embed, minimum baseline demand-satisfaction rate required to preserve baseline context.")
     parser.add_argument("--dtc_enable_dependency_binding", type=string_to_bool, default=False,
                         help="For --setwise_selector dtc_embed, bind dependent subqueries to pool titles mentioned by upstream evidence.")
     parser.add_argument("--dtc_binding_max_candidates", type=int, default=4,
@@ -7514,6 +7540,8 @@ def main():
             dtc_decomposition_mode=str(args.dtc_decomposition_mode),
             dtc_enforce_dependencies=bool(args.dtc_enforce_dependencies),
             dtc_require_new_crossing=bool(args.dtc_require_new_crossing),
+            dtc_demand_gate_enabled=bool(args.dtc_demand_gate_enabled),
+            dtc_demand_gate_alpha=float(args.dtc_demand_gate_alpha),
             dtc_enable_dependency_binding=bool(args.dtc_enable_dependency_binding),
             dtc_binding_max_candidates=int(args.dtc_binding_max_candidates),
             dtc_binding_entity_hit_required=bool(args.dtc_binding_entity_hit_required),
@@ -7964,6 +7992,8 @@ def main():
             "dtc_decomposition_mode": str(args.dtc_decomposition_mode),
             "dtc_enforce_dependencies": bool(args.dtc_enforce_dependencies),
             "dtc_require_new_crossing": bool(args.dtc_require_new_crossing),
+            "dtc_demand_gate_enabled": bool(args.dtc_demand_gate_enabled),
+            "dtc_demand_gate_alpha": float(args.dtc_demand_gate_alpha),
             "dtc_enable_dependency_binding": bool(args.dtc_enable_dependency_binding),
             "dtc_binding_max_candidates": int(args.dtc_binding_max_candidates),
             "dtc_binding_entity_hit_required": bool(args.dtc_binding_entity_hit_required),
