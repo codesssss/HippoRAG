@@ -373,6 +373,7 @@ def select_dtc_embed_positions(
     require_new_crossing: bool = False,
     demand_gate_enabled: bool = False,
     demand_gate_alpha: float = 1.0,
+    repairable_filter_enabled: bool = False,
     ser_enabled: bool = False,
     ser_lambda0: float = 1.0,
     ser_anchor_binding_enabled: bool = False,
@@ -759,6 +760,27 @@ def select_dtc_embed_positions(
             "coverage_steps": local_steps,
         }
 
+    def repairable_requirement_status(req: DTCRequirement) -> Dict[str, object]:
+        has_explicit_anchor = bool(req.anchor_mentions)
+        has_resolved_binding = bool(binding_candidates_by_req.get(req.unit_id))
+        inference_veto = _is_inference_only_requirement(req)
+        repairable = (has_explicit_anchor or has_resolved_binding) and not inference_veto
+        if inference_veto:
+            reason = "inference_only_veto"
+        elif has_resolved_binding:
+            reason = "resolved_dependency_binding"
+        elif has_explicit_anchor:
+            reason = "explicit_anchor"
+        else:
+            reason = "unresolved_dependency_or_unanchored"
+        return {
+            "repairable": bool(repairable),
+            "reason": reason,
+            "has_explicit_anchor": bool(has_explicit_anchor),
+            "has_resolved_dependency_binding": bool(has_resolved_binding),
+            "inference_veto": bool(inference_veto),
+        }
+
     baseline_demand_assessment = compute_demand_assessment(range(target_k))
     demand_gate = {
         "enabled": bool(demand_gate_enabled),
@@ -795,6 +817,7 @@ def select_dtc_embed_positions(
             "binding_max_candidates": int(binding_max_candidates),
             "binding_entity_hit_required": bool(binding_entity_hit_required),
             "require_new_crossing": bool(require_new_crossing),
+            "repairable_filter_enabled": bool(repairable_filter_enabled),
             "demand_gate": demand_gate,
             "baseline_demand_assessment": baseline_demand_assessment,
             "binding_candidates_by_requirement": {},
@@ -1042,6 +1065,7 @@ def select_dtc_embed_positions(
             "binding_max_candidates": int(binding_max_candidates),
             "binding_entity_hit_required": bool(binding_entity_hit_required),
             "require_new_crossing": bool(require_new_crossing),
+            "repairable_filter_enabled": bool(repairable_filter_enabled),
             "demand_gate": demand_gate,
             "baseline_demand_assessment": baseline_demand_assessment,
             "ser": {
@@ -1123,6 +1147,9 @@ def select_dtc_embed_positions(
             for req in active_requirements:
                 if any(dep not in cover_position_by_req for dep in req.depends_on):
                     continue
+                repairable_status = repairable_requirement_status(req)
+                if bool(repairable_filter_enabled) and not bool(repairable_status.get("repairable", False)):
+                    continue
                 req_score, score_trace = score_requirement_for_position(req, pos)
                 previous = float(coverage_by_req.get(req.unit_id, 0.0))
                 delta = max(0.0, req_score - previous)
@@ -1136,6 +1163,8 @@ def select_dtc_embed_positions(
                         "previous": round(float(previous), 4),
                         "delta": round(float(delta), 4),
                         "binding_title": score_trace.get("binding_title", ""),
+                        "repairable": bool(repairable_status.get("repairable", False)),
+                        "repairable_reason": str(repairable_status.get("reason", "")),
                     })
             total_gain = (
                 float(coverage_gain)
@@ -1249,8 +1278,13 @@ def select_dtc_embed_positions(
         "binding_max_candidates": int(binding_max_candidates),
         "binding_entity_hit_required": bool(binding_entity_hit_required),
         "require_new_crossing": bool(require_new_crossing),
+        "repairable_filter_enabled": bool(repairable_filter_enabled),
         "demand_gate": demand_gate,
         "baseline_demand_assessment": baseline_demand_assessment,
+        "repairable_by_requirement": {
+            req.unit_id: repairable_requirement_status(req)
+            for req in active_requirements
+        },
         "binding_candidates_by_requirement": {
             req_id: [
                 {
