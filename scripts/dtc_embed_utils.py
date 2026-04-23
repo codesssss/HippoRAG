@@ -324,6 +324,28 @@ def _build_bound_subquery(subquery: str, candidate_title: str) -> str:
     return f"{text} Target entity: {title}."
 
 
+_INFERENCE_ONLY_PATTERN = re.compile(
+    r"\b("
+    r"same|both|either|neither|compare|comparison|"
+    r"earlier|later|older|younger|first|last|"
+    r"more|less|larger|smaller|highest|lowest|"
+    r"which\s+.+\s+(?:first|earlier|later|older|younger)"
+    r")\b",
+    flags=re.IGNORECASE,
+)
+
+
+def _is_inference_only_requirement(req: DTCRequirement) -> bool:
+    """Return True for final comparison/aggregation needs that a selector cannot satisfy directly."""
+    role = normalize_structure_text(req.role)
+    if role in {"comparison", "compare", "comparator"}:
+        return True
+    if role != "answer":
+        return False
+    text = f"{req.subquery} {req.expected_answer_type}"
+    return bool(_INFERENCE_ONLY_PATTERN.search(text))
+
+
 def select_dtc_embed_positions(
     *,
     query: str,
@@ -354,6 +376,7 @@ def select_dtc_embed_positions(
     ser_enabled: bool = False,
     ser_lambda0: float = 1.0,
     ser_anchor_binding_enabled: bool = False,
+    ser_repairable_residual_enabled: bool = False,
     embed_texts_fn: Callable[[Sequence[str]], Dict[str, np.ndarray]] | None = None,
 ) -> Tuple[List[int], Dict[str, object]]:
     pool_limit = len(pool_docs)
@@ -786,6 +809,8 @@ def select_dtc_embed_positions(
             "embedding_available_doc_count": int(len(doc_vectors)),
         }
 
+    ser_binding_candidates_by_req: Dict[str, List[Dict[str, object]]] = {}
+
     def ser_support_score(req: DTCRequirement, pos: int) -> float:
         raw_score = float(raw_match_scores.get(req.unit_id, np.zeros(pool_limit))[pos])
         if not np.isfinite(raw_score):
@@ -796,6 +821,25 @@ def select_dtc_embed_positions(
         else:
             semantic_score = (raw_score - threshold) / max(1e-9, 1.0 - threshold)
         semantic_score = min(1.0, max(0.0, float(semantic_score)))
+        binding_candidates = ser_binding_candidates_by_req.get(req.unit_id, [])
+        if binding_candidates:
+            best_binding_score = 0.0
+            for candidate in binding_candidates:
+                candidate_key = str(candidate.get("key", "") or "")
+                hit_score = _binding_candidate_hit_score(
+                    candidate_key,
+                    doc_entities_for_pos(pos),
+                    pool_doc_titles[pos],
+                    pool_docs[pos],
+                )
+                bound_scores = ensure_bound_score(req, candidate)
+                bound_score = float(bound_scores[pos]) if bound_scores is not None else 0.0
+                if binding_entity_hit_required and hit_score <= 0.0:
+                    effective = 0.0
+                else:
+                    effective = min(1.0, max(0.0, bound_score + float(dependency_bonus_weight) * hit_score))
+                best_binding_score = max(best_binding_score, float(effective))
+            semantic_score = best_binding_score
         if bool(ser_anchor_binding_enabled) and req.anchor_mentions:
             bind_score = _anchor_hit_score(
                 req.anchor_mentions,
@@ -843,13 +887,60 @@ def select_dtc_embed_positions(
     if bool(ser_enabled):
         baseline_positions = list(range(target_k))
         baseline_position_set = set(baseline_positions)
+        baseline_cover_positions = {
+            str(req_id): int(pos)
+            for req_id, pos in dict(baseline_demand_assessment.get("cover_position_by_requirement", {})).items()
+        }
+        ser_binding_candidates_by_req.update({
+            req.unit_id: collect_binding_candidates(req, set(), baseline_cover_positions)
+            for req in active_requirements
+        })
+        repairable_by_req: Dict[str, Dict[str, object]] = {}
+        for req in active_requirements:
+            has_explicit_anchor = bool(req.anchor_mentions)
+            has_resolved_binding = bool(ser_binding_candidates_by_req.get(req.unit_id))
+            inference_veto = _is_inference_only_requirement(req)
+            repairable = (has_explicit_anchor or has_resolved_binding) and not inference_veto
+            if not bool(ser_repairable_residual_enabled):
+                repairable = True
+            if inference_veto:
+                reason = "inference_only_veto"
+            elif has_resolved_binding:
+                reason = "resolved_dependency_binding"
+            elif has_explicit_anchor:
+                reason = "explicit_anchor"
+            else:
+                reason = "unresolved_dependency_or_unanchored"
+            repairable_by_req[req.unit_id] = {
+                "repairable": bool(repairable),
+                "reason": reason,
+                "has_explicit_anchor": bool(has_explicit_anchor),
+                "has_resolved_dependency_binding": bool(has_resolved_binding),
+                "inference_veto": bool(inference_veto),
+                "binding_candidates": [
+                    {
+                        "title": str(row.get("title", "") or ""),
+                        "dep": str(row.get("dep", "") or ""),
+                        "title_pool_position": int(row.get("title_pool_position", -1)),
+                    }
+                    for row in ser_binding_candidates_by_req.get(req.unit_id, [])
+                ],
+            }
         baseline_ser_coverage = ser_coverage(baseline_positions)
         baseline_sufficiency = (
             sum(float(value) for value in baseline_ser_coverage.values())
             / float(max(len(active_requirements), 1))
         )
-        residual_by_req = {
+        raw_residual_by_req = {
             req.unit_id: max(0.0, 1.0 - float(baseline_ser_coverage.get(req.unit_id, 0.0)))
+            for req in active_requirements
+        }
+        residual_by_req = {
+            req.unit_id: (
+                float(raw_residual_by_req.get(req.unit_id, 0.0))
+                if bool(repairable_by_req.get(req.unit_id, {}).get("repairable", True))
+                else 0.0
+            )
             for req in active_requirements
         }
         lambda_q = max(0.0, float(ser_lambda0)) * float(baseline_sufficiency)
@@ -958,21 +1049,31 @@ def select_dtc_embed_positions(
                 "lambda0": round(float(ser_lambda0), 4),
                 "lambda_q": round(float(lambda_q), 6),
                 "anchor_binding_enabled": bool(ser_anchor_binding_enabled),
+                "repairable_residual_enabled": bool(ser_repairable_residual_enabled),
                 "baseline_sufficiency": round(float(baseline_sufficiency), 6),
                 "baseline_coverage_by_requirement": {
                     req_id: round(float(score), 6)
                     for req_id, score in baseline_ser_coverage.items()
                 },
+                "raw_residual_by_requirement": {
+                    req_id: round(float(score), 6)
+                    for req_id, score in raw_residual_by_req.items()
+                },
                 "residual_by_requirement": {
                     req_id: round(float(score), 6)
                     for req_id, score in residual_by_req.items()
                 },
+                "repairable_by_requirement": repairable_by_req,
                 "objective": round(float(current_objective), 6),
                 "repair_gain": round(float(current_repair), 6),
                 "preservation_gain": round(float(current_preservation), 6),
                 "swap_count": int(len(ser_steps)),
             },
-            "binding_candidates_by_requirement": {},
+            "binding_candidates_by_requirement": {
+                req_id: rows
+                for req_id, rows in ser_binding_candidates_by_req.items()
+                if rows
+            },
             "covered_requirement_count": int(covered_count),
             "covered_requirement_rate": round(float(covered_count) / float(max(len(active_requirements), 1)), 4),
             "coverage_by_requirement": {

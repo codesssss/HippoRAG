@@ -5049,6 +5049,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            dtc_ser_enabled: bool = False,
                            dtc_ser_lambda0: float = 1.0,
                            dtc_ser_anchor_binding_enabled: bool = False,
+                           dtc_ser_repairable_residual_enabled: bool = False,
                            dtc_enable_dependency_binding: bool = False,
                            dtc_binding_max_candidates: int = 4,
                            dtc_binding_entity_hit_required: bool = True) -> Tuple[List[QuerySolution], Dict[str, object]]:
@@ -5593,6 +5594,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 ser_enabled=bool(dtc_ser_enabled),
                 ser_lambda0=float(dtc_ser_lambda0),
                 ser_anchor_binding_enabled=bool(dtc_ser_anchor_binding_enabled),
+                ser_repairable_residual_enabled=bool(dtc_ser_repairable_residual_enabled),
                 embed_texts_fn=embed_dtc_bound_texts if bool(dtc_enable_dependency_binding) else None,
             )
             selector_trace["decomposition_trace"] = decomposition_trace
@@ -5607,6 +5609,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["dtc_ser_enabled"] = bool(dtc_ser_enabled)
             selector_trace["dtc_ser_lambda0"] = float(dtc_ser_lambda0)
             selector_trace["dtc_ser_anchor_binding_enabled"] = bool(dtc_ser_anchor_binding_enabled)
+            selector_trace["dtc_ser_repairable_residual_enabled"] = bool(dtc_ser_repairable_residual_enabled)
             selector_trace["dtc_enable_dependency_binding"] = bool(dtc_enable_dependency_binding)
             selector_trace["dtc_binding_max_candidates"] = int(dtc_binding_max_candidates)
             selector_trace["dtc_binding_entity_hit_required"] = bool(dtc_binding_entity_hit_required)
@@ -7031,6 +7034,8 @@ def main():
                         help="For --setwise_selector dtc_embed with SER enabled, global weight for baseline preservation; query weight is lambda0 * baseline sufficiency.")
     parser.add_argument("--dtc_ser_anchor_binding_enabled", type=string_to_bool, default=False,
                         help="For --setwise_selector dtc_embed with SER enabled, multiply anchored requirement support by local anchor/title/entity hit.")
+    parser.add_argument("--dtc_ser_repairable_residual_enabled", type=string_to_bool, default=False,
+                        help="For --setwise_selector dtc_embed with SER enabled, only optimize residual demand for document-satisfiable requirements.")
     parser.add_argument("--dtc_enable_dependency_binding", type=string_to_bool, default=False,
                         help="For --setwise_selector dtc_embed, bind dependent subqueries to pool titles mentioned by upstream evidence.")
     parser.add_argument("--dtc_binding_max_candidates", type=int, default=4,
@@ -7563,6 +7568,7 @@ def main():
             dtc_ser_enabled=bool(args.dtc_ser_enabled),
             dtc_ser_lambda0=float(args.dtc_ser_lambda0),
             dtc_ser_anchor_binding_enabled=bool(args.dtc_ser_anchor_binding_enabled),
+            dtc_ser_repairable_residual_enabled=bool(args.dtc_ser_repairable_residual_enabled),
             dtc_enable_dependency_binding=bool(args.dtc_enable_dependency_binding),
             dtc_binding_max_candidates=int(args.dtc_binding_max_candidates),
             dtc_binding_entity_hit_required=bool(args.dtc_binding_entity_hit_required),
@@ -8018,6 +8024,7 @@ def main():
             "dtc_ser_enabled": bool(args.dtc_ser_enabled),
             "dtc_ser_lambda0": float(args.dtc_ser_lambda0),
             "dtc_ser_anchor_binding_enabled": bool(args.dtc_ser_anchor_binding_enabled),
+            "dtc_ser_repairable_residual_enabled": bool(args.dtc_ser_repairable_residual_enabled),
             "dtc_enable_dependency_binding": bool(args.dtc_enable_dependency_binding),
             "dtc_binding_max_candidates": int(args.dtc_binding_max_candidates),
             "dtc_binding_entity_hit_required": bool(args.dtc_binding_entity_hit_required),

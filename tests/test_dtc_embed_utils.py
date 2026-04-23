@@ -580,3 +580,135 @@ def test_ser_anchor_binding_blocks_wrong_entity_distractor():
     assert selected == [0, 1]
     assert trace["status"] == "ser_repair_preserve"
     assert trace["ser"]["anchor_binding_enabled"] is True
+
+
+def test_repairable_residual_ignores_unbound_dependent_answer():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Who directed Film X?",
+            expected_answer_type="person",
+            anchor_mentions=("Film X",),
+            role="bridge",
+        ),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Where was that director born?",
+            depends_on=("s1",),
+            expected_answer_type="location",
+            role="answer",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Baseline Fill\nA high-ranked page that should be preserved.",
+        "Place of birth\nThis page is semantically close but has no resolved entity binding.",
+    ]
+    pool_doc_ids = [0, 1, 2]
+    pool_doc_titles = ["Film X", "Baseline Fill", "Place of birth"]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.1, 0.0],
+        [0.0, 1.0],
+    ])
+
+    selected, trace = select_dtc_embed_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=np.asarray([1.0, 0.9, 0.1]),
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"baseline"}, 2: {"place of birth"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.0,
+        dependency_bonus_weight=0.0,
+        ser_enabled=True,
+        ser_lambda0=0.1,
+        ser_repairable_residual_enabled=True,
+    )
+
+    assert selected == [0, 1]
+    assert trace["status"] == "ser_repair_preserve"
+    assert trace["ser"]["repairable_residual_enabled"] is True
+    assert trace["ser"]["repairable_by_requirement"]["s2"]["repairable"] is False
+    assert trace["ser"]["residual_by_requirement"]["s2"] == 0.0
+
+
+def test_repairable_residual_uses_resolved_dependency_binding():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Who directed Film X?",
+            expected_answer_type="person",
+            anchor_mentions=("Film X",),
+            role="bridge",
+        ),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Where was that director born?",
+            depends_on=("s1",),
+            expected_answer_type="location",
+            role="answer",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Baseline Fill\nA high-ranked page that should be preserved.",
+        "Alice\nAlice was born in Paris.",
+    ]
+    pool_doc_ids = [0, 1, 2]
+    pool_doc_titles = ["Film X", "Baseline Fill", "Alice"]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.1, 0.0],
+        [0.0, 1.0],
+    ])
+
+    def embed_bound_texts(texts):
+        return {text: np.asarray([0.0, 1.0]) for text in texts}
+
+    selected, trace = select_dtc_embed_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=np.asarray([1.0, 0.9, 0.1]),
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"baseline"}, 2: {"alice", "paris"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.0,
+        dependency_bonus_weight=0.0,
+        ser_enabled=True,
+        ser_lambda0=0.1,
+        ser_repairable_residual_enabled=True,
+        enable_dependency_binding=True,
+        binding_entity_hit_required=True,
+        embed_texts_fn=embed_bound_texts,
+    )
+
+    assert selected == [0, 2]
+    assert trace["status"] == "ser_repair_applied"
+    assert trace["ser"]["repairable_by_requirement"]["s2"]["repairable"] is True
+    assert trace["ser"]["repairable_by_requirement"]["s2"]["reason"] == "resolved_dependency_binding"
+    assert trace["selection_steps"][0]["add_position"] == 2
