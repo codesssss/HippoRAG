@@ -1,0 +1,222 @@
+{
+  "query_alignment": [
+    {
+      "dataset": "2wikimultihopqa",
+      "display": "2Wiki",
+      "dataset_file_first_n_match": true,
+      "dataset_file_first_n": 100,
+      "dataset_file_sha1_prop": "cf8eb5f1a77d39d74bebd097dc78d419a7d84b5f",
+      "dataset_file_sha1_hippo": "cf8eb5f1a77d39d74bebd097dc78d419a7d84b5f",
+      "saved_examples_compared": 10,
+      "prop_saved_examples": 10,
+      "dtc_trace_examples": 100,
+      "saved_examples_match": true,
+      "first_mismatch": null
+    },
+    {
+      "dataset": "hotpotqa",
+      "display": "HotpotQA",
+      "dataset_file_first_n_match": true,
+      "dataset_file_first_n": 100,
+      "dataset_file_sha1_prop": "280c93c76b4b6f29f322b90b7e8320316a26a170",
+      "dataset_file_sha1_hippo": "280c93c76b4b6f29f322b90b7e8320316a26a170",
+      "saved_examples_compared": 10,
+      "prop_saved_examples": 10,
+      "dtc_trace_examples": 100,
+      "saved_examples_match": true,
+      "first_mismatch": null
+    },
+    {
+      "dataset": "musique",
+      "display": "MuSiQue",
+      "dataset_file_first_n_match": true,
+      "dataset_file_first_n": 100,
+      "dataset_file_sha1_prop": "41644b8bf2723b8313ed2dc556a0dfc4ebea6bec",
+      "dataset_file_sha1_hippo": "41644b8bf2723b8313ed2dc556a0dfc4ebea6bec",
+      "saved_examples_compared": 10,
+      "prop_saved_examples": 10,
+      "dtc_trace_examples": 100,
+      "saved_examples_match": true,
+      "first_mismatch": null
+    }
+  ],
+  "protocol_checks": [
+    {
+      "status": "PASS",
+      "check": "2Wiki: pilot limit",
+      "evidence": "both reports use limit=100"
+    },
+    {
+      "status": "PASS",
+      "check": "2Wiki: reader model",
+      "evidence": "qwen3-8b-train"
+    },
+    {
+      "status": "PASS",
+      "check": "2Wiki: embedding model",
+      "evidence": "VLLM/nvidia/NV-Embed-v2"
+    },
+    {
+      "status": "PASS",
+      "check": "2Wiki: embedding endpoint",
+      "evidence": "http://localhost:8019/v1/embeddings"
+    },
+    {
+      "status": "PASS",
+      "check": "2Wiki: top-100 budget",
+      "evidence": "retrieval_top_k/setwise_pool_k=100"
+    },
+    {
+      "status": "PASS",
+      "check": "2Wiki: QA context width",
+      "evidence": "PropRAG docs and DtC trace top titles are width 5"
+    },
+    {
+      "status": "PASS",
+      "check": "2Wiki: PropRAG max_new_tokens",
+      "evidence": "2048"
+    },
+    {
+      "status": "WARN",
+      "check": "2Wiki: DtC QA max_new_tokens",
+      "evidence": "DtC report does not serialize qa max_new_tokens; build_config currently sets BaseConfig.max_new_tokens=None."
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: pilot limit",
+      "evidence": "both reports use limit=100"
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: reader model",
+      "evidence": "qwen3-8b-train"
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: embedding model",
+      "evidence": "VLLM/nvidia/NV-Embed-v2"
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: embedding endpoint",
+      "evidence": "http://localhost:8019/v1/embeddings"
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: top-100 budget",
+      "evidence": "retrieval_top_k/setwise_pool_k=100"
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: QA context width",
+      "evidence": "PropRAG docs and DtC trace top titles are width 5"
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: PropRAG max_new_tokens",
+      "evidence": "2048"
+    },
+    {
+      "status": "WARN",
+      "check": "HotpotQA: DtC QA max_new_tokens",
+      "evidence": "DtC report does not serialize qa max_new_tokens; build_config currently sets BaseConfig.max_new_tokens=None."
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: pilot limit",
+      "evidence": "both reports use limit=100"
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: reader model",
+      "evidence": "qwen3-8b-train"
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: embedding model",
+      "evidence": "VLLM/nvidia/NV-Embed-v2"
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: embedding endpoint",
+      "evidence": "http://localhost:8019/v1/embeddings"
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: top-100 budget",
+      "evidence": "retrieval_top_k/setwise_pool_k=100"
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: QA context width",
+      "evidence": "PropRAG docs and DtC trace top titles are width 5"
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: PropRAG max_new_tokens",
+      "evidence": "2048"
+    },
+    {
+      "status": "WARN",
+      "check": "MuSiQue: DtC QA max_new_tokens",
+      "evidence": "DtC report does not serialize qa max_new_tokens; build_config currently sets BaseConfig.max_new_tokens=None."
+    },
+    {
+      "status": "WARN",
+      "check": "fixed-pool comparability",
+      "evidence": "PropRAG retrieves from its own proposition graph; DtC selects from HippoRAG top-100. This is not same fixed-pool composition."
+    }
+  ],
+  "gold_nothink_checks": [
+    {
+      "status": "PASS",
+      "check": "PropRAG QA prompt source",
+      "evidence": "qa() body uses query_solution.docs[:qa_top_k], not gold fields"
+    },
+    {
+      "status": "PASS",
+      "check": "PropRAG gold_docs retrieval use",
+      "evidence": "retrieved docs are built before recall evaluation: top_k_docs line 353, recall line 358"
+    },
+    {
+      "status": "PASS",
+      "check": "2Wiki: PropRAG examples gold leakage fields",
+      "evidence": "only gold_answers is serialized; no gold_docs in examples"
+    },
+    {
+      "status": "PASS",
+      "check": "HotpotQA: PropRAG examples gold leakage fields",
+      "evidence": "only gold_answers is serialized; no gold_docs in examples"
+    },
+    {
+      "status": "PASS",
+      "check": "MuSiQue: PropRAG examples gold leakage fields",
+      "evidence": "only gold_answers is serialized; no gold_docs in examples"
+    },
+    {
+      "status": "PASS",
+      "check": "PropRAG QA no-think",
+      "evidence": "/mnt/nvme/code/PropRAG/src/proprag/PropRAG.py"
+    },
+    {
+      "status": "PASS",
+      "check": "EnhancedOpenIE no-think",
+      "evidence": "/mnt/nvme/code/PropRAG/src/proprag/information_extraction/enhanced_openie.py"
+    },
+    {
+      "status": "PASS",
+      "check": "Proposition extraction no-think",
+      "evidence": "/mnt/nvme/code/PropRAG/src/proprag/information_extraction/proposition_extraction.py"
+    },
+    {
+      "status": "PASS",
+      "check": "OpenAI wrapper strips think envelope",
+      "evidence": "/mnt/nvme/code/PropRAG/src/proprag/llm/openai_gpt.py"
+    },
+    {
+      "status": "PASS",
+      "check": "PropRAG clean text artifacts contain think tags",
+      "evidence": "no <think> / </think> tags found in JSON/log/OpenIE text artifacts"
+    }
+  ]
+}

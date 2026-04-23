@@ -1,0 +1,55 @@
+{
+  "metrics": [
+    {
+      "dataset": "2wikimultihopqa",
+      "display": "2Wiki",
+      "hippo_baseline_em": 0.4,
+      "hippo_baseline_f1": 0.4531,
+      "dtc_em": 0.48,
+      "dtc_f1": 0.5477,
+      "dtc_delta_em": 0.08,
+      "dtc_delta_f1": 0.0946,
+      "dtc_recall5": 0.885,
+      "dtc_recall20": 0.915,
+      "prop_em": 0.6,
+      "prop_f1": 0.6468,
+      "prop_recall5": 0.935,
+      "prop_recall20": 0.9625,
+      "prop_recall100": 0.9875
+    },
+    {
+      "dataset": "hotpotqa",
+      "display": "HotpotQA",
+      "hippo_baseline_em": 0.57,
+      "hippo_baseline_f1": 0.6744,
+      "dtc_em": 0.59,
+      "dtc_f1": 0.7054,
+      "dtc_delta_em": 0.02,
+      "dtc_delta_f1": 0.031,
+      "dtc_recall5": 0.955,
+      "dtc_recall20": 0.995,
+      "prop_em": 0.57,
+      "prop_f1": 0.6912,
+      "prop_recall5": 0.93,
+      "prop_recall20": 0.995,
+      "prop_recall100": 1.0
+    },
+    {
+      "dataset": "musique",
+      "display": "MuSiQue",
+      "hippo_baseline_em": 0.3,
+      "hippo_baseline_f1": 0.3852,
+      "dtc_em": 0.37,
+      "dtc_f1": 0.4484,
+      "dtc_delta_em": 0.07,
+      "dtc_delta_f1": 0.0632,
+      "dtc_recall5": 0.7283,
+      "dtc_recall20": 0.8667,
+      "prop_em": 0.41,
+      "prop_f1": 0.463,
+      "prop_recall5": 0.6775,
+      "prop_recall20": 0.89,
+      "prop_recall100": 0.9725
+    }
+  ]
+}
