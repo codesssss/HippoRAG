@@ -27,7 +27,8 @@ def test_parse_dtc_decomposition_response_accepts_dependency_schema():
         "depends_on": [],
         "expected_answer_type": "person",
         "anchor_mentions": ["Film X"],
-        "role": "bridge"
+        "role": "bridge",
+        "satisfiable_by": "document"
       },
       {
         "id": "s2",
@@ -35,7 +36,8 @@ def test_parse_dtc_decomposition_response_accepts_dependency_schema():
         "depends_on": ["s1"],
         "expected_answer_type": "location",
         "anchor_mentions": [],
-        "role": "answer"
+        "role": "answer",
+        "satisfiable_by": "document"
       }
     ]
     """
@@ -45,6 +47,8 @@ def test_parse_dtc_decomposition_response_accepts_dependency_schema():
     assert [req.unit_id for req in requirements] == ["s1", "s2"]
     assert requirements[1].depends_on == ("s1",)
     assert requirements[0].anchor_mentions == ("Film X",)
+    assert requirements[0].satisfiable_by == "document"
+    assert requirements[1].satisfiable_by == "document"
 
 
 def test_select_dtc_embed_positions_covers_dependent_requirement_after_support():
@@ -197,6 +201,66 @@ def test_repairable_filter_skips_inference_only_answer_requirement():
             anchor_mentions=("Film X",),
             expected_answer_type="country",
             role="bridge",
+            satisfiable_by="document",
+        ),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Are the countries the same?",
+            expected_answer_type="boolean",
+            role="answer",
+            satisfiable_by="inference",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0, 0.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X is from France.",
+        "Baseline\nA high-ranked baseline page.",
+        "Same country\nThis page talks about whether countries are the same.",
+    ]
+    pool_doc_ids = [0, 1, 2]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0],
+        [0.0, 1.0, 0.0],
+    ])
+
+    selected, trace = select_dtc_embed_positions(
+        query="Are the countries from Film X and another film the same?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=np.asarray([1.0, 0.9, 0.1]),
+        pool_doc_titles=["Film X", "Baseline", "Same country"],
+        doc_idx_to_entities={0: {"film x", "france"}, 1: {"baseline"}, 2: {"same country"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.0,
+        dependency_bonus_weight=0.0,
+        repairable_filter_enabled=True,
+    )
+
+    assert selected == [0, 1]
+    assert trace["repairable_by_requirement"]["s2"]["repairable"] is False
+    assert trace["repairable_by_requirement"]["s2"]["reason"] == "inference_only_veto"
+    assert trace["repairable_by_requirement"]["s2"]["satisfiable_by"] == "inference"
+
+
+def test_repairable_filter_keeps_regex_fallback_without_satisfiable_by():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Which country is Film X from?",
+            anchor_mentions=("Film X",),
+            expected_answer_type="country",
+            role="bridge",
         ),
         DTCRequirement(
             unit_id="s2",
@@ -244,6 +308,7 @@ def test_repairable_filter_skips_inference_only_answer_requirement():
     assert selected == [0, 1]
     assert trace["repairable_by_requirement"]["s2"]["repairable"] is False
     assert trace["repairable_by_requirement"]["s2"]["reason"] == "inference_only_veto"
+    assert trace["repairable_by_requirement"]["s2"]["satisfiable_by"] == "unknown"
 
 
 def test_select_dtc_embed_positions_can_disable_dependency_ordering():

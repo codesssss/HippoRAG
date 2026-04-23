@@ -1466,9 +1466,11 @@ def request_dtc_requirements_from_llm(query: str,
                 "You decompose multi-hop QA questions into evidence requirements for fixed-pool passage selection. "
                 "Do not answer the question and do not fill unknown entities from world knowledge. "
                 "Return JSON only: an array of 1-4 objects. Each object must have keys: "
-                "id, subquery, depends_on, expected_answer_type, anchor_mentions, role. "
+                "id, subquery, depends_on, expected_answer_type, anchor_mentions, role, satisfiable_by. "
                 "Use ids like s1, s2. depends_on is a list of previous ids. "
-                "A subquery should describe the evidence needed, not the final answer."
+                "A subquery should describe the evidence needed, not the final answer. "
+                "Set satisfiable_by to 'document' if a specific document in the pool could satisfy the need, "
+                "or 'inference' if the reader must compare, aggregate, or reason across multiple documents."
             ),
         },
         {
@@ -1478,10 +1480,11 @@ def request_dtc_requirements_from_llm(query: str,
                 f"Question: {query}\n\n"
                 "Return JSON array only. Example:\n"
                 "[{\"id\":\"s1\",\"subquery\":\"Who directed film X?\",\"depends_on\":[],"
-                "\"expected_answer_type\":\"person\",\"anchor_mentions\":[\"film X\"],\"role\":\"bridge\"},"
+                "\"expected_answer_type\":\"person\",\"anchor_mentions\":[\"film X\"],"
+                "\"role\":\"bridge\",\"satisfiable_by\":\"document\"},"
                 "{\"id\":\"s2\",\"subquery\":\"What is the birthplace of that director?\","
                 "\"depends_on\":[\"s1\"],\"expected_answer_type\":\"location\","
-                "\"anchor_mentions\":[],\"role\":\"answer\"}]"
+                "\"anchor_mentions\":[],\"role\":\"answer\",\"satisfiable_by\":\"document\"}]"
             ),
         },
     ]

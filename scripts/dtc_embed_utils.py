@@ -18,6 +18,7 @@ class DTCRequirement:
     expected_answer_type: str = "unknown"
     anchor_mentions: Tuple[str, ...] = ()
     role: str = "support"
+    satisfiable_by: str = "unknown"
 
     def to_trace(self) -> Dict[str, object]:
         payload = asdict(self)
@@ -65,6 +66,15 @@ def _coerce_string_list(value: Any) -> Tuple[str, ...]:
         cleaned.append(text)
         seen.add(key)
     return tuple(cleaned)
+
+
+def _normalize_satisfiable_by(value: Any) -> str:
+    key = normalize_structure_text(value)
+    if key in {"document", "doc", "passage", "evidence"}:
+        return "document"
+    if key in {"inference", "reasoning", "reader", "aggregation", "comparison"}:
+        return "inference"
+    return "unknown"
 
 
 def parse_dtc_decomposition_response(
@@ -128,6 +138,7 @@ def parse_dtc_decomposition_response(
                 expected_answer_type=str(raw_step.get("expected_answer_type", "unknown") or "unknown").strip().lower(),
                 anchor_mentions=_coerce_string_list(raw_step.get("anchor_mentions", raw_step.get("anchors", []))),
                 role=str(raw_step.get("role", raw_step.get("type", "support")) or "support").strip().lower(),
+                satisfiable_by=_normalize_satisfiable_by(raw_step.get("satisfiable_by", "unknown")),
             )
         )
         if len(requirements) >= max(1, int(max_steps)):
@@ -144,6 +155,7 @@ def parse_dtc_decomposition_response(
                 expected_answer_type=req.expected_answer_type,
                 anchor_mentions=req.anchor_mentions,
                 role=req.role,
+                satisfiable_by=req.satisfiable_by,
             )
         )
 
@@ -163,6 +175,7 @@ def build_fallback_dtc_requirements(query: str) -> List[DTCRequirement]:
             expected_answer_type="unknown",
             anchor_mentions=(),
             role="query",
+            satisfiable_by="unknown",
         )
     ] if str(query or "").strip() else []
 
@@ -337,6 +350,11 @@ _INFERENCE_ONLY_PATTERN = re.compile(
 
 def _is_inference_only_requirement(req: DTCRequirement) -> bool:
     """Return True for final comparison/aggregation needs that a selector cannot satisfy directly."""
+    satisfiable_by = _normalize_satisfiable_by(req.satisfiable_by)
+    if satisfiable_by == "inference":
+        return True
+    if satisfiable_by == "document":
+        return False
     role = normalize_structure_text(req.role)
     if role in {"comparison", "compare", "comparator"}:
         return True
@@ -395,6 +413,7 @@ def select_dtc_embed_positions(
                 expected_answer_type=req.expected_answer_type,
                 anchor_mentions=req.anchor_mentions,
                 role=req.role,
+                satisfiable_by=req.satisfiable_by,
             )
             for req in active_requirements
         ]
@@ -764,6 +783,7 @@ def select_dtc_embed_positions(
         has_explicit_anchor = bool(req.anchor_mentions)
         has_resolved_binding = bool(binding_candidates_by_req.get(req.unit_id))
         inference_veto = _is_inference_only_requirement(req)
+        satisfiable_by = _normalize_satisfiable_by(req.satisfiable_by)
         repairable = (has_explicit_anchor or has_resolved_binding) and not inference_veto
         if inference_veto:
             reason = "inference_only_veto"
@@ -779,6 +799,7 @@ def select_dtc_embed_positions(
             "has_explicit_anchor": bool(has_explicit_anchor),
             "has_resolved_dependency_binding": bool(has_resolved_binding),
             "inference_veto": bool(inference_veto),
+            "satisfiable_by": satisfiable_by,
         }
 
     baseline_demand_assessment = compute_demand_assessment(range(target_k))
@@ -923,6 +944,7 @@ def select_dtc_embed_positions(
             has_explicit_anchor = bool(req.anchor_mentions)
             has_resolved_binding = bool(ser_binding_candidates_by_req.get(req.unit_id))
             inference_veto = _is_inference_only_requirement(req)
+            satisfiable_by = _normalize_satisfiable_by(req.satisfiable_by)
             repairable = (has_explicit_anchor or has_resolved_binding) and not inference_veto
             if not bool(ser_repairable_residual_enabled):
                 repairable = True
@@ -940,6 +962,7 @@ def select_dtc_embed_positions(
                 "has_explicit_anchor": bool(has_explicit_anchor),
                 "has_resolved_dependency_binding": bool(has_resolved_binding),
                 "inference_veto": bool(inference_veto),
+                "satisfiable_by": satisfiable_by,
                 "binding_candidates": [
                     {
                         "title": str(row.get("title", "") or ""),
