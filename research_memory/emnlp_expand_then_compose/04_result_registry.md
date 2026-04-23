@@ -35,6 +35,9 @@ Diversity baseline memo:
 DtC direction memo:
 - `research_memory/emnlp_expand_then_compose/14_dtc_nv_full1000_rank_prior_20260422.md`
 
+Demand gate ablation memo:
+- `research_memory/emnlp_expand_then_compose/15_demand_gate_ablation_20260423.md`
+
 Structure-blind diversity baselines:
 
 | Dataset | Baseline F1 | MMR F1 | DPP F1 | Oracle@100 F1 |
@@ -67,6 +70,19 @@ Interpretation:
 - Hard-crossing removes wins but does not remove losses.
 - Losses are better explained by false-positive requirement coverage, especially from deeper pool positions.
 - The next method should regularize coverage by base retriever rank instead of adding a hard acceptance gate.
+
+Demand-gate pilot100 ablation:
+
+| Dataset | No-Gate Delta F1 | Best Gate Delta F1 | Best Gate Wins/Losses | Interpretation |
+|---|---:|---:|---:|---|
+| 2Wiki | +0.0456 | +0.0382 | 6 / 1 | reduces losses but loses wins |
+| HotpotQA | +0.0310 | +0.0050 | 1 / 0 | over-abstains |
+| MuSiQue | +0.0397 | +0.0034 | 4 / 4 | over-abstains badly |
+
+Interpretation:
+- A hard compose-or-preserve gate is too conservative as the main method.
+- Gate remains useful as a diagnostic and negative ablation.
+- The next method should treat composition as conservative repair: continuous residual-demand reward plus sufficiency-calibrated baseline preservation, rather than binary abstention.
 
 ## 2WikiMultihopQA-1000
 

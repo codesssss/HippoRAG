@@ -145,3 +145,25 @@ Consequence:
 - Keep all claims tied to same-pool, same-reader evidence composition.
 - Canonical note:
   - `research_memory/emnlp_expand_then_compose/14_dtc_nv_full1000_rank_prior_20260422.md`
+
+## 2026-04-23: Demote demand gate to ablation and start SC-SER
+
+Decision:
+- Do not promote hard demand-gated DtC as the main paper method.
+- Keep demand gate as a diagnostic / negative ablation.
+- Start `SC-SER` as the next method line: sufficiency-calibrated selective evidence repair.
+
+Reason:
+- Pilot100 demand-gate sweep shows consistent over-abstention:
+  - `2Wiki`: best gate `F1 +0.0382` vs no-gate `+0.0456`
+  - `HotpotQA`: best gate `F1 +0.0050` vs no-gate `+0.0310`
+  - `MuSiQue`: best gate `F1 +0.0034` vs no-gate `+0.0397`
+- The hard gate reduces some losses but sacrifices too many wins.
+- This supports a softer repair objective rather than an if-else preserve policy.
+
+Consequence:
+- Treat fixed-pool composition as conservative repair from baseline top-5.
+- Use residual-demand coverage and a sufficiency-calibrated baseline preservation term.
+- Optimize by warm-start 1-swap and stop when no positive repair exists.
+- Canonical note:
+  - `research_memory/emnlp_expand_then_compose/15_demand_gate_ablation_20260423.md`

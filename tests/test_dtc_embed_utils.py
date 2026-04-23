@@ -420,3 +420,163 @@ def test_demand_gate_preserves_baseline_when_requirements_already_satisfied():
     assert trace["status"] == "demand_gate_preserve"
     assert trace["demand_gate"]["preserve"] is True
     assert trace["baseline_demand_assessment"]["covered_requirement_rate"] == 1.0
+
+
+def test_ser_repairs_missing_residual_requirement_with_one_swap():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Who directed Film X?",
+            anchor_mentions=("Film X",),
+            role="bridge",
+        ),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Where was that director born?",
+            expected_answer_type="location",
+            role="answer",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Baseline Fill\nA high-ranked page that does not satisfy the missing demand.",
+        "Alice\nAlice was born in Paris.",
+    ]
+    pool_doc_ids = [0, 1, 2]
+    pool_doc_titles = ["Film X", "Baseline Fill", "Alice"]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.1, 0.0],
+        [0.0, 1.0],
+    ])
+
+    selected, trace = select_dtc_embed_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=np.asarray([1.0, 0.9, 0.1]),
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"baseline"}, 2: {"alice", "paris"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.0,
+        dependency_bonus_weight=0.0,
+        ser_enabled=True,
+        ser_lambda0=0.2,
+    )
+
+    assert selected == [0, 2]
+    assert trace["status"] == "ser_repair_applied"
+    assert trace["ser"]["swap_count"] == 1
+    assert trace["selection_steps"][0]["mode"] == "ser_swap"
+    assert trace["selection_steps"][0]["add_position"] == 2
+
+
+def test_ser_preserves_sufficient_baseline_when_repair_gain_is_not_enough():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Who directed Film X?",
+            anchor_mentions=("Film X",),
+            role="bridge",
+        ),
+    ]
+    requirement_embeddings = {"s1": np.asarray([1.0, 0.0])}
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Baseline Fill\nA high-ranked page that should be preserved.",
+        "Soft Gain\nThis page is slightly more similar but covers no residual demand.",
+    ]
+    pool_doc_ids = [0, 1, 2]
+    pool_doc_titles = ["Film X", "Baseline Fill", "Soft Gain"]
+    passage_embeddings = np.asarray([
+        [0.8, 0.2],
+        [0.0, 1.0],
+        [0.9, 0.1],
+    ])
+
+    selected, trace = select_dtc_embed_positions(
+        query="Who directed Film X?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=np.asarray([1.0, 0.9, 0.1]),
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"baseline"}, 2: {"soft"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.0,
+        dependency_bonus_weight=0.0,
+        ser_enabled=True,
+        ser_lambda0=2.0,
+    )
+
+    assert selected == [0, 1]
+    assert trace["status"] == "ser_repair_preserve"
+    assert trace["ser"]["swap_count"] == 0
+    assert trace["ser"]["lambda_q"] > 0.0
+
+
+def test_ser_anchor_binding_blocks_wrong_entity_distractor():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Who directed Film X?",
+            anchor_mentions=("Film X",),
+            role="bridge",
+        ),
+    ]
+    requirement_embeddings = {"s1": np.asarray([1.0, 0.0])}
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Baseline Fill\nA high-ranked page that should be preserved.",
+        "Other Film\nOther Film was directed by Bob.",
+    ]
+    pool_doc_ids = [0, 1, 2]
+    pool_doc_titles = ["Film X", "Baseline Fill", "Other Film"]
+    passage_embeddings = np.asarray([
+        [0.8, 0.2],
+        [0.0, 1.0],
+        [0.95, 0.05],
+    ])
+
+    selected, trace = select_dtc_embed_positions(
+        query="Who directed Film X?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=pool_doc_ids,
+        pool_doc_scores=np.asarray([1.0, 0.9, 0.1]),
+        pool_doc_titles=pool_doc_titles,
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"baseline"}, 2: {"other film", "bob"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.0,
+        dependency_bonus_weight=0.0,
+        ser_enabled=True,
+        ser_lambda0=0.1,
+        ser_anchor_binding_enabled=True,
+    )
+
+    assert selected == [0, 1]
+    assert trace["status"] == "ser_repair_preserve"
+    assert trace["ser"]["anchor_binding_enabled"] is True

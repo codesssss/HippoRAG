@@ -351,6 +351,9 @@ def select_dtc_embed_positions(
     require_new_crossing: bool = False,
     demand_gate_enabled: bool = False,
     demand_gate_alpha: float = 1.0,
+    ser_enabled: bool = False,
+    ser_lambda0: float = 1.0,
+    ser_anchor_binding_enabled: bool = False,
     embed_texts_fn: Callable[[Sequence[str]], Dict[str, np.ndarray]] | None = None,
 ) -> Tuple[List[int], Dict[str, object]]:
     pool_limit = len(pool_docs)
@@ -782,6 +785,215 @@ def select_dtc_embed_positions(
             "embedding_available_requirement_count": int(sum(req_vectors.get(req.unit_id, np.array([])).size > 0 for req in active_requirements)),
             "embedding_available_doc_count": int(len(doc_vectors)),
         }
+
+    def ser_support_score(req: DTCRequirement, pos: int) -> float:
+        raw_score = float(raw_match_scores.get(req.unit_id, np.zeros(pool_limit))[pos])
+        if not np.isfinite(raw_score):
+            return 0.0
+        threshold = float(match_threshold)
+        if threshold >= 1.0:
+            semantic_score = 1.0 if raw_score >= threshold else 0.0
+        else:
+            semantic_score = (raw_score - threshold) / max(1e-9, 1.0 - threshold)
+        semantic_score = min(1.0, max(0.0, float(semantic_score)))
+        if bool(ser_anchor_binding_enabled) and req.anchor_mentions:
+            bind_score = _anchor_hit_score(
+                req.anchor_mentions,
+                pool_doc_titles[pos],
+                pool_docs[pos],
+                doc_entities_for_pos(pos),
+            )
+            semantic_score *= min(1.0, max(0.0, float(bind_score)))
+        return min(1.0, max(0.0, semantic_score))
+
+    def ser_coverage(positions: Sequence[int]) -> Dict[str, float]:
+        valid_positions = [
+            int(pos)
+            for pos in positions
+            if 0 <= int(pos) < pool_limit
+        ]
+        coverage: Dict[str, float] = {}
+        for req in active_requirements:
+            miss_prob = 1.0
+            for pos in valid_positions:
+                miss_prob *= 1.0 - ser_support_score(req, pos)
+            coverage[req.unit_id] = min(1.0, max(0.0, 1.0 - miss_prob))
+        return coverage
+
+    def ser_objective(
+        positions: Sequence[int],
+        residual_by_req: Dict[str, float],
+        lambda_q: float,
+        baseline_position_set: set[int],
+    ) -> Tuple[float, Dict[str, float], float, float]:
+        coverage = ser_coverage(positions)
+        repair_gain = sum(
+            float(residual_by_req.get(req.unit_id, 0.0)) * float(coverage.get(req.unit_id, 0.0))
+            for req in active_requirements
+        )
+        baseline_overlap = len({int(pos) for pos in positions} & baseline_position_set)
+        preservation_gain = float(lambda_q) * float(baseline_overlap) / float(max(target_k, 1))
+        return (
+            float(repair_gain + preservation_gain),
+            coverage,
+            float(repair_gain),
+            float(preservation_gain),
+        )
+
+    if bool(ser_enabled):
+        baseline_positions = list(range(target_k))
+        baseline_position_set = set(baseline_positions)
+        baseline_ser_coverage = ser_coverage(baseline_positions)
+        baseline_sufficiency = (
+            sum(float(value) for value in baseline_ser_coverage.values())
+            / float(max(len(active_requirements), 1))
+        )
+        residual_by_req = {
+            req.unit_id: max(0.0, 1.0 - float(baseline_ser_coverage.get(req.unit_id, 0.0)))
+            for req in active_requirements
+        }
+        lambda_q = max(0.0, float(ser_lambda0)) * float(baseline_sufficiency)
+        current_positions = list(baseline_positions)
+        current_objective, current_coverage, current_repair, current_preservation = ser_objective(
+            current_positions,
+            residual_by_req,
+            lambda_q,
+            baseline_position_set,
+        )
+        ser_steps: List[Dict[str, object]] = []
+        max_swaps = max(0, min(target_k, pool_limit - target_k))
+        for _ in range(max_swaps):
+            selected_set = set(current_positions)
+            best_swap: Dict[str, object] | None = None
+            for candidate_pos in range(pool_limit):
+                if candidate_pos in selected_set:
+                    continue
+                candidate_title_key = normalize_structure_text(pool_doc_titles[candidate_pos])
+                for slot_idx, remove_pos in enumerate(list(current_positions)):
+                    if bool(non_anchor_title_dedup) and candidate_title_key:
+                        duplicate = any(
+                            normalize_structure_text(pool_doc_titles[kept_pos]) == candidate_title_key
+                            for kept_pos in current_positions
+                            if int(kept_pos) != int(remove_pos)
+                        )
+                        if duplicate:
+                            continue
+                    proposed_positions = list(current_positions)
+                    proposed_positions[slot_idx] = int(candidate_pos)
+                    proposed_objective, proposed_coverage, proposed_repair, proposed_preservation = ser_objective(
+                        proposed_positions,
+                        residual_by_req,
+                        lambda_q,
+                        baseline_position_set,
+                    )
+                    delta = float(proposed_objective - current_objective)
+                    if delta <= 1e-9:
+                        continue
+                    row = {
+                        "slot": int(slot_idx),
+                        "remove_position": int(remove_pos),
+                        "remove_title": pool_doc_titles[remove_pos],
+                        "add_position": int(candidate_pos),
+                        "add_title": pool_doc_titles[candidate_pos],
+                        "objective": float(proposed_objective),
+                        "delta": float(delta),
+                        "repair_gain": float(proposed_repair),
+                        "preservation_gain": float(proposed_preservation),
+                        "coverage": proposed_coverage,
+                    }
+                    if best_swap is None or (
+                        float(row["delta"]),
+                        float(row["objective"]),
+                        int(remove_pos),
+                        -int(candidate_pos),
+                    ) > (
+                        float(best_swap["delta"]),
+                        float(best_swap["objective"]),
+                        int(best_swap["remove_position"]),
+                        -int(best_swap["add_position"]),
+                    ):
+                        best_swap = row
+            if best_swap is None:
+                break
+            current_positions[int(best_swap["slot"])] = int(best_swap["add_position"])
+            current_objective = float(best_swap["objective"])
+            current_coverage = dict(best_swap["coverage"])
+            current_repair = float(best_swap["repair_gain"])
+            current_preservation = float(best_swap["preservation_gain"])
+            ser_steps.append({
+                "step": int(len(ser_steps) + 1),
+                "mode": "ser_swap",
+                "slot": int(best_swap["slot"]),
+                "remove_position": int(best_swap["remove_position"]),
+                "remove_title": str(best_swap["remove_title"]),
+                "add_position": int(best_swap["add_position"]),
+                "add_title": str(best_swap["add_title"]),
+                "objective_delta": round(float(best_swap["delta"]), 6),
+                "objective": round(float(current_objective), 6),
+                "repair_gain": round(float(current_repair), 6),
+                "preservation_gain": round(float(current_preservation), 6),
+            })
+        covered_count = sum(
+            1 for value in current_coverage.values()
+            if float(value) >= float(match_threshold)
+        )
+        trace = {
+            "selector": "dtc_embed",
+            "status": "ser_repair_applied" if ser_steps else "ser_repair_preserve",
+            "query": str(query),
+            "requirement_count": int(len(active_requirements)),
+            "requirements": [req.to_trace() for req in active_requirements],
+            "match_threshold": round(float(match_threshold), 4),
+            "rank_weight": round(float(rank_weight), 4),
+            "reserve_top_m": int(reserve_count),
+            "dependency_binding_enabled": bool(enable_dependency_binding),
+            "dependency_enforced": bool(enforce_dependencies),
+            "binding_max_candidates": int(binding_max_candidates),
+            "binding_entity_hit_required": bool(binding_entity_hit_required),
+            "require_new_crossing": bool(require_new_crossing),
+            "demand_gate": demand_gate,
+            "baseline_demand_assessment": baseline_demand_assessment,
+            "ser": {
+                "enabled": True,
+                "lambda0": round(float(ser_lambda0), 4),
+                "lambda_q": round(float(lambda_q), 6),
+                "anchor_binding_enabled": bool(ser_anchor_binding_enabled),
+                "baseline_sufficiency": round(float(baseline_sufficiency), 6),
+                "baseline_coverage_by_requirement": {
+                    req_id: round(float(score), 6)
+                    for req_id, score in baseline_ser_coverage.items()
+                },
+                "residual_by_requirement": {
+                    req_id: round(float(score), 6)
+                    for req_id, score in residual_by_req.items()
+                },
+                "objective": round(float(current_objective), 6),
+                "repair_gain": round(float(current_repair), 6),
+                "preservation_gain": round(float(current_preservation), 6),
+                "swap_count": int(len(ser_steps)),
+            },
+            "binding_candidates_by_requirement": {},
+            "covered_requirement_count": int(covered_count),
+            "covered_requirement_rate": round(float(covered_count) / float(max(len(active_requirements), 1)), 4),
+            "coverage_by_requirement": {
+                req_id: round(float(score), 6)
+                for req_id, score in current_coverage.items()
+            },
+            "cover_position_by_requirement": {
+                req_id: int(max(
+                    current_positions,
+                    key=lambda pos, unit_id=req_id: ser_support_score(req_by_id[unit_id], int(pos)),
+                ))
+                for req_id in current_coverage
+                if req_id in req_by_id and current_positions
+            },
+            "selected_positions": list(current_positions[:target_k]),
+            "selected_titles": [pool_doc_titles[pos] for pos in current_positions[:target_k]],
+            "selection_steps": ser_steps,
+            "embedding_available_requirement_count": int(sum(req_vectors.get(req.unit_id, np.array([])).size > 0 for req in active_requirements)),
+            "embedding_available_doc_count": int(len(doc_vectors)),
+        }
+        return current_positions[:target_k], trace
 
     for reserved_pos in list(selected_positions):
         mark_coverage_from_position(reserved_pos, mode="reserve")
