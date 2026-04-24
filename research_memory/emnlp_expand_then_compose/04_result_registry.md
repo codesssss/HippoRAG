@@ -1,6 +1,6 @@
 # Result Registry
 
-Last updated: 2026-04-22
+Last updated: 2026-04-24
 
 This file stores concrete results only. Every result must have a file path.
 
@@ -25,7 +25,8 @@ Key status:
 - `DtC-Embed` is now the active fixed-pool composition method candidate:
   - aligned NV-Embed non-instruction full1000 is positive on all three datasets
   - hard-crossing ablation is negative as a main fix
-  - rank-regularized demand coverage is the next implementation target
+  - Layer-1 retriever-agnostic runs are positive on both PropRAG top-100 pools and dense NV-Embed top-100 pools
+  - 2Wiki PropRAG-pool ablation supports dependency binding, but does not support rank prior or repair typing as necessary components
 
 ## Fixed-Pool Composition Baselines and DtC
 
@@ -37,6 +38,15 @@ DtC direction memo:
 
 Demand gate ablation memo:
 - `research_memory/emnlp_expand_then_compose/15_demand_gate_ablation_20260423.md`
+
+Satisfiable-by prompt sweep memo:
+- `research_memory/emnlp_expand_then_compose/satisfiable_by_prompt_sweep_20260424.md`
+
+Layer-1 retriever-agnostic composition memo:
+- `research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md`
+
+Layer-1 follow-up memo:
+- `research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md`
 
 Structure-blind diversity baselines:
 
@@ -83,6 +93,105 @@ Interpretation:
 - A hard compose-or-preserve gate is too conservative as the main method.
 - Gate remains useful as a diagnostic and negative ablation.
 - The next method should treat composition as conservative repair: continuous residual-demand reward plus sufficiency-calibrated baseline preservation, rather than binary abstention.
+
+Satisfiable-by prompt/policy sweep:
+
+| Variant | Avg Selector F1 | Interpretation |
+|---|---:|---|
+| `old_repairable` | 0.5672 | best validated prompt |
+| `sat_by_strict` | 0.5587 | too strict; loses dependent evidence |
+| `binding_override` | 0.5601 | safer than strict but still below old prompt |
+| `grounded_override` | 0.5616 | best schema-based variant, still below old prompt |
+| `regex_only` | 0.5590 | shows the prompt/schema perturbation itself causes most of the drop |
+
+Interpretation:
+- Keep `satisfiable_by` parsing and downstream policy support in code.
+- Default `--dtc_include_satisfiable_by=false` for main experiments to preserve the validated decomposition prompt.
+- Use `--dtc_include_satisfiable_by=true` only for diagnostic/appendix taxonomy runs unless later evidence reverses this result.
+
+Layer-1 PropRAG-pool + DAEC/DtC full1000:
+
+| Dataset | Report | Base EM/F1 | DAEC EM/F1 | Delta EM/F1 | Oracle F1 | R@5 / R@20 / R@100 |
+|---|---|---:|---:|---:|---:|---:|
+| 2Wiki | `run_logs/layer1_proprag_pool_eval_fixed_20260424/2wikimultihopqa_proprag_pool_daec_oracle.json` | 0.5750 / 0.6457 | 0.6070 / 0.6810 | +0.0320 / +0.0353 | 0.7311 | 0.9028 / 0.9607 / 0.9872 |
+| HotpotQA | `run_logs/layer1_proprag_pool_eval_fixed_20260424/hotpotqa_proprag_pool_daec_oracle.json` | 0.5950 / 0.7227 | 0.6060 / 0.7348 | +0.0110 / +0.0121 | 0.7697 | 0.9500 / 0.9925 / 0.9990 |
+| MuSiQue | `run_logs/layer1_proprag_pool_eval_fixed_20260424/musique_proprag_pool_daec_oracle.json` | 0.3300 / 0.4266 | 0.3390 / 0.4404 | +0.0090 / +0.0138 | 0.6019 | 0.7131 / 0.8942 / 0.9677 |
+
+Layer-1 dense-pool + DAEC/DtC full1000:
+
+| Dataset | Report | Base EM/F1 | DAEC EM/F1 | Delta EM/F1 | Oracle F1 | R@5 / R@20 / R@100 |
+|---|---|---:|---:|---:|---:|---:|
+| 2Wiki | `run_logs/layer1_dense_pool_eval_20260424/2wikimultihopqa_dense_pool_daec_oracle.json` | 0.4550 / 0.4984 | 0.5060 / 0.5628 | +0.0510 / +0.0644 | 0.6396 | 0.7238 / 0.7990 / 0.8770 |
+| HotpotQA | `run_logs/layer1_dense_pool_eval_20260424/hotpotqa_dense_pool_daec_oracle.json` | 0.5950 / 0.7106 | 0.6140 / 0.7326 | +0.0190 / +0.0220 | 0.7669 | 0.9305 / 0.9830 / 0.9925 |
+| MuSiQue | `run_logs/layer1_dense_pool_eval_20260424/musique_dense_pool_daec_oracle.json` | 0.2980 / 0.3896 | 0.3160 / 0.4138 | +0.0180 / +0.0242 | 0.5521 | 0.6628 / 0.8197 / 0.9055 |
+
+Layer-1 2Wiki PropRAG-pool internal ablation:
+
+| Variant | Report | Selector EM/F1 | Delta EM/F1 | Interpretation |
+|---|---|---:|---:|---|
+| Full | `run_logs/layer1_proprag_pool_eval_fixed_20260424/2wikimultihopqa_proprag_pool_daec_oracle.json` | 0.6070 / 0.6810 | +0.0320 / +0.0353 | current conservative full config |
+| `nobinding` | `run_logs/layer1_proprag_pool_ablation_2wiki_20260424/2wikimultihopqa_nobinding.json` | 0.5900 / 0.6599 | +0.0150 / +0.0142 | dependency binding is load-bearing |
+| `norepairtyping` | `run_logs/layer1_proprag_pool_ablation_2wiki_20260424/2wikimultihopqa_norepairtyping.json` | 0.6110 / 0.6841 | +0.0360 / +0.0384 | repair typing not supported as necessary on 2Wiki |
+| `norank` | `run_logs/layer1_proprag_pool_ablation_2wiki_20260424/2wikimultihopqa_norank.json` | 0.6110 / 0.6846 | +0.0360 / +0.0389 | rank prior not supported as necessary on 2Wiki |
+
+Interpretation:
+- DAEC/DtC improves all three datasets on both PropRAG top-100 and dense NV-Embed top-100 pools.
+- This supports a retriever-agnostic fixed-pool composition claim, not only a HippoRAG-specific selector claim.
+- Dependency binding is the strongest supported component in the current ablation evidence.
+- Rank prior and repair typing should not be overclaimed until cross-dataset ablations support them.
+- MuSiQue has substantial oracle headroom but weak recovery, so residual failure analysis is now higher priority than adding another gate.
+
+Layer-1 paired significance:
+
+Source:
+- `run_logs/layer1_significance_20260424/summary.md`
+
+| Dataset | Pool | Delta F1 | 95% CI | F1 p-value | Delta EM | 95% CI | EM p-value |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 2Wiki | PropRAG | +0.0353 | [+0.0230, +0.0480] | 0.0001 | +0.0320 | [+0.0190, +0.0450] | 0.0001 |
+| HotpotQA | PropRAG | +0.0121 | [+0.0047, +0.0200] | 0.0021 | +0.0110 | [+0.0040, +0.0190] | 0.0074 |
+| MuSiQue | PropRAG | +0.0138 | [+0.0012, +0.0266] | 0.0352 | +0.0090 | [-0.0040, +0.0220] | 0.2138 |
+| 2Wiki | Dense | +0.0644 | [+0.0489, +0.0802] | 0.0001 | +0.0510 | [+0.0360, +0.0660] | 0.0001 |
+| HotpotQA | Dense | +0.0221 | [+0.0123, +0.0326] | 0.0001 | +0.0190 | [+0.0090, +0.0300] | 0.0005 |
+| MuSiQue | Dense | +0.0242 | [+0.0111, +0.0376] | 0.0001 | +0.0180 | [+0.0050, +0.0310] | 0.0112 |
+
+Interpretation:
+- All six F1 gains have bootstrap 95% confidence intervals above zero.
+- EM is significant for five of six settings; `MuSiQue x PropRAG` remains F1-positive but EM-uncertain.
+
+Layer-1 failure taxonomy:
+
+Source:
+- `run_logs/failure_taxonomy_layer1_20260424/summary.md`
+
+| Pool | Dataset | Changed | Wins | Losses | Mean Delta F1 | Loss: gold pushed | Loss: reader noise | Loss: binding candidate | Loss: other |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| PropRAG | 2Wiki | 191 | 47 | 8 | +0.0353 | 1 | 3 | 1 | 3 |
+| PropRAG | HotpotQA | 130 | 17 | 3 | +0.0121 | 0 | 3 | 0 | 0 |
+| PropRAG | MuSiQue | 334 | 39 | 28 | +0.0138 | 1 | 9 | 9 | 9 |
+| Dense | 2Wiki | 226 | 79 | 6 | +0.0644 | 1 | 3 | 1 | 1 |
+| Dense | HotpotQA | 117 | 35 | 6 | +0.0221 | 2 | 3 | 0 | 1 |
+| Dense | MuSiQue | 307 | 52 | 22 | +0.0242 | 3 | 6 | 7 | 6 |
+
+Interpretation:
+- `MuSiQue` remains the residual failure dataset: it has the largest number of losses and a mixed loss profile.
+- `HotpotQA` losses are mostly reader interference, consistent with its shallow support structure.
+- The automatic taxonomy is conservative; the emitted `*.loss_cases.jsonl` files should be manually audited before writing final qualitative claims.
+
+Layer-1 targeted `nobinding` ablation:
+
+| Dataset | Pool | Full DAEC Delta F1 | NoBinding Delta F1 | Binding Contribution | NoBinding Report |
+|---|---|---:|---:|---:|---|
+| 2Wiki | PropRAG | +0.0353 | +0.0142 | +0.0211 | `run_logs/layer1_proprag_pool_ablation_2wiki_20260424/2wikimultihopqa_nobinding.json` |
+| 2Wiki | Dense | +0.0644 | +0.0100 | +0.0544 | `run_logs/layer1_targeted_nobinding_20260424/2wikimultihopqa_dense_nvembed_top100_nobinding.json` |
+| HotpotQA | PropRAG | +0.0121 | +0.0009 | +0.0112 | `run_logs/layer1_targeted_nobinding_20260424/hotpotqa_proprag_clean_nothink_top100_nobinding.json` |
+| MuSiQue | PropRAG | +0.0138 | +0.0055 | +0.0083 | `run_logs/layer1_targeted_nobinding_20260424/musique_proprag_clean_nothink_top100_nobinding.json` |
+| MuSiQue | Dense | +0.0242 | -0.0003 | +0.0245 | `run_logs/layer1_targeted_nobinding_20260424/musique_dense_nvembed_top100_nobinding.json` |
+
+Interpretation:
+- Dependency binding is not a `2Wiki + PropRAG` artifact.
+- All five tested `(dataset, pool)` pairs lose F1 when binding is disabled.
+- Binding should remain a main-method component; rank prior and repair typing should remain optional/appendix until broader ablations support them.
 
 ## 2WikiMultihopQA-1000
 

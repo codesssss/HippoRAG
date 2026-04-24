@@ -1132,6 +1132,18 @@ class HippoRAG:
         """
         #Running inference for QA
         all_qa_messages = []
+        qa_doc_max_chars = max(0, int(getattr(self.global_config, "qa_doc_max_chars", 0) or 0))
+
+        def truncate_qa_passage(passage: str) -> str:
+            if qa_doc_max_chars <= 0 or len(passage) <= qa_doc_max_chars:
+                return passage
+            first_line, sep, rest = passage.partition("\n")
+            if not sep:
+                return passage[:qa_doc_max_chars].rstrip() + " ... [truncated]"
+            remaining = max(0, qa_doc_max_chars - len(first_line) - 1)
+            if remaining <= 0:
+                return first_line[:qa_doc_max_chars].rstrip() + " ... [truncated]"
+            return first_line + "\n" + rest[:remaining].rstrip() + " ... [truncated]"
 
         for query_solution in tqdm(queries, desc="Collecting QA prompts"):
 
@@ -1144,6 +1156,7 @@ class HippoRAG:
 
             prompt_user = ''
             for passage in retrieved_passages:
+                passage = truncate_qa_passage(str(passage))
                 prompt_user += f'Wikipedia Title: {passage}\n\n'
 
             causal_context_items = []
@@ -1160,6 +1173,7 @@ class HippoRAG:
                         'trust the retrieved Wikipedia passages.\n\n'
                     )
             retrieval_trace["generator_used_causal_context"] = bool(causal_context_items)
+            retrieval_trace["reader_qa_doc_max_chars"] = int(qa_doc_max_chars)
 
             prompt_user += 'Question: ' + query_solution.question + '\nThought: '
 

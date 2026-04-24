@@ -161,16 +161,21 @@ class CacheOpenAI(BaseLLM):
         else:
             client = httpx.Client(trust_env=trust_env) if self.global_config.azure_endpoint is None else None
 
-        self.max_retries = kwargs.get("max_retries", 2)
+        self.max_retries = kwargs.get(
+            "max_retries",
+            getattr(global_config, "max_retry_attempts", 2),
+        )
         api_key = os.getenv("OPENAI_API_KEY")
         if is_local_base_url and not api_key:
             api_key = "sk-"
+
+        client_max_retries = min(self.max_retries, 2) if is_local_base_url else self.max_retries
 
         if self.global_config.azure_endpoint is None:
             self.openai_client = OpenAI(
                 base_url=self.llm_base_url,
                 http_client=client,
-                max_retries=self.max_retries,
+                max_retries=client_max_retries,
                 api_key=api_key,
             )
         else:

@@ -24,10 +24,12 @@ rag_qa_system = (
     'As an advanced reading comprehension assistant, analyze the passages and answer the question using only the provided evidence. '
     'Start your response after "Thought: " with brief reasoning. '
     'Your final line must be exactly in the format "Answer: <short answer>". '
+    'Do not output hidden reasoning tags such as <think>. '
     'Do not add any text after that final Answer line.'
 )
 
 one_shot_rag_qa_input = (
+    "/no_think\n"
     f"{one_shot_rag_qa_docs}"
     "\n\nQuestion: "
     "When was Neville A. Stanton's employer founded?"
@@ -44,5 +46,5 @@ prompt_template = [
     {"role": "system", "content": rag_qa_system},
     {"role": "user", "content": one_shot_rag_qa_input},
     {"role": "assistant", "content": one_shot_rag_qa_output},
-    {"role": "user", "content": "${prompt_user} Keep the reasoning brief and end with exactly one final line in the format \"Answer: <short answer>\"."}
+    {"role": "user", "content": "/no_think\n${prompt_user} Keep the reasoning brief and end with exactly one final line in the format \"Answer: <short answer>\"."}
 ]

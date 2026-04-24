@@ -416,6 +416,10 @@ class BaseConfig:
         default=5,
         metadata={"help": "Feeding top k documents to the QA model for reading."}
     )
+    qa_doc_max_chars: int = field(
+        default=0,
+        metadata={"help": "Optional per-document character cap for QA context. Non-positive means no truncation."}
+    )
     
     # Save dir (highest level directory)
     save_dir: str = field(

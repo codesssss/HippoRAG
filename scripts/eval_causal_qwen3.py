@@ -523,6 +523,146 @@ def build_doc_text_to_chunk_id(corpus: List[dict]) -> Dict[str, str]:
     return doc_text_to_chunk_id
 
 
+def build_unique_title_to_doc_text(corpus: List[dict]) -> Dict[str, str]:
+    title_to_docs: Dict[str, List[str]] = {}
+    for row in corpus:
+        title_key = normalize_structure_text(str(row.get("title", "")))
+        if not title_key:
+            continue
+        title_to_docs.setdefault(title_key, []).append(f"{row['title']}\n{row['text']}")
+    return {
+        title_key: doc_values[0]
+        for title_key, doc_values in title_to_docs.items()
+        if len(doc_values) == 1
+    }
+
+
+def load_external_pool_query_solutions(pool_json_path: str | Path,
+                                       *,
+                                       dataset_name: str,
+                                       samples: Sequence[dict],
+                                       corpus: List[dict],
+                                       gold_docs: Sequence[Sequence[str]],
+                                       gold_answers: Sequence[Sequence[str]],
+                                       source_name: str = "external_pool",
+                                       strict_questions: bool = True) -> Tuple[List[QuerySolution], Dict[str, object]]:
+    pool_path = Path(pool_json_path)
+    payload = json.load(pool_path.open())
+    records = list(payload.get("records") or [])
+    if len(records) < len(samples):
+        raise ValueError(
+            f"External pool has {len(records)} records, fewer than requested samples ({len(samples)}): {pool_path}"
+        )
+
+    payload_dataset = str(payload.get("dataset") or "").strip().lower()
+    expected_dataset = str(dataset_name or "").strip().lower()
+    if payload_dataset and payload_dataset != expected_dataset:
+        raise ValueError(
+            f"External pool dataset mismatch: expected {dataset_name}, found {payload.get('dataset')}"
+        )
+
+    canonical_docs = {f"{row['title']}\n{row['text']}" for row in corpus}
+    unique_title_to_doc = build_unique_title_to_doc_text(corpus)
+
+    query_solutions: List[QuerySolution] = []
+    question_mismatch_count = 0
+    query_idx_mismatch_count = 0
+    exact_doc_text_match_count = 0
+    title_fallback_match_count = 0
+    unmatched_doc_count = 0
+    total_pool_doc_count = 0
+    per_query_pool_sizes: List[int] = []
+
+    for q_idx, sample in enumerate(samples):
+        record = records[q_idx]
+        record_query_idx = record.get("query_idx")
+        if record_query_idx is not None and int(record_query_idx) != q_idx:
+            query_idx_mismatch_count += 1
+
+        sample_question = str(sample.get("question") or "").strip()
+        record_question = str(record.get("question") or "").strip()
+        if record_question and record_question != sample_question:
+            question_mismatch_count += 1
+            if strict_questions:
+                raise ValueError(
+                    f"External pool question mismatch at index {q_idx}: "
+                    f"sample={sample_question!r}, record={record_question!r}"
+                )
+
+        raw_pool_docs = list(record.get("pool_docs") or [])
+        raw_pool_titles = list(record.get("pool_titles") or [])
+        if not raw_pool_docs and raw_pool_titles:
+            raw_pool_docs = ["" for _ in raw_pool_titles]
+        if len(raw_pool_titles) < len(raw_pool_docs):
+            raw_pool_titles.extend(extract_doc_title(doc_text) for doc_text in raw_pool_docs[len(raw_pool_titles):])
+
+        aligned_docs: List[str] = []
+        aligned_titles: List[str] = []
+        for doc_pos, raw_doc in enumerate(raw_pool_docs):
+            doc_text = str(raw_doc or "")
+            title = str(raw_pool_titles[doc_pos] if doc_pos < len(raw_pool_titles) else extract_doc_title(doc_text)).strip()
+            aligned_doc = doc_text
+            if doc_text in canonical_docs:
+                exact_doc_text_match_count += 1
+            else:
+                title_key = normalize_structure_text(title or extract_doc_title(doc_text))
+                title_doc = unique_title_to_doc.get(title_key)
+                if title_doc is not None:
+                    aligned_doc = title_doc
+                    title_fallback_match_count += 1
+                else:
+                    unmatched_doc_count += 1
+            aligned_docs.append(aligned_doc)
+            aligned_titles.append(extract_doc_title(aligned_doc) or title)
+
+        scores = list(record.get("pool_doc_scores") or [])
+        if len(scores) != len(aligned_docs):
+            scores = np.linspace(len(aligned_docs), 1, len(aligned_docs), dtype=float).tolist()
+        doc_scores = np.asarray(scores, dtype=float)
+
+        total_pool_doc_count += len(aligned_docs)
+        per_query_pool_sizes.append(len(aligned_docs))
+        query_solutions.append(
+            QuerySolution(
+                question=sample_question or record_question,
+                docs=aligned_docs,
+                doc_scores=doc_scores,
+                gold_answers=list(gold_answers[q_idx]),
+                gold_docs=list(gold_docs[q_idx]),
+                retrieval_trace={
+                    "external_pool": True,
+                    "external_pool_source": source_name,
+                    "external_pool_path": str(pool_path),
+                    "external_query_idx": int(record_query_idx) if record_query_idx is not None else q_idx,
+                    "external_pool_k": len(aligned_docs),
+                    "external_pool_titles": aligned_titles[:100],
+                    "external_pool_doc_ids": list(record.get("pool_doc_ids") or [])[:len(aligned_docs)],
+                },
+            )
+        )
+
+    summary = {
+        "enabled": True,
+        "path": str(pool_path),
+        "source": source_name,
+        "dataset": payload.get("dataset"),
+        "records_loaded": len(query_solutions),
+        "records_available": len(records),
+        "pool_k_payload": payload.get("pool_k"),
+        "min_pool_size": int(min(per_query_pool_sizes)) if per_query_pool_sizes else 0,
+        "max_pool_size": int(max(per_query_pool_sizes)) if per_query_pool_sizes else 0,
+        "mean_pool_size": round(float(np.mean(per_query_pool_sizes)), 2) if per_query_pool_sizes else 0.0,
+        "total_pool_docs": int(total_pool_doc_count),
+        "exact_doc_text_match_count": int(exact_doc_text_match_count),
+        "title_fallback_match_count": int(title_fallback_match_count),
+        "unmatched_doc_count": int(unmatched_doc_count),
+        "question_mismatch_count": int(question_mismatch_count),
+        "query_idx_mismatch_count": int(query_idx_mismatch_count),
+        "payload_retrieval": payload.get("retrieval") or {},
+    }
+    return query_solutions, summary
+
+
 def serialize_retrieved_doc_ids(retrieved_docs: List[str], doc_text_to_chunk_id: Dict[str, str]) -> List[str | None]:
     return [doc_text_to_chunk_id.get(doc_text) for doc_text in retrieved_docs]
 
@@ -1440,11 +1580,13 @@ def request_dtc_requirements_from_llm(query: str,
                                       infer_fn,
                                       model_name: str,
                                       max_steps: int = 4,
-                                      max_completion_tokens: int = 512) -> Tuple[List[DTCRequirement], Dict[str, object]]:
+                                      max_completion_tokens: int = 512,
+                                      include_satisfiable_by: bool = False) -> Tuple[List[DTCRequirement], Dict[str, object]]:
     trace: Dict[str, object] = {
         "mode": "llm",
         "llm_model": str(model_name or ""),
         "max_steps": int(max_steps),
+        "include_satisfiable_by": bool(include_satisfiable_by),
         "llm_error": None,
         "fallback_used": False,
         "raw_output_preview": "",
@@ -1459,6 +1601,31 @@ def request_dtc_requirements_from_llm(query: str,
         })
         return requirements, trace
 
+    required_keys = "id, subquery, depends_on, expected_answer_type, anchor_mentions, role"
+    satisfiable_by_instruction = ""
+    example_payload = (
+        "[{\"id\":\"s1\",\"subquery\":\"Who directed film X?\",\"depends_on\":[],"
+        "\"expected_answer_type\":\"person\",\"anchor_mentions\":[\"film X\"],"
+        "\"role\":\"bridge\"},"
+        "{\"id\":\"s2\",\"subquery\":\"What is the birthplace of that director?\","
+        "\"depends_on\":[\"s1\"],\"expected_answer_type\":\"location\","
+        "\"anchor_mentions\":[],\"role\":\"answer\"}]"
+    )
+    if bool(include_satisfiable_by):
+        required_keys += ", satisfiable_by"
+        satisfiable_by_instruction = (
+            " Set satisfiable_by to 'document' if a specific document in the pool could satisfy the need, "
+            "or 'inference' if the reader must compare, aggregate, or reason across multiple documents."
+        )
+        example_payload = (
+            "[{\"id\":\"s1\",\"subquery\":\"Who directed film X?\",\"depends_on\":[],"
+            "\"expected_answer_type\":\"person\",\"anchor_mentions\":[\"film X\"],"
+            "\"role\":\"bridge\",\"satisfiable_by\":\"document\"},"
+            "{\"id\":\"s2\",\"subquery\":\"What is the birthplace of that director?\","
+            "\"depends_on\":[\"s1\"],\"expected_answer_type\":\"location\","
+            "\"anchor_mentions\":[],\"role\":\"answer\",\"satisfiable_by\":\"document\"}]"
+        )
+
     messages = [
         {
             "role": "system",
@@ -1466,11 +1633,10 @@ def request_dtc_requirements_from_llm(query: str,
                 "You decompose multi-hop QA questions into evidence requirements for fixed-pool passage selection. "
                 "Do not answer the question and do not fill unknown entities from world knowledge. "
                 "Return JSON only: an array of 1-4 objects. Each object must have keys: "
-                "id, subquery, depends_on, expected_answer_type, anchor_mentions, role, satisfiable_by. "
+                f"{required_keys}. "
                 "Use ids like s1, s2. depends_on is a list of previous ids. "
-                "A subquery should describe the evidence needed, not the final answer. "
-                "Set satisfiable_by to 'document' if a specific document in the pool could satisfy the need, "
-                "or 'inference' if the reader must compare, aggregate, or reason across multiple documents."
+                "A subquery should describe the evidence needed, not the final answer."
+                f"{satisfiable_by_instruction}"
             ),
         },
         {
@@ -1479,12 +1645,7 @@ def request_dtc_requirements_from_llm(query: str,
                 f"{SETWISE_LLM_NO_THINK_PREFIX}\n"
                 f"Question: {query}\n\n"
                 "Return JSON array only. Example:\n"
-                "[{\"id\":\"s1\",\"subquery\":\"Who directed film X?\",\"depends_on\":[],"
-                "\"expected_answer_type\":\"person\",\"anchor_mentions\":[\"film X\"],"
-                "\"role\":\"bridge\",\"satisfiable_by\":\"document\"},"
-                "{\"id\":\"s2\",\"subquery\":\"What is the birthplace of that director?\","
-                "\"depends_on\":[\"s1\"],\"expected_answer_type\":\"location\","
-                "\"anchor_mentions\":[],\"role\":\"answer\",\"satisfiable_by\":\"document\"}]"
+                f"{example_payload}"
             ),
         },
     ]
@@ -5045,11 +5206,13 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            dtc_dependency_bonus_weight: float = 0.10,
                            dtc_max_completion_tokens: int = 512,
                            dtc_decomposition_mode: str = "llm",
+                           dtc_include_satisfiable_by: bool = False,
                            dtc_enforce_dependencies: bool = True,
                            dtc_require_new_crossing: bool = False,
                            dtc_demand_gate_enabled: bool = False,
                            dtc_demand_gate_alpha: float = 1.0,
                            dtc_repairable_filter_enabled: bool = False,
+                           dtc_satisfiable_by_policy: str = "binding_override",
                            dtc_ser_enabled: bool = False,
                            dtc_ser_lambda0: float = 1.0,
                            dtc_ser_anchor_binding_enabled: bool = False,
@@ -5560,6 +5723,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     ),
                     max_steps=int(dtc_max_steps),
                     max_completion_tokens=int(dtc_max_completion_tokens),
+                    include_satisfiable_by=bool(dtc_include_satisfiable_by),
                 )
             requirement_embeddings = build_dtc_requirement_embeddings(
                 hipporag=hipporag,
@@ -5596,6 +5760,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 demand_gate_enabled=bool(dtc_demand_gate_enabled),
                 demand_gate_alpha=float(dtc_demand_gate_alpha),
                 repairable_filter_enabled=bool(dtc_repairable_filter_enabled),
+                satisfiable_by_policy=str(dtc_satisfiable_by_policy),
                 ser_enabled=bool(dtc_ser_enabled),
                 ser_lambda0=float(dtc_ser_lambda0),
                 ser_anchor_binding_enabled=bool(dtc_ser_anchor_binding_enabled),
@@ -5606,6 +5771,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["dtc_max_steps"] = int(dtc_max_steps)
             selector_trace["dtc_max_completion_tokens"] = int(dtc_max_completion_tokens)
             selector_trace["dtc_decomposition_mode"] = normalized_dtc_decomposition_mode
+            selector_trace["dtc_include_satisfiable_by"] = bool(dtc_include_satisfiable_by)
             selector_trace["dtc_enforce_dependencies"] = bool(dtc_enforce_dependencies)
             selector_trace["dtc_require_new_crossing"] = bool(dtc_require_new_crossing)
             selector_trace["dtc_demand_gate_enabled"] = bool(dtc_demand_gate_enabled)
@@ -6320,11 +6486,13 @@ def apply_setwise_selector(hipporag: HippoRAG,
             "dtc_dependency_bonus_weight": round(float(dtc_dependency_bonus_weight), 4),
             "dtc_max_completion_tokens": int(dtc_max_completion_tokens),
             "dtc_decomposition_mode": str(dtc_decomposition_mode),
+            "dtc_include_satisfiable_by": bool(dtc_include_satisfiable_by),
             "dtc_enforce_dependencies": bool(dtc_enforce_dependencies),
             "dtc_require_new_crossing": bool(dtc_require_new_crossing),
             "dtc_demand_gate_enabled": bool(dtc_demand_gate_enabled),
             "dtc_demand_gate_alpha": round(float(dtc_demand_gate_alpha), 4),
             "dtc_repairable_filter_enabled": bool(dtc_repairable_filter_enabled),
+            "dtc_satisfiable_by_policy": str(dtc_satisfiable_by_policy),
             "dtc_demand_gate_preserve_count": int(dtc_demand_gate_preserve_count),
             "avg_dtc_baseline_demand_satisfaction_rate": round(
                 float(np.mean(dtc_baseline_demand_satisfaction_rates))
@@ -6762,6 +6930,7 @@ def build_config(args, corpus_len: int) -> BaseConfig:
         linking_top_k=args.linking_top_k,
         max_qa_steps=args.max_qa_steps,
         qa_top_k=args.qa_top_k,
+        qa_doc_max_chars=getattr(args, "qa_doc_max_chars", 0),
         graph_type="facts_and_sim_passage_node_unidirectional",
         embedding_batch_size=args.embedding_batch_size,
         max_new_tokens=None,
@@ -6839,6 +7008,12 @@ def main():
     parser.add_argument("--retrieval_top_k", type=int, default=200)
     parser.add_argument("--linking_top_k", type=int, default=5)
     parser.add_argument("--qa_top_k", type=int, default=5)
+    parser.add_argument(
+        "--qa_doc_max_chars",
+        type=int,
+        default=0,
+        help="Optional per-document character cap for QA context. Non-positive keeps full documents.",
+    )
     parser.add_argument("--max_qa_steps", type=int, default=3)
     parser.add_argument("--embedding_batch_size", type=int, default=8)
     parser.add_argument("--causal_enabled", type=str, default="true")
@@ -7027,6 +7202,8 @@ def main():
                         help="For --setwise_selector dtc_embed, max tokens for the one-shot decomposition LLM call.")
     parser.add_argument("--dtc_decomposition_mode", choices=["llm", "query"], default="llm",
                         help="For --setwise_selector dtc_embed, use LLM requirements or a query-only single-requirement ablation.")
+    parser.add_argument("--dtc_include_satisfiable_by", type=string_to_bool, default=False,
+                        help="For --setwise_selector dtc_embed, ask the decomposition LLM to emit satisfiable_by labels. Default is false to preserve the validated decomposition prompt.")
     parser.add_argument("--dtc_enforce_dependencies", type=string_to_bool, default=True,
                         help="For --setwise_selector dtc_embed, enforce LLM-declared requirement dependencies before downstream coverage.")
     parser.add_argument("--dtc_require_new_crossing", type=string_to_bool, default=False,
@@ -7037,6 +7214,10 @@ def main():
                         help="For --setwise_selector dtc_embed, minimum baseline demand-satisfaction rate required to preserve baseline context.")
     parser.add_argument("--dtc_repairable_filter_enabled", type=string_to_bool, default=False,
                         help="For --setwise_selector dtc_embed, exclude non-document-satisfiable requirements from no-gate greedy coverage gains.")
+    parser.add_argument("--dtc_satisfiable_by_policy",
+                        choices=["strict", "binding_override", "grounded_override", "regex_only"],
+                        default="binding_override",
+                        help="For --setwise_selector dtc_embed, controls how the decomposition satisfiable_by field vetoes repairable requirements.")
     parser.add_argument("--dtc_ser_enabled", type=string_to_bool, default=False,
                         help="For --setwise_selector dtc_embed, use sufficiency-calibrated selective evidence repair instead of from-scratch greedy fill.")
     parser.add_argument("--dtc_ser_lambda0", type=float, default=1.0,
@@ -7141,6 +7322,12 @@ def main():
                         help="Eval-only need-unit bridge bonus mode for requirement_beam. off preserves legacy scoring; variable_binding grants a small relation_hop override when predecessor coverage and entity-binding continuity are present.")
     parser.add_argument("--setwise_requirement_probe_bridge_bonus_weight", type=float, default=0.0,
                         help="Eval-only bridge bonus weight used when --setwise_requirement_probe_bridge_bonus_mode variable_binding.")
+    parser.add_argument("--external_pool_json", type=str, default="",
+                        help="Optional fixed-pool JSON exported by scripts/export_proprag_pool.py or an equivalent pool exporter. When set, HippoRAG retrieval is skipped and the supplied pool is evaluated under the same reader/selector/oracle protocol.")
+    parser.add_argument("--external_pool_source_name", type=str, default="external_pool",
+                        help="Short label stored in traces/reports when --external_pool_json is used.")
+    parser.add_argument("--external_pool_strict_questions", type=string_to_bool, default=True,
+                        help="Require external-pool questions to exactly match the current dataset sample order.")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -7178,6 +7365,7 @@ def main():
     setwise_selector_query_traces = None
     expand_assemble_results = None
     expand_assemble_query_traces = None
+    external_pool_summary = None
     learned_model_bundle = None
     state_weight_config = {
         "path_connectivity": float(args.setwise_state_path_connectivity_weight),
@@ -7255,6 +7443,10 @@ def main():
         response_format=None,
     )
 
+    external_pool_json = str(args.external_pool_json or "").strip()
+    if external_pool_json and gold_doc_reader:
+        raise ValueError("--external_pool_json cannot be combined with --gold_doc_reader true")
+
     if gold_doc_reader:
         # Exp2: Gold-doc reader — skip retrieval, feed gold docs to reader
         hipporag = HippoRAG(global_config=config)
@@ -7278,7 +7470,40 @@ def main():
     else:
         hipporag = HippoRAG(global_config=config)
         hipporag.index(docs)
-        if retrieval_only:
+        if external_pool_json:
+            query_solutions, external_pool_summary = load_external_pool_query_solutions(
+                external_pool_json,
+                dataset_name=dataset_name,
+                samples=samples,
+                corpus=corpus,
+                gold_docs=gold_docs,
+                gold_answers=gold_answers,
+                source_name=str(args.external_pool_source_name or "external_pool"),
+                strict_questions=bool(args.external_pool_strict_questions),
+            )
+            retrieval_recall = RetrievalRecall(global_config=config)
+            retrieval_metrics, _ = retrieval_recall.calculate_metric_scores(
+                gold_docs=gold_docs,
+                retrieved_docs=[qs.docs for qs in query_solutions],
+                k_list=[1, 2, 5, 10, 20, 30, 50, 100, 150, 200],
+            )
+            overall_retrieval_result = {
+                **retrieval_metrics,
+                "external_pool": external_pool_summary,
+            }
+            if retrieval_only:
+                responses = []
+                metadata = []
+                overall_qa_results = {}
+                effective_gold_answers = None
+            else:
+                query_solutions, responses, metadata, _, overall_qa_results = hipporag.rag_qa(
+                    queries=query_solutions,
+                    gold_docs=gold_docs,
+                    gold_answers=gold_answers,
+                )
+                effective_gold_answers = gold_answers
+        elif retrieval_only:
             query_solutions, overall_retrieval_result = hipporag.retrieve(
                 queries=queries,
                 gold_docs=gold_docs,
@@ -7489,6 +7714,8 @@ def main():
 
     if setwise_selector != "none" and not retrieval_only and query_solutions:
         logger = logging.getLogger(__name__)
+        if not hasattr(hipporag, "passage_node_key_to_doc_idx") or not bool(getattr(hipporag, "ready_to_retrieve", False)):
+            hipporag.prepare_retrieval_objects()
         selected_solutions, selector_summary = apply_setwise_selector(
             hipporag=hipporag,
             query_solutions=query_solutions,
@@ -7570,11 +7797,13 @@ def main():
             dtc_dependency_bonus_weight=float(args.dtc_dependency_bonus_weight),
             dtc_max_completion_tokens=int(args.dtc_max_completion_tokens),
             dtc_decomposition_mode=str(args.dtc_decomposition_mode),
+            dtc_include_satisfiable_by=bool(args.dtc_include_satisfiable_by),
             dtc_enforce_dependencies=bool(args.dtc_enforce_dependencies),
             dtc_require_new_crossing=bool(args.dtc_require_new_crossing),
             dtc_demand_gate_enabled=bool(args.dtc_demand_gate_enabled),
             dtc_demand_gate_alpha=float(args.dtc_demand_gate_alpha),
             dtc_repairable_filter_enabled=bool(args.dtc_repairable_filter_enabled),
+            dtc_satisfiable_by_policy=str(args.dtc_satisfiable_by_policy),
             dtc_ser_enabled=bool(args.dtc_ser_enabled),
             dtc_ser_lambda0=float(args.dtc_ser_lambda0),
             dtc_ser_anchor_binding_enabled=bool(args.dtc_ser_anchor_binding_enabled),
@@ -7976,6 +8205,8 @@ def main():
             "general_graph_seed_top_k": config.general_graph_seed_top_k,
             "retrieval_only": retrieval_only,
             "gold_doc_reader": gold_doc_reader,
+            "external_pool_json": external_pool_json or None,
+            "external_pool_source_name": str(args.external_pool_source_name or "external_pool"),
             "oracle_reorder_k": oracle_reorder_k,
             "oracle_select_ks": oracle_select_ks,
             "cross_encoder_rerank": cross_encoder_rerank,
@@ -8027,11 +8258,13 @@ def main():
             "dtc_dependency_bonus_weight": float(args.dtc_dependency_bonus_weight),
             "dtc_max_completion_tokens": int(args.dtc_max_completion_tokens),
             "dtc_decomposition_mode": str(args.dtc_decomposition_mode),
+            "dtc_include_satisfiable_by": bool(args.dtc_include_satisfiable_by),
             "dtc_enforce_dependencies": bool(args.dtc_enforce_dependencies),
             "dtc_require_new_crossing": bool(args.dtc_require_new_crossing),
             "dtc_demand_gate_enabled": bool(args.dtc_demand_gate_enabled),
             "dtc_demand_gate_alpha": float(args.dtc_demand_gate_alpha),
             "dtc_repairable_filter_enabled": bool(args.dtc_repairable_filter_enabled),
+            "dtc_satisfiable_by_policy": str(args.dtc_satisfiable_by_policy),
             "dtc_ser_enabled": bool(args.dtc_ser_enabled),
             "dtc_ser_lambda0": float(args.dtc_ser_lambda0),
             "dtc_ser_anchor_binding_enabled": bool(args.dtc_ser_anchor_binding_enabled),
@@ -8106,6 +8339,7 @@ def main():
         **({"expand_assemble_qa": expand_assemble_results} if expand_assemble_results else {}),
         **({"expand_assemble_query_traces": expand_assemble_query_traces} if expand_assemble_query_traces else {}),
         **({"cross_encoder_rerank_qa": cross_encoder_rerank_results} if cross_encoder_rerank_results else {}),
+        **({"external_pool": external_pool_summary} if external_pool_summary else {}),
         "examples": build_report_examples(
             config=config,
             query_solutions=query_solutions,
@@ -8141,6 +8375,8 @@ def main():
         print_result["expand_assemble_qa"] = expand_assemble_results
     if cross_encoder_rerank_results:
         print_result["cross_encoder_rerank_qa"] = cross_encoder_rerank_results
+    if external_pool_summary:
+        print_result["external_pool"] = external_pool_summary
     if gold_doc_reader:
         print_result["mode"] = "gold_doc_reader"
     print(json.dumps(print_result, indent=2, ensure_ascii=False))

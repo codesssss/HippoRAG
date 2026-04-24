@@ -1,0 +1,52 @@
+DAEC Layer-1 implementation status 2026-04-24
+
+Implemented:
+- docs/daec_dapg_full_spec_20260424.md
+- docs/daec_dapg_layered_plan_20260424.md
+- scripts/analyze_failure_taxonomy.py
+- scripts/analyze_layer1_significance.py
+- scripts/export_dense_pool.py
+- scripts/export_proprag_pool.py
+- scripts/eval_causal_qwen3.py external_pool_json support
+- scripts/summarize_layer1_results.py
+- run_logs/run_layer1_dense_pool_eval_20260424.sh
+- run_logs/run_layer1_proprag_pool_eval_20260424.sh
+- run_logs/run_layer1_proprag_pool_ablation_20260424.sh
+- run_logs/run_layer1_targeted_nobinding_20260424.sh
+- research_memory/emnlp_expand_then_compose/satisfiable_by_prompt_sweep_20260424.md
+- research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md
+- research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md
+
+Verified:
+- py_compile passed for changed scripts.
+- external-pool retrieval smoke passed on 2Wiki limit=1.
+- external-pool DtC smoke passed on 2Wiki limit=1, mapped 100/100 pool docs.
+- PropRAG 2Wiki full1000 pool export completed and recall matches clean PropRAG full1000: R@5=0.9028, R@20=0.9607, R@100=0.9872.
+- dense-pool export smoke passed on 2Wiki limit=1.
+- failure-taxonomy smoke passed on external-pool DtC smoke report.
+- dense top-100 pools exported for 2Wiki / HotpotQA / MuSiQue.
+- PropRAG-pool + DtC/DAEC full1000 completed for 2Wiki / HotpotQA / MuSiQue.
+- Dense-pool + DtC/DAEC full1000 completed for 2Wiki / HotpotQA / MuSiQue.
+- 2Wiki PropRAG-pool ablations completed: nobinding / norepairtyping / norank.
+- Satisfiable-by prompt/policy sweep completed; main experiments keep --dtc_include_satisfiable_by=false.
+- Failure taxonomy completed for six Layer-1 full1000 reports.
+- Paired bootstrap/sign-flip significance completed for six Layer-1 full1000 reports.
+- Targeted cross-pool nobinding ablations completed for HotpotQA x PropRAG, MuSiQue x PropRAG, 2Wiki x Dense, and MuSiQue x Dense.
+- Result tables are consolidated in research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md.
+- Follow-up taxonomy/significance/binding results are consolidated in research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md.
+
+Running:
+- No active Layer-1 DtC/DAEC evaluation jobs are expected to be running.
+
+Completed output roots:
+- PropRAG pool: run_logs/layer1_proprag_pool_eval_fixed_20260424/
+- Dense pool: run_logs/layer1_dense_pool_eval_20260424/
+- 2Wiki ablations: run_logs/layer1_proprag_pool_ablation_2wiki_20260424/
+- Failure taxonomy: run_logs/failure_taxonomy_layer1_20260424/
+- Paired significance: run_logs/layer1_significance_20260424/
+- Targeted nobinding: run_logs/layer1_targeted_nobinding_20260424/
+
+Operational notes:
+- The first direct interactive launches produced no final JSON and no durable stdout, so use the parallel launcher for reproducibility.
+- Early reruns exposed QA APIConnectionError contamination. Fixed src/hipporag/llm/openai_gpt.py so global_config.max_retry_attempts is honored.
+- For local vLLM endpoints, OpenAI client's internal retry is capped at 2 while the outer retry uses --max_retry_attempts 20, avoiding both dirty failed answers and very long exponential stalls.

@@ -51,6 +51,26 @@ def test_parse_dtc_decomposition_response_accepts_dependency_schema():
     assert requirements[1].satisfiable_by == "document"
 
 
+def test_parse_dtc_decomposition_response_keeps_satisfiable_by_optional():
+    raw = """
+    [
+      {
+        "id": "s1",
+        "subquery": "Who directed Film X?",
+        "depends_on": [],
+        "expected_answer_type": "person",
+        "anchor_mentions": ["Film X"],
+        "role": "bridge"
+      }
+    ]
+    """
+    requirements, trace = parse_dtc_decomposition_response(raw, max_steps=4)
+
+    assert trace["parse_succeeded"] is True
+    assert len(requirements) == 1
+    assert requirements[0].satisfiable_by == "unknown"
+
+
 def test_select_dtc_embed_positions_covers_dependent_requirement_after_support():
     requirements = [
         DTCRequirement(
@@ -65,6 +85,7 @@ def test_select_dtc_embed_positions_covers_dependent_requirement_after_support()
             depends_on=("s1",),
             expected_answer_type="location",
             role="answer",
+            satisfiable_by="inference",
         ),
     ]
     requirement_embeddings = {
@@ -130,6 +151,7 @@ def test_select_dtc_embed_positions_uses_title_binding_for_dependent_requirement
             depends_on=("s1",),
             expected_answer_type="location",
             role="answer",
+            satisfiable_by="inference",
         ),
     ]
     requirement_embeddings = {
@@ -191,6 +213,80 @@ def test_select_dtc_embed_positions_uses_title_binding_for_dependent_requirement
     assert trace["binding_candidates_by_requirement"]["s2"][0]["title"] == "Alice"
     assert trace["repairable_by_requirement"]["s2"]["repairable"] is True
     assert trace["repairable_by_requirement"]["s2"]["reason"] == "resolved_dependency_binding"
+    assert trace["repairable_by_requirement"]["s2"]["raw_inference_veto"] is True
+    assert trace["repairable_by_requirement"]["s2"]["inference_veto"] is False
+    assert trace["repairable_by_requirement"]["s2"]["satisfiable_by_policy"] == "binding_override"
+
+
+def test_strict_satisfiable_by_policy_vetoes_bound_inference_requirement():
+    requirements = [
+        DTCRequirement(
+            unit_id="s1",
+            subquery="Who directed Film X?",
+            anchor_mentions=("Film X",),
+            expected_answer_type="person",
+            role="bridge",
+        ),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Where was that director born?",
+            depends_on=("s1",),
+            expected_answer_type="location",
+            role="answer",
+            satisfiable_by="inference",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0, 0.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0, 0.0, 0.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice and released in 1999.",
+        "Place of birth\nA generic page about the concept of places of birth.",
+        "Alice\nAlice was born in Paris.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0],
+    ])
+
+    def embed_bound_texts(texts):
+        return {
+            text: np.asarray([0.0, 0.0, 1.0, 0.0])
+            for text in texts
+            if "Alice" in text
+        }
+
+    selected, trace = select_dtc_embed_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_scores=np.asarray([1.0, 0.95, 0.2]),
+        pool_doc_titles=["Film X", "Place of birth", "Alice"],
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"place of birth"}, 2: {"alice", "paris"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        reserve_top_m=1,
+        match_threshold=0.35,
+        redundancy_weight=0.0,
+        base_weight=0.0,
+        anchor_bonus_weight=0.1,
+        dependency_bonus_weight=0.1,
+        enable_dependency_binding=True,
+        binding_entity_hit_required=True,
+        repairable_filter_enabled=True,
+        satisfiable_by_policy="strict",
+        embed_texts_fn=embed_bound_texts,
+    )
+
+    assert selected == [0, 1]
+    assert trace["repairable_by_requirement"]["s2"]["repairable"] is False
+    assert trace["repairable_by_requirement"]["s2"]["raw_inference_veto"] is True
+    assert trace["repairable_by_requirement"]["s2"]["inference_veto"] is True
+    assert trace["repairable_by_requirement"]["s2"]["satisfiable_by_policy"] == "strict"
 
 
 def test_repairable_filter_skips_inference_only_answer_requirement():

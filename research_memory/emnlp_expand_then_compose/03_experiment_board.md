@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-22
+Last updated: 2026-04-24
 
 ## Canonical Outputs
 
@@ -25,6 +25,19 @@ Last updated: 2026-04-22
 - `DtC supplemental experiment memo`: `research_memory/emnlp_expand_then_compose/12_dtc_supplemental_experiments_20260421.md`
 - `MuSiQue 4-doc DtC regression memo`: `research_memory/emnlp_expand_then_compose/13_musique_4doc_regression_analysis_20260421.md`
 - `DtC NV full1000 + rank-prior direction memo`: `research_memory/emnlp_expand_then_compose/14_dtc_nv_full1000_rank_prior_20260422.md`
+- `DtC satisfiable_by prompt sweep memo`: `research_memory/emnlp_expand_then_compose/satisfiable_by_prompt_sweep_20260424.md`
+- `QBF pilot negative result memo`: `research_memory/emnlp_expand_then_compose/15_qbf_pilot_negative_result_20260424.md`
+- `Layer-1 retriever-agnostic composition memo`: `research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md`
+- `Layer-1 follow-up taxonomy/significance memo`: `research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md`
+- `QBF pilot implementation`: `src/hipporag/qbf.py`
+- `QBF pilot evaluator`: `scripts/eval_qbf_pilot.py`
+- `QBF pilot outputs`: `run_logs/qbf_pilot_20260424/`
+- `PropRAG-pool + DAEC/DtC full1000 outputs`: `run_logs/layer1_proprag_pool_eval_fixed_20260424/`
+- `Dense-pool + DAEC/DtC full1000 outputs`: `run_logs/layer1_dense_pool_eval_20260424/`
+- `2Wiki PropRAG-pool DAEC/DtC ablation outputs`: `run_logs/layer1_proprag_pool_ablation_2wiki_20260424/`
+- `Layer-1 failure taxonomy outputs`: `run_logs/failure_taxonomy_layer1_20260424/`
+- `Layer-1 paired significance outputs`: `run_logs/layer1_significance_20260424/`
+- `Layer-1 targeted nobinding ablation outputs`: `run_logs/layer1_targeted_nobinding_20260424/`
 
 ## Done
 
@@ -75,48 +88,83 @@ Last updated: 2026-04-22
 - Ran aligned NV-Embed non-instruction DtC full1000 on all three datasets
 - Ran hard-crossing pilot100 ablation and rejected it as the main fix
 - Diagnosed deep-pool false positives as the next DtC scoring problem
+- Ran the `satisfiable_by` prompt/policy sweep and kept the field optional:
+  - default main experiments keep the old prompt via `--dtc_include_satisfiable_by=false`
+  - `satisfiable_by` remains available for diagnostics/appendix runs
+- Implemented and tested the QBF retrieval-only pilot:
+  - `src/hipporag/qbf.py`
+  - `scripts/eval_qbf_pilot.py`
+  - `tests/test_qbf.py`
+- Ran QBF pilot100 on `2Wiki` and `MuSiQue`
+- Rejected QBF as a main method line: raw QBF destroys pool recall, PPR+QBF rerank still hurts top-5 support, random-chi is competitive with schema-chi, and oracle-relation QBF remains below PPR
+- Ran PropRAG-pool + DAEC/DtC full1000 on `2Wiki`, `HotpotQA`, and `MuSiQue`
+- Consolidated PropRAG-pool oracle select@100 in the same full1000 reports
+- Ran dense `NV-Embed` top-100 pool + DAEC/DtC full1000 on `2Wiki`, `HotpotQA`, and `MuSiQue`
+- Ran 2Wiki PropRAG-pool internal ablations:
+  - `nobinding`
+  - `norepairtyping`
+  - `norank`
+- Recorded the Layer-1 retriever-agnostic composition memo:
+  - `research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md`
+- Fixed and reran `scripts/analyze_failure_taxonomy.py` for the six completed Layer-1 full1000 reports
+- Added and ran paired bootstrap/sign-flip significance analysis:
+  - `scripts/analyze_layer1_significance.py`
+  - `run_logs/layer1_significance_20260424/`
+- Ran targeted cross-pool `nobinding` ablations:
+  - launcher: `run_logs/run_layer1_targeted_nobinding_20260424.sh`
+  - output root: `run_logs/layer1_targeted_nobinding_20260424/`
+  - completed pairs:
+    - `HotpotQA x PropRAG x nobinding`
+    - `MuSiQue x PropRAG x nobinding`
+    - `2Wiki x Dense x nobinding`
+    - `MuSiQue x Dense x nobinding`
+- Recorded the Layer-1 follow-up memo:
+  - `research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md`
 
 ## Running
 
-- PropRAG aligned same-protocol comparison is running in `/mnt/nvme/code/PropRAG`:
-  - script: `run_logs/run_proprag_aligned_qwenopenie_top100_8042_20260422.sh`
-  - log: `run_logs/proprag_aligned_qwenopenie_top100_maxtok2048_nothinkopenie_propcap12_8042_20260422.log`
-  - output root: `outputs_aligned_qwenopenie_top100_maxtok2048_nothinkopenie_propcap12`
+- No active Layer-1 DtC/DAEC evaluation jobs are expected to be running.
 
 ## Next Wave
 
-1. Implement rank-regularized DtC scoring:
-   - add `--dtc_rank_weight`
-   - use `normalized_rank = pool_position / max(pool_k - 1, 1)`
-   - subtract `rank_weight * normalized_rank` in the greedy gain
-2. Sweep `rank_weight in {0.1, 0.2, 0.3, 0.6, 1.0}` on pilot100 for all three datasets
-3. Promote to full1000 only if the sweep preserves most wins while reducing losses
-4. Keep hard-crossing as a negative ablation, not a main method
-5. Finish the PropRAG aligned comparison after its 8B OpenIE assets finish building
+1. Manually audit `MuSiQue` loss cases from the taxonomy JSONL outputs:
+   - `PropRAG x MuSiQue`
+   - `Dense x MuSiQue`
+2. Decide the paper-facing main config:
+   - current full config is positive across pools
+   - targeted `nobinding` says dependency binding is load-bearing across tested pairs
+   - 2Wiki ablation says `rank_weight=0.2` and repair typing should not be overclaimed as necessary components
+3. Consolidate a unified oracle-on-pools table for HippoRAG/NV, PropRAG top-100, and dense top-100 pools
+4. Start the paper skeleton around the retriever-agnostic fixed-pool composition claim
+5. Keep QBF as a negative pilot, not a main method
 
 ## Method Priority
 
 Method implementation order should be:
 
 1. Active paper method candidate:
-   - `DtC-Embed` under fixed-pool evidence composition
-   - next variant: rank-regularized demand coverage
+   - `DtC/DAEC` as a retriever-agnostic fixed-pool evidence compositor
+   - strongest supported component so far: dependency binding across tested PropRAG and dense pool settings
 2. Baselines and controls:
    - baseline top-5
    - MMR/DPP structure-blind diversity
    - oracle select@100
-   - PropRAG aligned comparison when assets complete
+   - PropRAG aligned comparison
+   - dense-pool comparison
 3. Backup line:
    - keep `Requirement-Aware Strongest` documented and runnable as a reserve option
    - do not promote it without at least `HotpotQA` baseline parity plus retained `2Wiki` gains
 4. Do not jump to open iterative retrieval, online judges, or planner-style control before the fixed-pool DtC objective is fully tested
+5. Do not continue QBF unless a new graph substrate or a fundamentally different supervision signal is introduced
 
 ## Blockers
 
 - Full1000 DtC is positive but still leaves most oracle headroom unused
-- `2Wiki` full1000 gain is weak because wins and losses are nearly balanced
-- Hard-crossing cuts wins more than losses, so the next fix must target scoring false positives rather than acceptance thresholds
+- `MuSiQue` has large oracle headroom but low DAEC/DtC gap recovery, so selector/scoring remains the main weakness there
+- Targeted cross-pool `nobinding` supports dependency binding as a main component, but rank prior and repair typing are not yet supported as necessary components
+- Hard-crossing cuts wins more than losses, so hard per-candidate gates remain rejected
 - The strongest/GBC backup line is coherent, but it still lacks a positive shallow-dataset end-to-end result
+- QBF terminal-schema backward flow fails as a retrieval operator on 2Wiki and MuSiQue pilot100; the issue appears operator-level rather than hyperparameter-level
 
 ## Do Not Drift
 

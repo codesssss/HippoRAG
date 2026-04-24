@@ -348,13 +348,25 @@ _INFERENCE_ONLY_PATTERN = re.compile(
 )
 
 
-def _is_inference_only_requirement(req: DTCRequirement) -> bool:
+def _normalize_satisfiable_by_policy(value: str | None) -> str:
+    policy = str(value or "binding_override").strip().lower().replace("-", "_")
+    if policy in {"strict", "binding_override", "grounded_override", "regex_only"}:
+        return policy
+    return "binding_override"
+
+
+def _is_inference_only_requirement(
+    req: DTCRequirement,
+    *,
+    use_satisfiable_by: bool = True,
+) -> bool:
     """Return True for final comparison/aggregation needs that a selector cannot satisfy directly."""
-    satisfiable_by = _normalize_satisfiable_by(req.satisfiable_by)
-    if satisfiable_by == "inference":
-        return True
-    if satisfiable_by == "document":
-        return False
+    if bool(use_satisfiable_by):
+        satisfiable_by = _normalize_satisfiable_by(req.satisfiable_by)
+        if satisfiable_by == "inference":
+            return True
+        if satisfiable_by == "document":
+            return False
     role = normalize_structure_text(req.role)
     if role in {"comparison", "compare", "comparator"}:
         return True
@@ -362,6 +374,27 @@ def _is_inference_only_requirement(req: DTCRequirement) -> bool:
         return False
     text = f"{req.subquery} {req.expected_answer_type}"
     return bool(_INFERENCE_ONLY_PATTERN.search(text))
+
+
+def _requirement_inference_veto(
+    req: DTCRequirement,
+    *,
+    has_explicit_anchor: bool,
+    has_resolved_binding: bool,
+    satisfiable_by_policy: str,
+) -> Tuple[bool, bool]:
+    policy = _normalize_satisfiable_by_policy(satisfiable_by_policy)
+    field_or_regex_veto = _is_inference_only_requirement(req, use_satisfiable_by=True)
+    regex_veto = _is_inference_only_requirement(req, use_satisfiable_by=False)
+    if policy == "regex_only":
+        return bool(regex_veto), bool(regex_veto)
+    if policy == "strict":
+        return bool(field_or_regex_veto), bool(field_or_regex_veto)
+    if policy == "grounded_override":
+        effective_veto = bool(field_or_regex_veto and not (has_explicit_anchor or has_resolved_binding))
+        return bool(field_or_regex_veto), effective_veto
+    effective_veto = bool(field_or_regex_veto and not has_resolved_binding)
+    return bool(field_or_regex_veto), effective_veto
 
 
 def select_dtc_embed_positions(
@@ -392,6 +425,7 @@ def select_dtc_embed_positions(
     demand_gate_enabled: bool = False,
     demand_gate_alpha: float = 1.0,
     repairable_filter_enabled: bool = False,
+    satisfiable_by_policy: str = "binding_override",
     ser_enabled: bool = False,
     ser_lambda0: float = 1.0,
     ser_anchor_binding_enabled: bool = False,
@@ -399,6 +433,7 @@ def select_dtc_embed_positions(
     embed_texts_fn: Callable[[Sequence[str]], Dict[str, np.ndarray]] | None = None,
 ) -> Tuple[List[int], Dict[str, object]]:
     pool_limit = len(pool_docs)
+    normalized_satisfiable_by_policy = _normalize_satisfiable_by_policy(satisfiable_by_policy)
     target_k = min(max(int(qa_top_k), 0), pool_limit)
     if target_k <= 0:
         return [], {"selector": "dtc_embed", "status": "empty_pool"}
@@ -782,7 +817,12 @@ def select_dtc_embed_positions(
     def repairable_requirement_status(req: DTCRequirement) -> Dict[str, object]:
         has_explicit_anchor = bool(req.anchor_mentions)
         has_resolved_binding = bool(binding_candidates_by_req.get(req.unit_id))
-        inference_veto = _is_inference_only_requirement(req)
+        raw_inference_veto, inference_veto = _requirement_inference_veto(
+            req,
+            has_explicit_anchor=has_explicit_anchor,
+            has_resolved_binding=has_resolved_binding,
+            satisfiable_by_policy=normalized_satisfiable_by_policy,
+        )
         satisfiable_by = _normalize_satisfiable_by(req.satisfiable_by)
         repairable = (has_explicit_anchor or has_resolved_binding) and not inference_veto
         if inference_veto:
@@ -798,8 +838,10 @@ def select_dtc_embed_positions(
             "reason": reason,
             "has_explicit_anchor": bool(has_explicit_anchor),
             "has_resolved_dependency_binding": bool(has_resolved_binding),
+            "raw_inference_veto": bool(raw_inference_veto),
             "inference_veto": bool(inference_veto),
             "satisfiable_by": satisfiable_by,
+            "satisfiable_by_policy": normalized_satisfiable_by_policy,
         }
 
     baseline_demand_assessment = compute_demand_assessment(range(target_k))
@@ -839,6 +881,7 @@ def select_dtc_embed_positions(
             "binding_entity_hit_required": bool(binding_entity_hit_required),
             "require_new_crossing": bool(require_new_crossing),
             "repairable_filter_enabled": bool(repairable_filter_enabled),
+            "satisfiable_by_policy": normalized_satisfiable_by_policy,
             "demand_gate": demand_gate,
             "baseline_demand_assessment": baseline_demand_assessment,
             "binding_candidates_by_requirement": {},
@@ -943,7 +986,12 @@ def select_dtc_embed_positions(
         for req in active_requirements:
             has_explicit_anchor = bool(req.anchor_mentions)
             has_resolved_binding = bool(ser_binding_candidates_by_req.get(req.unit_id))
-            inference_veto = _is_inference_only_requirement(req)
+            raw_inference_veto, inference_veto = _requirement_inference_veto(
+                req,
+                has_explicit_anchor=has_explicit_anchor,
+                has_resolved_binding=has_resolved_binding,
+                satisfiable_by_policy=normalized_satisfiable_by_policy,
+            )
             satisfiable_by = _normalize_satisfiable_by(req.satisfiable_by)
             repairable = (has_explicit_anchor or has_resolved_binding) and not inference_veto
             if not bool(ser_repairable_residual_enabled):
@@ -961,8 +1009,10 @@ def select_dtc_embed_positions(
                 "reason": reason,
                 "has_explicit_anchor": bool(has_explicit_anchor),
                 "has_resolved_dependency_binding": bool(has_resolved_binding),
+                "raw_inference_veto": bool(raw_inference_veto),
                 "inference_veto": bool(inference_veto),
                 "satisfiable_by": satisfiable_by,
+                "satisfiable_by_policy": normalized_satisfiable_by_policy,
                 "binding_candidates": [
                     {
                         "title": str(row.get("title", "") or ""),
@@ -1089,6 +1139,7 @@ def select_dtc_embed_positions(
             "binding_entity_hit_required": bool(binding_entity_hit_required),
             "require_new_crossing": bool(require_new_crossing),
             "repairable_filter_enabled": bool(repairable_filter_enabled),
+            "satisfiable_by_policy": normalized_satisfiable_by_policy,
             "demand_gate": demand_gate,
             "baseline_demand_assessment": baseline_demand_assessment,
             "ser": {
@@ -1302,6 +1353,7 @@ def select_dtc_embed_positions(
         "binding_entity_hit_required": bool(binding_entity_hit_required),
         "require_new_crossing": bool(require_new_crossing),
         "repairable_filter_enabled": bool(repairable_filter_enabled),
+        "satisfiable_by_policy": normalized_satisfiable_by_policy,
         "demand_gate": demand_gate,
         "baseline_demand_assessment": baseline_demand_assessment,
         "repairable_by_requirement": {
