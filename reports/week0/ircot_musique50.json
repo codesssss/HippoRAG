@@ -1,0 +1,9 @@
+{
+  "status": "not_run",
+  "dataset": "musique",
+  "limit": 50,
+  "max_iter": 3,
+  "top_k_per_iter": 5,
+  "llm_name": "qwen3-8b",
+  "reason": "No --llm_base_url or --replay_report provided. This script will not fabricate IRCoT results."
+}

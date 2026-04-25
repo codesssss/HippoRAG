@@ -1,0 +1,5 @@
+{
+  "status": "not_run",
+  "reason": "No predicted_jsonl or llm_base_url provided. Use --llm_base_url for real Qwen evaluation.",
+  "num_examples": 0
+}

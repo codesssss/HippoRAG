@@ -1,0 +1,101 @@
+{
+  "split_audit": {
+    "dataset_name": "musique",
+    "variant": "MuSiQue-Ans-local-subset",
+    "train_size": 0,
+    "dev_size": 1000,
+    "test_size": 0,
+    "local_sample_size": 1000,
+    "local_corpus_size": 11656,
+    "has_unanswerable": false,
+    "answerable_distribution": {
+      "True": 1000
+    },
+    "has_decomposition": true,
+    "has_supporting_paragraphs": true,
+    "current_layer1_musique_1000_source": "reproduce/dataset/musique.json",
+    "current_layer1_musique_1000_corpus": "reproduce/dataset/musique_corpus.json",
+    "recommended_eval_split": "reproduce/dataset/musique.json",
+    "all_local_musique_files": [
+      "reproduce/dataset/musique.json",
+      "reproduce/dataset/musique_corpus.json",
+      "reproduce/dataset/musique_coverage_gap_20260406.json",
+      "reproduce/dataset/musique_coverage_gap_20260406_corpus.json",
+      "reproduce/dataset/musique_plagueprobe.json",
+      "reproduce/dataset/musique_plagueprobe_corpus.json",
+      "reproduce/dataset/musique_q6probe.json",
+      "reproduce/dataset/musique_q6probe_corpus.json",
+      "reproduce/dataset/musique_readerprobe_improved30_20260406.json",
+      "reproduce/dataset/musique_readerprobe_improved30_20260406_corpus.json",
+      "reproduce/dataset/musique_readerprobe_q6_20260406.json",
+      "reproduce/dataset/musique_readerprobe_q6_20260406_corpus.json",
+      "reproduce/dataset/musique_saudiprobe.json",
+      "reproduce/dataset/musique_saudiprobe_corpus.json",
+      "reproduce/dataset/musique_smoke40_familygate_20260404.json",
+      "reproduce/dataset/musique_smoke40_familygate_20260404_corpus.json"
+    ],
+    "notes": [
+      "Local file is answerable-only and smaller than official MuSiQue-Ans dev; treat it as a local MuSiQue-Ans-derived subset.",
+      "Official reference: MuSiQue-Ans total=24814, dev=2417.",
+      "Do not tune latent-slot prompts on the same examples used for oracle-slot diagnostics."
+    ]
+  },
+  "ircot_baseline": {
+    "status": "not_run",
+    "dataset": "musique",
+    "limit": 50,
+    "max_iter": 3,
+    "top_k_per_iter": 5,
+    "llm_name": "qwen3-8b",
+    "reason": "No --llm_base_url or --replay_report provided. This script will not fabricate IRCoT results."
+  },
+  "nli_calibration": {
+    "status": "completed",
+    "model_name": "microsoft/deberta-v3-base-mnli",
+    "calibration_source": "hotpotqa weak sentence labels (lexical smoke, not DeBERTa)",
+    "num_examples": 200,
+    "temperature": 0.5,
+    "ece": 0.08528021153070182,
+    "brier": 0.057685430095094414,
+    "nll": 0.23613221224395825,
+    "absorbing_status": "ablation",
+    "lexical_smoke": true
+  },
+  "oracle_slot_pipeline": {
+    "status": "completed",
+    "dataset": "musique",
+    "num_examples": 1000,
+    "output": "data/processed/musique_oracle_slots.jsonl",
+    "avg_slots": 2.648,
+    "min_slots": 2,
+    "max_slots": 4,
+    "contamination_warning": "Oracle slots are only for BSGS-oracle-slot diagnostics; do not tune latent-slot prompts on the same split."
+  },
+  "qwen_slot_quality": {
+    "status": "not_run",
+    "reason": "No predicted_jsonl or llm_base_url provided. Use --llm_base_url for real Qwen evaluation.",
+    "num_examples": 0
+  },
+  "decision": {
+    "week1_config": {
+      "dataset": "musique",
+      "slot_mode": "oracle-slot",
+      "binding": "hard normalized string / alias match",
+      "selector": "posterior top-k"
+    },
+    "components_enabled": [
+      "MuSiQue answerable-subset diagnostics",
+      "oracle-slot Week-1 diagnostic"
+    ],
+    "components_disabled": [
+      "latent-slot main path",
+      "soft binding",
+      "DPP",
+      "LLM verifier",
+      "semi-absorbing transition as main"
+    ],
+    "risks": [
+      "Formal DeBERTa calibration has not run; lexical smoke is not a main verifier result, so absorbing remains ablation/fallback."
+    ]
+  }
+}

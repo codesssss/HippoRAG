@@ -678,21 +678,34 @@ Required sections:
 - failure taxonomy;
 - decision.
 
-## 10. Initial Execution Order
+## 10. Initial Execution Dependencies
 
-Run strictly in this order until Week 0 is complete:
+`split_audit` is the only strict first step. It determines whether the
+remaining Week 0 jobs should use `MuSiQue-Ans`, `MuSiQue-Full`, or the local
+1000-example packaged subset.
+
+After the split audit is clear, these jobs are independent enough to run in
+parallel when compute is available:
+
+- IRCoT baseline;
+- DeBERTa-NLI calibration and throughput;
+- oracle slot pipeline;
+- Qwen slot quality evaluation.
+
+Recommended dependency order:
 
 1. `scripts/bsgs_split_audit.py`
-2. `scripts/bsgs_run_ircot_baseline.py`
-3. `scripts/bsgs_calibrate_nli.py`
-4. `scripts/bsgs_build_oracle_slots.py`
-5. `scripts/bsgs_eval_qwen_slots.py`
-6. `scripts/bsgs_week0_report.py`
+2. launch independent Week 0 jobs:
+   - `scripts/bsgs_run_ircot_baseline.py`
+   - `scripts/bsgs_calibrate_nli.py`
+   - `scripts/bsgs_build_oracle_slots.py`
+   - `scripts/bsgs_eval_qwen_slots.py`
+3. `scripts/bsgs_week0_report.py`
 
 Only after `reports/week0/decision.md` exists and passes review:
 
-7. `scripts/bsgs_run_oracle.py`
-8. `scripts/bsgs_week1_report.py`
+4. `scripts/bsgs_run_oracle.py`
+5. `scripts/bsgs_week1_report.py`
 
 ## 11. Current Status
 

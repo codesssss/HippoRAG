@@ -133,3 +133,8 @@ It must answer:
 - whether current Layer-1 MuSiQue-1000 matches the intended IRCoT-style answerable subset;
 - which split to use for oracle-slot diagnostics;
 - how to prevent oracle decomposition from contaminating latent-slot prompt evaluation.
+
+After `split_audit` completes, the remaining Week 0 jobs are parallelizable:
+IRCoT baseline, NLI calibration, oracle slot construction, and Qwen slot
+quality evaluation do not depend on each other except for using the split
+decision produced by the audit.

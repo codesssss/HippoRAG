@@ -1,0 +1,12 @@
+{
+  "status": "completed",
+  "model_name": "microsoft/deberta-v3-base-mnli",
+  "calibration_source": "hotpotqa weak sentence labels (lexical smoke, not DeBERTa)",
+  "num_examples": 200,
+  "temperature": 0.5,
+  "ece": 0.08528021153070182,
+  "brier": 0.057685430095094414,
+  "nll": 0.23613221224395825,
+  "absorbing_status": "ablation",
+  "lexical_smoke": true
+}

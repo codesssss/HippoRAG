@@ -40,6 +40,8 @@ Last updated: 2026-04-25
 - `Layer-1 targeted nobinding ablation outputs`: `run_logs/layer1_targeted_nobinding_20260424/`
 - `BSGS Week0/Week1 execution plan`: `docs/bsgs_week0_week1_plan_20260425.md`
 - `BSGS Week0/Week1 research memo`: `research_memory/emnlp_expand_then_compose/18_bsgs_week0_week1_plan_20260425.md`
+- `BSGS Week0 implementation`: `src/bsgs/`, `scripts/bsgs_*.py`
+- `BSGS Week0 preliminary reports`: `reports/week0/`
 
 ## Done
 
@@ -129,27 +131,54 @@ Last updated: 2026-04-25
 - Recorded the BSGS Week0/Week1 execution boundary:
   - `docs/bsgs_week0_week1_plan_20260425.md`
   - `research_memory/emnlp_expand_then_compose/18_bsgs_week0_week1_plan_20260425.md`
+- Implemented the additive BSGS Week0/Week1 scaffold:
+  - `src/bsgs/state.py`
+  - `src/bsgs/transition.py`
+  - `src/bsgs/verifier.py`
+  - `src/bsgs/extractor.py`
+  - `src/bsgs/slots.py`
+  - `src/bsgs/binding.py`
+  - `src/bsgs/metrics.py`
+  - `src/bsgs/runner_oracle.py`
+  - `src/bsgs/io.py`
+  - `src/bsgs/prompts.py`
+- Added BSGS Week0/Week1 script entry points:
+  - `scripts/bsgs_split_audit.py`
+  - `scripts/bsgs_run_ircot_baseline.py`
+  - `scripts/bsgs_calibrate_nli.py`
+  - `scripts/bsgs_build_oracle_slots.py`
+  - `scripts/bsgs_eval_qwen_slots.py`
+  - `scripts/bsgs_run_oracle.py`
+  - `scripts/bsgs_week0_report.py`
+  - `scripts/bsgs_week1_report.py`
+- Added BSGS unit tests under `tests/bsgs/`
+- Ran local Week0 preliminary scripts:
+  - split audit: local `musique.json` is `MuSiQue-Ans-local-subset`, 1000 answerable examples, not the full official 2417-example MuSiQue-Ans dev
+  - oracle slot pipeline: built 1000 local oracle-slot records
+  - IRCoT baseline: `not_run` report only; no endpoint/runtime result fabricated
+  - Qwen slot quality: `not_run` report only; no endpoint result fabricated
+  - NLI calibration: lexical smoke only, not a formal DeBERTa result; absorbing transition remains ablation/fallback
+- Verified BSGS scaffold:
+  - `py_compile` passed for all new modules/scripts
+  - `pytest tests/bsgs -q` passed: 7 tests
+  - `/tmp/bsgs_oracle_smoke.json` smoke run completed with `limit=5`
 
 ## Running
 
 - No active Layer-1 DtC/DAEC evaluation jobs are expected to be running.
-- No BSGS jobs have been launched yet on this branch.
+- No long-running BSGS jobs are active.
 
 ## Next Wave
 
-1. Implement and run the BSGS split audit:
-   - `scripts/bsgs_split_audit.py`
-   - first required outputs: `reports/week0/split_audit.md`, `reports/week0/split_audit.json`
-2. Run the rest of Week 0 only after the split audit is clear:
-   - IRCoT baseline
-   - DeBERTa-NLI calibration and throughput
-   - oracle slot pipeline
-   - Qwen slot quality evaluation
-3. Generate the Week 0 decision report:
-   - `reports/week0/decision.md`
-4. Run Week 1 oracle-slot BSGS only if Week 0 is usable:
+1. Replace preliminary placeholders with formal Week0 runs:
+   - run real IRCoT with Qwen3-8B no-think endpoint and shared retriever
+   - run formal DeBERTa-v3 MNLI calibration, not lexical smoke
+   - run real Qwen slot generation quality with no-think endpoint
+2. Decide whether the local 1000-example `MuSiQue-Ans-local-subset` is acceptable for Week1 diagnostics or whether to import official MuSiQue-Ans dev before final numbers.
+3. Run Week 1 oracle-slot BSGS after formal Week0 baselines are available:
    - `scripts/bsgs_run_oracle.py`
    - `reports/week1/operator_validation.md`
+4. Extend `scripts/bsgs_run_oracle.py` from lexical smoke likelihood to calibrated DeBERTa likelihood once calibration passes or is explicitly downgraded.
 5. Keep the DAEC paper floor frozen at `2555018`; BSGS must not rewrite the DAEC main path.
 6. Keep the DAEC paper-writing line available:
    - manually audit `MuSiQue` loss cases from Layer-1 taxonomy outputs
@@ -189,8 +218,8 @@ Method implementation order should be:
 - Hard-crossing cuts wins more than losses, so hard per-candidate gates remain rejected
 - The strongest/GBC backup line is coherent, but it still lacks a positive shallow-dataset end-to-end result
 - QBF terminal-schema backward flow fails as a retrieval operator on 2Wiki and MuSiQue pilot100; the issue appears operator-level rather than hyperparameter-level
-- BSGS is blocked until MuSiQue split audit confirms whether current evaluation data is `MuSiQue-Ans` or `MuSiQue-Full`
-- BSGS is blocked until IRCoT, NLI calibration, oracle slots, and Qwen slot quality are audited in Week 0
+- BSGS split audit found local `musique.json` is a 1000-example answerable-only local subset, not official full MuSiQue-Ans dev; final paper numbers need split alignment before claims
+- BSGS is blocked on formal IRCoT, formal DeBERTa calibration, and real Qwen slot quality; current Week0 reports only establish scaffolding and local split facts
 - BSGS absorbing transition is blocked unless DeBERTa-NLI calibration reaches the ECE threshold in the Week 0 report
 
 ## Do Not Drift

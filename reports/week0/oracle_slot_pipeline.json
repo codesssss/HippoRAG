@@ -1,0 +1,10 @@
+{
+  "status": "completed",
+  "dataset": "musique",
+  "num_examples": 1000,
+  "output": "data/processed/musique_oracle_slots.jsonl",
+  "avg_slots": 2.648,
+  "min_slots": 2,
+  "max_slots": 4,
+  "contamination_warning": "Oracle slots are only for BSGS-oracle-slot diagnostics; do not tune latent-slot prompts on the same split."
+}

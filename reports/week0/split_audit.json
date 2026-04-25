@@ -1,0 +1,41 @@
+{
+  "dataset_name": "musique",
+  "variant": "MuSiQue-Ans-local-subset",
+  "train_size": 0,
+  "dev_size": 1000,
+  "test_size": 0,
+  "local_sample_size": 1000,
+  "local_corpus_size": 11656,
+  "has_unanswerable": false,
+  "answerable_distribution": {
+    "True": 1000
+  },
+  "has_decomposition": true,
+  "has_supporting_paragraphs": true,
+  "current_layer1_musique_1000_source": "reproduce/dataset/musique.json",
+  "current_layer1_musique_1000_corpus": "reproduce/dataset/musique_corpus.json",
+  "recommended_eval_split": "reproduce/dataset/musique.json",
+  "all_local_musique_files": [
+    "reproduce/dataset/musique.json",
+    "reproduce/dataset/musique_corpus.json",
+    "reproduce/dataset/musique_coverage_gap_20260406.json",
+    "reproduce/dataset/musique_coverage_gap_20260406_corpus.json",
+    "reproduce/dataset/musique_plagueprobe.json",
+    "reproduce/dataset/musique_plagueprobe_corpus.json",
+    "reproduce/dataset/musique_q6probe.json",
+    "reproduce/dataset/musique_q6probe_corpus.json",
+    "reproduce/dataset/musique_readerprobe_improved30_20260406.json",
+    "reproduce/dataset/musique_readerprobe_improved30_20260406_corpus.json",
+    "reproduce/dataset/musique_readerprobe_q6_20260406.json",
+    "reproduce/dataset/musique_readerprobe_q6_20260406_corpus.json",
+    "reproduce/dataset/musique_saudiprobe.json",
+    "reproduce/dataset/musique_saudiprobe_corpus.json",
+    "reproduce/dataset/musique_smoke40_familygate_20260404.json",
+    "reproduce/dataset/musique_smoke40_familygate_20260404_corpus.json"
+  ],
+  "notes": [
+    "Local file is answerable-only and smaller than official MuSiQue-Ans dev; treat it as a local MuSiQue-Ans-derived subset.",
+    "Official reference: MuSiQue-Ans total=24814, dev=2417.",
+    "Do not tune latent-slot prompts on the same examples used for oracle-slot diagnostics."
+  ]
+}
