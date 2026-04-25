@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-24
+Last updated: 2026-04-25
 
 ## Canonical Outputs
 
@@ -38,6 +38,8 @@ Last updated: 2026-04-24
 - `Layer-1 failure taxonomy outputs`: `run_logs/failure_taxonomy_layer1_20260424/`
 - `Layer-1 paired significance outputs`: `run_logs/layer1_significance_20260424/`
 - `Layer-1 targeted nobinding ablation outputs`: `run_logs/layer1_targeted_nobinding_20260424/`
+- `BSGS Week0/Week1 execution plan`: `docs/bsgs_week0_week1_plan_20260425.md`
+- `BSGS Week0/Week1 research memo`: `research_memory/emnlp_expand_then_compose/18_bsgs_week0_week1_plan_20260425.md`
 
 ## Done
 
@@ -120,42 +122,64 @@ Last updated: 2026-04-24
     - `MuSiQue x Dense x nobinding`
 - Recorded the Layer-1 follow-up memo:
   - `research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md`
+- Froze the DAEC Layer-1 code/docs checkpoint:
+  - `2555018 Add DAEC layer1 external-pool evaluation`
+- Created the BSGS exploration branch:
+  - `bsgs-week0-week1`
+- Recorded the BSGS Week0/Week1 execution boundary:
+  - `docs/bsgs_week0_week1_plan_20260425.md`
+  - `research_memory/emnlp_expand_then_compose/18_bsgs_week0_week1_plan_20260425.md`
 
 ## Running
 
 - No active Layer-1 DtC/DAEC evaluation jobs are expected to be running.
+- No BSGS jobs have been launched yet on this branch.
 
 ## Next Wave
 
-1. Manually audit `MuSiQue` loss cases from the taxonomy JSONL outputs:
-   - `PropRAG x MuSiQue`
-   - `Dense x MuSiQue`
-2. Decide the paper-facing main config:
-   - current full config is positive across pools
-   - targeted `nobinding` says dependency binding is load-bearing across tested pairs
-   - 2Wiki ablation says `rank_weight=0.2` and repair typing should not be overclaimed as necessary components
-3. Consolidate a unified oracle-on-pools table for HippoRAG/NV, PropRAG top-100, and dense top-100 pools
-4. Start the paper skeleton around the retriever-agnostic fixed-pool composition claim
-5. Keep QBF as a negative pilot, not a main method
+1. Implement and run the BSGS split audit:
+   - `scripts/bsgs_split_audit.py`
+   - first required outputs: `reports/week0/split_audit.md`, `reports/week0/split_audit.json`
+2. Run the rest of Week 0 only after the split audit is clear:
+   - IRCoT baseline
+   - DeBERTa-NLI calibration and throughput
+   - oracle slot pipeline
+   - Qwen slot quality evaluation
+3. Generate the Week 0 decision report:
+   - `reports/week0/decision.md`
+4. Run Week 1 oracle-slot BSGS only if Week 0 is usable:
+   - `scripts/bsgs_run_oracle.py`
+   - `reports/week1/operator_validation.md`
+5. Keep the DAEC paper floor frozen at `2555018`; BSGS must not rewrite the DAEC main path.
+6. Keep the DAEC paper-writing line available:
+   - manually audit `MuSiQue` loss cases from Layer-1 taxonomy outputs
+   - consolidate oracle-on-pools tables
+   - start paper skeleton around retriever-agnostic fixed-pool composition
 
 ## Method Priority
 
 Method implementation order should be:
 
-1. Active paper method candidate:
+1. Frozen paper-floor method:
    - `DtC/DAEC` as a retriever-agnostic fixed-pool evidence compositor
    - strongest supported component so far: dependency binding across tested PropRAG and dense pool settings
-2. Baselines and controls:
+2. New exploratory method branch:
+   - `BSGS` as multi-step node-marginal belief-state filtering
+   - Week 0 is risk audit only
+   - Week 1 is oracle-slot operator validation only
+   - do not promote BSGS to a full method until the mechanism gate passes
+3. Baselines and controls:
    - baseline top-5
    - MMR/DPP structure-blind diversity
    - oracle select@100
    - PropRAG aligned comparison
    - dense-pool comparison
-3. Backup line:
+   - IRCoT-style iterative baseline for BSGS
+4. Backup line:
    - keep `Requirement-Aware Strongest` documented and runnable as a reserve option
    - do not promote it without at least `HotpotQA` baseline parity plus retained `2Wiki` gains
-4. Do not jump to open iterative retrieval, online judges, or planner-style control before the fixed-pool DtC objective is fully tested
-5. Do not continue QBF unless a new graph substrate or a fundamentally different supervision signal is introduced
+5. Do not jump to latent-slot, soft-binding, DPP, or full proposition-graph extraction before Week 1 BSGS oracle-slot validation passes
+6. Do not continue QBF unless a new graph substrate or a fundamentally different supervision signal is introduced
 
 ## Blockers
 
@@ -165,6 +189,9 @@ Method implementation order should be:
 - Hard-crossing cuts wins more than losses, so hard per-candidate gates remain rejected
 - The strongest/GBC backup line is coherent, but it still lacks a positive shallow-dataset end-to-end result
 - QBF terminal-schema backward flow fails as a retrieval operator on 2Wiki and MuSiQue pilot100; the issue appears operator-level rather than hyperparameter-level
+- BSGS is blocked until MuSiQue split audit confirms whether current evaluation data is `MuSiQue-Ans` or `MuSiQue-Full`
+- BSGS is blocked until IRCoT, NLI calibration, oracle slots, and Qwen slot quality are audited in Week 0
+- BSGS absorbing transition is blocked unless DeBERTa-NLI calibration reaches the ECE threshold in the Week 0 report
 
 ## Do Not Drift
 
@@ -175,3 +202,8 @@ Method implementation order should be:
 - Do not pitch DtC as open iterative retrieval; the protocol is fixed-pool post-retrieval composition
 - Do not let the old unvalidated `PCRS-RAG V1` branch overwrite the active DtC line by default
 - Do not let the current strongest/GBC backup line overwrite the paper mainline based on smoke-scale evidence
+- Do not implement BSGS latent slots, soft binding, or DPP in Week 1
+- Do not use an LLM verifier for BSGS Week 0/1
+- Do not mix `MuSiQue-Full` and `MuSiQue-Ans` baselines
+- Do not write oracle-slot BSGS as a non-oracle main result
+- Do not frame DAEC and BSGS as the same probability space
