@@ -28,11 +28,22 @@ _REF_RE = re.compile(r"#(\d+)")
 
 
 def parse_json_list(text: str) -> list[dict[str, Any]]:
-    """Parse a JSON list, tolerating fenced code blocks around model output."""
+    """Parse a JSON list, tolerating common chat-model wrappers.
+
+    Qwen-style endpoints may return an empty ``<think>...</think>`` block even
+    under no-think prompting.  The evaluator is a quality diagnostic, so it
+    should not count wrapper text as a slot-generation failure.
+    """
     raw = str(text or "").strip()
+    raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL | re.IGNORECASE).strip()
     if raw.startswith("```"):
         raw = re.sub(r"^```(?:json)?", "", raw).strip()
         raw = re.sub(r"```$", "", raw).strip()
+    if not raw.startswith("["):
+        start = raw.find("[")
+        end = raw.rfind("]")
+        if start >= 0 and end > start:
+            raw = raw[start : end + 1]
     payload = json.loads(raw)
     if not isinstance(payload, list):
         raise ValueError("Expected a JSON list of slots")

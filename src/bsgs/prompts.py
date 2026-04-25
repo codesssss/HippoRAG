@@ -1,6 +1,7 @@
 """Prompt templates for BSGS Week-0/Week-1 scripts."""
 
-QWEN_SLOT_GENERATION_PROMPT = """Given a multi-hop question, decompose it into atomic information needs.
+QWEN_SLOT_GENERATION_PROMPT = """/no_think
+Given a multi-hop question, decompose it into atomic information needs.
 
 Return only a JSON list. Each item should be a slot with:
 - slot_text: the atomic information need

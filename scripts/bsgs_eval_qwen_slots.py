@@ -91,7 +91,7 @@ def main() -> None:
         print(f"Wrote not_run report to {args.report_json}")
         return
 
-    for sample in samples:
+    for idx, sample in enumerate(samples, start=1):
         qid = str(sample.get("id") or sample.get("_id"))
         gold = build_oracle_slots_for_sample(sample)
         try:
@@ -114,6 +114,8 @@ def main() -> None:
             scores.append(evaluate_slot_quality(predicted, gold))
         except (ValueError, KeyError, urllib.error.URLError, TimeoutError) as exc:
             errors.append(f"{qid}: {exc}")
+        if idx % 25 == 0 or idx == len(samples):
+            print(f"[qwen-slot] processed {idx}/{len(samples)} examples, valid={len(scores)}, errors={len(errors)}", flush=True)
 
     if generated_rows:
         write_jsonl(generated_rows, args.predictions_out)
