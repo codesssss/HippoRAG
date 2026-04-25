@@ -48,7 +48,7 @@ Paper-safe claim:
 | ID | Task | Main output | Gate |
 |---|---|---|---|
 | W0-T0 | MuSiQue split audit | `reports/week0/split_audit.md/json` | local split and Layer-1 source identified |
-| W0-T1 | IRCoT baseline | `reports/week0/ircot_baseline.md` | MuSiQue-50/200 EM/F1 + cost |
+| W0-T1 | IRCoT baseline | `reports/week0/ircot_baseline.md` | local MuSiQue-1000 EM/F1 + cost |
 | W0-T2 | DeBERTa-NLI calibration | `reports/week0/nli_calibration.md/json` | ECE decides absorbing main vs ablation |
 | W0-T3 | Oracle slot pipeline | `data/processed/musique_oracle_slots.jsonl` | oracle slots built without prompt contamination |
 | W0-T4 | Qwen slot quality | `reports/week0/qwen_slot_quality.md/json` | slot recall decides latent-slot route |
@@ -64,7 +64,7 @@ reports/week0/decision.md
 Run minimal BSGS operator validation:
 
 ```text
-dataset: MuSiQue-200
+dataset: local MuSiQue-1000
 slot mode: oracle-slot
 binding: hard normalized string / alias match
 verifier: calibrated DeBERTa-NLI

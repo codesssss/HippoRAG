@@ -63,7 +63,7 @@ def decide(split: dict[str, Any], nli: dict[str, Any], slots: dict[str, Any]) ->
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--split_json", default="reports/week0/split_audit.json")
-    parser.add_argument("--ircot_json", default="reports/week0/ircot_musique50.json")
+    parser.add_argument("--ircot_json", default="reports/week0/ircot_musique1000.json")
     parser.add_argument("--nli_json", default="reports/week0/nli_calibration.json")
     parser.add_argument("--oracle_json", default="reports/week0/oracle_slot_pipeline.json")
     parser.add_argument("--qwen_json", default="reports/week0/qwen_slot_quality.json")

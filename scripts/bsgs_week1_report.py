@@ -23,19 +23,35 @@ def safe_read(path: str) -> dict[str, Any]:
     return read_json(p)
 
 
+def metric(report: dict[str, Any], name: str, default: float = 0.0) -> float:
+    if name in report and report.get(name) is not None:
+        return float(report[name])
+    metrics = report.get("metrics") or {}
+    if name in metrics and metrics.get(name) is not None:
+        return float(metrics[name])
+    return default
+
+
 def evaluate_gates(bsgs: dict[str, Any], daec: dict[str, Any], ircot: dict[str, Any]) -> dict[str, Any]:
-    metrics = bsgs.get("metrics") or {}
-    bsgs_recall = float(metrics.get("supporting_paragraph_recall") or 0.0)
-    daec_recall = float((daec.get("metrics") or {}).get("supporting_paragraph_recall") or 0.0)
-    ircot_recall = float((ircot.get("metrics") or {}).get("supporting_paragraph_recall") or 0.0)
+    bsgs_recall = metric(bsgs, "supporting_paragraph_recall")
+    daec_recall = metric(daec, "supporting_paragraph_recall")
+    ircot_recall = metric(ircot, "supporting_paragraph_recall")
     best_base = max(daec_recall, ircot_recall)
     mechanism_delta = bsgs_recall - best_base
     mechanism_passed = mechanism_delta >= 0.05
+    bsgs_f1 = metric(bsgs, "answer_f1", default=-1.0)
+    best_answer_f1 = max(metric(daec, "answer_f1"), metric(ircot, "answer_f1"))
+    if bsgs_f1 >= 0.0 and bsgs_f1 >= best_answer_f1 + 0.01:
+        answer_grade = "Green"
+    elif mechanism_passed:
+        answer_grade = "Yellow"
+    else:
+        answer_grade = "Red"
     return {
         "mechanism_passed": mechanism_passed,
         "mechanism_metric": "supporting_paragraph_recall",
         "mechanism_delta": mechanism_delta,
-        "answer_grade": "Yellow" if mechanism_passed else "Red",
+        "answer_grade": answer_grade,
         "decision": "continue_bsgs_diagnostics" if mechanism_passed else "fallback_to_daec",
     }
 
@@ -44,7 +60,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--bsgs_json", default="reports/week1/operator_validation.json")
     parser.add_argument("--daec_json", default="")
-    parser.add_argument("--ircot_json", default="reports/week0/ircot_musique200.json")
+    parser.add_argument("--ircot_json", default="reports/week0/ircot_musique1000.json")
     parser.add_argument("--json_out", default="reports/week1/operator_validation_summary.json")
     parser.add_argument("--md_out", default="reports/week1/operator_validation.md")
     args = parser.parse_args()
@@ -57,6 +73,8 @@ def main() -> None:
     write_json(payload, args.json_out)
 
     metrics = bsgs.get("metrics") or {}
+    daec_recall = metric(daec, "supporting_paragraph_recall")
+    ircot_recall = metric(ircot, "supporting_paragraph_recall")
     lines = [
         "# Week 1 Oracle-Slot BSGS Operator Validation",
         "",
@@ -72,9 +90,9 @@ def main() -> None:
         "## Main comparison",
         "| Method | EM | F1 | Bridge Recall | Evidence Path Recall | AICBF | Latency |",
         "|---|---:|---:|---:|---:|---:|---:|",
-        "| DAEC |  |  |  |  |  |  |",
-        "| IRCoT |  |  |  |  |  |  |",
-        f"| BSGS-oracle-slot |  |  |  | `{metrics.get('supporting_paragraph_recall', 0.0):.4f}` |  |  |",
+        f"| DAEC | `{metric(daec, 'answer_em'):.4f}` | `{metric(daec, 'answer_f1'):.4f}` |  | `{daec_recall:.4f}` |  | `{metric(daec, 'latency_per_query'):.4f}` |",
+        f"| IRCoT | `{metric(ircot, 'answer_em'):.4f}` | `{metric(ircot, 'answer_f1'):.4f}` |  | `{ircot_recall:.4f}` |  | `{metric(ircot, 'latency_per_query'):.4f}` |",
+        f"| BSGS-oracle-slot | `{metric(bsgs, 'answer_em'):.4f}` | `{metric(bsgs, 'answer_f1'):.4f}` |  | `{metrics.get('supporting_paragraph_recall', 0.0):.4f}` |  | `{metric(bsgs, 'latency_per_query'):.4f}` |",
         "",
         "## Mechanism gate",
         f"- Passed: `{gates['mechanism_passed']}`",

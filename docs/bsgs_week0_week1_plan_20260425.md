@@ -55,7 +55,7 @@ In scope:
 - DeBERTa-NLI calibration and throughput check.
 - Oracle-slot pipeline from MuSiQue gold decomposition.
 - Qwen3-8B no-think slot generation quality evaluation.
-- Minimal oracle-slot BSGS operator validation on MuSiQue-200.
+- Minimal oracle-slot BSGS operator validation on the local MuSiQue-1000 protocol used by the DAEC/PropRAG/Dense comparisons.
 
 Out of scope for Week 0/1:
 
@@ -127,14 +127,14 @@ retriever: same substrate as DAEC/BSGS diagnostic
 max_iter: 3 or 4
 top_k_per_iter: 5
 reader: Qwen3-8B no-think
-dataset: MuSiQue-50 smoke + MuSiQue-200 diagnostic
+dataset: local MuSiQue-1000 protocol
+smoke: optional limit-1/limit-50 plumbing check only; do not report as the protocol result
 ```
 
 Outputs:
 
 ```text
-reports/week0/ircot_musique50.json
-reports/week0/ircot_musique200.json
+reports/week0/ircot_musique1000.json
 reports/week0/ircot_baseline.md
 ```
 
@@ -322,7 +322,7 @@ Week 1 validates the BSGS operator under oracle slot order.
 Fixed config:
 
 ```text
-dataset: MuSiQue-200 diagnostic
+dataset: local MuSiQue-1000 diagnostic protocol
 slot mode: oracle-slot
 binding: hard normalized string / alias match
 verifier: calibrated DeBERTa-NLI
@@ -619,7 +619,7 @@ Do not use a single answer-F1 AND gate.
 
 ### Hard Mechanism Gate
 
-On MuSiQue-200 oracle-slot setting, BSGS-oracle-slot must satisfy at least one:
+On the local MuSiQue-1000 oracle-slot setting, BSGS-oracle-slot must satisfy at least one:
 
 ```text
 bridge entity recall +5 pp over DAEC or IRCoT
