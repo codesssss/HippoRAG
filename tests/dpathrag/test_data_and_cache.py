@@ -5,7 +5,7 @@ from src.dpathrag.data import context_documents, evidence_path_entities, normali
 from src.dpathrag.metrics import recall_at_k, support_complete_at_k
 from src.dpathrag.reader import exact_match, format_reader_input, score_prediction, summarize_scores, token_f1
 from src.dpathrag.reader_data import build_gold_reader_record, build_pool_reader_record
-from src.dpathrag.selector_data import FEATURE_NAMES, featurize_selector_record, support_metrics_for_indices
+from src.dpathrag.selector_data import FEATURE_NAMES, featurize_selector_record, selection_overlap, support_metrics_for_indices
 
 
 def test_support_titles_and_evidence_entities() -> None:
@@ -145,3 +145,35 @@ def test_selector_featurization_keeps_gold_label_out_of_features() -> None:
     metrics = support_metrics_for_indices(example, [0, 1])
     assert metrics["support_complete"] == 1.0
     assert metrics["duplicate_title"] == 0.0
+    assert selection_overlap([0, 1], [1, 2]) == 1 / 3
+
+
+def test_selector_featurization_accepts_extra_embedding_features() -> None:
+    record = {
+        "qid": "q1",
+        "question": "Who is related to Gold A?",
+        "type": "compositional",
+        "gold_titles": ["Gold A"],
+        "evidences": [["A", "rel", "Bridge"], ["Bridge", "rel", "Answer"]],
+        "candidates": [
+            {
+                "rank": 1,
+                "title": "Gold A",
+                "text": "Gold A\nBridge appears here.",
+                "retriever_score": 0.9,
+                "gold_support": 1,
+            }
+        ],
+    }
+    example = featurize_selector_record(
+        record,
+        max_candidates=2,
+        path_len=2,
+        candidate_extra_features=[[0.2, 0.3]],
+        query_extra_features=[0.4, 0.5],
+    )
+    assert len(example.candidate_features[0]) == len(FEATURE_NAMES) + 2
+    assert len(example.query_features) == len(FEATURE_NAMES) + 2
+    assert example.bridge_entities == ["Bridge"]
+    metrics = support_metrics_for_indices(example, [0])
+    assert metrics["bridge_entity_recall"] == 1.0

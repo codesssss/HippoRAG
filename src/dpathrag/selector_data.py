@@ -12,7 +12,7 @@ import math
 import re
 from typing import Any, Sequence
 
-from src.dpathrag.data import normalize_text
+from src.dpathrag.data import evidence_path_entities, normalize_text
 
 
 FEATURE_NAMES = [
@@ -42,7 +42,9 @@ class SelectorExample:
     candidate_mask: list[bool]
     target_indices: list[int]
     gold_titles: list[str]
+    bridge_entities: list[str]
     candidate_titles: list[str]
+    candidate_texts: list[str]
     candidate_gold_support: list[int]
 
 
@@ -89,6 +91,8 @@ def featurize_selector_record(
     *,
     max_candidates: int = 100,
     path_len: int = 5,
+    candidate_extra_features: Sequence[Sequence[float]] | None = None,
+    query_extra_features: Sequence[float] | None = None,
 ) -> SelectorExample:
     candidates = list(record.get("candidates") or [])[: int(max_candidates)]
     question = str(record.get("question") or "")
@@ -97,7 +101,9 @@ def featurize_selector_record(
     score_minmax = _minmax_scores(candidates)
     features: list[list[float]] = []
     titles: list[str] = []
+    texts: list[str] = []
     support_labels: list[int] = []
+    extra_dim = len(candidate_extra_features[0]) if candidate_extra_features is not None else 0
     for idx, candidate in enumerate(candidates):
         title = str(candidate.get("title") or "")
         raw_text = str(candidate.get("text") or "")
@@ -108,8 +114,7 @@ def featurize_selector_record(
         body_tokens = _tokens(body)
         rank = float(candidate.get("rank") or (idx + 1))
         score = float(candidate.get("retriever_score") or 0.0)
-        features.append(
-            [
+        base_features = [
                 1.0,
                 1.0 / max(1.0, rank),
                 rank / max(1.0, float(max_candidates)),
@@ -123,13 +128,22 @@ def featurize_selector_record(
                 1.0 if q_type == "bridge" else 0.0,
                 1.0 if q_type == "comparison" else 0.0,
             ]
+        extras = (
+            list(candidate_extra_features[idx])
+            if candidate_extra_features is not None and idx < len(candidate_extra_features)
+            else []
         )
+        if extra_dim and len(extras) != extra_dim:
+            raise ValueError("All candidate_extra_features rows must have the same dimension")
+        features.append(base_features + [float(value) for value in extras])
         titles.append(title)
+        texts.append(raw_text)
         support_labels.append(int(candidate.get("gold_support") or 0))
 
     while len(features) < int(max_candidates):
-        features.append([0.0 for _ in FEATURE_NAMES])
+        features.append([0.0 for _ in FEATURE_NAMES] + [0.0 for _ in range(extra_dim)])
         titles.append("")
+        texts.append("")
         support_labels.append(0)
 
     target_indices = [idx for idx, label in enumerate(support_labels[: len(candidates)]) if int(label) == 1]
@@ -139,7 +153,7 @@ def featurize_selector_record(
 
     q_type_bridge = 1.0 if q_type == "bridge" else 0.0
     q_type_comparison = 1.0 if q_type == "comparison" else 0.0
-    query_features = [
+    query_base_features = [
         1.0,
         0.0,
         0.0,
@@ -153,6 +167,15 @@ def featurize_selector_record(
         q_type_bridge,
         q_type_comparison,
     ]
+    query_extras = list(query_extra_features) if query_extra_features is not None else []
+    if extra_dim and len(query_extras) != extra_dim:
+        raise ValueError("query_extra_features dimension must match candidate_extra_features")
+    query_features = query_base_features + [float(value) for value in query_extras]
+    bridge_entities = evidence_path_entities(record)
+    if len(bridge_entities) > 2:
+        bridge_entities = bridge_entities[1:-1]
+    else:
+        bridge_entities = []
 
     return SelectorExample(
         qid=str(record.get("qid") or record.get("query_idx") or ""),
@@ -162,7 +185,9 @@ def featurize_selector_record(
         candidate_mask=[idx < len(candidates) for idx in range(int(max_candidates))],
         target_indices=target_indices,
         gold_titles=[str(title) for title in record.get("gold_titles") or []],
+        bridge_entities=[str(entity) for entity in bridge_entities],
         candidate_titles=titles,
+        candidate_texts=texts,
         candidate_gold_support=support_labels,
     )
 
@@ -170,6 +195,7 @@ def featurize_selector_record(
 def support_metrics_for_indices(example: SelectorExample, selected_indices: Sequence[int]) -> dict[str, float]:
     selected = [int(index) for index in selected_indices if 0 <= int(index) < len(example.candidate_titles)]
     selected_titles = [example.candidate_titles[index] for index in selected]
+    selected_texts = [example.candidate_texts[index] for index in selected]
     gold = {normalize_text(title) for title in example.gold_titles if normalize_text(title)}
     observed = {normalize_text(title) for title in selected_titles if normalize_text(title)}
     if not gold:
@@ -182,13 +208,28 @@ def support_metrics_for_indices(example: SelectorExample, selected_indices: Sequ
     duplicate_title = 1.0 if any(count > 1 for count in title_counts.values()) else 0.0
     unique_title_rate = len(title_counts) / max(1, len(selected_titles))
     selected_gold_count = sum(example.candidate_gold_support[index] for index in selected)
+    bridge_entities = {normalize_text(entity) for entity in example.bridge_entities if normalize_text(entity)}
+    selected_blob = normalize_text(" ".join(selected_titles + selected_texts))
+    if bridge_entities:
+        bridge_entity_recall = sum(1 for entity in bridge_entities if entity in selected_blob) / len(bridge_entities)
+    else:
+        bridge_entity_recall = 0.0
     return {
         "support_recall": recall,
         "support_complete": complete,
         "duplicate_title": duplicate_title,
         "unique_title_rate": unique_title_rate,
         "selected_gold_count": float(selected_gold_count),
+        "bridge_entity_recall": bridge_entity_recall,
     }
+
+
+def selection_overlap(left_indices: Sequence[int], right_indices: Sequence[int]) -> float:
+    left = {int(index) for index in left_indices}
+    right = {int(index) for index in right_indices}
+    if not left and not right:
+        return 1.0
+    return len(left & right) / max(1, len(left | right))
 
 
 def summarize_selector_metrics(rows: Sequence[dict[str, float]]) -> dict[str, float]:
@@ -200,6 +241,8 @@ def summarize_selector_metrics(rows: Sequence[dict[str, float]]) -> dict[str, fl
             "duplicate_title_rate": 0.0,
             "unique_title_rate": 0.0,
             "selected_gold_count": 0.0,
+            "bridge_entity_recall": 0.0,
+            "selection_overlap": 0.0,
         }
     denom = float(len(rows))
     return {
@@ -209,4 +252,6 @@ def summarize_selector_metrics(rows: Sequence[dict[str, float]]) -> dict[str, fl
         "duplicate_title_rate": round(sum(float(row.get("duplicate_title") or 0.0) for row in rows) / denom, 4),
         "unique_title_rate": round(sum(float(row.get("unique_title_rate") or 0.0) for row in rows) / denom, 4),
         "selected_gold_count": round(sum(float(row.get("selected_gold_count") or 0.0) for row in rows) / denom, 4),
+        "bridge_entity_recall": round(sum(float(row.get("bridge_entity_recall") or 0.0) for row in rows) / denom, 4),
+        "selection_overlap": round(sum(float(row.get("selection_overlap") or 0.0) for row in rows) / denom, 4),
     }

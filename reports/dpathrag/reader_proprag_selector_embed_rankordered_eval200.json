@@ -1,0 +1,23 @@
+{
+  "input_jsonl": "data/dpathrag/reader_baselines/2wiki_proprag_selector_embed_rankordered_eval200.jsonl",
+  "limit": 200,
+  "runtime": {
+    "mode": "hf_seq2seq",
+    "model_name_or_path": "data/dpathrag/models/flan_t5_base_gold_k5_5k"
+  },
+  "generation": {
+    "batch_size": 8,
+    "max_input_tokens": 1024,
+    "max_new_tokens": 32,
+    "max_docs": 0,
+    "max_doc_chars": 0
+  },
+  "summary": {
+    "rows": 200,
+    "answer_em": 0.415,
+    "answer_f1": 0.4708,
+    "support_recall": 0.9025,
+    "support_complete": 0.77,
+    "avg_selected_doc_count": 5.0
+  }
+}

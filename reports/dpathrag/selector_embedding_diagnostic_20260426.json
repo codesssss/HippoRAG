@@ -1,0 +1,138 @@
+{
+  "date": "2026-04-26",
+  "setting": {
+    "dataset": "2Wiki local1000 protocol",
+    "split": "first 800 train, final 200 eval",
+    "selector": "AR no-replacement warm-start",
+    "path_len": 5,
+    "reader": "data/dpathrag/models/flan_t5_base_gold_k5_5k",
+    "embedding_model": "nvidia/NV-Embed-v2",
+    "embedding_base_url": "http://localhost:8019/v1/embeddings",
+    "projection_dim": 64,
+    "semantic_feature_dim": 193,
+    "early_stopping": {
+      "metric": "support_complete",
+      "patience": 5,
+      "load_best_at_end": true
+    }
+  },
+  "embedding_cache": {
+    "dense": {
+      "rows": 1000,
+      "unique_texts": 6774,
+      "embedding_dim": 4096,
+      "projection_dim": 64,
+      "semantic_feature_dim": 193
+    },
+    "proprag": {
+      "rows": 1000,
+      "unique_texts": 6975,
+      "embedding_dim": 4096,
+      "projection_dim": 64,
+      "semantic_feature_dim": 193
+    }
+  },
+  "dense": {
+    "rank_top5": {
+      "support_recall": 0.7388,
+      "support_complete": 0.455,
+      "bridge_entity_recall": 0.9083,
+      "selection_overlap": 1.0,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.37,
+      "answer_f1": 0.4154
+    },
+    "lightweight_selector": {
+      "support_recall": 0.7612,
+      "support_complete": 0.495,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.38,
+      "answer_f1": 0.4285
+    },
+    "embedding_selector_no_early_stop": {
+      "support_recall": 0.7188,
+      "support_complete": 0.42,
+      "bridge_entity_recall": 0.9,
+      "selection_overlap": 0.2868,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.36,
+      "answer_f1": 0.4015
+    },
+    "embedding_selector_early_stop_best": {
+      "best_epoch": 1,
+      "support_recall": 0.7662,
+      "support_complete": 0.505,
+      "bridge_entity_recall": 0.9083,
+      "selection_overlap": 0.4992,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.405,
+      "answer_f1": 0.4404,
+      "delta_vs_rank": {
+        "support_recall": 0.0274,
+        "support_complete": 0.05,
+        "bridge_entity_recall": 0.0,
+        "answer_f1": 0.025
+      }
+    }
+  },
+  "proprag": {
+    "rank_top5": {
+      "support_recall": 0.8962,
+      "support_complete": 0.75,
+      "bridge_entity_recall": 0.9408,
+      "selection_overlap": 1.0,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.485,
+      "answer_f1": 0.5426
+    },
+    "lightweight_selector": {
+      "support_recall": 0.8838,
+      "support_complete": 0.72,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.46,
+      "answer_f1": 0.5274
+    },
+    "embedding_selector_no_early_stop_ar_order": {
+      "support_recall": 0.9025,
+      "support_complete": 0.77,
+      "bridge_entity_recall": 0.9517,
+      "selection_overlap": 0.5113,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.42,
+      "answer_f1": 0.4858
+    },
+    "embedding_selector_no_early_stop_rank_order": {
+      "support_recall": 0.9025,
+      "support_complete": 0.77,
+      "answer_em": 0.415,
+      "answer_f1": 0.4708
+    },
+    "embedding_selector_early_stop_best": {
+      "best_epoch": 3,
+      "support_recall": 0.9137,
+      "support_complete": 0.78,
+      "bridge_entity_recall": 0.945,
+      "selection_overlap": 0.6411,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.475,
+      "answer_f1": 0.5344,
+      "delta_vs_rank": {
+        "support_recall": 0.0175,
+        "support_complete": 0.03,
+        "bridge_entity_recall": 0.0042,
+        "answer_f1": -0.0082
+      }
+    }
+  },
+  "gate_status": {
+    "dense": "Green: mechanism and Answer F1 both improve over rank top-5.",
+    "proprag": "Yellow: mechanism improves over rank top-5, but Answer F1 remains slightly lower."
+  },
+  "decision": "Embedding features plus early stopping keep D-PathRAG viable. Dense is Green; PropRAG is a reader-consumption/order bottleneck rather than a selector-coverage failure.",
+  "next_actions": [
+    "Evaluate answer-in-context-but-fail on PropRAG early-stop cases.",
+    "Run selected-doc formatting/order ablations: AR order, retriever-rank order, gold-support-first oracle order.",
+    "Try lower-capacity semantic features: cosine-only or projection_dim=16/32.",
+    "Move to cross-encoder feature cache only if PropRAG F1 remains below rank despite better support-complete."
+  ]
+}

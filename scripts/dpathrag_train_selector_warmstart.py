@@ -21,6 +21,7 @@ from src.dpathrag.selector_data import (
     IGNORE_TARGET,
     SelectorExample,
     featurize_selector_record,
+    selection_overlap,
     summarize_selector_metrics,
     support_metrics_for_indices,
 )
@@ -47,9 +48,17 @@ class SelectorDataset:
         path_len: int,
         shuffle_targets: bool,
         seed: int,
+        extra_features_by_qid: dict[str, tuple[Any, Any]] | None = None,
     ) -> None:
+        extra_features_by_qid = extra_features_by_qid or {}
         self.examples = [
-            featurize_selector_record(record, max_candidates=max_candidates, path_len=path_len)
+            featurize_selector_record(
+                record,
+                max_candidates=max_candidates,
+                path_len=path_len,
+                candidate_extra_features=extra_features_by_qid.get(str(record.get("qid") or record.get("query_idx") or ""), (None, None))[0],
+                query_extra_features=extra_features_by_qid.get(str(record.get("qid") or record.get("query_idx") or ""), (None, None))[1],
+            )
             for record in records
         ]
         self.path_len = int(path_len)
@@ -111,6 +120,8 @@ def evaluate_selector(
             model_metric = support_metrics_for_indices(example, selected_indices)
             rank_indices = list(range(min(int(path_len), sum(1 for mask in example.candidate_mask if mask))))
             rank_metric = support_metrics_for_indices(example, rank_indices)
+            model_metric["selection_overlap"] = selection_overlap(selected_indices, rank_indices)
+            rank_metric["selection_overlap"] = 1.0
             model_rows.append(model_metric)
             rank_rows.append(rank_metric)
             prediction_rows.append(
@@ -129,6 +140,28 @@ def evaluate_selector(
     return {"model": model_summary, "rank_topk": rank_summary}, prediction_rows
 
 
+def load_embedding_features(path: str, *, limit: int = 0) -> tuple[dict[str, tuple[Any, Any]], list[str]]:
+    if not path:
+        return {}, []
+    import numpy as np
+
+    payload = np.load(path, allow_pickle=True)
+    qids = [str(qid) for qid in payload["qids"].tolist()]
+    candidate_features = payload["candidate_features"]
+    query_features = payload["query_features"]
+    if limit > 0:
+        qids = qids[: int(limit)]
+        candidate_features = candidate_features[: int(limit)]
+        query_features = query_features[: int(limit)]
+    if len(qids) != candidate_features.shape[0] or len(qids) != query_features.shape[0]:
+        raise ValueError("Embedding feature rows must align with qids")
+    feature_names = [str(item) for item in payload["feature_names"].tolist()] if "feature_names" in payload.files else []
+    return {
+        qid: (candidate_features[idx].astype("float32"), query_features[idx].astype("float32"))
+        for idx, qid in enumerate(qids)
+    }, feature_names
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache_jsonl", default="data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl")
@@ -144,11 +177,16 @@ def main() -> None:
     parser.add_argument("--num_layers", type=int, default=2)
     parser.add_argument("--num_heads", type=int, default=4)
     parser.add_argument("--dropout", type=float, default=0.1)
+    parser.add_argument("--embedding_npz", default="")
     parser.add_argument("--epochs", type=int, default=25)
     parser.add_argument("--learning_rate", type=float, default=2e-3)
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--eval_batch_size", type=int, default=64)
     parser.add_argument("--shuffle_targets", action="store_true")
+    parser.add_argument("--eval_each_epoch", action="store_true")
+    parser.add_argument("--best_metric", choices=["support_complete", "support_recall", "bridge_entity_recall"], default="support_complete")
+    parser.add_argument("--early_stop_patience", type=int, default=0)
+    parser.add_argument("--load_best_at_end", action="store_true")
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
@@ -162,6 +200,7 @@ def main() -> None:
     device = torch.device(args.device if args.device != "auto" else ("cuda" if torch.cuda.is_available() else "cpu"))
 
     rows = load_jsonl(args.cache_jsonl, limit=int(args.limit))
+    embedding_features, embedding_feature_names = load_embedding_features(str(args.embedding_npz), limit=int(args.limit))
     train_rows = rows[: int(args.train_size)]
     eval_rows = rows[int(args.train_size) : int(args.train_size) + int(args.eval_size)]
     if not train_rows or not eval_rows:
@@ -172,14 +211,21 @@ def main() -> None:
         path_len=int(args.path_len),
         shuffle_targets=bool(args.shuffle_targets),
         seed=int(args.seed),
+        extra_features_by_qid=embedding_features,
     )
     eval_examples = [
-        featurize_selector_record(record, max_candidates=int(args.max_candidates), path_len=int(args.path_len))
+        featurize_selector_record(
+            record,
+            max_candidates=int(args.max_candidates),
+            path_len=int(args.path_len),
+            candidate_extra_features=embedding_features.get(str(record.get("qid") or record.get("query_idx") or ""), (None, None))[0],
+            query_extra_features=embedding_features.get(str(record.get("qid") or record.get("query_idx") or ""), (None, None))[1],
+        )
         for record in eval_rows
     ]
     train_loader = DataLoader(train_dataset, batch_size=int(args.batch_size), shuffle=True)
     model = AutoregressivePathSelector(
-        candidate_feature_dim=len(FEATURE_NAMES),
+        candidate_feature_dim=len(train_dataset.examples[0].candidate_features[0]),
         hidden_dim=int(args.hidden_dim),
         num_layers=int(args.num_layers),
         num_heads=int(args.num_heads),
@@ -188,9 +234,10 @@ def main() -> None:
     optimizer = torch.optim.AdamW(model.parameters(), lr=float(args.learning_rate), weight_decay=0.01)
     report: dict[str, Any] = {
         "cache_jsonl": str(args.cache_jsonl),
+        "embedding_npz": str(args.embedding_npz),
         "train_rows": len(train_rows),
         "eval_rows": len(eval_rows),
-        "feature_names": FEATURE_NAMES,
+        "feature_names": FEATURE_NAMES + embedding_feature_names,
         "config": {
             "max_candidates": int(args.max_candidates),
             "path_len": int(args.path_len),
@@ -202,6 +249,10 @@ def main() -> None:
             "learning_rate": float(args.learning_rate),
             "batch_size": int(args.batch_size),
             "shuffle_targets": bool(args.shuffle_targets),
+            "eval_each_epoch": bool(args.eval_each_epoch),
+            "best_metric": str(args.best_metric),
+            "early_stop_patience": int(args.early_stop_patience),
+            "load_best_at_end": bool(args.load_best_at_end),
         },
     }
     before_summary, _ = evaluate_selector(
@@ -214,7 +265,13 @@ def main() -> None:
     report["eval_before_train"] = before_summary
 
     epoch_losses: list[float] = []
-    for _epoch in tqdm(range(int(args.epochs)), desc="Warm-start selector"):
+    epoch_evals: list[dict[str, Any]] = []
+    best_metric_value = float("-inf")
+    best_epoch = -1
+    best_state: dict[str, Any] | None = None
+    stale_epochs = 0
+    epochs_run = 0
+    for epoch in tqdm(range(int(args.epochs)), desc="Warm-start selector"):
         model.train()
         total_loss = 0.0
         total_batches = 0
@@ -239,6 +296,29 @@ def main() -> None:
             total_loss += float(loss.detach().cpu())
             total_batches += 1
         epoch_losses.append(round(total_loss / max(1, total_batches), 6))
+        epochs_run += 1
+        if bool(args.eval_each_epoch):
+            epoch_summary, _ = evaluate_selector(
+                model,
+                eval_examples,
+                batch_size=int(args.eval_batch_size),
+                path_len=int(args.path_len),
+                device=device,
+            )
+            metric_value = float(epoch_summary["model"].get(str(args.best_metric), 0.0))
+            epoch_evals.append({"epoch": int(epoch + 1), "loss": epoch_losses[-1], "eval": epoch_summary})
+            if metric_value > best_metric_value:
+                best_metric_value = metric_value
+                best_epoch = int(epoch + 1)
+                best_state = {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
+                stale_epochs = 0
+            else:
+                stale_epochs += 1
+            if int(args.early_stop_patience) > 0 and stale_epochs >= int(args.early_stop_patience):
+                break
+
+    if bool(args.load_best_at_end) and best_state is not None:
+        model.load_state_dict(best_state)
 
     after_summary, prediction_rows = evaluate_selector(
         model,
@@ -250,6 +330,11 @@ def main() -> None:
     report["training"] = {
         "epoch_losses": epoch_losses,
         "final_epoch_loss": epoch_losses[-1] if epoch_losses else None,
+        "epochs_run": int(epochs_run),
+        "epoch_evals": epoch_evals,
+        "best_epoch": int(best_epoch),
+        "best_metric": str(args.best_metric),
+        "best_metric_value": round(best_metric_value, 6) if best_metric_value != float("-inf") else None,
     }
     report["eval_after_train"] = after_summary
     model_dir = Path(args.output_dir)

@@ -44,6 +44,7 @@ def build_reader_rows(
     mode: str,
     source: str,
     max_doc_chars: int,
+    sort_selected_by_rank: bool,
 ) -> list[dict[str, Any]]:
     cache_by_qid = {str(row.get("qid")): row for row in cache_rows}
     reader_rows: list[dict[str, Any]] = []
@@ -59,6 +60,8 @@ def build_reader_rows(
             indices = list(range(len(prediction.get("rank_topk_titles") or [])))
         else:
             raise ValueError(f"Unsupported mode: {mode}")
+        if sort_selected_by_rank:
+            indices = sorted(indices)
         selected_docs: list[dict[str, Any]] = []
         for rank, index in enumerate(indices, start=1):
             if index < 0 or index >= len(candidates):
@@ -107,6 +110,7 @@ def main() -> None:
     parser.add_argument("--mode", choices=["model", "rank_topk"], default="model")
     parser.add_argument("--source", default="")
     parser.add_argument("--max_doc_chars", type=int, default=0)
+    parser.add_argument("--sort_selected_by_rank", action="store_true")
     args = parser.parse_args()
 
     cache_rows = load_jsonl(args.cache_jsonl, limit=int(args.cache_limit))
@@ -118,6 +122,7 @@ def main() -> None:
         mode=str(args.mode),
         source=source,
         max_doc_chars=int(args.max_doc_chars),
+        sort_selected_by_rank=bool(args.sort_selected_by_rank),
     )
     write_jsonl(reader_rows, args.output_jsonl)
     manifest = {
@@ -126,6 +131,7 @@ def main() -> None:
         "output_jsonl": str(args.output_jsonl),
         "mode": str(args.mode),
         "source": source,
+        "sort_selected_by_rank": bool(args.sort_selected_by_rank),
         "summary": summarize_reader_records(reader_rows),
     }
     if args.manifest_json:

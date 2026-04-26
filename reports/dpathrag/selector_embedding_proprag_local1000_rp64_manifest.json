@@ -1,0 +1,12 @@
+{
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "output_npz": "data/dpathrag/cache/selector_embedding_proprag_local1000_rp64.npz",
+  "rows": 1000,
+  "unique_texts": 6975,
+  "max_candidates": 100,
+  "embedding_model": "nvidia/NV-Embed-v2",
+  "embedding_base_url": "http://localhost:8019/v1/embeddings",
+  "embedding_dim": 4096,
+  "projection_dim": 64,
+  "semantic_feature_dim": 193
+}
