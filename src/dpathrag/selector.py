@@ -74,6 +74,7 @@ class AutoregressivePathSelector(nn.Module):
         candidate_features: Tensor,
         *,
         path_len: int,
+        query_features: Tensor | None = None,
         tau: float = 1.0,
         candidate_mask: Tensor | None = None,
         hard: bool = True,
@@ -86,11 +87,14 @@ class AutoregressivePathSelector(nn.Module):
         batch_size, candidate_count, _ = candidate_features.shape
         add_noise = self.training if add_gumbel_noise is None else bool(add_gumbel_noise)
         encoded = self.feature_projection(candidate_features)
+        query_token = self._project_query_token(query_features, batch_size=batch_size) if query_features is not None else None
         valid_mask = torch.ones(batch_size, candidate_count, dtype=torch.bool, device=candidate_features.device)
         if candidate_mask is not None:
             valid_mask = candidate_mask.bool()
         available = valid_mask.clone()
         state = self.initial_state.unsqueeze(0).expand(batch_size, -1)
+        if query_token is not None:
+            state = state + query_token
         path_mask = torch.zeros(batch_size, candidate_count, dtype=candidate_features.dtype, device=candidate_features.device)
         selected_indices: list[Tensor] = []
         step_logits: list[Tensor] = []
@@ -98,7 +102,7 @@ class AutoregressivePathSelector(nn.Module):
         states: list[Tensor] = []
 
         for _ in range(int(path_len)):
-            conditioned = self._condition_candidates(encoded, state)
+            conditioned = self._condition_candidates(encoded, state, query_token=query_token)
             scorer_state = state.unsqueeze(1).expand(-1, candidate_count, -1)
             logits = self.scorer(torch.cat([conditioned, scorer_state], dim=-1)).squeeze(-1)
             probs = masked_softmax(logits, available, dim=-1)
@@ -121,11 +125,27 @@ class AutoregressivePathSelector(nn.Module):
             states=torch.stack(states, dim=1),
         )
 
-    def _condition_candidates(self, encoded: Tensor, state: Tensor) -> Tensor:
+    def _project_query_token(self, query_features: Tensor, *, batch_size: int) -> Tensor:
+        if query_features.ndim == 2:
+            pass
+        elif query_features.ndim == 3 and query_features.shape[1] == 1:
+            query_features = query_features.squeeze(1)
+        else:
+            raise ValueError("query_features must have shape [batch, feature_dim] or [batch, 1, feature_dim]")
+        if query_features.shape[0] != batch_size:
+            raise ValueError("query_features batch size must match candidate_features")
+        return self.feature_projection(query_features)
+
+    def _condition_candidates(self, encoded: Tensor, state: Tensor, *, query_token: Tensor | None = None) -> Tensor:
         state_token = state.unsqueeze(1)
-        sequence = torch.cat([state_token, encoded], dim=1)
+        sequence_parts = [state_token]
+        if query_token is not None:
+            sequence_parts.append(query_token.unsqueeze(1))
+        sequence_parts.append(encoded)
+        sequence = torch.cat(sequence_parts, dim=1)
         conditioned = self.list_encoder(sequence)
-        return conditioned[:, 1:, :]
+        candidate_start = 2 if query_token is not None else 1
+        return conditioned[:, candidate_start:, :]
 
 
 def teacher_forced_path_nll(step_logits: Tensor, target_indices: Tensor, *, candidate_mask: Tensor | None = None) -> Tensor:
@@ -152,4 +172,3 @@ def teacher_forced_path_nll(step_logits: Tensor, target_indices: Tensor, *, cand
         losses.append(F.cross_entropy(logits, target, reduction="none"))
         available = available.scatter(1, target.unsqueeze(1), False)
     return torch.stack(losses, dim=1).mean()
-

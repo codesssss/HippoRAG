@@ -142,8 +142,8 @@ r_t = GRU(r_{t-1}, sum_i z_{t,i} H_i^(t))
 `h_q` is a query token injected into every per-step listwise re-encoding pass.
 This keeps candidate-candidate interactions query-conditioned throughout the
 self-attention stack, not only in the final scoring head.  The current
-selector skeleton should be extended to accept `query_features` before Stage 1
-warm-start training.
+selector accepts optional `query_features`; Stage 1 should pass encoded question
+features once the q-doc encoder is wired in.
 
 Main variant:
 
@@ -457,6 +457,7 @@ Scripts:
 ```text
 scripts/dpathrag_audit_2wiki.py
 scripts/dpathrag_build_cache.py
+scripts/dpathrag_build_reader_baseline.py
 scripts/dpathrag_train_reader.py
 scripts/dpathrag_train_warmstart.py
 scripts/dpathrag_train_e2e.py
@@ -519,6 +520,39 @@ Generated smoke caches:
 ```text
 data/dpathrag/cache/2wiki_dense_pool100_smoke.jsonl
 data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl
+```
+
+Generated reader-baseline JSONL files:
+
+```text
+data/dpathrag/reader_baselines/2wiki_train_gold_k5_5k.jsonl
+data/dpathrag/reader_baselines/2wiki_validation_gold_k5_1k.jsonl
+data/dpathrag/reader_baselines/2wiki_local1000_dense_k5.jsonl
+data/dpathrag/reader_baselines/2wiki_local1000_proprag_k5.jsonl
+```
+
+Reader-baseline support exposure:
+
+```text
+train gold 5k: support-complete = 1.000, avg selected docs = 2.4356
+validation gold 1k: support-complete = 1.000, avg selected docs = 2.4570
+local1000 dense@5: support recall = 0.7238, support-complete = 0.429
+local1000 proprag@5: support recall = 0.9028, support-complete = 0.772
+```
+
+Reader JSONL schema:
+
+```text
+qid
+split
+source
+question
+answer
+type
+gold_titles
+selected_docs[{doc_id, rank, title, text, source, retriever_score, gold_support}]
+support_recall
+support_complete
 ```
 
 Current audit result:

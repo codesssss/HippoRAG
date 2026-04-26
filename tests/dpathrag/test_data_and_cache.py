@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from src.dpathrag.cache import build_cache_record, gold_support_indicators
-from src.dpathrag.data import evidence_path_entities, normalize_text, support_titles
+from src.dpathrag.data import context_documents, evidence_path_entities, normalize_text, support_titles
 from src.dpathrag.metrics import recall_at_k, support_complete_at_k
+from src.dpathrag.reader_data import build_gold_reader_record, build_pool_reader_record
 
 
 def test_support_titles_and_evidence_entities() -> None:
@@ -52,3 +53,39 @@ def test_build_cache_record_labels_candidates() -> None:
     assert [candidate["gold_support"] for candidate in row["candidates"]] == [1, 0, 1]
     assert row["candidates"][0]["features"]["rank"] == 1.0
     assert "gold_support_indicator" not in row["candidates"][0]["features"]
+
+
+def test_context_documents_and_gold_reader_record() -> None:
+    sample = {
+        "_id": "q1",
+        "question": "question?",
+        "answer": "answer",
+        "supporting_facts": [["Gold A", 0], ["Gold B", 1]],
+        "context": [["Gold A", ["a1", "a2"]], ["Distractor", ["d"]], ["Gold B", ["b"]]],
+    }
+    docs = context_documents(sample)
+    assert docs[0]["doc"] == "Gold A\na1 a2"
+    row = build_gold_reader_record(sample, split="validation")
+    assert row["source"] == "gold"
+    assert [doc["gold_support"] for doc in row["selected_docs"]] == [1, 1]
+    assert row["support_complete"] == 1.0
+
+
+def test_pool_reader_record() -> None:
+    sample = {
+        "_id": "q1",
+        "question": "question?",
+        "answer": "answer",
+        "supporting_facts": [["Gold A", 0], ["Gold B", 1]],
+    }
+    pool_record = {
+        "query_idx": 0,
+        "question": "question?",
+        "pool_docs": ["Gold A\ntext", "Distractor\ntext", "Gold B\ntext"],
+        "pool_titles": ["Gold A", "Distractor", "Gold B"],
+        "pool_doc_scores": [0.9, 0.4, 0.3],
+    }
+    row = build_pool_reader_record(sample, pool_record, split="dev1000", source="dense", top_k=2)
+    assert row["source"] == "dense"
+    assert row["support_recall"] == 0.5
+    assert row["support_complete"] == 0.0

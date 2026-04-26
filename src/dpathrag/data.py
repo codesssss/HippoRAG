@@ -98,6 +98,30 @@ def context_titles(sample: dict[str, Any]) -> list[str]:
     return titles
 
 
+def context_documents(sample: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return context documents in a title/text representation.
+
+    Supports both the local 1000-example schema ``[[title, [sentences]]]`` and
+    the normalized full-split schema produced by
+    ``scripts/dpathrag_prepare_2wiki_full.py``.
+    """
+
+    docs: list[dict[str, Any]] = []
+    for idx, item in enumerate(sample.get("context") or []):
+        title = ""
+        sentences: list[Any] = []
+        if isinstance(item, (list, tuple)) and item:
+            title = str(item[0])
+            sentences = list(item[1] or []) if len(item) > 1 else []
+        elif isinstance(item, dict):
+            title = str(item.get("title") or "")
+            raw_text = item.get("sentences") if item.get("sentences") is not None else item.get("text")
+            sentences = list(raw_text) if isinstance(raw_text, list) else raw_text
+        text = " ".join(str(sentence) for sentence in sentences) if isinstance(sentences, list) else str(sentences or "")
+        docs.append({"idx": idx, "title": title, "text": text, "doc": f"{title}\n{text}".strip()})
+    return docs
+
+
 def field_coverage(samples: Sequence[dict[str, Any]], fields: Sequence[str]) -> dict[str, float]:
     if not samples:
         return {field: 0.0 for field in fields}
@@ -164,4 +188,3 @@ def infer_split_status(data_root: str | Path, dataset: str, sample_count: int) -
             else "Verify split provenance before training D-PathRAG."
         ],
     }
-

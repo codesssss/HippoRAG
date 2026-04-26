@@ -27,6 +27,18 @@ def test_autoregressive_selector_shapes_and_no_replacement() -> None:
         assert len(row) == len(set(row))
 
 
+def test_autoregressive_selector_accepts_query_features() -> None:
+    torch.manual_seed(11)
+    selector = AutoregressivePathSelector(candidate_feature_dim=4, hidden_dim=16, num_layers=1, num_heads=4, dropout=0.0)
+    selector.eval()
+    features = torch.randn(2, 5, 4)
+    query_features = torch.randn(2, 4, requires_grad=True)
+    output = selector(features, query_features=query_features, path_len=3, tau=1.0, hard=True, add_gumbel_noise=False)
+    assert output.selected_indices.shape == (2, 3)
+    output.step_logits.sum().backward()
+    assert query_features.grad is not None
+
+
 def test_teacher_forced_path_nll_backpropagates() -> None:
     logits = torch.randn(2, 3, 5, requires_grad=True)
     targets = torch.tensor([[0, 2, 4], [1, 3, 0]])

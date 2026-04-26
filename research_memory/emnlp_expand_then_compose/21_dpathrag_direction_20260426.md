@@ -144,6 +144,34 @@ data/dpathrag/cache/2wiki_dense_pool100_smoke.jsonl
 data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl
 ```
 
+Reader-baseline protocol added:
+
+```text
+scripts/dpathrag_build_reader_baseline.py
+src/dpathrag/reader_data.py
+```
+
+Generated under ignored `data/`:
+
+```text
+data/dpathrag/reader_baselines/2wiki_train_gold_k5_5k.jsonl
+data/dpathrag/reader_baselines/2wiki_validation_gold_k5_1k.jsonl
+data/dpathrag/reader_baselines/2wiki_local1000_dense_k5.jsonl
+data/dpathrag/reader_baselines/2wiki_local1000_proprag_k5.jsonl
+```
+
+Support exposure:
+
+```text
+train gold 5k support-complete = 1.000
+validation gold 1k support-complete = 1.000
+local1000 dense@5 support recall / complete = 0.7238 / 0.429
+local1000 proprag@5 support recall / complete = 0.9028 / 0.772
+```
+
+Selector skeleton now accepts optional `query_features` and injects a query
+token into every per-step listwise pass.
+
 Audit result:
 
 ```text
