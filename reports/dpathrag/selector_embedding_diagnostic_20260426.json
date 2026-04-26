@@ -124,6 +124,27 @@
       }
     }
   },
+  "proprag_reader_failure_analysis": {
+    "rank_top5": {
+      "answer_in_context_rate": 0.8,
+      "answer_failure_rate": 0.515,
+      "answer_in_context_but_fail_rate": 0.36,
+      "support_complete_but_fail_rate": 0.36,
+      "incomplete_but_answer_in_context_rate": 0.105,
+      "avg_f1_answer_in_context": 0.6141,
+      "avg_f1_answer_absent": 0.2567
+    },
+    "embedding_selector_early_stop_best": {
+      "answer_in_context_rate": 0.82,
+      "answer_failure_rate": 0.525,
+      "answer_in_context_but_fail_rate": 0.39,
+      "support_complete_but_fail_rate": 0.385,
+      "incomplete_but_answer_in_context_rate": 0.1,
+      "avg_f1_answer_in_context": 0.5944,
+      "avg_f1_answer_absent": 0.2611
+    },
+    "interpretation": "The early-stop selector places the answer string in context more often than rank top-5, but answer-in-context-but-fail also rises, pointing to reader consumption or distractor sensitivity rather than pure evidence absence."
+  },
   "gate_status": {
     "dense": "Green: mechanism and Answer F1 both improve over rank top-5.",
     "proprag": "Yellow: mechanism improves over rank top-5, but Answer F1 remains slightly lower."

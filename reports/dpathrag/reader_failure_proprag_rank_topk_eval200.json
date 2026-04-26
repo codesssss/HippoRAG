@@ -1,0 +1,15 @@
+{
+  "summary": {
+    "rows": 200,
+    "answer_in_context_rate": 0.8,
+    "answer_failure_rate": 0.515,
+    "answer_in_context_but_fail_rate": 0.36,
+    "support_complete_but_fail_rate": 0.36,
+    "incomplete_but_answer_in_context_rate": 0.105,
+    "avg_f1_answer_in_context": 0.6141,
+    "avg_f1_answer_absent": 0.2567
+  },
+  "input_jsonl": "data/dpathrag/reader_baselines/2wiki_proprag_rank_topk_eval200.jsonl",
+  "predictions_jsonl": "reports/dpathrag/reader_proprag_rank_topk_eval200.predictions.jsonl",
+  "limit": 0
+}

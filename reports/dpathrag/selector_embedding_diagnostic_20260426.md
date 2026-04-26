@@ -51,11 +51,19 @@ Embedding features are cached in `.npz` and are not backpropagated through in th
 | PropRAG | embedding selector, no early stop, rank order | 0.4150 | 0.4708 |
 | PropRAG | embedding selector, early-stop best | 0.4750 | 0.5344 |
 
+## PropRAG Reader Failure Analysis
+
+| Method | Answer In Context | Answer Fail Rate | Answer-In-Context But Fail | Support-Complete But Fail | F1 If Answer In Context | F1 If Answer Absent |
+|---|---:|---:|---:|---:|---:|---:|
+| rank top-5 | 0.8000 | 0.5150 | 0.3600 | 0.3600 | 0.6141 | 0.2567 |
+| embedding selector, early-stop best | 0.8200 | 0.5250 | 0.3900 | 0.3850 | 0.5944 | 0.2611 |
+
 ## Interpretation
 
 - Early stopping is load-bearing for semantic features. Without it, Dense overfits badly; with best-checkpoint loading, Dense improves over rank top-5 by +5.0 pp support-complete and +2.50 pp Answer F1.
 - PropRAG also passes the mechanism gate with early stopping: support-complete improves by +3.0 pp over rank top-5, support recall by +1.75 pp, and bridge-entity recall by +0.42 pp. The overlap vs rank is 0.6411, so the selector is changing a meaningful fraction of the set rather than copying rank order.
 - PropRAG answer F1 remains slightly below rank top-5: 0.5344 vs 0.5426 (-0.82 pp). This is a Yellow result: evidence selection improves, but reader consumption/ordering does not fully convert the support gain into answer gain.
+- Failure analysis supports the reader-consumption diagnosis: the early-stop selector puts the answer string in context more often than rank top-5 (0.8200 vs 0.8000), but answer-in-context-but-fail also rises (0.3900 vs 0.3600). The selected set is more complete but appears slightly more distracting for the current reader.
 - The previous no-early-stop PropRAG result showed stronger bridge recall but severe reader regression. The early-stop checkpoint fixes most of that regression while preserving the support-complete gain.
 
 ## Decision

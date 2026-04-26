@@ -1,0 +1,15 @@
+{
+  "summary": {
+    "rows": 200,
+    "answer_in_context_rate": 0.82,
+    "answer_failure_rate": 0.525,
+    "answer_in_context_but_fail_rate": 0.39,
+    "support_complete_but_fail_rate": 0.385,
+    "incomplete_but_answer_in_context_rate": 0.1,
+    "avg_f1_answer_in_context": 0.5944,
+    "avg_f1_answer_absent": 0.2611
+  },
+  "input_jsonl": "data/dpathrag/reader_baselines/2wiki_proprag_selector_embed_best_eval200.jsonl",
+  "predictions_jsonl": "reports/dpathrag/reader_proprag_selector_embed_best_eval200.predictions.jsonl",
+  "limit": 0
+}
