@@ -184,6 +184,22 @@ mock_empty answer_em / answer_f1 = 0.0 / 0.0
 report = reports/dpathrag/reader_mock_oracle_smoke.json
 ```
 
+Real HF reader smoke:
+
+```text
+model = google/flan-t5-base
+device = CUDA_VISIBLE_DEVICES=3
+limit = 50
+validation gold@5 EM/F1 = 0.3400 / 0.4560
+local1000 dense@5 EM/F1 = 0.3400 / 0.4080
+local1000 PropRAG@5 EM/F1 = 0.3600 / 0.4213
+report = reports/dpathrag/reader_flan_t5_base_smoke50.md
+```
+
+Decision: zero-shot `flan-t5-base` is too weak for the reader gate.  Do not
+start selector warm-start yet.  Next step is either small fine-tuning on
+gold-support records or evaluating a stronger Flan-T5 reader.
+
 Audit result:
 
 ```text
