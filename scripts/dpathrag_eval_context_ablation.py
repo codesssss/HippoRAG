@@ -55,31 +55,50 @@ def generate_predictions(
 
 
 def write_markdown(summary: dict[str, Any], path: str | Path) -> None:
+    has_diagnostics = any(bool(payload.get("diagnostics")) for payload in summary["configs"].values())
     lines = [
         "# D-PathRAG PropRAG Context Ablation",
         "",
         f"- Reader: `{summary['model_name_or_path']}`",
         f"- Rows per config: {summary['rows_per_config']}",
         "",
-        "| Config | Support Recall | Support Complete | Answer EM | Answer F1 |",
-        "|---|---:|---:|---:|---:|",
     ]
+    if has_diagnostics:
+        lines.extend(
+            [
+                "| Config | Support Recall | Support Complete | Answer EM | Answer F1 | Anchor Docs | Selector Added | Added Gold | Rank Gold Removed | Net Gold Gain |",
+                "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "| Config | Support Recall | Support Complete | Answer EM | Answer F1 |",
+                "|---|---:|---:|---:|---:|",
+            ]
+        )
     for config, payload in summary["configs"].items():
         reader_summary = payload["reader_summary"]
         input_summary = payload["input_summary"]
-        lines.append(
-            "| "
-            + " | ".join(
+        cells = [
+            config,
+            f"{input_summary['avg_support_recall']:.4f}",
+            f"{input_summary['support_complete_rate']:.4f}",
+            f"{reader_summary['answer_em']:.4f}",
+            f"{reader_summary['answer_f1']:.4f}",
+        ]
+        if has_diagnostics:
+            diagnostics = payload.get("diagnostics") or {}
+            cells.extend(
                 [
-                    config,
-                    f"{input_summary['avg_support_recall']:.4f}",
-                    f"{input_summary['support_complete_rate']:.4f}",
-                    f"{reader_summary['answer_em']:.4f}",
-                    f"{reader_summary['answer_f1']:.4f}",
+                    f"{float(diagnostics.get('avg_rank_anchor_docs') or 0.0):.4f}",
+                    f"{float(diagnostics.get('avg_selector_added_docs') or 0.0):.4f}",
+                    f"{float(diagnostics.get('avg_selector_added_gold') or 0.0):.4f}",
+                    f"{float(diagnostics.get('avg_rank_tail_gold_removed') or 0.0):.4f}",
+                    f"{float(diagnostics.get('avg_net_gold_gain') or 0.0):.4f}",
                 ]
             )
-            + " |"
-        )
+        lines.append("| " + " | ".join(cells) + " |")
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -144,6 +163,7 @@ def main() -> None:
             "input_jsonl": payload["output_jsonl"],
             "predictions_jsonl": str(predictions_path),
             "input_summary": payload["summary"],
+            "diagnostics": payload.get("diagnostics", {}),
             "reader_summary": summarize_scores(scored),
         }
         write_json(summary, args.output_json)

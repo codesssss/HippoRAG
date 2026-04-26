@@ -1,0 +1,178 @@
+{
+  "manifest_json": "reports/dpathrag/rank_anchor_blend_proprag_eval200_manifest.json",
+  "model_name_or_path": "data/dpathrag/models/flan_t5_base_gold_k5_5k",
+  "rows_per_config": 200,
+  "generation": {
+    "batch_size": 8,
+    "max_input_tokens": 1024,
+    "max_new_tokens": 32,
+    "max_docs": 0,
+    "max_doc_chars": 0
+  },
+  "configs": {
+    "rank_anchor_m0": {
+      "input_jsonl": "data/dpathrag/reader_rank_anchor/2wiki_proprag_rank_anchor_m0.jsonl",
+      "predictions_jsonl": "reports/dpathrag/rank_anchor_predictions_proprag/rank_anchor_m0.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      },
+      "diagnostics": {
+        "rank_anchor_m": 0.0,
+        "avg_rank_anchor_docs": 0.0,
+        "avg_selector_added_docs": 5.0,
+        "avg_selector_added_gold": 2.235,
+        "avg_rank_tail_gold_removed": 0.04,
+        "avg_net_gold_gain": 2.195
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.475,
+        "answer_f1": 0.5344,
+        "support_recall": 0.9137,
+        "support_complete": 0.78,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "rank_anchor_m1": {
+      "input_jsonl": "data/dpathrag/reader_rank_anchor/2wiki_proprag_rank_anchor_m1.jsonl",
+      "predictions_jsonl": "reports/dpathrag/rank_anchor_predictions_proprag/rank_anchor_m1.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      },
+      "diagnostics": {
+        "rank_anchor_m": 1.0,
+        "avg_rank_anchor_docs": 1.0,
+        "avg_selector_added_docs": 4.0,
+        "avg_selector_added_gold": 1.285,
+        "avg_rank_tail_gold_removed": 0.04,
+        "avg_net_gold_gain": 1.245
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.475,
+        "answer_f1": 0.5344,
+        "support_recall": 0.9137,
+        "support_complete": 0.78,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "rank_anchor_m2": {
+      "input_jsonl": "data/dpathrag/reader_rank_anchor/2wiki_proprag_rank_anchor_m2.jsonl",
+      "predictions_jsonl": "reports/dpathrag/rank_anchor_predictions_proprag/rank_anchor_m2.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      },
+      "diagnostics": {
+        "rank_anchor_m": 2.0,
+        "avg_rank_anchor_docs": 2.0,
+        "avg_selector_added_docs": 3.0,
+        "avg_selector_added_gold": 0.57,
+        "avg_rank_tail_gold_removed": 0.04,
+        "avg_net_gold_gain": 0.53
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.47,
+        "answer_f1": 0.5319,
+        "support_recall": 0.9137,
+        "support_complete": 0.78,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "rank_anchor_m3": {
+      "input_jsonl": "data/dpathrag/reader_rank_anchor/2wiki_proprag_rank_anchor_m3.jsonl",
+      "predictions_jsonl": "reports/dpathrag/rank_anchor_predictions_proprag/rank_anchor_m3.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9125,
+        "support_complete_rate": 0.775
+      },
+      "diagnostics": {
+        "rank_anchor_m": 3.0,
+        "avg_rank_anchor_docs": 3.0,
+        "avg_selector_added_docs": 2.0,
+        "avg_selector_added_gold": 0.27,
+        "avg_rank_tail_gold_removed": 0.045,
+        "avg_net_gold_gain": 0.225
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.48,
+        "answer_f1": 0.5404,
+        "support_recall": 0.9125,
+        "support_complete": 0.775,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "rank_anchor_m4": {
+      "input_jsonl": "data/dpathrag/reader_rank_anchor/2wiki_proprag_rank_anchor_m4.jsonl",
+      "predictions_jsonl": "reports/dpathrag/rank_anchor_predictions_proprag/rank_anchor_m4.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.91,
+        "support_complete_rate": 0.775
+      },
+      "diagnostics": {
+        "rank_anchor_m": 4.0,
+        "avg_rank_anchor_docs": 4.0,
+        "avg_selector_added_docs": 1.0,
+        "avg_selector_added_gold": 0.115,
+        "avg_rank_tail_gold_removed": 0.04,
+        "avg_net_gold_gain": 0.075
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.48,
+        "answer_f1": 0.5346,
+        "support_recall": 0.91,
+        "support_complete": 0.775,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "rank_anchor_m5": {
+      "input_jsonl": "data/dpathrag/reader_rank_anchor/2wiki_proprag_rank_anchor_m5.jsonl",
+      "predictions_jsonl": "reports/dpathrag/rank_anchor_predictions_proprag/rank_anchor_m5.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.8962,
+        "support_complete_rate": 0.75
+      },
+      "diagnostics": {
+        "rank_anchor_m": 5.0,
+        "avg_rank_anchor_docs": 5.0,
+        "avg_selector_added_docs": 0.0,
+        "avg_selector_added_gold": 0.0,
+        "avg_rank_tail_gold_removed": 0.0,
+        "avg_net_gold_gain": 0.0
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.485,
+        "answer_f1": 0.5426,
+        "support_recall": 0.8962,
+        "support_complete": 0.75,
+        "avg_selected_doc_count": 5.0
+      }
+    }
+  },
+  "interpretation": {
+    "sanity_check": "rank_anchor_m5 exactly matches the PropRAG rank top-5 baseline.",
+    "best_blend": "rank_anchor_m3",
+    "best_blend_answer_f1": 0.5404,
+    "rank_baseline_answer_f1": 0.5426,
+    "decision": "Rank-anchor blending does not turn the PropRAG Yellow case Green; support coverage improves, but Answer F1 remains below the original rank top-5 context.",
+    "next_priority": "Test support-confidence gating before considering prompt-format mitigation."
+  }
+}
