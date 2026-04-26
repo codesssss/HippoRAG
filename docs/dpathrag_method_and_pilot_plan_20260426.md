@@ -440,3 +440,50 @@ Next implementation step:
 Prepare the official 2Wiki train/dev split, then train Stage 1 selector warm start.
 Until then, use the local 1000-example subset only for smoke/cache validation.
 ```
+
+## Full 2Wiki Data Policy
+
+The existing 1000-example protocol remains:
+
+```text
+reproduce/dataset/2wikimultihopqa.json
+reproduce/dataset/2wikimultihopqa_corpus.json
+```
+
+Full HuggingFace train/dev/test data must be kept separate:
+
+```text
+data/dpathrag/full_2wiki/
+```
+
+Prepare it with:
+
+```text
+HF_ENDPOINT=https://hf-mirror.com .venv-hipporag/bin/python scripts/dpathrag_prepare_2wiki_full.py
+```
+
+This writes normalized split files:
+
+```text
+data/dpathrag/full_2wiki/2wikimultihopqa_train.json
+data/dpathrag/full_2wiki/2wikimultihopqa_validation.json
+data/dpathrag/full_2wiki/2wikimultihopqa_test.json
+data/dpathrag/full_2wiki/2wikimultihopqa_full_corpus.json
+data/dpathrag/full_2wiki/manifest.json
+```
+
+Prepared on 2026-04-26 via `HF_ENDPOINT=https://hf-mirror.com`:
+
+```text
+train rows: 167454
+validation rows: 12576
+test rows: 12576
+full corpus unique docs: 430225
+full corpus unique titles: 398354
+corpus dedupe key: title+text
+```
+
+The title-only corpus merge was explicitly avoided because the full release
+contains same-title contexts with different text.  D-PathRAG full-corpus
+experiments should use the `idx` field in `2wikimultihopqa_full_corpus.json`
+rather than assuming title uniqueness.

@@ -127,3 +127,37 @@ Next:
 Acquire/prepare official 2Wiki train/dev before real E2E selector training.
 Use local 1000 only for smoke validation until then.
 ```
+
+## Data Separation Rule
+
+Keep legacy 1000-example reproduction protocol unchanged:
+
+```text
+reproduce/dataset/2wikimultihopqa.json
+reproduce/dataset/2wikimultihopqa_corpus.json
+```
+
+Full 2Wiki train/dev/test for D-PathRAG lives under:
+
+```text
+data/dpathrag/full_2wiki/
+```
+
+Use HF mirror:
+
+```text
+HF_ENDPOINT=https://hf-mirror.com .venv-hipporag/bin/python scripts/dpathrag_prepare_2wiki_full.py
+```
+
+Prepared on 2026-04-26:
+
+```text
+train = 167454
+validation = 12576
+test = 12576
+full corpus unique docs = 430225
+full corpus unique titles = 398354
+dedupe key = title+text
+```
+
+Do not assume title uniqueness in the full corpus.
