@@ -1,0 +1,183 @@
+{
+  "dataset": "2wikimultihopqa",
+  "local_samples_path": "reproduce/dataset/2wikimultihopqa.json",
+  "local_corpus_path": "reproduce/dataset/2wikimultihopqa_corpus.json",
+  "sample_count": 1000,
+  "audited_sample_count": 1000,
+  "corpus_count": 6119,
+  "split_status": "local_eval_subset_only",
+  "has_train_dev_test": false,
+  "split_files": [],
+  "field_coverage": {
+    "_id": 1.0,
+    "type": 1.0,
+    "question": 1.0,
+    "context": 1.0,
+    "supporting_facts": 1.0,
+    "evidences": 1.0,
+    "evidences_id": 1.0,
+    "answer": 1.0
+  },
+  "type_distribution": {
+    "bridge_comparison": 235,
+    "comparison": 244,
+    "compositional": 413,
+    "inference": 108
+  },
+  "support_stats": {
+    "avg_supporting_facts": 2.471,
+    "avg_support_titles": 2.47,
+    "avg_evidence_path_len": 2.507,
+    "avg_context_docs": 10.0
+  },
+  "examples": [
+    {
+      "id": "83bf3b5a0bd911eba7f7acde48001122",
+      "type": "compositional",
+      "question": "When did Lothair Ii's mother die?",
+      "answer": "20 March 851",
+      "supporting_facts": [
+        [
+          "Lothair II",
+          1
+        ],
+        [
+          "Ermengarde of Tours",
+          0
+        ]
+      ],
+      "evidences": [
+        [
+          "Lothair II",
+          "mother",
+          "Ermengarde of Tours"
+        ],
+        [
+          "Ermengarde of Tours",
+          "date of death",
+          "20 March 851"
+        ]
+      ],
+      "evidence_path_entities": [
+        "Lothair II",
+        "Ermengarde of Tours",
+        "20 March 851"
+      ]
+    },
+    {
+      "id": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "type": "comparison",
+      "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+      "answer": "Phoolwari",
+      "supporting_facts": [
+        [
+          "Aas Ka Panchhi",
+          0
+        ],
+        [
+          "Phoolwari",
+          0
+        ]
+      ],
+      "evidences": [
+        [
+          "Aas Ka Panchhi",
+          "publication date",
+          "1961"
+        ],
+        [
+          "Phoolwari",
+          "publication date",
+          "1946"
+        ]
+      ],
+      "evidence_path_entities": [
+        "Aas Ka Panchhi",
+        "1961",
+        "1946"
+      ]
+    },
+    {
+      "id": "2dc690ba0bdc11eba7f7acde48001122",
+      "type": "compositional",
+      "question": "What is the place of birth of the performer of song Changed It?",
+      "answer": "Port of Spain",
+      "supporting_facts": [
+        [
+          "Changed It",
+          0
+        ],
+        [
+          "Nicki Minaj",
+          1
+        ]
+      ],
+      "evidences": [
+        [
+          "Changed It",
+          "performer",
+          "Nicki Minaj"
+        ],
+        [
+          "Nicki Minaj",
+          "place of birth",
+          "Port of Spain"
+        ]
+      ],
+      "evidence_path_entities": [
+        "Changed It",
+        "Nicki Minaj",
+        "Port of Spain"
+      ]
+    }
+  ],
+  "pool_compatibility": {
+    "dense": {
+      "exists": true,
+      "path": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+      "source": "dense",
+      "dataset": "2wikimultihopqa",
+      "limit": 1000,
+      "pool_k": 100,
+      "records": 1000,
+      "compared_records": 1000,
+      "question_mismatch_count": 0,
+      "query_idx_mismatch_count": 0,
+      "gold_title_mismatch_count": 0,
+      "support_recall_at_5": 0.7238,
+      "support_recall_at_20": 0.799,
+      "support_recall_at_100": 0.877,
+      "support_complete_at_5": 0.429,
+      "support_complete_at_20": 0.558,
+      "support_complete_at_100": 0.706,
+      "question_mismatch_examples": []
+    },
+    "proprag": {
+      "exists": true,
+      "path": "run_logs/proprag_pool_exports_full1000_20260424/2wikimultihopqa_pool100.json",
+      "source": "proprag",
+      "dataset": "2wikimultihopqa",
+      "limit": 1000,
+      "pool_k": 100,
+      "records": 1000,
+      "compared_records": 1000,
+      "question_mismatch_count": 0,
+      "query_idx_mismatch_count": 0,
+      "gold_title_mismatch_count": 0,
+      "support_recall_at_5": 0.9028,
+      "support_recall_at_20": 0.9607,
+      "support_recall_at_100": 0.9872,
+      "support_complete_at_5": 0.772,
+      "support_complete_at_20": 0.9,
+      "support_complete_at_100": 0.968,
+      "question_mismatch_examples": []
+    }
+  },
+  "can_build_smoke_cache": true,
+  "recommendation": "Build a D-PathRAG smoke cache from the local 1000-example subset, but acquire/prepare official 2Wiki train/dev before E2E training.",
+  "notes": [
+    "The local 1000-example file is suitable for smoke/cache audit, not for full E2E selector training.",
+    "D-PathRAG Phase 1 must use HuggingFace differentiable reader training; vLLM/Qwen is only for later hard-selection evaluation.",
+    "The local audit does not validate full training feasibility unless an official train split is present."
+  ]
+}
