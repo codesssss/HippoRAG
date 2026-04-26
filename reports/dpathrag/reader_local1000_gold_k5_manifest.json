@@ -1,0 +1,32 @@
+{
+  "samples_json": "reproduce/dataset/2wikimultihopqa.json",
+  "pool_json": "",
+  "split": "local1000",
+  "mode": "gold",
+  "source": "gold_local1000",
+  "top_k": 5,
+  "limit": 1000,
+  "max_doc_chars": 0,
+  "output_jsonl": "data/dpathrag/reader_baselines/2wiki_local1000_gold_k5.jsonl",
+  "summary": {
+    "rows": 1000,
+    "avg_selected_docs": 2.471,
+    "avg_support_recall": 1.0,
+    "support_complete_rate": 1.0
+  },
+  "schema": {
+    "selected_docs": [
+      "doc_id",
+      "rank",
+      "title",
+      "text",
+      "source",
+      "retriever_score",
+      "gold_support"
+    ],
+    "metrics": [
+      "support_recall",
+      "support_complete"
+    ]
+  }
+}
