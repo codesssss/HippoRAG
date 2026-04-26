@@ -1,0 +1,122 @@
+{
+  "manifest_json": "reports/dpathrag/context_ablation_proprag_eval200_manifest.json",
+  "model_name_or_path": "data/dpathrag/models/flan_t5_base_gold_k5_5k",
+  "rows_per_config": 200,
+  "generation": {
+    "batch_size": 8,
+    "max_input_tokens": 1024,
+    "max_new_tokens": 32,
+    "max_docs": 0,
+    "max_doc_chars": 0
+  },
+  "configs": {
+    "rank_top5": {
+      "input_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_rank_top5.jsonl",
+      "predictions_jsonl": "reports/dpathrag/context_ablation_predictions/rank_top5.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.8962,
+        "support_complete_rate": 0.75
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.485,
+        "answer_f1": 0.5426,
+        "support_recall": 0.8962,
+        "support_complete": 0.75,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "selector_ar_order": {
+      "input_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_selector_ar_order.jsonl",
+      "predictions_jsonl": "reports/dpathrag/context_ablation_predictions/selector_ar_order.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.475,
+        "answer_f1": 0.5344,
+        "support_recall": 0.9137,
+        "support_complete": 0.78,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "selector_rank_order": {
+      "input_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_selector_rank_order.jsonl",
+      "predictions_jsonl": "reports/dpathrag/context_ablation_predictions/selector_rank_order.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.465,
+        "answer_f1": 0.5229,
+        "support_recall": 0.9137,
+        "support_complete": 0.78,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "selector_gold_first": {
+      "input_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_selector_gold_first.jsonl",
+      "predictions_jsonl": "reports/dpathrag/context_ablation_predictions/selector_gold_first.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.48,
+        "answer_f1": 0.5369,
+        "support_recall": 0.9137,
+        "support_complete": 0.78,
+        "avg_selected_doc_count": 5.0
+      }
+    },
+    "gold_support_only": {
+      "input_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_gold_support_only.jsonl",
+      "predictions_jsonl": "reports/dpathrag/context_ablation_predictions/gold_support_only.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 2.435,
+        "avg_support_recall": 0.9888,
+        "support_complete_rate": 0.97
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.63,
+        "answer_f1": 0.707,
+        "support_recall": 0.9888,
+        "support_complete": 0.97,
+        "avg_selected_doc_count": 2.435
+      }
+    },
+    "gold_plus_selector_distractors": {
+      "input_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_gold_plus_selector_distractors.jsonl",
+      "predictions_jsonl": "reports/dpathrag/context_ablation_predictions/gold_plus_selector_distractors.predictions.jsonl",
+      "input_summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9888,
+        "support_complete_rate": 0.97
+      },
+      "reader_summary": {
+        "rows": 200,
+        "answer_em": 0.535,
+        "answer_f1": 0.5896,
+        "support_recall": 0.9888,
+        "support_complete": 0.97,
+        "avg_selected_doc_count": 5.0
+      }
+    }
+  }
+}

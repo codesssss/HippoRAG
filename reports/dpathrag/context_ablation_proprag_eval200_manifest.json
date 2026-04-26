@@ -1,0 +1,70 @@
+{
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "predictions_jsonl": "reports/dpathrag/selector_warmstart_proprag_embed_best_local1000.predictions.jsonl",
+  "cache_limit": 1000,
+  "prediction_rows": 200,
+  "top_k": 5,
+  "max_candidates": 100,
+  "configs": {
+    "rank_top5": {
+      "source": "proprag_context_ablation_rank_top5",
+      "output_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_rank_top5.jsonl",
+      "summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.8962,
+        "support_complete_rate": 0.75
+      }
+    },
+    "selector_ar_order": {
+      "source": "proprag_context_ablation_selector_ar_order",
+      "output_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_selector_ar_order.jsonl",
+      "summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      }
+    },
+    "selector_rank_order": {
+      "source": "proprag_context_ablation_selector_rank_order",
+      "output_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_selector_rank_order.jsonl",
+      "summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      }
+    },
+    "selector_gold_first": {
+      "source": "proprag_context_ablation_selector_gold_first",
+      "output_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_selector_gold_first.jsonl",
+      "summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9137,
+        "support_complete_rate": 0.78
+      }
+    },
+    "gold_support_only": {
+      "source": "proprag_context_ablation_gold_support_only",
+      "output_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_gold_support_only.jsonl",
+      "summary": {
+        "rows": 200,
+        "avg_selected_docs": 2.435,
+        "avg_support_recall": 0.9888,
+        "support_complete_rate": 0.97
+      }
+    },
+    "gold_plus_selector_distractors": {
+      "source": "proprag_context_ablation_gold_plus_selector_distractors",
+      "output_jsonl": "data/dpathrag/reader_ablation/2wiki_proprag_context_ablation_gold_plus_selector_distractors.jsonl",
+      "summary": {
+        "rows": 200,
+        "avg_selected_docs": 5.0,
+        "avg_support_recall": 0.9888,
+        "support_complete_rate": 0.97
+      }
+    }
+  }
+}
