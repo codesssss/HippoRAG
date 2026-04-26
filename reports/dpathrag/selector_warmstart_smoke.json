@@ -1,0 +1,74 @@
+{
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "train_rows": 64,
+  "eval_rows": 32,
+  "feature_names": [
+    "bias",
+    "rank_reciprocal",
+    "rank_fraction",
+    "retriever_score",
+    "retriever_score_minmax",
+    "title_question_jaccard",
+    "body_question_jaccard",
+    "title_in_question",
+    "question_token_coverage",
+    "log_text_chars",
+    "type_bridge",
+    "type_comparison"
+  ],
+  "config": {
+    "max_candidates": 100,
+    "path_len": 5,
+    "hidden_dim": 32,
+    "num_layers": 1,
+    "num_heads": 4,
+    "dropout": 0.1,
+    "epochs": 2,
+    "learning_rate": 0.002,
+    "batch_size": 16,
+    "shuffle_targets": false
+  },
+  "eval_before_train": {
+    "model": {
+      "rows": 32,
+      "support_recall": 0.0,
+      "support_complete": 0.0,
+      "duplicate_title_rate": 0.0,
+      "unique_title_rate": 1.0,
+      "selected_gold_count": 0.0
+    },
+    "rank_topk": {
+      "rows": 32,
+      "support_recall": 0.9609,
+      "support_complete": 0.875,
+      "duplicate_title_rate": 0.0,
+      "unique_title_rate": 1.0,
+      "selected_gold_count": 2.3125
+    }
+  },
+  "training": {
+    "epoch_losses": [
+      4.532208,
+      4.133458
+    ],
+    "final_epoch_loss": 4.133458
+  },
+  "eval_after_train": {
+    "model": {
+      "rows": 32,
+      "support_recall": 0.9609,
+      "support_complete": 0.875,
+      "duplicate_title_rate": 0.0,
+      "unique_title_rate": 1.0,
+      "selected_gold_count": 2.3125
+    },
+    "rank_topk": {
+      "rows": 32,
+      "support_recall": 0.9609,
+      "support_complete": 0.875,
+      "duplicate_title_rate": 0.0,
+      "unique_title_rate": 1.0,
+      "selected_gold_count": 2.3125
+    }
+  }
+}

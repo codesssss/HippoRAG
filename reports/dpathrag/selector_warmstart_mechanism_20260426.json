@@ -1,0 +1,54 @@
+{
+  "date": "2026-04-26",
+  "setting": {
+    "dataset": "2Wiki local1000 protocol",
+    "split": "first 800 train, final 200 eval",
+    "path_len": 5,
+    "selector": "AR no-replacement warm-start",
+    "reader": "data/dpathrag/models/flan_t5_base_gold_k5_5k",
+    "feature_scope": "rank, score, lexical overlap; no gold labels as input"
+  },
+  "dense_pool100": {
+    "rank_top5": {
+      "support_recall": 0.7388,
+      "support_complete": 0.455,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.37,
+      "answer_f1": 0.4154
+    },
+    "selector_warmstart": {
+      "support_recall": 0.7612,
+      "support_complete": 0.495,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.38,
+      "answer_f1": 0.4285
+    },
+    "delta_selector_minus_rank": {
+      "support_recall": 0.0224,
+      "support_complete": 0.04,
+      "answer_f1": 0.0131
+    }
+  },
+  "proprag_pool100": {
+    "rank_top5": {
+      "support_recall": 0.8962,
+      "support_complete": 0.75,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.485,
+      "answer_f1": 0.5426
+    },
+    "selector_warmstart": {
+      "support_recall": 0.8838,
+      "support_complete": 0.72,
+      "duplicate_title_rate": 0.005,
+      "answer_em": 0.46,
+      "answer_f1": 0.5274
+    },
+    "delta_selector_minus_rank": {
+      "support_recall": -0.0124,
+      "support_complete": -0.03,
+      "answer_f1": -0.0152
+    }
+  },
+  "decision": "Pipeline passes, but lightweight-feature selector is not the final D-PathRAG method. Next version needs q-doc encoder or embedding features."
+}

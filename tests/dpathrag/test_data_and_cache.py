@@ -5,6 +5,7 @@ from src.dpathrag.data import context_documents, evidence_path_entities, normali
 from src.dpathrag.metrics import recall_at_k, support_complete_at_k
 from src.dpathrag.reader import exact_match, format_reader_input, score_prediction, summarize_scores, token_f1
 from src.dpathrag.reader_data import build_gold_reader_record, build_pool_reader_record
+from src.dpathrag.selector_data import FEATURE_NAMES, featurize_selector_record, support_metrics_for_indices
 
 
 def test_support_titles_and_evidence_entities() -> None:
@@ -111,3 +112,36 @@ def test_reader_format_and_metrics() -> None:
     summary = summarize_scores([scored])
     assert summary["answer_em"] == 1.0
     assert summary["answer_f1"] == 1.0
+
+
+def test_selector_featurization_keeps_gold_label_out_of_features() -> None:
+    record = {
+        "qid": "q1",
+        "question": "Who is related to Gold A?",
+        "type": "bridge",
+        "gold_titles": ["Gold A"],
+        "candidates": [
+            {
+                "rank": 1,
+                "title": "Gold A",
+                "text": "Gold A\nGold A is a person.",
+                "retriever_score": 0.9,
+                "gold_support": 1,
+            },
+            {
+                "rank": 2,
+                "title": "Other",
+                "text": "Other\nDistractor text.",
+                "retriever_score": 0.1,
+                "gold_support": 0,
+            },
+        ],
+    }
+    example = featurize_selector_record(record, max_candidates=4, path_len=3)
+    assert len(example.candidate_features[0]) == len(FEATURE_NAMES)
+    assert example.target_indices == [0, -100, -100]
+    assert example.candidate_mask == [True, True, False, False]
+    assert "gold" not in " ".join(FEATURE_NAMES)
+    metrics = support_metrics_for_indices(example, [0, 1])
+    assert metrics["support_complete"] == 1.0
+    assert metrics["duplicate_title"] == 0.0

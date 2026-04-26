@@ -148,7 +148,13 @@ class AutoregressivePathSelector(nn.Module):
         return conditioned[:, candidate_start:, :]
 
 
-def teacher_forced_path_nll(step_logits: Tensor, target_indices: Tensor, *, candidate_mask: Tensor | None = None) -> Tensor:
+def teacher_forced_path_nll(
+    step_logits: Tensor,
+    target_indices: Tensor,
+    *,
+    candidate_mask: Tensor | None = None,
+    ignore_index: int = -100,
+) -> Tensor:
     """Cross-entropy warm-start loss with no-replacement masking.
 
     This trains the selector to imitate a gold/DAEC evidence path during Stage 1.
@@ -169,6 +175,13 @@ def teacher_forced_path_nll(step_logits: Tensor, target_indices: Tensor, *, cand
     for step in range(steps):
         logits = step_logits[:, step, :].masked_fill(~available, torch.finfo(step_logits.dtype).min)
         target = target_indices[:, step]
-        losses.append(F.cross_entropy(logits, target, reduction="none"))
-        available = available.scatter(1, target.unsqueeze(1), False)
-    return torch.stack(losses, dim=1).mean()
+        valid = target.ne(int(ignore_index))
+        if valid.any():
+            safe_target = target.masked_fill(~valid, 0)
+            step_loss = F.cross_entropy(logits, safe_target, reduction="none")
+            losses.append(step_loss[valid])
+            valid_rows = valid.nonzero(as_tuple=False).squeeze(1)
+            available[valid_rows] = available[valid_rows].scatter(1, target[valid].unsqueeze(1), False)
+    if not losses:
+        return step_logits.sum() * 0.0
+    return torch.cat(losses, dim=0).mean()

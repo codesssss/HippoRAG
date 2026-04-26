@@ -46,3 +46,12 @@ def test_teacher_forced_path_nll_backpropagates() -> None:
     assert loss.item() > 0
     loss.backward()
     assert logits.grad is not None
+
+
+def test_teacher_forced_path_nll_ignores_padded_targets() -> None:
+    logits = torch.randn(2, 3, 5, requires_grad=True)
+    targets = torch.tensor([[0, -100, -100], [1, 3, -100]])
+    loss = teacher_forced_path_nll(logits, targets)
+    assert loss.item() > 0
+    loss.backward()
+    assert logits.grad is not None

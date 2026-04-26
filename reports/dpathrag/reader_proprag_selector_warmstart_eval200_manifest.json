@@ -1,0 +1,13 @@
+{
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "predictions_jsonl": "reports/dpathrag/selector_warmstart_proprag_local1000.predictions.jsonl",
+  "output_jsonl": "data/dpathrag/reader_baselines/2wiki_proprag_selector_warmstart_eval200.jsonl",
+  "mode": "model",
+  "source": "proprag_selector_warmstart_eval200",
+  "summary": {
+    "rows": 200,
+    "avg_selected_docs": 5.0,
+    "avg_support_recall": 0.8838,
+    "support_complete_rate": 0.72
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "train_rows": 800,
+  "eval_rows": 200,
+  "feature_names": [
+    "bias",
+    "rank_reciprocal",
+    "rank_fraction",
+    "retriever_score",
+    "retriever_score_minmax",
+    "title_question_jaccard",
+    "body_question_jaccard",
+    "title_in_question",
+    "question_token_coverage",
+    "log_text_chars",
+    "type_bridge",
+    "type_comparison"
+  ],
+  "config": {
+    "max_candidates": 100,
+    "path_len": 5,
+    "hidden_dim": 128,
+    "num_layers": 2,
+    "num_heads": 4,
+    "dropout": 0.1,
+    "epochs": 25,
+    "learning_rate": 0.002,
+    "batch_size": 32,
+    "shuffle_targets": false
+  },
+  "eval_before_train": {
+    "model": {
+      "rows": 200,
+      "support_recall": 0.6987,
+      "support_complete": 0.365,
+      "duplicate_title_rate": 0.005,
+      "unique_title_rate": 0.999,
+      "selected_gold_count": 1.675
+    },
+    "rank_topk": {
+      "rows": 200,
+      "support_recall": 0.8962,
+      "support_complete": 0.75,
+      "duplicate_title_rate": 0.005,
+      "unique_title_rate": 0.999,
+      "selected_gold_count": 2.19
+    }
+  },
+  "training": {
+    "epoch_losses": [
+      1.500704,
+      0.940596,
+      0.825465,
+      0.775988,
+      0.757082,
+      0.729993,
+      0.741386,
+      0.719321,
+      0.710986,
+      0.675441,
+      0.708399,
+      0.685151,
+      0.7053,
+      0.691676,
+      0.656457,
+      0.662448,
+      0.65869,
+      0.642877,
+      0.65223,
+      0.62443,
+      0.619149,
+      0.628044,
+      0.634259,
+      0.608416,
+      0.619038
+    ],
+    "final_epoch_loss": 0.619038
+  },
+  "eval_after_train": {
+    "model": {
+      "rows": 200,
+      "support_recall": 0.8838,
+      "support_complete": 0.72,
+      "duplicate_title_rate": 0.005,
+      "unique_title_rate": 0.999,
+      "selected_gold_count": 2.155
+    },
+    "rank_topk": {
+      "rows": 200,
+      "support_recall": 0.8962,
+      "support_complete": 0.75,
+      "duplicate_title_rate": 0.005,
+      "unique_title_rate": 0.999,
+      "selected_gold_count": 2.19
+    }
+  }
+}
