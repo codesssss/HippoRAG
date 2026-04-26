@@ -1,0 +1,40 @@
+{
+  "train_jsonl": "data/dpathrag/reader_baselines/2wiki_train_gold_k5_5k.jsonl",
+  "eval_jsonl": "data/dpathrag/reader_baselines/2wiki_validation_gold_k5_1k.jsonl",
+  "model_name_or_path": "google/flan-t5-base",
+  "output_dir": "data/dpathrag/models/flan_t5_base_gold_k5_smoke",
+  "train_records": 32,
+  "eval_records": 16,
+  "config": {
+    "epochs": 0.2,
+    "learning_rate": 5e-05,
+    "batch_size": 2,
+    "eval_batch_size": 4,
+    "gradient_accumulation_steps": 2,
+    "max_input_tokens": 512,
+    "max_target_tokens": 32,
+    "max_new_tokens": 32,
+    "total_update_steps": 2
+  },
+  "eval_before_train": {
+    "rows": 16,
+    "answer_em": 0.4375,
+    "answer_f1": 0.5354,
+    "support_recall": 1.0,
+    "support_complete": 1.0,
+    "avg_selected_doc_count": 2.5
+  },
+  "training": {
+    "micro_steps": 4,
+    "update_steps": 2,
+    "avg_loss_per_micro_step": 0.563622
+  },
+  "eval_after_train": {
+    "rows": 16,
+    "answer_em": 0.4375,
+    "answer_f1": 0.5354,
+    "support_recall": 1.0,
+    "support_complete": 1.0,
+    "avg_selected_doc_count": 2.5
+  }
+}
