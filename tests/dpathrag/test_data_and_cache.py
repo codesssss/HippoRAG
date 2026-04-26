@@ -3,6 +3,7 @@ from __future__ import annotations
 from src.dpathrag.cache import build_cache_record, gold_support_indicators
 from src.dpathrag.data import context_documents, evidence_path_entities, normalize_text, support_titles
 from src.dpathrag.metrics import recall_at_k, support_complete_at_k
+from src.dpathrag.reader import exact_match, format_reader_input, score_prediction, summarize_scores, token_f1
 from src.dpathrag.reader_data import build_gold_reader_record, build_pool_reader_record
 
 
@@ -89,3 +90,24 @@ def test_pool_reader_record() -> None:
     assert row["source"] == "dense"
     assert row["support_recall"] == 0.5
     assert row["support_complete"] == 0.0
+
+
+def test_reader_format_and_metrics() -> None:
+    record = {
+        "qid": "q1",
+        "source": "gold",
+        "question": "Who?",
+        "answer": "The Queen",
+        "support_recall": 1.0,
+        "support_complete": 1.0,
+        "selected_docs": [{"title": "Doc", "text": "Doc\nThe queen appears."}],
+    }
+    prompt = format_reader_input(record)
+    assert "Question: Who?" in prompt
+    assert "[1] Doc" in prompt
+    assert exact_match(["Queen"], "the queen") == 1.0
+    assert token_f1(["The Queen"], "queen") == 1.0
+    scored = score_prediction(record, "queen")
+    summary = summarize_scores([scored])
+    assert summary["answer_em"] == 1.0
+    assert summary["answer_f1"] == 1.0

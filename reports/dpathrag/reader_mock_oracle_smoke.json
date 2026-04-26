@@ -1,0 +1,22 @@
+{
+  "input_jsonl": "data/dpathrag/reader_baselines/2wiki_validation_gold_k5_1k.jsonl",
+  "limit": 5,
+  "runtime": {
+    "mode": "mock_oracle"
+  },
+  "generation": {
+    "batch_size": 4,
+    "max_input_tokens": 2048,
+    "max_new_tokens": 32,
+    "max_docs": 0,
+    "max_doc_chars": 0
+  },
+  "summary": {
+    "rows": 5,
+    "answer_em": 1.0,
+    "answer_f1": 1.0,
+    "support_recall": 1.0,
+    "support_complete": 1.0,
+    "avg_selected_doc_count": 2.0
+  }
+}

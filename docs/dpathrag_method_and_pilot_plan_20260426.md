@@ -458,6 +458,7 @@ Scripts:
 scripts/dpathrag_audit_2wiki.py
 scripts/dpathrag_build_cache.py
 scripts/dpathrag_build_reader_baseline.py
+scripts/dpathrag_eval_reader_baseline.py
 scripts/dpathrag_train_reader.py
 scripts/dpathrag_train_warmstart.py
 scripts/dpathrag_train_e2e.py
@@ -553,6 +554,31 @@ gold_titles
 selected_docs[{doc_id, rank, title, text, source, retriever_score, gold_support}]
 support_recall
 support_complete
+```
+
+Reader evaluator implemented:
+
+```text
+scripts/dpathrag_eval_reader_baseline.py
+src/dpathrag/reader.py
+```
+
+Supported modes:
+
+```text
+--model_name_or_path <HF seq2seq model>  # real FiD/Flan-style baseline path
+--mock_mode oracle                       # pipeline sanity: EM/F1 should be 1.0
+--mock_mode empty                        # pipeline sanity: EM/F1 should be 0.0
+```
+
+Smoke result:
+
+```text
+reports/dpathrag/reader_mock_oracle_smoke.json
+limit: 5
+answer_em: 1.0
+answer_f1: 1.0
+support_complete: 1.0
 ```
 
 Current audit result:

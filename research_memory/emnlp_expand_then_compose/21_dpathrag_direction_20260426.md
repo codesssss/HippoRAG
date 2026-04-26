@@ -148,7 +148,9 @@ Reader-baseline protocol added:
 
 ```text
 scripts/dpathrag_build_reader_baseline.py
+scripts/dpathrag_eval_reader_baseline.py
 src/dpathrag/reader_data.py
+src/dpathrag/reader.py
 ```
 
 Generated under ignored `data/`:
@@ -171,6 +173,16 @@ local1000 proprag@5 support recall / complete = 0.9028 / 0.772
 
 Selector skeleton now accepts optional `query_features` and injects a query
 token into every per-step listwise pass.
+
+Reader evaluator smoke:
+
+```text
+input = data/dpathrag/reader_baselines/2wiki_validation_gold_k5_1k.jsonl
+limit = 5
+mock_oracle answer_em / answer_f1 = 1.0 / 1.0
+mock_empty answer_em / answer_f1 = 0.0 / 0.0
+report = reports/dpathrag/reader_mock_oracle_smoke.json
+```
 
 Audit result:
 
