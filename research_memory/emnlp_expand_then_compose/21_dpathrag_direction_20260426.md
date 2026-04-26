@@ -41,6 +41,47 @@ D-PathRAG full vs unordered ST-Gumbel / Gumbel Reranking-style mask
 
 If AR path does not beat unordered mask on support metrics, stop.
 
+## Borrowed Ideas To Keep
+
+Must use:
+
+```text
+SetR: direct baseline; it owns the generic set-selection framing.
+Stochastic RAG: unordered ST-Gumbel baseline.
+Gumbel Reranking: document-wise top-k mask baseline.
+G-Reasoner: negative-section framing for learned vs assumed graph edge semantics.
+```
+
+Recommended implementation details:
+
+```text
+Inject a query token h_q into every per-step ListTransformer pass.
+Shuffle ambiguous gold support order per epoch during warm start.
+Track Stage 2 selector drift with KL > 0.05 as meaningful movement.
+Track warm-start top-1 overlap; healthy range is 60-90%.
+Track selector gradient norm in the first 100 steps.
+Use 2Wiki pilot -> HotpotQA sanity -> MuSiQue stress test.
+```
+
+Paper framing:
+
+```text
+Use "stateful evidence accumulation" as the intro story.
+Do not use cognitive-memory metaphor as a technical claim.
+Do not claim novelty from ST-Gumbel alone.
+Do not add supporting-fact auxiliary loss in Stage 2.
+Do not use hand-weighted DAEC residual prior as the main method.
+```
+
+Source anchors:
+
+```text
+SetR: https://aclanthology.org/2025.acl-long.861/
+Stochastic RAG: https://arxiv.org/abs/2405.02816
+Gumbel Reranking: https://aclanthology.org/2025.acl-long.354/
+G-Reasoner: https://arxiv.org/abs/2509.24276
+```
+
 ## Execution Rule
 
 Do not implement the full four-week system immediately. First do a 10-day kill-or-continue pilot:

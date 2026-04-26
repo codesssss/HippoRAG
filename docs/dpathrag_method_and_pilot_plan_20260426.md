@@ -12,6 +12,30 @@ New main research direction:
 
 D-PathRAG is **not** full-corpus end-to-end retrieval. It is end-to-end evidence selection over a fixed candidate pool.
 
+## Paper Positioning
+
+Use this framing in the paper:
+
+```text
+Multi-hop QA requires stateful evidence accumulation: each selected document
+changes what the next document should be.  Prior work either makes this state
+explicit via natural-language decomposition/CoT at inference time, or ignores
+the state by selecting an unordered set.  D-PathRAG learns an implicit state
+with an autoregressive evidence-path selector over a fixed candidate pool.
+```
+
+Do not frame the contribution as "we use ST-Gumbel" or "we select a set."  SetR
+already owns the set-selection framing; Stochastic RAG and Gumbel Reranking
+already occupy the differentiable top-k/mask framing.  The contribution must be
+the combination of:
+
+```text
+state-conditioned autoregressive evidence path
+per-step listwise re-encoding
+DAEC binding features + warm-start curriculum
+answer-loss-only E2E fine-tuning with selector drift diagnostics
+```
+
 ## Motivation
 
 BSGS failed because node marginals are the wrong state variable for multi-hop evidence composition. The oracle diagnostics showed that even after oracle pool exposure, oracle binding rewrites, and oracle likelihoods, BSGS still failed to recover coherent full support sets and produced high duplicate-title concentration.
@@ -36,6 +60,17 @@ q_theta(pi | q, C_q)
 ```
 
 where `C_q` is a fixed candidate pool from dense retrieval / DAEC / PropRAG.
+
+Negative result framing must be precise:
+
+```text
+Hand-crafted graph belief propagation assumes graph edges encode reasoning
+transitions.  This assumption fails on noisy association substrates such as
+HippoRAG-style graphs.  Learned graph-reasoning systems such as G-Reasoner
+avoid this failure mode by learning edge/topology semantics from training
+signals.  D-PathRAG takes the complementary route: bypass the noisy graph
+substrate and directly learn a coherent evidence path inside a fixed pool.
+```
 
 ## Method Boundary
 
@@ -86,22 +121,29 @@ rank / retriever score
 DAEC per-demand coverage score(s)
 binding / entity overlap features
 DAEC selected indicator
-gold support indicator if available
 title metadata
 ```
 
 DAEC features are observations and warm-start targets, not hand-weighted logit priors.
+Gold support labels are separate warm-start/evaluation targets and must not be
+included in selector input features.
 
 ### Autoregressive Selector
 
 At each step `t`:
 
 ```text
-H^(t) = ListTransformer(h_1, ..., h_n ; r_{t-1}, selected_mask)
+H^(t) = ListTransformer(h_q, h_1, ..., h_n ; r_{t-1}, selected_mask)
 logits_t = f_theta(H^(t), r_{t-1}) + no_replacement_mask
 z_t = ST-GumbelTop1(logits_t, tau)
 r_t = GRU(r_{t-1}, sum_i z_{t,i} H_i^(t))
 ```
+
+`h_q` is a query token injected into every per-step listwise re-encoding pass.
+This keeps candidate-candidate interactions query-conditioned throughout the
+self-attention stack, not only in the final scoring head.  The current
+selector skeleton should be extended to accept `query_features` before Stage 1
+warm-start training.
 
 Main variant:
 
@@ -160,9 +202,15 @@ Train selector on:
 
 ```text
 gold support path if ordered path is available
-gold support set with canonical ordering otherwise
+gold support set with randomized epoch-wise ordering otherwise
 DAEC selected path only when gold supervision is unavailable
 ```
+
+2Wiki/Hotpot supporting facts are effectively evidence sets even when evidence
+triples suggest a path.  If the gold path order is ambiguous, shuffle support
+order per epoch rather than training on one arbitrary canonical order.  This
+keeps the autoregressive conditioning inductive bias without overfitting to a
+spurious order.
 
 Early stop on support metrics, not selector NLL alone:
 
@@ -196,6 +244,14 @@ answer EM/F1
 duplicate-title rate
 ```
 
+Operational thresholds:
+
+```text
+KL(Stage2 selector || warm-start selector) > 0.05 => meaningful drift
+top-1 overlap with warm-start selector in [0.60, 0.90] => changed but not collapsed
+mean selector gradient norm over first 100 steps > near-zero epsilon => gradient path alive
+```
+
 If answer F1 improves but support metrics degrade, mark as reward shortcut, not a method success.
 
 ## Baselines
@@ -207,6 +263,7 @@ Run these before any large matrix:
 ```text
 Dense top-k + same reader
 DAEC + same reader
+SetR / SetR-windowed + same reader
 Unordered ST-Gumbel top-k selector
 D-PathRAG-full
 Gold support + same reader
@@ -220,10 +277,30 @@ Add only after pilot passes:
 Supervised selector + same reader
 Stochastic RAG-style unordered ST-Gumbel-top-k
 Gumbel Reranking-style document-wise top-k attention mask
+SetR official or faithful reimplementation
 D-PathRAG w/o DAEC features
 D-PathRAG w/o DAEC warm start
 D-PathRAG frozen-listwise ablation
 Qwen3 hard-reader eval
+```
+
+Required related-work distinctions:
+
+```text
+SetR: prompt/CoT-based set selection; D-PathRAG is learned AR path selection.
+Stochastic RAG: unordered sampling without replacement; D-PathRAG is state-conditioned path construction.
+Gumbel Reranking: document-wise top-k mask / reranker optimization; D-PathRAG repeatedly conditions the next selection on the accumulated path state.
+IRCoT: explicit natural-language iterative state at inference time; D-PathRAG learns an implicit selector state.
+G-Reasoner: learned graph semantics; D-PathRAG bypasses graph propagation and composes within a fixed pool.
+```
+
+Verified source anchors for writing:
+
+```text
+SetR: https://aclanthology.org/2025.acl-long.861/
+Stochastic RAG: https://arxiv.org/abs/2405.02816
+Gumbel Reranking: https://aclanthology.org/2025.acl-long.354/
+G-Reasoner: https://arxiv.org/abs/2509.24276
 ```
 
 ## Metrics
@@ -325,6 +402,35 @@ AND selector KL/JS from warm-start is non-zero
 ```
 
 If support metrics do not improve, stop D-PathRAG.
+
+## Borrowed Ideas Ledger
+
+Must-use:
+
+- `SetR`: cite and compare directly; do not claim generic set selection as novelty.
+- `Stochastic RAG`: use as the unordered ST-Gumbel baseline and implementation reference.
+- `Gumbel Reranking`: use as the document-wise mask baseline and direct differentiable-reranking neighbor.
+- `G-Reasoner`: use to sharpen the BSGS negative section as "assumed edge semantics fail; learned edge semantics may work."
+
+Recommended:
+
+- Query token injection in the per-step ListTransformer.
+- Stage 2 drift thresholds: KL > 0.05, warm-start top-1 overlap 60-90%, non-zero selector gradient norm.
+- Epoch-wise randomization of ambiguous gold support order during warm start.
+- Dataset order: 2Wiki pilot, HotpotQA sanity, MuSiQue stress test.
+- Intro framing as stateful evidence accumulation.
+
+Optional:
+
+- DAEC-selected path as pseudo-label when gold support labels are unavailable.
+- Future-work hook: G-Reasoner-style graph foundation model for candidate generation, D-PathRAG for path composition.
+
+Explicitly excluded:
+
+- Cognitive-memory metaphor as a main technical claim.
+- Supporting-fact auxiliary loss in Stage 2.
+- Unordered Gumbel top-k as the main method.
+- Hand-weighted `DAEC_score + neural_score` residual prior as the main scoring rule.
 
 ## Engineering Layout
 
