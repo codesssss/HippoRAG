@@ -1,5 +1,17 @@
 {
-  "status": "not_run",
-  "reason": "No predicted_jsonl or llm_base_url provided. Use --llm_base_url for real Qwen evaluation.",
-  "num_examples": 0
+  "status": "completed",
+  "oracle_smoke": false,
+  "num_examples": 997,
+  "metrics": {
+    "slot_precision": 0.6551248985050385,
+    "slot_recall": 0.6768639251086587,
+    "slot_f1": 0.655210798340185,
+    "variable_grounding_accuracy": 0.0019224339685723836
+  },
+  "errors": [
+    "3hop1__518381_709625_84283: Invalid \\escape: line 1 column 58 (char 57)",
+    "3hop1__798544_514761_594810: Invalid \\escape: line 1 column 61 (char 60)",
+    "2hop__689472_52835: Invalid \\escape: line 1 column 59 (char 58)"
+  ],
+  "predictions_out": "data/processed/musique_qwen_slots.jsonl"
 }

@@ -1,0 +1,72 @@
+{
+  "rows": 200,
+  "skipped_no_answer_clusters": 0,
+  "qwen": {
+    "available": false,
+    "error": "<urlopen error [Errno 111] Connection refused>"
+  },
+  "sampled_counts": {
+    "oracle_beneficial": 80,
+    "lexical_HN": 200,
+    "random_non_beneficial": 200
+  },
+  "oracle_answer_diagnostic": {
+    "beneficial_vs_lexical_hn": {
+      "auc": 0.713375,
+      "ci_low": 0.6355,
+      "ci_high": 0.785188
+    },
+    "beneficial_vs_random_non_beneficial": {
+      "auc": 0.76725,
+      "ci_low": 0.70175,
+      "ci_high": 0.83125
+    },
+    "pr_auc_beneficial_vs_lexical_hn": 0.663781,
+    "mean_delta_beneficial": 2.954419,
+    "mean_delta_lexical_hn": 0.133903,
+    "mean_delta_random_non_beneficial": -0.591263
+  },
+  "non_oracle_auc_diagnostic": {
+    "beneficial_vs_lexical_hn": {
+      "auc": 0.536875,
+      "ci_low": 0.449813,
+      "ci_high": 0.62225
+    },
+    "beneficial_vs_random_non_beneficial": {
+      "auc": 0.490875,
+      "ci_low": 0.409562,
+      "ci_high": 0.577438
+    },
+    "pr_auc_beneficial_vs_lexical_hn": 0.359246,
+    "mean_delta_beneficial": -0.412859,
+    "mean_delta_lexical_hn": -0.553136,
+    "mean_delta_random_non_beneficial": 0.060331
+  },
+  "non_oracle_decision_diagnostic": {
+    "queries": 200,
+    "stop_rate": 0.965,
+    "top1_beneficial_rate_rank_incomplete": 0.0,
+    "rank_complete_false_edit_rate": 0.03681,
+    "added_gold": 0,
+    "added_non_gold": 7,
+    "non_gold_per_gold": 7.0,
+    "support_complete_before": 0.815,
+    "support_complete_after": 0.805,
+    "support_complete_gain": -0.01,
+    "support_recall_before": 0.9175,
+    "support_recall_after": 0.9125,
+    "support_recall_gain": -0.005
+  },
+  "checks": {
+    "auc_ge_0_70": false,
+    "auc_ci_low_ge_0_65": false,
+    "top1_beneficial_rate_ge_0_30": false,
+    "rank_complete_false_edit_rate_le_0_05": true,
+    "non_gold_per_gold_le_5": false,
+    "support_complete_gain_ge_1pp": false
+  },
+  "passed": false,
+  "reader_forwards": 21660,
+  "mean_reader_forwards_per_query": 108.3,
+  "elapsed_seconds": 419.287
+}

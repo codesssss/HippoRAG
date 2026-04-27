@@ -1,0 +1,876 @@
+{
+  "rows": 1000,
+  "folds": 5,
+  "candidate_pool_size": 20,
+  "rank_topk": {
+    "rows": 1000,
+    "support_recall": 0.9028,
+    "support_complete": 0.772,
+    "duplicate_title_rate": 0.001,
+    "unique_title_rate": 0.9998,
+    "selected_gold_count": 2.227,
+    "bridge_entity_recall": 0.9365,
+    "selection_overlap": 0.0
+  },
+  "selector_v1": {
+    "rows": 1000,
+    "support_recall": 0.9233,
+    "support_complete": 0.805,
+    "duplicate_title_rate": 0.001,
+    "unique_title_rate": 0.9998,
+    "selected_gold_count": 2.266,
+    "bridge_entity_recall": 0.9416,
+    "selection_overlap": 0.6192,
+    "added_gold": 76,
+    "added_non_gold": 1205,
+    "non_gold_per_gold": 15.8553
+  },
+  "oracle_edit1": {
+    "rows": 1000,
+    "support_recall": 0.9593,
+    "support_complete": 0.895,
+    "duplicate_title_rate": 0.001,
+    "unique_title_rate": 0.9998,
+    "selected_gold_count": 2.363,
+    "bridge_entity_recall": 0.951,
+    "selection_overlap": 0.0,
+    "queries_with_edit": 136,
+    "stop_rate": 0.864,
+    "added_gold": 136,
+    "added_non_gold": 0,
+    "non_gold_per_gold": 0.0
+  },
+  "variants": {
+    "learned_stop_margin15": {
+      "rows": 1000,
+      "support_recall": 0.907,
+      "support_complete": 0.778,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.235,
+      "bridge_entity_recall": 0.939,
+      "selection_overlap": 0.951,
+      "added_gold": 19,
+      "added_non_gold": 128,
+      "removed_gold": 11,
+      "removed_non_gold": 136,
+      "queries_with_edit": 147,
+      "stop_rate": 0.853,
+      "non_gold_per_gold": 6.7368,
+      "gates": {
+        "support_complete_gain_ge_1pp": false,
+        "non_gold_per_gold_le_5": false,
+        "added_non_gold_50pct_below_v1": true,
+        "passed_count": 1
+      }
+    },
+    "learned_stop_margin20": {
+      "rows": 1000,
+      "support_recall": 0.906,
+      "support_complete": 0.778,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.234,
+      "bridge_entity_recall": 0.939,
+      "selection_overlap": 0.9603,
+      "added_gold": 16,
+      "added_non_gold": 103,
+      "removed_gold": 9,
+      "removed_non_gold": 110,
+      "queries_with_edit": 119,
+      "stop_rate": 0.881,
+      "non_gold_per_gold": 6.4375,
+      "gates": {
+        "support_complete_gain_ge_1pp": false,
+        "non_gold_per_gold_le_5": false,
+        "added_non_gold_50pct_below_v1": true,
+        "passed_count": 1
+      }
+    }
+  },
+  "fold_reports": [
+    {
+      "fold": 0,
+      "edit_train": {
+        "queries": 800,
+        "positive_edits": 401,
+        "positive_stops": 684,
+        "negative_edits": 12800,
+        "negative_stops": 116
+      },
+      "edit_fit": {
+        "rows": 13201,
+        "positive_rate": 0.030376,
+        "fit_method": "standardized_nearest_centroid_log_prior"
+      },
+      "stop_fit": {
+        "rows": 640,
+        "positive_rate": 0.153125,
+        "fit_method": "standardized_nearest_centroid"
+      },
+      "margins": {
+        "learned_stop_margin15": {
+          "threshold": 96.439682,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9156,
+              "support_complete": 0.8063,
+              "duplicate_title_rate": 0.0063,
+              "unique_title_rate": 0.9988,
+              "selected_gold_count": 2.1812,
+              "bridge_entity_recall": 0.9333,
+              "selection_overlap": 0.9979,
+              "added_gold": 0,
+              "added_non_gold": 1,
+              "removed_gold": 0,
+              "removed_non_gold": 1,
+              "queries_with_edit": 1,
+              "stop_rate": 0.9938,
+              "non_gold_per_gold": 1.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": 96.439682,
+              "auc": 0.594679,
+              "accuracy": 0.89375,
+              "precision": 1.0,
+              "recall": 0.055556,
+              "tp": 1,
+              "fp": 0,
+              "tn": 142,
+              "fn": 17
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.9175,
+            "support_complete": 0.815,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.265,
+            "bridge_entity_recall": 0.9383,
+            "selection_overlap": 0.9967,
+            "added_gold": 0,
+            "added_non_gold": 2,
+            "removed_gold": 0,
+            "removed_non_gold": 2,
+            "queries_with_edit": 2,
+            "stop_rate": 0.99,
+            "non_gold_per_gold": 2.0
+          },
+          "eval_classification": {
+            "threshold": 96.439682,
+            "auc": 0.713056,
+            "accuracy": 0.89,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tp": 0,
+            "fp": 2,
+            "tn": 178,
+            "fn": 20
+          }
+        },
+        "learned_stop_margin20": {
+          "threshold": 96.439682,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9156,
+              "support_complete": 0.8063,
+              "duplicate_title_rate": 0.0063,
+              "unique_title_rate": 0.9988,
+              "selected_gold_count": 2.1812,
+              "bridge_entity_recall": 0.9333,
+              "selection_overlap": 0.9979,
+              "added_gold": 0,
+              "added_non_gold": 1,
+              "removed_gold": 0,
+              "removed_non_gold": 1,
+              "queries_with_edit": 1,
+              "stop_rate": 0.9938,
+              "non_gold_per_gold": 1.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": 96.439682,
+              "auc": 0.594679,
+              "accuracy": 0.89375,
+              "precision": 1.0,
+              "recall": 0.055556,
+              "tp": 1,
+              "fp": 0,
+              "tn": 142,
+              "fn": 17
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.9175,
+            "support_complete": 0.815,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.265,
+            "bridge_entity_recall": 0.9383,
+            "selection_overlap": 0.9967,
+            "added_gold": 0,
+            "added_non_gold": 2,
+            "removed_gold": 0,
+            "removed_non_gold": 2,
+            "queries_with_edit": 2,
+            "stop_rate": 0.99,
+            "non_gold_per_gold": 2.0
+          },
+          "eval_classification": {
+            "threshold": 96.439682,
+            "auc": 0.713056,
+            "accuracy": 0.89,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tp": 0,
+            "fp": 2,
+            "tn": 178,
+            "fn": 20
+          }
+        }
+      }
+    },
+    {
+      "fold": 1,
+      "edit_train": {
+        "queries": 800,
+        "positive_edits": 399,
+        "positive_stops": 687,
+        "negative_edits": 12800,
+        "negative_stops": 113
+      },
+      "edit_fit": {
+        "rows": 13199,
+        "positive_rate": 0.03023,
+        "fit_method": "standardized_nearest_centroid_log_prior"
+      },
+      "stop_fit": {
+        "rows": 640,
+        "positive_rate": 0.14375,
+        "fit_method": "standardized_nearest_centroid"
+      },
+      "margins": {
+        "learned_stop_margin15": {
+          "threshold": 32.005627,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9094,
+              "support_complete": 0.7875,
+              "duplicate_title_rate": 0.0063,
+              "unique_title_rate": 0.9988,
+              "selected_gold_count": 2.2125,
+              "bridge_entity_recall": 0.9667,
+              "selection_overlap": 0.9792,
+              "added_gold": 2,
+              "added_non_gold": 8,
+              "removed_gold": 0,
+              "removed_non_gold": 10,
+              "queries_with_edit": 10,
+              "stop_rate": 0.9375,
+              "non_gold_per_gold": 4.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": 32.005627,
+              "auc": 0.682083,
+              "accuracy": 0.825,
+              "precision": 0.266667,
+              "recall": 0.190476,
+              "tp": 4,
+              "fp": 11,
+              "tn": 128,
+              "fn": 17
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.9125,
+            "support_complete": 0.79,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.19,
+            "bridge_entity_recall": 0.96,
+            "selection_overlap": 0.9567,
+            "added_gold": 4,
+            "added_non_gold": 22,
+            "removed_gold": 1,
+            "removed_non_gold": 25,
+            "queries_with_edit": 26,
+            "stop_rate": 0.87,
+            "non_gold_per_gold": 5.5
+          },
+          "eval_classification": {
+            "threshold": 32.005627,
+            "auc": 0.68337,
+            "accuracy": 0.82,
+            "precision": 0.290323,
+            "recall": 0.391304,
+            "tp": 9,
+            "fp": 22,
+            "tn": 155,
+            "fn": 14
+          }
+        },
+        "learned_stop_margin20": {
+          "threshold": -23.172256,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9156,
+              "support_complete": 0.8,
+              "duplicate_title_rate": 0.0063,
+              "unique_title_rate": 0.9988,
+              "selected_gold_count": 2.225,
+              "bridge_entity_recall": 0.9667,
+              "selection_overlap": 0.9479,
+              "added_gold": 5,
+              "added_non_gold": 20,
+              "removed_gold": 1,
+              "removed_non_gold": 24,
+              "queries_with_edit": 25,
+              "stop_rate": 0.8438,
+              "non_gold_per_gold": 4.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": -23.172256,
+              "auc": 0.682083,
+              "accuracy": 0.575,
+              "precision": 0.202532,
+              "recall": 0.761905,
+              "tp": 16,
+              "fp": 63,
+              "tn": 76,
+              "fn": 5
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.9125,
+            "support_complete": 0.79,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.19,
+            "bridge_entity_recall": 0.96,
+            "selection_overlap": 0.94,
+            "added_gold": 5,
+            "added_non_gold": 31,
+            "removed_gold": 2,
+            "removed_non_gold": 34,
+            "queries_with_edit": 36,
+            "stop_rate": 0.82,
+            "non_gold_per_gold": 6.2
+          },
+          "eval_classification": {
+            "threshold": -23.172256,
+            "auc": 0.68337,
+            "accuracy": 0.495,
+            "precision": 0.145455,
+            "recall": 0.695652,
+            "tp": 16,
+            "fp": 94,
+            "tn": 83,
+            "fn": 7
+          }
+        }
+      }
+    },
+    {
+      "fold": 2,
+      "edit_train": {
+        "queries": 800,
+        "positive_edits": 376,
+        "positive_stops": 694,
+        "negative_edits": 12800,
+        "negative_stops": 106
+      },
+      "edit_fit": {
+        "rows": 13176,
+        "positive_rate": 0.028537,
+        "fit_method": "standardized_nearest_centroid_log_prior"
+      },
+      "stop_fit": {
+        "rows": 640,
+        "positive_rate": 0.128125,
+        "fit_method": "standardized_nearest_centroid"
+      },
+      "margins": {
+        "learned_stop_margin15": {
+          "threshold": -50.42841,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.8766,
+              "support_complete": 0.7125,
+              "duplicate_title_rate": 0.0063,
+              "unique_title_rate": 0.9988,
+              "selected_gold_count": 2.1562,
+              "bridge_entity_recall": 0.9542,
+              "selection_overlap": 0.9,
+              "added_gold": 5,
+              "added_non_gold": 43,
+              "removed_gold": 5,
+              "removed_non_gold": 43,
+              "queries_with_edit": 48,
+              "stop_rate": 0.7,
+              "non_gold_per_gold": 8.6
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": false,
+              "non_gold_per_gold_le_5": false,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 1
+            },
+            "classification": {
+              "threshold": -50.42841,
+              "auc": 0.675245,
+              "accuracy": 0.3625,
+              "precision": 0.175,
+              "recall": 0.875,
+              "tp": 21,
+              "fp": 99,
+              "tn": 37,
+              "fn": 3
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.9137,
+            "support_complete": 0.79,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.31,
+            "bridge_entity_recall": 0.9317,
+            "selection_overlap": 0.9017,
+            "added_gold": 9,
+            "added_non_gold": 50,
+            "removed_gold": 2,
+            "removed_non_gold": 57,
+            "queries_with_edit": 59,
+            "stop_rate": 0.705,
+            "non_gold_per_gold": 5.5556
+          },
+          "eval_classification": {
+            "threshold": -50.42841,
+            "auc": 0.650784,
+            "accuracy": 0.36,
+            "precision": 0.185897,
+            "recall": 0.966667,
+            "tp": 29,
+            "fp": 127,
+            "tn": 43,
+            "fn": 1
+          }
+        },
+        "learned_stop_margin20": {
+          "threshold": -50.42841,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.875,
+              "support_complete": 0.7125,
+              "duplicate_title_rate": 0.0063,
+              "unique_title_rate": 0.9988,
+              "selected_gold_count": 2.1562,
+              "bridge_entity_recall": 0.9562,
+              "selection_overlap": 0.9333,
+              "added_gold": 4,
+              "added_non_gold": 28,
+              "removed_gold": 4,
+              "removed_non_gold": 28,
+              "queries_with_edit": 32,
+              "stop_rate": 0.8,
+              "non_gold_per_gold": 7.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": false,
+              "non_gold_per_gold_le_5": false,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 1
+            },
+            "classification": {
+              "threshold": -50.42841,
+              "auc": 0.675245,
+              "accuracy": 0.3625,
+              "precision": 0.175,
+              "recall": 0.875,
+              "tp": 21,
+              "fp": 99,
+              "tn": 37,
+              "fn": 3
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.91,
+            "support_complete": 0.785,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.3,
+            "bridge_entity_recall": 0.93,
+            "selection_overlap": 0.9417,
+            "added_gold": 7,
+            "added_non_gold": 28,
+            "removed_gold": 2,
+            "removed_non_gold": 33,
+            "queries_with_edit": 35,
+            "stop_rate": 0.825,
+            "non_gold_per_gold": 4.0
+          },
+          "eval_classification": {
+            "threshold": -50.42841,
+            "auc": 0.650784,
+            "accuracy": 0.36,
+            "precision": 0.185897,
+            "recall": 0.966667,
+            "tp": 29,
+            "fp": 127,
+            "tn": 43,
+            "fn": 1
+          }
+        }
+      }
+    },
+    {
+      "fold": 3,
+      "edit_train": {
+        "queries": 800,
+        "positive_edits": 373,
+        "positive_stops": 695,
+        "negative_edits": 12800,
+        "negative_stops": 105
+      },
+      "edit_fit": {
+        "rows": 13173,
+        "positive_rate": 0.028315,
+        "fit_method": "standardized_nearest_centroid_log_prior"
+      },
+      "stop_fit": {
+        "rows": 640,
+        "positive_rate": 0.132812,
+        "fit_method": "standardized_nearest_centroid"
+      },
+      "margins": {
+        "learned_stop_margin15": {
+          "threshold": 143.546661,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9219,
+              "support_complete": 0.8187,
+              "duplicate_title_rate": 0.0,
+              "unique_title_rate": 1.0,
+              "selected_gold_count": 2.2437,
+              "bridge_entity_recall": 0.9562,
+              "selection_overlap": 0.9979,
+              "added_gold": 0,
+              "added_non_gold": 1,
+              "removed_gold": 0,
+              "removed_non_gold": 1,
+              "queries_with_edit": 1,
+              "stop_rate": 0.9938,
+              "non_gold_per_gold": 1.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": 143.546661,
+              "auc": 0.637143,
+              "accuracy": 0.86875,
+              "precision": 0.0,
+              "recall": 0.0,
+              "tp": 0,
+              "fp": 1,
+              "tn": 139,
+              "fn": 20
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.8975,
+            "support_complete": 0.76,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.23,
+            "bridge_entity_recall": 0.9233,
+            "selection_overlap": 0.9983,
+            "added_gold": 0,
+            "added_non_gold": 1,
+            "removed_gold": 0,
+            "removed_non_gold": 1,
+            "queries_with_edit": 1,
+            "stop_rate": 0.995,
+            "non_gold_per_gold": 1.0
+          },
+          "eval_classification": {
+            "threshold": 143.546661,
+            "auc": 0.608704,
+            "accuracy": 0.84,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tp": 0,
+            "fp": 1,
+            "tn": 168,
+            "fn": 31
+          }
+        },
+        "learned_stop_margin20": {
+          "threshold": 143.546661,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9219,
+              "support_complete": 0.8187,
+              "duplicate_title_rate": 0.0,
+              "unique_title_rate": 1.0,
+              "selected_gold_count": 2.2437,
+              "bridge_entity_recall": 0.9562,
+              "selection_overlap": 0.9979,
+              "added_gold": 0,
+              "added_non_gold": 1,
+              "removed_gold": 0,
+              "removed_non_gold": 1,
+              "queries_with_edit": 1,
+              "stop_rate": 0.9938,
+              "non_gold_per_gold": 1.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": 143.546661,
+              "auc": 0.637143,
+              "accuracy": 0.86875,
+              "precision": 0.0,
+              "recall": 0.0,
+              "tp": 0,
+              "fp": 1,
+              "tn": 139,
+              "fn": 20
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.8975,
+            "support_complete": 0.76,
+            "duplicate_title_rate": 0.0,
+            "unique_title_rate": 1.0,
+            "selected_gold_count": 2.23,
+            "bridge_entity_recall": 0.9233,
+            "selection_overlap": 0.9983,
+            "added_gold": 0,
+            "added_non_gold": 1,
+            "removed_gold": 0,
+            "removed_non_gold": 1,
+            "queries_with_edit": 1,
+            "stop_rate": 0.995,
+            "non_gold_per_gold": 1.0
+          },
+          "eval_classification": {
+            "threshold": 143.546661,
+            "auc": 0.608704,
+            "accuracy": 0.84,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tp": 0,
+            "fp": 1,
+            "tn": 168,
+            "fn": 31
+          }
+        }
+      }
+    },
+    {
+      "fold": 4,
+      "edit_train": {
+        "queries": 800,
+        "positive_edits": 375,
+        "positive_stops": 696,
+        "negative_edits": 12800,
+        "negative_stops": 104
+      },
+      "edit_fit": {
+        "rows": 13175,
+        "positive_rate": 0.028463,
+        "fit_method": "standardized_nearest_centroid_log_prior"
+      },
+      "stop_fit": {
+        "rows": 640,
+        "positive_rate": 0.128125,
+        "fit_method": "standardized_nearest_centroid"
+      },
+      "margins": {
+        "learned_stop_margin15": {
+          "threshold": -97.846123,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9281,
+              "support_complete": 0.8187,
+              "duplicate_title_rate": 0.0,
+              "unique_title_rate": 1.0,
+              "selected_gold_count": 2.2625,
+              "bridge_entity_recall": 0.9208,
+              "selection_overlap": 0.925,
+              "added_gold": 9,
+              "added_non_gold": 27,
+              "removed_gold": 1,
+              "removed_non_gold": 35,
+              "queries_with_edit": 36,
+              "stop_rate": 0.775,
+              "non_gold_per_gold": 3.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": -97.846123,
+              "auc": 0.68083,
+              "accuracy": 0.1375,
+              "precision": 0.1375,
+              "recall": 1.0,
+              "tp": 22,
+              "fp": 138,
+              "tn": 0,
+              "fn": 0
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.8938,
+            "support_complete": 0.735,
+            "duplicate_title_rate": 0.005,
+            "unique_title_rate": 0.999,
+            "selected_gold_count": 2.18,
+            "bridge_entity_recall": 0.9417,
+            "selection_overlap": 0.9017,
+            "added_gold": 6,
+            "added_non_gold": 53,
+            "removed_gold": 8,
+            "removed_non_gold": 51,
+            "queries_with_edit": 59,
+            "stop_rate": 0.705,
+            "non_gold_per_gold": 8.8333
+          },
+          "eval_classification": {
+            "threshold": -97.846123,
+            "auc": 0.726562,
+            "accuracy": 0.16,
+            "precision": 0.16,
+            "recall": 1.0,
+            "tp": 32,
+            "fp": 168,
+            "tn": 0,
+            "fn": 0
+          }
+        },
+        "learned_stop_margin20": {
+          "threshold": -97.846123,
+          "dev": {
+            "summary": {
+              "rows": 160,
+              "support_recall": 0.9219,
+              "support_complete": 0.8063,
+              "duplicate_title_rate": 0.0,
+              "unique_title_rate": 1.0,
+              "selected_gold_count": 2.25,
+              "bridge_entity_recall": 0.9208,
+              "selection_overlap": 0.9417,
+              "added_gold": 7,
+              "added_non_gold": 21,
+              "removed_gold": 1,
+              "removed_non_gold": 27,
+              "queries_with_edit": 28,
+              "stop_rate": 0.825,
+              "non_gold_per_gold": 3.0
+            },
+            "gates": {
+              "support_complete_gain_ge_1pp": true,
+              "non_gold_per_gold_le_5": true,
+              "added_non_gold_50pct_below_v1": true,
+              "passed_count": 3
+            },
+            "classification": {
+              "threshold": -97.846123,
+              "auc": 0.68083,
+              "accuracy": 0.1375,
+              "precision": 0.1375,
+              "recall": 1.0,
+              "tp": 22,
+              "fp": 138,
+              "tn": 0,
+              "fn": 0
+            }
+          },
+          "eval_summary": {
+            "rows": 200,
+            "support_recall": 0.8925,
+            "support_complete": 0.74,
+            "duplicate_title_rate": 0.005,
+            "unique_title_rate": 0.999,
+            "selected_gold_count": 2.185,
+            "bridge_entity_recall": 0.9433,
+            "selection_overlap": 0.925,
+            "added_gold": 4,
+            "added_non_gold": 41,
+            "removed_gold": 5,
+            "removed_non_gold": 40,
+            "queries_with_edit": 45,
+            "stop_rate": 0.775,
+            "non_gold_per_gold": 10.25
+          },
+          "eval_classification": {
+            "threshold": -97.846123,
+            "auc": 0.726562,
+            "accuracy": 0.16,
+            "precision": 0.16,
+            "recall": 1.0,
+            "tp": 32,
+            "fp": 168,
+            "tn": 0,
+            "fn": 0
+          }
+        }
+      }
+    }
+  ],
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "selector_predictions_jsonl": "reports/dpathrag/kfold_proprag/selector_kfold_proprag_embed_local1000.predictions.jsonl",
+  "embedding_npz": "data/dpathrag/cache/selector_embedding_proprag_local1000_rp64.npz"
+}

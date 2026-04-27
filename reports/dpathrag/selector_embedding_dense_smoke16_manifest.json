@@ -1,0 +1,12 @@
+{
+  "cache_jsonl": "data/dpathrag/cache/2wiki_dense_pool100_smoke.jsonl",
+  "output_npz": "data/dpathrag/cache/selector_embedding_dense_smoke16.npz",
+  "rows": 16,
+  "unique_texts": 279,
+  "max_candidates": 20,
+  "embedding_model": "nvidia/NV-Embed-v2",
+  "embedding_base_url": "http://localhost:8019/v1/embeddings",
+  "embedding_dim": 4096,
+  "projection_dim": 16,
+  "semantic_feature_dim": 49
+}

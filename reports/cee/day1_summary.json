@@ -1,0 +1,152 @@
+{
+  "decision": "STOP_DECISION_SEPARABILITY_FAIL",
+  "reports": {
+    "asset_audit": {
+      "reader_model": "data/dpathrag/models/flan_t5_base_gold_k5_5k",
+      "reader_files": {
+        "config.json": true,
+        "tokenizer.json": true,
+        "spiece.model": true,
+        "model.safetensors": true
+      },
+      "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+      "pool_rows": 1000,
+      "dense_cache_jsonl": "data/dpathrag/cache/2wiki_dense_pool100_smoke.jsonl",
+      "dense_rows": 1000,
+      "reports_dir_created": true,
+      "cache_dir_created": true,
+      "torch": {
+        "import_ok": true,
+        "cuda_available": true,
+        "device_count": 8
+      },
+      "qwen": {
+        "available": false,
+        "error": "<urlopen error [Errno 111] Connection refused>"
+      },
+      "passed": true
+    },
+    "likelihood_sanity": {
+      "rows": 5,
+      "identity_delta_policy": "defined_exact_zero",
+      "batch_single_max_abs_diff": 0.0,
+      "cache_repeat_max_abs_diff": 0.0,
+      "token_rows": [
+        {
+          "qid": "83bf3b5a0bd911eba7f7acde48001122",
+          "source_tokens": 522,
+          "truncated_source_tokens": 522,
+          "target_tokens": 5
+        },
+        {
+          "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+          "source_tokens": 899,
+          "truncated_source_tokens": 899,
+          "target_tokens": 7
+        },
+        {
+          "qid": "2dc690ba0bdc11eba7f7acde48001122",
+          "source_tokens": 1100,
+          "truncated_source_tokens": 1024,
+          "target_tokens": 4
+        },
+        {
+          "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+          "source_tokens": 343,
+          "truncated_source_tokens": 343,
+          "target_tokens": 2
+        },
+        {
+          "qid": "a1cdb240085811ebbd5bac1f6bf848b6",
+          "source_tokens": 1297,
+          "truncated_source_tokens": 1024,
+          "target_tokens": 7
+        }
+      ],
+      "passed": true
+    },
+    "reader_semantic_capacity": {
+      "sample_size": 163,
+      "auc": 0.988332,
+      "ci_low": 0.978735,
+      "ci_high": 0.995408,
+      "mean_positive_loglik": -1.022002,
+      "mean_distractor_loglik": -8.665074,
+      "mean_gap": 7.643073,
+      "paired_win_rate": 1.0,
+      "passed": true
+    },
+    "decision_separability": {
+      "rows": 200,
+      "skipped_no_answer_clusters": 0,
+      "qwen": {
+        "available": false,
+        "error": "<urlopen error [Errno 111] Connection refused>"
+      },
+      "sampled_counts": {
+        "oracle_beneficial": 80,
+        "lexical_HN": 200,
+        "random_non_beneficial": 200
+      },
+      "oracle_answer_diagnostic": {
+        "beneficial_vs_lexical_hn": {
+          "auc": 0.713375,
+          "ci_low": 0.6355,
+          "ci_high": 0.785188
+        },
+        "beneficial_vs_random_non_beneficial": {
+          "auc": 0.76725,
+          "ci_low": 0.70175,
+          "ci_high": 0.83125
+        },
+        "pr_auc_beneficial_vs_lexical_hn": 0.663781,
+        "mean_delta_beneficial": 2.954419,
+        "mean_delta_lexical_hn": 0.133903,
+        "mean_delta_random_non_beneficial": -0.591263
+      },
+      "non_oracle_auc_diagnostic": {
+        "beneficial_vs_lexical_hn": {
+          "auc": 0.536875,
+          "ci_low": 0.449813,
+          "ci_high": 0.62225
+        },
+        "beneficial_vs_random_non_beneficial": {
+          "auc": 0.490875,
+          "ci_low": 0.409562,
+          "ci_high": 0.577438
+        },
+        "pr_auc_beneficial_vs_lexical_hn": 0.359246,
+        "mean_delta_beneficial": -0.412859,
+        "mean_delta_lexical_hn": -0.553136,
+        "mean_delta_random_non_beneficial": 0.060331
+      },
+      "non_oracle_decision_diagnostic": {
+        "queries": 200,
+        "stop_rate": 0.965,
+        "top1_beneficial_rate_rank_incomplete": 0.0,
+        "rank_complete_false_edit_rate": 0.03681,
+        "added_gold": 0,
+        "added_non_gold": 7,
+        "non_gold_per_gold": 7.0,
+        "support_complete_before": 0.815,
+        "support_complete_after": 0.805,
+        "support_complete_gain": -0.01,
+        "support_recall_before": 0.9175,
+        "support_recall_after": 0.9125,
+        "support_recall_gain": -0.005
+      },
+      "checks": {
+        "auc_ge_0_70": false,
+        "auc_ci_low_ge_0_65": false,
+        "top1_beneficial_rate_ge_0_30": false,
+        "rank_complete_false_edit_rate_le_0_05": true,
+        "non_gold_per_gold_le_5": false,
+        "support_complete_gain_ge_1pp": false
+      },
+      "passed": false,
+      "reader_forwards": 21660,
+      "mean_reader_forwards_per_query": 108.3,
+      "elapsed_seconds": 419.287
+    }
+  }
+}

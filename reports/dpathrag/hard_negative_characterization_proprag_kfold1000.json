@@ -1,0 +1,429 @@
+{
+  "rows": 1000,
+  "top_k": 5,
+  "max_candidates": 100,
+  "query_counts": {
+    "selector_added_non_gold": 807,
+    "rank_retained_non_gold": 827,
+    "rank_removed_non_gold": 826,
+    "selector_added_gold": 76
+  },
+  "categories": {
+    "selector_added_non_gold": {
+      "count": 1205,
+      "features": {
+        "answer_in_doc": {
+          "mean": 0.040664,
+          "std": 0.19751
+        },
+        "body_question_jaccard": {
+          "mean": 0.057212,
+          "std": 0.039749
+        },
+        "bridge_entity_in_doc": {
+          "mean": 0.048133,
+          "std": 0.214047
+        },
+        "doc_chars": {
+          "mean": 748.897925,
+          "std": 733.312404
+        },
+        "log_doc_chars": {
+          "mean": 6.148089,
+          "std": 1.018787
+        },
+        "q_doc_cosine": {
+          "mean": 0.189457,
+          "std": 0.159319
+        },
+        "question_token_coverage": {
+          "mean": 0.319034,
+          "std": 0.163848
+        },
+        "rank": {
+          "mean": 18.008299,
+          "std": 17.711658
+        },
+        "retriever_score": {
+          "mean": 0.002517,
+          "std": 0.000905
+        },
+        "title_question_jaccard": {
+          "mean": 0.037277,
+          "std": 0.070027
+        }
+      }
+    },
+    "rank_retained_non_gold": {
+      "count": 1529,
+      "features": {
+        "answer_in_doc": {
+          "mean": 0.083715,
+          "std": 0.27696
+        },
+        "body_question_jaccard": {
+          "mean": 0.072349,
+          "std": 0.049873
+        },
+        "bridge_entity_in_doc": {
+          "mean": 0.126226,
+          "std": 0.332104
+        },
+        "doc_chars": {
+          "mean": 626.451275,
+          "std": 614.307976
+        },
+        "log_doc_chars": {
+          "mean": 6.047128,
+          "std": 0.899739
+        },
+        "q_doc_cosine": {
+          "mean": 0.262917,
+          "std": 0.173033
+        },
+        "question_token_coverage": {
+          "mean": 0.36276,
+          "std": 0.169274
+        },
+        "rank": {
+          "mean": 3.34794,
+          "std": 1.127252
+        },
+        "retriever_score": {
+          "mean": 0.005728,
+          "std": 0.003574
+        },
+        "title_question_jaccard": {
+          "mean": 0.068476,
+          "std": 0.097209
+        }
+      }
+    },
+    "rank_removed_non_gold": {
+      "count": 1244,
+      "features": {
+        "answer_in_doc": {
+          "mean": 0.036174,
+          "std": 0.186722
+        },
+        "body_question_jaccard": {
+          "mean": 0.08023,
+          "std": 0.059689
+        },
+        "bridge_entity_in_doc": {
+          "mean": 0.090836,
+          "std": 0.287376
+        },
+        "doc_chars": {
+          "mean": 320.901125,
+          "std": 404.22759
+        },
+        "log_doc_chars": {
+          "mean": 5.204641,
+          "std": 1.06551
+        },
+        "q_doc_cosine": {
+          "mean": 0.212778,
+          "std": 0.160146
+        },
+        "question_token_coverage": {
+          "mean": 0.258622,
+          "std": 0.169341
+        },
+        "rank": {
+          "mean": 4.334405,
+          "std": 0.782078
+        },
+        "retriever_score": {
+          "mean": 0.003731,
+          "std": 0.00115
+        },
+        "title_question_jaccard": {
+          "mean": 0.068284,
+          "std": 0.08766
+        }
+      }
+    },
+    "selector_added_gold": {
+      "count": 76,
+      "features": {
+        "answer_in_doc": {
+          "mean": 0.526316,
+          "std": 0.499307
+        },
+        "body_question_jaccard": {
+          "mean": 0.066231,
+          "std": 0.04878
+        },
+        "bridge_entity_in_doc": {
+          "mean": 0.763158,
+          "std": 0.425145
+        },
+        "doc_chars": {
+          "mean": 759.25,
+          "std": 648.839675
+        },
+        "log_doc_chars": {
+          "mean": 6.23739,
+          "std": 0.93072
+        },
+        "q_doc_cosine": {
+          "mean": 0.263529,
+          "std": 0.171971
+        },
+        "question_token_coverage": {
+          "mean": 0.35405,
+          "std": 0.14636
+        },
+        "rank": {
+          "mean": 9.684211,
+          "std": 6.122028
+        },
+        "retriever_score": {
+          "mean": 0.003169,
+          "std": 0.000805
+        },
+        "title_question_jaccard": {
+          "mean": 0.090841,
+          "std": 0.109265
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "selector_added_non_gold_minus_rank_retained_non_gold": {
+      "answer_in_doc": -0.043051,
+      "body_question_jaccard": -0.015137,
+      "bridge_entity_in_doc": -0.078093,
+      "doc_chars": 122.44665,
+      "log_doc_chars": 0.100961,
+      "q_doc_cosine": -0.07346,
+      "question_token_coverage": -0.043726,
+      "rank": 14.660359,
+      "retriever_score": -0.003211,
+      "title_question_jaccard": -0.031199
+    },
+    "selector_added_non_gold_minus_rank_removed_non_gold": {
+      "answer_in_doc": 0.00449,
+      "body_question_jaccard": -0.023018,
+      "bridge_entity_in_doc": -0.042703,
+      "doc_chars": 427.9968,
+      "log_doc_chars": 0.943448,
+      "q_doc_cosine": -0.023321,
+      "question_token_coverage": 0.060412,
+      "rank": 13.673894,
+      "retriever_score": -0.001214,
+      "title_question_jaccard": -0.031007
+    },
+    "selector_added_gold_minus_selector_added_non_gold": {
+      "answer_in_doc": 0.485652,
+      "body_question_jaccard": 0.009019,
+      "bridge_entity_in_doc": 0.715025,
+      "doc_chars": 10.352075,
+      "log_doc_chars": 0.089301,
+      "q_doc_cosine": 0.074072,
+      "question_token_coverage": 0.035016,
+      "rank": -8.324088,
+      "retriever_score": 0.000652,
+      "title_question_jaccard": 0.053564
+    }
+  },
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "predictions_jsonl": "reports/dpathrag/kfold_proprag/selector_kfold_proprag_embed_local1000.predictions.jsonl",
+  "embedding_npz": "data/dpathrag/cache/selector_embedding_proprag_local1000_rp64.npz",
+  "embedding_feature_names": [
+    "doc_embed_rp_0",
+    "doc_embed_rp_1",
+    "doc_embed_rp_2",
+    "doc_embed_rp_3",
+    "doc_embed_rp_4",
+    "doc_embed_rp_5",
+    "doc_embed_rp_6",
+    "doc_embed_rp_7",
+    "doc_embed_rp_8",
+    "doc_embed_rp_9",
+    "doc_embed_rp_10",
+    "doc_embed_rp_11",
+    "doc_embed_rp_12",
+    "doc_embed_rp_13",
+    "doc_embed_rp_14",
+    "doc_embed_rp_15",
+    "doc_embed_rp_16",
+    "doc_embed_rp_17",
+    "doc_embed_rp_18",
+    "doc_embed_rp_19",
+    "doc_embed_rp_20",
+    "doc_embed_rp_21",
+    "doc_embed_rp_22",
+    "doc_embed_rp_23",
+    "doc_embed_rp_24",
+    "doc_embed_rp_25",
+    "doc_embed_rp_26",
+    "doc_embed_rp_27",
+    "doc_embed_rp_28",
+    "doc_embed_rp_29",
+    "doc_embed_rp_30",
+    "doc_embed_rp_31",
+    "doc_embed_rp_32",
+    "doc_embed_rp_33",
+    "doc_embed_rp_34",
+    "doc_embed_rp_35",
+    "doc_embed_rp_36",
+    "doc_embed_rp_37",
+    "doc_embed_rp_38",
+    "doc_embed_rp_39",
+    "doc_embed_rp_40",
+    "doc_embed_rp_41",
+    "doc_embed_rp_42",
+    "doc_embed_rp_43",
+    "doc_embed_rp_44",
+    "doc_embed_rp_45",
+    "doc_embed_rp_46",
+    "doc_embed_rp_47",
+    "doc_embed_rp_48",
+    "doc_embed_rp_49",
+    "doc_embed_rp_50",
+    "doc_embed_rp_51",
+    "doc_embed_rp_52",
+    "doc_embed_rp_53",
+    "doc_embed_rp_54",
+    "doc_embed_rp_55",
+    "doc_embed_rp_56",
+    "doc_embed_rp_57",
+    "doc_embed_rp_58",
+    "doc_embed_rp_59",
+    "doc_embed_rp_60",
+    "doc_embed_rp_61",
+    "doc_embed_rp_62",
+    "doc_embed_rp_63",
+    "abs_q_doc_rp_0",
+    "abs_q_doc_rp_1",
+    "abs_q_doc_rp_2",
+    "abs_q_doc_rp_3",
+    "abs_q_doc_rp_4",
+    "abs_q_doc_rp_5",
+    "abs_q_doc_rp_6",
+    "abs_q_doc_rp_7",
+    "abs_q_doc_rp_8",
+    "abs_q_doc_rp_9",
+    "abs_q_doc_rp_10",
+    "abs_q_doc_rp_11",
+    "abs_q_doc_rp_12",
+    "abs_q_doc_rp_13",
+    "abs_q_doc_rp_14",
+    "abs_q_doc_rp_15",
+    "abs_q_doc_rp_16",
+    "abs_q_doc_rp_17",
+    "abs_q_doc_rp_18",
+    "abs_q_doc_rp_19",
+    "abs_q_doc_rp_20",
+    "abs_q_doc_rp_21",
+    "abs_q_doc_rp_22",
+    "abs_q_doc_rp_23",
+    "abs_q_doc_rp_24",
+    "abs_q_doc_rp_25",
+    "abs_q_doc_rp_26",
+    "abs_q_doc_rp_27",
+    "abs_q_doc_rp_28",
+    "abs_q_doc_rp_29",
+    "abs_q_doc_rp_30",
+    "abs_q_doc_rp_31",
+    "abs_q_doc_rp_32",
+    "abs_q_doc_rp_33",
+    "abs_q_doc_rp_34",
+    "abs_q_doc_rp_35",
+    "abs_q_doc_rp_36",
+    "abs_q_doc_rp_37",
+    "abs_q_doc_rp_38",
+    "abs_q_doc_rp_39",
+    "abs_q_doc_rp_40",
+    "abs_q_doc_rp_41",
+    "abs_q_doc_rp_42",
+    "abs_q_doc_rp_43",
+    "abs_q_doc_rp_44",
+    "abs_q_doc_rp_45",
+    "abs_q_doc_rp_46",
+    "abs_q_doc_rp_47",
+    "abs_q_doc_rp_48",
+    "abs_q_doc_rp_49",
+    "abs_q_doc_rp_50",
+    "abs_q_doc_rp_51",
+    "abs_q_doc_rp_52",
+    "abs_q_doc_rp_53",
+    "abs_q_doc_rp_54",
+    "abs_q_doc_rp_55",
+    "abs_q_doc_rp_56",
+    "abs_q_doc_rp_57",
+    "abs_q_doc_rp_58",
+    "abs_q_doc_rp_59",
+    "abs_q_doc_rp_60",
+    "abs_q_doc_rp_61",
+    "abs_q_doc_rp_62",
+    "abs_q_doc_rp_63",
+    "prod_q_doc_rp_0",
+    "prod_q_doc_rp_1",
+    "prod_q_doc_rp_2",
+    "prod_q_doc_rp_3",
+    "prod_q_doc_rp_4",
+    "prod_q_doc_rp_5",
+    "prod_q_doc_rp_6",
+    "prod_q_doc_rp_7",
+    "prod_q_doc_rp_8",
+    "prod_q_doc_rp_9",
+    "prod_q_doc_rp_10",
+    "prod_q_doc_rp_11",
+    "prod_q_doc_rp_12",
+    "prod_q_doc_rp_13",
+    "prod_q_doc_rp_14",
+    "prod_q_doc_rp_15",
+    "prod_q_doc_rp_16",
+    "prod_q_doc_rp_17",
+    "prod_q_doc_rp_18",
+    "prod_q_doc_rp_19",
+    "prod_q_doc_rp_20",
+    "prod_q_doc_rp_21",
+    "prod_q_doc_rp_22",
+    "prod_q_doc_rp_23",
+    "prod_q_doc_rp_24",
+    "prod_q_doc_rp_25",
+    "prod_q_doc_rp_26",
+    "prod_q_doc_rp_27",
+    "prod_q_doc_rp_28",
+    "prod_q_doc_rp_29",
+    "prod_q_doc_rp_30",
+    "prod_q_doc_rp_31",
+    "prod_q_doc_rp_32",
+    "prod_q_doc_rp_33",
+    "prod_q_doc_rp_34",
+    "prod_q_doc_rp_35",
+    "prod_q_doc_rp_36",
+    "prod_q_doc_rp_37",
+    "prod_q_doc_rp_38",
+    "prod_q_doc_rp_39",
+    "prod_q_doc_rp_40",
+    "prod_q_doc_rp_41",
+    "prod_q_doc_rp_42",
+    "prod_q_doc_rp_43",
+    "prod_q_doc_rp_44",
+    "prod_q_doc_rp_45",
+    "prod_q_doc_rp_46",
+    "prod_q_doc_rp_47",
+    "prod_q_doc_rp_48",
+    "prod_q_doc_rp_49",
+    "prod_q_doc_rp_50",
+    "prod_q_doc_rp_51",
+    "prod_q_doc_rp_52",
+    "prod_q_doc_rp_53",
+    "prod_q_doc_rp_54",
+    "prod_q_doc_rp_55",
+    "prod_q_doc_rp_56",
+    "prod_q_doc_rp_57",
+    "prod_q_doc_rp_58",
+    "prod_q_doc_rp_59",
+    "prod_q_doc_rp_60",
+    "prod_q_doc_rp_61",
+    "prod_q_doc_rp_62",
+    "prod_q_doc_rp_63",
+    "q_doc_cosine_rp"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "rows": 5,
+  "identity_delta_policy": "defined_exact_zero",
+  "batch_single_max_abs_diff": 0.0,
+  "cache_repeat_max_abs_diff": 0.0,
+  "token_rows": [
+    {
+      "qid": "83bf3b5a0bd911eba7f7acde48001122",
+      "source_tokens": 522,
+      "truncated_source_tokens": 522,
+      "target_tokens": 5
+    },
+    {
+      "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "source_tokens": 899,
+      "truncated_source_tokens": 899,
+      "target_tokens": 7
+    },
+    {
+      "qid": "2dc690ba0bdc11eba7f7acde48001122",
+      "source_tokens": 1100,
+      "truncated_source_tokens": 1024,
+      "target_tokens": 4
+    },
+    {
+      "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+      "source_tokens": 343,
+      "truncated_source_tokens": 343,
+      "target_tokens": 2
+    },
+    {
+      "qid": "a1cdb240085811ebbd5bac1f6bf848b6",
+      "source_tokens": 1297,
+      "truncated_source_tokens": 1024,
+      "target_tokens": 7
+    }
+  ],
+  "passed": true
+}

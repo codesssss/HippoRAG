@@ -1,0 +1,369 @@
+{
+  "summary": {
+    "sample_queries": 5,
+    "avg_doc_id_overlap_top20": 9.4,
+    "avg_title_overlap_top20": 9.4,
+    "prop_top1_rrf_rank_values": [
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    "all_checks_pass": true,
+    "failure_count": 0,
+    "failures": []
+  },
+  "samples": [
+    {
+      "qid": "83bf3b5a0bd911eba7f7acde48001122",
+      "question": "When did Lothair Ii's mother die?",
+      "prop_doc_id_count": 20,
+      "dense_doc_id_count": 20,
+      "doc_id_overlap_top20": 14,
+      "title_overlap_top20": 14,
+      "prop_doc_id_sample": [
+        "0",
+        "1234",
+        "2",
+        "280",
+        "281"
+      ],
+      "dense_doc_id_sample": [
+        "0",
+        "2",
+        "2196",
+        "3342",
+        "3399"
+      ],
+      "prop_title_sample": [
+        "Lothair II",
+        "Teutberga",
+        "Bertha, daughter of Lothair II",
+        "Ermengarde of Tours",
+        "Waldrada of Lotharingia"
+      ],
+      "dense_title_sample": [
+        "Lothair II",
+        "Teutberga",
+        "Waldrada of Lotharingia",
+        "Bertha, daughter of Lothair II",
+        "ʻElisiva Fusipala Taukiʻonetuku"
+      ],
+      "union_size": 26,
+      "cross_pool_docs": 14,
+      "prop_top1_title": "Lothair II",
+      "prop_top1_manual_rrf_rank": 1,
+      "manual_rrf_top5_titles": [
+        "Lothair II",
+        "Teutberga",
+        "Bertha, daughter of Lothair II",
+        "Waldrada of Lotharingia",
+        "Ermengarde of Tours"
+      ],
+      "impl_rrf_top5_titles": [
+        "Lothair II",
+        "Teutberga",
+        "Bertha, daughter of Lothair II",
+        "Waldrada of Lotharingia",
+        "Ermengarde of Tours"
+      ],
+      "rrf_top5_match_manual": true,
+      "prop_rank_top5_titles_from_union": [
+        "Lothair II",
+        "Teutberga",
+        "Bertha, daughter of Lothair II",
+        "Waldrada of Lotharingia",
+        "Ermengarde of Tours"
+      ],
+      "manual_support_complete_proprag": 1.0,
+      "reported_support_complete_proprag": 1.0,
+      "shared_doc_title": "Lothair II",
+      "shared_doc_pool_sources": [
+        "proprag",
+        "dense"
+      ],
+      "shared_doc_cross_pool_count_in_graph": 2
+    },
+    {
+      "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+      "prop_doc_id_count": 20,
+      "dense_doc_id_count": 20,
+      "doc_id_overlap_top20": 8,
+      "title_overlap_top20": 8,
+      "prop_doc_id_sample": [
+        "1067",
+        "1321",
+        "1454",
+        "17",
+        "19"
+      ],
+      "dense_doc_id_sample": [
+        "1260",
+        "1321",
+        "1454",
+        "1455",
+        "17"
+      ],
+      "prop_title_sample": [
+        "Aas Ka Panchhi",
+        "Phoolwari",
+        "John Jaffer Janardhanan",
+        "Kishore Sahu",
+        "Aansoo Ban Gaye Phool"
+      ],
+      "dense_title_sample": [
+        "Aas Ka Panchhi",
+        "Phoolwari",
+        "Aansoo Ban Gaye Phool",
+        "Pyar Ka Bandhan",
+        "Kyōen Kobanzame"
+      ],
+      "union_size": 32,
+      "cross_pool_docs": 8,
+      "prop_top1_title": "Aas Ka Panchhi",
+      "prop_top1_manual_rrf_rank": 1,
+      "manual_rrf_top5_titles": [
+        "Aas Ka Panchhi",
+        "Phoolwari",
+        "Aansoo Ban Gaye Phool",
+        "Kishore Sahu",
+        "The Warriors"
+      ],
+      "impl_rrf_top5_titles": [
+        "Aas Ka Panchhi",
+        "Phoolwari",
+        "Aansoo Ban Gaye Phool",
+        "Kishore Sahu",
+        "The Warriors"
+      ],
+      "rrf_top5_match_manual": true,
+      "prop_rank_top5_titles_from_union": [
+        "Aas Ka Panchhi",
+        "Phoolwari",
+        "Aansoo Ban Gaye Phool",
+        "John Jaffer Janardhanan",
+        "Kishore Sahu"
+      ],
+      "manual_support_complete_proprag": 1.0,
+      "reported_support_complete_proprag": 1.0,
+      "shared_doc_title": "Aas Ka Panchhi",
+      "shared_doc_pool_sources": [
+        "proprag",
+        "dense"
+      ],
+      "shared_doc_cross_pool_count_in_graph": 2
+    },
+    {
+      "qid": "2dc690ba0bdc11eba7f7acde48001122",
+      "question": "What is the place of birth of the performer of song Changed It?",
+      "prop_doc_id_count": 20,
+      "dense_doc_id_count": 20,
+      "doc_id_overlap_top20": 9,
+      "title_overlap_top20": 9,
+      "prop_doc_id_sample": [
+        "1421",
+        "180",
+        "22",
+        "2281",
+        "2595"
+      ],
+      "dense_doc_id_sample": [
+        "1345",
+        "1421",
+        "180",
+        "2151",
+        "22"
+      ],
+      "prop_title_sample": [
+        "Changed It",
+        "Carly Rae Jepsen",
+        "Did It On'em",
+        "Andrew Allen (singer)",
+        "Dip (song)"
+      ],
+      "dense_title_sample": [
+        "Changed It",
+        "You Changed Me",
+        "Charles Arthur Tabberer",
+        "Zhang Ye (singer)",
+        "Place of birth"
+      ],
+      "union_size": 31,
+      "cross_pool_docs": 9,
+      "prop_top1_title": "Changed It",
+      "prop_top1_manual_rrf_rank": 1,
+      "manual_rrf_top5_titles": [
+        "Changed It",
+        "You Changed Me",
+        "Andrew Allen (singer)",
+        "Place of birth",
+        "Carly Rae Jepsen"
+      ],
+      "impl_rrf_top5_titles": [
+        "Changed It",
+        "You Changed Me",
+        "Andrew Allen (singer)",
+        "Place of birth",
+        "Carly Rae Jepsen"
+      ],
+      "rrf_top5_match_manual": true,
+      "prop_rank_top5_titles_from_union": [
+        "Changed It",
+        "Carly Rae Jepsen",
+        "You Changed Me",
+        "Did It On'em",
+        "Andrew Allen (singer)"
+      ],
+      "manual_support_complete_proprag": 0.0,
+      "reported_support_complete_proprag": 0.0,
+      "shared_doc_title": "Changed It",
+      "shared_doc_pool_sources": [
+        "proprag",
+        "dense"
+      ],
+      "shared_doc_cross_pool_count_in_graph": 2
+    },
+    {
+      "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+      "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+      "prop_doc_id_count": 20,
+      "dense_doc_id_count": 20,
+      "doc_id_overlap_top20": 9,
+      "title_overlap_top20": 9,
+      "prop_doc_id_sample": [
+        "1427",
+        "2312",
+        "2314",
+        "2315",
+        "2316"
+      ],
+      "dense_doc_id_sample": [
+        "1426",
+        "1427",
+        "2094",
+        "2313",
+        "2316"
+      ],
+      "prop_title_sample": [
+        "Nasamkhrali",
+        "Marufabad",
+        "Ampelakia, Evros",
+        "Radisele",
+        "Where Was I"
+      ],
+      "dense_title_sample": [
+        "Marufabad",
+        "Nasamkhrali",
+        "Abdul-Vahed Niyazov",
+        "Qaleh-ye Bakhtiar",
+        "Cheshmeh Ali"
+      ],
+      "union_size": 31,
+      "cross_pool_docs": 9,
+      "prop_top1_title": "Nasamkhrali",
+      "prop_top1_manual_rrf_rank": 2,
+      "manual_rrf_top5_titles": [
+        "Marufabad",
+        "Nasamkhrali",
+        "Where Was I",
+        "Qaleh-ye Bakhtiar",
+        "Qaleh-ye Zaras"
+      ],
+      "impl_rrf_top5_titles": [
+        "Marufabad",
+        "Nasamkhrali",
+        "Where Was I",
+        "Qaleh-ye Bakhtiar",
+        "Qaleh-ye Zaras"
+      ],
+      "rrf_top5_match_manual": true,
+      "prop_rank_top5_titles_from_union": [
+        "Marufabad",
+        "Nasamkhrali",
+        "Ampelakia, Evros",
+        "Qaleh-ye Bakhtiar",
+        "Radisele"
+      ],
+      "manual_support_complete_proprag": 1.0,
+      "reported_support_complete_proprag": 1.0,
+      "shared_doc_title": "Marufabad",
+      "shared_doc_pool_sources": [
+        "proprag",
+        "dense"
+      ],
+      "shared_doc_cross_pool_count_in_graph": 2
+    },
+    {
+      "qid": "a1cdb240085811ebbd5bac1f6bf848b6",
+      "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+      "prop_doc_id_count": 20,
+      "dense_doc_id_count": 20,
+      "doc_id_overlap_top20": 7,
+      "title_overlap_top20": 7,
+      "prop_doc_id_sample": [
+        "1045",
+        "1269",
+        "1579",
+        "1776",
+        "2306"
+      ],
+      "dense_doc_id_sample": [
+        "165",
+        "1911",
+        "2306",
+        "3238",
+        "3277"
+      ],
+      "prop_title_sample": [
+        "Aldri annet enn bråk",
+        "Edith Carlmar",
+        "God's Gift to Women",
+        "Altid ballade",
+        "Michael Curtiz"
+      ],
+      "dense_title_sample": [
+        "Aldri annet enn bråk",
+        "God's Gift to Women",
+        "Edith Carlmar",
+        "Arne Toonen",
+        "Alberto Lattuada"
+      ],
+      "union_size": 33,
+      "cross_pool_docs": 7,
+      "prop_top1_title": "Aldri annet enn bråk",
+      "prop_top1_manual_rrf_rank": 1,
+      "manual_rrf_top5_titles": [
+        "Aldri annet enn bråk",
+        "Edith Carlmar",
+        "God's Gift to Women",
+        "Ingmar Bergman",
+        "Bjarne Henning-Jensen"
+      ],
+      "impl_rrf_top5_titles": [
+        "Aldri annet enn bråk",
+        "Edith Carlmar",
+        "God's Gift to Women",
+        "Ingmar Bergman",
+        "Bjarne Henning-Jensen"
+      ],
+      "rrf_top5_match_manual": true,
+      "prop_rank_top5_titles_from_union": [
+        "Aldri annet enn bråk",
+        "Edith Carlmar",
+        "God's Gift to Women",
+        "Altid ballade",
+        "Michael Curtiz"
+      ],
+      "manual_support_complete_proprag": 1.0,
+      "reported_support_complete_proprag": 1.0,
+      "shared_doc_title": "Aldri annet enn bråk",
+      "shared_doc_pool_sources": [
+        "proprag",
+        "dense"
+      ],
+      "shared_doc_cross_pool_count_in_graph": 2
+    }
+  ]
+}

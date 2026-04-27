@@ -1,0 +1,554 @@
+{
+  "status": "completed",
+  "n": 1000,
+  "overall": {
+    "supporting_paragraph_recall": 0.2267500000000002,
+    "avg_belief_entropy": 2.471900567838928,
+    "avg_duplicate_title_rate": 0.26539999999999886
+  },
+  "support_coverage_bins": {
+    "full_support_covered": {
+      "count": 54.0,
+      "fraction": 0.054,
+      "avg_entropy": 2.7556957448640023,
+      "avg_recall": 1.0
+    },
+    "partial_support_covered": {
+      "count": 400.0,
+      "fraction": 0.4,
+      "avg_entropy": 2.500872423526295,
+      "avg_recall": 0.43187500000000023
+    },
+    "no_support_covered": {
+      "count": 546.0,
+      "fraction": 0.546,
+      "avg_entropy": 2.4226081102669488,
+      "avg_recall": 0.0
+    }
+  },
+  "failure_samples": [
+    {
+      "category": "no_support_covered",
+      "qid": "2hop__766973_770570",
+      "question": "What county is Erik Hort's birthplace a part of?",
+      "selected_titles": [
+        "Eritrea",
+        "Italian Eritrea",
+        "Sant Martí d'Empúries",
+        "Sant Martí d'Empúries",
+        "Långe Erik"
+      ],
+      "gold_titles": [
+        "Montebello, New York",
+        "Erik Hort"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": 2.7292872611860304,
+      "last_step_top_props": [
+        [
+          "17::Eritrea::p2",
+          0.11808118081180813
+        ],
+        [
+          "5::Italian Eritrea::p2",
+          0.11070110701107012
+        ],
+        [
+          "7::Sant Martí d'Empúries::p1",
+          0.09840098400984008
+        ]
+      ]
+    },
+    {
+      "category": "no_support_covered",
+      "qid": "2hop__170823_120171",
+      "question": "What year did the publisher of Labyrinth end?",
+      "selected_titles": [
+        "Blast Corps",
+        "Blast Corps",
+        "Blast Corps",
+        "Blast Corps",
+        "List of Little House on the Prairie books"
+      ],
+      "gold_titles": [
+        "Acornsoft",
+        "Labyrinth (1984 video game)"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": 4.204692619390968,
+      "last_step_top_props": [
+        [
+          "0::Blast Corps::p1",
+          0.014925373134328358
+        ],
+        [
+          "0::Blast Corps::p2",
+          0.014925373134328358
+        ],
+        [
+          "0::Blast Corps::p3",
+          0.014925373134328358
+        ]
+      ]
+    },
+    {
+      "category": "no_support_covered",
+      "qid": "2hop__511454_120259",
+      "question": "When was Lady Godiva's birthplace abolished?",
+      "selected_titles": [
+        "Mary, mother of Jesus",
+        "1909 World Figure Skating Championships",
+        "Our Lady of Guadaloupe Church",
+        "Capital punishment in the United Kingdom",
+        "Capital punishment in the United Kingdom"
+      ],
+      "gold_titles": [
+        "Mercia",
+        "Spalding Priory"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": 2.2480845061618098,
+      "last_step_top_props": [
+        [
+          "7::Mary, mother of Jesus::p2",
+          0.18181818181818182
+        ],
+        [
+          "16::1909 World Figure Skating Championships::p3",
+          0.1818181818181818
+        ],
+        [
+          "6::Our Lady of Guadaloupe Church::p3",
+          0.13636363636363635
+        ]
+      ]
+    },
+    {
+      "category": "no_support_covered",
+      "qid": "4hop2__71753_648517_70784_79935",
+      "question": "When was the region immediately north of the region where Israel is located and the location of the Battle of Qurah and Umm al Maradim created?",
+      "selected_titles": [
+        "Umm Ubays",
+        "Wollaston Peninsula",
+        "Wollaston Peninsula",
+        "Wollaston Peninsula",
+        "Wollaston Peninsula"
+      ],
+      "gold_titles": [
+        "History of Saudi Arabia",
+        "Israel",
+        "Battle of Qurah and Umm al Maradim",
+        "Geography of Saudi Arabia"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": -0.0,
+      "last_step_top_props": [
+        [
+          "1::Umm Ubays::p2",
+          1.0
+        ],
+        [
+          "0::Wollaston Peninsula::p1",
+          0.0
+        ],
+        [
+          "0::Wollaston Peninsula::p2",
+          0.0
+        ]
+      ]
+    },
+    {
+      "category": "no_support_covered",
+      "qid": "4hop1__94201_642284_131926_89261",
+      "question": "Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+      "selected_titles": [
+        "Seama, New Mexico",
+        "Paguate, New Mexico",
+        "Belview, Virginia",
+        "One Tree Hill (season 3)",
+        "One Tree Hill (season 3)"
+      ],
+      "gold_titles": [
+        "Riverside Plaza",
+        "Mississippi River",
+        "Minneapolis",
+        "Southeast Library"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": 1.8866967846580787,
+      "last_step_top_props": [
+        [
+          "13::Seama, New Mexico::p2",
+          0.2
+        ],
+        [
+          "15::Paguate, New Mexico::p2",
+          0.2
+        ],
+        [
+          "16::Belview, Virginia::p2",
+          0.2
+        ]
+      ]
+    },
+    {
+      "category": "no_support_covered",
+      "qid": "4hop1__152562_5274_458768_33633",
+      "question": "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+      "selected_titles": [
+        "Metropolis International",
+        "Terry Nelson (musician)",
+        "Terry Nelson (musician)",
+        "Terry Nelson (musician)",
+        "Terry Nelson (musician)"
+      ],
+      "gold_titles": [
+        "Sony Music",
+        "Vilaiyaadu Mankatha",
+        "The Right Stuff Records",
+        "Santa Monica, California"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": -0.0,
+      "last_step_top_props": [
+        [
+          "16::Metropolis International::p3",
+          1.0
+        ],
+        [
+          "0::Terry Nelson (musician)::p1",
+          0.0
+        ],
+        [
+          "0::Terry Nelson (musician)::p2",
+          0.0
+        ]
+      ]
+    },
+    {
+      "category": "no_support_covered",
+      "qid": "3hop1__305282_282081_73772",
+      "question": "When was the start of the battle of the birthplace of the performer of III?",
+      "selected_titles": [
+        "Giovanni Cifolelli",
+        "Battle of Abbeville",
+        "Battle of Preveza",
+        "Battle of Preveza",
+        "Fundamental Rights, Directive Principles and Fundamental Duties of India"
+      ],
+      "gold_titles": [
+        "III (Stanton Moore album)",
+        "Flyin' the Koop",
+        "Battle of New Orleans"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": 2.023282440667481,
+      "last_step_top_props": [
+        [
+          "6::Giovanni Cifolelli::p3",
+          0.3202846975088968
+        ],
+        [
+          "3::Battle of Abbeville::p1",
+          0.14234875444839856
+        ],
+        [
+          "13::Battle of Preveza::p1",
+          0.1281138790035587
+        ]
+      ]
+    },
+    {
+      "category": "no_support_covered",
+      "qid": "2hop__619265_45326",
+      "question": "How many episodes are in season 5 of the series with The Bag or the Bat?",
+      "selected_titles": [
+        "Cartoon Wars Part I",
+        "Glee (season 5)",
+        "Glee (season 5)",
+        "List of The Mindy Project episodes",
+        "List of The Mindy Project episodes"
+      ],
+      "gold_titles": [
+        "The Bag or the Bat",
+        "List of Ray Donovan episodes"
+      ],
+      "supporting_paragraph_recall": 0.0,
+      "belief_entropy": 3.046585562809183,
+      "last_step_top_props": [
+        [
+          "15::Cartoon Wars Part I::p1",
+          0.12778904665314406
+        ],
+        [
+          "14::Glee (season 5)::p1",
+          0.05679513184584179
+        ],
+        [
+          "14::Glee (season 5)::p4",
+          0.05679513184584179
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "3hop1__9285_5188_23307",
+      "question": "What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities commonwealth, the top-ranking Warsaw Pact operatives originated?",
+      "selected_titles": [
+        "Events leading to the attack on Pearl Harbor",
+        "Warsaw Pact",
+        "Warsaw Pact",
+        "Warsaw Pact",
+        "Warsaw Pact"
+      ],
+      "gold_titles": [
+        "Szlachta",
+        "Molotov–Ribbentrop Pact",
+        "Warsaw Pact"
+      ],
+      "supporting_paragraph_recall": 0.3333333333333333,
+      "belief_entropy": 3.8200549257445573,
+      "last_step_top_props": [
+        [
+          "13::Events leading to the attack on Pearl Harbor::p4",
+          0.049507300112721316
+        ],
+        [
+          "12::Warsaw Pact::p1",
+          0.038585936613606216
+        ],
+        [
+          "12::Warsaw Pact::p2",
+          0.038585936613606216
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "2hop__655505_110949",
+      "question": "What is the Till dom ensamma performer's birth date?",
+      "selected_titles": [
+        "Metsweding District Municipality",
+        "Dominic Toretto",
+        "List of The Blacklist characters",
+        "Till dom ensamma",
+        "Till dom ensamma"
+      ],
+      "gold_titles": [
+        "Till dom ensamma",
+        "Mauro Scocco"
+      ],
+      "supporting_paragraph_recall": 0.5,
+      "belief_entropy": 3.2163627648591824,
+      "last_step_top_props": [
+        [
+          "10::Metsweding District Municipality::p2",
+          0.08130081300813007
+        ],
+        [
+          "6::Dominic Toretto::p4",
+          0.06504065040650404
+        ],
+        [
+          "18::List of The Blacklist characters::p2",
+          0.06504065040650404
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "3hop1__820301_720914_41132",
+      "question": "How many times did plague occur in the place where Crucifixion's creator died?",
+      "selected_titles": [
+        "The Crucifixion of St Julia",
+        "The Crucifixion of St Julia",
+        "The Crucifixion of St Julia",
+        "Black Death",
+        "Black Death"
+      ],
+      "gold_titles": [
+        "Crucifixion (Titian)",
+        "Black Death",
+        "The Martyrdom of Saint Lawrence (Titian)"
+      ],
+      "supporting_paragraph_recall": 0.3333333333333333,
+      "belief_entropy": 4.234106504597258,
+      "last_step_top_props": [
+        [
+          "0::The Crucifixion of St Julia::p1",
+          0.014492753623188406
+        ],
+        [
+          "0::The Crucifixion of St Julia::p2",
+          0.014492753623188406
+        ],
+        [
+          "0::The Crucifixion of St Julia::p3",
+          0.014492753623188406
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "3hop1__849312_503371_21711",
+      "question": "When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?",
+      "selected_titles": [
+        "Palau Tiger Team",
+        "Martin of Aragon",
+        "Jardin botanique de Bordeaux",
+        "Jardin botanique de Bordeaux",
+        "Île de la Cité"
+      ],
+      "gold_titles": [
+        "Martin of Aragon",
+        "Perdiguera",
+        "Gothic architecture"
+      ],
+      "supporting_paragraph_recall": 0.3333333333333333,
+      "belief_entropy": 2.2209892129904056,
+      "last_step_top_props": [
+        [
+          "13::Palau Tiger Team::p1",
+          0.31788079470198666
+        ],
+        [
+          "3::Martin of Aragon::p1",
+          0.10596026490066222
+        ],
+        [
+          "18::Jardin botanique de Bordeaux::p1",
+          0.07947019867549666
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "2hop__731956_126089",
+      "question": "Who was in charge of the place where Castricum is located?",
+      "selected_titles": [
+        "Castricum",
+        "French Algeria",
+        "Cyprus Popular Bank",
+        "Cyprus Popular Bank",
+        "List of territorial entities where English is an official language"
+      ],
+      "gold_titles": [
+        "Castricum",
+        "North Holland"
+      ],
+      "supporting_paragraph_recall": 0.5,
+      "belief_entropy": 2.3303832627715946,
+      "last_step_top_props": [
+        [
+          "4::Castricum::p2",
+          0.14516129032258066
+        ],
+        [
+          "2::French Algeria::p1",
+          0.12903225806451613
+        ],
+        [
+          "0::Cyprus Popular Bank::p1",
+          0.10752688172043011
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "2hop__123545_47134",
+      "question": "Who is the mascot of the university related to Randy Conrads?",
+      "selected_titles": [
+        "Randy Conrads",
+        "Don Frye",
+        "Jason Hu",
+        "Leo Harris",
+        "Leo Harris"
+      ],
+      "gold_titles": [
+        "Randy Conrads",
+        "Benny Beaver"
+      ],
+      "supporting_paragraph_recall": 0.5,
+      "belief_entropy": 3.4937272742780734,
+      "last_step_top_props": [
+        [
+          "3::Randy Conrads::p4",
+          0.08836524300441828
+        ],
+        [
+          "15::Don Frye::p2",
+          0.055228276877761426
+        ],
+        [
+          "9::Jason Hu::p4",
+          0.04418262150220914
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "3hop1__108833_720914_41132",
+      "question": "How many times did the plague occur in the city where the painter of The Bacchanal of the Andrians died?",
+      "selected_titles": [
+        "Suicide",
+        "Black Death",
+        "Peter Strudel",
+        "Black Death",
+        "Black Death"
+      ],
+      "gold_titles": [
+        "The Bacchanal of the Andrians",
+        "Black Death",
+        "The Martyrdom of Saint Lawrence (Titian)"
+      ],
+      "supporting_paragraph_recall": 0.3333333333333333,
+      "belief_entropy": 2.048427472216545,
+      "last_step_top_props": [
+        [
+          "8::Suicide::p1",
+          0.2592592592592593
+        ],
+        [
+          "12::Black Death::p4",
+          0.18518518518518517
+        ],
+        [
+          "19::Peter Strudel::p4",
+          0.18518518518518517
+        ]
+      ]
+    },
+    {
+      "category": "partial_support_covered",
+      "qid": "2hop__347686_127399",
+      "question": "In what year was the group who performed Attics To Eden formed?",
+      "selected_titles": [
+        "Eagles (band)",
+        "(Ghost) Riders in the Sky: A Cowboy Legend",
+        "Eden Lake Township, Stearns County, Minnesota",
+        "(Ghost) Riders in the Sky: A Cowboy Legend",
+        "Attics to Eden"
+      ],
+      "gold_titles": [
+        "Attics to Eden",
+        "Madina Lake"
+      ],
+      "supporting_paragraph_recall": 0.5,
+      "belief_entropy": 2.8052247183900616,
+      "last_step_top_props": [
+        [
+          "0::Eagles (band)::p4",
+          0.1069042316258352
+        ],
+        [
+          "15::(Ghost) Riders in the Sky: A Cowboy Legend::p2",
+          0.089086859688196
+        ],
+        [
+          "1::Eden Lake Township, Stearns County, Minnesota::p2",
+          0.06681514476614699
+        ]
+      ]
+    }
+  ]
+}

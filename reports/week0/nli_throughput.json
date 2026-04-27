@@ -1,6 +1,4 @@
 {
-  "num_examples": 200.0,
-  "elapsed_seconds": 0.0012545157223939896,
-  "samples_per_second": 159424.06813231518,
-  "latency_per_1000_seconds": 0.006272578611969948
+  "status": "not_measured",
+  "error": "microsoft/deberta-v3-base-mnli is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'\nIf this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`"
 }

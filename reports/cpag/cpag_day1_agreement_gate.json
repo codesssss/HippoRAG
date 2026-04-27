@@ -1,0 +1,291 @@
+{
+  "config": {
+    "proprag_cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+    "dense_cache_jsonl": "data/dpathrag/cache/2wiki_dense_pool100_smoke.jsonl",
+    "openie_json": "outputs/2wikimultihopqa/openie_results_ner_qwen3-8b.json",
+    "dev_start": 0,
+    "dev_end": 200,
+    "pool_k": 20,
+    "pool_cap": 60,
+    "top_k": 5,
+    "max_props": 8
+  },
+  "summaries": {
+    "proprag_rank": {
+      "rows": 200,
+      "support_recall": 0.8888,
+      "support_complete": 0.705,
+      "selected_gold_count": 2.155,
+      "avg_pool_size": 31.15,
+      "avg_cross_pool_docs": 8.835,
+      "avg_agreed_entities": 60.045
+    },
+    "dense_rank": {
+      "rows": 200,
+      "support_recall": 0.7712,
+      "support_complete": 0.49,
+      "selected_gold_count": 1.84,
+      "avg_pool_size": 31.15,
+      "avg_cross_pool_docs": 8.835,
+      "avg_agreed_entities": 60.045
+    },
+    "rrf": {
+      "rows": 200,
+      "support_recall": 0.765,
+      "support_complete": 0.49,
+      "selected_gold_count": 1.82,
+      "avg_pool_size": 31.15,
+      "avg_cross_pool_docs": 8.835,
+      "avg_agreed_entities": 60.045
+    },
+    "cpag_pure": {
+      "rows": 200,
+      "support_recall": 0.5687,
+      "support_complete": 0.31,
+      "selected_gold_count": 1.305,
+      "avg_pool_size": 31.15,
+      "avg_cross_pool_docs": 8.835,
+      "avg_agreed_entities": 60.045
+    },
+    "cpag": {
+      "rows": 200,
+      "support_recall": 0.7412,
+      "support_complete": 0.47,
+      "selected_gold_count": 1.735,
+      "avg_pool_size": 31.15,
+      "avg_cross_pool_docs": 8.835,
+      "avg_agreed_entities": 60.045
+    }
+  },
+  "by_type": {
+    "proprag_rank": {
+      "bridge_comparison": {
+        "rows": 47,
+        "support_recall": 0.8032,
+        "support_complete": 0.2766,
+        "selected_gold_count": 3.2128,
+        "avg_pool_size": 31.1277,
+        "avg_cross_pool_docs": 8.8723,
+        "avg_agreed_entities": 71.0
+      },
+      "comparison": {
+        "rows": 51,
+        "support_recall": 1.0,
+        "support_complete": 1.0,
+        "selected_gold_count": 2.0,
+        "avg_pool_size": 31.7255,
+        "avg_cross_pool_docs": 8.2745,
+        "avg_agreed_entities": 49.7647
+      },
+      "compositional": {
+        "rows": 79,
+        "support_recall": 0.8797,
+        "support_complete": 0.7595,
+        "selected_gold_count": 1.7595,
+        "avg_pool_size": 31.0886,
+        "avg_cross_pool_docs": 8.8734,
+        "avg_agreed_entities": 56.6962
+      },
+      "inference": {
+        "rows": 23,
+        "support_recall": 0.8478,
+        "support_complete": 0.7391,
+        "selected_gold_count": 1.6957,
+        "avg_pool_size": 30.1304,
+        "avg_cross_pool_docs": 9.8696,
+        "avg_agreed_entities": 71.9565
+      }
+    },
+    "dense_rank": {
+      "bridge_comparison": {
+        "rows": 47,
+        "support_recall": 0.633,
+        "support_complete": 0.0426,
+        "selected_gold_count": 2.5319,
+        "avg_pool_size": 31.1277,
+        "avg_cross_pool_docs": 8.8723,
+        "avg_agreed_entities": 71.0
+      },
+      "comparison": {
+        "rows": 51,
+        "support_recall": 1.0,
+        "support_complete": 1.0,
+        "selected_gold_count": 2.0,
+        "avg_pool_size": 31.7255,
+        "avg_cross_pool_docs": 8.2745,
+        "avg_agreed_entities": 49.7647
+      },
+      "compositional": {
+        "rows": 79,
+        "support_recall": 0.7215,
+        "support_complete": 0.443,
+        "selected_gold_count": 1.443,
+        "avg_pool_size": 31.0886,
+        "avg_cross_pool_docs": 8.8734,
+        "avg_agreed_entities": 56.6962
+      },
+      "inference": {
+        "rows": 23,
+        "support_recall": 0.7174,
+        "support_complete": 0.4348,
+        "selected_gold_count": 1.4348,
+        "avg_pool_size": 30.1304,
+        "avg_cross_pool_docs": 9.8696,
+        "avg_agreed_entities": 71.9565
+      }
+    },
+    "rrf": {
+      "bridge_comparison": {
+        "rows": 47,
+        "support_recall": 0.617,
+        "support_complete": 0.0426,
+        "selected_gold_count": 2.4681,
+        "avg_pool_size": 31.1277,
+        "avg_cross_pool_docs": 8.8723,
+        "avg_agreed_entities": 71.0
+      },
+      "comparison": {
+        "rows": 51,
+        "support_recall": 1.0,
+        "support_complete": 1.0,
+        "selected_gold_count": 2.0,
+        "avg_pool_size": 31.7255,
+        "avg_cross_pool_docs": 8.2745,
+        "avg_agreed_entities": 49.7647
+      },
+      "compositional": {
+        "rows": 79,
+        "support_recall": 0.7089,
+        "support_complete": 0.4177,
+        "selected_gold_count": 1.4177,
+        "avg_pool_size": 31.0886,
+        "avg_cross_pool_docs": 8.8734,
+        "avg_agreed_entities": 56.6962
+      },
+      "inference": {
+        "rows": 23,
+        "support_recall": 0.7391,
+        "support_complete": 0.5217,
+        "selected_gold_count": 1.4783,
+        "avg_pool_size": 30.1304,
+        "avg_cross_pool_docs": 9.8696,
+        "avg_agreed_entities": 71.9565
+      }
+    },
+    "cpag_pure": {
+      "bridge_comparison": {
+        "rows": 47,
+        "support_recall": 0.3564,
+        "support_complete": 0.0,
+        "selected_gold_count": 1.4255,
+        "avg_pool_size": 31.1277,
+        "avg_cross_pool_docs": 8.8723,
+        "avg_agreed_entities": 71.0
+      },
+      "comparison": {
+        "rows": 51,
+        "support_recall": 0.8039,
+        "support_complete": 0.6863,
+        "selected_gold_count": 1.6078,
+        "avg_pool_size": 31.7255,
+        "avg_cross_pool_docs": 8.2745,
+        "avg_agreed_entities": 49.7647
+      },
+      "compositional": {
+        "rows": 79,
+        "support_recall": 0.5949,
+        "support_complete": 0.2911,
+        "selected_gold_count": 1.1899,
+        "avg_pool_size": 31.0886,
+        "avg_cross_pool_docs": 8.8734,
+        "avg_agreed_entities": 56.6962
+      },
+      "inference": {
+        "rows": 23,
+        "support_recall": 0.3913,
+        "support_complete": 0.1739,
+        "selected_gold_count": 0.7826,
+        "avg_pool_size": 30.1304,
+        "avg_cross_pool_docs": 9.8696,
+        "avg_agreed_entities": 71.9565
+      }
+    },
+    "cpag": {
+      "bridge_comparison": {
+        "rows": 47,
+        "support_recall": 0.5372,
+        "support_complete": 0.0,
+        "selected_gold_count": 2.1489,
+        "avg_pool_size": 31.1277,
+        "avg_cross_pool_docs": 8.8723,
+        "avg_agreed_entities": 71.0
+      },
+      "comparison": {
+        "rows": 51,
+        "support_recall": 0.9804,
+        "support_complete": 0.9608,
+        "selected_gold_count": 1.9608,
+        "avg_pool_size": 31.7255,
+        "avg_cross_pool_docs": 8.2745,
+        "avg_agreed_entities": 49.7647
+      },
+      "compositional": {
+        "rows": 79,
+        "support_recall": 0.7278,
+        "support_complete": 0.4557,
+        "selected_gold_count": 1.4557,
+        "avg_pool_size": 31.0886,
+        "avg_cross_pool_docs": 8.8734,
+        "avg_agreed_entities": 56.6962
+      },
+      "inference": {
+        "rows": 23,
+        "support_recall": 0.6739,
+        "support_complete": 0.3913,
+        "selected_gold_count": 1.3478,
+        "avg_pool_size": 30.1304,
+        "avg_cross_pool_docs": 9.8696,
+        "avg_agreed_entities": 71.9565
+      }
+    }
+  },
+  "signal": {
+    "cross_pool_gold_vs_nongold_auc": 0.772391,
+    "cpag_support_complete_delta_vs_proprag": -0.235,
+    "cpag_added_gold_vs_proprag": 3,
+    "cpag_added_non_gold_vs_proprag": 87,
+    "cpag_non_gold_per_gold_vs_proprag": 29.0
+  },
+  "reader_manifests": {
+    "proprag_rank": {
+      "rows": 200,
+      "avg_selected_docs": 5.0,
+      "avg_support_recall": 0.8888,
+      "support_complete_rate": 0.705
+    },
+    "dense_rank": {
+      "rows": 200,
+      "avg_selected_docs": 5.0,
+      "avg_support_recall": 0.7712,
+      "support_complete_rate": 0.49
+    },
+    "rrf": {
+      "rows": 200,
+      "avg_selected_docs": 5.0,
+      "avg_support_recall": 0.765,
+      "support_complete_rate": 0.49
+    },
+    "cpag_pure": {
+      "rows": 200,
+      "avg_selected_docs": 5.0,
+      "avg_support_recall": 0.5687,
+      "support_complete_rate": 0.31
+    },
+    "cpag": {
+      "rows": 200,
+      "avg_selected_docs": 5.0,
+      "avg_support_recall": 0.7412,
+      "support_complete_rate": 0.47
+    }
+  }
+}

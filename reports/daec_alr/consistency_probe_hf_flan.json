@@ -1,0 +1,163 @@
+{
+  "inputs": {
+    "report_json": "run_logs/layer1_proprag_pool_eval_fixed_20260424/2wikimultihopqa_proprag_pool_daec_oracle.json",
+    "pool_json": "run_logs/proprag_pool_exports_full1000_20260424/2wikimultihopqa_pool100.json",
+    "limit": 200,
+    "offset": 0,
+    "top_k": 5
+  },
+  "runtime": {
+    "mode": "hf_seq2seq",
+    "model_name_or_path": "data/dpathrag/models/flan_t5_base_gold_k5_5k"
+  },
+  "generation": {
+    "batch_size": 8,
+    "max_input_tokens": 1024,
+    "max_new_tokens": 32,
+    "max_docs": 0,
+    "max_doc_chars": 0
+  },
+  "summary": {
+    "rows": 200,
+    "variant_rows": 1000,
+    "variants": [
+      "original",
+      "swap01",
+      "reverse",
+      "rotate_left",
+      "drop_last"
+    ],
+    "original_em": 0.45,
+    "original_f1": 0.512913,
+    "support_recall": 0.94125,
+    "support_complete": 0.855,
+    "consistency_means": {
+      "majority_fraction": 0.888,
+      "inverse_entropy": 0.856596,
+      "inverse_distinct": 0.89125,
+      "mean_pairwise_f1": 0.829371,
+      "normalized_entropy": 0.143404,
+      "distinct_answer_count": 1.435
+    },
+    "correct_f1_ge_0_5_means": {
+      "majority_fraction": 0.913208,
+      "inverse_entropy": 0.884408,
+      "inverse_distinct": 0.910377,
+      "mean_pairwise_f1": 0.860351,
+      "normalized_entropy": 0.115592,
+      "distinct_answer_count": 1.358491
+    },
+    "wrong_f1_lt_0_5_means": {
+      "majority_fraction": 0.859574,
+      "inverse_entropy": 0.825234,
+      "inverse_distinct": 0.869681,
+      "mean_pairwise_f1": 0.794436,
+      "normalized_entropy": 0.174766,
+      "distinct_answer_count": 1.521277
+    },
+    "aucs": {
+      "label_em": {
+        "positives": 90,
+        "negatives": 110,
+        "metrics": {
+          "majority_fraction": {
+            "auc": 0.59096,
+            "ci95": [
+              0.53019,
+              0.652426
+            ]
+          },
+          "inverse_entropy": {
+            "auc": 0.59197,
+            "ci95": [
+              0.531455,
+              0.65431
+            ]
+          },
+          "inverse_distinct": {
+            "auc": 0.585505,
+            "ci95": [
+              0.525379,
+              0.647925
+            ]
+          },
+          "mean_pairwise_f1": {
+            "auc": 0.585909,
+            "ci95": [
+              0.524328,
+              0.64692
+            ]
+          }
+        }
+      },
+      "label_f1_positive": {
+        "positives": 114,
+        "negatives": 86,
+        "metrics": {
+          "majority_fraction": {
+            "auc": 0.529376,
+            "ci95": [
+              0.456905,
+              0.598573
+            ]
+          },
+          "inverse_entropy": {
+            "auc": 0.529019,
+            "ci95": [
+              0.456956,
+              0.597439
+            ]
+          },
+          "inverse_distinct": {
+            "auc": 0.52244,
+            "ci95": [
+              0.453367,
+              0.588742
+            ]
+          },
+          "mean_pairwise_f1": {
+            "auc": 0.533303,
+            "ci95": [
+              0.460738,
+              0.602371
+            ]
+          }
+        }
+      },
+      "label_f1_ge_0_5": {
+        "positives": 106,
+        "negatives": 94,
+        "metrics": {
+          "majority_fraction": {
+            "auc": 0.56664,
+            "ci95": [
+              0.498599,
+              0.631503
+            ]
+          },
+          "inverse_entropy": {
+            "auc": 0.565787,
+            "ci95": [
+              0.498197,
+              0.631679
+            ]
+          },
+          "inverse_distinct": {
+            "auc": 0.557557,
+            "ci95": [
+              0.490196,
+              0.622607
+            ]
+          },
+          "mean_pairwise_f1": {
+            "auc": 0.560618,
+            "ci95": [
+              0.491,
+              0.62635
+            ]
+          }
+        }
+      }
+    }
+  }
+}

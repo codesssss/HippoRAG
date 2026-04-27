@@ -1,0 +1,755 @@
+{
+  "diagnostic_c": {
+    "rows": 1000,
+    "top_k": 5,
+    "candidate_pool_size": 20,
+    "beneficial_edits": 543,
+    "lexical_negative_edits": 36230,
+    "same_remove_beneficial_vs_lexical_pairs": 526,
+    "queries_with_same_remove_pairs": 132,
+    "shallow_false_positive_edits": 294,
+    "shallow_false_positive_queries": 185,
+    "shallow_false_negative_queries": 109,
+    "positive_add_features": {
+      "count": 543,
+      "rank": {
+        "mean": 9.924494,
+        "std": 4.12911
+      },
+      "retriever_score": {
+        "mean": 0.00309,
+        "std": 0.000734
+      },
+      "title_question_jaccard": {
+        "mean": 0.082693,
+        "std": 0.10263
+      },
+      "body_question_jaccard": {
+        "mean": 0.067502,
+        "std": 0.04515
+      },
+      "question_token_coverage": {
+        "mean": 0.367745,
+        "std": 0.140107
+      },
+      "q_doc_cosine": {
+        "mean": 0.279297,
+        "std": 0.161431
+      },
+      "answer_in_doc": {
+        "mean": 0.589319,
+        "std": 0.491958
+      },
+      "bridge_entity_in_doc": {
+        "mean": 0.869245,
+        "std": 0.337132
+      },
+      "log_doc_chars": {
+        "mean": 6.269793,
+        "std": 0.905938
+      }
+    },
+    "lexical_negative_add_features": {
+      "count": 36230,
+      "rank": {
+        "mean": 12.637179,
+        "std": 4.288311
+      },
+      "retriever_score": {
+        "mean": 0.002667,
+        "std": 0.000508
+      },
+      "title_question_jaccard": {
+        "mean": 0.070589,
+        "std": 0.079006
+      },
+      "body_question_jaccard": {
+        "mean": 0.090874,
+        "std": 0.047835
+      },
+      "question_token_coverage": {
+        "mean": 0.35091,
+        "std": 0.146277
+      },
+      "q_doc_cosine": {
+        "mean": 0.211095,
+        "std": 0.152962
+      },
+      "answer_in_doc": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "bridge_entity_in_doc": {
+        "mean": 0.0,
+        "std": 0.0
+      },
+      "log_doc_chars": {
+        "mean": 5.618658,
+        "std": 1.133332
+      }
+    },
+    "feature_mean_delta_positive_minus_lexical": {
+      "rank": -2.712685,
+      "retriever_score": 0.000423,
+      "title_question_jaccard": 0.012104,
+      "body_question_jaccard": -0.023372,
+      "question_token_coverage": 0.016835,
+      "q_doc_cosine": 0.068202,
+      "answer_in_doc": 0.589319,
+      "bridge_entity_in_doc": 0.869245,
+      "log_doc_chars": 0.651135
+    },
+    "sample_shallow_false_positives": [
+      {
+        "qid": "2dc690ba0bdc11eba7f7acde48001122",
+        "remove_index": 4,
+        "add_index": 10,
+        "score": 20.5288028717041,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "9fe6a6760baf11ebab90acde48001122",
+        "remove_index": 3,
+        "add_index": 6,
+        "score": 22.04961585998535,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "9fe6a6760baf11ebab90acde48001122",
+        "remove_index": 2,
+        "add_index": 9,
+        "score": 20.888151168823242,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "914b452c0bdc11eba7f7acde48001122",
+        "remove_index": 4,
+        "add_index": 11,
+        "score": 31.979936599731445,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "265daf200bdc11eba7f7acde48001122",
+        "remove_index": 1,
+        "add_index": 8,
+        "score": 22.97511863708496,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "265daf200bdc11eba7f7acde48001122",
+        "remove_index": 8,
+        "add_index": 1,
+        "score": 27.128217697143555,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "435f65fa0baf11ebab90acde48001122",
+        "remove_index": 4,
+        "add_index": 11,
+        "score": 28.19277000427246,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "b672c1ee0bdd11eba7f7acde48001122",
+        "remove_index": 4,
+        "add_index": 14,
+        "score": 24.134584426879883,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "62a9cd640bb011ebab90acde48001122",
+        "remove_index": 4,
+        "add_index": 6,
+        "score": 31.34488868713379,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "62a9cd640bb011ebab90acde48001122",
+        "remove_index": 6,
+        "add_index": 4,
+        "score": 27.09861183166504,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "0083038e0bde11eba7f7acde48001122",
+        "remove_index": 4,
+        "add_index": 8,
+        "score": 28.476999282836914,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "0083038e0bde11eba7f7acde48001122",
+        "remove_index": 8,
+        "add_index": 6,
+        "score": 27.30475425720215,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "a9e322b20bdc11eba7f7acde48001122",
+        "remove_index": 2,
+        "add_index": 8,
+        "score": 24.50994300842285,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "8f783c7a0bda11eba7f7acde48001122",
+        "remove_index": 4,
+        "add_index": 6,
+        "score": 26.324708938598633,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "8f783c7a0bda11eba7f7acde48001122",
+        "remove_index": 3,
+        "add_index": 5,
+        "score": 24.98871421813965,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "b642318c0bdd11eba7f7acde48001122",
+        "remove_index": 4,
+        "add_index": 6,
+        "score": 28.140024185180664,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "b642318c0bdd11eba7f7acde48001122",
+        "remove_index": 6,
+        "add_index": 5,
+        "score": 30.473852157592773,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "076288460bde11eba7f7acde48001122",
+        "remove_index": 4,
+        "add_index": 6,
+        "score": 32.93669128417969,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "076288460bde11eba7f7acde48001122",
+        "remove_index": 6,
+        "add_index": 4,
+        "score": 25.450666427612305,
+        "stop_score": 20.0
+      },
+      {
+        "qid": "dfb1d2c8085611ebbd59ac1f6bf848b6",
+        "remove_index": 3,
+        "add_index": 8,
+        "score": 21.47935676574707,
+        "stop_score": 20.0
+      }
+    ],
+    "sample_shallow_false_negatives": [
+      {
+        "qid": "551e024408a611ebbd7fac1f6bf848b6",
+        "beneficial_edits": 2,
+        "rank_complete": false
+      },
+      {
+        "qid": "006d81bc0bde11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "3ce92df80bde11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "49b22d0a0bde11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "0083038e0bde11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "3bb9c0740bb011ebab90acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "3ab846860bde11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "0016373a0bda11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "49ccfdfa08ce11ebbd94ac1f6bf848b6",
+        "beneficial_edits": 10,
+        "rank_complete": false
+      },
+      {
+        "qid": "f04cc9b408d611ebbd99ac1f6bf848b6",
+        "beneficial_edits": 2,
+        "rank_complete": false
+      },
+      {
+        "qid": "755fdd7c08a411ebbd7cac1f6bf848b6",
+        "beneficial_edits": 2,
+        "rank_complete": false
+      },
+      {
+        "qid": "7efb04e708a011ebbd78ac1f6bf848b6",
+        "beneficial_edits": 5,
+        "rank_complete": false
+      },
+      {
+        "qid": "96b7c1a60bdd11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "095c87880bdd11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "ee212a820bdc11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "5f2bb1060bd911eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "6a4840d608dc11ebbd9cac1f6bf848b6",
+        "beneficial_edits": 2,
+        "rank_complete": false
+      },
+      {
+        "qid": "8540ae66088011ebbd6cac1f6bf848b6",
+        "beneficial_edits": 7,
+        "rank_complete": false
+      },
+      {
+        "qid": "a8a18e800bdb11eba7f7acde48001122",
+        "beneficial_edits": 4,
+        "rank_complete": false
+      },
+      {
+        "qid": "5037e45b08cb11ebbd92ac1f6bf848b6",
+        "beneficial_edits": 2,
+        "rank_complete": false
+      }
+    ]
+  },
+  "daec_audit": {
+    "root": "/mnt/nvme/code/HippoRAG",
+    "matches": [
+      {
+        "path": "docs/cee_v2_pairwise_admission_plan_20260427.md",
+        "score": 7,
+        "snippet": "ag top-20 edit@1 only pairwise hard-negative edit scorer admission-induced stop daec residual / binding features if available platt scaling + fixed 0.5 cutoff ```  stop:  ```text free-form d-pathrag selector as main method naked stage 2 ans"
+      },
+      {
+        "path": "scripts/dpathrag_cee_diagnostic_c.py",
+        "score": 7,
+        "snippet": "cal = [edit for edit in edits if not edit[\"beneficial\"] and edit[\"hard_negative_type\"] == \"lexical_hard_negative\"]         beneficial_total += len(beneficial)         lexical_negative_total += len(lexical)         positive_features.extend(e"
+      },
+      {
+        "path": "docs/dpathrag_method_and_pilot_plan_20260426.md",
+        "score": 6,
+        "snippet": "xt state-conditioned autoregressive evidence path per-step listwise re-encoding daec binding features + warm-start curriculum answer-loss-only e2e fine-tuning with selector drift diagnostics ```  ## motivation  bsgs failed because node marg"
+      },
+      {
+        "path": "outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_ser_lam1p0_smoke5_anchor2_8042.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_ser_enabled\": true,     \"dtc_ser_lambda0\": 1.0,     \"dtc_ser_anchor_binding_enabled\": fa"
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_dense_k100_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_dense_k100_limit100_doc160.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_dense_k20_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_dense_k50_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_dense_k50_limit100_doc320.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_proprag_k100_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_proprag_k100_limit100_doc160.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_proprag_k20_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_proprag_k50_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_2wikimultihopqa_proprag_k50_limit100_doc320.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_windowed_2wikimultihopqa_dense_k100_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_windowed_2wikimultihopqa_dense_k50_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_windowed_2wikimultihopqa_proprag_k100_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "reports/setr_pathA/setr_windowed_2wikimultihopqa_proprag_k50_limit100.eval.json",
+        "score": 5,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "scripts/eval_causal_qwen3.py",
+        "score": 5,
+        "snippet": "classes import dataclass import json import logging import os import sys import types from collections import counter from pathlib import path from typing import any, dict, list, sequence, set, tuple  import joblib import numpy as np import"
+      },
+      {
+        "path": "outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_set_closure_exactonly_100_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "question\": \"what is one of the stars of  the newcomers known for\",       \"query_type\": \"non_causal\",       \"answer\": \"that the text does not provide that information.\",       \"gold_answers\": [         \"superhero roles as the marvel comics\" "
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/requirement_beam_oracle_smoke40_v2_legacyfact_pool100_ann50_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/requirement_beam_oracle_smoke40_v2_legacyfact_pool100_ann50_reserve3_dedup_proj3_fullpoolfix.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_bridge_smoke40_legacy_control.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_bridge_smoke40_legacy_reserve3_dedup_control.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_closure_proxy_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_closure_proxy_smoke40_legacy_v2.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_aligncheck_factor1_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_aligncheck_factor3_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactonly_100_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactonly_hybrid_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactonly_question_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactonly_smoke40_legacy_reserve2_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactonly_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_exactproj3_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_gpt54judge_chatstream_smoke40.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_gpt54judge_chatstream_tiebreak002_smoke40.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_gpt54judge_featureprompt_finalists_tiebreak002_smoke40.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"non_causal\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at b"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_pathcore_guard_align_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_pathcore_guard_llmjudge_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_pathcore_guard_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_pathcore_smoke40_legacy_reserve3_dedup.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_smoke40_legacy_reserve3_dedup_qcov30_support20.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_smoke40_legacy_reserve3_dedup_qcov35_support15.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_smoke40_legacy_reserve3_dedup_qcov40_support10.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_smoke40_legacy_reserve3_dedup_reweight_baseprior.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_smoke40_legacy_reserve3_dedup_suffix000.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_smoke40_legacy_reserve3_dedup_suffix002.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_beam_set_closure_smoke40_legacy_reserve3_dedup_suffix005.json",
+        "score": 4,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "refine-logs/EXPERIMENT_PLAN.md",
+        "score": 4,
+        "snippet": "m**: setr already claims set-level rag selection over information requirements; daec needs a sharper contribution boundary. **method thesis**: daec targets fixed-pool evidence composition in widened graphrag pools, where bridge evidence is "
+      },
+      {
+        "path": "reproduce/dataset/musique_readerprobe_improved30_20260406.json",
+        "score": 4,
+        "snippet": "dock connector, allowing for firewire or usb connectivity. this provided better compatibility with non-apple machines, as most of them did not have firewire ports at the time. eventually apple began shipping ipods with usb cables instead of"
+      },
+      {
+        "path": "research_memory/emnlp_expand_then_compose/04_result_registry.md",
+        "score": 4,
+        "snippet": "ense nv-embed top-100 pools   - 2wiki proprag-pool ablation supports dependency binding, but does not support rank prior or repair typing as necessary components  ## fixed-pool composition baselines and dtc  diversity baseline memo: - `rese"
+      },
+      {
+        "path": "research_memory/emnlp_expand_then_compose/15_qbf_pilot_negative_result_20260424.md",
+        "score": 4,
+        "snippet": "n, for example `country`, `date`, `birthplace` - score facts by terminal-schema compatibility `chi` - propagate terminal potential backward over the fact-entity graph - rank documents by query relevance times backward potential  the intende"
+      },
+      {
+        "path": "research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md",
+        "score": 4,
+        "snippet": "e fixed-pool evidence composition paper line.  the tested question was:  > does demand-aware evidence composition improve final top-5 reader utility across different top-100 retrieval pools, including a strong proposition retriever and a no"
+      },
+      {
+        "path": "research_memory/emnlp_expand_then_compose/21_dpathrag_direction_20260426.md",
+        "score": 4,
+        "snippet": "# d-pathrag direction - 2026-04-26  ## final direction  stop expanding daec-vs-setr as a main-track claim. setr-windowed is a strong baseline and makes the \"setr cannot handle widened pools\" framing unsafe.  stop bsgs as a main rou"
+      },
+      {
+        "path": "run_logs/external_pool_dtc_smoke_2wiki1_20260424.json",
+        "score": 4,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": true,     \"dtc_satisfiable_by_policy\": \"strict\",     \"dtc_se"
+      },
+      {
+        "path": "run_logs/external_pool_eval_smoke_2wiki1_20260424.json",
+        "score": 4,
+        "snippet": "tc_enforce_dependencies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_demand_gate_enabled\": false,     \"dtc_demand_gate_alpha\": 1.0,     \"dtc_repairable_filter_enabled\": false,     \"dtc_satisfiable_by_policy\": \"binding_override\", "
+      },
+      {
+        "path": "scripts/dtc_embed_utils.py",
+        "score": 4,
+        "snippet": " str     subquery: str     depends_on: tuple[str, ...] = ()     expected_answer_type: str = \"unknown\"     anchor_mentions: tuple[str, ...] = ()     role: str = \"support\"     satisfiable_by: str = \"unknown\"      def to_trace(self) -> dict[st"
+      },
+      {
+        "path": "tests/test_dtc_embed_utils.py",
+        "score": 4,
+        "snippet": "ry\": \"who directed film x?\",         \"depends_on\": [],         \"expected_answer_type\": \"person\",         \"anchor_mentions\": [\"film x\"],         \"role\": \"bridge\",         \"satisfiable_by\": \"document\"       },       {         \"id\": \"s2\",     "
+      },
+      {
+        "path": "data/processed/musique_qwen_slots.jsonl",
+        "score": 3,
+        "snippet": "goals in copa del rey\"], \"output_variable\": \"person_compared\", \"expected_answer_type\": \"person\", \"gold_subquestion\": null, \"gold_answer\": null}, {\"slot_id\": \"p2\", \"slot_text\": \"find the date when the person_compared was signed by barcelona\""
+      },
+      {
+        "path": "docs/bsgs_week0_week1_plan_20260425.md",
+        "score": 3,
+        "snippet": " date: 2026-04-25  branch: `bsgs-week0-week1`  base checkpoint:  - `2555018 add daec layer1 external-pool evaluation`  ## 1. decision  this branch starts the bsgs line from the frozen daec layer-1 checkpoint.  final method boundary:  ```tex"
+      },
+      {
+        "path": "outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_set_closure_exactonly_100_legacy_reserve3_dedup.json",
+        "score": 3,
+        "snippet": "s\": [     {       \"question\": \"when did lothair ii's mother die?\",       \"query_type\": \"non_causal\",       \"answer\": \"851.\",       \"gold_answers\": [         \"20 march 851\"       ],       \"docs\": [         \"lothair ii\\nlothair ii (835 –) was"
+      },
+      {
+        "path": "outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_set_closure_exactonly_smoke40_legacy_reserve3_dedup.json",
+        "score": 3,
+        "snippet": "question\": \"what is one of the stars of  the newcomers known for\",       \"query_type\": \"non_causal\",       \"answer\": \"that the text does not provide that information.\",       \"gold_answers\": [         \"superhero roles as the marvel comics\" "
+      },
+      {
+        "path": "outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_set_closure_exactproj3_smoke40_legacy_reserve3_dedup.json",
+        "score": 3,
+        "snippet": "question\": \"what is one of the stars of  the newcomers known for\",       \"query_type\": \"non_causal\",       \"answer\": \"that the text does not provide that information.\",       \"gold_answers\": [         \"superhero roles as the marvel comics\" "
+      },
+      {
+        "path": "outputs_step0_general_hotpotqa/eval_reports/setwise_bridge_beam_set_closure_pathcore_smoke40_legacy_reserve3_dedup.json",
+        "score": 3,
+        "snippet": "question\": \"what is one of the stars of  the newcomers known for\",       \"query_type\": \"standard\",       \"answer\": \"that the text does not provide that information.\",       \"gold_answers\": [         \"superhero roles as the marvel comics\"   "
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/causal_eval_musique_full_qwen3-8b_qatopk5_baseline_20260409full.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/causal_eval_musique_full_qwen3-8b_qatopk7_baseline_20260409full.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/musique_readerprobe_improved30_20260406_candidate_control.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"gold_answers\": [         \"june 1982\"       ],       \"gold_doc_count\": 2,       \"gold_titles\": [         \"fc barcelona\",         \"fc ba"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/musique_readerprobe_improved30_20260406_promote_best_bridge_to_slot3.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"gold_answers\": [         \"june 1982\"       ],       \"gold_doc_count\": 2,       \"gold_titles\": [         \"fc barcelona\",         \"fc ba"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/setwise_bridge_greedy_pilot_20_legacy.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"answer\": \"june 1982.\",       \"gold_answers\": [         \"june 1982\"       ],       \"docs\": [         \"lionel messi\\nafter a year at bar"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409full.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"gold_answers\": [         \"june 1982\"       ],       \"gold_doc_count\": 2,       \"gold_titles\": [         \"fc barcelona\",         \"fc ba"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk7_20260409full.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"gold_answers\": [         \"june 1982\"       ],       \"gold_doc_count\": 2,       \"gold_titles\": [         \"fc barcelona\",         \"fc ba"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260409full.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"gold_answers\": [         \"june 1982\"       ],       \"gold_doc_count\": 2,       \"gold_titles\": [         \"fc barcelona\",         \"fc ba"
+      },
+      {
+        "path": "outputs_step0_general_musique/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260409full.json",
+        "score": 3,
+        "snippet": "ssi's goals in copa del rey compared to get signed by barcelona?\",       \"query_type\": \"standard\",       \"gold_answers\": [         \"june 1982\"       ],       \"gold_doc_count\": 2,       \"gold_titles\": [         \"fc barcelona\",         \"fc ba"
+      },
+      {
+        "path": "outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+        "score": 3,
+        "snippet": "ncies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_enable_dependency_binding\": false,     \"dtc_binding_max_candidates\": 4,     \"dtc_binding_entity_hit_required\": true,     \"setwise_late_rerank_enabled\": false,     \"setwise_late_r"
+      },
+      {
+        "path": "outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+        "score": 3,
+        "snippet": "ncies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_enable_dependency_binding\": false,     \"dtc_binding_max_candidates\": 4,     \"dtc_binding_entity_hit_required\": true,     \"setwise_late_rerank_enabled\": false,     \"setwise_late_r"
+      },
+      {
+        "path": "outputs_step0_general_nvembed_musique/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+        "score": 3,
+        "snippet": "ncies\": true,     \"dtc_require_new_crossing\": false,     \"dtc_enable_dependency_binding\": false,     \"dtc_binding_max_candidates\": 4,     \"dtc_binding_entity_hit_required\": true,     \"setwise_late_rerank_enabled\": false,     \"setwise_late_r"
+      },
+      {
+        "path": "reports/setr_pathA/bridge_depth_musique_dense.json",
+        "score": 3,
+        "snippet": "{       \"query_idx\": 198,       \"question\": \"after the period which limited the supply of shellac; białystok, przemyśl were returned to what country along with the region they had been given in the treaty of schönbrunn?\",       \"support_ran"
+      },
+      {
+        "path": "reports/setr_pathA/bridge_depth_musique_proprag.json",
+        "score": 3,
+        "snippet": "{       \"query_idx\": 198,       \"question\": \"after the period which limited the supply of shellac; białystok, przemyśl were returned to what country along with the region they had been given in the treaty of schönbrunn?\",       \"support_ran"
+      },
+      {
+        "path": "research_memory/emnlp_expand_then_compose/03_experiment_board.md",
+        "score": 3,
+        "snippet": "lot.py` - `qbf pilot outputs`: `run_logs/qbf_pilot_20260424/` - `proprag-pool + daec/dtc full1000 outputs`: `run_logs/layer1_proprag_pool_eval_fixed_20260424/` - `dense-pool + daec/dtc full1000 outputs`: `run_logs/layer1_dense_pool_eval_202"
+      },
+      {
+        "path": "research_memory/emnlp_expand_then_compose/10_requirement_aware_strongest_backup.md",
+        "score": 3,
+        "snippet": " anchor entity / event    - relation or role    - requested attribute or answer type 4. protect top anchor passages that already satisfy grounded requirements. 5. score frontier candidates by unmet-requirement coverage, not only by graph pr"
+      }
+    ],
+    "joinable_cache_candidates": [],
+    "status": "no_direct_joinable_cache_found",
+    "decision": "Use CEE-pairwise v0 first; add DAEC features only after a fold-safe per-query/per-doc cache is confirmed."
+  }
+}

@@ -1,0 +1,343 @@
+{
+  "rows": 1000,
+  "folds": 5,
+  "top_k": 5,
+  "candidate_pool_size": 20,
+  "baselines": {
+    "rank_top5": {
+      "rows": 1000,
+      "support_recall": 0.9028,
+      "support_complete": 0.772,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.227,
+      "bridge_entity_recall": 0.9365,
+      "selection_overlap": 0.0
+    },
+    "oracle_edit1_top20": {
+      "rows": 1000,
+      "support_recall": 0.9593,
+      "support_complete": 0.895,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.363,
+      "bridge_entity_recall": 0.951,
+      "selection_overlap": 0.0,
+      "queries_with_edit": 136,
+      "stop_rate": 0.864,
+      "added_gold": 136,
+      "added_non_gold": 0,
+      "non_gold_per_gold": 0.0
+    },
+    "selector_v1": {
+      "rows": 1000,
+      "support_recall": 0.9233,
+      "support_complete": 0.805,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.266,
+      "bridge_entity_recall": 0.9416,
+      "selection_overlap": 0.6192,
+      "added_gold": 76,
+      "added_non_gold": 1205,
+      "non_gold_per_gold": 15.8553
+    },
+    "shallow_cee_margin20": {
+      "rows": 2000,
+      "support_recall": 0.907,
+      "support_complete": 0.778,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.235,
+      "bridge_entity_recall": 0.9408,
+      "selection_overlap": 0.9396,
+      "added_gold": 54,
+      "added_non_gold": 344,
+      "removed_gold": 30,
+      "removed_non_gold": 368,
+      "queries_with_edit": 398,
+      "stop_rate": 0.801,
+      "non_gold_per_gold": 6.3704,
+      "rank_complete_over_edit_rate": 0.135,
+      "oracle_beneficial_edit_recall": 0.0,
+      "oracle_not_beneficial_false_positive_rate": 0.199,
+      "lexical_hard_negative_admission_rate": 0.0
+    }
+  },
+  "summaries": {
+    "cee_pairwise_linear_v0": {
+      "rows": 1000,
+      "support_recall": 0.9032,
+      "support_complete": 0.771,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.226,
+      "bridge_entity_recall": 0.9358,
+      "selection_overlap": 0.9827,
+      "added_gold": 3,
+      "added_non_gold": 49,
+      "removed_gold": 4,
+      "removed_non_gold": 48,
+      "queries_with_edit": 52,
+      "stop_rate": 0.948,
+      "non_gold_per_gold": 16.3333,
+      "rank_complete_over_edit_rate": 0.043,
+      "oracle_beneficial_edit_recall": 0.022059,
+      "oracle_not_beneficial_false_positive_rate": 0.050926,
+      "lexical_hard_negative_admission_rate": 0.826923
+    },
+    "cee_pairwise_mlp_v0": {
+      "rows": 1000,
+      "support_recall": 0.9032,
+      "support_complete": 0.771,
+      "duplicate_title_rate": 0.001,
+      "unique_title_rate": 0.9998,
+      "selected_gold_count": 2.224,
+      "bridge_entity_recall": 0.9355,
+      "selection_overlap": 0.951,
+      "added_gold": 9,
+      "added_non_gold": 138,
+      "removed_gold": 12,
+      "removed_non_gold": 135,
+      "queries_with_edit": 147,
+      "stop_rate": 0.853,
+      "non_gold_per_gold": 15.3333,
+      "rank_complete_over_edit_rate": 0.119,
+      "oracle_beneficial_edit_recall": 0.058824,
+      "oracle_not_beneficial_false_positive_rate": 0.148148,
+      "lexical_hard_negative_admission_rate": 0.632653
+    }
+  },
+  "gates": {
+    "cee_pairwise_linear_v0": {
+      "checks": {
+        "support_complete_ge_rank_plus_1pp": false,
+        "non_gold_per_gold_le_5": false,
+        "added_non_gold_le_half_selector_v1": true
+      },
+      "passed": 1,
+      "total": 3
+    },
+    "cee_pairwise_mlp_v0": {
+      "checks": {
+        "support_complete_ge_rank_plus_1pp": false,
+        "non_gold_per_gold_le_5": false,
+        "added_non_gold_le_half_selector_v1": true
+      },
+      "passed": 1,
+      "total": 3
+    }
+  },
+  "fold_reports": [
+    {
+      "fold": 0,
+      "train_pairs": 547,
+      "calib_pairs": 137,
+      "models": {
+        "cee_pairwise_linear_v0": {
+          "fit": {
+            "model": "linear",
+            "pairs": 547
+          },
+          "calibration": {
+            "a": 0.14761095099348945,
+            "b": -2.64547501798579,
+            "calib_rows": 137,
+            "calib_queries": 89,
+            "calib_scores": 6675,
+            "positive_rate": 0.053184,
+            "positive_prob_mean": 0.198463,
+            "negative_prob_mean": 0.05967,
+            "calibration": "candidate_level_all_edits"
+          }
+        },
+        "cee_pairwise_mlp_v0": {
+          "fit": {
+            "model": "mlp",
+            "pairs": 547,
+            "final_loss": 0.090427
+          },
+          "calibration": {
+            "a": 0.775017290675032,
+            "b": -2.789920494220926,
+            "calib_rows": 137,
+            "calib_queries": 89,
+            "calib_scores": 6675,
+            "positive_rate": 0.053184,
+            "positive_prob_mean": 0.31994,
+            "negative_prob_mean": 0.057772,
+            "calibration": "candidate_level_all_edits"
+          }
+        }
+      }
+    },
+    {
+      "fold": 1,
+      "train_pairs": 526,
+      "calib_pairs": 132,
+      "models": {
+        "cee_pairwise_linear_v0": {
+          "fit": {
+            "model": "linear",
+            "pairs": 526
+          },
+          "calibration": {
+            "a": 0.15364092495383222,
+            "b": -2.640231226300512,
+            "calib_rows": 132,
+            "calib_queries": 86,
+            "calib_scores": 6450,
+            "positive_rate": 0.054884,
+            "positive_prob_mean": 0.194543,
+            "negative_prob_mean": 0.060941,
+            "calibration": "candidate_level_all_edits"
+          }
+        },
+        "cee_pairwise_mlp_v0": {
+          "fit": {
+            "model": "mlp",
+            "pairs": 526,
+            "final_loss": 0.165959
+          },
+          "calibration": {
+            "a": 1.3516936471223613,
+            "b": -2.0721056188397355,
+            "calib_rows": 132,
+            "calib_queries": 86,
+            "calib_scores": 6450,
+            "positive_rate": 0.054884,
+            "positive_prob_mean": 0.358823,
+            "negative_prob_mean": 0.051709,
+            "calibration": "candidate_level_all_edits"
+          }
+        }
+      }
+    },
+    {
+      "fold": 2,
+      "train_pairs": 494,
+      "calib_pairs": 123,
+      "models": {
+        "cee_pairwise_linear_v0": {
+          "fit": {
+            "model": "linear",
+            "pairs": 494
+          },
+          "calibration": {
+            "a": 0.14016181818516818,
+            "b": -2.665766273465254,
+            "calib_rows": 123,
+            "calib_queries": 75,
+            "calib_scores": 5625,
+            "positive_rate": 0.052622,
+            "positive_prob_mean": 0.193813,
+            "negative_prob_mean": 0.059325,
+            "calibration": "candidate_level_all_edits"
+          }
+        },
+        "cee_pairwise_mlp_v0": {
+          "fit": {
+            "model": "mlp",
+            "pairs": 494,
+            "final_loss": 0.148283
+          },
+          "calibration": {
+            "a": 1.0261021723707784,
+            "b": -2.9634451949086023,
+            "calib_rows": 123,
+            "calib_queries": 75,
+            "calib_scores": 5625,
+            "positive_rate": 0.052622,
+            "positive_prob_mean": 0.325324,
+            "negative_prob_mean": 0.058006,
+            "calibration": "candidate_level_all_edits"
+          }
+        }
+      }
+    },
+    {
+      "fold": 3,
+      "train_pairs": 490,
+      "calib_pairs": 123,
+      "models": {
+        "cee_pairwise_linear_v0": {
+          "fit": {
+            "model": "linear",
+            "pairs": 490
+          },
+          "calibration": {
+            "a": 0.12712607102393117,
+            "b": -2.594635504041727,
+            "calib_rows": 123,
+            "calib_queries": 67,
+            "calib_scores": 5025,
+            "positive_rate": 0.056517,
+            "positive_prob_mean": 0.145575,
+            "negative_prob_mean": 0.062869,
+            "calibration": "candidate_level_all_edits"
+          }
+        },
+        "cee_pairwise_mlp_v0": {
+          "fit": {
+            "model": "mlp",
+            "pairs": 490,
+            "final_loss": 0.146633
+          },
+          "calibration": {
+            "a": 1.057301949970445,
+            "b": -2.8780830521990857,
+            "calib_rows": 123,
+            "calib_queries": 67,
+            "calib_scores": 5025,
+            "positive_rate": 0.056517,
+            "positive_prob_mean": 0.28392,
+            "negative_prob_mean": 0.061343,
+            "calibration": "candidate_level_all_edits"
+          }
+        }
+      }
+    },
+    {
+      "fold": 4,
+      "train_pairs": 483,
+      "calib_pairs": 121,
+      "models": {
+        "cee_pairwise_linear_v0": {
+          "fit": {
+            "model": "linear",
+            "pairs": 483
+          },
+          "calibration": {
+            "a": 0.12575239424854348,
+            "b": -2.6984741667296706,
+            "calib_rows": 121,
+            "calib_queries": 74,
+            "calib_scores": 5550,
+            "positive_rate": 0.052613,
+            "positive_prob_mean": 0.182167,
+            "negative_prob_mean": 0.05989,
+            "calibration": "candidate_level_all_edits"
+          }
+        },
+        "cee_pairwise_mlp_v0": {
+          "fit": {
+            "model": "mlp",
+            "pairs": 483,
+            "final_loss": 0.146657
+          },
+          "calibration": {
+            "a": 0.9945889133884653,
+            "b": -2.928119395563366,
+            "calib_rows": 121,
+            "calib_queries": 74,
+            "calib_scores": 5550,
+            "positive_rate": 0.052613,
+            "positive_prob_mean": 0.289618,
+            "negative_prob_mean": 0.059638,
+            "calibration": "candidate_level_all_edits"
+          }
+        }
+      }
+    }
+  ]
+}

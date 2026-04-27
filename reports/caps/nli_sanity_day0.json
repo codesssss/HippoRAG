@@ -1,0 +1,137 @@
+{
+  "status": "completed",
+  "decision": "PROCEED_DAY1",
+  "model_name": "cross-encoder/nli-deberta-v3-base",
+  "lexical_smoke": false,
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "dev_start": 0,
+  "dev_end": 200,
+  "num_pairs": 200,
+  "pair_stats": {
+    "rows_seen": 44,
+    "triples_seen": 109,
+    "triples_missing_subject_doc": 9,
+    "triples_missing_negative_doc": 0,
+    "positive_pairs": 100,
+    "negative_pairs": 100
+  },
+  "metrics": {
+    "num_positive": 100,
+    "num_negative": 100,
+    "auc": 0.903,
+    "ci_low": 0.8616,
+    "ci_high": 0.9401,
+    "mean_positive_score": 0.590845,
+    "mean_negative_score": 0.001769,
+    "paired_win_rate": 0.88
+  },
+  "model_meta": {
+    "device": "cuda",
+    "entailment_class_index": 1,
+    "id2label": {
+      "0": "contradiction",
+      "1": "entailment",
+      "2": "neutral"
+    },
+    "elapsed_seconds": 1.8423,
+    "pairs_per_second": 108.5603
+  },
+  "examples": [
+    {
+      "qid": "83bf3b5a0bd911eba7f7acde48001122",
+      "label": 1,
+      "hypothesis": "The mother of Lothair II is Ermengarde of Tours.",
+      "doc_title": "Lothair II",
+      "doc_index": 0,
+      "score": 0.969212
+    },
+    {
+      "qid": "83bf3b5a0bd911eba7f7acde48001122",
+      "label": 0,
+      "hypothesis": "The mother of Lothair II is Ermengarde of Tours.",
+      "doc_title": "Louis the Pious",
+      "doc_index": 68,
+      "score": 0.000519
+    },
+    {
+      "qid": "83bf3b5a0bd911eba7f7acde48001122",
+      "label": 1,
+      "hypothesis": "The date of death of Ermengarde of Tours is 20 March 851.",
+      "doc_title": "Ermengarde of Tours",
+      "doc_index": 3,
+      "score": 0.001982
+    },
+    {
+      "qid": "83bf3b5a0bd911eba7f7acde48001122",
+      "label": 0,
+      "hypothesis": "The date of death of Ermengarde of Tours is 20 March 851.",
+      "doc_title": "Louise of Anhalt-Dessau (1709–1732)",
+      "doc_index": 55,
+      "score": 1.1e-05
+    },
+    {
+      "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "label": 1,
+      "hypothesis": "The publication date of Aas Ka Panchhi is 1961.",
+      "doc_title": "Aas Ka Panchhi",
+      "doc_index": 0,
+      "score": 0.232161
+    },
+    {
+      "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "label": 0,
+      "hypothesis": "The publication date of Aas Ka Panchhi is 1961.",
+      "doc_title": "Dharti",
+      "doc_index": 40,
+      "score": 7e-06
+    },
+    {
+      "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "label": 1,
+      "hypothesis": "The publication date of Phoolwari is 1946.",
+      "doc_title": "Phoolwari",
+      "doc_index": 1,
+      "score": 0.997272
+    },
+    {
+      "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "label": 0,
+      "hypothesis": "The publication date of Phoolwari is 1946.",
+      "doc_title": "Allqamari",
+      "doc_index": 48,
+      "score": 0.000549
+    },
+    {
+      "qid": "2dc690ba0bdc11eba7f7acde48001122",
+      "label": 1,
+      "hypothesis": "The performer of Changed It is Nicki Minaj.",
+      "doc_title": "Changed It",
+      "doc_index": 0,
+      "score": 0.997902
+    },
+    {
+      "qid": "2dc690ba0bdc11eba7f7acde48001122",
+      "label": 0,
+      "hypothesis": "The performer of Changed It is Nicki Minaj.",
+      "doc_title": "All Over Me (Chocolate Starfish song)",
+      "doc_index": 38,
+      "score": 3e-06
+    },
+    {
+      "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+      "label": 1,
+      "hypothesis": "The country of Marufabad is Iran.",
+      "doc_title": "Marufabad",
+      "doc_index": 1,
+      "score": 0.85696
+    },
+    {
+      "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+      "label": 0,
+      "hypothesis": "The country of Marufabad is Iran.",
+      "doc_title": "Marzuban ibn Muhammad",
+      "doc_index": 24,
+      "score": 0.000127
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "sample_size": 163,
+  "auc": 0.988332,
+  "ci_low": 0.978735,
+  "ci_high": 0.995408,
+  "mean_positive_loglik": -1.022002,
+  "mean_distractor_loglik": -8.665074,
+  "mean_gap": 7.643073,
+  "paired_win_rate": 1.0,
+  "passed": true
+}

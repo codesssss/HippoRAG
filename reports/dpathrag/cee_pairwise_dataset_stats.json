@@ -1,0 +1,340 @@
+{
+  "rows": 1000,
+  "folds": 5,
+  "top_k": 5,
+  "candidate_pool_size": 20,
+  "output_dir": "data/dpathrag/cee_pairwise_train_folds",
+  "train_pairs_total": {
+    "pairs": 2540,
+    "queries": 136,
+    "pair_types": {
+      "graded": 426,
+      "lexical": 1259,
+      "mixed": 855
+    },
+    "negative_types": {
+      "answer_string_distractor": 40,
+      "bridge_entity_distractor": 79,
+      "lexical_hard_negative": 1513,
+      "low_signal_deep_negative": 698,
+      "semantic_hard_negative": 210
+    },
+    "same_remove_pairs": 2540,
+    "same_remove_rate": 1.0
+  },
+  "calib_pairs_total": {
+    "pairs": 636,
+    "queries": 136,
+    "pair_types": {
+      "graded": 118,
+      "lexical": 325,
+      "mixed": 193
+    },
+    "negative_types": {
+      "answer_string_distractor": 15,
+      "bridge_entity_distractor": 13,
+      "lexical_hard_negative": 390,
+      "low_signal_deep_negative": 160,
+      "semantic_hard_negative": 58
+    },
+    "same_remove_pairs": 636,
+    "same_remove_rate": 1.0
+  },
+  "fold_reports": [
+    {
+      "fold": 0,
+      "train_source_rows": 800,
+      "eval_rows": 200,
+      "train_pairs": {
+        "pairs": 547,
+        "queries": 116,
+        "pair_types": {
+          "graded": 91,
+          "lexical": 276,
+          "mixed": 180
+        },
+        "negative_types": {
+          "answer_string_distractor": 7,
+          "bridge_entity_distractor": 19,
+          "lexical_hard_negative": 327,
+          "low_signal_deep_negative": 148,
+          "semantic_hard_negative": 46
+        },
+        "same_remove_pairs": 547,
+        "same_remove_rate": 1.0
+      },
+      "calib_pairs": {
+        "pairs": 137,
+        "queries": 89,
+        "pair_types": {
+          "graded": 25,
+          "lexical": 66,
+          "mixed": 46
+        },
+        "negative_types": {
+          "answer_string_distractor": 3,
+          "bridge_entity_distractor": 3,
+          "lexical_hard_negative": 83,
+          "low_signal_deep_negative": 32,
+          "semantic_hard_negative": 16
+        },
+        "same_remove_pairs": 137,
+        "same_remove_rate": 1.0
+      },
+      "all_pairs": {
+        "pairs": 684,
+        "queries": 116,
+        "pair_types": {
+          "graded": 116,
+          "lexical": 342,
+          "mixed": 226
+        },
+        "negative_types": {
+          "answer_string_distractor": 10,
+          "bridge_entity_distractor": 22,
+          "lexical_hard_negative": 410,
+          "low_signal_deep_negative": 180,
+          "semantic_hard_negative": 62
+        },
+        "same_remove_pairs": 684,
+        "same_remove_rate": 1.0
+      }
+    },
+    {
+      "fold": 1,
+      "train_source_rows": 800,
+      "eval_rows": 200,
+      "train_pairs": {
+        "pairs": 526,
+        "queries": 113,
+        "pair_types": {
+          "graded": 89,
+          "lexical": 263,
+          "mixed": 174
+        },
+        "negative_types": {
+          "answer_string_distractor": 7,
+          "bridge_entity_distractor": 21,
+          "lexical_hard_negative": 319,
+          "low_signal_deep_negative": 139,
+          "semantic_hard_negative": 40
+        },
+        "same_remove_pairs": 526,
+        "same_remove_rate": 1.0
+      },
+      "calib_pairs": {
+        "pairs": 132,
+        "queries": 86,
+        "pair_types": {
+          "graded": 24,
+          "lexical": 64,
+          "mixed": 44
+        },
+        "negative_types": {
+          "answer_string_distractor": 6,
+          "bridge_entity_distractor": 3,
+          "lexical_hard_negative": 72,
+          "low_signal_deep_negative": 42,
+          "semantic_hard_negative": 9
+        },
+        "same_remove_pairs": 132,
+        "same_remove_rate": 1.0
+      },
+      "all_pairs": {
+        "pairs": 658,
+        "queries": 113,
+        "pair_types": {
+          "graded": 113,
+          "lexical": 327,
+          "mixed": 218
+        },
+        "negative_types": {
+          "answer_string_distractor": 13,
+          "bridge_entity_distractor": 24,
+          "lexical_hard_negative": 391,
+          "low_signal_deep_negative": 181,
+          "semantic_hard_negative": 49
+        },
+        "same_remove_pairs": 658,
+        "same_remove_rate": 1.0
+      }
+    },
+    {
+      "fold": 2,
+      "train_source_rows": 800,
+      "eval_rows": 200,
+      "train_pairs": {
+        "pairs": 494,
+        "queries": 106,
+        "pair_types": {
+          "graded": 84,
+          "lexical": 244,
+          "mixed": 166
+        },
+        "negative_types": {
+          "answer_string_distractor": 10,
+          "bridge_entity_distractor": 17,
+          "lexical_hard_negative": 289,
+          "low_signal_deep_negative": 140,
+          "semantic_hard_negative": 38
+        },
+        "same_remove_pairs": 494,
+        "same_remove_rate": 1.0
+      },
+      "calib_pairs": {
+        "pairs": 123,
+        "queries": 75,
+        "pair_types": {
+          "graded": 22,
+          "lexical": 65,
+          "mixed": 36
+        },
+        "negative_types": {
+          "answer_string_distractor": 2,
+          "bridge_entity_distractor": 1,
+          "lexical_hard_negative": 76,
+          "low_signal_deep_negative": 28,
+          "semantic_hard_negative": 16
+        },
+        "same_remove_pairs": 123,
+        "same_remove_rate": 1.0
+      },
+      "all_pairs": {
+        "pairs": 617,
+        "queries": 106,
+        "pair_types": {
+          "graded": 106,
+          "lexical": 309,
+          "mixed": 202
+        },
+        "negative_types": {
+          "answer_string_distractor": 12,
+          "bridge_entity_distractor": 18,
+          "lexical_hard_negative": 365,
+          "low_signal_deep_negative": 168,
+          "semantic_hard_negative": 54
+        },
+        "same_remove_pairs": 617,
+        "same_remove_rate": 1.0
+      }
+    },
+    {
+      "fold": 3,
+      "train_source_rows": 800,
+      "eval_rows": 200,
+      "train_pairs": {
+        "pairs": 490,
+        "queries": 105,
+        "pair_types": {
+          "graded": 85,
+          "lexical": 237,
+          "mixed": 168
+        },
+        "negative_types": {
+          "answer_string_distractor": 6,
+          "bridge_entity_distractor": 15,
+          "lexical_hard_negative": 294,
+          "low_signal_deep_negative": 136,
+          "semantic_hard_negative": 39
+        },
+        "same_remove_pairs": 490,
+        "same_remove_rate": 1.0
+      },
+      "calib_pairs": {
+        "pairs": 123,
+        "queries": 67,
+        "pair_types": {
+          "graded": 20,
+          "lexical": 69,
+          "mixed": 34
+        },
+        "negative_types": {
+          "answer_string_distractor": 3,
+          "bridge_entity_distractor": 3,
+          "lexical_hard_negative": 82,
+          "low_signal_deep_negative": 28,
+          "semantic_hard_negative": 7
+        },
+        "same_remove_pairs": 123,
+        "same_remove_rate": 1.0
+      },
+      "all_pairs": {
+        "pairs": 613,
+        "queries": 105,
+        "pair_types": {
+          "graded": 105,
+          "lexical": 306,
+          "mixed": 202
+        },
+        "negative_types": {
+          "answer_string_distractor": 9,
+          "bridge_entity_distractor": 18,
+          "lexical_hard_negative": 376,
+          "low_signal_deep_negative": 164,
+          "semantic_hard_negative": 46
+        },
+        "same_remove_pairs": 613,
+        "same_remove_rate": 1.0
+      }
+    },
+    {
+      "fold": 4,
+      "train_source_rows": 800,
+      "eval_rows": 200,
+      "train_pairs": {
+        "pairs": 483,
+        "queries": 104,
+        "pair_types": {
+          "graded": 77,
+          "lexical": 239,
+          "mixed": 167
+        },
+        "negative_types": {
+          "answer_string_distractor": 10,
+          "bridge_entity_distractor": 7,
+          "lexical_hard_negative": 284,
+          "low_signal_deep_negative": 135,
+          "semantic_hard_negative": 47
+        },
+        "same_remove_pairs": 483,
+        "same_remove_rate": 1.0
+      },
+      "calib_pairs": {
+        "pairs": 121,
+        "queries": 74,
+        "pair_types": {
+          "graded": 27,
+          "lexical": 61,
+          "mixed": 33
+        },
+        "negative_types": {
+          "answer_string_distractor": 1,
+          "bridge_entity_distractor": 3,
+          "lexical_hard_negative": 77,
+          "low_signal_deep_negative": 30,
+          "semantic_hard_negative": 10
+        },
+        "same_remove_pairs": 121,
+        "same_remove_rate": 1.0
+      },
+      "all_pairs": {
+        "pairs": 604,
+        "queries": 104,
+        "pair_types": {
+          "graded": 104,
+          "lexical": 300,
+          "mixed": 200
+        },
+        "negative_types": {
+          "answer_string_distractor": 11,
+          "bridge_entity_distractor": 10,
+          "lexical_hard_negative": 361,
+          "low_signal_deep_negative": 165,
+          "semantic_hard_negative": 57
+        },
+        "same_remove_pairs": 604,
+        "same_remove_rate": 1.0
+      }
+    }
+  ]
+}

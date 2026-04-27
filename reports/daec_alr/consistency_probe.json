@@ -1,0 +1,165 @@
+{
+  "inputs": {
+    "report_json": "run_logs/layer1_proprag_pool_eval_fixed_20260424/2wikimultihopqa_proprag_pool_daec_oracle.json",
+    "pool_json": "run_logs/proprag_pool_exports_full1000_20260424/2wikimultihopqa_pool100.json",
+    "limit": 200,
+    "offset": 0,
+    "top_k": 5
+  },
+  "runtime": {
+    "mode": "openai_compatible_chat",
+    "base_url": "http://localhost:8043/v1",
+    "model": "qwen3-8b-train",
+    "concurrency": 8
+  },
+  "generation": {
+    "batch_size": 8,
+    "max_input_tokens": 1024,
+    "max_new_tokens": 64,
+    "max_docs": 0,
+    "max_doc_chars": 0
+  },
+  "summary": {
+    "rows": 200,
+    "variant_rows": 1000,
+    "variants": [
+      "original",
+      "swap01",
+      "reverse",
+      "rotate_left",
+      "drop_last"
+    ],
+    "original_em": 0.49,
+    "original_f1": 0.588182,
+    "support_recall": 0.94125,
+    "support_complete": 0.855,
+    "consistency_means": {
+      "majority_fraction": 0.803,
+      "inverse_entropy": 0.737676,
+      "inverse_distinct": 0.78,
+      "mean_pairwise_f1": 0.776602,
+      "normalized_entropy": 0.262324,
+      "distinct_answer_count": 1.88
+    },
+    "correct_f1_ge_0_5_means": {
+      "majority_fraction": 0.89916,
+      "inverse_entropy": 0.864936,
+      "inverse_distinct": 0.894958,
+      "mean_pairwise_f1": 0.865757,
+      "normalized_entropy": 0.135064,
+      "distinct_answer_count": 1.420168
+    },
+    "wrong_f1_lt_0_5_means": {
+      "majority_fraction": 0.661728,
+      "inverse_entropy": 0.550714,
+      "inverse_distinct": 0.611111,
+      "mean_pairwise_f1": 0.64562,
+      "normalized_entropy": 0.449286,
+      "distinct_answer_count": 2.555556
+    },
+    "aucs": {
+      "label_em": {
+        "positives": 98,
+        "negatives": 102,
+        "metrics": {
+          "majority_fraction": {
+            "auc": 0.768307,
+            "ci95": [
+              0.705579,
+              0.823163
+            ]
+          },
+          "inverse_entropy": {
+            "auc": 0.769958,
+            "ci95": [
+              0.706321,
+              0.826364
+            ]
+          },
+          "inverse_distinct": {
+            "auc": 0.764756,
+            "ci95": [
+              0.702833,
+              0.823464
+            ]
+          },
+          "mean_pairwise_f1": {
+            "auc": 0.744748,
+            "ci95": [
+              0.677818,
+              0.804485
+            ]
+          }
+        }
+      },
+      "label_f1_positive": {
+        "positives": 145,
+        "negatives": 55,
+        "metrics": {
+          "majority_fraction": {
+            "auc": 0.599812,
+            "ci95": [
+              0.516806,
+              0.676663
+            ]
+          },
+          "inverse_entropy": {
+            "auc": 0.599373,
+            "ci95": [
+              0.515486,
+              0.676663
+            ]
+          },
+          "inverse_distinct": {
+            "auc": 0.600313,
+            "ci95": [
+              0.5162,
+              0.676906
+            ]
+          },
+          "mean_pairwise_f1": {
+            "auc": 0.675674,
+            "ci95": [
+              0.583009,
+              0.755102
+            ]
+          }
+        }
+      },
+      "label_f1_ge_0_5": {
+        "positives": 119,
+        "negatives": 81,
+        "metrics": {
+          "majority_fraction": {
+            "auc": 0.757184,
+            "ci95": [
+              0.687466,
+              0.820193
+            ]
+          },
+          "inverse_entropy": {
+            "auc": 0.759778,
+            "ci95": [
+              0.690214,
+              0.822619
+            ]
+          },
+          "inverse_distinct": {
+            "auc": 0.759882,
+            "ci95": [
+              0.689822,
+              0.821756
+            ]
+          },
+          "mean_pairwise_f1": {
+            "auc": 0.731663,
+            "ci95": [
+              0.660055,
+              0.798296
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,683 @@
+{
+  "summary": {
+    "rows": 5,
+    "recall_at_5": 0.8,
+    "recall_at_10": 0.8,
+    "recall_at_20": 0.8,
+    "avg_candidate_count": 10.4,
+    "decision": "STOP_CANDIDATE_V2_RECALL_FAIL",
+    "passed_top5": false,
+    "passed_top10": false
+  },
+  "payload": {
+    "status": "completed",
+    "health": {
+      "available": true,
+      "status": 200,
+      "models": [
+        "qwen3-8b-train"
+      ]
+    },
+    "config": {
+      "llm_endpoint": "http://localhost:8043/v1",
+      "llm_model": "qwen3-8b-train",
+      "include_v1": false,
+      "include_string_extract": false,
+      "answer_cap": 20
+    },
+    "summary": {
+      "rows": 5,
+      "recall_at_5": 0.8,
+      "recall_at_10": 0.8,
+      "recall_at_20": 0.8,
+      "avg_candidate_count": 10.4,
+      "decision": "STOP_CANDIDATE_V2_RECALL_FAIL",
+      "passed_top5": false,
+      "passed_top10": false
+    }
+  },
+  "rows": [
+    {
+      "qid": "6718770a087311ebbd66ac1f6bf848b6",
+      "gold_answers": [
+        "The Heart Of Doreon"
+      ],
+      "candidate_count": 10,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "recall_at_20": 1.0,
+      "llm_candidates": [
+        "Robert North Bradbury",
+        "Charlie Day",
+        "1886",
+        "1976",
+        "The Heart Of Doreon",
+        "El Tonto",
+        "1921",
+        "1989",
+        "1934",
+        "1918"
+      ],
+      "top_candidates": [
+        {
+          "text": "Robert North Bradbury",
+          "normalized": "robert north bradbury",
+          "score": 80.0,
+          "max_score": 80.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Charlie Day",
+          "normalized": "charlie day",
+          "score": 79.0,
+          "max_score": 79.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "1886",
+          "normalized": "1886",
+          "score": 78.0,
+          "max_score": 78.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "1976",
+          "normalized": "1976",
+          "score": 77.0,
+          "max_score": 77.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "The Heart Of Doreon",
+          "normalized": "heart of doreon",
+          "score": 76.0,
+          "max_score": 76.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "El Tonto",
+          "normalized": "el tonto",
+          "score": 75.0,
+          "max_score": 75.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "1921",
+          "normalized": "1921",
+          "score": 74.0,
+          "max_score": 74.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "1989",
+          "normalized": "1989",
+          "score": 73.0,
+          "max_score": 73.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "1934",
+          "normalized": "1934",
+          "score": 72.0,
+          "max_score": 72.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "1918",
+          "normalized": "1918",
+          "score": 71.0,
+          "max_score": 71.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        }
+      ]
+    },
+    {
+      "qid": "7f7046d308f711ebbdaaac1f6bf848b6",
+      "gold_answers": [
+        "Andy Summers"
+      ],
+      "candidate_count": 12,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "recall_at_20": 1.0,
+      "llm_candidates": [
+        "Andy Summers was born on 31 December 1942",
+        "Andy Summers",
+        "Aivar Kuusmaa was born on 12 June 1967",
+        "Aivar Kuusmaa",
+        "Andy Summers was born first",
+        "Aivar Kuusmaa was born later",
+        "Andy Summers born 1942",
+        "Aivar Kuusmaa born 1967",
+        "Andy Summers is older",
+        "Aivar Kuusmaa is younger",
+        "Andy Summers born first",
+        "Aivar Kuusmaa born second"
+      ],
+      "top_candidates": [
+        {
+          "text": "Andy Summers was born on 31 December 1942",
+          "normalized": "andy summers was born on 31 december 1942",
+          "score": 80.0,
+          "max_score": 80.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Andy Summers",
+          "normalized": "andy summers",
+          "score": 79.0,
+          "max_score": 79.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Aivar Kuusmaa was born on 12 June 1967",
+          "normalized": "aivar kuusmaa was born on 12 june 1967",
+          "score": 78.0,
+          "max_score": 78.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Aivar Kuusmaa",
+          "normalized": "aivar kuusmaa",
+          "score": 77.0,
+          "max_score": 77.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Andy Summers was born first",
+          "normalized": "andy summers was born first",
+          "score": 76.0,
+          "max_score": 76.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Aivar Kuusmaa was born later",
+          "normalized": "aivar kuusmaa was born later",
+          "score": 75.0,
+          "max_score": 75.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Andy Summers born 1942",
+          "normalized": "andy summers born 1942",
+          "score": 74.0,
+          "max_score": 74.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Aivar Kuusmaa born 1967",
+          "normalized": "aivar kuusmaa born 1967",
+          "score": 73.0,
+          "max_score": 73.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Andy Summers is older",
+          "normalized": "andy summers is older",
+          "score": 72.0,
+          "max_score": 72.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Aivar Kuusmaa is younger",
+          "normalized": "aivar kuusmaa is younger",
+          "score": 71.0,
+          "max_score": 71.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Andy Summers born first",
+          "normalized": "andy summers born first",
+          "score": 70.0,
+          "max_score": 70.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Aivar Kuusmaa born second",
+          "normalized": "aivar kuusmaa born second",
+          "score": 69.0,
+          "max_score": 69.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        }
+      ]
+    },
+    {
+      "qid": "9fe6a6760baf11ebab90acde48001122",
+      "gold_answers": [
+        "Ailéan mac Ruaidhrí"
+      ],
+      "candidate_count": 10,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "recall_at_20": 1.0,
+      "llm_candidates": [
+        "Ailéan mac Ruaidhrí",
+        "Ruaidhrí Mac Ruaidhrí",
+        "Dáire Drechlethan",
+        "Takayama Tomoteru",
+        "Amy of Garmoran",
+        "List of people named O'Grady",
+        "Comgall mac Domangairt",
+        "Dugès",
+        "Tnúthgal mac Donngaile",
+        "Domnall mac Caustantín"
+      ],
+      "top_candidates": [
+        {
+          "text": "Ailéan mac Ruaidhrí",
+          "normalized": "ailéan mac ruaidhrí",
+          "score": 80.0,
+          "max_score": 80.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Ruaidhrí Mac Ruaidhrí",
+          "normalized": "ruaidhrí mac ruaidhrí",
+          "score": 79.0,
+          "max_score": 79.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Dáire Drechlethan",
+          "normalized": "dáire drechlethan",
+          "score": 78.0,
+          "max_score": 78.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Takayama Tomoteru",
+          "normalized": "takayama tomoteru",
+          "score": 77.0,
+          "max_score": 77.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Amy of Garmoran",
+          "normalized": "amy of garmoran",
+          "score": 76.0,
+          "max_score": 76.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "List of people named O'Grady",
+          "normalized": "list of people named ogrady",
+          "score": 75.0,
+          "max_score": 75.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Comgall mac Domangairt",
+          "normalized": "comgall mac domangairt",
+          "score": 74.0,
+          "max_score": 74.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Dugès",
+          "normalized": "dugès",
+          "score": 73.0,
+          "max_score": 73.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Tnúthgal mac Donngaile",
+          "normalized": "tnúthgal mac donngaile",
+          "score": 72.0,
+          "max_score": 72.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Domnall mac Caustantín",
+          "normalized": "domnall mac caustantín",
+          "score": 71.0,
+          "max_score": 71.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        }
+      ]
+    },
+    {
+      "qid": "551e024408a611ebbd7fac1f6bf848b6",
+      "gold_answers": [
+        "yes"
+      ],
+      "candidate_count": 10,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "recall_at_20": 1.0,
+      "llm_candidates": [
+        "Yes",
+        "No",
+        "Both films are British",
+        "Frank Launder is British",
+        "Perry Bhandal is British",
+        "The Last Coupon is British",
+        "Interview with a Hitman is British",
+        "Both directors are from the same country",
+        "The directors are from the same country",
+        "The films are both from the UK"
+      ],
+      "top_candidates": [
+        {
+          "text": "Yes",
+          "normalized": "yes",
+          "score": 80.0,
+          "max_score": 80.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "No",
+          "normalized": "no",
+          "score": 79.0,
+          "max_score": 79.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Both films are British",
+          "normalized": "both films are british",
+          "score": 78.0,
+          "max_score": 78.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Frank Launder is British",
+          "normalized": "frank launder is british",
+          "score": 77.0,
+          "max_score": 77.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Perry Bhandal is British",
+          "normalized": "perry bhandal is british",
+          "score": 76.0,
+          "max_score": 76.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "The Last Coupon is British",
+          "normalized": "last coupon is british",
+          "score": 75.0,
+          "max_score": 75.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Interview with a Hitman is British",
+          "normalized": "interview with hitman is british",
+          "score": 74.0,
+          "max_score": 74.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Both directors are from the same country",
+          "normalized": "both directors are from same country",
+          "score": 73.0,
+          "max_score": 73.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "The directors are from the same country",
+          "normalized": "directors are from same country",
+          "score": 72.0,
+          "max_score": 72.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "The films are both from the UK",
+          "normalized": "films are both from uk",
+          "score": 71.0,
+          "max_score": 71.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        }
+      ]
+    },
+    {
+      "qid": "33f51d7e0bde11eba7f7acde48001122",
+      "gold_answers": [
+        "Chinese"
+      ],
+      "candidate_count": 10,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "recall_at_20": 0.0,
+      "llm_candidates": [
+        "Chinese American",
+        "Swedish",
+        "Thai",
+        "American",
+        "South Korean",
+        "Mexican",
+        "Filipino",
+        "French",
+        "Australian",
+        "German"
+      ],
+      "top_candidates": [
+        {
+          "text": "Chinese American",
+          "normalized": "chinese american",
+          "score": 80.0,
+          "max_score": 80.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Swedish",
+          "normalized": "swedish",
+          "score": 79.0,
+          "max_score": 79.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Thai",
+          "normalized": "thai",
+          "score": 78.0,
+          "max_score": 78.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "American",
+          "normalized": "american",
+          "score": 77.0,
+          "max_score": 77.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "South Korean",
+          "normalized": "south korean",
+          "score": 76.0,
+          "max_score": 76.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Mexican",
+          "normalized": "mexican",
+          "score": 75.0,
+          "max_score": 75.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Filipino",
+          "normalized": "filipino",
+          "score": 74.0,
+          "max_score": 74.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "French",
+          "normalized": "french",
+          "score": 73.0,
+          "max_score": 73.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "Australian",
+          "normalized": "australian",
+          "score": 72.0,
+          "max_score": 72.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        },
+        {
+          "text": "German",
+          "normalized": "german",
+          "score": 71.0,
+          "max_score": 71.0,
+          "sources": [
+            "llm_candidate_list"
+          ],
+          "source_count": 1
+        }
+      ]
+    }
+  ]
+}

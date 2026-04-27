@@ -41,25 +41,19 @@
     ]
   },
   "ircot_baseline": {
-    "status": "not_run",
-    "dataset": "musique",
-    "limit": 50,
-    "max_iter": 3,
-    "top_k_per_iter": 5,
-    "llm_name": "qwen3-8b",
-    "reason": "No --llm_base_url or --replay_report provided. This script will not fabricate IRCoT results."
+    "status": "missing",
+    "path": "reports/week0/ircot_musique1000.json"
   },
   "nli_calibration": {
-    "status": "completed",
+    "status": "model_unavailable",
     "model_name": "microsoft/deberta-v3-base-mnli",
-    "calibration_source": "hotpotqa weak sentence labels (lexical smoke, not DeBERTa)",
-    "num_examples": 200,
-    "temperature": 0.5,
-    "ece": 0.08528021153070182,
-    "brier": 0.057685430095094414,
-    "nll": 0.23613221224395825,
+    "num_examples": 0,
+    "ece": 1.0,
+    "brier": 1.0,
+    "nll": 0.0,
+    "temperature": 1.0,
     "absorbing_status": "ablation",
-    "lexical_smoke": true
+    "error": "microsoft/deberta-v3-base-mnli is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'\nIf this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`"
   },
   "oracle_slot_pipeline": {
     "status": "completed",
@@ -72,9 +66,644 @@
     "contamination_warning": "Oracle slots are only for BSGS-oracle-slot diagnostics; do not tune latent-slot prompts on the same split."
   },
   "qwen_slot_quality": {
-    "status": "not_run",
-    "reason": "No predicted_jsonl or llm_base_url provided. Use --llm_base_url for real Qwen evaluation.",
-    "num_examples": 0
+    "status": "completed",
+    "oracle_smoke": false,
+    "num_examples": 997,
+    "metrics": {
+      "slot_precision": 0.6551248985050385,
+      "slot_recall": 0.6768639251086587,
+      "slot_f1": 0.655210798340185,
+      "variable_grounding_accuracy": 0.0019224339685723836
+    },
+    "errors": [
+      "3hop1__518381_709625_84283: Invalid \\escape: line 1 column 58 (char 57)",
+      "3hop1__798544_514761_594810: Invalid \\escape: line 1 column 61 (char 60)",
+      "2hop__689472_52835: Invalid \\escape: line 1 column 59 (char 58)"
+    ],
+    "predictions_out": "data/processed/musique_qwen_slots.jsonl"
+  },
+  "qwen_slot_quality_posthoc": {
+    "status": "completed",
+    "num_examples": 997,
+    "threshold": 0.35,
+    "metrics": {
+      "avg_gold_slots": 2.6479438314944836,
+      "avg_predicted_slots": 2.7833500501504513,
+      "slot_count_exact": 0.6308926780341023,
+      "slot_count_within_one": 0.9428284854563691,
+      "aligned_answer_type_accuracy": 0.18029087261785365,
+      "dependency_presence_accuracy": 0.6908224674022063,
+      "position_chain_accuracy": 0.5575058508859912,
+      "avg_gold_dependent_slots": 1.5165496489468404,
+      "avg_predicted_internal_dependencies": 1.5195586760280841
+    },
+    "interpretation": "position_chain_accuracy checks whether a generated dependent slot refers to a previous generated output variable, avoiding brittle exact-name matching against oracle x1/x2 labels.",
+    "examples": [
+      {
+        "qid": "3hop1__9285_5188_23307",
+        "question": "What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities commonwealth, the top-ranking Warsaw Pact operatives originated?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "What was the nobilities commonwealth?",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "What was the nobilities commonwealth?",
+            "gold_answer": "Poland"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "Despite being headquartered in #1 , the top-ranking operatives of the Warsaw Pact were from which country?",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "x2",
+            "expected_answer_type": "other",
+            "gold_subquestion": "Despite being headquartered in #1 , the top-ranking operatives of the Warsaw Pact were from which country?",
+            "gold_answer": "the USSR"
+          },
+          {
+            "slot_id": "s3",
+            "slot_text": "What month did the Tripartite discussions begin between Britain, #2 and France?",
+            "input_variables": [
+              "x2"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "date",
+            "gold_subquestion": "What month did the Tripartite discussions begin between Britain, #2 and France?",
+            "gold_answer": "mid-June"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Identify the country where the top-ranking Warsaw Pact operatives originated.",
+            "input_variables": [],
+            "output_variable": "country_origin",
+            "expected_answer_type": "place",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "Determine the month when the Tripartite discussions began between Britain, France, and the identified country.",
+            "input_variables": [
+              "country_origin"
+            ],
+            "output_variable": "month_begin",
+            "expected_answer_type": "date",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 3.0,
+          "slot_count_predicted": 2.0,
+          "slot_count_exact": 0.0,
+          "slot_count_within_one": 1.0,
+          "aligned_slots": 2.0,
+          "aligned_answer_type_accuracy": 0.5,
+          "dependency_presence_accuracy": 0.5,
+          "position_chain_accuracy": 0.5,
+          "gold_dependent_slots": 2.0,
+          "predicted_internal_dependencies": 1.0
+        }
+      },
+      {
+        "qid": "2hop__766973_770570",
+        "question": "What county is Erik Hort's birthplace a part of?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "Erik Hort >> place of birth",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "Erik Hort >> place of birth",
+            "gold_answer": "Montebello"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "#1 >> located in the administrative territorial entity",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "other",
+            "gold_subquestion": "#1 >> located in the administrative territorial entity",
+            "gold_answer": "Rockland County"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Identify Erik Hort's birthplace",
+            "input_variables": [
+              "Erik Hort"
+            ],
+            "output_variable": "birthplace",
+            "expected_answer_type": "place",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "Determine the county of the birthplace",
+            "input_variables": [
+              "birthplace"
+            ],
+            "output_variable": "county",
+            "expected_answer_type": "place",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 2.0,
+          "slot_count_predicted": 2.0,
+          "slot_count_exact": 1.0,
+          "slot_count_within_one": 1.0,
+          "aligned_slots": 0.0,
+          "aligned_answer_type_accuracy": 0.0,
+          "dependency_presence_accuracy": 0.0,
+          "position_chain_accuracy": 0.0,
+          "gold_dependent_slots": 1.0,
+          "predicted_internal_dependencies": 1.0
+        }
+      },
+      {
+        "qid": "4hop3__754156_88460_30152_20999",
+        "question": "How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "A Lim >> country",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "A Lim >> country",
+            "gold_answer": "Laos"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "what natural boundary lies between thailand and #1",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "x2",
+            "expected_answer_type": "other",
+            "gold_subquestion": "what natural boundary lies between thailand and #1",
+            "gold_answer": "Myanmar"
+          },
+          {
+            "slot_id": "s3",
+            "slot_text": "New coins were a proclamation of independence by the Somali Muslim Ajuran Empire from whom?",
+            "input_variables": [],
+            "output_variable": "x3",
+            "expected_answer_type": "other",
+            "gold_subquestion": "New coins were a proclamation of independence by the Somali Muslim Ajuran Empire from whom?",
+            "gold_answer": "the Portuguese"
+          },
+          {
+            "slot_id": "s4",
+            "slot_text": "How were the #3 expelled from #2 ?",
+            "input_variables": [
+              "x3",
+              "x2"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "other",
+            "gold_subquestion": "How were the #3 expelled from #2 ?",
+            "gold_answer": "The dynasty regrouped and defeated the Portuguese"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Identify the Somali Muslim Ajuran Empire",
+            "input_variables": [],
+            "output_variable": "ajuran_empire",
+            "expected_answer_type": "organization",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "Identify the country between Thailand and A Lim's country",
+            "input_variables": [
+              "thailand",
+              "a_lim_country"
+            ],
+            "output_variable": "country_between",
+            "expected_answer_type": "place",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p3",
+            "slot_text": "Determine the method of expulsion of people by the Somali Muslim Ajuran Empire",
+            "input_variables": [
+              "ajuran_empire",
+              "country_between"
+            ],
+            "output_variable": "expulsion_method",
+            "expected_answer_type": "other",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p4",
+            "slot_text": "Identify the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire",
+            "input_variables": [
+              "ajuran_empire"
+            ],
+            "output_variable": "people_involved",
+            "expected_answer_type": "other",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 4.0,
+          "slot_count_predicted": 4.0,
+          "slot_count_exact": 1.0,
+          "slot_count_within_one": 1.0,
+          "aligned_slots": 2.0,
+          "aligned_answer_type_accuracy": 0.0,
+          "dependency_presence_accuracy": 1.0,
+          "position_chain_accuracy": 0.0,
+          "gold_dependent_slots": 2.0,
+          "predicted_internal_dependencies": 2.0
+        }
+      },
+      {
+        "qid": "2hop__199513_801817",
+        "question": "What is the birthplace of the person after whom São José dos Campos was named?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "São José dos Campos >> named after",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "São José dos Campos >> named after",
+            "gold_answer": "Joseph"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "#1 >> place of birth",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "other",
+            "gold_subquestion": "#1 >> place of birth",
+            "gold_answer": "Nazareth"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Identify the person after whom São José dos Campos was named.",
+            "input_variables": [],
+            "output_variable": "named_person",
+            "expected_answer_type": "person",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "Find the birthplace of the identified person.",
+            "input_variables": [
+              "named_person"
+            ],
+            "output_variable": "birthplace",
+            "expected_answer_type": "place",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 2.0,
+          "slot_count_predicted": 2.0,
+          "slot_count_exact": 1.0,
+          "slot_count_within_one": 1.0,
+          "aligned_slots": 1.0,
+          "aligned_answer_type_accuracy": 0.0,
+          "dependency_presence_accuracy": 1.0,
+          "position_chain_accuracy": 0.0,
+          "gold_dependent_slots": 1.0,
+          "predicted_internal_dependencies": 1.0
+        }
+      },
+      {
+        "qid": "3hop1__136129_87694_124169",
+        "question": "What year did the Governor of the city where the basilica named after the same saint as the one that Mantua Cathedral is dedicated to die?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "What is Đakovo Cathedral named after?",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "What is Đakovo Cathedral named after?",
+            "gold_answer": "Peter"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "st. #1 ’s basilica the head of the catholic religion is located in",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "x2",
+            "expected_answer_type": "other",
+            "gold_subquestion": "st. #1 ’s basilica the head of the catholic religion is located in",
+            "gold_answer": "Vatican City"
+          },
+          {
+            "slot_id": "s3",
+            "slot_text": "On what date did Governor of #2 end?",
+            "input_variables": [
+              "x2"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "number",
+            "gold_subquestion": "On what date did Governor of #2 end?",
+            "gold_answer": "1952"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Identify the saint associated with Mantua Cathedral.",
+            "input_variables": [],
+            "output_variable": "saint_name",
+            "expected_answer_type": "other",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "Find the basilica named after the same saint as Mantua Cathedral.",
+            "input_variables": [
+              "saint_name"
+            ],
+            "output_variable": "basilica_name",
+            "expected_answer_type": "other",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p3",
+            "slot_text": "Determine the city where the identified basilica is located.",
+            "input_variables": [
+              "basilica_name"
+            ],
+            "output_variable": "city_name",
+            "expected_answer_type": "other",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p4",
+            "slot_text": "Find the Governor of the identified city.",
+            "input_variables": [
+              "city_name"
+            ],
+            "output_variable": "governor_name",
+            "expected_answer_type": "person",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p5",
+            "slot_text": "Determine the year the identified Governor died.",
+            "input_variables": [
+              "governor_name"
+            ],
+            "output_variable": "death_year",
+            "expected_answer_type": "date",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 3.0,
+          "slot_count_predicted": 5.0,
+          "slot_count_exact": 0.0,
+          "slot_count_within_one": 0.0,
+          "aligned_slots": 1.0,
+          "aligned_answer_type_accuracy": 1.0,
+          "dependency_presence_accuracy": 0.0,
+          "position_chain_accuracy": 0.0,
+          "gold_dependent_slots": 2.0,
+          "predicted_internal_dependencies": 4.0
+        }
+      },
+      {
+        "qid": "2hop__354635_174222",
+        "question": "What company succeeded the owner of Empire Sports Network?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "Empire Sports Network >> owned by",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "Empire Sports Network >> owned by",
+            "gold_answer": "Adelphia Communications Corporation"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "#1 >> followed by",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "other",
+            "gold_subquestion": "#1 >> followed by",
+            "gold_answer": "Time Warner Cable"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Who is the owner of Empire Sports Network?",
+            "input_variables": [],
+            "output_variable": "owner_of_empire_sports_network",
+            "expected_answer_type": "person",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "What company succeeded the owner of Empire Sports Network?",
+            "input_variables": [
+              "owner_of_empire_sports_network"
+            ],
+            "output_variable": "company_that_succeeded_owner",
+            "expected_answer_type": "organization",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 2.0,
+          "slot_count_predicted": 2.0,
+          "slot_count_exact": 1.0,
+          "slot_count_within_one": 1.0,
+          "aligned_slots": 1.0,
+          "aligned_answer_type_accuracy": 0.0,
+          "dependency_presence_accuracy": 1.0,
+          "position_chain_accuracy": 0.0,
+          "gold_dependent_slots": 1.0,
+          "predicted_internal_dependencies": 1.0
+        }
+      },
+      {
+        "qid": "2hop__511296_577502",
+        "question": "Who married the actor from Terminator?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "Terminator >> performer",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "Terminator >> performer",
+            "gold_answer": "Arnold Schwarzenegger"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "#1 >> spouse",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "other",
+            "gold_subquestion": "#1 >> spouse",
+            "gold_answer": "Maria Shriver"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Identify the actor from Terminator",
+            "input_variables": [],
+            "output_variable": "actor_from_terminator",
+            "expected_answer_type": "person",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "Find who married the identified actor",
+            "input_variables": [
+              "actor_from_terminator"
+            ],
+            "output_variable": "spouse_of_actor",
+            "expected_answer_type": "person",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 2.0,
+          "slot_count_predicted": 2.0,
+          "slot_count_exact": 1.0,
+          "slot_count_within_one": 1.0,
+          "aligned_slots": 0.0,
+          "aligned_answer_type_accuracy": 0.0,
+          "dependency_presence_accuracy": 0.0,
+          "position_chain_accuracy": 0.0,
+          "gold_dependent_slots": 1.0,
+          "predicted_internal_dependencies": 1.0
+        }
+      },
+      {
+        "qid": "3hop1__786632_831637_91775",
+        "question": "What does seal stand for in the U.S. military branch that operates destroyers, as well as the USS Edsall?",
+        "gold_slots": [
+          {
+            "slot_id": "s1",
+            "slot_text": "USS Edsall >> operator",
+            "input_variables": [],
+            "output_variable": "x1",
+            "expected_answer_type": "other",
+            "gold_subquestion": "USS Edsall >> operator",
+            "gold_answer": "United States Navy"
+          },
+          {
+            "slot_id": "s2",
+            "slot_text": "list of destroyer classes of #1 >> operator",
+            "input_variables": [
+              "x1"
+            ],
+            "output_variable": "x2",
+            "expected_answer_type": "other",
+            "gold_subquestion": "list of destroyer classes of #1 >> operator",
+            "gold_answer": "U.S. Navy"
+          },
+          {
+            "slot_id": "s3",
+            "slot_text": "what does seal stand for in #2 seals",
+            "input_variables": [
+              "x2"
+            ],
+            "output_variable": "answer",
+            "expected_answer_type": "other",
+            "gold_subquestion": "what does seal stand for in #2 seals",
+            "gold_answer": "Sea, Air, and Land"
+          }
+        ],
+        "predicted_slots": [
+          {
+            "slot_id": "p1",
+            "slot_text": "Identify the U.S. military branch that operates destroyers",
+            "input_variables": [],
+            "output_variable": "military_branch",
+            "expected_answer_type": "organization",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p2",
+            "slot_text": "Identify the meaning of the term 'seal' in the context of the identified military branch",
+            "input_variables": [
+              "military_branch"
+            ],
+            "output_variable": "seal_meaning",
+            "expected_answer_type": "other",
+            "gold_subquestion": null,
+            "gold_answer": null
+          },
+          {
+            "slot_id": "p3",
+            "slot_text": "Identify the USS Edsall and its association with the military branch",
+            "input_variables": [
+              "military_branch"
+            ],
+            "output_variable": "uss_eddall_association",
+            "expected_answer_type": "other",
+            "gold_subquestion": null,
+            "gold_answer": null
+          }
+        ],
+        "metrics": {
+          "slot_count_gold": 3.0,
+          "slot_count_predicted": 3.0,
+          "slot_count_exact": 1.0,
+          "slot_count_within_one": 1.0,
+          "aligned_slots": 0.0,
+          "aligned_answer_type_accuracy": 0.0,
+          "dependency_presence_accuracy": 0.0,
+          "position_chain_accuracy": 0.0,
+          "gold_dependent_slots": 2.0,
+          "predicted_internal_dependencies": 2.0
+        }
+      }
+    ]
   },
   "decision": {
     "week1_config": {
@@ -95,7 +724,9 @@
       "semi-absorbing transition as main"
     ],
     "risks": [
-      "Formal DeBERTa calibration has not run; lexical smoke is not a main verifier result, so absorbing remains ablation/fallback."
+      "NLI calibration did not pass or was unavailable; absorbing remains ablation/fallback.",
+      "Qwen slot recall is 0.6769, below the 0.70 Week-2 main-route gate; keep latent slots diagnostic-only.",
+      "Post-hoc position-chain accuracy is 0.5575; Qwen often misses explicit dependency wiring even when slot text matches."
     ]
   }
 }

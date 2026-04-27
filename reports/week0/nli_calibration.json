@@ -1,12 +1,11 @@
 {
-  "status": "completed",
+  "status": "model_unavailable",
   "model_name": "microsoft/deberta-v3-base-mnli",
-  "calibration_source": "hotpotqa weak sentence labels (lexical smoke, not DeBERTa)",
-  "num_examples": 200,
-  "temperature": 0.5,
-  "ece": 0.08528021153070182,
-  "brier": 0.057685430095094414,
-  "nll": 0.23613221224395825,
+  "num_examples": 0,
+  "ece": 1.0,
+  "brier": 1.0,
+  "nll": 0.0,
+  "temperature": 1.0,
   "absorbing_status": "ablation",
-  "lexical_smoke": true
+  "error": "microsoft/deberta-v3-base-mnli is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'\nIf this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`"
 }

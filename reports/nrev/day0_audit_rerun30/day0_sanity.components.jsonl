@@ -1,0 +1,1060 @@
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "dependency", "answer": "20 March 851", "score": -0.09212411107898788}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "reverse", "answer": "20 March 851", "score": -0.2888684911945347}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "20 March 851", "score": -0.10744754284382907}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "20 March 851", "score": -0.10797994351172235}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "20 March 851", "score": -2.322610590570548}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "20 March 851", "score": -2.2333247214119183}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "20 March 851", "score": -0.5907382817447342}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "20 March 851", "score": -0.6016640114539769}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "20 March 851", "score": -0.10990262701454867}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "20 March 851", "score": -0.0961650427638574}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "20 March 851", "score": -0.13288997195900265}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "20 March 851", "score": -0.09884509001665265}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "20 March 851", "score": -0.10400538046883412}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "20 March 851", "score": -0.08336481483706848}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "20 March 851", "score": -2.6358316851838026}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Ermengarde of Tours", "score": -0.19488731099070833}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Ermengarde of Tours", "score": -0.15118160004855005}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Ermengarde of Tours", "score": -0.27786564195325997}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Ermengarde of Tours", "score": -0.13516008818300898}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Ermengarde of Tours", "score": -0.9091481689437538}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Ermengarde of Tours", "score": -1.258505966965913}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Ermengarde of Tours", "score": -0.42189414146681276}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Ermengarde of Tours", "score": -0.3799854412604115}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Ermengarde of Tours", "score": -0.2111304907228373}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Ermengarde of Tours", "score": -0.246207290417748}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Ermengarde of Tours", "score": -0.14531459350291223}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Ermengarde of Tours", "score": -0.2563541006325778}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Ermengarde of Tours", "score": -0.1686821102992392}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Ermengarde of Tours", "score": -0.2658234994796646}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Ermengarde of Tours", "score": -2.2502363498012223}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Phoolwari", "score": -0.06149375808649893}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Phoolwari", "score": -0.07154112307329541}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Phoolwari", "score": -0.10491214687181127}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Phoolwari", "score": -0.55012488362547}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Phoolwari", "score": -0.10889621067917687}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Phoolwari", "score": -0.08795439434061336}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Phoolwari", "score": -1.3916718895779905}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Phoolwari", "score": -1.3915375443393714}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Phoolwari", "score": -0.06359365579987752}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Phoolwari", "score": -0.04672844332139903}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Phoolwari", "score": -0.05774668974163433}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Phoolwari", "score": -0.046676892741515985}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Phoolwari", "score": -0.047290939764479845}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Phoolwari", "score": -0.054612450275044466}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Phoolwari", "score": -0.5766795575462993}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Indian", "score": -13.933454513549805}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Indian", "score": -14.098649024963379}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Indian", "score": -12.8571195602417}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Indian", "score": -14.512980461120605}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Indian", "score": -10.597307205200195}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Indian", "score": -12.496953010559082}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Indian", "score": -12.72569751739502}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Indian", "score": -10.597307205200195}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Indian", "score": -11.80103874206543}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Indian", "score": -11.216886520385742}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Indian", "score": -10.515754699707031}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Indian", "score": -10.791887283325195}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Indian", "score": -10.649849891662598}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Indian", "score": -10.792774200439453}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Indian", "score": -10.882589340209961}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Indian", "score": -11.176270484924316}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Indian", "score": -10.353476524353027}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Indian", "score": -10.132497787475586}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Indian", "score": -13.351103782653809}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Phoolwari", "score": -0.11809555406668437}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Phoolwari", "score": -0.09299744657296571}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Phoolwari", "score": -0.05643244453831642}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Phoolwari", "score": -0.11809555406668437}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Port of Spain", "score": -0.7067978381628564}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Port of Spain", "score": -1.6421828268764027}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Port of Spain", "score": -1.1455458005108692}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Port of Spain", "score": -0.8321422338161332}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Port of Spain", "score": -3.5685529589730627}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Port of Spain", "score": -2.437009346050521}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Port of Spain", "score": -1.273792107378237}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Port of Spain", "score": -1.3159492809434898}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Port of Spain", "score": -0.9260920682624297}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Port of Spain", "score": -0.9213749963021959}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Port of Spain", "score": -1.0251858233696112}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Port of Spain", "score": -0.8834790388303494}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Port of Spain", "score": -0.8854134082357632}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Port of Spain", "score": -0.5766679445822168}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Port of Spain", "score": -2.476415117329452}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Trinidadian", "score": -5.56611430644989}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Trinidadian", "score": -5.791490435600281}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Trinidadian", "score": -5.319166779518127}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Trinidadian", "score": -4.949227035045624}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Trinidadian", "score": -3.724550485610962}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Trinidadian", "score": -5.210383772850037}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Trinidadian", "score": -5.9871985912323}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Trinidadian", "score": -3.724550485610962}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Trinidadian", "score": -11.845967769622803}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Trinidadian", "score": -11.30882716178894}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Trinidadian", "score": -3.792604148387909}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Trinidadian", "score": -4.786806106567383}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Trinidadian", "score": -5.35547149181366}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Trinidadian", "score": -4.671111345291138}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Trinidadian", "score": -5.840020656585693}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Trinidadian", "score": -5.2908406257629395}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Trinidadian", "score": -2.469189941883087}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Trinidadian", "score": -3.7500362396240234}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Trinidadian", "score": -8.213147163391113}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Port of Spain", "score": -2.582691263325008}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Port of Spain", "score": -1.1899959883545914}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Port of Spain", "score": -1.4914044073472421}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Port of Spain", "score": -2.582691263325008}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "dependency", "answer": "no", "score": -4.417574882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "reverse", "answer": "no", "score": -4.066155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "no", "score": -3.4312148094177246}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "no", "score": -3.7024972438812256}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "no", "score": -4.826448440551758}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "no", "score": -4.85244083404541}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "no", "score": -3.272012233734131}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "no", "score": -3.6543664932250977}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "no", "score": -4.171446323394775}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "no", "score": -4.658447742462158}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "no", "score": -4.296712875366211}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "no", "score": -4.53909158706665}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "no", "score": -4.299405574798584}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "no", "score": -3.5692014694213867}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "no", "score": -6.758057117462158}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "yes", "score": -15.480074882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "yes", "score": -12.941155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "yes", "score": -13.118714332580566}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "yes", "score": -13.827497482299805}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "yes", "score": -15.480074882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "yes", "score": -12.941155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "yes", "score": -13.118714332580566}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "yes", "score": -15.722515106201172}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "yes", "score": -10.513948440551758}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "yes", "score": -9.53994083404541}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "yes", "score": -9.272011756896973}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "yes", "score": -10.529366493225098}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "yes", "score": -15.046446800231934}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "yes", "score": -15.658447265625}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "yes", "score": -14.921712875366211}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "yes", "score": -15.351592063903809}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "yes", "score": -14.861906051635742}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "yes", "score": -14.069201469421387}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "yes", "score": -4.508057117462158}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "no", "score": -4.417574882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "no", "score": -4.066155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "no", "score": -3.4312148094177246}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "no", "score": -4.41001558303833}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "dependency", "answer": "God'S Gift To Women", "score": -1.1998435264846194}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "reverse", "answer": "God'S Gift To Women", "score": -1.572022274077972}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "God'S Gift To Women", "score": -1.4241220524428173}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "God'S Gift To Women", "score": -1.276878923762888}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "God'S Gift To Women", "score": -1.2503731644886102}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "God'S Gift To Women", "score": -1.1861702457811816}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "God'S Gift To Women", "score": -1.4650934024803064}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "God'S Gift To Women", "score": -1.238042688641599}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "God'S Gift To Women", "score": -0.592198589650252}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "God'S Gift To Women", "score": -0.5682962809602031}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "God'S Gift To Women", "score": -1.1061505305593529}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "God'S Gift To Women", "score": -0.908284626600107}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "God'S Gift To Women", "score": -1.2683481937463512}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "God'S Gift To Women", "score": -1.18654546575126}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "God'S Gift To Women", "score": -0.6634305451385216}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Michael Curtiz", "score": -2.9739928799673785}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Michael Curtiz", "score": -2.408049502953247}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Michael Curtiz", "score": -1.4922027195570895}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Michael Curtiz", "score": -2.915987317177951}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Michael Curtiz", "score": -2.1559710143386206}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Michael Curtiz", "score": -2.865952830596749}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Michael Curtiz", "score": -1.7151685863306436}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Michael Curtiz", "score": -2.1559710143386206}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Michael Curtiz", "score": -1.8011049415605573}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Michael Curtiz", "score": -3.0551367759471737}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Michael Curtiz", "score": -1.7755321765434833}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Michael Curtiz", "score": -2.5993072376586497}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Michael Curtiz", "score": -2.497581901416794}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Michael Curtiz", "score": -2.0772422254667595}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Michael Curtiz", "score": -2.3415187351153364}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Michael Curtiz", "score": -2.5003419696586113}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Michael Curtiz", "score": -2.4522628975294816}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Michael Curtiz", "score": -2.647904639966621}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Michael Curtiz", "score": -6.627804974714915}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "God'S Gift To Women", "score": -1.0747218698650598}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "God'S Gift To Women", "score": -1.57003492970249}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "God'S Gift To Women", "score": -1.1819380450295043}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "God'S Gift To Women", "score": -1.0747218698650598}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "plus", "name": "dependency", "answer": "The Heart Of Doreon", "score": -0.14327821880103406}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "plus", "name": "reverse", "answer": "The Heart Of Doreon", "score": -0.14096636883170768}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "The Heart Of Doreon", "score": -0.1310864935199826}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "The Heart Of Doreon", "score": -0.16868192452904887}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "The Heart Of Doreon", "score": -0.14145291840173968}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "The Heart Of Doreon", "score": -0.18998291589991823}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "The Heart Of Doreon", "score": -0.02216812190030737}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "The Heart Of Doreon", "score": -0.028730398426688453}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "The Heart Of Doreon", "score": -0.17992578928654623}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "The Heart Of Doreon", "score": -0.1899225759680121}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "The Heart Of Doreon", "score": -0.12154074382063129}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "The Heart Of Doreon", "score": -0.12159733969735953}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "The Heart Of Doreon", "score": -0.1457678986033102}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "The Heart Of Doreon", "score": -0.16633696108628251}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "The Heart Of Doreon", "score": -0.07075655928650804}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "November 24, 1949", "score": -1.706451963505606}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "November 24, 1949", "score": -1.6366120239006705}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "November 24, 1949", "score": -1.544289160441258}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "November 24, 1949", "score": -1.7138604960968222}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "November 24, 1949", "score": -2.4932290488737636}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "November 24, 1949", "score": -2.7862664902582766}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "November 24, 1949", "score": -1.7038510289836268}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "November 24, 1949", "score": -1.961114758963231}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "November 24, 1949", "score": -1.5354752344894222}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "November 24, 1949", "score": -1.5612339437378977}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "November 24, 1949", "score": -1.7055598153341633}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "November 24, 1949", "score": -1.7041663518564747}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "November 24, 1949", "score": -1.7537885449381065}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "November 24, 1949", "score": -1.6615031153328346}
+{"qid": "6718770a087311ebbd66ac1f6bf848b6", "query_idx": 5, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "November 24, 1949", "score": -2.647213230933994}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Andy Summers", "score": -1.1603995560944895}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Andy Summers", "score": -2.5434626933983964}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Andy Summers", "score": -1.7251659631647271}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Andy Summers", "score": -1.1144457458822217}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Andy Summers", "score": -2.574694216195894}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Andy Summers", "score": -3.074515818785585}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Andy Summers", "score": -0.5826352234871592}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Andy Summers", "score": -0.49720886321301805}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Andy Summers", "score": -0.8882985709960849}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Andy Summers", "score": -0.6277337669789631}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Andy Summers", "score": -0.19048787550855195}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Andy Summers", "score": -0.7429389353819715}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Andy Summers", "score": -0.7007665037876905}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Andy Summers", "score": -1.00767517084887}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Andy Summers", "score": -0.8579484811525617}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Andy Summers born 1942", "score": -2.4258137549677485}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Andy Summers born 1942", "score": -2.605105065805674}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Andy Summers born 1942", "score": -2.6568726885941487}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Andy Summers born 1942", "score": -2.413870817565794}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Andy Summers born 1942", "score": -2.670340758152406}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Andy Summers born 1942", "score": -2.999097656151207}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Andy Summers born 1942", "score": -2.0553800024135853}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Andy Summers born 1942", "score": -2.20162956832246}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Andy Summers born 1942", "score": -2.248837150663121}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Andy Summers born 1942", "score": -2.292156979202673}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Andy Summers born 1942", "score": -2.0625372556369257}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Andy Summers born 1942", "score": -2.1923752289267213}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Andy Summers born 1942", "score": -2.348859249986731}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Andy Summers born 1942", "score": -2.3948172190233663}
+{"qid": "7f7046d308f711ebbdaaac1f6bf848b6", "query_idx": 6, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Andy Summers born 1942", "score": -2.1912287872746674}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Ailéan mac Ruaidhrí", "score": -0.08871658955731714}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Ailéan mac Ruaidhrí", "score": -0.009666039025283624}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Ailéan mac Ruaidhrí", "score": -0.0066618826292210226}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Ailéan mac Ruaidhrí", "score": -0.024112129501108685}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Ailéan mac Ruaidhrí", "score": -1.9422836236707326}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Ailéan mac Ruaidhrí", "score": -1.9562746285355135}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Ailéan mac Ruaidhrí", "score": -0.021608326751453275}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Ailéan mac Ruaidhrí", "score": -0.02369848059030646}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Ailéan mac Ruaidhrí", "score": -0.04306351233005756}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Ailéan mac Ruaidhrí", "score": -0.17610743129839948}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Ailéan mac Ruaidhrí", "score": -0.03737496602417975}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Ailéan mac Ruaidhrí", "score": -0.061900127496590095}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Ailéan mac Ruaidhrí", "score": -0.06663570976734373}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Ailéan mac Ruaidhrí", "score": -0.06410675166797514}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Ailéan mac Ruaidhrí", "score": -1.3815560673384526}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.08853279661606292}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.358692591110936}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.550968018232153}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.2883688020770489}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.723435450150919}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.8232138898633363}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.2883688020770489}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.550968018232153}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.24092522343232126}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.6299417984086106}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.02486975341069808}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.023719030735155872}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.7767455397225445}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.4865680055242849}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.8153068385278743}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.7765065413606401}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.6910294737673139}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.6146421779171476}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Ruaidhrí Mac Ruaidhrí", "score": -0.7691273259519499}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Ailéan mac Ruaidhrí", "score": -0.006495379383042948}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Ailéan mac Ruaidhrí", "score": -0.0032791100928501273}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Ailéan mac Ruaidhrí", "score": -0.024112129501108685}
+{"qid": "9fe6a6760baf11ebab90acde48001122", "query_idx": 7, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Ailéan mac Ruaidhrí", "score": -0.0066618826292210226}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "plus", "name": "dependency", "answer": "yes", "score": -3.4495034217834473}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "plus", "name": "reverse", "answer": "yes", "score": -3.8164613246917725}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "yes", "score": -4.163050651550293}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "yes", "score": -3.8176541328430176}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "yes", "score": -4.132527828216553}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "yes", "score": -1.733728051185608}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "yes", "score": -1.8996838331222534}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "yes", "score": -2.5065395832061768}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "yes", "score": -3.042004346847534}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "yes", "score": -3.709305763244629}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "yes", "score": -3.9016497135162354}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "yes", "score": -8.462146759033203}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "yes", "score": -5.268360137939453}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "yes", "score": -4.167825698852539}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "yes", "score": -4.953229904174805}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "No", "score": -2.1995034217834473}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "No", "score": -5.691461563110352}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "No", "score": -6.788050651550293}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "No", "score": -3.9426541328430176}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "No", "score": -1.9046850204467773}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "No", "score": -1.5222790241241455}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "No", "score": -1.9049214124679565}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "No", "score": -1.9046850204467773}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "No", "score": -1.5669312477111816}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "No", "score": -2.4983837604522705}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "No", "score": -0.19507233798503876}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "No", "score": -2.3934059143066406}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "No", "score": -1.5192116498947144}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "No", "score": -1.5388212203979492}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "No", "score": -1.5155390501022339}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "No", "score": -2.422700881958008}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "No", "score": -3.4831109046936035}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "No", "score": -2.3363349437713623}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "No", "score": -3.5782296657562256}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "yes", "score": -5.029685020446777}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "yes", "score": -5.147278785705566}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "yes", "score": -5.529921531677246}
+{"qid": "551e024408a611ebbd7fac1f6bf848b6", "query_idx": 8, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "yes", "score": -5.029685020446777}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Chinese", "score": -1.9808562994003296}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Chinese", "score": -4.437951564788818}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Chinese", "score": -0.9340956807136536}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Chinese", "score": -2.8946614265441895}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Chinese", "score": -2.4745490550994873}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Chinese", "score": -5.443659782409668}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Chinese", "score": -6.471333026885986}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Chinese", "score": -7.586239337921143}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Chinese", "score": -2.5379791259765625}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Chinese", "score": -2.208162307739258}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Chinese", "score": -2.5373480319976807}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Chinese", "score": -2.5666284561157227}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Chinese", "score": -2.6816773414611816}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Chinese", "score": -2.774916172027588}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Chinese", "score": -4.466380596160889}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Leo Fong", "score": -1.5353181346144993}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Leo Fong", "score": -1.2710237081870825}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Leo Fong", "score": -0.8947103021455405}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Leo Fong", "score": -1.5899121751960266}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Leo Fong", "score": -1.5353181346144993}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Leo Fong", "score": -1.2710237081870825}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Leo Fong", "score": -0.8947103021455405}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Leo Fong", "score": -1.3865252329827225}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Leo Fong", "score": -1.7415644690771235}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Leo Fong", "score": -3.6688584605500787}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Leo Fong", "score": -1.532143511785146}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Leo Fong", "score": -1.4454582501784803}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Leo Fong", "score": -1.3460206179370264}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Leo Fong", "score": -1.2777547818986907}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Leo Fong", "score": -1.3041434674087213}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Leo Fong", "score": -1.6055680106486154}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Leo Fong", "score": -1.3105851799045827}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Leo Fong", "score": -1.7166643132877653}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Leo Fong", "score": -6.367265045642853}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Chinese", "score": -1.9808562994003296}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Chinese", "score": -4.437951564788818}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Chinese", "score": -0.9340956807136536}
+{"qid": "33f51d7e0bde11eba7f7acde48001122", "query_idx": 9, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Chinese", "score": -2.409515619277954}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Mexico City", "score": -0.1327226631110534}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Mexico City", "score": -0.3366166539490223}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Mexico City", "score": -0.5497007489902899}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Mexico City", "score": -0.13214708503801376}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Mexico City", "score": -0.5874344930052757}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Mexico City", "score": -0.23391609266400337}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Mexico City", "score": -0.02425110840704292}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Mexico City", "score": -0.025555080268532038}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Mexico City", "score": -0.10162082500755787}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Mexico City", "score": -0.11130098451394588}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Mexico City", "score": -0.1158314001513645}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Mexico City", "score": -0.1227523481938988}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Mexico City", "score": -0.16106915811542422}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Mexico City", "score": -0.1254446159582585}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Mexico City", "score": -1.9766704766079783}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Swiss", "score": -20.10706901550293}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Swiss", "score": -20.1065731048584}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Swiss", "score": -20.814958572387695}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Swiss", "score": -21.308374404907227}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Swiss", "score": -16.76990509033203}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Swiss", "score": -14.658608436584473}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Swiss", "score": -13.633197784423828}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Swiss", "score": -16.76990509033203}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Swiss", "score": -13.716996192932129}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Swiss", "score": -15.669411659240723}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Swiss", "score": -18.90102767944336}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Swiss", "score": -19.11775779724121}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Swiss", "score": -16.677452087402344}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Swiss", "score": -16.13924217224121}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Swiss", "score": -12.035396575927734}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Swiss", "score": -16.239336013793945}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Swiss", "score": -15.030184745788574}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Swiss", "score": -12.351945877075195}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Swiss", "score": -11.497087478637695}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Mexico City", "score": -0.2614467734238133}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Mexico City", "score": -1.206104847136885}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Mexico City", "score": -0.9757965160533786}
+{"qid": "914b452c0bdc11eba7f7acde48001122", "query_idx": 10, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Mexico City", "score": -0.2614467734238133}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "plus", "name": "dependency", "answer": "yes", "score": -4.088375091552734}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "plus", "name": "reverse", "answer": "yes", "score": -3.9846482276916504}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "yes", "score": -4.704683780670166}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "yes", "score": -4.079402923583984}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "yes", "score": -3.6500511169433594}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "yes", "score": -5.856795310974121}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "yes", "score": -3.7505674362182617}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "yes", "score": -4.235745429992676}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "yes", "score": -4.203492641448975}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "yes", "score": -3.953098773956299}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "yes", "score": -4.21187162399292}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "yes", "score": -4.212788105010986}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "yes", "score": -4.151625633239746}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "yes", "score": -4.063041687011719}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "yes", "score": -8.016668319702148}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Russia", "score": -13.42406177520752}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Russia", "score": -12.671514511108398}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Russia", "score": -14.018318176269531}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Russia", "score": -13.42406177520752}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Russia", "score": -12.524750709533691}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Russia", "score": -11.819757461547852}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Russia", "score": -11.650041580200195}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Russia", "score": -11.237008094787598}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Russia", "score": -12.94207763671875}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Russia", "score": -13.246580123901367}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Russia", "score": -13.49131965637207}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Russia", "score": -13.443492889404297}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Russia", "score": -13.203493118286133}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Russia", "score": -13.794921875}
+{"qid": "d6898f78089511ebbd75ac1f6bf848b6", "query_idx": 11, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Russia", "score": -15.766668319702148}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "plus", "name": "dependency", "answer": "America", "score": -9.456686019897461}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "plus", "name": "reverse", "answer": "America", "score": -9.828145980834961}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "America", "score": -8.574607849121094}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "America", "score": -9.456686019897461}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "America", "score": -8.711932182312012}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "America", "score": -8.918269157409668}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "America", "score": -9.102498054504395}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "America", "score": -8.491809844970703}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "America", "score": -9.597576141357422}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "America", "score": -9.499380111694336}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "America", "score": -9.6559476852417}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "America", "score": -9.531169891357422}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "America", "score": -9.594362258911133}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "America", "score": -9.288270950317383}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "America", "score": -12.203068733215332}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "singer-songwriter", "score": -5.070972571736395}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "singer-songwriter", "score": -4.817123306672632}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "singer-songwriter", "score": -4.761198730906472}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "singer-songwriter", "score": -5.070972571736395}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "singer-songwriter", "score": -4.947303630804527}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "singer-songwriter", "score": -4.7120696740336525}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "singer-songwriter", "score": -4.929977592090533}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "singer-songwriter", "score": -4.722588135404901}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "singer-songwriter", "score": -4.750827242465069}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "singer-songwriter", "score": -4.769671465852298}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "singer-songwriter", "score": -4.987241587174746}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "singer-songwriter", "score": -4.997688172875011}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "singer-songwriter", "score": -4.961160164617468}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "singer-songwriter", "score": -5.055297416125541}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "singer-songwriter", "score": -3.6708764139718064}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "singer-songwriter", "score": -3.700647752712636}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "singer-songwriter", "score": -4.923461680509111}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "singer-songwriter", "score": -4.90995517099024}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "singer-songwriter", "score": -3.76542699307538}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "America", "score": -8.344194412231445}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "America", "score": -9.284825325012207}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "America", "score": -9.060431480407715}
+{"qid": "006d81bc0bde11eba7f7acde48001122", "query_idx": 12, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "America", "score": -8.365568161010742}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Dean Miller", "score": -6.395956501364708}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Dean Miller", "score": -6.934761572629213}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Dean Miller", "score": -6.058190777897835}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Dean Miller", "score": -6.7370551116764545}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Dean Miller", "score": -7.025293506681919}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Dean Miller", "score": -6.825571835041046}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Dean Miller", "score": -8.162004470825195}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Dean Miller", "score": -7.869351148605347}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Dean Miller", "score": -6.6664673537015915}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Dean Miller", "score": -6.8482649475336075}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Dean Miller", "score": -6.47832952439785}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Dean Miller", "score": -5.952624246478081}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Dean Miller", "score": -6.654989846050739}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Dean Miller", "score": -6.520323783159256}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Dean Miller", "score": -7.452136754989624}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "1971", "score": -2.0558427590876818}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "1971", "score": -1.8053627267479897}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "1971", "score": -2.0004903727211056}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "1971", "score": -2.0558427590876818}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "1971", "score": -2.0004782497882845}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "1971", "score": -2.2438271284103393}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "1971", "score": -2.1896231114980766}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "1971", "score": -2.3132159078493713}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "1971", "score": -2.2292712297290564}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "1971", "score": -2.2839076280593873}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "1971", "score": -2.050944262370467}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "1971", "score": -1.8748252652585506}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "1971", "score": -2.1754751920700075}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "1971", "score": -2.638218903541565}
+{"qid": "f5e3b9ca0bdb11eba7f7acde48001122", "query_idx": 13, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "1971", "score": -3.2974360466003416}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Delft", "score": -0.030476137635560008}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Delft", "score": -1.1768109997112408}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Delft", "score": -0.4886997342109301}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Delft", "score": -0.4328019991517067}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Delft", "score": -5.487677300882448}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Delft", "score": -3.057649338559713}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Delft", "score": -2.29766523838043}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Delft", "score": -0.3865416447321574}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Delft", "score": -0.031425609204840534}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Delft", "score": -0.04056740045029983}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Delft", "score": -0.022696397617740633}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Delft", "score": -0.0698642976907043}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Delft", "score": -0.020602577670613204}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Delft", "score": -0.03548836166737601}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Delft", "score": -2.8253491127252346}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "William the Silent", "score": -1.9520564971953718}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "William the Silent", "score": -2.34009789803531}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "William the Silent", "score": -2.4140867193273152}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "William the Silent", "score": -2.5440297522509354}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "William the Silent", "score": -3.406989823153708}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "William the Silent", "score": -3.049606718768094}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "William the Silent", "score": -2.4704379238234346}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "William the Silent", "score": -3.406989823153708}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "William the Silent", "score": -2.53194296317209}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "William the Silent", "score": -2.7290246078312825}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "William the Silent", "score": -2.736638452225634}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "William the Silent", "score": -2.929968496159745}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "William the Silent", "score": -3.004122116105767}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "William the Silent", "score": -2.970819264999591}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "William the Silent", "score": -3.332527987343686}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "William the Silent", "score": -3.7819734381434196}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "William the Silent", "score": -2.955384426061452}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "William the Silent", "score": -3.3831960291669625}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "William the Silent", "score": -4.583447888066682}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Delft", "score": -4.1191239555675265}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Delft", "score": -0.04554000496863372}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Delft", "score": -0.3083585500717163}
+{"qid": "265daf200bdc11eba7f7acde48001122", "query_idx": 14, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Delft", "score": -4.1191239555675265}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Polish-Lithuanian Commonwealth", "score": -0.5179636257518409}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Polish-Lithuanian Commonwealth", "score": -0.5915395194765539}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Polish-Lithuanian Commonwealth", "score": -0.46056838564102875}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Polish-Lithuanian Commonwealth", "score": -0.9551904953611169}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Polish-Lithuanian Commonwealth", "score": -0.7006396333423813}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Polish-Lithuanian Commonwealth", "score": -0.5664816852913633}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Polish-Lithuanian Commonwealth", "score": -1.0714518724893953}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Polish-Lithuanian Commonwealth", "score": -1.5815670687209906}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Polish-Lithuanian Commonwealth", "score": -0.3555188480877393}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Polish-Lithuanian Commonwealth", "score": -0.31399724552071834}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Polish-Lithuanian Commonwealth", "score": -0.5268917032262787}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Polish-Lithuanian Commonwealth", "score": -0.5670084775850436}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Polish-Lithuanian Commonwealth", "score": -0.43427694315444754}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Polish-Lithuanian Commonwealth", "score": -0.3623549824095929}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Polish-Lithuanian Commonwealth", "score": -0.4095052885405342}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Grand Standard-Bearer of the Crown", "score": -4.054676586801569}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Grand Standard-Bearer of the Crown", "score": -4.014843183810756}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Grand Standard-Bearer of the Crown", "score": -3.746454877853726}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Grand Standard-Bearer of the Crown", "score": -3.8773352583812084}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Grand Standard-Bearer of the Crown", "score": -4.054676586801569}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Grand Standard-Bearer of the Crown", "score": -4.014843183810756}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Grand Standard-Bearer of the Crown", "score": -3.746454877853726}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Grand Standard-Bearer of the Crown", "score": -3.8773352583812084}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Grand Standard-Bearer of the Crown", "score": -5.350371412153306}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Grand Standard-Bearer of the Crown", "score": -5.230865258617476}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Grand Standard-Bearer of the Crown", "score": -3.6426290569673125}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Grand Standard-Bearer of the Crown", "score": -3.5128514416210237}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Grand Standard-Bearer of the Crown", "score": -3.825222148277265}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Grand Standard-Bearer of the Crown", "score": -3.9686696458832427}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Grand Standard-Bearer of the Crown", "score": -4.160043816078022}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Grand Standard-Bearer of the Crown", "score": -4.454401087069917}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Grand Standard-Bearer of the Crown", "score": -4.161155020549943}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Grand Standard-Bearer of the Crown", "score": -3.9672447048630732}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Grand Standard-Bearer of the Crown", "score": -4.946278190132164}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Polish-Lithuanian Commonwealth", "score": -0.5179636257518409}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Polish-Lithuanian Commonwealth", "score": -0.5915395194765539}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Polish-Lithuanian Commonwealth", "score": -0.46056838564102875}
+{"qid": "1c0dd3b00bdc11eba7f7acde48001122", "query_idx": 15, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Polish-Lithuanian Commonwealth", "score": -0.9551904953611169}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "plus", "name": "dependency", "answer": "10 August 1960", "score": -0.1851379747891997}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "plus", "name": "reverse", "answer": "10 August 1960", "score": -0.24990046489569473}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "10 August 1960", "score": -0.22286775208652265}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "10 August 1960", "score": -0.2832576525359198}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "10 August 1960", "score": -0.3301877103092718}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "10 August 1960", "score": -0.6314547634279329}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "10 August 1960", "score": -1.5810093934026856}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "10 August 1960", "score": -1.7521787432245521}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "10 August 1960", "score": -0.17285923662509756}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "10 August 1960", "score": -0.2012408199022199}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "10 August 1960", "score": -0.24463889570668268}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "10 August 1960", "score": -0.21965263409250232}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "10 August 1960", "score": -0.19419957344153874}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "10 August 1960", "score": -0.1598322298594768}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "10 August 1960", "score": -1.5471527654590318}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "French", "score": -11.981947898864746}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "French", "score": -12.16049861907959}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "French", "score": -11.58292007446289}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "French", "score": -11.981947898864746}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "French", "score": -11.794099807739258}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "French", "score": -11.884968757629395}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "French", "score": -11.868331909179688}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "French", "score": -12.145315170288086}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "French", "score": -12.53504753112793}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "French", "score": -12.25494384765625}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "French", "score": -12.290484428405762}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "French", "score": -12.702651977539062}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "French", "score": -13.467794418334961}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "French", "score": -12.295787811279297}
+{"qid": "bab3b6d00bda11eba7f7acde48001122", "query_idx": 16, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "French", "score": -9.051050186157227}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "plus", "name": "dependency", "answer": "no", "score": -5.12234354019165}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "plus", "name": "reverse", "answer": "no", "score": -5.300871849060059}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "no", "score": -4.810853958129883}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "no", "score": -5.157764434814453}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "no", "score": -4.715479373931885}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "no", "score": -4.031508445739746}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "no", "score": -4.711400508880615}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "no", "score": -4.6142048835754395}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "no", "score": -4.976344585418701}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "no", "score": -4.903117656707764}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "no", "score": -5.009650707244873}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "no", "score": -5.137267112731934}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "no", "score": -5.364281177520752}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "no", "score": -5.456516265869141}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "no", "score": -1.3292536735534668}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -0.7269942420609817}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -1.009923086877716}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -1.3574636371376672}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -0.773441655536806}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -1.32985266271564}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -0.8947510429104699}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -1.2585937008568104}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -1.365048013353264}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -1.1178135692413114}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -1.0341967566662502}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -0.7321476047240218}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -0.7579312141978277}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -0.8169114893807738}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -0.7649269454392075}
+{"qid": "84b691d8086a11ebbd5fac1f6bf848b6", "query_idx": 17, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Declan O'Brien is American, Clio Barnard is British", "score": -4.586458155652508}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "plus", "name": "dependency", "answer": "You Can No Longer Remain Silent", "score": -0.5117338424089048}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "plus", "name": "reverse", "answer": "You Can No Longer Remain Silent", "score": -0.7743492223485191}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "You Can No Longer Remain Silent", "score": -0.5954357988113467}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "You Can No Longer Remain Silent", "score": -0.4033439051016394}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "You Can No Longer Remain Silent", "score": -0.7231427055147179}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "You Can No Longer Remain Silent", "score": -0.5441869111039436}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "You Can No Longer Remain Silent", "score": -0.5146375871952339}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "You Can No Longer Remain Silent", "score": -0.488435211965637}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "You Can No Longer Remain Silent", "score": -0.4149074776573028}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "You Can No Longer Remain Silent", "score": -0.4080654666639691}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "You Can No Longer Remain Silent", "score": -0.19915478592815697}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "You Can No Longer Remain Silent", "score": -0.20212566475001856}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "You Can No Longer Remain Silent", "score": -0.37618959175779193}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "You Can No Longer Remain Silent", "score": -0.3606524831485925}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "You Can No Longer Remain Silent", "score": -0.038952154377582815}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "1955", "score": -1.9235798195004463}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "1955", "score": -2.101814728975296}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "1955", "score": -2.138223423063755}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "1955", "score": -1.9235798195004463}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "1955", "score": -2.7260073900222777}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "1955", "score": -2.833010530471802}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "1955", "score": -2.1300823003053666}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "1955", "score": -2.123519241809845}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "1955", "score": -1.9738177932798862}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "1955", "score": -1.9204465366899968}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "1955", "score": -1.933609026670456}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "1955", "score": -1.8281704664230347}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "1955", "score": -1.9861933052539826}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "1955", "score": -1.8409429028630258}
+{"qid": "dcbee4b608b011ebbd85ac1f6bf848b6", "query_idx": 18, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "1955", "score": -4.2245134830474855}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Montreal, Quebec", "score": -0.1957556318496548}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Montreal, Quebec", "score": -0.19372083833028833}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Montreal, Quebec", "score": -0.2201122330546544}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Montreal, Quebec", "score": -0.07017961642607891}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Montreal, Quebec", "score": -1.3785777694235246}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Montreal, Quebec", "score": -1.1822661592935522}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Montreal, Quebec", "score": -0.41811625398501445}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Montreal, Quebec", "score": -0.8450506171793677}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Montreal, Quebec", "score": -0.2630463780418116}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Montreal, Quebec", "score": -0.17250313157607403}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Montreal, Quebec", "score": -0.2480823402159634}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Montreal, Quebec", "score": -0.17191554381861351}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Montreal, Quebec", "score": -0.1543051456271011}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Montreal, Quebec", "score": -0.21906905377545627}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Montreal, Quebec", "score": -2.9465538635849953}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Quebec", "score": -7.705061435699463}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Quebec", "score": -8.01496410369873}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Quebec", "score": -6.902595520019531}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Quebec", "score": -7.328577041625977}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Quebec", "score": -5.8702497482299805}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Quebec", "score": -7.272906303405762}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Quebec", "score": -6.531627655029297}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Quebec", "score": -6.898197174072266}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Quebec", "score": -6.206170558929443}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Quebec", "score": -6.877619743347168}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Quebec", "score": -3.3630900382995605}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Quebec", "score": -3.8212907314300537}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Quebec", "score": -5.903319835662842}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Quebec", "score": -5.746155738830566}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Quebec", "score": -6.384757041931152}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Quebec", "score": -5.537764549255371}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Quebec", "score": -5.572750091552734}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Quebec", "score": -5.620613098144531}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Quebec", "score": -12.111431121826172}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Montreal, Quebec", "score": -0.2934177132010518}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Montreal, Quebec", "score": -0.4274298282980453}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Montreal, Quebec", "score": -0.1372485304818838}
+{"qid": "2d8f3ebe0bda11eba7f7acde48001122", "query_idx": 19, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Montreal, Quebec", "score": -0.38625765294515685}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Oxford", "score": -3.627239465713501}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Oxford", "score": -3.1888999938964844}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Oxford", "score": -7.978379249572754}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Oxford", "score": -6.170310974121094}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Oxford", "score": -3.4284403324127197}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Oxford", "score": -3.140390634536743}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Oxford", "score": -7.552037715911865}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Oxford", "score": -7.052766799926758}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Oxford", "score": -3.0502452850341797}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Oxford", "score": -4.579747676849365}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Oxford", "score": -3.6807117462158203}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Oxford", "score": -3.538008689880371}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Oxford", "score": -4.6493144035339355}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Oxford", "score": -7.328073024749756}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Oxford", "score": -6.13427209854126}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "1792", "score": -1.8824540555477143}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "1792", "score": -1.6692679882049561}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "1792", "score": -2.003216552734375}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "1792", "score": -1.8824540555477143}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "1792", "score": -1.9923205852508545}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "1792", "score": -1.9220324277877807}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "1792", "score": -1.7061407089233398}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "1792", "score": -1.885486501455307}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "1792", "score": -1.9556890845298767}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "1792", "score": -1.8667538642883301}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "1792", "score": -1.9512528002262115}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "1792", "score": -1.717708593606949}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "1792", "score": -2.1732511043548586}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "1792", "score": -2.047869694232941}
+{"qid": "e6e38bc40bdd11eba7f7acde48001122", "query_idx": 20, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "1792", "score": -3.0659544587135317}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "plus", "name": "dependency", "answer": "tuberculosis", "score": -12.702054023742676}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "plus", "name": "reverse", "answer": "tuberculosis", "score": -12.98682975769043}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "tuberculosis", "score": -12.058133125305176}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "tuberculosis", "score": -13.944894790649414}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "tuberculosis", "score": -14.7809476852417}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "tuberculosis", "score": -13.492178916931152}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "tuberculosis", "score": -11.952170372009277}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "tuberculosis", "score": -12.113601684570312}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "tuberculosis", "score": -12.95776081085205}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "tuberculosis", "score": -13.288317680358887}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "tuberculosis", "score": -13.772214889526367}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "tuberculosis", "score": -13.403285026550293}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "tuberculosis", "score": -13.141672134399414}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "tuberculosis", "score": -13.048595428466797}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "tuberculosis", "score": -9.544109344482422}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.7197926921273152}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.8580754737941874}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.7753148456232408}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.8669894052693823}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.7197926921273152}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.8580754737941874}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.7753148456232408}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.8669894052693823}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -4.424745047077471}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -4.305703415883651}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.747329349553218}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.7757862410071192}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.705757341706339}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.8353666116121485}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.792172614971699}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.8332271990446831}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.6938904707436455}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -1.768305904829926}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Diagnosed with extrapulmonary tuberculosis", "score": -3.6776417556808507}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "tuberculosis", "score": -12.702054023742676}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "tuberculosis", "score": -12.98682975769043}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "tuberculosis", "score": -12.058133125305176}
+{"qid": "0bedb7e80bdc11eba7f7acde48001122", "query_idx": 21, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "tuberculosis", "score": -13.944894790649414}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Southampton, Hampshire", "score": -0.6739379034285472}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Southampton, Hampshire", "score": -0.6590160477183721}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Southampton, Hampshire", "score": -0.8324106222717091}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Southampton, Hampshire", "score": -0.7227358698880076}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Southampton, Hampshire", "score": -1.4964855327270925}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Southampton, Hampshire", "score": -0.6891416201882142}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Southampton, Hampshire", "score": -4.7707343101501465}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Southampton, Hampshire", "score": -4.628981093565623}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Southampton, Hampshire", "score": -0.7095708631192489}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Southampton, Hampshire", "score": -0.6090553831018042}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Southampton, Hampshire", "score": -0.6317631512295824}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Southampton, Hampshire", "score": -0.5390021712446469}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Southampton, Hampshire", "score": -0.43543332324285683}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Southampton, Hampshire", "score": -0.4529920058466814}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Southampton, Hampshire", "score": -6.1827975908915205}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Hampshire", "score": -7.075406074523926}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Hampshire", "score": -4.717990398406982}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Hampshire", "score": -6.666274070739746}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Hampshire", "score": -4.165333271026611}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Hampshire", "score": -2.9316930770874023}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Hampshire", "score": -2.310189962387085}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Hampshire", "score": -2.573350191116333}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Hampshire", "score": -2.9316930770874023}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Hampshire", "score": -9.147828102111816}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Hampshire", "score": -7.402152061462402}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Hampshire", "score": -4.208414077758789}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Hampshire", "score": -4.6282196044921875}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Hampshire", "score": -3.061577320098877}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Hampshire", "score": -3.269550323486328}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Hampshire", "score": -3.3162755966186523}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Hampshire", "score": -3.965606689453125}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Hampshire", "score": -4.315136909484863}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Hampshire", "score": -3.6268842220306396}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Hampshire", "score": -16.64143180847168}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Southampton, Hampshire", "score": -0.35406657519342843}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Southampton, Hampshire", "score": -0.4374192688022352}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Southampton, Hampshire", "score": -0.27618422531547066}
+{"qid": "86508dc60bdc11eba7f7acde48001122", "query_idx": 22, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Southampton, Hampshire", "score": -0.35406657519342843}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Stockholm", "score": -1.6918364763259888}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Stockholm", "score": -2.2438337802886963}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Stockholm", "score": -1.5843887329101562}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Stockholm", "score": -3.183750629425049}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Stockholm", "score": -1.7057363986968994}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Stockholm", "score": -2.543178081512451}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Stockholm", "score": -3.684901237487793}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Stockholm", "score": -2.8693902492523193}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Stockholm", "score": -1.284435749053955}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Stockholm", "score": -0.9898494482040405}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Stockholm", "score": -2.2639784812927246}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Stockholm", "score": -1.7612186670303345}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Stockholm", "score": -2.6749534606933594}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Stockholm", "score": -2.2408692836761475}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Stockholm", "score": -1.3070259094238281}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Stockholm archipelago, Sweden", "score": -3.642093369737173}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Stockholm archipelago, Sweden", "score": -3.659752337872457}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Stockholm archipelago, Sweden", "score": -3.5522025836006983}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Stockholm archipelago, Sweden", "score": -3.8398318315540414}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Stockholm archipelago, Sweden", "score": -3.642093369737173}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Stockholm archipelago, Sweden", "score": -3.659752337872457}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Stockholm archipelago, Sweden", "score": -3.5522025836006983}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Stockholm archipelago, Sweden", "score": -3.9950401422874315}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Stockholm archipelago, Sweden", "score": -3.640730772167236}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Stockholm archipelago, Sweden", "score": -3.6562616563918104}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Stockholm archipelago, Sweden", "score": -3.906347299611298}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Stockholm archipelago, Sweden", "score": -3.900243441082542}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Stockholm archipelago, Sweden", "score": -3.48781410851628}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Stockholm archipelago, Sweden", "score": -3.5568984697201813}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Stockholm archipelago, Sweden", "score": -3.708888568604683}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Stockholm archipelago, Sweden", "score": -3.828373131562936}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Stockholm archipelago, Sweden", "score": -3.4909369945525177}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Stockholm archipelago, Sweden", "score": -3.5948283392935942}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Stockholm archipelago, Sweden", "score": -3.823864737041731}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Stockholm", "score": -1.6918364763259888}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Stockholm", "score": -2.2438337802886963}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Stockholm", "score": -1.5843887329101562}
+{"qid": "e311a3ba0bdc11eba7f7acde48001122", "query_idx": 23, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Stockholm", "score": -3.5457987785339355}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Dying God", "score": -0.08218452828926577}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Dying God", "score": -1.040279614893734}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Dying God", "score": -1.5529901257868914}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Dying God", "score": -0.1646048226439234}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Dying God", "score": -0.6469099859823473}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Dying God", "score": -0.5507969808046861}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Dying God", "score": -0.3856654880122126}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Dying God", "score": -0.18533962125487355}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Dying God", "score": -0.09121696153564092}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Dying God", "score": -0.08844010033923648}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Dying God", "score": -0.07482998563591536}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Dying God", "score": -0.05748615162398588}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Dying God", "score": -0.06299261717625389}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Dying God", "score": -0.06345369903374376}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Dying God", "score": -0.40766564998496807}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Dying God (2008)", "score": -0.36985889102065683}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Dying God (2008)", "score": -0.6953497463007605}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Dying God (2008)", "score": -0.8479272207521515}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Dying God (2008)", "score": -0.345504973276699}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Dying God (2008)", "score": -1.4620895275503345}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Dying God (2008)", "score": -1.5017469120373588}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Dying God (2008)", "score": -0.34031545943805164}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Dying God (2008)", "score": -0.3541264497141583}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Dying God (2008)", "score": -0.4405240832818688}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Dying God (2008)", "score": -0.4144961996470076}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Dying God (2008)", "score": -0.3794571954659729}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Dying God (2008)", "score": -0.3485678581701974}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Dying God (2008)", "score": -0.39495230022434197}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Dying God (2008)", "score": -0.34586216573208856}
+{"qid": "bdd526c4091811ebbdaeac1f6bf848b6", "query_idx": 24, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Dying God (2008)", "score": -1.0235677525353013}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Norodom Sutharot", "score": -0.9139462007830493}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Norodom Sutharot", "score": -0.37067739975547437}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Norodom Sutharot", "score": -0.3359465105457389}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Norodom Sutharot", "score": -0.5244107710362478}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Norodom Sutharot", "score": -3.1429011523723602}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Norodom Sutharot", "score": -4.754031454523404}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Norodom Sutharot", "score": -0.19406237612292898}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Norodom Sutharot", "score": -0.11779681816303385}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Norodom Sutharot", "score": -0.8662863522767074}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Norodom Sutharot", "score": -0.8682726075250761}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Norodom Sutharot", "score": -0.5903807344535608}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Norodom Sutharot", "score": -1.0062231669823138}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Norodom Sutharot", "score": -1.0271229939535071}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Norodom Sutharot", "score": -0.9326312228416391}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Norodom Sutharot", "score": -4.406920932332771}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Suramarit", "score": -2.6631875375993936}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Suramarit", "score": -2.777686993195554}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Suramarit", "score": -2.6327807993996735}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Suramarit", "score": -1.7882775862741862}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Suramarit", "score": -3.051645198565287}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Suramarit", "score": -2.2158370017996276}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Suramarit", "score": -1.7882775862741862}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Suramarit", "score": -2.6327807993996735}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Suramarit", "score": -1.4377220471287728}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Suramarit", "score": -1.5312672455878176}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Suramarit", "score": -2.9087121485620933}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Suramarit", "score": -3.2164532343425285}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Suramarit", "score": -3.053794105363823}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Suramarit", "score": -3.1960433718850254}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Suramarit", "score": -2.9016555545398055}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Suramarit", "score": -3.4770193889914176}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Suramarit", "score": -2.876979072294489}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Suramarit", "score": -3.0753548523692493}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Suramarit", "score": -4.377608833524088}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Norodom Sutharot", "score": -0.8233420755687652}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Norodom Sutharot", "score": -0.7510331968461136}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Norodom Sutharot", "score": -0.5244107710362478}
+{"qid": "435f65fa0baf11ebab90acde48001122", "query_idx": 25, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Norodom Sutharot", "score": -0.3359465105457389}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Ness", "score": -2.9435763359069824}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Ness", "score": -1.3280725479125977}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Ness", "score": -0.8372285962104797}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Ness", "score": -0.5693663954734802}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Ness", "score": -7.528729438781738}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Ness", "score": -11.898322105407715}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Ness", "score": -14.140989303588867}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Ness", "score": -14.468282699584961}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Ness", "score": -1.3075389862060547}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Ness", "score": -2.1359829902648926}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Ness", "score": -2.525967597961426}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Ness", "score": -4.19260835647583}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Ness", "score": -1.8295109272003174}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Ness", "score": -3.340653896331787}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Ness", "score": -15.335391998291016}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.41766719777098676}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.27439259801876015}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.24189671158978854}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.22038675618305412}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.24923214777802308}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.42024309119843584}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.22038675618305412}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.24189671158978854}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -3.131937122665642}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -3.1386487706847466}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.8583896345315778}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.9025120838869353}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.20723065344602468}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.2139367327439872}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.24138647660048596}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.245583632929693}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.2495173288640341}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -0.26215435023226}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Ness, daughter of Eochaid Sálbuide", "score": -4.697340132943778}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Ness", "score": -0.13327282667160034}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Ness", "score": -3.3300070762634277}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Ness", "score": -0.5693663954734802}
+{"qid": "5cc01ab60bb011ebab90acde48001122", "query_idx": 26, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Ness", "score": -0.8372285962104797}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Yale College", "score": -1.7496941536664963}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Yale College", "score": -2.3571451008319855}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Yale College", "score": -2.041057139635086}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Yale College", "score": -2.4618615210056305}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Yale College", "score": -2.8831921219825745}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Yale College", "score": -3.0351254642009735}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Yale College", "score": -1.8469003736972809}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Yale College", "score": -1.9589548110961914}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Yale College", "score": -1.8654582351446152}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Yale College", "score": -1.8107909709215164}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Yale College", "score": -1.6246103644371033}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Yale College", "score": -1.847990334033966}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Yale College", "score": -1.282406985759735}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Yale College", "score": -1.5265904068946838}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Yale College", "score": -2.5626010298728943}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "law", "score": -15.390754699707031}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "law", "score": -14.745912551879883}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "law", "score": -16.291271209716797}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "law", "score": -14.784804344177246}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "law", "score": -13.356225967407227}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "law", "score": -13.852685928344727}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "law", "score": -13.898092269897461}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "law", "score": -13.356225967407227}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "law", "score": -11.368653297424316}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "law", "score": -11.793920516967773}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "law", "score": -12.094862937927246}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "law", "score": -13.678391456604004}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "law", "score": -13.011747360229492}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "law", "score": -12.914570808410645}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "law", "score": -12.999847412109375}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "law", "score": -13.474197387695312}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "law", "score": -12.880770683288574}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "law", "score": -13.283449172973633}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "law", "score": -12.584843635559082}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Yale College", "score": -3.3446857929229736}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Yale College", "score": -3.6305940449237823}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Yale College", "score": -3.8056984543800354}
+{"qid": "2084260e0bde11eba7f7acde48001122", "query_idx": 27, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Yale College", "score": -3.3446857929229736}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "plus", "name": "dependency", "answer": "New York", "score": -3.093108701519668}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "plus", "name": "reverse", "answer": "New York", "score": -3.247421041596681}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "New York", "score": -3.5700922943651676}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "New York", "score": -2.9732172318035737}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "New York", "score": -2.6240108013153076}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "New York", "score": -3.581365182995796}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "New York", "score": -4.0468029752373695}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "New York", "score": -3.683958049863577}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "New York", "score": -3.1580363395623863}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "New York", "score": -2.808034667163156}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "New York", "score": -3.0026289636734873}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "New York", "score": -3.0044595093932003}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "New York", "score": -2.9488750341988634}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "New York", "score": -3.2030021535465494}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "New York", "score": -1.2239454975351691}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Jim Wynorski is the director", "score": -1.2251489337681067}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Jim Wynorski is the director", "score": -0.9703338921166765}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Jim Wynorski is the director", "score": -1.3770964050422663}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Jim Wynorski is the director", "score": -1.074825431723249}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Jim Wynorski is the director", "score": -1.208599954915891}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Jim Wynorski is the director", "score": -0.9437702444521554}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Jim Wynorski is the director", "score": -1.074825431723249}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Jim Wynorski is the director", "score": -1.3770964050422663}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Jim Wynorski is the director", "score": -1.1815196658404343}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Jim Wynorski is the director", "score": -1.09668599478854}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Jim Wynorski is the director", "score": -1.2488186687622016}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Jim Wynorski is the director", "score": -1.1651837106161338}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Jim Wynorski is the director", "score": -1.2274642008924275}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Jim Wynorski is the director", "score": -1.1530040985771848}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Jim Wynorski is the director", "score": -1.2611574225403663}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Jim Wynorski is the director", "score": -1.1178768958754322}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Jim Wynorski is the director", "score": -1.3637091548259508}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Jim Wynorski is the director", "score": -1.1243556976008904}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Jim Wynorski is the director", "score": -2.1250797632669025}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "New York", "score": -2.7608568691648543}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "New York", "score": -3.153111502644606}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "New York", "score": -2.9732172318035737}
+{"qid": "7cb81afc0bd911eba7f7acde48001122", "query_idx": 28, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "New York", "score": -3.5700922943651676}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Detroit", "score": -1.9127312898635864}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Detroit", "score": -2.911816120147705}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Detroit", "score": -3.2933785915374756}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Detroit", "score": -0.9933550953865051}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Detroit", "score": -1.9315862655639648}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Detroit", "score": -3.1452383995056152}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Detroit", "score": -5.242967128753662}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Detroit", "score": -2.967844009399414}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Detroit", "score": -2.0385940074920654}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Detroit", "score": -3.3477988243103027}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Detroit", "score": -1.3936022520065308}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Detroit", "score": -2.0440239906311035}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Detroit", "score": -1.616034984588623}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Detroit", "score": -2.58781099319458}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Detroit", "score": -7.904446125030518}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "R&B chart", "score": -3.885660727818807}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "R&B chart", "score": -3.8835588792959848}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "R&B chart", "score": -4.053560142715772}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "R&B chart", "score": -4.343100962539514}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "R&B chart", "score": -4.576466917991638}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "R&B chart", "score": -3.707364564140638}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "R&B chart", "score": -4.343100962539514}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "R&B chart", "score": -4.053560142715772}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "R&B chart", "score": -6.211806694666545}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "R&B chart", "score": -6.152371406555176}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "R&B chart", "score": -4.136710703372955}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "R&B chart", "score": -4.012009501457214}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "R&B chart", "score": -4.945100833972295}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "R&B chart", "score": -5.028089677294095}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "R&B chart", "score": -4.201413889726003}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "R&B chart", "score": -4.370216051737468}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "R&B chart", "score": -4.393977075815201}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "R&B chart", "score": -4.5759817858537035}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "R&B chart", "score": -7.470220406850179}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Detroit", "score": -2.2283360958099365}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Detroit", "score": -2.850611686706543}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Detroit", "score": -0.9933550953865051}
+{"qid": "a1d9a65c0bd911eba7f7acde48001122", "query_idx": 29, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Detroit", "score": -3.2933785915374756}

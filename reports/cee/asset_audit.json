@@ -1,0 +1,25 @@
+{
+  "reader_model": "data/dpathrag/models/flan_t5_base_gold_k5_5k",
+  "reader_files": {
+    "config.json": true,
+    "tokenizer.json": true,
+    "spiece.model": true,
+    "model.safetensors": true
+  },
+  "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+  "pool_rows": 1000,
+  "dense_cache_jsonl": "data/dpathrag/cache/2wiki_dense_pool100_smoke.jsonl",
+  "dense_rows": 1000,
+  "reports_dir_created": true,
+  "cache_dir_created": true,
+  "torch": {
+    "import_ok": true,
+    "cuda_available": true,
+    "device_count": 8
+  },
+  "qwen": {
+    "available": false,
+    "error": "<urlopen error [Errno 111] Connection refused>"
+  },
+  "passed": true
+}

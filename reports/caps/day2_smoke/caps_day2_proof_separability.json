@@ -1,0 +1,355 @@
+{
+  "summary": {
+    "rows": 5,
+    "candidate_recall_at_20": 0.8,
+    "top1_accuracy_all": 0.2,
+    "top3_accuracy_all": 0.4,
+    "top1_accuracy_cond_gold_present": 0.25,
+    "top3_accuracy_cond_gold_present": 0.5,
+    "mrr_cond_gold_present": 0.45,
+    "answer_conditioned_rate": 0.8,
+    "substituted_rate": 0.6,
+    "gold_vs_best_wrong_auc": 0.28125,
+    "mean_gold_score": 0.25192,
+    "mean_best_wrong_score": 0.488601,
+    "paired_gold_win_rate": 0.0,
+    "by_type": {
+      "bridge_comparison": {
+        "rows": 1,
+        "candidate_recall_at_20": 1.0,
+        "top1_accuracy_all": 0.0,
+        "top3_accuracy_all": 0.0,
+        "top1_accuracy_cond_gold_present": 0.0,
+        "top3_accuracy_cond_gold_present": 0.0,
+        "mrr_cond_gold_present": 0.2,
+        "answer_conditioned_rate": 1.0,
+        "substituted_rate": 1.0
+      },
+      "comparison": {
+        "rows": 2,
+        "candidate_recall_at_20": 1.0,
+        "top1_accuracy_all": 0.5,
+        "top3_accuracy_all": 1.0,
+        "top1_accuracy_cond_gold_present": 0.5,
+        "top3_accuracy_cond_gold_present": 1.0,
+        "mrr_cond_gold_present": 0.75,
+        "answer_conditioned_rate": 0.5,
+        "substituted_rate": 0.5
+      },
+      "compositional": {
+        "rows": 2,
+        "candidate_recall_at_20": 0.5,
+        "top1_accuracy_all": 0.0,
+        "top3_accuracy_all": 0.0,
+        "top1_accuracy_cond_gold_present": 0.0,
+        "top3_accuracy_cond_gold_present": 0.0,
+        "mrr_cond_gold_present": 0.1,
+        "answer_conditioned_rate": 1.0,
+        "substituted_rate": 0.5
+      }
+    }
+  },
+  "payload": {
+    "decision": "STOP_CAPS_PROOF_RANKER_FAIL",
+    "summary": {
+      "rows": 5,
+      "candidate_recall_at_20": 0.8,
+      "top1_accuracy_all": 0.2,
+      "top3_accuracy_all": 0.4,
+      "top1_accuracy_cond_gold_present": 0.25,
+      "top3_accuracy_cond_gold_present": 0.5,
+      "mrr_cond_gold_present": 0.45,
+      "answer_conditioned_rate": 0.8,
+      "substituted_rate": 0.6,
+      "gold_vs_best_wrong_auc": 0.28125,
+      "mean_gold_score": 0.25192,
+      "mean_best_wrong_score": 0.488601,
+      "paired_gold_win_rate": 0.0,
+      "by_type": {
+        "bridge_comparison": {
+          "rows": 1,
+          "candidate_recall_at_20": 1.0,
+          "top1_accuracy_all": 0.0,
+          "top3_accuracy_all": 0.0,
+          "top1_accuracy_cond_gold_present": 0.0,
+          "top3_accuracy_cond_gold_present": 0.0,
+          "mrr_cond_gold_present": 0.2,
+          "answer_conditioned_rate": 1.0,
+          "substituted_rate": 1.0
+        },
+        "comparison": {
+          "rows": 2,
+          "candidate_recall_at_20": 1.0,
+          "top1_accuracy_all": 0.5,
+          "top3_accuracy_all": 1.0,
+          "top1_accuracy_cond_gold_present": 0.5,
+          "top3_accuracy_cond_gold_present": 1.0,
+          "mrr_cond_gold_present": 0.75,
+          "answer_conditioned_rate": 0.5,
+          "substituted_rate": 0.5
+        },
+        "compositional": {
+          "rows": 2,
+          "candidate_recall_at_20": 0.5,
+          "top1_accuracy_all": 0.0,
+          "top3_accuracy_all": 0.0,
+          "top1_accuracy_cond_gold_present": 0.0,
+          "top3_accuracy_cond_gold_present": 0.0,
+          "mrr_cond_gold_present": 0.1,
+          "answer_conditioned_rate": 1.0,
+          "substituted_rate": 0.5
+        }
+      }
+    },
+    "nli_pairs": 2556,
+    "tasks": 100,
+    "config": {
+      "answer_cap": 20,
+      "proof_pool_k": 30,
+      "pool_k": 20,
+      "nli_model": "cross-encoder/nli-deberta-v3-base"
+    }
+  },
+  "rows": [
+    {
+      "qid": "83bf3b5a0bd911eba7f7acde48001122",
+      "type": "compositional",
+      "question": "When did Lothair Ii's mother die?",
+      "gold_answers": [
+        "20 March 851"
+      ],
+      "gold_present": true,
+      "gold_rank": 10,
+      "answer_conditioned_available": true,
+      "gold_substituted": true,
+      "best_answer": "Ermengarde of Tours",
+      "best_score": 0.950599,
+      "gold_best_score": 0.003911,
+      "best_wrong_score": 0.950599,
+      "top5": [
+        {
+          "answer": "Ermengarde of Tours",
+          "score": 0.950599,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "875",
+          "score": 0.940113,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Okay, let's tackle this question: \"When did Lothair II's mother die?",
+          "score": 0.071178,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Teutberga",
+          "score": 0.05209,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Lothair II",
+          "score": 0.034774,
+          "is_gold": false,
+          "substituted": true
+        }
+      ]
+    },
+    {
+      "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+      "type": "comparison",
+      "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+      "gold_answers": [
+        "Phoolwari"
+      ],
+      "gold_present": true,
+      "gold_rank": 2,
+      "answer_conditioned_available": true,
+      "gold_substituted": true,
+      "best_answer": "Indian",
+      "best_score": 0.250376,
+      "gold_best_score": 0.250338,
+      "best_wrong_score": 0.250376,
+      "top5": [
+        {
+          "answer": "Indian",
+          "score": 0.250376,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Phoolwari",
+          "score": 0.250338,
+          "is_gold": true,
+          "substituted": true
+        },
+        {
+          "answer": "Hindi",
+          "score": 0.247365,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "1946",
+          "score": 0.225252,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Aas Ka Panchhi",
+          "score": 0.090169,
+          "is_gold": false,
+          "substituted": true
+        }
+      ]
+    },
+    {
+      "qid": "2dc690ba0bdc11eba7f7acde48001122",
+      "type": "compositional",
+      "question": "What is the place of birth of the performer of song Changed It?",
+      "gold_answers": [
+        "Port of Spain"
+      ],
+      "gold_present": false,
+      "gold_rank": null,
+      "answer_conditioned_available": true,
+      "gold_substituted": false,
+      "best_answer": "Trinidadian",
+      "best_score": 0.993914,
+      "gold_best_score": 0.0,
+      "best_wrong_score": 0.993914,
+      "top5": [
+        {
+          "answer": "Trinidadian",
+          "score": 0.993914,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Changed It",
+          "score": 0.981974,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "American",
+          "score": 0.961988,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Wood Green",
+          "score": 0.490102,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "Kansas City",
+          "score": 0.006082,
+          "is_gold": false,
+          "substituted": true
+        }
+      ]
+    },
+    {
+      "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+      "type": "comparison",
+      "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+      "gold_answers": [
+        "no"
+      ],
+      "gold_present": true,
+      "gold_rank": 1,
+      "answer_conditioned_available": false,
+      "gold_substituted": false,
+      "best_answer": "no",
+      "best_score": 0.753428,
+      "gold_best_score": 0.753428,
+      "best_wrong_score": 0.753428,
+      "top5": [
+        {
+          "answer": "no",
+          "score": 0.753428,
+          "is_gold": true,
+          "substituted": false
+        },
+        {
+          "answer": "yes",
+          "score": 0.753428,
+          "is_gold": false,
+          "substituted": false
+        },
+        {
+          "answer": "2006",
+          "score": 0.753428,
+          "is_gold": false,
+          "substituted": false
+        },
+        {
+          "answer": "Central District",
+          "score": 0.753428,
+          "is_gold": false,
+          "substituted": false
+        },
+        {
+          "answer": "Qaleh",
+          "score": 0.753428,
+          "is_gold": false,
+          "substituted": false
+        }
+      ]
+    },
+    {
+      "qid": "a1cdb240085811ebbd5bac1f6bf848b6",
+      "type": "bridge_comparison",
+      "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+      "gold_answers": [
+        "God'S Gift To Women"
+      ],
+      "gold_present": true,
+      "gold_rank": 5,
+      "answer_conditioned_available": true,
+      "gold_substituted": true,
+      "best_answer": "Michael Curtiz",
+      "best_score": 2e-06,
+      "gold_best_score": 1e-06,
+      "best_wrong_score": 2e-06,
+      "top5": [
+        {
+          "answer": "Michael Curtiz",
+          "score": 2e-06,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "1931",
+          "score": 2e-06,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "1905",
+          "score": 2e-06,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "1886",
+          "score": 1e-06,
+          "is_gold": false,
+          "substituted": true
+        },
+        {
+          "answer": "God's Gift to Women",
+          "score": 1e-06,
+          "is_gold": true,
+          "substituted": true
+        }
+      ]
+    }
+  ]
+}

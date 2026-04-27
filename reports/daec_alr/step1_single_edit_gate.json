@@ -1,0 +1,161 @@
+{
+  "inputs": {
+    "dataset": "2wikimultihopqa",
+    "report_json": "run_logs/layer1_proprag_pool_eval_fixed_20260424/2wikimultihopqa_proprag_pool_daec_oracle.json",
+    "pool_json": "run_logs/proprag_pool_exports_full1000_20260424/2wikimultihopqa_pool100.json",
+    "limit": 200,
+    "offset": 0,
+    "top_k": 5,
+    "variants": [
+      "no_edit_daec_only",
+      "binding_gate_only",
+      "consistency_gate_only",
+      "double_gate_no_skip",
+      "double_gate_skip"
+    ],
+    "k_edit": 5,
+    "admission_inverse_entropy_margin": 0.1
+  },
+  "runtime": {
+    "mode": "openai_compatible_chat",
+    "model": "qwen3-8b-train",
+    "base_url": "http://localhost:8043/v1",
+    "concurrency": 8,
+    "reader_cache_jsonl": "reports/daec_alr/step1_single_edit_reader_cache.jsonl"
+  },
+  "summary": {
+    "variants": {
+      "no_edit_daec_only": {
+        "rows": 200,
+        "answer_em": 0.49,
+        "answer_f1": 0.588134,
+        "support_recall": 0.94125,
+        "support_complete": 0.855,
+        "mean_f1_delta_vs_no_edit": 0.0,
+        "f1_delta_ci95": [
+          0.0,
+          0.0
+        ],
+        "eligible_query_rate": 0.0,
+        "candidate_trigger_rate": 0.0,
+        "admitted_to_validation_rate": 0.0,
+        "accepted_edit_rate": 0.0,
+        "accepted_edit_rate_eligible": 0.0,
+        "edited_subset_pre_f1": 0.0,
+        "edited_subset_post_f1": 0.0,
+        "wrong_to_correct_flips": 0,
+        "correct_to_wrong_flips": 0,
+        "added_gold": 0,
+        "added_non_gold": 0,
+        "removed_gold": 0,
+        "removed_non_gold": 0,
+        "added_non_gold_per_added_gold": null
+      },
+      "binding_gate_only": {
+        "rows": 200,
+        "answer_em": 0.44,
+        "answer_f1": 0.524536,
+        "support_recall": 0.86875,
+        "support_complete": 0.645,
+        "mean_f1_delta_vs_no_edit": -0.0635982,
+        "f1_delta_ci95": [
+          -0.1158655,
+          -0.01898664
+        ],
+        "eligible_query_rate": 1.0,
+        "candidate_trigger_rate": 1.0,
+        "admitted_to_validation_rate": 0.0,
+        "accepted_edit_rate": 1.0,
+        "accepted_edit_rate_eligible": 1.0,
+        "edited_subset_pre_f1": 0.58872,
+        "edited_subset_post_f1": 0.524536,
+        "wrong_to_correct_flips": 9,
+        "correct_to_wrong_flips": 25,
+        "added_gold": 13,
+        "added_non_gold": 187,
+        "removed_gold": 57,
+        "removed_non_gold": 143,
+        "added_non_gold_per_added_gold": 14.384615
+      },
+      "consistency_gate_only": {
+        "rows": 200,
+        "answer_em": 0.475,
+        "answer_f1": 0.575673,
+        "support_recall": 0.92125,
+        "support_complete": 0.815,
+        "mean_f1_delta_vs_no_edit": -0.01246114,
+        "f1_delta_ci95": [
+          -0.03710149,
+          0.01100277
+        ],
+        "eligible_query_rate": 1.0,
+        "candidate_trigger_rate": 1.0,
+        "admitted_to_validation_rate": 0.3,
+        "accepted_edit_rate": 0.23,
+        "accepted_edit_rate_eligible": 0.23,
+        "edited_subset_pre_f1": 0.291038,
+        "edited_subset_post_f1": 0.234312,
+        "wrong_to_correct_flips": 3,
+        "correct_to_wrong_flips": 5,
+        "added_gold": 4,
+        "added_non_gold": 42,
+        "removed_gold": 15,
+        "removed_non_gold": 31,
+        "added_non_gold_per_added_gold": 10.5
+      },
+      "double_gate_no_skip": {
+        "rows": 200,
+        "answer_em": 0.475,
+        "answer_f1": 0.575673,
+        "support_recall": 0.92125,
+        "support_complete": 0.815,
+        "mean_f1_delta_vs_no_edit": -0.01246114,
+        "f1_delta_ci95": [
+          -0.03710149,
+          0.01100277
+        ],
+        "eligible_query_rate": 1.0,
+        "candidate_trigger_rate": 1.0,
+        "admitted_to_validation_rate": 0.3,
+        "accepted_edit_rate": 0.23,
+        "accepted_edit_rate_eligible": 0.23,
+        "edited_subset_pre_f1": 0.291038,
+        "edited_subset_post_f1": 0.234312,
+        "wrong_to_correct_flips": 3,
+        "correct_to_wrong_flips": 5,
+        "added_gold": 4,
+        "added_non_gold": 42,
+        "removed_gold": 15,
+        "removed_non_gold": 31,
+        "added_non_gold_per_added_gold": 10.5
+      },
+      "double_gate_skip": {
+        "rows": 200,
+        "answer_em": 0.475,
+        "answer_f1": 0.575673,
+        "support_recall": 0.92125,
+        "support_complete": 0.815,
+        "mean_f1_delta_vs_no_edit": -0.01246114,
+        "f1_delta_ci95": [
+          -0.03710149,
+          0.01100277
+        ],
+        "eligible_query_rate": 0.485,
+        "candidate_trigger_rate": 0.485,
+        "admitted_to_validation_rate": 0.3,
+        "accepted_edit_rate": 0.23,
+        "accepted_edit_rate_eligible": 0.474227,
+        "edited_subset_pre_f1": 0.291038,
+        "edited_subset_post_f1": 0.234312,
+        "wrong_to_correct_flips": 3,
+        "correct_to_wrong_flips": 5,
+        "added_gold": 4,
+        "added_non_gold": 42,
+        "removed_gold": 15,
+        "removed_non_gold": 31,
+        "added_non_gold_per_added_gold": 10.5
+      }
+    },
+    "main_decision": "RED"
+  }
+}

@@ -1,0 +1,182 @@
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "dependency", "answer": "20 March 851", "score": -0.09212411107898788}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "reverse", "answer": "20 March 851", "score": -0.2888684911945347}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "20 March 851", "score": -0.10744754284382907}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "20 March 851", "score": -0.10797994351172235}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "20 March 851", "score": -2.322610590570548}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "20 March 851", "score": -0.09212411107898788}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "20 March 851", "score": -0.5907382817447342}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "20 March 851", "score": -0.09212411107898788}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "20 March 851", "score": -0.10990262701454867}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "20 March 851", "score": -0.08624239154741531}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "20 March 851", "score": -0.13288997195900265}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "20 March 851", "score": -0.09884509001665265}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "20 March 851", "score": -0.10400538046883412}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "20 March 851", "score": -0.08336481483706848}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "20 March 851", "score": -2.6358316851838026}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Ermengarde of Tours", "score": -0.19488731099070833}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Ermengarde of Tours", "score": -0.15118160004855005}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Ermengarde of Tours", "score": -0.27786564195325997}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Ermengarde of Tours", "score": -0.13516008818300898}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Ermengarde of Tours", "score": -0.9091481689437538}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Ermengarde of Tours", "score": -1.258505966965913}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Ermengarde of Tours", "score": -0.42189414146681276}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Ermengarde of Tours", "score": -0.3799854412604115}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Ermengarde of Tours", "score": -0.2111304907228373}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Ermengarde of Tours", "score": -0.246207290417748}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Ermengarde of Tours", "score": -0.14531459350291223}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Ermengarde of Tours", "score": -0.2563541006325778}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Ermengarde of Tours", "score": -0.1686821102992392}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Ermengarde of Tours", "score": -0.2658234994796646}
+{"qid": "83bf3b5a0bd911eba7f7acde48001122", "query_idx": 0, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Ermengarde of Tours", "score": -2.2912766387065253}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Phoolwari", "score": -0.06149375808649893}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Phoolwari", "score": -0.07154112307329541}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Phoolwari", "score": -0.10491214687181127}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Phoolwari", "score": -0.55012488362547}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Phoolwari", "score": -0.10889621067917687}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Phoolwari", "score": -0.06149375808649893}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Phoolwari", "score": -1.3916718895779905}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Phoolwari", "score": -0.06149375808649893}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Phoolwari", "score": -0.06359365579987752}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Phoolwari", "score": -0.04593996700009484}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Phoolwari", "score": -0.05774668974163433}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Phoolwari", "score": -0.046676892741515985}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Phoolwari", "score": -0.047290939764479845}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Phoolwari", "score": -0.04007926943313578}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Phoolwari", "score": -0.5766795575462993}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Indian", "score": -13.933454513549805}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Indian", "score": -14.098649024963379}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Indian", "score": -12.8571195602417}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Indian", "score": -14.512980461120605}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Indian", "score": -10.597307205200195}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Indian", "score": -12.496953010559082}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Indian", "score": -12.72569751739502}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Indian", "score": -10.597307205200195}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Indian", "score": -11.80103874206543}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Indian", "score": -11.216886520385742}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Indian", "score": -10.515754699707031}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Indian", "score": -10.791887283325195}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Indian", "score": -10.649849891662598}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Indian", "score": -10.792774200439453}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Indian", "score": -10.882589340209961}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Indian", "score": -11.176270484924316}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Indian", "score": -10.353476524353027}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Indian", "score": -10.132497787475586}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Indian", "score": -13.244203567504883}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Phoolwari", "score": -0.11809555406668437}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Phoolwari", "score": -0.09299744657296571}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Phoolwari", "score": -0.05643244453831642}
+{"qid": "a80d84e7096d11ebbdb0ac1f6bf848b6", "query_idx": 1, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Phoolwari", "score": -0.11809555406668437}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "dependency", "answer": "Port of Spain", "score": -0.7067978381628564}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "reverse", "answer": "Port of Spain", "score": -1.6421828268764027}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "Port of Spain", "score": -1.1455458005108692}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "Port of Spain", "score": -0.8321422338161332}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "Port of Spain", "score": -3.5685529589730627}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "Port of Spain", "score": -2.437009346050521}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "Port of Spain", "score": -1.273792107378237}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "Port of Spain", "score": -0.7067978381628564}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "Port of Spain", "score": -0.9260920682624297}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "Port of Spain", "score": -0.9213749963021959}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "Port of Spain", "score": -1.0251858233696112}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "Port of Spain", "score": -0.8834790388303494}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "Port of Spain", "score": -0.8854134082357632}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "Port of Spain", "score": -0.5766679445822168}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "Port of Spain", "score": -2.476415117329452}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Trinidadian", "score": -5.56611430644989}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Trinidadian", "score": -5.791490435600281}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Trinidadian", "score": -5.319166779518127}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Trinidadian", "score": -4.949227035045624}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Trinidadian", "score": -3.724550485610962}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Trinidadian", "score": -5.210383772850037}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Trinidadian", "score": -5.9871985912323}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Trinidadian", "score": -3.724550485610962}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Trinidadian", "score": -11.845967769622803}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Trinidadian", "score": -11.30882716178894}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Trinidadian", "score": -3.792604148387909}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Trinidadian", "score": -4.786806106567383}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Trinidadian", "score": -5.35547149181366}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Trinidadian", "score": -4.671111345291138}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Trinidadian", "score": -5.840020656585693}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Trinidadian", "score": -5.2908406257629395}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Trinidadian", "score": -2.469189941883087}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Trinidadian", "score": -3.7500362396240234}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Trinidadian", "score": -8.213147163391113}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "Port of Spain", "score": -2.582691263325008}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "Port of Spain", "score": -1.1899959883545914}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "Port of Spain", "score": -1.4914044073472421}
+{"qid": "2dc690ba0bdc11eba7f7acde48001122", "query_idx": 2, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "Port of Spain", "score": -2.582691263325008}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "dependency", "answer": "no", "score": -4.417574882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "reverse", "answer": "no", "score": -4.066155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "no", "score": -3.4312148094177246}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "no", "score": -3.7024972438812256}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "no", "score": -4.826448440551758}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "no", "score": -4.417574882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "no", "score": -3.272012233734131}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "no", "score": -4.417574882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "no", "score": -4.171446323394775}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "no", "score": -4.658447742462158}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "no", "score": -4.296712875366211}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "no", "score": -4.53909158706665}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "no", "score": -4.299405574798584}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "no", "score": -3.5692014694213867}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "no", "score": -6.758057117462158}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "yes", "score": -15.480074882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "yes", "score": -12.941155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "yes", "score": -13.118714332580566}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "yes", "score": -13.827497482299805}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "yes", "score": -15.480074882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "yes", "score": -12.941155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "yes", "score": -13.118714332580566}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "yes", "score": -15.722515106201172}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "yes", "score": -10.513948440551758}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "yes", "score": -9.53994083404541}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "yes", "score": -9.272011756896973}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "yes", "score": -10.529366493225098}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "yes", "score": -15.046446800231934}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "yes", "score": -15.658447265625}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "yes", "score": -14.921712875366211}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "yes", "score": -15.351592063903809}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "yes", "score": -14.861906051635742}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "yes", "score": -14.069201469421387}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "yes", "score": -4.508057117462158}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "no", "score": -4.417574882507324}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "no", "score": -4.066155433654785}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "no", "score": -3.4312148094177246}
+{"qid": "462bb642099211ebbdb0ac1f6bf848b6", "query_idx": 3, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "no", "score": -4.41001558303833}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "dependency", "answer": "God'S Gift To Women", "score": -1.1998435264846194}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "reverse", "answer": "God'S Gift To Women", "score": -1.572022274077972}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "rotate_left", "answer": "God'S Gift To Women", "score": -1.4241220524428173}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "plus", "name": "edge_emphasis", "answer": "God'S Gift To Women", "score": -1.276878923762888}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_0", "answer": "God'S Gift To Women", "score": -1.2503731644886102}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_0", "answer": "God'S Gift To Women", "score": -1.1998435264846194}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_1", "answer": "God'S Gift To Women", "score": -1.4650934024803064}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_1", "answer": "God'S Gift To Women", "score": -1.1998435264846194}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_2", "answer": "God'S Gift To Women", "score": -0.592198589650252}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_2", "answer": "God'S Gift To Women", "score": -1.1998435264846194}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_3", "answer": "God'S Gift To Women", "score": -1.1061505305593529}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_3", "answer": "God'S Gift To Women", "score": -1.1998435264846194}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "delete_4", "answer": "God'S Gift To Women", "score": -1.2683481937463512}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "minus", "name": "replace_4", "answer": "God'S Gift To Women", "score": -1.2104567509843946}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "closed_book", "name": "empty", "answer": "God'S Gift To Women", "score": -0.6634305451385216}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "dependency", "answer": "Michael Curtiz", "score": -2.9739928799673785}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "reverse", "answer": "Michael Curtiz", "score": -2.408049502953247}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "rotate_left", "answer": "Michael Curtiz", "score": -1.4922027195570895}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "gold", "component": "alt_plus", "name": "edge_emphasis", "answer": "Michael Curtiz", "score": -2.915987317177951}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "dependency", "answer": "Michael Curtiz", "score": -2.1559710143386206}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "reverse", "answer": "Michael Curtiz", "score": -2.865952830596749}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "rotate_left", "answer": "Michael Curtiz", "score": -1.7151685863306436}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "plus", "name": "edge_emphasis", "answer": "Michael Curtiz", "score": -2.1559710143386206}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_0", "answer": "Michael Curtiz", "score": -1.8011049415605573}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_0", "answer": "Michael Curtiz", "score": -3.0551367759471737}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_1", "answer": "Michael Curtiz", "score": -1.7755321765434833}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_1", "answer": "Michael Curtiz", "score": -2.5993072376586497}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_2", "answer": "Michael Curtiz", "score": -2.497581901416794}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_2", "answer": "Michael Curtiz", "score": -2.0772422254667595}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_3", "answer": "Michael Curtiz", "score": -2.3415187351153364}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_3", "answer": "Michael Curtiz", "score": -2.5003419696586113}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "delete_4", "answer": "Michael Curtiz", "score": -2.4522628975294816}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "minus", "name": "replace_4", "answer": "Michael Curtiz", "score": -2.647904639966621}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "closed_book", "name": "empty", "answer": "Michael Curtiz", "score": -6.627804974714915}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "dependency", "answer": "God'S Gift To Women", "score": -1.0747218698650598}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "reverse", "answer": "God'S Gift To Women", "score": -1.57003492970249}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "rotate_left", "answer": "God'S Gift To Women", "score": -1.1819380450295043}
+{"qid": "a1cdb240085811ebbd5bac1f6bf848b6", "query_idx": 4, "pair": "wrong", "component": "alt_plus", "name": "edge_emphasis", "answer": "God'S Gift To Women", "score": -1.0747218698650598}
