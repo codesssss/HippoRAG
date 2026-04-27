@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-27
+Last updated: 2026-04-28
 
 ## Canonical Outputs
 
@@ -81,6 +81,7 @@ Last updated: 2026-04-27
 - `NREV Day-0 audit implementation`: `scripts/audit_nrev_day0.py`
 - `Q-BindCert Phase-0 plan`: `research_memory/emnlp_expand_then_compose/34_qbindcert_phase0_plan.md`
 - `Q-BindCert Phase-0 result`: `research_memory/emnlp_expand_then_compose/35_qbindcert_phase0_results_20260427.md`
+- `Q-BindCert Phase-0 closure`: `research_memory/emnlp_expand_then_compose/36_qbindcert_phase0_closure_20260428.md`
 - `Q-BindCert Phase-0 report`: `reports/qbindcert/phase0_sanity.md`
 - `Q-BindCert Phase-0 implementation`: `scripts/qbindcert_phase0_sanity.py`
 
@@ -352,6 +353,7 @@ Last updated: 2026-04-27
 - No CAPS long-running jobs are active; Day-2 proof ranking and Answer-Contrastive v0 are not green enough to proceed in the current paper cycle.
 - No CPAG jobs are active; Day-1 agreement graph diagnostic failed and CPAG should not continue without a different agreement object.
 - No DAEC-ALR job is active; Step-1 single-edit gate finished RED and should not continue without replacing the admission object or reconstructing the exact DAEC scorer.
+- No Q-BindCert jobs are active; Phase-0 oracle certificate search passed, but Qwen3-8B `/no_think` typed extraction and program-lattice gates failed, so Phase 1 is blocked.
 - The attempted `IRCoT MuSiQue-1000` run exited before writing `reports/week0/ircot_musique1000.json`; only `/tmp/bsgs_ircot_smoke.json` exists.
 
 ## Next Wave
@@ -382,6 +384,11 @@ Last updated: 2026-04-27
    - Step-1 showed that consistency does not transfer into safe edit admission,
    - main config F1/support both dropped and hard-negative import exceeded the pre-registered ratio gate,
    - only reopen if the exact DAEC embedding scorer can be reconstructed for candidate edits or the admission object changes materially.
+8. Do not enter Q-BindCert Phase 1 in the current paper cycle:
+   - oracle certificate search is positive,
+   - oracle answer-contrastive certificate search is positive,
+   - but Qwen3-8B `/no_think` extraction fails argument coverage (`0.62 < 0.80`) and program-lattice top-3 correctness (`0.55 < 0.75`),
+   - only reopen with a trained/supervised compiler or a materially stronger constrained extractor, not with prompt tuning alone.
 
 ## Method Priority
 
@@ -401,6 +408,7 @@ Method implementation order should be:
    - `CPAG` as training-free LLM/operator diagnostic: cached Qwen proposition/entity extraction plus agreement closure has local cross-pool signal but fails evidence assembly on strong PropRAG residuals
    - `Answer-Contrastive Verifier v0` as a supervised scalar-feature diagnostic: top-k placement partially recovers, but gold-vs-best-wrong AUC remains too weak for a main method
    - `DAEC-ALR Step-1` as a reader-consistency edit-admission diagnostic: Day-0 context stability signal passed, but single-edit admission failed with F1/support drops and hard-negative import
+   - `Q-BindCert Phase 0` as a certificate-search diagnostic: oracle certificates and oracle answer-contrastive rejection pass, but zero-shot typed extraction/query compilation fail the blocking gates
 3. Baselines and controls:
    - baseline top-5
    - MMR/DPP structure-blind diversity
@@ -428,6 +436,7 @@ Method implementation order should be:
 - D-PathRAG/CEE/C-CEE diagnostics are negative for the current paper cycle:
   - free-form selector improves support completeness but imports reader-hostile hard negatives
   - pairwise CEE admission fails to recover oracle Edit@1 headroom
+- Q-BindCert is blocked before Phase 1: oracle certificate search is viable, but Qwen3-8B `/no_think` produces only `0.62` argument extraction proxy and `0.55` top-3 program correctness proxy, below the pre-registered gates.
   - C-CEE reader likelihood passes semantic-capacity checks but fails non-oracle decision-level separability
 - CAPS is stopped for the current paper cycle:
   - NLI verifier sanity is positive with AUC `0.903`
