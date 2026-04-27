@@ -79,6 +79,10 @@ Last updated: 2026-04-27
 - `NREV same-title replacement fixed first-30 rerun`: `reports/nrev/day0_audit_rerun30/day0_sanity.md`
 - `NREV Day-0 implementation`: `scripts/run_nrev_day0_sanity.py`
 - `NREV Day-0 audit implementation`: `scripts/audit_nrev_day0.py`
+- `Q-BindCert Phase-0 plan`: `research_memory/emnlp_expand_then_compose/34_qbindcert_phase0_plan.md`
+- `Q-BindCert Phase-0 result`: `research_memory/emnlp_expand_then_compose/35_qbindcert_phase0_results_20260427.md`
+- `Q-BindCert Phase-0 report`: `reports/qbindcert/phase0_sanity.md`
+- `Q-BindCert Phase-0 implementation`: `scripts/qbindcert_phase0_sanity.py`
 
 ## Done
 

@@ -49,3 +49,8 @@ run_logs/*.tsv
 *.screenlog
 refine-logs/
 *.status
+
+# Q-BindCert Phase-0 local probe/caching artifacts.
+reports/qbindcert/phase0_probe*/
+reports/qbindcert/proxy_oracle_no_llm/
+reports/qbindcert/**/phase0_llm_cache.jsonl
