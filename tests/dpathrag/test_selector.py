@@ -14,6 +14,13 @@ def test_st_gumbel_top1_respects_mask_without_noise() -> None:
     assert sample.argmax(dim=-1).item() == 2
 
 
+def test_st_gumbel_top1_with_noise_is_finite() -> None:
+    logits = torch.tensor([[0.1, 2.0, -0.2]])
+    sample = st_gumbel_top1(logits, tau=1.0, hard=False, add_noise=True)
+    assert torch.isfinite(sample).all()
+    assert torch.allclose(sample.sum(dim=-1), torch.ones(1), atol=1e-6)
+
+
 def test_autoregressive_selector_shapes_and_no_replacement() -> None:
     torch.manual_seed(7)
     selector = AutoregressivePathSelector(candidate_feature_dim=3, hidden_dim=16, num_layers=1, num_heads=4, dropout=0.0)

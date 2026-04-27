@@ -8,7 +8,7 @@ from torch import Tensor
 
 def sample_gumbel(shape: torch.Size | tuple[int, ...], *, device: torch.device | None = None, eps: float = 1e-10) -> Tensor:
     uniform = torch.rand(shape, device=device)
-    return -torch.log(-torch.log(uniform.clamp_min(eps)).clamp_min(eps))
+    return -torch.log((-torch.log(uniform.clamp_min(eps))).clamp_min(eps))
 
 
 def masked_softmax(logits: Tensor, mask: Tensor | None = None, dim: int = -1) -> Tensor:
@@ -38,4 +38,3 @@ def st_gumbel_top1(logits: Tensor, *, tau: float = 1.0, mask: Tensor | None = No
     index = relaxed.argmax(dim=-1, keepdim=True)
     hard_sample = torch.zeros_like(relaxed).scatter_(-1, index, 1.0)
     return hard_sample.detach() - relaxed.detach() + relaxed
-

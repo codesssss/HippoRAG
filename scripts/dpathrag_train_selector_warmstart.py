@@ -39,6 +39,59 @@ def load_jsonl(path: str | Path, *, limit: int = 0) -> list[dict[str, Any]]:
     return rows
 
 
+def row_qid(row: dict[str, Any]) -> str:
+    return str(row.get("qid") or row.get("query_idx") or "")
+
+
+def split_rows(
+    rows: list[dict[str, Any]],
+    *,
+    train_size: int,
+    eval_size: int,
+    eval_start: int,
+    train_from_complement: bool,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    """Split rows for selector warm-start training.
+
+    The default path preserves the historical contiguous ``train/eval`` split.
+    Cross-fit runs set ``eval_start`` and ``train_from_complement`` so the held
+    out fold is never used for warm-start training.
+    """
+
+    train_size = int(train_size)
+    eval_size = int(eval_size)
+    eval_start = int(eval_start)
+    if eval_start < 0:
+        train_rows = list(rows[:train_size])
+        eval_rows = list(rows[train_size : train_size + eval_size])
+    else:
+        if eval_start >= len(rows):
+            raise ValueError(f"eval_start={eval_start} is outside rows length {len(rows)}")
+        eval_rows = list(rows[eval_start : eval_start + eval_size])
+        if len(eval_rows) < eval_size:
+            raise ValueError(f"Requested eval_size={eval_size} from eval_start={eval_start}, got {len(eval_rows)}")
+        if train_from_complement:
+            eval_qids = {row_qid(row) for row in eval_rows}
+            train_rows = [row for row in rows if row_qid(row) not in eval_qids]
+            if train_size > 0:
+                train_rows = train_rows[:train_size]
+        else:
+            train_rows = list(rows[:train_size])
+
+    train_qids = {row_qid(row) for row in train_rows}
+    eval_qids = {row_qid(row) for row in eval_rows}
+    metadata = {
+        "eval_start": eval_start,
+        "train_from_complement": bool(train_from_complement),
+        "train_rows": len(train_rows),
+        "eval_rows": len(eval_rows),
+        "train_unique_qids": len(train_qids),
+        "eval_unique_qids": len(eval_qids),
+        "train_eval_qid_overlap": len(train_qids & eval_qids),
+    }
+    return train_rows, eval_rows, metadata
+
+
 class SelectorDataset:
     def __init__(
         self,
@@ -171,6 +224,8 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=1000)
     parser.add_argument("--train_size", type=int, default=800)
     parser.add_argument("--eval_size", type=int, default=200)
+    parser.add_argument("--eval_start", type=int, default=-1)
+    parser.add_argument("--train_from_complement", action="store_true")
     parser.add_argument("--max_candidates", type=int, default=100)
     parser.add_argument("--path_len", type=int, default=5)
     parser.add_argument("--hidden_dim", type=int, default=128)
@@ -201,10 +256,17 @@ def main() -> None:
 
     rows = load_jsonl(args.cache_jsonl, limit=int(args.limit))
     embedding_features, embedding_feature_names = load_embedding_features(str(args.embedding_npz), limit=int(args.limit))
-    train_rows = rows[: int(args.train_size)]
-    eval_rows = rows[int(args.train_size) : int(args.train_size) + int(args.eval_size)]
+    train_rows, eval_rows, split_metadata = split_rows(
+        rows,
+        train_size=int(args.train_size),
+        eval_size=int(args.eval_size),
+        eval_start=int(args.eval_start),
+        train_from_complement=bool(args.train_from_complement),
+    )
     if not train_rows or not eval_rows:
         raise ValueError("Both train and eval splits must be non-empty")
+    if int(split_metadata["train_eval_qid_overlap"]) != 0:
+        raise ValueError(f"Train/eval qid overlap is not allowed: {split_metadata['train_eval_qid_overlap']}")
     train_dataset = SelectorDataset(
         train_rows,
         max_candidates=int(args.max_candidates),
@@ -237,6 +299,7 @@ def main() -> None:
         "embedding_npz": str(args.embedding_npz),
         "train_rows": len(train_rows),
         "eval_rows": len(eval_rows),
+        "split": split_metadata,
         "feature_names": FEATURE_NAMES + embedding_feature_names,
         "config": {
             "max_candidates": int(args.max_candidates),

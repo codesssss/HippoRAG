@@ -23,7 +23,13 @@ def safe_read(path: str) -> dict[str, Any]:
     return read_json(p)
 
 
-def decide(split: dict[str, Any], nli: dict[str, Any], slots: dict[str, Any]) -> dict[str, Any]:
+def decide(
+    split: dict[str, Any],
+    nli: dict[str, Any],
+    slots: dict[str, Any],
+    qwen: dict[str, Any],
+    qwen_posthoc: dict[str, Any],
+) -> dict[str, Any]:
     components_enabled: list[str] = []
     components_disabled = ["latent-slot main path", "soft binding", "DPP", "LLM verifier"]
     risks: list[str] = []
@@ -47,6 +53,25 @@ def decide(split: dict[str, Any], nli: dict[str, Any], slots: dict[str, Any]) ->
     else:
         risks.append("Oracle slots missing; Week 1 cannot run until built.")
 
+    qwen_recall = float((qwen.get("metrics") or {}).get("slot_recall") or 0.0)
+    if qwen.get("status") == "completed" and qwen_recall >= 0.70:
+        components_enabled.append("latent-slot route as Week-2 candidate")
+        if "latent-slot main path" in components_disabled:
+            components_disabled.remove("latent-slot main path")
+    elif qwen.get("status") == "completed":
+        risks.append(
+            f"Qwen slot recall is {qwen_recall:.4f}, below the 0.70 Week-2 main-route gate; keep latent slots diagnostic-only."
+        )
+    else:
+        risks.append("Qwen slot quality is missing; latent-slot route cannot be promoted.")
+
+    if qwen_posthoc.get("status") == "completed":
+        chain_acc = float((qwen_posthoc.get("metrics") or {}).get("position_chain_accuracy") or 0.0)
+        if chain_acc < 0.70:
+            risks.append(
+                f"Post-hoc position-chain accuracy is {chain_acc:.4f}; Qwen often misses explicit dependency wiring even when slot text matches."
+            )
+
     return {
         "week1_config": {
             "dataset": "musique",
@@ -67,6 +92,7 @@ def main() -> None:
     parser.add_argument("--nli_json", default="reports/week0/nli_calibration.json")
     parser.add_argument("--oracle_json", default="reports/week0/oracle_slot_pipeline.json")
     parser.add_argument("--qwen_json", default="reports/week0/qwen_slot_quality.json")
+    parser.add_argument("--qwen_posthoc_json", default="reports/week0/qwen_slot_quality_posthoc.json")
     parser.add_argument("--json_out", default="reports/week0/decision.json")
     parser.add_argument("--md_out", default="reports/week0/decision.md")
     args = parser.parse_args()
@@ -76,13 +102,15 @@ def main() -> None:
     nli = safe_read(args.nli_json)
     oracle = safe_read(args.oracle_json)
     qwen = safe_read(args.qwen_json)
-    decision = decide(split, nli, oracle)
+    qwen_posthoc = safe_read(args.qwen_posthoc_json)
+    decision = decide(split, nli, oracle, qwen, qwen_posthoc)
     payload = {
         "split_audit": split,
         "ircot_baseline": ircot,
         "nli_calibration": nli,
         "oracle_slot_pipeline": oracle,
         "qwen_slot_quality": qwen,
+        "qwen_slot_quality_posthoc": qwen_posthoc,
         "decision": decision,
     }
     write_json(payload, args.json_out)
@@ -118,6 +146,12 @@ def main() -> None:
         f"- Slot recall: `{(qwen.get('metrics') or {}).get('slot_recall', '')}`",
         f"- Slot precision: `{(qwen.get('metrics') or {}).get('slot_precision', '')}`",
         f"- Variable grounding accuracy: `{(qwen.get('metrics') or {}).get('variable_grounding_accuracy', '')}`",
+        "",
+        "## Qwen slot quality post-hoc",
+        f"- Status: `{qwen_posthoc.get('status', 'missing')}`",
+        f"- Position-chain accuracy: `{(qwen_posthoc.get('metrics') or {}).get('position_chain_accuracy', '')}`",
+        f"- Dependency presence accuracy: `{(qwen_posthoc.get('metrics') or {}).get('dependency_presence_accuracy', '')}`",
+        f"- Slot count within one: `{(qwen_posthoc.get('metrics') or {}).get('slot_count_within_one', '')}`",
         "",
         "## Decision",
         f"- Week 1 config: `{decision['week1_config']}`",
