@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-25
+Last updated: 2026-04-27
 
 ## Canonical Outputs
 
@@ -40,8 +40,45 @@ Last updated: 2026-04-25
 - `Layer-1 targeted nobinding ablation outputs`: `run_logs/layer1_targeted_nobinding_20260424/`
 - `BSGS Week0/Week1 execution plan`: `docs/bsgs_week0_week1_plan_20260425.md`
 - `BSGS Week0/Week1 research memo`: `research_memory/emnlp_expand_then_compose/18_bsgs_week0_week1_plan_20260425.md`
+- `BSGS negative diagnostic memo`: `research_memory/emnlp_expand_then_compose/19_bsgs_negative_diagnostic_20260425.md`
 - `BSGS Week0 implementation`: `src/bsgs/`, `scripts/bsgs_*.py`
-- `BSGS Week0 preliminary reports`: `reports/week0/`
+- `BSGS Week0 reports`: `reports/week0/`
+- `BSGS Week1 oracle-slot reports`: `reports/week1/`
+- `D-PathRAG/CEE/C-CEE negative diagnostic memo`: `research_memory/emnlp_expand_then_compose/20_dpathrag_cee_ccee_negative_diagnostic_20260427.md`
+- `C-CEE negative result summary`: `reports/cee/ccee_negative_result_summary.md`
+- `D-PathRAG PropRAG eval1000 report`: `reports/dpathrag/proprag_kfold_eval1000_results.md`
+- `CEE-pairwise v0 implementation summary`: `reports/dpathrag/cee_pairwise_v0_implementation_summary.md`
+- `C-CEE Day-1 gate reports`: `reports/cee/`
+- `CAPS Day-0 NLI sanity report`: `reports/caps/nli_sanity_day0.md`
+- `CAPS Day-0 NLI sanity implementation`: `scripts/caps_day0_nli_sanity.py`
+- `CAPS Day-0 research memo`: `research_memory/emnlp_expand_then_compose/21_caps_day0_nli_sanity_20260427.md`
+- `CAPS Day-1 candidate recall failure summary`: `reports/caps/caps_day1_candidate_recall_failure_summary.md`
+- `CAPS Day-1 research memo`: `research_memory/emnlp_expand_then_compose/22_caps_day1_candidate_recall_failure_20260427.md`
+- `CAPS Day-1.5 candidate v2 failure summary`: `reports/caps/caps_day1_5_candidate_v2_summary.md`
+- `CAPS Day-1.5 research memo`: `research_memory/emnlp_expand_then_compose/23_caps_day1_5_candidate_v2_failure_20260427.md`
+- `CAPS Day-2 oracle-obligation proof-ranker report`: `reports/caps/caps_day2_proof_separability.md`
+- `CAPS Day-2 oracle-obligation proof-ranker implementation`: `scripts/caps_day2_proof_separability.py`
+- `CAPS Day-2 research memo`: `research_memory/emnlp_expand_then_compose/24_caps_day2_proof_separability_20260427.md`
+- `CPAG Day-1 agreement graph report`: `reports/cpag/cpag_day1_agreement_gate.md`
+- `CPAG Day-1 implementation`: `scripts/run_cpag_agreement.py`
+- `CPAG Day-1 research memo`: `research_memory/emnlp_expand_then_compose/25_cpag_day1_agreement_failure_20260427.md`
+- `CPAG implementation audit`: `reports/cpag/audit200/cpag_implementation_audit.md`
+- `Answer-Contrastive Verifier v0 report`: `reports/contrastive_verifier/day1_gate.md`
+- `Answer-Contrastive Verifier v0 implementation`: `scripts/run_answer_contrastive_verifier.py`
+- `Answer-Contrastive Verifier v0 research memo`: `research_memory/emnlp_expand_then_compose/26_answer_contrastive_verifier_20260427.md`
+- `Residual route lessons checkpoint`: `research_memory/emnlp_expand_then_compose/27_residual_route_lessons_20260427.md`
+- `Full attempt history synthesis`: `research_memory/emnlp_expand_then_compose/28_full_attempt_history_synthesis_20260427.md`
+- `DAEC-ALR Day-0 reader consistency probe`: `research_memory/emnlp_expand_then_compose/29_daec_alr_consistency_probe_20260427.md`
+- `DAEC-ALR Step-1 pre-flight plan`: `research_memory/emnlp_expand_then_compose/30_daec_alr_step1_plan.md`
+- `DAEC-ALR Step-1 single-edit result`: `research_memory/emnlp_expand_then_compose/31_daec_alr_step1_single_edit_failure_20260427.md`
+- `DAEC-ALR Step-1 report`: `reports/daec_alr/step1_single_edit_gate.md`
+- `DAEC-ALR Step-1 implementation`: `scripts/run_daec_alr_step1.py`
+- `NREV Day-0 sanity result`: `research_memory/emnlp_expand_then_compose/32_nrev_day0_sanity_20260427.md`
+- `NREV Day-0 report`: `reports/nrev/day0_sanity.md`
+- `NREV Day-0 audit report`: `reports/nrev/day0_audit.md`
+- `NREV same-title replacement fixed first-30 rerun`: `reports/nrev/day0_audit_rerun30/day0_sanity.md`
+- `NREV Day-0 implementation`: `scripts/run_nrev_day0_sanity.py`
+- `NREV Day-0 audit implementation`: `scripts/audit_nrev_day0.py`
 
 ## Done
 
@@ -152,38 +189,195 @@ Last updated: 2026-04-25
   - `scripts/bsgs_week0_report.py`
   - `scripts/bsgs_week1_report.py`
 - Added BSGS unit tests under `tests/bsgs/`
-- Ran local Week0 preliminary scripts:
+- Ran local Week0 scripts:
   - split audit: local `musique.json` is `MuSiQue-Ans-local-subset`, 1000 answerable examples, not the full official 2417-example MuSiQue-Ans dev
   - oracle slot pipeline: built 1000 local oracle-slot records
-  - IRCoT baseline: `not_run` report only; no endpoint/runtime result fabricated
-  - Qwen slot quality: `not_run` report only; no endpoint result fabricated
-  - NLI calibration: lexical smoke only, not a formal DeBERTa result; absorbing transition remains ablation/fallback
+  - Qwen slot quality: real Qwen3-8B no-think slot generation completed on 997 valid local examples
+  - Qwen slot post-hoc diagnostics: slot count is mostly correct, but position-chain accuracy is weak
+  - NLI calibration: DeBERTa model unavailable; absorbing transition remains ablation/fallback
 - Verified BSGS scaffold:
   - `py_compile` passed for all new modules/scripts
-  - `pytest tests/bsgs -q` passed: 7 tests
+  - `pytest tests/bsgs` passed: 8 tests
   - `/tmp/bsgs_oracle_smoke.json` smoke run completed with `limit=5`
+- Ran BSGS oracle-slot MuSiQue-1000 mechanism validation:
+  - `reports/week1/operator_validation.json`
+  - `reports/week1/operator_mechanism_analysis.md`
+  - supporting paragraph recall: `0.2268`
+  - full support covered: `54/1000`
+  - no support covered: `546/1000`
+- Rejected BSGS as a main method route:
+  - oracle slot order does not rescue the node-marginal operator
+  - failure is attributed to set/path coherence loss plus graph-substrate mismatch
+  - BSGS remains available as a negative diagnostic section for the DAEC paper
+- Ran D-PathRAG PropRAG eval1000 cross-fit:
+  - `reports/dpathrag/proprag_kfold_eval1000_results.md`
+  - support-complete improved from `0.7720` to `0.8050`
+  - reader F1 moved from `0.4824` to `0.4634`
+  - selector added `76` gold docs but also `1205` non-gold docs
+- Ran CEE oracle/headroom and pairwise-admission diagnostics:
+  - oracle Edit@1 top20 support-complete reached `0.8950`
+  - CEE-pairwise linear/MLP v0 both ended at support-complete `0.7710`
+  - beneficial edit recall was `0.0221` / `0.0588`
+  - stopped CEE-pairwise as a method route
+- Ran C-CEE Day-1 reader-counterfactual separability gate:
+  - `reports/cee/day1_summary.md`
+  - reader semantic capacity passed with AUC `0.988332`
+  - non-oracle beneficial-vs-lexical-HN AUC was `0.536875`
+  - simulated decision added `0` gold and `7` non-gold docs on dev fold
+  - final decision: `STOP_DECISION_SEPARABILITY_FAIL`
+- Recorded D-PathRAG/CEE/C-CEE as a stopped diagnostic branch:
+  - `research_memory/emnlp_expand_then_compose/20_dpathrag_cee_ccee_negative_diagnostic_20260427.md`
+  - `reports/cee/ccee_negative_result_summary.md`
+- Started CAPS as a new answer-conditioned proof-search line:
+  - Implemented Day-0 blocking verifier sanity:
+    - `scripts/caps_day0_nli_sanity.py`
+    - `tests/dpathrag/test_caps_day0.py`
+  - Ran template-obligation NLI sanity on 2Wiki PropRAG dev fold:
+    - model: `cross-encoder/nli-deberta-v3-base`
+    - pairs: 100 positive gold-doc obligation pairs + 100 same-query non-gold negatives
+    - AUC: `0.903`, 95% CI `[0.8616, 0.9401]`
+    - paired win rate: `0.88`
+    - decision: `PROCEED_DAY1`
+- Ran CAPS Day-1 candidate answer recall gate:
+  - implementation: `scripts/caps_day1_gates.py`
+  - test: `tests/dpathrag/test_caps_day1.py`
+  - candidate sources: heuristic spans, PropRAG/Dense/Union reader answers, single-passage reader answers, pairwise reader answers
+  - cached reader generations: `data/dpathrag/cache/caps/caps_day1_answer_cache.jsonl` with 4000 rows
+  - final recall@5 / @10 / @20: `0.670` / `0.740` / `0.750`
+  - union top60 answer-string oracle: `0.900`
+  - decision: `STOP_CANDIDATE_RECALL_FAIL`
+  - interpretation: CAPS verifier is viable, but current training-free candidate answer generation is not high-recall enough
+- Ran CAPS Day-1.5 candidate generator v2 rescue:
+  - discovered active local LLM endpoints:
+    - `http://localhost:8041/v1`, `8042`, `8043` -> `qwen3-8b-train`
+    - `http://localhost:8045/v1` -> `qwen3-32b-judge`
+    - `http://localhost:8088/v1` -> `Qwen3-32B`
+  - used `http://localhost:8043/v1` with `qwen3-8b-train`
+  - implemented `/no_think` JSON candidate-list prompt and parser cleanup
+  - LLM-only recall@5/@10/@20: `0.455` / `0.480` / `0.485`
+  - LLM + v1 + string extraction recall@5/@10/@20: `0.635` / `0.665` / `0.840`
+  - decision: `STOP_CANDIDATE_V2_RECALL_FAIL`
+  - interpretation: LLM candidate generation improves deep recall only when unioned, but top-rank candidate recall remains far below gate
+- Ran CAPS Day-2 oracle-obligation proof-ranker diagnostic:
+  - implementation: `scripts/caps_day2_proof_separability.py`
+  - test: `tests/dpathrag/test_caps_day2.py`
+  - candidate source: Day-1.5 union top-20 candidates
+  - obligations: oracle/template answer-conditioned obligations from 2Wiki evidence triples
+  - proof docs: PropRAG/Dense union top30
+  - unique NLI pairs: `116619`
+  - candidate recall@20: `0.840`
+  - all-query top1/top3: `0.285` / `0.490`
+  - conditional top1/top3 given gold present: `0.339286` / `0.583333`
+  - gold-vs-best-wrong AUC: `0.398136`
+  - mean gold proof score vs best wrong: `0.383771` vs `0.530366`
+  - decision: `STOP_CAPS_PROOF_RANKER_FAIL`
+  - interpretation: obligation-level NLI signal does not aggregate into answer-level proof ranking under broad candidate competition
+- Ran CPAG Day-1 training-free multi-pool proposition agreement diagnostic:
+  - implementation: `scripts/run_cpag_agreement.py`
+  - test: `tests/dpathrag/test_cpag_agreement.py`
+  - pools: PropRAG top20 + Dense top20; BM25 was unavailable in local D-PathRAG cache
+  - LLM artifact: cached Qwen OpenIE extraction from `outputs/2wikimultihopqa/openie_results_ner_qwen3-8b.json`
+  - cross-pool gold-vs-non-gold AUC: `0.772391`
+  - support-complete PropRAG rank vs CPAG: `0.705` vs `0.470`
+  - reader F1 PropRAG rank vs CPAG: `0.4720` vs `0.3897`
+  - CPAG added only `3` gold supports while adding `87` non-gold docs relative to PropRAG top5
+  - decision: `STOP_CPAG_AGREEMENT_FAIL`
+  - interpretation: proposition/entity agreement has local signal, but agreement closure chases high-degree wrong hubs and does not assemble coherent evidence sets
+- Audited CPAG implementation after RRF appeared anomalously weak:
+  - audit: `reports/cpag/audit200/cpag_implementation_audit.md`
+  - avg PropRAG/Dense doc_id overlap@20: `8.84`
+  - avg title overlap@20: `8.835`
+  - RRF/support/cross-pool implementation checks passed
+  - warnings: PropRAG top1 was pushed below RRF rank 3 in `12/200` queries
+  - conclusion: RRF/CPAG drop is methodological, not an implementation artifact
+- Ran Answer-Contrastive Verifier v0 as the final CAPS residual-recovery check:
+  - implementation: `scripts/run_answer_contrastive_verifier.py`
+  - test: `tests/dpathrag/test_answer_contrastive_verifier.py`
+  - candidate rows: `4000` from 200 dev queries, using cached Day-1.5 union top-20 candidates
+  - proof protocol: CAPS Day-2 oracle/template obligations, PropRAG/Dense union top30, `116619` unique NLI pairs
+  - no new LLM calls and no DeBERTa/Qwen fine-tuning
+  - proof-score baseline gold-vs-best-wrong AUC/top1-cond/top3-cond: `0.398136` / `0.339286` / `0.583333`
+  - best supervised scalar-feature model: `hist_gradient_boosting`
+  - best model gold-vs-best-wrong AUC: `0.570826`, 95% CI `[0.514952, 0.624433]`
+  - best model conditional top1/top3: `0.595238` / `0.827381`
+  - decision: `PARTIAL_TOPK_RECOVERY_NOT_MAINLINE`
+  - interpretation: scalar candidate/proof/source features recover top-k placement but not clean same-query gold-vs-best-wrong separability
+- Ran DAEC-ALR Day-0 reader consistency probe:
+  - implementation: `scripts/run_daec_consistency_probe.py`
+  - test: `tests/dpathrag/test_daec_consistency_probe.py`
+  - input: 2Wiki first 200 queries from PropRAG top100 DAEC report
+  - perturbations: original, swap01, reverse, rotate_left, drop_last
+  - primary reader: `qwen3-8b-train` at `http://localhost:8043/v1` with HippoRAG `rag_qa_musique` one-shot prompt
+  - generated `1000` reader outputs
+  - original reconstructed DAEC EM/F1: `0.4900` / `0.5882`
+  - majority-consistency AUC vs original `F1>=0.5`: `0.757184`, 95% CI `[0.687466, 0.820193]`
+  - inverse-entropy AUC vs original `F1>=0.5`: `0.759778`, 95% CI `[0.690214, 0.822619]`
+  - decision: `PASS_SIGNAL_PROBE`
+  - interpretation: Qwen answer self-consistency under DAEC evidence perturbations is a real reader-side signal; proceed only to bounded single-edit-in-pool probe, not active retrieval yet
+- Pre-registered the DAEC-ALR Step-1 single-edit plan:
+  - plan: `research_memory/emnlp_expand_then_compose/30_daec_alr_step1_plan.md`
+  - scope: single-edit repair inside existing PropRAG top100, not active retrieval
+  - fixed main config: `double_gate_skip`
+  - fixed skip rule: edit only when round-0 `majority_fraction < 1.0`
+  - fixed candidate budget: `K_edit = 5`
+  - fixed reader gates: order-based admission with `K_admit = 4`, independent subset/drop validation with `K_val = 6`
+  - fixed ablations: no edit, binding-only, consistency-only, double-gate no-skip, double-gate with skip
+  - fixed decision rules: 2Wiki F1 gain, bootstrap CI, edit-rate window, edited-subset gain, flip balance, support-complete preservation, and hard-negative import ratio
+- Implemented and ran DAEC-ALR Step-1 single-edit gate:
+  - implementation: `scripts/run_daec_alr_step1.py`
+  - test: `tests/dpathrag/test_daec_alr_step1.py`
+  - report: `reports/daec_alr/step1_single_edit_gate.md`
+  - trace output: `reports/daec_alr/step1_single_edit_traces.jsonl`
+  - research memo: `research_memory/emnlp_expand_then_compose/31_daec_alr_step1_single_edit_failure_20260427.md`
+  - initial `max_new_tokens=32` run was invalid because it collapsed the no-edit baseline to F1 `0.2034`; cache key was fixed to include generation limits and the valid run used `max_new_tokens=64`
+  - valid no-edit baseline matched Day-0: EM/F1 `0.4900` / `0.5881`
+  - main `double_gate_skip` result: EM/F1 `0.4750` / `0.5757`
+  - F1 delta vs no-edit: `-0.0125`, 95% CI `[-0.0371, 0.0110]`
+  - support_complete dropped from `0.8550` to `0.8150`
+  - accepted edit rate: `0.230`
+  - edited subset F1 moved from `0.2910` to `0.2343`
+  - flips: wrong-to-correct `3`, correct-to-wrong `5`
+  - hard-negative import: added gold/non-gold `4/42`, ratio `10.50`
+  - decision: `STOP_DAEC_ALR_STEP1_SINGLE_EDIT`
 
 ## Running
 
 - No active Layer-1 DtC/DAEC evaluation jobs are expected to be running.
 - No long-running BSGS jobs are active.
+- No D-PathRAG, CEE-pairwise, or C-CEE jobs are active or expected to continue.
+- No CAPS long-running jobs are active; Day-2 proof ranking and Answer-Contrastive v0 are not green enough to proceed in the current paper cycle.
+- No CPAG jobs are active; Day-1 agreement graph diagnostic failed and CPAG should not continue without a different agreement object.
+- No DAEC-ALR job is active; Step-1 single-edit gate finished RED and should not continue without replacing the admission object or reconstructing the exact DAEC scorer.
+- The attempted `IRCoT MuSiQue-1000` run exited before writing `reports/week0/ircot_musique1000.json`; only `/tmp/bsgs_ircot_smoke.json` exists.
 
 ## Next Wave
 
-1. Replace preliminary placeholders with formal Week0 runs:
-   - run real IRCoT with Qwen3-8B no-think endpoint and shared retriever
-   - run formal DeBERTa-v3 MNLI calibration, not lexical smoke
-   - run real Qwen slot generation quality with no-think endpoint
-2. Decide whether the local 1000-example `MuSiQue-Ans-local-subset` is acceptable for Week1 diagnostics or whether to import official MuSiQue-Ans dev before final numbers.
-3. Run Week 1 oracle-slot BSGS after formal Week0 baselines are available:
-   - `scripts/bsgs_run_oracle.py`
-   - `reports/week1/operator_validation.md`
-4. Extend `scripts/bsgs_run_oracle.py` from lexical smoke likelihood to calibrated DeBERTa likelihood once calibration passes or is explicitly downgraded.
-5. Keep the DAEC paper floor frozen at `2555018`; BSGS must not rewrite the DAEC main path.
-6. Keep the DAEC paper-writing line available:
+1. Keep the DAEC paper floor frozen at `2555018`; BSGS must not rewrite the DAEC main path.
+2. Keep the DAEC paper-writing line active:
    - manually audit `MuSiQue` loss cases from Layer-1 taxonomy outputs
    - consolidate oracle-on-pools tables
    - start paper skeleton around retriever-agnostic fixed-pool composition
+3. Treat BSGS, D-PathRAG/CEE/C-CEE, CAPS, CPAG/RRF, and Answer-Contrastive as negative or partial diagnostic sections rather than new method routes.
+4. Only run the optional MuSiQue-200 oracle decomposition diagnostic if a sharper appendix is needed:
+   - oracle pool
+   - oracle pool + oracle binding rewrite
+   - oracle pool + oracle binding + oracle likelihood
+5. Do not continue CAPS proof search or scalar answer-contrastive verifier engineering in the current paper cycle:
+   - Day-0 NLI verifier passed,
+   - Day-1 candidate recall failed,
+   - Day-1.5 LLM candidate rescue improved only deep recall,
+   - Day-2 oracle-obligation proof ranking failed even with gold-derived obligations,
+   - Answer-Contrastive v0 improves top-k but fails clean gold-vs-best-wrong separability,
+   - only reopen CAPS if the proof object changes materially, not by tuning priors, thresholds, or scalar feature rankers.
+6. Do not continue CPAG agreement-closure engineering in the current paper cycle:
+   - cross-pool presence has local AUC `0.772391`,
+   - but CPAG support/F1 are far below PropRAG rank,
+   - only reopen with a different agreement object, not hand-tuned weights.
+7. Do not continue DAEC-ALR Step-1 as currently formulated:
+   - Day-0 consistency remains a valid context-stability diagnostic,
+   - Step-1 showed that consistency does not transfer into safe edit admission,
+   - main config F1/support both dropped and hard-negative import exceeded the pre-registered ratio gate,
+   - only reopen if the exact DAEC embedding scorer can be reconstructed for candidate edits or the admission object changes materially.
 
 ## Method Priority
 
@@ -192,11 +386,17 @@ Method implementation order should be:
 1. Frozen paper-floor method:
    - `DtC/DAEC` as a retriever-agnostic fixed-pool evidence compositor
    - strongest supported component so far: dependency binding across tested PropRAG and dense pool settings
-2. New exploratory method branch:
+2. Negative diagnostic branch:
    - `BSGS` as multi-step node-marginal belief-state filtering
-   - Week 0 is risk audit only
-   - Week 1 is oracle-slot operator validation only
-   - do not promote BSGS to a full method until the mechanism gate passes
+   - Week 1 oracle-slot validation failed to support promotion
+   - use BSGS to explain why graph-native belief propagation is not the current intervention point
+   - `D-PathRAG/CEE/C-CEE` as selector/edit-admission diagnostics
+   - use D-PathRAG to show mechanism-positive evidence selection with hard-negative import
+   - use CEE/C-CEE to show oracle edit headroom but failed practical admission under non-oracle conditions
+   - `CAPS` as answer-conditioned proof-search diagnostic: verifier passes, candidate generation is weak, and oracle-obligation proof ranking still fails to aggregate to answer-level discrimination
+   - `CPAG` as training-free LLM/operator diagnostic: cached Qwen proposition/entity extraction plus agreement closure has local cross-pool signal but fails evidence assembly on strong PropRAG residuals
+   - `Answer-Contrastive Verifier v0` as a supervised scalar-feature diagnostic: top-k placement partially recovers, but gold-vs-best-wrong AUC remains too weak for a main method
+   - `DAEC-ALR Step-1` as a reader-consistency edit-admission diagnostic: Day-0 context stability signal passed, but single-edit admission failed with F1/support drops and hard-negative import
 3. Baselines and controls:
    - baseline top-5
    - MMR/DPP structure-blind diversity
@@ -209,6 +409,7 @@ Method implementation order should be:
    - do not promote it without at least `HotpotQA` baseline parity plus retained `2Wiki` gains
 5. Do not jump to latent-slot, soft-binding, DPP, or full proposition-graph extraction before Week 1 BSGS oracle-slot validation passes
 6. Do not continue QBF unless a new graph substrate or a fundamentally different supervision signal is introduced
+7. Do not continue D-PathRAG/CEE/C-CEE unless a new mechanism supplies reliable answer hypotheses or direct edit supervision
 
 ## Blockers
 
@@ -219,8 +420,32 @@ Method implementation order should be:
 - The strongest/GBC backup line is coherent, but it still lacks a positive shallow-dataset end-to-end result
 - QBF terminal-schema backward flow fails as a retrieval operator on 2Wiki and MuSiQue pilot100; the issue appears operator-level rather than hyperparameter-level
 - BSGS split audit found local `musique.json` is a 1000-example answerable-only local subset, not official full MuSiQue-Ans dev; final paper numbers need split alignment before claims
-- BSGS is blocked on formal IRCoT, formal DeBERTa calibration, and real Qwen slot quality; current Week0 reports only establish scaffolding and local split facts
-- BSGS absorbing transition is blocked unless DeBERTa-NLI calibration reaches the ECE threshold in the Week 0 report
+- BSGS oracle-slot validation is negative: full route is stopped unless a future graph substrate or path/set-state representation changes the operator premise
+- D-PathRAG/CEE/C-CEE diagnostics are negative for the current paper cycle:
+  - free-form selector improves support completeness but imports reader-hostile hard negatives
+  - pairwise CEE admission fails to recover oracle Edit@1 headroom
+  - C-CEE reader likelihood passes semantic-capacity checks but fails non-oracle decision-level separability
+- CAPS is stopped for the current paper cycle:
+  - NLI verifier sanity is positive with AUC `0.903`
+  - candidate answer recall@5 is only `0.670`, recall@20 only `0.750`
+  - LLM candidate v2 recall@10 is only `0.665` even when unioned with v1/string candidates
+  - union top60 answer string presence is `0.900`, so the bottleneck is extraction/proposal rather than retrieval absence
+  - Day-2 broad top-20 proof-ranker test still fails under oracle/template obligations:
+    - conditional top1/top3: `0.339286` / `0.583333`
+    - gold-vs-best-wrong AUC: `0.398136`
+    - mean gold proof score is lower than mean best-wrong proof score (`0.383771` vs `0.530366`)
+- CPAG is stopped for the current paper cycle:
+  - cross-pool document presence is locally discriminative (`AUC=0.772391`)
+  - agreement closure lowers support-complete from `0.705` to `0.470`
+  - reader F1 drops from `0.4720` to `0.3897`
+  - CPAG adds `3` gold supports but `87` non-gold documents relative to PropRAG top5
+  - implementation audit passed; standard RRF itself demotes PropRAG-only gold in some cases because shared cross-pool distractors receive two reciprocal-rank contributions
+- Answer-Contrastive Verifier v0 is partial but not a mainline recovery:
+  - candidate-level AUC is high (`0.943125`) because easy negatives are separable
+  - gold-vs-best-wrong AUC remains low (`0.570826`, CI upper `0.624433`)
+  - conditional top1/top3 improve to `0.595238` / `0.827381`, but this is not clean answer-level separability
+  - compositional/inference types remain weak, so the result supports a diagnostic section rather than another method iteration
+- Formal IRCoT MuSiQue-1000 remains unavailable because the run exited before final JSON; this is a baseline gap, not a blocker for the BSGS negative mechanism conclusion
 
 ## Do Not Drift
 
@@ -232,7 +457,30 @@ Method implementation order should be:
 - Do not let the old unvalidated `PCRS-RAG V1` branch overwrite the active DtC line by default
 - Do not let the current strongest/GBC backup line overwrite the paper mainline based on smoke-scale evidence
 - Do not implement BSGS latent slots, soft binding, or DPP in Week 1
+- Do not continue full BSGS engineering on the current node-marginal operator
 - Do not use an LLM verifier for BSGS Week 0/1
 - Do not mix `MuSiQue-Full` and `MuSiQue-Ans` baselines
 - Do not write oracle-slot BSGS as a non-oracle main result
+- Do not continue CAPS by tuning proof scoring, answer priors, or thresholds; Day-2 failed even under oracle/template obligations
+- Do not continue CPAG by hand-tuning agreement weights or adding heuristic penalties; Day-1 failed at support and reader levels
 - Do not frame DAEC and BSGS as the same probability space
+- Do not continue Answer-Contrastive by adding Qwen/DeBERTa fine-tuning in this cycle; v0 is enough to conclude scalar cached features are not a clean residual fix
+
+## Paper Integrity Audit: Same-title Confounds (2026-04-27)
+
+Status:
+- Completed static same-title audit across D-PathRAG selector, CEE edit policy, CPAG, DAEC, and DAEC-ALR traces.
+- Canonical report: `reports/paper/same_title_audit.md`
+- Machine-readable output: `reports/paper/same_title_audit.json`
+- Script: `scripts/audit_same_title_confound.py`
+- Research note: `research_memory/emnlp_expand_then_compose/33_same_title_integrity_audit_20260427.md`
+
+Key outcome:
+- Same-title replacement is a real destructive-null hygiene issue for NREV-style perturbation, but it does not explain the main existing method conclusions.
+- D-PathRAG selector_v1 still imports `1205` added non-gold documents, with `0` same-title non-gold additions versus rank top-5.
+- CPAG remains a shared cross-pool distractor failure: anchored CPAG selected `341 / 554` cross-pool gold/non-gold documents.
+- DAEC 2Wiki/HotpotQA has negligible same-title exposure; MuSiQue has high duplicate-title exposure inherited from baseline, and DAEC slightly reduces rather than amplifies selected duplicate-title rate.
+
+Decision:
+- Do not rerun D-PathRAG, CPAG, or DAEC solely for same-title concerns.
+- Keep same-title exclusion as mandatory hygiene for future destructive perturbation or edit-replacement methods.

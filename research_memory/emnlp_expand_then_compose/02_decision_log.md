@@ -1,6 +1,6 @@
 # Decision Log
 
-Last updated: 2026-04-22
+Last updated: 2026-04-27
 
 ## 2026-03-26: Freeze the retrieval backbone
 
@@ -167,3 +167,99 @@ Consequence:
 - Optimize by warm-start 1-swap and stop when no positive repair exists.
 - Canonical note:
   - `research_memory/emnlp_expand_then_compose/15_demand_gate_ablation_20260423.md`
+
+## 2026-04-24: Promote DAEC as the frozen positive floor
+
+Decision:
+- Treat `DAEC/DtC` fixed-pool evidence composition as the current positive method floor.
+- Keep the method framing as retriever-agnostic post-retrieval composition over a fixed top-100 pool.
+- Treat dependency binding as the strongest supported component.
+- Do not overclaim rank prior or repair typing as necessary components.
+
+Reason:
+- Layer-1 full1000 runs are positive across both PropRAG top100 and dense top100 pools.
+- All six tested `(dataset, pool)` F1 gains have bootstrap confidence intervals above zero.
+- Targeted `nobinding` ablations reduce gains across tested dataset/pool settings.
+- Generic diversity, QBF, graph belief propagation, free path selection, proof ranking, and agreement closure all failed or stayed diagnostic-only.
+
+Consequence:
+- DAEC is the stable baseline for future residual-route experiments.
+- New branches must beat DAEC without damaging support_complete or importing hard negatives.
+- Canonical notes:
+  - `research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md`
+  - `research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md`
+
+## 2026-04-27: Stop DAEC-ALR Step-1 as currently formulated
+
+Decision:
+- Stop `DAEC-ALR Step-1` single-edit repair.
+- Keep Day-0 reader self-consistency as a context-stability diagnostic only.
+- Do not tune the inverse-entropy margin, skip threshold, `K_edit`, or perturbation set.
+- Do not launch active retrieval on top of the current admission rule.
+
+Reason:
+- Day-0 consistency signal passed, but edit admission failed on the pre-registered 2Wiki eval200 gate.
+- Valid 64-token run matched Day-0 no-edit baseline: EM/F1 `0.4900 / 0.5881`.
+- Main `double_gate_skip` dropped F1 from `0.5881` to `0.5757`.
+- support_complete dropped from `0.8550` to `0.8150`.
+- Edited-subset F1 dropped from `0.2910` to `0.2343`.
+- Flip balance failed: wrong-to-correct `3`, correct-to-wrong `5`.
+- Hard-negative import failed: added gold/non-gold `4/42`, ratio `10.50`.
+
+Consequence:
+- Reader self-consistency should not be used as a local edit-admission utility in the current DAEC residual route.
+- Reopen only if the exact DAEC embedding scorer is reconstructed for arbitrary candidate edits, or if the admission object changes materially.
+- Canonical notes:
+  - `research_memory/emnlp_expand_then_compose/30_daec_alr_step1_plan.md`
+  - `research_memory/emnlp_expand_then_compose/31_daec_alr_step1_single_edit_failure_20260427.md`
+
+## 2026-04-27: Audit NREV before final stop
+
+Decision:
+- Do not launch the full `NREV-GraphRAG` fixed-pool prototype.
+- Do not launch open-pool NREV rescue.
+- Do not tune thresholds around the current destructive-null construction.
+- After audit, allow at most one bounded T-minus redesign if this line is reopened.
+
+Reason:
+- Full NREV failed the pre-registered Day-0 gate on `2Wiki` first-100 gold-vs-plausible-wrong pairs.
+- Overall full NREV AUC was `0.6042`, with 95% CI `[0.5149, 0.6889]`.
+- Closed-book-wrong subset AUC was `0.6057`, below the scoped proceed gate.
+- The simplest evidence-world likelihood signal was stronger: `l_plus` AUC `0.7085`.
+- Original REV was below random: AUC `0.4266`.
+- Audit corrected two implementation/interpretation issues:
+  - closed-book `2/100` is prompt/parsing sensitive; direct short-answer closed-book first-20 is `7/20`;
+  - same-title matched replacement was a real bug and has been fixed.
+- The fixed first-30 rerun improved full NREV to AUC `0.6644`, but this is still below the audit keep-alive threshold `0.70` and still below `l_plus`.
+
+Consequence:
+- Treat current NREV as an informative but not-passed diagnostic for reader-likelihood falsification.
+- Do not enter full implementation.
+- If reopened, the only acceptable next step is one bounded T-minus redesign, not threshold tuning or open-pool rescue.
+- Canonical notes:
+  - `research_memory/emnlp_expand_then_compose/32_nrev_day0_sanity_20260427.md`
+  - `reports/nrev/day0_sanity.md`
+  - `reports/nrev/day0_audit.md`
+
+## 2026-04-27: Close same-title paper-integrity audit
+
+Decision:
+- Do not rerun D-PathRAG, CPAG, or DAEC solely because NREV exposed a same-title replacement bug.
+- Keep same-title exclusion as required hygiene for future destructive perturbation or edit-replacement methods.
+- Treat same-title duplication as a documented corpus/pool confound, not as the explanation for current main results.
+
+Reason:
+- Static audit found D-PathRAG selector_v1 added `1205` non-gold documents, but `0` were same-title additions versus rank top-5.
+- CEE learned_edit2 has `92` operation-level same-title non-gold additions, but these are multi-step oscillation/reinsertion; final selected-set same-title non-gold is `0`.
+- CPAG anchored added `436` non-gold documents versus PropRAG rank with `0` same-title added non-gold; its sharper failure is shared cross-pool distractor agreement (`341 / 554` selected cross-pool gold/non-gold).
+- DAEC 2Wiki/HotpotQA have negligible same-title exposure.
+- MuSiQue has high duplicate-title exposure, but baseline already has more selected duplicate-title queries than DAEC (`0.388` vs `0.364` for PropRAG, `0.365` vs `0.349` for dense).
+
+Consequence:
+- Preserve D-PathRAG, CPAG, and DAEC conclusions.
+- In paper writing, mention same-title replacement as a perturbation-method hygiene issue and MuSiQue duplicate-title exposure as a dataset/pool property.
+- No new method exploration is justified by this audit.
+- Canonical notes:
+  - `research_memory/emnlp_expand_then_compose/33_same_title_integrity_audit_20260427.md`
+  - `reports/paper/same_title_audit.md`
+  - `reports/paper/same_title_audit.json`

@@ -1,6 +1,6 @@
 # Result Registry
 
-Last updated: 2026-04-24
+Last updated: 2026-04-27
 
 This file stores concrete results only. Every result must have a file path.
 
@@ -27,6 +27,56 @@ Key status:
   - hard-crossing ablation is negative as a main fix
   - Layer-1 retriever-agnostic runs are positive on both PropRAG top-100 pools and dense NV-Embed top-100 pools
   - 2Wiki PropRAG-pool ablation supports dependency binding, but does not support rank prior or repair typing as necessary components
+
+## NREV Day-0 Sanity
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/32_nrev_day0_sanity_20260427.md`
+
+Primary report:
+- `reports/nrev/day0_sanity.md`
+- `reports/nrev/day0_sanity.json`
+- `reports/nrev/day0_audit.md`
+- `reports/nrev/day0_audit_rerun30/day0_sanity.md`
+
+Implementation:
+- `scripts/run_nrev_day0_sanity.py`
+- `scripts/audit_nrev_day0.py`
+- `tests/dpathrag/test_nrev_day0_sanity.py`
+
+Protocol:
+- `2WikiMultiHopQA`, first `100` local dev/eval records.
+- Gold pair: gold answer plus gold support docs padded to `k=5`.
+- Wrong pair: first non-gold CAPS Day-2 plausible wrong answer, with evidence approximated from wrong-answer-containing pool docs plus high-ranked distractors.
+- Reader/scorer: local `qwen3-8b-train`; likelihood from prompt logprobs.
+
+Main result:
+
+| Score | AUC | 95% CI | Paired Win Rate |
+|---|---:|---:|---:|
+| `l_plus` | 0.7085 | [0.6273, 0.7790] | 0.7000 |
+| `rev` | 0.4266 | [0.3555, 0.4960] | 0.4000 |
+| `nrev_no_alt` | 0.4221 | [0.3417, 0.4972] | 0.4100 |
+| `nrev_no_l0` | 0.6146 | [0.5241, 0.6969] | 0.5700 |
+| `nrev_full` | 0.6042 | [0.5149, 0.6889] | 0.5600 |
+
+Closed-book stratification:
+
+| Subset | N | Full NREV AUC | 95% CI |
+|---|---:|---:|---:|
+| closed-book correct | 2 | 0.5000 | [0.0000, 1.0000] |
+| closed-book wrong | 98 | 0.6057 | [0.5068, 0.6968] |
+
+Decision:
+- Original full100 run: `STOP_NREV_DAY0_FAIL`
+- Audit after fixing same-title replacement: `NREV_AUDIT_MARGINAL_TMINUS_REDESIGN_ONLY`
+
+Interpretation:
+- Evidence-world likelihood alone has a marginal signal (`l_plus` AUC `0.7085`).
+- The reversible/null-dominated construction does not improve it; original REV falls below random and full NREV remains below the `0.65` stop threshold.
+- Audit found the closed-book `2/100` stratification is prompt-sensitive and should not be treated as a scientific claim.
+- Audit also found a real same-title replacement bug in `T_minus`; fixing it and rerunning first-30 gives full NREV AUC `0.6644`, still below the audit keep-alive threshold `0.70`.
+- Do not launch full fixed-pool NREV from this result. If reopened, allow only one bounded T-minus redesign.
 
 ## Fixed-Pool Composition Baselines and DtC
 
@@ -192,6 +242,43 @@ Interpretation:
 - Dependency binding is not a `2Wiki + PropRAG` artifact.
 - All five tested `(dataset, pool)` pairs lose F1 when binding is disabled.
 - Binding should remain a main-method component; rank prior and repair typing should remain optional/appendix until broader ablations support them.
+
+## DAEC-ALR Reader-Consistency Residual Route
+
+Day-0 consistency probe:
+- memo: `research_memory/emnlp_expand_then_compose/29_daec_alr_consistency_probe_20260427.md`
+- report: `reports/daec_alr/consistency_probe.md`
+- rows: first `200` 2Wiki queries from the PropRAG top100 DAEC report
+- reader: local `qwen3-8b-train` with HippoRAG `rag_qa_musique` one-shot prompt
+- no-edit reconstructed EM/F1: `0.4900 / 0.5882`
+- support recall/complete: `0.9413 / 0.8550`
+- `majority_fraction` AUC vs original `F1>=0.5`: `0.7572`, CI `[0.6875, 0.8202]`
+- `inverse_entropy` AUC vs original `F1>=0.5`: `0.7598`, CI `[0.6902, 0.8226]`
+- decision: `PASS_SIGNAL_PROBE`
+
+Step-1 single-edit gate:
+- pre-flight plan: `research_memory/emnlp_expand_then_compose/30_daec_alr_step1_plan.md`
+- memo: `research_memory/emnlp_expand_then_compose/31_daec_alr_step1_single_edit_failure_20260427.md`
+- report: `reports/daec_alr/step1_single_edit_gate.md`
+- implementation: `scripts/run_daec_alr_step1.py`
+- test: `tests/dpathrag/test_daec_alr_step1.py`
+- rows: first `200` 2Wiki queries
+- reader: local `qwen3-8b-train`, valid run with `max_new_tokens=64`
+- invalid audit: an initial `max_new_tokens=32` run collapsed no-edit F1 to `0.2034`; cache key was fixed to include generation limits before the valid run
+
+| Variant | F1 | Delta F1 | CI95 Delta F1 | Support Complete | Accepted Edit Rate | Edited Subset F1 Pre/Post | W->C | C->W | Added Gold / Non-Gold | Non-Gold / Gold |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `no_edit_daec_only` | 0.5881 | 0.0000 | [0.0000, 0.0000] | 0.8550 | 0.000 | 0.0000 / 0.0000 | 0 | 0 | 0 / 0 | n/a |
+| `binding_gate_only` | 0.5245 | -0.0636 | [-0.1159, -0.0190] | 0.6450 | 1.000 | 0.5887 / 0.5245 | 9 | 25 | 13 / 187 | 14.38 |
+| `consistency_gate_only` | 0.5757 | -0.0125 | [-0.0371, 0.0110] | 0.8150 | 0.230 | 0.2910 / 0.2343 | 3 | 5 | 4 / 42 | 10.50 |
+| `double_gate_no_skip` | 0.5757 | -0.0125 | [-0.0371, 0.0110] | 0.8150 | 0.230 | 0.2910 / 0.2343 | 3 | 5 | 4 / 42 | 10.50 |
+| `double_gate_skip` | 0.5757 | -0.0125 | [-0.0371, 0.0110] | 0.8150 | 0.230 | 0.2910 / 0.2343 | 3 | 5 | 4 / 42 | 10.50 |
+
+Interpretation:
+- Qwen reader self-consistency is a valid context-stability diagnostic.
+- The same signal does not transfer into safe single-edit admission.
+- Consistency gating reduces the damage from binding-only edits, but still fails F1, support preservation, edited-subset improvement, flip balance, and hard-negative import gates.
+- Stop DAEC-ALR Step-1 unless the exact DAEC scorer is reconstructed for candidate edits or the admission object changes materially.
 
 ## 2WikiMultihopQA-1000
 
@@ -524,3 +611,31 @@ Takeaways:
 - The aggressive `bridge_beam` config is strongest on `2Wiki`, but not safe as a shared cross-dataset setting.
 - The closure-only shared config is the current best compromise: `2Wiki` stays positive, `HotpotQA` becomes non-destructive, and `MuSiQue` recovers to neutral overall while keeping a positive `4-doc` signal.
 - So the method story is now safer, but still not a clean universal improvement claim.
+
+## Same-title Integrity Audit (2026-04-27)
+
+Canonical files:
+- report: `reports/paper/same_title_audit.md`
+- JSON: `reports/paper/same_title_audit.json`
+- script: `scripts/audit_same_title_confound.py`
+- note: `research_memory/emnlp_expand_then_compose/33_same_title_integrity_audit_20260427.md`
+
+Raw audit highlights:
+- `D-PathRAG selector_v1 PropRAG kfold1000`: added gold/non-gold `76 / 1205`; same-title added non-gold vs rank top-5 `0`.
+- `CEE learned_edit1 margin15`: added gold/non-gold `35 / 239`; same-title non-gold `0`.
+- `CEE learned_edit2 margin15`: operation-level added gold/non-gold `45 / 403`; operation-level same-title non-gold `92`, but final-set same-title non-gold `0`.
+- `CPAG anchored`: added gold/non-gold vs PropRAG rank `5 / 436`; selected cross-pool gold/non-gold `341 / 554`; same-title added non-gold `0`.
+- `DAEC PropRAG 2Wiki`: added gold/non-gold `73 / 43`; same-title non-gold `0`; selected duplicate-title query rate `0.003`.
+- `DAEC PropRAG HotpotQA`: added gold/non-gold `26 / 35`; same-title non-gold `0`; selected duplicate-title query rate `0.001`.
+- `DAEC PropRAG MuSiQue`: added gold/non-gold `126 / 154`; same-title non-gold `2`; selected/base duplicate-title query rate `0.364 / 0.388`.
+- `DAEC Dense 2Wiki`: added gold/non-gold `131 / 42`; same-title non-gold `0`; selected duplicate-title query rate `0.003`.
+- `DAEC Dense HotpotQA`: added gold/non-gold `37 / 30`; same-title non-gold `0`; selected duplicate-title query rate `0.001`.
+- `DAEC Dense MuSiQue`: added gold/non-gold `126 / 139`; same-title non-gold `1`; selected/base duplicate-title query rate `0.349 / 0.365`.
+- `DAEC-ALR Step-1`: added gold/non-gold `25 / 313`; same-title non-gold replacements `0`.
+
+Interpretation:
+- Same-title duplication does not explain D-PathRAG hard-negative import.
+- CPAG failure remains shared cross-pool distractor agreement, not same-title duplicate inflation.
+- DAEC 2Wiki/HotpotQA mainline is robust to same-title concerns under the static audit.
+- MuSiQue duplicate-title exposure is a dataset/pool property inherited from baseline; DAEC does not amplify it.
+- Same-title exclusion remains mandatory for counterfactual perturbation methods such as NREV.
