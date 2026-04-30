@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
+import itertools
 import json
 import re
 from typing import Any, Callable, Dict, List, Sequence, Tuple
@@ -25,6 +26,26 @@ class DTCRequirement:
         payload["depends_on"] = list(self.depends_on)
         payload["anchor_mentions"] = list(self.anchor_mentions)
         return payload
+
+
+@dataclass(frozen=True)
+class DAECBinding:
+    binding_id: str
+    assignments: Tuple[Tuple[str, str], ...] = ()
+    prior: float = 1.0
+
+    def assignment_map(self) -> Dict[str, str]:
+        return {str(key): str(value) for key, value in self.assignments}
+
+    def to_trace(self) -> Dict[str, object]:
+        return {
+            "binding_id": self.binding_id,
+            "assignments": {str(key): str(value) for key, value in self.assignments},
+            "prior": float(self.prior),
+        }
+
+
+DAEC_MAX_BINDINGS = 25
 
 
 def _strip_think_tags(text: str) -> str:
@@ -395,6 +416,580 @@ def _requirement_inference_veto(
         return bool(field_or_regex_veto), effective_veto
     effective_veto = bool(field_or_regex_veto and not has_resolved_binding)
     return bool(field_or_regex_veto), effective_veto
+
+
+def _is_daec_operator_requirement(req: DTCRequirement) -> bool:
+    role = normalize_structure_text(req.role)
+    if role in {"comparison", "compare", "comparator", "aggregation", "aggregate"}:
+        return True
+    return _normalize_satisfiable_by(req.satisfiable_by) == "inference"
+
+
+def _compute_embedding_match_scores(
+    requirements: Sequence[DTCRequirement],
+    requirement_embeddings: Dict[str, np.ndarray],
+    doc_vectors: Dict[int, np.ndarray],
+    pool_limit: int,
+) -> Dict[str, np.ndarray]:
+    scores: Dict[str, np.ndarray] = {}
+    for req in requirements:
+        req_vec = _normalize_vector(requirement_embeddings.get(req.unit_id, np.array([])))
+        values: List[float] = []
+        for pos in range(pool_limit):
+            doc_vec = doc_vectors.get(pos)
+            if req_vec.size == 0 or doc_vec is None or req_vec.shape != doc_vec.shape:
+                values.append(float("-inf"))
+            else:
+                values.append(float(np.dot(req_vec, doc_vec)))
+        scores[req.unit_id] = _min_max(np.asarray(values, dtype=float))
+    return scores
+
+
+def _daec_noisy_or_coverage(phi_for_binding: np.ndarray, selected_positions: Sequence[int]) -> np.ndarray:
+    if phi_for_binding.size == 0:
+        return np.asarray([], dtype=float)
+    valid_positions = [
+        int(pos)
+        for pos in selected_positions
+        if 0 <= int(pos) < phi_for_binding.shape[1]
+    ]
+    if not valid_positions:
+        return np.zeros(phi_for_binding.shape[0], dtype=float)
+    selected_phi = np.clip(phi_for_binding[:, valid_positions], 0.0, 1.0)
+    return np.clip(1.0 - np.prod(1.0 - selected_phi, axis=1), 0.0, 1.0)
+
+
+def _daec_rank_scores(pool_doc_scores: Sequence[float] | None, pool_limit: int) -> np.ndarray:
+    if pool_limit <= 0:
+        return np.asarray([], dtype=float)
+    if pool_doc_scores is None:
+        return np.linspace(1.0, 0.0, pool_limit, dtype=float)
+    try:
+        values = np.asarray(list(pool_doc_scores)[:pool_limit], dtype=float).reshape(-1)
+    except Exception:
+        values = np.asarray([], dtype=float)
+    if values.size < pool_limit:
+        fallback = np.linspace(float(pool_limit), 1.0, pool_limit, dtype=float)
+        if values.size:
+            fallback[: values.size] = values
+        values = fallback
+    values = values[:pool_limit]
+    if not np.any(np.isfinite(values)):
+        return np.linspace(1.0, 0.0, pool_limit, dtype=float)
+    return _min_max(values)
+
+
+def _daec_replace_at_position(positions: Sequence[int], old_pos: int, new_pos: int) -> List[int]:
+    updated: List[int] = []
+    seen: set[int] = set()
+    for pos in positions:
+        candidate = int(new_pos) if int(pos) == int(old_pos) else int(pos)
+        if candidate in seen:
+            continue
+        updated.append(candidate)
+        seen.add(candidate)
+    return updated
+
+
+def select_daec_noisyor_positions(
+    *,
+    query: str,
+    requirements: Sequence[DTCRequirement],
+    requirement_embeddings: Dict[str, np.ndarray],
+    pool_docs: Sequence[str],
+    pool_doc_ids: Sequence[int | None],
+    pool_doc_titles: Sequence[str],
+    doc_idx_to_entities: Dict[int, set[str]],
+    passage_embeddings: np.ndarray,
+    qa_top_k: int,
+    pool_doc_scores: Sequence[float] | None = None,
+    binding_top_m: int = 5,
+    embed_texts_fn: Callable[[Sequence[str]], Dict[str, np.ndarray]] | None = None,
+    safe_projection: bool = False,
+    safe_min_objective_gain: float = 0.02,
+    safe_min_swap_gain: float = 0.01,
+    safe_max_swaps: int = 2,
+    safe_preserve_top_m: int = 1,
+    safe_retriever_margin_threshold: float = 1.01,
+) -> Tuple[List[int], Dict[str, object]]:
+    """Select evidence by frozen-binding noisy-OR demand coverage.
+
+    This is the clean DAEC composer path: it freezes an approximate binding set,
+    precomputes phi[requirement, binding, document], and then runs greedy
+    maximization over a single noisy-OR set objective. Legacy gates, repair
+    filters, rank priors, and selection-time binding mutation intentionally do
+    not participate in this path.
+    """
+    selector_label = "daec_noisyor_safe" if bool(safe_projection) else "daec_noisyor"
+    pool_limit = len(pool_docs)
+    target_k = min(max(int(qa_top_k), 0), pool_limit)
+    if target_k <= 0:
+        return [], {"selector": selector_label, "status": "empty_pool"}
+
+    active_requirements = [
+        req for req in requirements
+        if str(req.subquery or "").strip() and not _is_daec_operator_requirement(req)
+    ]
+    operator_requirement_count = len(list(requirements)) - len(active_requirements)
+    if not active_requirements:
+        fallback_positions = list(range(target_k))
+        return fallback_positions, {
+            "selector": selector_label,
+            "status": "fallback_no_retrieval_requirements",
+            "query": str(query),
+            "requirement_count": 0,
+            "operator_requirement_count": int(operator_requirement_count),
+            "binding_count": 1,
+            "selected_positions": fallback_positions,
+            "selected_titles": [pool_doc_titles[pos] for pos in fallback_positions],
+            "selection_steps": [],
+        }
+
+    doc_vectors: Dict[int, np.ndarray] = {}
+    for pos, doc_id in enumerate(pool_doc_ids[:pool_limit]):
+        if doc_id is None or int(doc_id) < 0 or int(doc_id) >= len(passage_embeddings):
+            continue
+        vector = _normalize_vector(passage_embeddings[int(doc_id)])
+        if vector.size:
+            doc_vectors[int(pos)] = vector
+
+    raw_match_scores = _compute_embedding_match_scores(
+        active_requirements,
+        requirement_embeddings,
+        doc_vectors,
+        pool_limit,
+    )
+    req_by_id = {req.unit_id: req for req in active_requirements}
+    normalized_query = normalize_structure_text(query)
+    query_anchor_keys = {
+        normalize_structure_text(anchor)
+        for req in active_requirements
+        for anchor in req.anchor_mentions
+        if normalize_structure_text(anchor)
+    }
+    for title in pool_doc_titles[:pool_limit]:
+        title_key = normalize_structure_text(title)
+        if title_key and _contains_normalized_phrase(normalized_query, title_key):
+            query_anchor_keys.add(title_key)
+
+    def doc_entities_for_pos(pos: int) -> set[str]:
+        doc_id = pool_doc_ids[pos] if 0 <= pos < len(pool_doc_ids) else None
+        if doc_id is None:
+            return set()
+        return set(doc_idx_to_entities.get(int(doc_id), set()) or set())
+
+    def collect_frozen_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
+        if not req.depends_on:
+            return []
+        rows: List[Dict[str, object]] = []
+        seen_keys: set[str] = set()
+        top_m = max(0, int(binding_top_m))
+        for dep in req.depends_on:
+            dep_req = req_by_id.get(dep)
+            if dep_req is None:
+                continue
+            dep_scores = raw_match_scores.get(dep, np.zeros(pool_limit, dtype=float))
+            upstream_positions = sorted(
+                range(pool_limit),
+                key=lambda pos: (-float(dep_scores[pos]), int(pos)),
+            )[:top_m]
+            expected_type = dep_req.expected_answer_type if dep_req is not None else "unknown"
+            for dep_pos in upstream_positions:
+                upstream_text = normalize_structure_text(_doc_text_body(pool_docs[dep_pos]))
+                upstream_title_key = normalize_structure_text(pool_doc_titles[dep_pos])
+                for title_pos, raw_title in enumerate(pool_doc_titles[:pool_limit]):
+                    title = str(raw_title or "").strip()
+                    title_key = normalize_structure_text(title)
+                    if not title_key or title_key in seen_keys:
+                        continue
+                    if title_key == upstream_title_key or title_key in query_anchor_keys:
+                        continue
+                    if not _candidate_type_compatible(title, expected_type):
+                        continue
+                    count, first_pos = _phrase_occurrences(upstream_text, title_key)
+                    if count <= 0:
+                        continue
+                    seen_keys.add(title_key)
+                    rows.append({
+                        "requirement_id": req.unit_id,
+                        "title": title,
+                        "key": title_key,
+                        "dep": dep,
+                        "dep_position": int(dep_pos),
+                        "dep_score": float(dep_scores[dep_pos]),
+                        "title_pool_position": int(title_pos),
+                        "count": int(count),
+                        "first_pos": int(first_pos),
+                    })
+        rows.sort(
+            key=lambda row: (
+                int(row["first_pos"]),
+                -int(row["count"]),
+                int(row["title_pool_position"]),
+            )
+        )
+        return rows[:max(0, int(binding_top_m))]
+
+    binding_candidates_by_req = {
+        req.unit_id: collect_frozen_binding_candidates(req)
+        for req in active_requirements
+        if req.depends_on
+    }
+    candidate_lists: List[List[Dict[str, object]]] = [
+        rows for rows in binding_candidates_by_req.values() if rows
+    ]
+    unpruned_binding_count = 1
+    binding_pruned = False
+    if candidate_lists:
+        combo_records: List[Tuple[float, int, Tuple[Dict[str, object], ...]]] = []
+        for combo_idx, combo in enumerate(itertools.product(*candidate_lists)):
+            dep_score_sum = float(sum(float(row.get("dep_score", 0.0) or 0.0) for row in combo))
+            combo_records.append((dep_score_sum, int(combo_idx), tuple(combo)))
+        unpruned_binding_count = len(combo_records)
+        if len(combo_records) > DAEC_MAX_BINDINGS:
+            binding_pruned = True
+            combo_records = sorted(combo_records, key=lambda item: (-float(item[0]), int(item[1])))[:DAEC_MAX_BINDINGS]
+            combo_records = sorted(combo_records, key=lambda item: int(item[1]))
+
+        bindings = []
+        for binding_idx, (_, _, combo) in enumerate(combo_records):
+            assignments = tuple(
+                sorted(
+                    (
+                        str(row["requirement_id"]),
+                        str(row["title"]),
+                    )
+                    for row in combo
+                )
+            )
+            bindings.append(DAECBinding(binding_id=f"b{binding_idx}", assignments=assignments))
+    else:
+        bindings = [DAECBinding(binding_id="b0", assignments=())]
+    prior = 1.0 / float(max(len(bindings), 1))
+    bindings = [
+        DAECBinding(binding_id=binding.binding_id, assignments=binding.assignments, prior=prior)
+        for binding in bindings
+    ]
+
+    binding_embedding_cache: Dict[str, np.ndarray] = {}
+
+    def score_bound_requirement(req: DTCRequirement, candidate_title: str) -> np.ndarray:
+        bound_query = _build_bound_subquery(req.subquery, candidate_title)
+        if not bound_query or embed_texts_fn is None:
+            return raw_match_scores.get(req.unit_id, np.zeros(pool_limit, dtype=float))
+        if bound_query not in binding_embedding_cache:
+            embedded = embed_texts_fn([bound_query]) or {}
+            vector = embedded.get(bound_query) if isinstance(embedded, dict) else None
+            binding_embedding_cache[bound_query] = _normalize_vector(vector if vector is not None else np.array([]))
+        req_vec = binding_embedding_cache.get(bound_query, np.array([]))
+        values: List[float] = []
+        for pos in range(pool_limit):
+            doc_vec = doc_vectors.get(pos)
+            if req_vec.size == 0 or doc_vec is None or req_vec.shape != doc_vec.shape:
+                values.append(float("-inf"))
+            else:
+                values.append(float(np.dot(req_vec, doc_vec)))
+        return _min_max(np.asarray(values, dtype=float))
+
+    phi = np.zeros((len(active_requirements), len(bindings), pool_limit), dtype=float)
+    for req_idx, req in enumerate(active_requirements):
+        for binding_idx, binding in enumerate(bindings):
+            assignment = binding.assignment_map().get(req.unit_id, "")
+            support_scores = raw_match_scores.get(req.unit_id, np.zeros(pool_limit, dtype=float))
+            if assignment and req.depends_on:
+                support_scores = score_bound_requirement(req, assignment)
+                candidate_key = normalize_structure_text(assignment)
+                compat = np.asarray([
+                    _binding_candidate_hit_score(
+                        candidate_key,
+                        doc_entities_for_pos(pos),
+                        pool_doc_titles[pos],
+                        pool_docs[pos],
+                    )
+                    for pos in range(pool_limit)
+                ], dtype=float)
+                support_scores = np.asarray(support_scores, dtype=float) * np.clip(compat, 0.0, 1.0)
+            phi[req_idx, binding_idx, :] = np.clip(np.asarray(support_scores, dtype=float), 0.0, 1.0)
+
+    demand_weights = np.full(len(active_requirements), 1.0 / float(max(len(active_requirements), 1)), dtype=float)
+
+    def objective(binding_idx: int, positions: Sequence[int]) -> Tuple[float, np.ndarray]:
+        coverage = _daec_noisy_or_coverage(phi[:, binding_idx, :], positions)
+        return float(np.dot(demand_weights, coverage)), coverage
+
+    binding_results: List[Dict[str, object]] = []
+    best_result: Dict[str, object] | None = None
+    for binding_idx, binding in enumerate(bindings):
+        selected_positions: List[int] = []
+        selected_set: set[int] = set()
+        current_score, current_coverage = objective(binding_idx, selected_positions)
+        steps: List[Dict[str, object]] = []
+        while len(selected_positions) < target_k:
+            best_row: Dict[str, object] | None = None
+            for pos in range(pool_limit):
+                if pos in selected_set:
+                    continue
+                proposed_positions = list(selected_positions) + [int(pos)]
+                proposed_score, proposed_coverage = objective(binding_idx, proposed_positions)
+                gain = float(proposed_score - current_score)
+                if gain <= 1e-12:
+                    continue
+                row = {
+                    "pool_position": int(pos),
+                    "title": pool_doc_titles[pos],
+                    "objective_gain": gain,
+                    "objective": float(proposed_score),
+                    "coverage": proposed_coverage,
+                }
+                if best_row is None or (
+                    float(row["objective_gain"]),
+                    float(row["objective"]),
+                    -int(row["pool_position"]),
+                ) > (
+                    float(best_row["objective_gain"]),
+                    float(best_row["objective"]),
+                    -int(best_row["pool_position"]),
+                ):
+                    best_row = row
+            if best_row is None:
+                break
+            chosen_pos = int(best_row["pool_position"])
+            selected_positions.append(chosen_pos)
+            selected_set.add(chosen_pos)
+            current_score = float(best_row["objective"])
+            current_coverage = np.asarray(best_row["coverage"], dtype=float)
+            steps.append({
+                "step": int(len(steps) + 1),
+                "mode": "daec_noisyor_greedy",
+                "pool_position": chosen_pos,
+                "title": str(best_row["title"]),
+                "objective_gain": round(float(best_row["objective_gain"]), 6),
+                "objective": round(float(current_score), 6),
+                "coverage_by_requirement": {
+                    req.unit_id: round(float(current_coverage[req_idx]), 6)
+                    for req_idx, req in enumerate(active_requirements)
+                },
+            })
+        result = {
+            "binding_idx": int(binding_idx),
+            "binding": binding,
+            "positions": selected_positions,
+            "objective": float(current_score),
+            "coverage": current_coverage,
+            "steps": steps,
+        }
+        binding_results.append(result)
+        if best_result is None or (
+            float(result["objective"]),
+            -int(result["binding_idx"]),
+        ) > (
+            float(best_result["objective"]),
+            -int(best_result["binding_idx"]),
+        ):
+            best_result = result
+
+    if best_result is None:
+        fallback_positions = list(range(target_k))
+        return fallback_positions, {
+            "selector": selector_label,
+            "status": "fallback_no_positive_objective",
+            "query": str(query),
+            "requirement_count": int(len(active_requirements)),
+            "operator_requirement_count": int(operator_requirement_count),
+            "binding_count": int(len(bindings)),
+            "binding_count_unpruned": int(unpruned_binding_count),
+            "binding_max_bindings": int(DAEC_MAX_BINDINGS),
+            "binding_pruned": bool(binding_pruned),
+            "phi_shape": [int(dim) for dim in phi.shape],
+            "selected_positions": fallback_positions,
+            "selected_titles": [pool_doc_titles[pos] for pos in fallback_positions],
+            "selection_steps": [],
+        }
+    best_binding = best_result["binding"]
+    best_binding_idx = int(best_result["binding_idx"])
+    rebuild_positions = list(best_result["positions"])[:target_k]
+    rebuild_objective = float(best_result["objective"])
+    rebuild_coverage = np.asarray(best_result["coverage"], dtype=float)
+    baseline_positions = list(range(target_k))
+    baseline_objective, baseline_coverage = objective(best_binding_idx, baseline_positions)
+    rank_scores = _daec_rank_scores(pool_doc_scores, pool_limit)
+    retriever_margin = 0.0
+    if rank_scores.size and target_k > 0:
+        retriever_margin = float(rank_scores[0] - rank_scores[target_k - 1])
+
+    safe_trace: Dict[str, object] = {
+        "safe_projection": bool(safe_projection),
+        "baseline_positions": list(baseline_positions),
+        "baseline_titles": [pool_doc_titles[pos] for pos in baseline_positions],
+        "baseline_objective": round(float(baseline_objective), 6),
+        "rebuild_positions": list(rebuild_positions),
+        "rebuild_titles": [pool_doc_titles[pos] for pos in rebuild_positions],
+        "rebuild_objective": round(float(rebuild_objective), 6),
+        "rebuild_gain_over_baseline": round(float(rebuild_objective - baseline_objective), 6),
+        "retriever_margin_top1_to_topk": round(float(retriever_margin), 6),
+        "safe_min_objective_gain": round(float(safe_min_objective_gain), 6),
+        "safe_min_swap_gain": round(float(safe_min_swap_gain), 6),
+        "safe_max_swaps": int(max(0, safe_max_swaps)),
+        "safe_preserve_top_m": int(max(0, safe_preserve_top_m)),
+        "safe_retriever_margin_threshold": round(float(safe_retriever_margin_threshold), 6),
+        "safe_decision": "not_enabled",
+        "safe_swap_steps": [],
+    }
+
+    best_positions = rebuild_positions
+    best_coverage = rebuild_coverage
+    best_objective = rebuild_objective
+    best_steps = list(best_result["steps"])
+    if bool(safe_projection):
+        max_swaps = max(0, int(safe_max_swaps))
+        preserve_top_m = max(0, int(safe_preserve_top_m))
+        min_total_gain = float(safe_min_objective_gain)
+        min_swap_gain = float(safe_min_swap_gain)
+        if (
+            np.isfinite(float(safe_retriever_margin_threshold))
+            and float(safe_retriever_margin_threshold) <= 1.0
+            and retriever_margin >= float(safe_retriever_margin_threshold)
+        ):
+            best_positions = list(baseline_positions)
+            best_objective = float(baseline_objective)
+            best_coverage = np.asarray(baseline_coverage, dtype=float)
+            best_steps = []
+            safe_trace["safe_decision"] = "fallback_retriever_margin"
+        elif float(rebuild_objective - baseline_objective) < min_total_gain:
+            best_positions = list(baseline_positions)
+            best_objective = float(baseline_objective)
+            best_coverage = np.asarray(baseline_coverage, dtype=float)
+            best_steps = []
+            safe_trace["safe_decision"] = "fallback_low_rebuild_gain"
+        else:
+            current_positions = list(baseline_positions)
+            current_score = float(baseline_objective)
+            current_coverage = np.asarray(baseline_coverage, dtype=float)
+            swap_steps: List[Dict[str, object]] = []
+            protected_positions = set(range(min(preserve_top_m, target_k)))
+            for _ in range(max_swaps):
+                current_set = set(current_positions)
+                best_swap: Dict[str, object] | None = None
+                for out_pos in list(current_positions):
+                    if int(out_pos) in protected_positions:
+                        continue
+                    for in_pos in range(pool_limit):
+                        if in_pos in current_set:
+                            continue
+                        proposed_positions = _daec_replace_at_position(current_positions, out_pos, in_pos)
+                        proposed_score, proposed_coverage = objective(best_binding_idx, proposed_positions)
+                        gain = float(proposed_score - current_score)
+                        if gain < min_swap_gain:
+                            continue
+                        row = {
+                            "out_position": int(out_pos),
+                            "out_title": pool_doc_titles[int(out_pos)],
+                            "in_position": int(in_pos),
+                            "in_title": pool_doc_titles[int(in_pos)],
+                            "objective_gain": gain,
+                            "objective": float(proposed_score),
+                            "coverage": proposed_coverage,
+                        }
+                        if best_swap is None or (
+                            float(row["objective_gain"]),
+                            float(row["objective"]),
+                            -int(row["in_position"]),
+                        ) > (
+                            float(best_swap["objective_gain"]),
+                            float(best_swap["objective"]),
+                            -int(best_swap["in_position"]),
+                        ):
+                            best_swap = row
+                if best_swap is None:
+                    break
+                current_positions = _daec_replace_at_position(
+                    current_positions,
+                    int(best_swap["out_position"]),
+                    int(best_swap["in_position"]),
+                )
+                current_score = float(best_swap["objective"])
+                current_coverage = np.asarray(best_swap["coverage"], dtype=float)
+                swap_steps.append({
+                    "step": int(len(swap_steps) + 1),
+                    "mode": "daec_noisyor_safe_swap",
+                    "out_position": int(best_swap["out_position"]),
+                    "out_title": str(best_swap["out_title"]),
+                    "in_position": int(best_swap["in_position"]),
+                    "in_title": str(best_swap["in_title"]),
+                    "objective_gain": round(float(best_swap["objective_gain"]), 6),
+                    "objective": round(float(current_score), 6),
+                    "coverage_by_requirement": {
+                        req.unit_id: round(float(current_coverage[req_idx]), 6)
+                        for req_idx, req in enumerate(active_requirements)
+                    },
+                })
+            best_positions = list(current_positions)
+            best_objective = float(current_score)
+            best_coverage = np.asarray(current_coverage, dtype=float)
+            best_steps = list(swap_steps)
+            safe_trace["safe_swap_steps"] = list(swap_steps)
+            safe_trace["safe_decision"] = "minimal_edit_applied" if swap_steps else "fallback_no_eligible_swap"
+
+    covered_count = int(np.sum(best_coverage > 0.0))
+    trace = {
+        "selector": selector_label,
+        "status": "applied",
+        "query": str(query),
+        "requirement_count": int(len(active_requirements)),
+        "operator_requirement_count": int(operator_requirement_count),
+        "requirements": [req.to_trace() for req in active_requirements],
+        "binding_top_m": int(binding_top_m),
+        "binding_count": int(len(bindings)),
+        "binding_count_unpruned": int(unpruned_binding_count),
+        "binding_max_bindings": int(DAEC_MAX_BINDINGS),
+        "binding_pruned": bool(binding_pruned),
+        "binding_selection_protocol": "best_binding_final_pool",
+        "bindings": [binding.to_trace() for binding in bindings[:20]],
+        "selected_binding": best_binding.to_trace(),
+        "selected_binding_id": str(best_binding.binding_id),
+        "binding_candidates_by_requirement": {
+            req_id: [
+                {
+                    "title": str(row.get("title", "") or ""),
+                    "dep": str(row.get("dep", "") or ""),
+                    "dep_position": int(row.get("dep_position", -1)),
+                    "dep_score": round(float(row.get("dep_score", 0.0) or 0.0), 6),
+                    "title_pool_position": int(row.get("title_pool_position", -1)),
+                    "count": int(row.get("count", 0)),
+                    "first_pos": int(row.get("first_pos", 10**9)),
+                }
+                for row in rows
+            ]
+            for req_id, rows in binding_candidates_by_req.items()
+        },
+        "objective": round(float(best_objective), 6),
+        "rebuild_objective": round(float(rebuild_objective), 6),
+        "baseline_objective": round(float(baseline_objective), 6),
+        "covered_requirement_count": covered_count,
+        "covered_requirement_rate": round(float(covered_count) / float(max(len(active_requirements), 1)), 4),
+        "coverage_by_requirement": {
+            req.unit_id: round(float(best_coverage[req_idx]), 6)
+            for req_idx, req in enumerate(active_requirements)
+        },
+        "phi_shape": [int(dim) for dim in phi.shape],
+        "selected_positions": best_positions,
+        "selected_titles": [pool_doc_titles[pos] for pos in best_positions],
+        "selection_steps": list(best_steps),
+        "safe_projection_trace": safe_trace,
+        "embedding_available_requirement_count": int(
+            sum(_normalize_vector(requirement_embeddings.get(req.unit_id, np.array([]))).size > 0 for req in active_requirements)
+        ),
+        "embedding_available_doc_count": int(len(doc_vectors)),
+        "binding_objectives": [
+            {
+                "binding_id": str(result["binding"].binding_id),
+                "objective": round(float(result["objective"]), 6),
+                "selected_positions": list(result["positions"]),
+            }
+            for result in binding_results[:20]
+        ],
+    }
+    return best_positions, trace
 
 
 def select_dtc_embed_positions(

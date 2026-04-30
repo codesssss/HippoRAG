@@ -57,6 +57,7 @@ from dtc_embed_utils import (
     DTCRequirement,
     build_fallback_dtc_requirements,
     parse_dtc_decomposition_response,
+    select_daec_noisyor_positions,
     select_dtc_embed_positions,
 )
 from src.hipporag.HippoRAG import HippoRAG
@@ -123,7 +124,7 @@ SETWISE_LLM_JSON_END_TAG = "</JSON>"
 SETWISE_LLM_LATE_RERANK_MAX_COMPLETION_TOKENS = 256
 SETWISE_LLM_LATE_RERANK_REPAIR_MAX_COMPLETION_TOKENS = 96
 SETWISE_LLM_NO_THINK_PREFIX = "/no_think"
-DEFAULT_CE_BATCH_SIZE = 8
+DEFAULT_CE_BATCH_SIZE = 64
 DEFAULT_CE_MAX_LENGTH = 1024
 
 
@@ -5219,13 +5220,18 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            dtc_ser_repairable_residual_enabled: bool = False,
                            dtc_enable_dependency_binding: bool = False,
                            dtc_binding_max_candidates: int = 4,
-                           dtc_binding_entity_hit_required: bool = True) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           dtc_binding_entity_hit_required: bool = True,
+                           daec_safe_min_objective_gain: float = 0.02,
+                           daec_safe_min_swap_gain: float = 0.01,
+                           daec_safe_max_swaps: int = 2,
+                           daec_safe_preserve_top_m: int = 1,
+                           daec_safe_retriever_margin_threshold: float = 1.01) -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
     normalized_assemble_mode = normalize_assemble_mode(assemble_mode)
     normalized_append_policy = normalize_append_policy(append_policy)
-    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed"}:
+    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -5697,6 +5703,76 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["assemble_mode"] = normalized_assemble_mode
             selector_trace["selected_positions_before_assemble"] = list(selected_positions)
             selected_positions = list(reranked_positions)
+        elif selector_name in {"daec_noisyor", "daec_noisyor_safe"}:
+            normalized_dtc_decomposition_mode = str(dtc_decomposition_mode or "llm").strip().lower()
+            if normalized_dtc_decomposition_mode == "query":
+                requirements = build_fallback_dtc_requirements(qs.question)
+                decomposition_trace = {
+                    "mode": "query",
+                    "llm_model": "",
+                    "max_steps": int(dtc_max_steps),
+                    "llm_error": None,
+                    "fallback_used": False,
+                    "parse_succeeded": bool(requirements),
+                    "parse_error": None,
+                    "raw_output_preview": "",
+                    "active_step_count": int(len(requirements)),
+                }
+            else:
+                requirements, decomposition_trace = request_dtc_requirements_from_llm(
+                    query=qs.question,
+                    infer_fn=getattr(getattr(hipporag, "llm_model", None), "infer", None),
+                    model_name=str(
+                        getattr(getattr(hipporag, "global_config", None), "llm_request_name", None)
+                        or getattr(getattr(hipporag, "global_config", None), "llm_name", "")
+                        or ""
+                    ),
+                    max_steps=int(dtc_max_steps),
+                    max_completion_tokens=int(dtc_max_completion_tokens),
+                    include_satisfiable_by=bool(dtc_include_satisfiable_by),
+                )
+            requirement_embeddings = build_dtc_requirement_embeddings(
+                hipporag=hipporag,
+                requirements=requirements,
+            )
+
+            def embed_daec_bound_texts(texts: Sequence[str]) -> Dict[str, np.ndarray]:
+                return build_dtc_text_embeddings(hipporag=hipporag, texts=texts)
+
+            selected_positions, selector_trace = select_daec_noisyor_positions(
+                query=qs.question,
+                requirements=requirements,
+                requirement_embeddings=requirement_embeddings,
+                pool_docs=pool_docs,
+                pool_doc_ids=pool_doc_ids,
+                pool_doc_titles=pool_titles,
+                pool_doc_scores=pool_scores,
+                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                passage_embeddings=np.asarray(getattr(hipporag, "passage_embeddings", np.array([]))),
+                qa_top_k=qa_top_k,
+                binding_top_m=int(dtc_binding_max_candidates),
+                embed_texts_fn=embed_daec_bound_texts,
+                safe_projection=selector_name == "daec_noisyor_safe",
+                safe_min_objective_gain=float(daec_safe_min_objective_gain),
+                safe_min_swap_gain=float(daec_safe_min_swap_gain),
+                safe_max_swaps=int(daec_safe_max_swaps),
+                safe_preserve_top_m=int(daec_safe_preserve_top_m),
+                safe_retriever_margin_threshold=float(daec_safe_retriever_margin_threshold),
+            )
+            selector_trace["decomposition_trace"] = decomposition_trace
+            selector_trace["dtc_max_steps"] = int(dtc_max_steps)
+            selector_trace["dtc_max_completion_tokens"] = int(dtc_max_completion_tokens)
+            selector_trace["dtc_decomposition_mode"] = normalized_dtc_decomposition_mode
+            selector_trace["dtc_include_satisfiable_by"] = bool(dtc_include_satisfiable_by)
+            selector_trace["daec_main_objective"] = "frozen_binding_noisy_or"
+            selector_trace["daec_safe_projection"] = selector_name == "daec_noisyor_safe"
+            dtc_parse_success_count += int(bool(decomposition_trace.get("parse_succeeded", False)))
+            dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
+            dtc_requirement_counts.append(int(selector_trace.get("requirement_count", 0) or 0))
+            dtc_covered_requirement_rates.append(float(selector_trace.get("covered_requirement_rate", 0.0) or 0.0))
+            dtc_embedding_available_requirement_counts.append(
+                int(selector_trace.get("embedding_available_requirement_count", 0) or 0)
+            )
         elif selector_name == "dtc_embed":
             normalized_dtc_decomposition_mode = str(dtc_decomposition_mode or "llm").strip().lower()
             if normalized_dtc_decomposition_mode == "query":
@@ -6475,7 +6551,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             },
             "append_stop_reason_counts": dict(sorted(append_stop_reason_counts.items())),
         })
-    if selector_name == "dtc_embed":
+    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe"}:
         summary.update({
             "dtc_max_steps": int(dtc_max_steps),
             "dtc_match_threshold": round(float(dtc_match_threshold), 4),
@@ -6515,6 +6591,17 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 4,
             ),
         })
+        if selector_name in {"daec_noisyor", "daec_noisyor_safe"}:
+            summary.update({
+                "daec_main_objective": "frozen_binding_noisy_or",
+                "daec_binding_top_m": int(dtc_binding_max_candidates),
+                "daec_safe_projection": selector_name == "daec_noisyor_safe",
+                "daec_safe_min_objective_gain": round(float(daec_safe_min_objective_gain), 6),
+                "daec_safe_min_swap_gain": round(float(daec_safe_min_swap_gain), 6),
+                "daec_safe_max_swaps": int(daec_safe_max_swaps),
+                "daec_safe_preserve_top_m": int(daec_safe_preserve_top_m),
+                "daec_safe_retriever_margin_threshold": round(float(daec_safe_retriever_margin_threshold), 6),
+            })
     if selector_name == "requirement_beam":
         summary.update({
             "requirement_mode": str((requirement_selector_bundle or {}).get("mode", "oracle")),
@@ -7076,7 +7163,7 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--expand_base_k", type=int, default=10,
                         help="For --setwise_selector bridge_append, preserve baseline top-B before appending deep-pool bridge candidates.")
@@ -7232,6 +7319,16 @@ def main():
                         help="For --setwise_selector dtc_embed, max title candidates used to bind each dependent requirement.")
     parser.add_argument("--dtc_binding_entity_hit_required", type=string_to_bool, default=True,
                         help="For --setwise_selector dtc_embed, require a dependent candidate doc to mention the selected binding title.")
+    parser.add_argument("--daec_safe_min_objective_gain", type=float, default=0.02,
+                        help="For --setwise_selector daec_noisyor_safe, minimum DAEC coverage gain over baseline top-k before any edit is allowed.")
+    parser.add_argument("--daec_safe_min_swap_gain", type=float, default=0.01,
+                        help="For --setwise_selector daec_noisyor_safe, minimum objective gain required for each single-document swap.")
+    parser.add_argument("--daec_safe_max_swaps", type=int, default=2,
+                        help="For --setwise_selector daec_noisyor_safe, maximum number of baseline top-k documents that may be replaced.")
+    parser.add_argument("--daec_safe_preserve_top_m", type=int, default=1,
+                        help="For --setwise_selector daec_noisyor_safe, always preserve this many highest-ranked baseline documents.")
+    parser.add_argument("--daec_safe_retriever_margin_threshold", type=float, default=1.01,
+                        help="For --setwise_selector daec_noisyor_safe, keep baseline unchanged when normalized top1-to-topk retriever margin exceeds this threshold. Values >1 disable this fallback.")
     parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
                         help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
     parser.add_argument("--setwise_late_rerank_candidate_count", type=int, default=4,
@@ -7811,6 +7908,11 @@ def main():
             dtc_enable_dependency_binding=bool(args.dtc_enable_dependency_binding),
             dtc_binding_max_candidates=int(args.dtc_binding_max_candidates),
             dtc_binding_entity_hit_required=bool(args.dtc_binding_entity_hit_required),
+            daec_safe_min_objective_gain=float(args.daec_safe_min_objective_gain),
+            daec_safe_min_swap_gain=float(args.daec_safe_min_swap_gain),
+            daec_safe_max_swaps=int(args.daec_safe_max_swaps),
+            daec_safe_preserve_top_m=int(args.daec_safe_preserve_top_m),
+            daec_safe_retriever_margin_threshold=float(args.daec_safe_retriever_margin_threshold),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
@@ -8150,6 +8252,41 @@ def main():
                 "ce_rerank_F1": round(float(np.mean(data["ce_f1"])), 4),
             }
 
+        ce_query_traces = []
+        reader_top_k = max(int(getattr(config, "qa_top_k", 5)), 0)
+        for q_idx, (baseline_qs, ce_qs) in enumerate(zip(query_solutions, reranked_solutions)):
+            gold_set = set(gold_docs[q_idx])
+            baseline_top_docs = list(baseline_qs.docs[:reader_top_k])
+            ce_top_docs = list(ce_qs.docs[:reader_top_k])
+            ce_query_traces.append({
+                "question": str(queries[q_idx]),
+                "gold_doc_count": int(len(gold_set)),
+                "gold_titles": [extract_doc_title(doc) for doc in gold_docs[q_idx]],
+                "baseline_answer": str(baseline_qs.answer or ""),
+                "ce_answer": str(ce_qs.answer or ""),
+                "baseline_top_titles": [extract_doc_title(doc) for doc in baseline_top_docs],
+                "ce_top_titles": [extract_doc_title(doc) for doc in ce_top_docs],
+                "changed_from_baseline": bool(list(baseline_top_docs) != list(ce_top_docs)),
+                "baseline_metrics": {
+                    "ExactMatch": float(bl_per_query_em[q_idx]["ExactMatch"]),
+                    "F1": float(bl_per_query_f1[q_idx]["F1"]),
+                    "support_recall": (
+                        float(len(gold_set & set(baseline_top_docs)) / max(1, len(gold_set)))
+                        if gold_set else 0.0
+                    ),
+                    "support_complete": float(gold_set.issubset(set(baseline_top_docs))) if gold_set else 0.0,
+                },
+                "ce_metrics": {
+                    "ExactMatch": float(ce_per_query_em[q_idx]["ExactMatch"]),
+                    "F1": float(ce_per_query_f1[q_idx]["F1"]),
+                    "support_recall": (
+                        float(len(gold_set & set(ce_top_docs)) / max(1, len(gold_set)))
+                        if gold_set else 0.0
+                    ),
+                    "support_complete": float(gold_set.issubset(set(ce_top_docs))) if gold_set else 0.0,
+                },
+            })
+
         cross_encoder_rerank_results = {
             "ce_model": ce_model_name,
             "ce_alpha": ce_alpha,
@@ -8162,6 +8299,7 @@ def main():
             "F1_delta": round(float(ce_f1) - float(baseline_f1), 4),
             "ce_retrieval_metrics": ce_retrieval_metrics,
             "per_bucket": bucket_summary,
+            "per_query": ce_query_traces,
         }
 
     slice_metrics = compute_slice_metrics(
