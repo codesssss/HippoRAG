@@ -320,6 +320,20 @@ def _candidate_type_compatible(title: str, expected_answer_type: str) -> bool:
     return True
 
 
+def _title_match_pool_position(entity: str, pool_titles: Sequence[str]) -> int | None:
+    entity_lower = entity.lower().strip()
+    if not entity_lower:
+        return None
+    for idx, title in enumerate(pool_titles):
+        if entity_lower == title.lower().strip():
+            return idx
+    for idx, title in enumerate(pool_titles):
+        tl = title.lower().strip()
+        if (entity_lower in tl or tl in entity_lower) and min(len(entity_lower), len(tl)) >= 3:
+            return idx
+    return None
+
+
 def _binding_candidate_hit_score(candidate_key: str,
                                  doc_entities: set[str],
                                  doc_title: str,
@@ -491,6 +505,383 @@ def _daec_replace_at_position(positions: Sequence[int], old_pos: int, new_pos: i
     return updated
 
 
+def _topological_requirement_order(requirements: Sequence[DTCRequirement]) -> List[DTCRequirement]:
+    req_by_id = {str(req.unit_id): req for req in requirements}
+    visited: set[str] = set()
+    visiting: set[str] = set()
+    ordered: List[DTCRequirement] = []
+
+    def visit(req: DTCRequirement) -> None:
+        req_id = str(req.unit_id)
+        if req_id in visited:
+            return
+        if req_id in visiting:
+            return
+        visiting.add(req_id)
+        for dep_id in req.depends_on:
+            dep = req_by_id.get(str(dep_id))
+            if dep is not None:
+                visit(dep)
+        visiting.discard(req_id)
+        visited.add(req_id)
+        ordered.append(req)
+
+    for requirement in requirements:
+        visit(requirement)
+    return ordered
+
+
+def select_minimal_demand_repair_positions(
+    *,
+    query: str,
+    requirements: Sequence[DTCRequirement],
+    requirement_embeddings: Dict[str, np.ndarray],
+    pool_docs: Sequence[str],
+    pool_doc_ids: Sequence[int | None],
+    pool_doc_titles: Sequence[str],
+    passage_embeddings: np.ndarray,
+    qa_top_k: int,
+    tau_percentile: float = 50.0,
+    edit_budget: int = 2,
+) -> Tuple[List[int], Dict[str, object]]:
+    """Repair unmet demand coverage using only cosine phi.
+
+    This intentionally excludes anchor, binding, relation, sentence-level, and
+    retriever-prior features. It is a minimal sanity probe for the repair
+    framing rather than a tuned DAEC variant.
+    """
+    selector_label = "minimal_demand_repair"
+    pool_limit = len(pool_docs)
+    target_k = min(max(int(qa_top_k), 0), pool_limit)
+    if target_k <= 0:
+        return [], {"selector": selector_label, "status": "empty_pool"}
+
+    baseline_positions = list(range(target_k))
+    active_requirements = [
+        req for req in requirements
+        if str(req.subquery or "").strip() and not _is_daec_operator_requirement(req)
+    ]
+    if not active_requirements:
+        return baseline_positions, {
+            "selector": selector_label,
+            "status": "fallback_no_requirements",
+            "query": str(query),
+            "selected_positions": baseline_positions,
+            "keep_baseline": True,
+            "edit_count": 0,
+            "selection_steps": [],
+        }
+
+    doc_vectors: Dict[int, np.ndarray] = {}
+    for pos, doc_id in enumerate(pool_doc_ids[:pool_limit]):
+        if doc_id is None or int(doc_id) < 0 or int(doc_id) >= len(passage_embeddings):
+            continue
+        vector = _normalize_vector(passage_embeddings[int(doc_id)])
+        if vector.size:
+            doc_vectors[int(pos)] = vector
+    phi_by_req = _compute_embedding_match_scores(
+        active_requirements,
+        requirement_embeddings,
+        doc_vectors,
+        pool_limit,
+    )
+    phi = np.asarray(
+        [phi_by_req.get(req.unit_id, np.zeros(pool_limit, dtype=float)) for req in active_requirements],
+        dtype=float,
+    )
+    finite_phi = phi[np.isfinite(phi)]
+    tau = float(np.percentile(finite_phi, float(tau_percentile))) if finite_phi.size else 1.0
+    tau = float(np.clip(tau, 0.0, 1.0))
+
+    req_index_by_id = {str(req.unit_id): idx for idx, req in enumerate(active_requirements)}
+    baseline_max_by_req = {
+        str(req.unit_id): float(np.max(phi[idx, baseline_positions])) if baseline_positions else 0.0
+        for idx, req in enumerate(active_requirements)
+    }
+    unmet_ids = {
+        str(req_id)
+        for req_id, score in baseline_max_by_req.items()
+        if float(score) < tau
+    }
+    if not unmet_ids:
+        return baseline_positions, {
+            "selector": selector_label,
+            "status": "keep_all_demands_met",
+            "query": str(query),
+            "requirement_count": int(len(active_requirements)),
+            "requirements": [req.to_trace() for req in active_requirements],
+            "tau_percentile": round(float(tau_percentile), 4),
+            "tau": round(float(tau), 6),
+            "baseline_max_by_requirement": {
+                req_id: round(float(score), 6) for req_id, score in baseline_max_by_req.items()
+            },
+            "unmet_requirement_ids": [],
+            "selected_positions": baseline_positions,
+            "selected_titles": [pool_doc_titles[pos] for pos in baseline_positions],
+            "keep_baseline": True,
+            "edit_count": 0,
+            "edit_budget": int(max(0, edit_budget)),
+            "selection_steps": [],
+        }
+
+    def coverage_loss_count(out_pos: int, positions: Sequence[int]) -> int:
+        selected = [int(pos) for pos in positions if 0 <= int(pos) < pool_limit]
+        if int(out_pos) not in selected:
+            return 0
+        loss = 0
+        for req_idx in range(len(active_requirements)):
+            scores = [(pos, float(phi[req_idx, pos])) for pos in selected]
+            scores.sort(key=lambda item: (-item[1], item[0]))
+            if not scores or scores[0][0] != int(out_pos) or scores[0][1] < tau:
+                continue
+            second_score = scores[1][1] if len(scores) > 1 else 0.0
+            if scores[0][1] > second_score + 1e-9:
+                loss += 1
+        return int(loss)
+
+    selected_positions = list(baseline_positions)
+    edit_limit = max(0, int(edit_budget))
+    steps: List[Dict[str, object]] = []
+    ordered_requirements = [
+        req for req in _topological_requirement_order(active_requirements)
+        if str(req.unit_id) in unmet_ids
+    ]
+    for req in ordered_requirements:
+        if len(steps) >= edit_limit:
+            break
+        req_idx = req_index_by_id.get(str(req.unit_id))
+        if req_idx is None:
+            continue
+        selected_set = set(selected_positions)
+        candidates = [pos for pos in range(pool_limit) if pos not in selected_set]
+        if not candidates:
+            break
+        in_pos = max(candidates, key=lambda pos: (float(phi[req_idx, pos]), -int(pos)))
+        in_score = float(phi[req_idx, in_pos])
+        if in_score < tau:
+            continue
+        out_pos = min(
+            selected_positions,
+            key=lambda pos: (coverage_loss_count(int(pos), selected_positions), int(pos)),
+        )
+        loss = coverage_loss_count(int(out_pos), selected_positions)
+        if in_score <= float(loss):
+            continue
+        selected_positions = _daec_replace_at_position(selected_positions, int(out_pos), int(in_pos))
+        steps.append({
+            "step": int(len(steps) + 1),
+            "mode": "minimal_demand_repair",
+            "requirement_id": str(req.unit_id),
+            "requirement_subquery": str(req.subquery),
+            "out_position": int(out_pos),
+            "out_title": str(pool_doc_titles[int(out_pos)]),
+            "in_position": int(in_pos),
+            "in_title": str(pool_doc_titles[int(in_pos)]),
+            "in_phi": round(float(in_score), 6),
+            "coverage_loss_count": int(loss),
+            "tau": round(float(tau), 6),
+        })
+
+    keep_baseline = list(selected_positions) == baseline_positions
+    return selected_positions, {
+        "selector": selector_label,
+        "status": "keep_no_accepted_repair" if keep_baseline else "repaired",
+        "query": str(query),
+        "requirement_count": int(len(active_requirements)),
+        "requirements": [req.to_trace() for req in active_requirements],
+        "tau_percentile": round(float(tau_percentile), 4),
+        "tau": round(float(tau), 6),
+        "baseline_max_by_requirement": {
+            req_id: round(float(score), 6) for req_id, score in baseline_max_by_req.items()
+        },
+        "unmet_requirement_ids": sorted(unmet_ids),
+        "selected_positions": list(selected_positions),
+        "selected_titles": [pool_doc_titles[pos] for pos in selected_positions],
+        "baseline_positions": baseline_positions,
+        "baseline_titles": [pool_doc_titles[pos] for pos in baseline_positions],
+        "keep_baseline": bool(keep_baseline),
+        "edit_count": int(len(steps)),
+        "edit_budget": int(edit_limit),
+        "selection_steps": steps,
+    }
+
+
+def select_minimal_demand_repair_nli_positions(
+    *,
+    query: str,
+    requirements: Sequence[DTCRequirement],
+    pool_docs: Sequence[str],
+    pool_doc_titles: Sequence[str],
+    qa_top_k: int,
+    nli_score_fn: Callable[[Sequence[Tuple[str, str]]], List[float]],
+    tau_percentile: float = 50.0,
+    edit_budget: int = 2,
+) -> Tuple[List[int], Dict[str, object]]:
+    """MDR with NLI entailment as phi(r, d) instead of cosine."""
+    selector_label = "minimal_demand_repair_nli"
+    pool_limit = len(pool_docs)
+    target_k = min(max(int(qa_top_k), 0), pool_limit)
+    if target_k <= 0:
+        return [], {"selector": selector_label, "status": "empty_pool"}
+
+    baseline_positions = list(range(target_k))
+    active_requirements = [
+        req for req in requirements
+        if str(req.subquery or "").strip() and not _is_daec_operator_requirement(req)
+    ]
+    if not active_requirements:
+        return baseline_positions, {
+            "selector": selector_label,
+            "status": "fallback_no_requirements",
+            "query": str(query),
+            "selected_positions": baseline_positions,
+            "keep_baseline": True,
+            "edit_count": 0,
+            "selection_steps": [],
+        }
+
+    pairs: List[Tuple[str, str]] = []
+    for req in active_requirements:
+        for pos in range(pool_limit):
+            pairs.append((str(req.subquery), str(pool_docs[pos])))
+    raw_scores = nli_score_fn(pairs)
+    phi = np.zeros((len(active_requirements), pool_limit), dtype=float)
+    idx = 0
+    for r_idx in range(len(active_requirements)):
+        for p_idx in range(pool_limit):
+            phi[r_idx, p_idx] = float(raw_scores[idx])
+            idx += 1
+
+    finite_phi = phi[np.isfinite(phi)]
+    tau = float(np.percentile(finite_phi, float(tau_percentile))) if finite_phi.size else 1.0
+    tau = float(np.clip(tau, 0.0, 1.0))
+
+    req_index_by_id = {str(req.unit_id): idx for idx, req in enumerate(active_requirements)}
+    baseline_max_by_req = {
+        str(req.unit_id): float(np.max(phi[idx, baseline_positions])) if baseline_positions else 0.0
+        for idx, req in enumerate(active_requirements)
+    }
+    unmet_ids = {
+        str(req_id)
+        for req_id, score in baseline_max_by_req.items()
+        if float(score) < tau
+    }
+
+    phi_stats = {
+        "phi_mean": round(float(np.mean(phi)), 6),
+        "phi_std": round(float(np.std(phi)), 6),
+        "phi_min": round(float(np.min(phi)), 6),
+        "phi_max": round(float(np.max(phi)), 6),
+        "phi_median": round(float(np.median(phi)), 6),
+        "phi_p25": round(float(np.percentile(phi, 25)), 6),
+        "phi_p75": round(float(np.percentile(phi, 75)), 6),
+    }
+
+    if not unmet_ids:
+        return baseline_positions, {
+            "selector": selector_label,
+            "status": "keep_all_demands_met",
+            "query": str(query),
+            "requirement_count": int(len(active_requirements)),
+            "requirements": [req.to_trace() for req in active_requirements],
+            "tau_percentile": round(float(tau_percentile), 4),
+            "tau": round(float(tau), 6),
+            "baseline_max_by_requirement": {
+                req_id: round(float(score), 6) for req_id, score in baseline_max_by_req.items()
+            },
+            "unmet_requirement_ids": [],
+            "selected_positions": baseline_positions,
+            "selected_titles": [pool_doc_titles[pos] for pos in baseline_positions],
+            "keep_baseline": True,
+            "edit_count": 0,
+            "edit_budget": int(max(0, edit_budget)),
+            "selection_steps": [],
+            "phi_stats": phi_stats,
+        }
+
+    def coverage_loss_count(out_pos: int, positions: Sequence[int]) -> int:
+        selected = [int(pos) for pos in positions if 0 <= int(pos) < pool_limit]
+        if int(out_pos) not in selected:
+            return 0
+        loss = 0
+        for req_idx in range(len(active_requirements)):
+            scores = [(pos, float(phi[req_idx, pos])) for pos in selected]
+            scores.sort(key=lambda item: (-item[1], item[0]))
+            if not scores or scores[0][0] != int(out_pos) or scores[0][1] < tau:
+                continue
+            second_score = scores[1][1] if len(scores) > 1 else 0.0
+            if scores[0][1] > second_score + 1e-9:
+                loss += 1
+        return int(loss)
+
+    selected_positions = list(baseline_positions)
+    edit_limit = max(0, int(edit_budget))
+    steps: List[Dict[str, object]] = []
+    ordered_requirements = [
+        req for req in _topological_requirement_order(active_requirements)
+        if str(req.unit_id) in unmet_ids
+    ]
+    for req in ordered_requirements:
+        if len(steps) >= edit_limit:
+            break
+        req_idx = req_index_by_id.get(str(req.unit_id))
+        if req_idx is None:
+            continue
+        selected_set = set(selected_positions)
+        candidates = [pos for pos in range(pool_limit) if pos not in selected_set]
+        if not candidates:
+            break
+        in_pos = max(candidates, key=lambda pos: (float(phi[req_idx, pos]), -int(pos)))
+        in_score = float(phi[req_idx, in_pos])
+        if in_score < tau:
+            continue
+        out_pos = min(
+            selected_positions,
+            key=lambda pos: (coverage_loss_count(int(pos), selected_positions), int(pos)),
+        )
+        loss = coverage_loss_count(int(out_pos), selected_positions)
+        if in_score <= float(loss):
+            continue
+        selected_positions = _daec_replace_at_position(selected_positions, int(out_pos), int(in_pos))
+        steps.append({
+            "step": int(len(steps) + 1),
+            "mode": "minimal_demand_repair_nli",
+            "requirement_id": str(req.unit_id),
+            "requirement_subquery": str(req.subquery),
+            "out_position": int(out_pos),
+            "out_title": str(pool_doc_titles[int(out_pos)]),
+            "in_position": int(in_pos),
+            "in_title": str(pool_doc_titles[int(in_pos)]),
+            "in_phi": round(float(in_score), 6),
+            "coverage_loss_count": int(loss),
+            "tau": round(float(tau), 6),
+        })
+
+    keep_baseline = list(selected_positions) == baseline_positions
+    return selected_positions, {
+        "selector": selector_label,
+        "status": "keep_no_accepted_repair" if keep_baseline else "repaired",
+        "query": str(query),
+        "requirement_count": int(len(active_requirements)),
+        "requirements": [req.to_trace() for req in active_requirements],
+        "tau_percentile": round(float(tau_percentile), 4),
+        "tau": round(float(tau), 6),
+        "baseline_max_by_requirement": {
+            req_id: round(float(score), 6) for req_id, score in baseline_max_by_req.items()
+        },
+        "unmet_requirement_ids": sorted(unmet_ids),
+        "selected_positions": list(selected_positions),
+        "selected_titles": [pool_doc_titles[pos] for pos in selected_positions],
+        "baseline_positions": baseline_positions,
+        "baseline_titles": [pool_doc_titles[pos] for pos in baseline_positions],
+        "keep_baseline": bool(keep_baseline),
+        "edit_count": int(len(steps)),
+        "edit_budget": int(edit_limit),
+        "selection_steps": steps,
+        "phi_stats": phi_stats,
+    }
+
+
 def select_daec_noisyor_positions(
     *,
     query: str,
@@ -511,6 +902,10 @@ def select_daec_noisyor_positions(
     safe_max_swaps: int = 2,
     safe_preserve_top_m: int = 1,
     safe_retriever_margin_threshold: float = 1.01,
+    safe_retriever_rank_penalty: float = 0.0,
+    llm_extract_fn: Callable[[str, str], List[str]] | None = None,
+    binding_mode: str = "auto",
+    gold_titles: Sequence[str] | None = None,
 ) -> Tuple[List[int], Dict[str, object]]:
     """Select evidence by frozen-binding noisy-OR demand coverage.
 
@@ -630,11 +1025,132 @@ def select_daec_noisyor_positions(
         )
         return rows[:max(0, int(binding_top_m))]
 
-    binding_candidates_by_req = {
-        req.unit_id: collect_frozen_binding_candidates(req)
-        for req in active_requirements
-        if req.depends_on
-    }
+    def collect_llm_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
+        if not req.depends_on or llm_extract_fn is None:
+            return []
+        rows: List[Dict[str, object]] = []
+        seen_keys: set[str] = set()
+        top_m = max(0, int(binding_top_m))
+        for dep in req.depends_on:
+            dep_req = req_by_id.get(dep)
+            if dep_req is None:
+                continue
+            dep_scores = raw_match_scores.get(dep, np.zeros(pool_limit, dtype=float))
+            upstream_positions = sorted(
+                range(pool_limit),
+                key=lambda pos: (-float(dep_scores[pos]), int(pos)),
+            )[:top_m]
+            dep_subquery = str(dep_req.subquery or "").strip()
+            if not dep_subquery:
+                continue
+            for dep_pos in upstream_positions:
+                doc_text = str(pool_docs[dep_pos])
+                entities = llm_extract_fn(dep_subquery, doc_text)
+                for ent in entities:
+                    ent_key = normalize_structure_text(ent)
+                    if not ent_key or ent_key in seen_keys:
+                        continue
+                    if ent_key in query_anchor_keys:
+                        continue
+                    title_pos = _title_match_pool_position(ent, pool_doc_titles[:pool_limit])
+                    if title_pos is None:
+                        continue
+                    seen_keys.add(ent_key)
+                    rows.append({
+                        "requirement_id": req.unit_id,
+                        "title": str(pool_doc_titles[title_pos]),
+                        "key": ent_key,
+                        "dep": dep,
+                        "dep_position": int(dep_pos),
+                        "dep_score": float(dep_scores[dep_pos]),
+                        "title_pool_position": int(title_pos),
+                        "count": 1,
+                        "first_pos": 0,
+                        "llm_extracted_entity": str(ent),
+                    })
+        rows.sort(key=lambda row: (-float(row["dep_score"]), int(row["title_pool_position"])))
+        return rows[:max(0, int(binding_top_m))]
+
+    _binding_mode = str(binding_mode or "auto").strip().lower()
+    if _binding_mode == "auto":
+        _binding_mode = "llm" if llm_extract_fn is not None else "string_match"
+
+    def collect_random_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
+        if not req.depends_on:
+            return []
+        import random as _rng
+        eligible = [
+            pos for pos in range(pool_limit)
+            if normalize_structure_text(pool_doc_titles[pos]) not in query_anchor_keys
+        ]
+        if not eligible:
+            return []
+        chosen_pos = _rng.choice(eligible)
+        return [{
+            "requirement_id": req.unit_id,
+            "title": str(pool_doc_titles[chosen_pos]),
+            "key": normalize_structure_text(pool_doc_titles[chosen_pos]),
+            "dep": str(req.depends_on[0]) if req.depends_on else "",
+            "dep_position": 0,
+            "dep_score": 0.0,
+            "title_pool_position": int(chosen_pos),
+            "count": 1,
+            "first_pos": 0,
+        }]
+
+    def collect_oracle_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
+        if not req.depends_on or not gold_titles:
+            return []
+        rows: List[Dict[str, object]] = []
+        seen_keys: set[str] = set()
+        for gt in gold_titles:
+            gt_key = normalize_structure_text(gt)
+            if not gt_key or gt_key in seen_keys or gt_key in query_anchor_keys:
+                continue
+            title_pos = _title_match_pool_position(gt, pool_doc_titles[:pool_limit])
+            if title_pos is None:
+                continue
+            seen_keys.add(gt_key)
+            rows.append({
+                "requirement_id": req.unit_id,
+                "title": str(pool_doc_titles[title_pos]),
+                "key": gt_key,
+                "dep": str(req.depends_on[0]) if req.depends_on else "",
+                "dep_position": 0,
+                "dep_score": 1.0,
+                "title_pool_position": int(title_pos),
+                "count": 1,
+                "first_pos": 0,
+            })
+        return rows[:max(0, int(binding_top_m))]
+
+    use_llm_binding = _binding_mode in ("llm",)
+    if _binding_mode == "nobind":
+        binding_candidates_by_req = {}
+    elif _binding_mode == "random":
+        binding_candidates_by_req = {
+            req.unit_id: collect_random_binding_candidates(req)
+            for req in active_requirements
+            if req.depends_on
+        }
+    elif _binding_mode == "oracle":
+        binding_candidates_by_req = {
+            req.unit_id: collect_oracle_binding_candidates(req)
+            for req in active_requirements
+            if req.depends_on
+        }
+    elif _binding_mode == "llm":
+        binding_candidates_by_req = {
+            req.unit_id: collect_llm_binding_candidates(req)
+            for req in active_requirements
+            if req.depends_on
+        }
+    else:
+        binding_candidates_by_req = {
+            req.unit_id: collect_frozen_binding_candidates(req)
+            for req in active_requirements
+            if req.depends_on
+        }
     candidate_lists: List[List[Dict[str, object]]] = [
         rows for rows in binding_candidates_by_req.values() if rows
     ]
@@ -699,15 +1215,21 @@ def select_daec_noisyor_positions(
             if assignment and req.depends_on:
                 support_scores = score_bound_requirement(req, assignment)
                 candidate_key = normalize_structure_text(assignment)
-                compat = np.asarray([
-                    _binding_candidate_hit_score(
-                        candidate_key,
-                        doc_entities_for_pos(pos),
-                        pool_doc_titles[pos],
-                        pool_docs[pos],
-                    )
-                    for pos in range(pool_limit)
-                ], dtype=float)
+                if _binding_mode in ("llm", "random", "oracle"):
+                    compat = np.asarray([
+                        1.0 if _title_match_pool_position(assignment, [pool_doc_titles[pos]]) is not None else 0.0
+                        for pos in range(pool_limit)
+                    ], dtype=float)
+                else:
+                    compat = np.asarray([
+                        _binding_candidate_hit_score(
+                            candidate_key,
+                            doc_entities_for_pos(pos),
+                            pool_doc_titles[pos],
+                            pool_docs[pos],
+                        )
+                        for pos in range(pool_limit)
+                    ], dtype=float)
                 support_scores = np.asarray(support_scores, dtype=float) * np.clip(compat, 0.0, 1.0)
             phi[req_idx, binding_idx, :] = np.clip(np.asarray(support_scores, dtype=float), 0.0, 1.0)
 
@@ -832,6 +1354,7 @@ def select_daec_noisyor_positions(
         "safe_max_swaps": int(max(0, safe_max_swaps)),
         "safe_preserve_top_m": int(max(0, safe_preserve_top_m)),
         "safe_retriever_margin_threshold": round(float(safe_retriever_margin_threshold), 6),
+        "safe_retriever_rank_penalty": round(float(safe_retriever_rank_penalty), 6),
         "safe_decision": "not_enabled",
         "safe_swap_steps": [],
     }
@@ -845,6 +1368,7 @@ def select_daec_noisyor_positions(
         preserve_top_m = max(0, int(safe_preserve_top_m))
         min_total_gain = float(safe_min_objective_gain)
         min_swap_gain = float(safe_min_swap_gain)
+        rank_penalty = max(0.0, float(safe_retriever_rank_penalty))
         if (
             np.isfinite(float(safe_retriever_margin_threshold))
             and float(safe_retriever_margin_threshold) <= 1.0
@@ -879,7 +1403,14 @@ def select_daec_noisyor_positions(
                         proposed_positions = _daec_replace_at_position(current_positions, out_pos, in_pos)
                         proposed_score, proposed_coverage = objective(best_binding_idx, proposed_positions)
                         gain = float(proposed_score - current_score)
-                        if gain < min_swap_gain:
+                        retriever_rank_loss = 0.0
+                        if rank_scores.size:
+                            retriever_rank_loss = max(
+                                0.0,
+                                float(rank_scores[int(out_pos)]) - float(rank_scores[int(in_pos)]),
+                            )
+                        adjusted_gain = gain - rank_penalty * retriever_rank_loss
+                        if adjusted_gain < min_swap_gain:
                             continue
                         row = {
                             "out_position": int(out_pos),
@@ -887,14 +1418,18 @@ def select_daec_noisyor_positions(
                             "in_position": int(in_pos),
                             "in_title": pool_doc_titles[int(in_pos)],
                             "objective_gain": gain,
+                            "retriever_rank_loss": retriever_rank_loss,
+                            "adjusted_gain": adjusted_gain,
                             "objective": float(proposed_score),
                             "coverage": proposed_coverage,
                         }
                         if best_swap is None or (
+                            float(row["adjusted_gain"]),
                             float(row["objective_gain"]),
                             float(row["objective"]),
                             -int(row["in_position"]),
                         ) > (
+                            float(best_swap["adjusted_gain"]),
                             float(best_swap["objective_gain"]),
                             float(best_swap["objective"]),
                             -int(best_swap["in_position"]),
@@ -917,6 +1452,8 @@ def select_daec_noisyor_positions(
                     "in_position": int(best_swap["in_position"]),
                     "in_title": str(best_swap["in_title"]),
                     "objective_gain": round(float(best_swap["objective_gain"]), 6),
+                    "retriever_rank_loss": round(float(best_swap["retriever_rank_loss"]), 6),
+                    "adjusted_gain": round(float(best_swap["adjusted_gain"]), 6),
                     "objective": round(float(current_score), 6),
                     "coverage_by_requirement": {
                         req.unit_id: round(float(current_coverage[req_idx]), 6)
@@ -944,6 +1481,7 @@ def select_daec_noisyor_positions(
         "binding_max_bindings": int(DAEC_MAX_BINDINGS),
         "binding_pruned": bool(binding_pruned),
         "binding_selection_protocol": "best_binding_final_pool",
+        "binding_mode": str(_binding_mode),
         "bindings": [binding.to_trace() for binding in bindings[:20]],
         "selected_binding": best_binding.to_trace(),
         "selected_binding_id": str(best_binding.binding_id),

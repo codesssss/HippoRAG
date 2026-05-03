@@ -15,6 +15,8 @@ from dtc_embed_utils import (  # noqa: E402
     parse_dtc_decomposition_response,
     select_daec_noisyor_positions,
     select_dtc_embed_positions,
+    select_minimal_demand_repair_positions,
+    select_minimal_demand_repair_nli_positions,
 )
 
 
@@ -1281,3 +1283,189 @@ def test_select_daec_noisyor_safe_retriever_margin_fallback():
 
     assert selected == [0, 1]
     assert trace["safe_projection_trace"]["safe_decision"] == "fallback_retriever_margin"
+
+
+def test_select_daec_noisyor_safe_rank_penalty_blocks_low_rank_swap():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Find first evidence."),
+        DTCRequirement(unit_id="s2", subquery="Find second evidence."),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Anchor\nStrong first evidence.",
+        "Weak baseline\nWeak second evidence.",
+        "Second support\nStrong second evidence.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.9, 0.1],
+        [0.0, 1.0],
+    ])
+
+    selected, trace = select_daec_noisyor_positions(
+        query="Find both pieces of evidence.",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Anchor", "Weak baseline", "Second support"],
+        pool_doc_scores=np.asarray([1.0, 0.9, 0.2]),
+        doc_idx_to_entities={idx: set() for idx in range(3)},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        safe_projection=True,
+        safe_min_objective_gain=0.05,
+        safe_min_swap_gain=0.01,
+        safe_max_swaps=1,
+        safe_preserve_top_m=1,
+        safe_retriever_rank_penalty=10.0,
+    )
+
+    assert selected == [0, 1]
+    assert trace["safe_projection_trace"]["safe_decision"] == "fallback_no_eligible_swap"
+    assert trace["safe_projection_trace"]["safe_retriever_rank_penalty"] == 10.0
+
+
+def test_select_minimal_demand_repair_keeps_when_baseline_covers_demands():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Find first evidence."),
+        DTCRequirement(unit_id="s2", subquery="Find second evidence."),
+    ]
+    selected, trace = select_minimal_demand_repair_positions(
+        query="Find both pieces of evidence.",
+        requirements=requirements,
+        requirement_embeddings={
+            "s1": np.asarray([1.0, 0.0]),
+            "s2": np.asarray([0.0, 1.0]),
+        },
+        pool_docs=[
+            "First\nStrong first evidence.",
+            "Second\nStrong second evidence.",
+            "Other\nWeak filler.",
+        ],
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["First", "Second", "Other"],
+        passage_embeddings=np.asarray([
+            [1.0, 0.0],
+            [0.0, 1.0],
+            [0.5, 0.5],
+        ]),
+        qa_top_k=2,
+        tau_percentile=50.0,
+        edit_budget=2,
+    )
+
+    assert selected == [0, 1]
+    assert trace["keep_baseline"] is True
+    assert trace["edit_count"] == 0
+
+
+def test_select_minimal_demand_repair_repairs_unmet_demand_with_one_edit():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Find first evidence."),
+        DTCRequirement(unit_id="s2", subquery="Find second evidence."),
+    ]
+    selected, trace = select_minimal_demand_repair_positions(
+        query="Find both pieces of evidence.",
+        requirements=requirements,
+        requirement_embeddings={
+            "s1": np.asarray([1.0, 0.0]),
+            "s2": np.asarray([0.0, 1.0]),
+        },
+        pool_docs=[
+            "First\nStrong first evidence.",
+            "Filler\nNo demand evidence.",
+            "Second\nStrong second evidence.",
+            "Second paraphrase\nAnother second evidence page.",
+        ],
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_titles=["First", "Filler", "Second", "Second paraphrase"],
+        passage_embeddings=np.asarray([
+            [1.0, 0.0],
+            [0.9, 0.1],
+            [0.0, 1.0],
+            [0.1, 0.9],
+        ]),
+        qa_top_k=2,
+        tau_percentile=50.0,
+        edit_budget=2,
+    )
+
+    assert selected == [0, 2]
+    assert trace["keep_baseline"] is False
+    assert trace["edit_count"] == 1
+    assert trace["selection_steps"][0]["requirement_id"] == "s2"
+
+
+def _fake_nli_score_many(scores_by_pair):
+    def score_fn(pairs):
+        return [float(scores_by_pair.get((o, d), 0.1)) for o, d in pairs]
+    return score_fn
+
+
+def test_select_minimal_demand_repair_nli_keeps_when_baseline_covers():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed X?"),
+        DTCRequirement(unit_id="s2", subquery="Where was Y born?"),
+    ]
+    scores = {
+        ("Who directed X?", "Doc A about director of X"): 0.9,
+        ("Who directed X?", "Doc B about birthplace of Y"): 0.1,
+        ("Who directed X?", "Doc C filler"): 0.05,
+        ("Where was Y born?", "Doc A about director of X"): 0.1,
+        ("Where was Y born?", "Doc B about birthplace of Y"): 0.85,
+        ("Where was Y born?", "Doc C filler"): 0.05,
+    }
+    selected, trace = select_minimal_demand_repair_nli_positions(
+        query="Who directed X and where was Y born?",
+        requirements=requirements,
+        pool_docs=["Doc A about director of X", "Doc B about birthplace of Y", "Doc C filler"],
+        pool_doc_titles=["Doc A", "Doc B", "Doc C"],
+        qa_top_k=2,
+        nli_score_fn=_fake_nli_score_many(scores),
+        tau_percentile=50.0,
+        edit_budget=2,
+    )
+    assert selected == [0, 1]
+    assert trace["keep_baseline"] is True
+    assert trace["edit_count"] == 0
+    assert "phi_stats" in trace
+
+
+def test_select_minimal_demand_repair_nli_repairs_unmet():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed X?"),
+        DTCRequirement(unit_id="s2", subquery="Where was Y born?"),
+    ]
+    scores = {
+        ("Who directed X?", "Doc A about director of X"): 0.9,
+        ("Who directed X?", "Doc B filler"): 0.4,
+        ("Who directed X?", "Doc C about birthplace of Y"): 0.3,
+        ("Who directed X?", "Doc D another filler"): 0.35,
+        ("Where was Y born?", "Doc A about director of X"): 0.3,
+        ("Where was Y born?", "Doc B filler"): 0.2,
+        ("Where was Y born?", "Doc C about birthplace of Y"): 0.88,
+        ("Where was Y born?", "Doc D another filler"): 0.25,
+    }
+    selected, trace = select_minimal_demand_repair_nli_positions(
+        query="Who directed X and where was Y born?",
+        requirements=requirements,
+        pool_docs=[
+            "Doc A about director of X",
+            "Doc B filler",
+            "Doc C about birthplace of Y",
+            "Doc D another filler",
+        ],
+        pool_doc_titles=["Doc A", "Doc B", "Doc C", "Doc D"],
+        qa_top_k=2,
+        nli_score_fn=_fake_nli_score_many(scores),
+        tau_percentile=50.0,
+        edit_budget=2,
+    )
+    assert trace["keep_baseline"] is False
+    assert trace["edit_count"] >= 1
+    assert 2 in selected
+    assert trace["selector"] == "minimal_demand_repair_nli"

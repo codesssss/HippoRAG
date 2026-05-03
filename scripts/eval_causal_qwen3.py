@@ -59,6 +59,8 @@ from dtc_embed_utils import (
     parse_dtc_decomposition_response,
     select_daec_noisyor_positions,
     select_dtc_embed_positions,
+    select_minimal_demand_repair_positions,
+    select_minimal_demand_repair_nli_positions,
 )
 from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.evaluation.qa_eval import QAExactMatch, QAF1Score
@@ -5225,13 +5227,16 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            daec_safe_min_swap_gain: float = 0.01,
                            daec_safe_max_swaps: int = 2,
                            daec_safe_preserve_top_m: int = 1,
-                           daec_safe_retriever_margin_threshold: float = 1.01) -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           daec_safe_retriever_margin_threshold: float = 1.01,
+                           daec_safe_retriever_rank_penalty: float = 0.0,
+                           llm_binding_url: str = "http://localhost:8043/v1",
+                           llm_binding_model: str = "qwen3-8b-train") -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
     normalized_assemble_mode = normalize_assemble_mode(assemble_mode)
     normalized_append_policy = normalize_append_policy(append_policy)
-    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe"}:
+    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -5300,6 +5305,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
     dtc_embedding_available_requirement_counts: List[int] = []
     dtc_baseline_demand_satisfaction_rates: List[float] = []
     dtc_demand_gate_preserve_count = 0
+    minimal_repair_keep_count = 0
+    minimal_repair_edit_counts: List[int] = []
+    minimal_repair_unmet_counts: List[int] = []
     normalized_late_rerank_policy = normalize_setwise_late_rerank_policy(late_rerank_policy)
     normalized_reader_order_probe_mode = normalize_setwise_reader_order_probe_mode(
         setwise_reader_order_probe_mode
@@ -5317,6 +5325,72 @@ def apply_setwise_selector(hipporag: HippoRAG,
             use_fp16=True,
             logger=logger,
         )
+
+    nli_verifier = None
+    if selector_name == "minimal_demand_repair_nli":
+        from src.dpathrag.arec.verifier import build_verifier
+        nli_verifier = build_verifier("nli", model_name="cross-encoder/nli-deberta-v3-base", batch_size=32)
+
+    llm_extract_fn = None
+    _llm_binding_stats = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_latency_s": 0.0}
+    if selector_name in {"daec_noisyor_llm", "daec_noisyor_safe_llm"}:
+        import re as _re
+        import time as _time
+        import requests as _requests
+        _THINK_RE = _re.compile(r"<think>.*?</think>\s*", _re.DOTALL)
+        _llm_binding_url = str(llm_binding_url or "http://localhost:8043/v1")
+        _llm_binding_model = str(llm_binding_model or "qwen3-8b-train")
+
+        def _llm_extract_entities(subquery: str, doc_text: str) -> List[str]:
+            prompt = (
+                "/no_think\n"
+                f"Passage:\n\"{doc_text[:1500]}\"\n\n"
+                f"Question: {subquery}\n\n"
+                "Extract all entity names from the passage that could answer this question. "
+                "Return one entity per line, nothing else. If no entity answers the question, reply NONE."
+            )
+            payload = {
+                "model": _llm_binding_model,
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 80,
+                "temperature": 0.0,
+            }
+            try:
+                t0 = _time.monotonic()
+                resp = _requests.post(f"{_llm_binding_url}/chat/completions", json=payload, timeout=30)
+                elapsed = _time.monotonic() - t0
+                resp.raise_for_status()
+                rj = resp.json()
+                usage = rj.get("usage", {})
+                _llm_binding_stats["calls"] += 1
+                _llm_binding_stats["prompt_tokens"] += int(usage.get("prompt_tokens", 0))
+                _llm_binding_stats["completion_tokens"] += int(usage.get("completion_tokens", 0))
+                _llm_binding_stats["total_latency_s"] += elapsed
+                raw = rj["choices"][0]["message"]["content"]
+                raw = _THINK_RE.sub("", raw).strip()
+                entities = []
+                for line in raw.strip().split("\n"):
+                    line = line.strip().strip("-•").strip()
+                    if line and line.upper() != "NONE":
+                        entities.append(line)
+                return entities
+            except Exception:
+                return []
+
+        llm_extract_fn = _llm_extract_entities
+        logger.info("LLM binding enabled: url=%s model=%s", _llm_binding_url, _llm_binding_model)
+
+    _DAEC_BINDING_MODE_MAP = {
+        "daec_noisyor": "string_match",
+        "daec_noisyor_safe": "string_match",
+        "daec_noisyor_llm": "llm",
+        "daec_noisyor_safe_llm": "llm",
+        "daec_noisyor_nobind": "nobind",
+        "daec_noisyor_randbind": "random",
+        "daec_noisyor_oracle": "oracle",
+    }
+    _daec_binding_mode = _DAEC_BINDING_MODE_MAP.get(selector_name, "auto")
+    _llm_binding_query_stats: List[Dict[str, object]] = []
 
     for q_idx, qs in enumerate(query_solutions):
         pool_limit = min(len(qs.docs), max(pool_k, qa_top_k))
@@ -5703,7 +5777,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["assemble_mode"] = normalized_assemble_mode
             selector_trace["selected_positions_before_assemble"] = list(selected_positions)
             selected_positions = list(reranked_positions)
-        elif selector_name in {"daec_noisyor", "daec_noisyor_safe"}:
+        elif selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
             normalized_dtc_decomposition_mode = str(dtc_decomposition_mode or "llm").strip().lower()
             if normalized_dtc_decomposition_mode == "query":
                 requirements = build_fallback_dtc_requirements(qs.question)
@@ -5739,33 +5813,85 @@ def apply_setwise_selector(hipporag: HippoRAG,
             def embed_daec_bound_texts(texts: Sequence[str]) -> Dict[str, np.ndarray]:
                 return build_dtc_text_embeddings(hipporag=hipporag, texts=texts)
 
-            selected_positions, selector_trace = select_daec_noisyor_positions(
-                query=qs.question,
-                requirements=requirements,
-                requirement_embeddings=requirement_embeddings,
-                pool_docs=pool_docs,
-                pool_doc_ids=pool_doc_ids,
-                pool_doc_titles=pool_titles,
-                pool_doc_scores=pool_scores,
-                doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
-                passage_embeddings=np.asarray(getattr(hipporag, "passage_embeddings", np.array([]))),
-                qa_top_k=qa_top_k,
-                binding_top_m=int(dtc_binding_max_candidates),
-                embed_texts_fn=embed_daec_bound_texts,
-                safe_projection=selector_name == "daec_noisyor_safe",
-                safe_min_objective_gain=float(daec_safe_min_objective_gain),
-                safe_min_swap_gain=float(daec_safe_min_swap_gain),
-                safe_max_swaps=int(daec_safe_max_swaps),
-                safe_preserve_top_m=int(daec_safe_preserve_top_m),
-                safe_retriever_margin_threshold=float(daec_safe_retriever_margin_threshold),
-            )
-            selector_trace["decomposition_trace"] = decomposition_trace
+            if selector_name == "minimal_demand_repair":
+                selected_positions, selector_trace = select_minimal_demand_repair_positions(
+                    query=qs.question,
+                    requirements=requirements,
+                    requirement_embeddings=requirement_embeddings,
+                    pool_docs=pool_docs,
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_titles=pool_titles,
+                    passage_embeddings=np.asarray(getattr(hipporag, "passage_embeddings", np.array([]))),
+                    qa_top_k=qa_top_k,
+                    tau_percentile=50.0,
+                    edit_budget=2,
+                )
+                minimal_repair_keep_count += int(bool(selector_trace.get("keep_baseline", False)))
+                minimal_repair_edit_counts.append(int(selector_trace.get("edit_count", 0) or 0))
+                minimal_repair_unmet_counts.append(len(selector_trace.get("unmet_requirement_ids", []) or []))
+            elif selector_name == "minimal_demand_repair_nli":
+                selected_positions, selector_trace = select_minimal_demand_repair_nli_positions(
+                    query=qs.question,
+                    requirements=requirements,
+                    pool_docs=pool_docs,
+                    pool_doc_titles=pool_titles,
+                    qa_top_k=qa_top_k,
+                    nli_score_fn=nli_verifier.score_many,
+                    tau_percentile=50.0,
+                    edit_budget=2,
+                )
+                minimal_repair_keep_count += int(bool(selector_trace.get("keep_baseline", False)))
+                minimal_repair_edit_counts.append(int(selector_trace.get("edit_count", 0) or 0))
+                minimal_repair_unmet_counts.append(len(selector_trace.get("unmet_requirement_ids", []) or []))
+            else:
+                _q_stats_before = {k: v for k, v in _llm_binding_stats.items()}
+                selected_positions, selector_trace = select_daec_noisyor_positions(
+                    query=qs.question,
+                    requirements=requirements,
+                    requirement_embeddings=requirement_embeddings,
+                    pool_docs=pool_docs,
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_titles=pool_titles,
+                    pool_doc_scores=pool_scores,
+                    doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                    passage_embeddings=np.asarray(getattr(hipporag, "passage_embeddings", np.array([]))),
+                    qa_top_k=qa_top_k,
+                    binding_top_m=int(dtc_binding_max_candidates),
+                    embed_texts_fn=embed_daec_bound_texts,
+                    safe_projection=selector_name in {"daec_noisyor_safe", "daec_noisyor_safe_llm"},
+                    safe_min_objective_gain=float(daec_safe_min_objective_gain),
+                    safe_min_swap_gain=float(daec_safe_min_swap_gain),
+                    safe_max_swaps=int(daec_safe_max_swaps),
+                    safe_preserve_top_m=int(daec_safe_preserve_top_m),
+                    safe_retriever_margin_threshold=float(daec_safe_retriever_margin_threshold),
+                    safe_retriever_rank_penalty=float(daec_safe_retriever_rank_penalty),
+                    llm_extract_fn=llm_extract_fn,
+                    binding_mode=_daec_binding_mode,
+                    gold_titles=[extract_doc_title(doc_text) for doc_text in (qs.gold_docs or [])] if selector_name == "daec_noisyor_oracle" else None,
+                )
+                _q_binding_cost = {
+                    "calls": _llm_binding_stats["calls"] - _q_stats_before["calls"],
+                    "prompt_tokens": _llm_binding_stats["prompt_tokens"] - _q_stats_before["prompt_tokens"],
+                    "completion_tokens": _llm_binding_stats["completion_tokens"] - _q_stats_before["completion_tokens"],
+                    "latency_s": round(_llm_binding_stats["total_latency_s"] - _q_stats_before["total_latency_s"], 4),
+                }
+                selector_trace["llm_binding_cost"] = _q_binding_cost
+                _llm_binding_query_stats.append(_q_binding_cost)
             selector_trace["dtc_max_steps"] = int(dtc_max_steps)
             selector_trace["dtc_max_completion_tokens"] = int(dtc_max_completion_tokens)
             selector_trace["dtc_decomposition_mode"] = normalized_dtc_decomposition_mode
             selector_trace["dtc_include_satisfiable_by"] = bool(dtc_include_satisfiable_by)
-            selector_trace["daec_main_objective"] = "frozen_binding_noisy_or"
-            selector_trace["daec_safe_projection"] = selector_name == "daec_noisyor_safe"
+            if selector_name == "minimal_demand_repair":
+                selector_trace["minimal_repair_phi"] = "cosine_minmax"
+                selector_trace["minimal_repair_tau_policy"] = "pool_median"
+            elif selector_name == "minimal_demand_repair_nli":
+                selector_trace["minimal_repair_phi"] = "nli_entailment"
+                selector_trace["minimal_repair_tau_policy"] = "pool_median"
+                selector_trace["minimal_repair_nli_model"] = "cross-encoder/nli-deberta-v3-base"
+            else:
+                selector_trace["daec_main_objective"] = "frozen_binding_noisy_or"
+                selector_trace["daec_safe_projection"] = selector_name in {"daec_noisyor_safe", "daec_noisyor_safe_llm"}
+                selector_trace["daec_binding_mode"] = str(_daec_binding_mode)
             dtc_parse_success_count += int(bool(decomposition_trace.get("parse_succeeded", False)))
             dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
             dtc_requirement_counts.append(int(selector_trace.get("requirement_count", 0) or 0))
@@ -6551,7 +6677,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             },
             "append_stop_reason_counts": dict(sorted(append_stop_reason_counts.items())),
         })
-    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe"}:
+    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair"}:
         summary.update({
             "dtc_max_steps": int(dtc_max_steps),
             "dtc_match_threshold": round(float(dtc_match_threshold), 4),
@@ -6591,17 +6717,75 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 4,
             ),
         })
-        if selector_name in {"daec_noisyor", "daec_noisyor_safe"}:
+        if selector_name == "minimal_demand_repair":
+            query_count = max(len(query_solutions), 1)
+            summary.update({
+                "minimal_repair_phi": "cosine_minmax",
+                "minimal_repair_tau_policy": "pool_median",
+                "minimal_repair_tau_percentile": 50.0,
+                "minimal_repair_edit_budget": 2,
+                "minimal_repair_keep_count": int(minimal_repair_keep_count),
+                "minimal_repair_keep_rate": round(float(minimal_repair_keep_count) / float(query_count), 4),
+                "minimal_repair_avg_edits_per_query": round(
+                    float(np.mean(minimal_repair_edit_counts)) if minimal_repair_edit_counts else 0.0,
+                    4,
+                ),
+                "minimal_repair_avg_unmet_requirements": round(
+                    float(np.mean(minimal_repair_unmet_counts)) if minimal_repair_unmet_counts else 0.0,
+                    4,
+                ),
+            })
+        if selector_name == "minimal_demand_repair_nli":
+            query_count = max(len(query_solutions), 1)
+            summary.update({
+                "minimal_repair_phi": "nli_entailment",
+                "minimal_repair_nli_model": "cross-encoder/nli-deberta-v3-base",
+                "minimal_repair_tau_policy": "pool_median",
+                "minimal_repair_tau_percentile": 50.0,
+                "minimal_repair_edit_budget": 2,
+                "minimal_repair_keep_count": int(minimal_repair_keep_count),
+                "minimal_repair_keep_rate": round(float(minimal_repair_keep_count) / float(query_count), 4),
+                "minimal_repair_avg_edits_per_query": round(
+                    float(np.mean(minimal_repair_edit_counts)) if minimal_repair_edit_counts else 0.0,
+                    4,
+                ),
+                "minimal_repair_avg_unmet_requirements": round(
+                    float(np.mean(minimal_repair_unmet_counts)) if minimal_repair_unmet_counts else 0.0,
+                    4,
+                ),
+            })
+        if selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle"}:
             summary.update({
                 "daec_main_objective": "frozen_binding_noisy_or",
                 "daec_binding_top_m": int(dtc_binding_max_candidates),
-                "daec_safe_projection": selector_name == "daec_noisyor_safe",
+                "daec_binding_mode": str(_daec_binding_mode),
+                "daec_safe_projection": selector_name in {"daec_noisyor_safe", "daec_noisyor_safe_llm"},
                 "daec_safe_min_objective_gain": round(float(daec_safe_min_objective_gain), 6),
                 "daec_safe_min_swap_gain": round(float(daec_safe_min_swap_gain), 6),
                 "daec_safe_max_swaps": int(daec_safe_max_swaps),
                 "daec_safe_preserve_top_m": int(daec_safe_preserve_top_m),
                 "daec_safe_retriever_margin_threshold": round(float(daec_safe_retriever_margin_threshold), 6),
+                "daec_safe_retriever_rank_penalty": round(float(daec_safe_retriever_rank_penalty), 6),
             })
+            if _llm_binding_query_stats:
+                import statistics as _stats_mod
+                _total_calls = sum(int(s["calls"]) for s in _llm_binding_query_stats)
+                _total_prompt = sum(int(s["prompt_tokens"]) for s in _llm_binding_query_stats)
+                _total_completion = sum(int(s["completion_tokens"]) for s in _llm_binding_query_stats)
+                _total_latency = sum(float(s["latency_s"]) for s in _llm_binding_query_stats)
+                _per_q_calls = [int(s["calls"]) for s in _llm_binding_query_stats]
+                _per_q_latency = [float(s["latency_s"]) for s in _llm_binding_query_stats]
+                summary.update({
+                    "llm_binding_total_calls": _total_calls,
+                    "llm_binding_total_prompt_tokens": _total_prompt,
+                    "llm_binding_total_completion_tokens": _total_completion,
+                    "llm_binding_total_tokens": _total_prompt + _total_completion,
+                    "llm_binding_total_latency_s": round(_total_latency, 2),
+                    "llm_binding_avg_calls_per_query": round(_total_calls / max(len(_llm_binding_query_stats), 1), 2),
+                    "llm_binding_avg_latency_per_query_s": round(_total_latency / max(len(_llm_binding_query_stats), 1), 4),
+                    "llm_binding_median_calls_per_query": _stats_mod.median(_per_q_calls) if _per_q_calls else 0,
+                    "llm_binding_median_latency_per_query_s": round(_stats_mod.median(_per_q_latency), 4) if _per_q_latency else 0.0,
+                })
     if selector_name == "requirement_beam":
         summary.update({
             "requirement_mode": str((requirement_selector_bundle or {}).get("mode", "oracle")),
@@ -7163,7 +7347,7 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--expand_base_k", type=int, default=10,
                         help="For --setwise_selector bridge_append, preserve baseline top-B before appending deep-pool bridge candidates.")
@@ -7329,6 +7513,12 @@ def main():
                         help="For --setwise_selector daec_noisyor_safe, always preserve this many highest-ranked baseline documents.")
     parser.add_argument("--daec_safe_retriever_margin_threshold", type=float, default=1.01,
                         help="For --setwise_selector daec_noisyor_safe, keep baseline unchanged when normalized top1-to-topk retriever margin exceeds this threshold. Values >1 disable this fallback.")
+    parser.add_argument("--daec_safe_retriever_rank_penalty", type=float, default=0.0,
+                        help="For --setwise_selector daec_noisyor_safe, penalize swaps that replace a higher-ranked retriever document with a lower-ranked document.")
+    parser.add_argument("--llm_binding_url", type=str, default="http://localhost:8043/v1",
+                        help="VLLM endpoint URL for LLM-extraction binding (daec_noisyor_llm).")
+    parser.add_argument("--llm_binding_model", type=str, default="qwen3-8b-train",
+                        help="Model name for LLM-extraction binding.")
     parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
                         help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
     parser.add_argument("--setwise_late_rerank_candidate_count", type=int, default=4,
@@ -7913,6 +8103,9 @@ def main():
             daec_safe_max_swaps=int(args.daec_safe_max_swaps),
             daec_safe_preserve_top_m=int(args.daec_safe_preserve_top_m),
             daec_safe_retriever_margin_threshold=float(args.daec_safe_retriever_margin_threshold),
+            daec_safe_retriever_rank_penalty=float(args.daec_safe_retriever_rank_penalty),
+            llm_binding_url=str(args.llm_binding_url),
+            llm_binding_model=str(args.llm_binding_model),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,
