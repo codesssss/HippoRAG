@@ -1181,6 +1181,107 @@ def test_select_daec_noisyor_llm_binding_guarded_mode_keeps_disambiguated_alias(
     assert trace["llm_binding_extractions"][0]["matched_entities"][0]["match_type"] == "substring"
 
 
+def test_select_daec_noisyor_llm_binding_wiki_title_rejects_single_token_substrings():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Which country is Film X from?"),
+        DTCRequirement(unit_id="s2", subquery="Which target is connected to that country?", depends_on=("s1",)),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X is from France and was released in 1926.",
+        "Rudolph of France\nA person page whose title contains France.",
+        "Camille\nA 1926 feature film.",
+        "Lichtenberg\nA one-token place or family-name page.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.0, 1.0],
+        [0.0, 1.0],
+        [0.0, 1.0],
+    ])
+
+    _, trace = select_daec_noisyor_positions(
+        query="Which target is connected to the country of Film X?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_titles=[
+            "Film X",
+            "Rudolph of France",
+            "Camille (1926 feature film)",
+            "Johann Reinhard I, Count of Hanau-Lichtenberg",
+        ],
+        doc_idx_to_entities={
+            0: {"film x", "france"},
+            1: {"rudolph of france"},
+            2: {"camille"},
+            3: {"hanau lichtenberg"},
+        },
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["France", "1926", "Lichtenberg"],
+        binding_mode="llm",
+        llm_binding_title_match_mode="wiki_title",
+    )
+
+    assert trace["binding_candidates_by_requirement"]["s2"] == []
+    assert trace["llm_binding_extractions"][0]["unmatched_entities"] == ["France", "1926", "Lichtenberg"]
+
+
+def test_select_daec_noisyor_llm_binding_wiki_title_keeps_generic_title_links():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?"),
+        DTCRequirement(unit_id="s2", subquery="Where was that director born?", depends_on=("s1",)),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Ian Barry, Count of Nassau-Dillenburg.",
+        "Ian Barry\nIan Barry was born in Australia.",
+        "William I\nWilliam I held the title Count of Nassau-Dillenburg.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.0, 1.0],
+        [0.0, 1.0],
+    ])
+
+    _, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Film X", "Ian Barry (director)", "William I, Count of Nassau-Dillenburg"],
+        doc_idx_to_entities={
+            0: {"film x", "ian barry", "count of nassau dillenburg"},
+            1: {"ian barry", "australia"},
+            2: {"william i", "count of nassau dillenburg"},
+        },
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["Ian Barry", "Count of Nassau-Dillenburg"],
+        binding_mode="llm",
+        llm_binding_title_match_mode="wiki_title",
+    )
+
+    matches = trace["llm_binding_extractions"][0]["matched_entities"]
+    assert matches[0]["title"] == "Ian Barry (director)"
+    assert matches[0]["match_type"] == "disambiguation"
+    assert matches[1]["title"] == "William I, Count of Nassau-Dillenburg"
+    assert matches[1]["match_type"] == "multi_token_alias"
+
+
 def test_select_daec_noisyor_excludes_operator_requirements_without_regex_policy():
     requirements = [
         DTCRequirement(

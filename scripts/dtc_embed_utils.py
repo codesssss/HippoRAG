@@ -515,12 +515,44 @@ def _substring_title_match_is_guarded(entity: str, title: str) -> bool:
     return False
 
 
+def _remove_parenthetical_disambiguation(text: str) -> str:
+    return re.sub(r"\s*\([^)]*\)", "", str(text or "")).strip()
+
+
+def _contiguous_token_subsequence(shorter: Sequence[str], longer: Sequence[str]) -> bool:
+    if not shorter or len(shorter) > len(longer):
+        return False
+    width = len(shorter)
+    return any(list(longer[start:start + width]) == list(shorter) for start in range(len(longer) - width + 1))
+
+
+def _wiki_title_match_type(entity: str, title: str) -> str | None:
+    entity_key = normalize_structure_text(entity)
+    title_key = normalize_structure_text(title)
+    title_base_key = normalize_structure_text(_remove_parenthetical_disambiguation(title))
+    if not entity_key or not title_key:
+        return None
+    if entity_key == title_key:
+        return "exact"
+    if entity_key.isdigit():
+        return None
+    if title_base_key and entity_key == title_base_key:
+        return "disambiguation"
+
+    entity_tokens = entity_key.split()
+    title_tokens = title_key.split()
+    if len(entity_tokens) >= 2 and _contiguous_token_subsequence(entity_tokens, title_tokens):
+        return "multi_token_alias"
+    return None
+
+
 def _title_match_pool_position_and_type(
     entity: str,
     pool_titles: Sequence[str],
     *,
     allow_substring: bool = True,
     guarded_substring: bool = False,
+    wiki_title_match: bool = False,
 ) -> Tuple[int | None, str]:
     entity_lower = entity.lower().strip()
     if not entity_lower:
@@ -528,6 +560,12 @@ def _title_match_pool_position_and_type(
     for idx, title in enumerate(pool_titles):
         if entity_lower == title.lower().strip():
             return idx, "exact"
+    if wiki_title_match:
+        for idx, title in enumerate(pool_titles):
+            match_type = _wiki_title_match_type(entity, str(title))
+            if match_type and match_type != "exact":
+                return idx, match_type
+        return None, "none"
     if allow_substring:
         for idx, title in enumerate(pool_titles):
             tl = title.lower().strip()
@@ -545,12 +583,14 @@ def _title_match_pool_position(
     *,
     allow_substring: bool = True,
     guarded_substring: bool = False,
+    wiki_title_match: bool = False,
 ) -> int | None:
     idx, _ = _title_match_pool_position_and_type(
         entity,
         pool_titles,
         allow_substring=allow_substring,
         guarded_substring=guarded_substring,
+        wiki_title_match=wiki_title_match,
     )
     return idx
 
@@ -1250,6 +1290,7 @@ def select_daec_noisyor_positions(
     _llm_binding_title_match_mode = str(llm_binding_title_match_mode or "substring").strip().lower()
     allow_substring_title_match = _llm_binding_title_match_mode not in {"exact", "exact_only"}
     guarded_substring_title_match = _llm_binding_title_match_mode in {"substring_guarded", "guarded_substring"}
+    wiki_title_match = _llm_binding_title_match_mode in {"wiki_title", "title_link", "normalized_title", "entity_title"}
     llm_binding_extraction_traces: List[Dict[str, object]] = []
 
     def collect_llm_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
@@ -1301,6 +1342,7 @@ def select_daec_noisyor_positions(
                         pool_doc_titles[:pool_limit],
                         allow_substring=allow_substring_title_match,
                         guarded_substring=guarded_substring_title_match,
+                        wiki_title_match=wiki_title_match,
                     )
                     if title_pos is None:
                         extraction_trace["unmatched_entities"].append(str(ent))
