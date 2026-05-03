@@ -553,6 +553,7 @@ def _title_match_pool_position_and_type(
     allow_substring: bool = True,
     guarded_substring: bool = False,
     wiki_title_match: bool = False,
+    require_unique_wiki_title_match: bool = False,
 ) -> Tuple[int | None, str]:
     entity_lower = entity.lower().strip()
     if not entity_lower:
@@ -561,10 +562,15 @@ def _title_match_pool_position_and_type(
         if entity_lower == title.lower().strip():
             return idx, "exact"
     if wiki_title_match:
+        wiki_matches: List[Tuple[int, str]] = []
         for idx, title in enumerate(pool_titles):
             match_type = _wiki_title_match_type(entity, str(title))
             if match_type and match_type != "exact":
-                return idx, match_type
+                wiki_matches.append((idx, match_type))
+        if len(wiki_matches) == 1:
+            return wiki_matches[0]
+        if wiki_matches and not require_unique_wiki_title_match:
+            return wiki_matches[0]
         return None, "none"
     if allow_substring:
         for idx, title in enumerate(pool_titles):
@@ -584,6 +590,7 @@ def _title_match_pool_position(
     allow_substring: bool = True,
     guarded_substring: bool = False,
     wiki_title_match: bool = False,
+    require_unique_wiki_title_match: bool = False,
 ) -> int | None:
     idx, _ = _title_match_pool_position_and_type(
         entity,
@@ -591,6 +598,7 @@ def _title_match_pool_position(
         allow_substring=allow_substring,
         guarded_substring=guarded_substring,
         wiki_title_match=wiki_title_match,
+        require_unique_wiki_title_match=require_unique_wiki_title_match,
     )
     return idx
 
@@ -1290,7 +1298,22 @@ def select_daec_noisyor_positions(
     _llm_binding_title_match_mode = str(llm_binding_title_match_mode or "substring").strip().lower()
     allow_substring_title_match = _llm_binding_title_match_mode not in {"exact", "exact_only"}
     guarded_substring_title_match = _llm_binding_title_match_mode in {"substring_guarded", "guarded_substring"}
-    wiki_title_match = _llm_binding_title_match_mode in {"wiki_title", "title_link", "normalized_title", "entity_title"}
+    wiki_title_match = _llm_binding_title_match_mode in {
+        "wiki_title",
+        "title_link",
+        "normalized_title",
+        "entity_title",
+        "wiki_title_unique",
+        "title_link_unique",
+        "normalized_title_unique",
+        "entity_title_unique",
+    }
+    require_unique_wiki_title_match = _llm_binding_title_match_mode in {
+        "wiki_title_unique",
+        "title_link_unique",
+        "normalized_title_unique",
+        "entity_title_unique",
+    }
     llm_binding_extraction_traces: List[Dict[str, object]] = []
 
     def collect_llm_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
@@ -1343,6 +1366,7 @@ def select_daec_noisyor_positions(
                         allow_substring=allow_substring_title_match,
                         guarded_substring=guarded_substring_title_match,
                         wiki_title_match=wiki_title_match,
+                        require_unique_wiki_title_match=require_unique_wiki_title_match,
                     )
                     if title_pos is None:
                         extraction_trace["unmatched_entities"].append(str(ent))

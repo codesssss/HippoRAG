@@ -1282,6 +1282,48 @@ def test_select_daec_noisyor_llm_binding_wiki_title_keeps_generic_title_links():
     assert matches[1]["match_type"] == "multi_token_alias"
 
 
+def test_select_daec_noisyor_llm_binding_wiki_title_unique_rejects_ambiguous_aliases():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?"),
+        DTCRequirement(unit_id="s2", subquery="Where was that director born?", depends_on=("s1",)),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Ian Barry.",
+        "Ian Barry\nA director page.",
+        "Ian Barry\nA producer page.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.0, 1.0],
+        [0.0, 1.0],
+    ])
+
+    _, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Film X", "Ian Barry (director)", "Ian Barry (producer)"],
+        doc_idx_to_entities={0: {"film x", "ian barry"}, 1: {"ian barry"}, 2: {"ian barry"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["Ian Barry"],
+        binding_mode="llm",
+        llm_binding_title_match_mode="wiki_title_unique",
+    )
+
+    assert trace["binding_candidates_by_requirement"]["s2"] == []
+    assert trace["llm_binding_extractions"][0]["matched_entities"] == []
+    assert trace["llm_binding_extractions"][0]["unmatched_entities"] == ["Ian Barry"]
+
+
 def test_select_daec_noisyor_excludes_operator_requirements_without_regex_policy():
     requirements = [
         DTCRequirement(
