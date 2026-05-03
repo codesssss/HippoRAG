@@ -136,7 +136,7 @@ run_direct_setr() {
       --output_pool_json "${selected_pool_json}" \
       --limit "${LIMIT}"
 
-  eval_selected_pool "${variant}" "${dataset}" "${pool}" "${selected_pool_json}" "${output_json}" "${port}"
+  eval_selected_pool "${dataset}_${pool}_${variant}" "${dataset}" "${pool}" "${selected_pool_json}" "${output_json}" "${port}"
 }
 
 run_windowed_setr() {
@@ -177,7 +177,7 @@ run_windowed_setr() {
       --output_pool_json "${selected_pool_json}" \
       --limit "${LIMIT}"
 
-  eval_selected_pool "${variant}" "${dataset}" "${pool}" "${selected_pool_json}" "${output_json}" "${port}"
+  eval_selected_pool "${dataset}_${pool}_${variant}" "${dataset}" "${pool}" "${selected_pool_json}" "${output_json}" "${port}"
 }
 
 run_dataset_worker() {
