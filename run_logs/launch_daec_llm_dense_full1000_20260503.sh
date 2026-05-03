@@ -55,6 +55,8 @@ run_one() {
       --dtc_binding_max_candidates 5 \
       --llm_binding_url "http://localhost:${port}/v1" \
       --llm_binding_model "qwen3-8b-train" \
+      --llm_binding_cache_path "${OUT_DIR}/${dataset}_llm_binding_cache.json" \
+      --llm_binding_title_match_mode substring \
       --output_json "${output_json}"
   ) > "${log_path}" 2>&1
   local code=$?

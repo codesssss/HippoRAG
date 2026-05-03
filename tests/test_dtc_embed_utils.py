@@ -1008,6 +1008,98 @@ def test_select_daec_noisyor_uses_frozen_binding_and_noisy_or_coverage():
     assert all("weighted_objective" not in row for row in trace["binding_objectives"])
 
 
+def test_select_daec_noisyor_llm_binding_traces_entity_matches():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?", role="bridge"),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Where was that director born?",
+            depends_on=("s1",),
+            role="answer",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice Smith.",
+        "Filler\nNo useful evidence.",
+        "Alice Smith\nAlice Smith was born in Paris.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.2, 0.1],
+        [0.0, 1.0],
+    ])
+
+    def embed_bound_texts(texts):
+        return {text: np.asarray([0.0, 1.0]) for text in texts}
+
+    selected, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Film X", "Filler", "Alice Smith"],
+        doc_idx_to_entities={0: {"film x", "alice smith"}, 1: set(), 2: {"alice smith", "paris"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=embed_bound_texts,
+        llm_extract_fn=lambda subquery, doc_text: ["Alice Smith"],
+        binding_mode="llm",
+    )
+
+    assert selected == [0, 2]
+    assert trace["binding_mode"] == "llm"
+    assert trace["selected_binding"]["assignments"] == {"s2": "Alice Smith"}
+    assert trace["binding_candidates_by_requirement"]["s2"][0]["llm_extracted_entity"] == "Alice Smith"
+    assert trace["binding_candidates_by_requirement"]["s2"][0]["entity_match_type"] == "exact"
+    assert trace["llm_binding_extractions"][0]["raw_entities"] == ["Alice Smith"]
+    assert trace["llm_binding_extractions"][0]["matched_entities"][0]["title"] == "Alice Smith"
+
+
+def test_select_daec_noisyor_llm_binding_exact_mode_blocks_substring_title_match():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?"),
+        DTCRequirement(unit_id="s2", subquery="Where was that director born?", depends_on=("s1",)),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Alice Smith\nAlice Smith was born in Paris.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.0, 1.0],
+    ])
+
+    _, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1],
+        pool_doc_titles=["Film X", "Alice Smith"],
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"alice smith", "paris"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["Alice"],
+        binding_mode="llm",
+        llm_binding_title_match_mode="exact",
+    )
+
+    assert trace["binding_candidates_by_requirement"]["s2"] == []
+    assert trace["llm_binding_extractions"][0]["unmatched_entities"] == ["Alice"]
+
+
 def test_select_daec_noisyor_excludes_operator_requirements_without_regex_policy():
     requirements = [
         DTCRequirement(

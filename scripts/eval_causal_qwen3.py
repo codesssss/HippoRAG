@@ -5230,13 +5230,15 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            daec_safe_retriever_margin_threshold: float = 1.01,
                            daec_safe_retriever_rank_penalty: float = 0.0,
                            llm_binding_url: str = "http://localhost:8043/v1",
-                           llm_binding_model: str = "qwen3-8b-train") -> Tuple[List[QuerySolution], Dict[str, object]]:
+                           llm_binding_model: str = "qwen3-8b-train",
+                           llm_binding_cache_path: str = "",
+                           llm_binding_title_match_mode: str = "substring") -> Tuple[List[QuerySolution], Dict[str, object]]:
     logger = logging.getLogger(__name__)
     selector_name = str(selector_name).strip().lower()
     score_mode = normalize_setwise_score_mode(score_mode)
     normalized_assemble_mode = normalize_assemble_mode(assemble_mode)
     normalized_append_policy = normalize_append_policy(append_policy)
-    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair"}:
+    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -5332,7 +5334,20 @@ def apply_setwise_selector(hipporag: HippoRAG,
         nli_verifier = build_verifier("nli", model_name="cross-encoder/nli-deberta-v3-base", batch_size=32)
 
     llm_extract_fn = None
-    _llm_binding_stats = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_latency_s": 0.0}
+    _llm_binding_stats = {
+        "attempts": 0,
+        "calls": 0,
+        "cache_hits": 0,
+        "successes": 0,
+        "failures": 0,
+        "empty_entity_responses": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_latency_s": 0.0,
+    }
+    _llm_binding_cache: Dict[str, List[str]] = {}
+    _llm_binding_cache_file: Path | None = None
+    _llm_binding_cache_dirty = False
     if selector_name in {"daec_noisyor_llm", "daec_noisyor_safe_llm"}:
         import re as _re
         import time as _time
@@ -5340,8 +5355,24 @@ def apply_setwise_selector(hipporag: HippoRAG,
         _THINK_RE = _re.compile(r"<think>.*?</think>\s*", _re.DOTALL)
         _llm_binding_url = str(llm_binding_url or "http://localhost:8043/v1")
         _llm_binding_model = str(llm_binding_model or "qwen3-8b-train")
+        if str(llm_binding_cache_path or "").strip():
+            _llm_binding_cache_file = Path(str(llm_binding_cache_path)).expanduser()
+            if not _llm_binding_cache_file.is_absolute():
+                _llm_binding_cache_file = ROOT_DIR / _llm_binding_cache_file
+            if _llm_binding_cache_file.exists():
+                try:
+                    loaded_cache = json.loads(_llm_binding_cache_file.read_text(encoding="utf-8"))
+                    if isinstance(loaded_cache, dict):
+                        _llm_binding_cache = {
+                            str(key): [str(item) for item in value]
+                            for key, value in loaded_cache.items()
+                            if isinstance(value, list)
+                        }
+                except Exception as exc:
+                    logger.warning("Failed to load LLM binding cache %s: %s", _llm_binding_cache_file, exc)
 
         def _llm_extract_entities(subquery: str, doc_text: str) -> List[str]:
+            nonlocal _llm_binding_cache_dirty
             prompt = (
                 "/no_think\n"
                 f"Passage:\n\"{doc_text[:1500]}\"\n\n"
@@ -5349,6 +5380,16 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "Extract all entity names from the passage that could answer this question. "
                 "Return one entity per line, nothing else. If no entity answers the question, reply NONE."
             )
+            cache_key = compute_mdhash_id(json.dumps({
+                "version": "daec_llm_binding_v1",
+                "model": _llm_binding_model,
+                "subquery": str(subquery),
+                "passage": str(doc_text[:1500]),
+            }, sort_keys=True, ensure_ascii=False))
+            _llm_binding_stats["attempts"] += 1
+            if cache_key in _llm_binding_cache:
+                _llm_binding_stats["cache_hits"] += 1
+                return list(_llm_binding_cache[cache_key])
             payload = {
                 "model": _llm_binding_model,
                 "messages": [{"role": "user", "content": prompt}],
@@ -5363,6 +5404,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 rj = resp.json()
                 usage = rj.get("usage", {})
                 _llm_binding_stats["calls"] += 1
+                _llm_binding_stats["successes"] += 1
                 _llm_binding_stats["prompt_tokens"] += int(usage.get("prompt_tokens", 0))
                 _llm_binding_stats["completion_tokens"] += int(usage.get("completion_tokens", 0))
                 _llm_binding_stats["total_latency_s"] += elapsed
@@ -5373,8 +5415,15 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     line = line.strip().strip("-•").strip()
                     if line and line.upper() != "NONE":
                         entities.append(line)
+                if not entities:
+                    _llm_binding_stats["empty_entity_responses"] += 1
+                if _llm_binding_cache_file is not None:
+                    _llm_binding_cache[cache_key] = [str(entity) for entity in entities]
+                    _llm_binding_cache_dirty = True
                 return entities
-            except Exception:
+            except Exception as exc:
+                _llm_binding_stats["failures"] += 1
+                logger.debug("LLM binding extraction failed: %s", exc)
                 return []
 
         llm_extract_fn = _llm_extract_entities
@@ -5867,10 +5916,16 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     safe_retriever_rank_penalty=float(daec_safe_retriever_rank_penalty),
                     llm_extract_fn=llm_extract_fn,
                     binding_mode=_daec_binding_mode,
+                    llm_binding_title_match_mode=str(llm_binding_title_match_mode),
                     gold_titles=[extract_doc_title(doc_text) for doc_text in (qs.gold_docs or [])] if selector_name == "daec_noisyor_oracle" else None,
                 )
                 _q_binding_cost = {
+                    "attempts": _llm_binding_stats["attempts"] - _q_stats_before["attempts"],
                     "calls": _llm_binding_stats["calls"] - _q_stats_before["calls"],
+                    "cache_hits": _llm_binding_stats["cache_hits"] - _q_stats_before["cache_hits"],
+                    "successes": _llm_binding_stats["successes"] - _q_stats_before["successes"],
+                    "failures": _llm_binding_stats["failures"] - _q_stats_before["failures"],
+                    "empty_entity_responses": _llm_binding_stats["empty_entity_responses"] - _q_stats_before["empty_entity_responses"],
                     "prompt_tokens": _llm_binding_stats["prompt_tokens"] - _q_stats_before["prompt_tokens"],
                     "completion_tokens": _llm_binding_stats["completion_tokens"] - _q_stats_before["completion_tokens"],
                     "latency_s": round(_llm_binding_stats["total_latency_s"] - _q_stats_before["total_latency_s"], 4),
@@ -6677,7 +6732,17 @@ def apply_setwise_selector(hipporag: HippoRAG,
             },
             "append_stop_reason_counts": dict(sorted(append_stop_reason_counts.items())),
         })
-    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair"}:
+    if _llm_binding_cache_file is not None and _llm_binding_cache_dirty:
+        try:
+            _llm_binding_cache_file.parent.mkdir(parents=True, exist_ok=True)
+            _llm_binding_cache_file.write_text(
+                json.dumps(_llm_binding_cache, ensure_ascii=False, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+        except Exception as exc:
+            logger.warning("Failed to write LLM binding cache %s: %s", _llm_binding_cache_file, exc)
+
+    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
         summary.update({
             "dtc_max_steps": int(dtc_max_steps),
             "dtc_match_threshold": round(float(dtc_match_threshold), 4),
@@ -6759,6 +6824,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "daec_main_objective": "frozen_binding_noisy_or",
                 "daec_binding_top_m": int(dtc_binding_max_candidates),
                 "daec_binding_mode": str(_daec_binding_mode),
+                "daec_llm_binding_title_match_mode": str(llm_binding_title_match_mode),
                 "daec_safe_projection": selector_name in {"daec_noisyor_safe", "daec_noisyor_safe_llm"},
                 "daec_safe_min_objective_gain": round(float(daec_safe_min_objective_gain), 6),
                 "daec_safe_min_swap_gain": round(float(daec_safe_min_swap_gain), 6),
@@ -6769,20 +6835,35 @@ def apply_setwise_selector(hipporag: HippoRAG,
             })
             if _llm_binding_query_stats:
                 import statistics as _stats_mod
+                _total_attempts = sum(int(s.get("attempts", 0)) for s in _llm_binding_query_stats)
                 _total_calls = sum(int(s["calls"]) for s in _llm_binding_query_stats)
+                _total_cache_hits = sum(int(s.get("cache_hits", 0)) for s in _llm_binding_query_stats)
+                _total_successes = sum(int(s.get("successes", 0)) for s in _llm_binding_query_stats)
+                _total_failures = sum(int(s.get("failures", 0)) for s in _llm_binding_query_stats)
+                _total_empty = sum(int(s.get("empty_entity_responses", 0)) for s in _llm_binding_query_stats)
                 _total_prompt = sum(int(s["prompt_tokens"]) for s in _llm_binding_query_stats)
                 _total_completion = sum(int(s["completion_tokens"]) for s in _llm_binding_query_stats)
                 _total_latency = sum(float(s["latency_s"]) for s in _llm_binding_query_stats)
+                _per_q_attempts = [int(s.get("attempts", 0)) for s in _llm_binding_query_stats]
                 _per_q_calls = [int(s["calls"]) for s in _llm_binding_query_stats]
                 _per_q_latency = [float(s["latency_s"]) for s in _llm_binding_query_stats]
                 summary.update({
+                    "llm_binding_cache_path": str(_llm_binding_cache_file) if _llm_binding_cache_file is not None else "",
+                    "llm_binding_cache_size": int(len(_llm_binding_cache)),
+                    "llm_binding_total_attempts": _total_attempts,
                     "llm_binding_total_calls": _total_calls,
+                    "llm_binding_total_cache_hits": _total_cache_hits,
+                    "llm_binding_total_successes": _total_successes,
+                    "llm_binding_total_failures": _total_failures,
+                    "llm_binding_total_empty_entity_responses": _total_empty,
                     "llm_binding_total_prompt_tokens": _total_prompt,
                     "llm_binding_total_completion_tokens": _total_completion,
                     "llm_binding_total_tokens": _total_prompt + _total_completion,
                     "llm_binding_total_latency_s": round(_total_latency, 2),
+                    "llm_binding_avg_attempts_per_query": round(_total_attempts / max(len(_llm_binding_query_stats), 1), 2),
                     "llm_binding_avg_calls_per_query": round(_total_calls / max(len(_llm_binding_query_stats), 1), 2),
                     "llm_binding_avg_latency_per_query_s": round(_total_latency / max(len(_llm_binding_query_stats), 1), 4),
+                    "llm_binding_median_attempts_per_query": _stats_mod.median(_per_q_attempts) if _per_q_attempts else 0,
                     "llm_binding_median_calls_per_query": _stats_mod.median(_per_q_calls) if _per_q_calls else 0,
                     "llm_binding_median_latency_per_query_s": round(_stats_mod.median(_per_q_latency), 4) if _per_q_latency else 0.0,
                 })
@@ -7347,7 +7428,7 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--expand_base_k", type=int, default=10,
                         help="For --setwise_selector bridge_append, preserve baseline top-B before appending deep-pool bridge candidates.")
@@ -7519,6 +7600,10 @@ def main():
                         help="VLLM endpoint URL for LLM-extraction binding (daec_noisyor_llm).")
     parser.add_argument("--llm_binding_model", type=str, default="qwen3-8b-train",
                         help="Model name for LLM-extraction binding.")
+    parser.add_argument("--llm_binding_cache_path", type=str, default="",
+                        help="Optional JSON cache path for LLM-extraction binding calls.")
+    parser.add_argument("--llm_binding_title_match_mode", choices=["exact", "substring"], default="substring",
+                        help="How LLM-extracted entities are matched back to candidate pool titles.")
     parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
                         help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
     parser.add_argument("--setwise_late_rerank_candidate_count", type=int, default=4,
@@ -8106,6 +8191,8 @@ def main():
             daec_safe_retriever_rank_penalty=float(args.daec_safe_retriever_rank_penalty),
             llm_binding_url=str(args.llm_binding_url),
             llm_binding_model=str(args.llm_binding_model),
+            llm_binding_cache_path=str(args.llm_binding_cache_path),
+            llm_binding_title_match_mode=str(args.llm_binding_title_match_mode),
         )
         selected_solutions, _, _, _, selector_qa_results = hipporag.rag_qa(
             queries=selected_solutions,

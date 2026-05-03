@@ -320,18 +320,38 @@ def _candidate_type_compatible(title: str, expected_answer_type: str) -> bool:
     return True
 
 
-def _title_match_pool_position(entity: str, pool_titles: Sequence[str]) -> int | None:
+def _title_match_pool_position_and_type(
+    entity: str,
+    pool_titles: Sequence[str],
+    *,
+    allow_substring: bool = True,
+) -> Tuple[int | None, str]:
     entity_lower = entity.lower().strip()
     if not entity_lower:
-        return None
+        return None, "none"
     for idx, title in enumerate(pool_titles):
         if entity_lower == title.lower().strip():
-            return idx
-    for idx, title in enumerate(pool_titles):
-        tl = title.lower().strip()
-        if (entity_lower in tl or tl in entity_lower) and min(len(entity_lower), len(tl)) >= 3:
-            return idx
-    return None
+            return idx, "exact"
+    if allow_substring:
+        for idx, title in enumerate(pool_titles):
+            tl = title.lower().strip()
+            if (entity_lower in tl or tl in entity_lower) and min(len(entity_lower), len(tl)) >= 3:
+                return idx, "substring"
+    return None, "none"
+
+
+def _title_match_pool_position(
+    entity: str,
+    pool_titles: Sequence[str],
+    *,
+    allow_substring: bool = True,
+) -> int | None:
+    idx, _ = _title_match_pool_position_and_type(
+        entity,
+        pool_titles,
+        allow_substring=allow_substring,
+    )
+    return idx
 
 
 def _binding_candidate_hit_score(candidate_key: str,
@@ -905,6 +925,7 @@ def select_daec_noisyor_positions(
     safe_retriever_rank_penalty: float = 0.0,
     llm_extract_fn: Callable[[str, str], List[str]] | None = None,
     binding_mode: str = "auto",
+    llm_binding_title_match_mode: str = "substring",
     gold_titles: Sequence[str] | None = None,
 ) -> Tuple[List[int], Dict[str, object]]:
     """Select evidence by frozen-binding noisy-OR demand coverage.
@@ -1025,6 +1046,10 @@ def select_daec_noisyor_positions(
         )
         return rows[:max(0, int(binding_top_m))]
 
+    _llm_binding_title_match_mode = str(llm_binding_title_match_mode or "substring").strip().lower()
+    allow_substring_title_match = _llm_binding_title_match_mode not in {"exact", "exact_only"}
+    llm_binding_extraction_traces: List[Dict[str, object]] = []
+
     def collect_llm_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
         if not req.depends_on or llm_extract_fn is None:
             return []
@@ -1046,16 +1071,45 @@ def select_daec_noisyor_positions(
             for dep_pos in upstream_positions:
                 doc_text = str(pool_docs[dep_pos])
                 entities = llm_extract_fn(dep_subquery, doc_text)
+                extraction_trace: Dict[str, object] = {
+                    "requirement_id": str(req.unit_id),
+                    "dep": str(dep),
+                    "dep_position": int(dep_pos),
+                    "dep_title": str(pool_doc_titles[int(dep_pos)]),
+                    "dep_score": round(float(dep_scores[dep_pos]), 6),
+                    "dep_subquery": str(dep_subquery),
+                    "raw_entities": [str(ent) for ent in entities],
+                    "matched_entities": [],
+                    "unmatched_entities": [],
+                    "skipped_anchor_entities": [],
+                    "duplicate_entities": [],
+                }
                 for ent in entities:
                     ent_key = normalize_structure_text(ent)
-                    if not ent_key or ent_key in seen_keys:
+                    if not ent_key:
+                        continue
+                    if ent_key in seen_keys:
+                        extraction_trace["duplicate_entities"].append(str(ent))
                         continue
                     if ent_key in query_anchor_keys:
+                        extraction_trace["skipped_anchor_entities"].append(str(ent))
                         continue
-                    title_pos = _title_match_pool_position(ent, pool_doc_titles[:pool_limit])
+                    title_pos, match_type = _title_match_pool_position_and_type(
+                        ent,
+                        pool_doc_titles[:pool_limit],
+                        allow_substring=allow_substring_title_match,
+                    )
                     if title_pos is None:
+                        extraction_trace["unmatched_entities"].append(str(ent))
                         continue
                     seen_keys.add(ent_key)
+                    extraction_trace["matched_entities"].append({
+                        "entity": str(ent),
+                        "normalized_entity": str(ent_key),
+                        "match_type": str(match_type),
+                        "title": str(pool_doc_titles[title_pos]),
+                        "title_pool_position": int(title_pos),
+                    })
                     rows.append({
                         "requirement_id": req.unit_id,
                         "title": str(pool_doc_titles[title_pos]),
@@ -1067,7 +1121,9 @@ def select_daec_noisyor_positions(
                         "count": 1,
                         "first_pos": 0,
                         "llm_extracted_entity": str(ent),
+                        "entity_match_type": str(match_type),
                     })
+                llm_binding_extraction_traces.append(extraction_trace)
         rows.sort(key=lambda row: (-float(row["dep_score"]), int(row["title_pool_position"])))
         return rows[:max(0, int(binding_top_m))]
 
@@ -1482,6 +1538,9 @@ def select_daec_noisyor_positions(
         "binding_pruned": bool(binding_pruned),
         "binding_selection_protocol": "best_binding_final_pool",
         "binding_mode": str(_binding_mode),
+        "llm_binding_title_match_mode": str(_llm_binding_title_match_mode),
+        "llm_binding_extractions": llm_binding_extraction_traces[:50],
+        "llm_binding_extraction_count": int(len(llm_binding_extraction_traces)),
         "bindings": [binding.to_trace() for binding in bindings[:20]],
         "selected_binding": best_binding.to_trace(),
         "selected_binding_id": str(best_binding.binding_id),
@@ -1495,6 +1554,8 @@ def select_daec_noisyor_positions(
                     "title_pool_position": int(row.get("title_pool_position", -1)),
                     "count": int(row.get("count", 0)),
                     "first_pos": int(row.get("first_pos", 10**9)),
+                    "llm_extracted_entity": str(row.get("llm_extracted_entity", "") or ""),
+                    "entity_match_type": str(row.get("entity_match_type", "") or ""),
                 }
                 for row in rows
             ]
