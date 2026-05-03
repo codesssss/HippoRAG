@@ -1,0 +1,24 @@
+{
+  "source_files": [
+    "run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/2wikimultihopqa_dense_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/2wikimultihopqa_hipporag_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/hotpotqa_dense_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/hotpotqa_hipporag_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/musique_dense_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/musique_hipporag_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_proprag_full1000_20260503/2wikimultihopqa_proprag_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_proprag_full1000_20260503/hotpotqa_proprag_wiki_title_daec_llm_full1000.json",
+    "run_logs/daec_llm_wiki_title_proprag_full1000_20260503/musique_proprag_wiki_title_daec_llm_full1000.json"
+  ],
+  "total_matched_links_seen": 13196,
+  "matched_links_by_type": {
+    "exact": 9620,
+    "disambiguation": 1183,
+    "multi_token_alias": 2393
+  },
+  "link_sample_size": 240,
+  "total_empty_extractions_seen": 39196,
+  "empty_sample_size": 120,
+  "link_sample_path": "reports/daec_ctl_audit_20260503/ctl_link_audit_sample.jsonl",
+  "empty_sample_path": "reports/daec_ctl_audit_20260503/ctl_empty_extraction_audit_sample.jsonl"
+}
