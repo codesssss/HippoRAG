@@ -320,11 +320,207 @@ def _candidate_type_compatible(title: str, expected_answer_type: str) -> bool:
     return True
 
 
+_GUARDED_SUBSTRING_SINGLE_TOKEN_BLOCKLIST = {
+    # Country / demonym-like single-token bridge entities are too ambiguous for
+    # substring title binding (e.g. "France" -> "Rudolph of France").
+    "afghanistan",
+    "albania",
+    "algeria",
+    "andorra",
+    "angola",
+    "argentina",
+    "armenia",
+    "australia",
+    "austria",
+    "azerbaijan",
+    "bahamas",
+    "bahrain",
+    "bangladesh",
+    "barbados",
+    "belarus",
+    "belgium",
+    "belize",
+    "benin",
+    "bhutan",
+    "bolivia",
+    "botswana",
+    "brazil",
+    "bulgaria",
+    "burundi",
+    "cambodia",
+    "cameroon",
+    "canada",
+    "chad",
+    "chile",
+    "china",
+    "colombia",
+    "comoros",
+    "croatia",
+    "cuba",
+    "cyprus",
+    "denmark",
+    "djibouti",
+    "dominica",
+    "ecuador",
+    "egypt",
+    "eritrea",
+    "estonia",
+    "ethiopia",
+    "fiji",
+    "finland",
+    "france",
+    "gabon",
+    "gambia",
+    "georgia",
+    "germany",
+    "ghana",
+    "greece",
+    "grenada",
+    "guatemala",
+    "guinea",
+    "guyana",
+    "haiti",
+    "honduras",
+    "hungary",
+    "iceland",
+    "india",
+    "indonesia",
+    "iran",
+    "iraq",
+    "ireland",
+    "israel",
+    "italy",
+    "jamaica",
+    "japan",
+    "jordan",
+    "kazakhstan",
+    "kenya",
+    "kiribati",
+    "kuwait",
+    "kyrgyzstan",
+    "laos",
+    "latvia",
+    "lebanon",
+    "lesotho",
+    "liberia",
+    "libya",
+    "liechtenstein",
+    "lithuania",
+    "luxembourg",
+    "madagascar",
+    "malawi",
+    "malaysia",
+    "maldives",
+    "mali",
+    "malta",
+    "mauritania",
+    "mauritius",
+    "mexico",
+    "moldova",
+    "monaco",
+    "mongolia",
+    "montenegro",
+    "morocco",
+    "mozambique",
+    "myanmar",
+    "namibia",
+    "nauru",
+    "nepal",
+    "netherlands",
+    "nicaragua",
+    "niger",
+    "nigeria",
+    "norway",
+    "oman",
+    "pakistan",
+    "palau",
+    "panama",
+    "paraguay",
+    "peru",
+    "philippines",
+    "poland",
+    "portugal",
+    "qatar",
+    "romania",
+    "russia",
+    "rwanda",
+    "samoa",
+    "senegal",
+    "serbia",
+    "seychelles",
+    "singapore",
+    "slovakia",
+    "slovenia",
+    "somalia",
+    "spain",
+    "sudan",
+    "suriname",
+    "sweden",
+    "switzerland",
+    "syria",
+    "tajikistan",
+    "tanzania",
+    "thailand",
+    "togo",
+    "tonga",
+    "tunisia",
+    "turkey",
+    "turkmenistan",
+    "tuvalu",
+    "uganda",
+    "ukraine",
+    "uruguay",
+    "uzbekistan",
+    "vanuatu",
+    "venezuela",
+    "vietnam",
+    "yemen",
+    "zambia",
+    "zimbabwe",
+    # High-risk single-token personal/common names seen in audit failures.
+    "muhammad",
+}
+
+
+def _substring_title_match_is_guarded(entity: str, title: str) -> bool:
+    entity_key = normalize_structure_text(entity)
+    title_key = normalize_structure_text(title)
+    if not entity_key or not title_key:
+        return False
+    if entity_key == title_key:
+        return True
+    if entity_key.isdigit() or title_key.isdigit():
+        return False
+
+    entity_tokens = entity_key.split()
+    title_tokens = title_key.split()
+    if not entity_tokens or not title_tokens:
+        return False
+    if len(entity_tokens) == 1 and entity_tokens[0] in _GUARDED_SUBSTRING_SINGLE_TOKEN_BLOCKLIST:
+        return False
+
+    def has_contiguous_subsequence(shorter: List[str], longer: List[str]) -> bool:
+        if len(shorter) > len(longer):
+            return False
+        width = len(shorter)
+        return any(longer[start:start + width] == shorter for start in range(len(longer) - width + 1))
+
+    # Prefer entity -> title containment. Reverse containment is allowed only
+    # when the matched title phrase has at least two tokens, avoiding cases like
+    # a long extracted phrase binding to a one-token generic page.
+    if has_contiguous_subsequence(entity_tokens, title_tokens):
+        return True
+    if len(title_tokens) >= 2 and has_contiguous_subsequence(title_tokens, entity_tokens):
+        return True
+    return False
+
+
 def _title_match_pool_position_and_type(
     entity: str,
     pool_titles: Sequence[str],
     *,
     allow_substring: bool = True,
+    guarded_substring: bool = False,
 ) -> Tuple[int | None, str]:
     entity_lower = entity.lower().strip()
     if not entity_lower:
@@ -335,8 +531,11 @@ def _title_match_pool_position_and_type(
     if allow_substring:
         for idx, title in enumerate(pool_titles):
             tl = title.lower().strip()
-            if (entity_lower in tl or tl in entity_lower) and min(len(entity_lower), len(tl)) >= 3:
-                return idx, "substring"
+            if not ((entity_lower in tl or tl in entity_lower) and min(len(entity_lower), len(tl)) >= 3):
+                continue
+            if guarded_substring and not _substring_title_match_is_guarded(entity, str(title)):
+                continue
+            return idx, "substring"
     return None, "none"
 
 
@@ -345,11 +544,13 @@ def _title_match_pool_position(
     pool_titles: Sequence[str],
     *,
     allow_substring: bool = True,
+    guarded_substring: bool = False,
 ) -> int | None:
     idx, _ = _title_match_pool_position_and_type(
         entity,
         pool_titles,
         allow_substring=allow_substring,
+        guarded_substring=guarded_substring,
     )
     return idx
 
@@ -1048,6 +1249,7 @@ def select_daec_noisyor_positions(
 
     _llm_binding_title_match_mode = str(llm_binding_title_match_mode or "substring").strip().lower()
     allow_substring_title_match = _llm_binding_title_match_mode not in {"exact", "exact_only"}
+    guarded_substring_title_match = _llm_binding_title_match_mode in {"substring_guarded", "guarded_substring"}
     llm_binding_extraction_traces: List[Dict[str, object]] = []
 
     def collect_llm_binding_candidates(req: DTCRequirement) -> List[Dict[str, object]]:
@@ -1098,6 +1300,7 @@ def select_daec_noisyor_positions(
                         ent,
                         pool_doc_titles[:pool_limit],
                         allow_substring=allow_substring_title_match,
+                        guarded_substring=guarded_substring_title_match,
                     )
                     if title_pos is None:
                         extraction_trace["unmatched_entities"].append(str(ent))

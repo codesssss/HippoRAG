@@ -7602,7 +7602,7 @@ def main():
                         help="Model name for LLM-extraction binding.")
     parser.add_argument("--llm_binding_cache_path", type=str, default="",
                         help="Optional JSON cache path for LLM-extraction binding calls.")
-    parser.add_argument("--llm_binding_title_match_mode", choices=["exact", "substring"], default="substring",
+    parser.add_argument("--llm_binding_title_match_mode", choices=["exact", "substring", "substring_guarded"], default="substring",
                         help="How LLM-extracted entities are matched back to candidate pool titles.")
     parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
                         help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
