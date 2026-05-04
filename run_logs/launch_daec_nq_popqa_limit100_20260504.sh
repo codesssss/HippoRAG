@@ -109,16 +109,14 @@ run_dataset_worker() {
 main() {
   echo "[START] daec_nq_popqa_limit${LIMIT} start=$(date -Is)" > "${OUT_DIR}/launcher.status"
   echo "[START] daec_nq_popqa_limit${LIMIT} start=$(date -Is)" > "${OUT_DIR}/launcher.log"
-  local pids=()
+  # Keep this launcher sequential under nohup. Background shell functions were
+  # observed to exit before emitting per-job status files in this environment.
+  # The Qwen endpoints are still configurable per dataset, so individual jobs
+  # can be split into separate launchers later if needed.
+  local rc=0
   local dataset
   for dataset in nq popqa; do
-    run_dataset_worker "${dataset}" &
-    pids+=("$!")
-  done
-  local rc=0
-  local pid
-  for pid in "${pids[@]}"; do
-    wait "${pid}" || rc=1
+    run_dataset_worker "${dataset}" || rc=1
   done
   if [[ "${rc}" -eq 0 ]]; then
     echo "[DONE] daec_nq_popqa_limit${LIMIT} end=$(date -Is)" > "${OUT_DIR}/launcher.status"
