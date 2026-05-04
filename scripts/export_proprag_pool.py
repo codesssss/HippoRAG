@@ -9,6 +9,7 @@ per-query top-N pools for downstream oracle/composition experiments.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import logging
 import os
@@ -22,6 +23,15 @@ DEFAULT_PROPRAG_ROOT = Path("/mnt/nvme/code/PropRAG")
 DEFAULT_SAVE_DIR = Path(
     "/mnt/nvme/code/PropRAG/outputs_aligned_clean_nothink_top100_nvembed_rebuild_20260423"
 )
+DATASET_FILE_ALIASES = {
+    "nq": "nq_rear",
+    "natural_questions": "nq_rear",
+}
+
+
+def resolve_dataset_file_stem(dataset_name: str | None) -> str:
+    normalized = str(dataset_name or "").strip().lower()
+    return DATASET_FILE_ALIASES.get(normalized, str(dataset_name or "").strip())
 
 
 def string_to_bool(value: Any) -> bool:
@@ -32,6 +42,28 @@ def string_to_bool(value: Any) -> bool:
 
 def extract_title(doc: str) -> str:
     return str(doc or "").split("\n", 1)[0].strip()
+
+
+def parse_answer_alias_values(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if not cleaned:
+            return []
+        if cleaned.startswith("[") and cleaned.endswith("]"):
+            try:
+                parsed = ast.literal_eval(cleaned)
+            except (ValueError, SyntaxError):
+                return [cleaned]
+            return parse_answer_alias_values(parsed)
+        return [cleaned]
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        aliases: List[str] = []
+        for item in value:
+            aliases.extend(parse_answer_alias_values(item))
+        return aliases
+    return [str(value)]
 
 
 def get_gold_docs(samples: Sequence[Dict[str, Any]], dataset_name: str) -> List[List[str]]:
@@ -67,21 +99,23 @@ def get_gold_docs(samples: Sequence[Dict[str, Any]], dataset_name: str) -> List[
 def get_gold_answers(samples: Sequence[Dict[str, Any]]) -> List[List[str]]:
     gold_answers: List[List[str]] = []
     for sample in samples:
+        answers: List[str]
         if "answer" in sample or "gold_ans" in sample:
             answer = sample["answer"] if "answer" in sample else sample["gold_ans"]
+            answers = parse_answer_alias_values(answer)
         elif "reference" in sample:
-            answer = sample["reference"]
+            answers = parse_answer_alias_values(sample["reference"])
         elif "obj" in sample:
-            answer = [sample["obj"], sample["possible_answers"], sample["o_wiki_title"], *sample["o_aliases"]]
+            answers = []
+            answers.extend(parse_answer_alias_values(sample.get("obj")))
+            answers.extend(parse_answer_alias_values(sample.get("possible_answers")))
+            answers.extend(parse_answer_alias_values(sample.get("o_wiki_title")))
+            answers.extend(parse_answer_alias_values(sample.get("o_aliases")))
         else:
             raise ValueError("Sample has no recognized answer field.")
-        if isinstance(answer, str):
-            answers = {answer}
-        else:
-            answers = set(answer)
         if "answer_aliases" in sample:
-            answers.update(sample["answer_aliases"])
-        gold_answers.append(sorted(str(item) for item in answers))
+            answers.extend(parse_answer_alias_values(sample["answer_aliases"]))
+        gold_answers.append(sorted({str(item).strip() for item in answers if str(item).strip()}))
     return gold_answers
 
 
@@ -162,8 +196,9 @@ def main() -> None:
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-    corpus_path = proprag_root / "reproduce" / "dataset" / f"{args.dataset}_corpus.json"
-    samples_path = proprag_root / "reproduce" / "dataset" / f"{args.dataset}.json"
+    dataset_file_stem = resolve_dataset_file_stem(args.dataset)
+    corpus_path = proprag_root / "reproduce" / "dataset" / f"{dataset_file_stem}_corpus.json"
+    samples_path = proprag_root / "reproduce" / "dataset" / f"{dataset_file_stem}.json"
     corpus = json.loads(corpus_path.read_text())
     samples = json.loads(samples_path.read_text())
     if int(args.limit) > 0:

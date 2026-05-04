@@ -11,6 +11,7 @@ similarity, and writes a fixed pool that can be consumed by
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Sequence
@@ -23,6 +24,15 @@ from tqdm import tqdm
 
 DEFAULT_DATA_ROOT = Path("reproduce/dataset")
 DEFAULT_SAVE_DIR = Path("outputs_step0_general_nvembed")
+DATASET_FILE_ALIASES = {
+    "nq": "nq_rear",
+    "natural_questions": "nq_rear",
+}
+
+
+def resolve_dataset_file_stem(dataset_name: str | None) -> str:
+    normalized = str(dataset_name or "").strip().lower()
+    return DATASET_FILE_ALIASES.get(normalized, str(dataset_name or "").strip())
 
 
 def extract_title(doc: str) -> str:
@@ -33,6 +43,28 @@ def string_to_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
     return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def parse_answer_alias_values(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if not cleaned:
+            return []
+        if cleaned.startswith("[") and cleaned.endswith("]"):
+            try:
+                parsed = ast.literal_eval(cleaned)
+            except (ValueError, SyntaxError):
+                return [cleaned]
+            return parse_answer_alias_values(parsed)
+        return [cleaned]
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        aliases: List[str] = []
+        for item in value:
+            aliases.extend(parse_answer_alias_values(item))
+        return aliases
+    return [str(value)]
 
 
 def get_gold_docs(samples: Sequence[Dict[str, Any]], dataset_name: str) -> List[List[str]]:
@@ -68,18 +100,23 @@ def get_gold_docs(samples: Sequence[Dict[str, Any]], dataset_name: str) -> List[
 def get_gold_answers(samples: Sequence[Dict[str, Any]]) -> List[List[str]]:
     gold_answers: List[List[str]] = []
     for sample in samples:
+        answers: List[str]
         if "answer" in sample or "gold_ans" in sample:
             answer = sample["answer"] if "answer" in sample else sample["gold_ans"]
+            answers = parse_answer_alias_values(answer)
         elif "reference" in sample:
-            answer = sample["reference"]
+            answers = parse_answer_alias_values(sample["reference"])
         elif "obj" in sample:
-            answer = [sample["obj"], sample["possible_answers"], sample["o_wiki_title"], *sample["o_aliases"]]
+            answers = []
+            answers.extend(parse_answer_alias_values(sample.get("obj")))
+            answers.extend(parse_answer_alias_values(sample.get("possible_answers")))
+            answers.extend(parse_answer_alias_values(sample.get("o_wiki_title")))
+            answers.extend(parse_answer_alias_values(sample.get("o_aliases")))
         else:
             raise ValueError("Sample has no recognized answer field.")
-        answers = {answer} if isinstance(answer, str) else set(answer)
         if "answer_aliases" in sample:
-            answers.update(sample["answer_aliases"])
-        gold_answers.append(sorted(str(item) for item in answers))
+            answers.extend(parse_answer_alias_values(sample["answer_aliases"]))
+        gold_answers.append(sorted({str(item).strip() for item in answers if str(item).strip()}))
     return gold_answers
 
 
@@ -132,10 +169,14 @@ def embed_queries(
 
 def resolve_chunk_embedding_path(save_dir: Path, dataset: str, llm_name: str, embedding_name: str) -> Path:
     suffix = f"{llm_name}_{embedding_name.replace('/', '_')}"
+    dataset_file_stem = resolve_dataset_file_stem(dataset)
     candidates = [
         save_dir / f"{dataset}_{suffix}" / "chunk_embeddings" / "vdb_chunk.parquet",
+        save_dir / f"{dataset_file_stem}_{suffix}" / "chunk_embeddings" / "vdb_chunk.parquet",
         save_dir / f"{dataset}" / suffix / "chunk_embeddings" / "vdb_chunk.parquet",
+        save_dir / f"{dataset_file_stem}" / suffix / "chunk_embeddings" / "vdb_chunk.parquet",
         Path(f"outputs_step0_general_nvembed_{dataset}") / suffix / "chunk_embeddings" / "vdb_chunk.parquet",
+        Path(f"outputs_step0_general_nvembed_{dataset_file_stem}") / suffix / "chunk_embeddings" / "vdb_chunk.parquet",
     ]
     for path in candidates:
         if path.exists():
@@ -158,7 +199,8 @@ def main() -> None:
     parser.add_argument("--normalize", type=string_to_bool, default=True)
     args = parser.parse_args()
 
-    samples_path = args.data_root / f"{args.dataset}.json"
+    dataset_file_stem = resolve_dataset_file_stem(args.dataset)
+    samples_path = args.data_root / f"{dataset_file_stem}.json"
     samples = json.loads(samples_path.read_text())
     if int(args.limit) > 0:
         samples = samples[: int(args.limit)]
