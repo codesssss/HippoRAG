@@ -10,7 +10,8 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Sequence
+import re
+from typing import Any, Dict, List, Mapping, Sequence
 
 import numpy as np
 
@@ -20,10 +21,72 @@ from src.hipporag.HippoRAG import HippoRAG
 from src.hipporag.utils.config_utils import BaseConfig
 
 DEFAULT_DATA_ROOT = Path("reproduce/dataset")
+DATASET_FILE_ALIASES = {
+    "nq": "nq_rear",
+    "natural_questions": "nq_rear",
+}
+
+
+def resolve_dataset_file_stem(dataset_name: str | None) -> str:
+    normalized = str(dataset_name or "").strip().lower()
+    return DATASET_FILE_ALIASES.get(normalized, str(dataset_name or "").strip())
 
 
 def extract_title(doc: str) -> str:
     return str(doc or "").split("\n", 1)[0].strip()
+
+
+def normalize_doc_text(doc: str) -> str:
+    return re.sub(r"\s+", " ", str(doc or "")).strip()
+
+
+def parse_answer_alias_values(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if not cleaned:
+            return []
+        if cleaned.startswith("[") and cleaned.endswith("]"):
+            try:
+                parsed = json.loads(cleaned)
+            except json.JSONDecodeError:
+                return [cleaned]
+            return parse_answer_alias_values(parsed)
+        return [cleaned]
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        aliases: List[str] = []
+        for item in value:
+            aliases.extend(parse_answer_alias_values(item))
+        return aliases
+    return [str(value)]
+
+
+def build_doc_id_index(docs: Sequence[str]) -> Dict[str, int]:
+    """Map retrieved document text back to corpus/OpenIE document indices."""
+
+    index: Dict[str, int] = {}
+    for doc_id, doc in enumerate(docs):
+        key = normalize_doc_text(doc)
+        if key and key not in index:
+            index[key] = int(doc_id)
+    return index
+
+
+def pool_doc_ids_for_docs(pool_docs: Sequence[str], doc_id_index: Mapping[str, int]) -> List[int]:
+    doc_ids: List[int] = []
+    unresolved: List[str] = []
+    for doc in pool_docs:
+        key = normalize_doc_text(doc)
+        doc_id = doc_id_index.get(key)
+        if doc_id is None:
+            unresolved.append(extract_title(doc) or key[:80])
+            continue
+        doc_ids.append(int(doc_id))
+    if unresolved:
+        preview = "; ".join(unresolved[:5])
+        raise ValueError(f"Could not resolve {len(unresolved)} retrieved docs to corpus indices: {preview}")
+    return doc_ids
 
 
 def get_gold_docs(samples: Sequence[Dict[str, Any]], dataset_name: str) -> List[List[str]]:
@@ -55,18 +118,23 @@ def get_gold_docs(samples: Sequence[Dict[str, Any]], dataset_name: str) -> List[
 def get_gold_answers(samples: Sequence[Dict[str, Any]]) -> List[List[str]]:
     gold_answers: List[List[str]] = []
     for sample in samples:
+        answers: List[str]
         if "answer" in sample or "gold_ans" in sample:
             answer = sample["answer"] if "answer" in sample else sample["gold_ans"]
+            answers = parse_answer_alias_values(answer)
         elif "reference" in sample:
-            answer = sample["reference"]
+            answers = parse_answer_alias_values(sample["reference"])
         elif "obj" in sample:
-            answer = [sample["obj"], sample["possible_answers"], sample["o_wiki_title"], *sample["o_aliases"]]
+            answers = []
+            answers.extend(parse_answer_alias_values(sample.get("obj")))
+            answers.extend(parse_answer_alias_values(sample.get("possible_answers")))
+            answers.extend(parse_answer_alias_values(sample.get("o_wiki_title")))
+            answers.extend(parse_answer_alias_values(sample.get("o_aliases")))
         else:
             raise ValueError("Sample has no recognized answer field.")
-        answers = {answer} if isinstance(answer, str) else set(answer)
         if "answer_aliases" in sample:
-            answers.update(sample["answer_aliases"])
-        gold_answers.append(sorted(str(item) for item in answers))
+            answers.extend(parse_answer_alias_values(sample["answer_aliases"]))
+        gold_answers.append(sorted({str(item).strip() for item in answers if str(item).strip()}))
     return gold_answers
 
 
@@ -102,8 +170,9 @@ def main() -> None:
     parser.add_argument("--output_json", type=Path, required=True)
     args = parser.parse_args()
 
-    samples_path = args.data_root / f"{args.dataset}.json"
-    corpus_path = args.data_root / f"{args.dataset}_corpus.json"
+    dataset_file_stem = resolve_dataset_file_stem(args.dataset)
+    samples_path = args.data_root / f"{dataset_file_stem}.json"
+    corpus_path = args.data_root / f"{dataset_file_stem}_corpus.json"
     samples = json.loads(samples_path.read_text())
     corpus = json.loads(corpus_path.read_text())
     if int(args.limit) > 0:
@@ -121,6 +190,7 @@ def main() -> None:
             docs.append(item["title"] + "\n" + item["body_text"])
         else:
             docs.append(str(item.get("text", item.get("body_text", ""))))
+    doc_id_index = build_doc_id_index(docs)
 
     save_dir = str(args.save_dir)
     if save_dir == "outputs":
@@ -164,6 +234,7 @@ def main() -> None:
         scores = qs.doc_scores.tolist() if qs.doc_scores is not None else [0.0] * len(retrieved)
         pool_docs = retrieved[:pool_k]
         pool_scores = [float(s) for s in scores[:pool_k]]
+        pool_doc_ids = pool_doc_ids_for_docs(pool_docs, doc_id_index)
         retrieved_doc_lists.append(pool_docs)
         records.append({
             "query_idx": qi,
@@ -175,7 +246,7 @@ def main() -> None:
             "pool_docs": pool_docs,
             "pool_titles": [extract_title(doc) for doc in pool_docs],
             "pool_doc_scores": pool_scores,
-            "pool_doc_ids": list(range(len(pool_docs))),
+            "pool_doc_ids": pool_doc_ids,
         })
 
     recall = compute_title_recall(gold_docs, retrieved_doc_lists, [5, 20, 100])

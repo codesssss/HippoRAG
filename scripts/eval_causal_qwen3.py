@@ -77,6 +77,11 @@ from src.hipporag.utils.causal_utils import (
 from src.hipporag.utils.config_utils import BaseConfig
 from src.hipporag.utils.misc_utils import QuerySolution, compute_mdhash_id, string_to_bool
 
+DATASET_FILE_ALIASES = {
+    "nq": "nq_rear",
+    "natural_questions": "nq_rear",
+}
+
 LEARNED_SETWISE_FEATURE_NAMES = [
     "base_score",
     "rank_fraction",
@@ -131,6 +136,37 @@ DEFAULT_CE_MAX_LENGTH = 1024
 
 
 _CROSS_ENCODER_RERANKER_CACHE: Dict[Tuple[str, str, bool, int, int], "TransformersCrossEncoderReranker"] = {}
+
+
+def canonical_dataset_name(dataset_name: str | None) -> str:
+    return str(dataset_name or "").strip().lower()
+
+
+def resolve_dataset_file_stem(dataset_name: str | None) -> str:
+    normalized = canonical_dataset_name(dataset_name)
+    return DATASET_FILE_ALIASES.get(normalized, str(dataset_name or "").strip())
+
+
+def parse_answer_alias_values(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if not cleaned:
+            return []
+        if cleaned.startswith("[") and cleaned.endswith("]"):
+            try:
+                parsed = ast.literal_eval(cleaned)
+            except (ValueError, SyntaxError):
+                return [cleaned]
+            return parse_answer_alias_values(parsed)
+        return [cleaned]
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        aliases: List[str] = []
+        for item in value:
+            aliases.extend(parse_answer_alias_values(item))
+        return aliases
+    return [str(value)]
 
 
 class TransformersCrossEncoderReranker:
@@ -501,19 +537,21 @@ def get_gold_docs(samples: List, dataset_name: str = None, corpus: List | None =
 def get_gold_answers(samples):
     gold_answers = []
     for sample in samples:
-        gold_ans = None
+        gold_ans: List[str] | None = None
         if 'answer' in sample or 'gold_ans' in sample:
-            gold_ans = sample['answer'] if 'answer' in sample else sample['gold_ans']
+            gold_ans = parse_answer_alias_values(sample['answer'] if 'answer' in sample else sample['gold_ans'])
         elif 'reference' in sample:
-            gold_ans = sample['reference']
+            gold_ans = parse_answer_alias_values(sample['reference'])
         elif 'obj' in sample:
-            gold_ans = list(set([sample['obj']] + [sample['possible_answers']] + [sample['o_wiki_title']] + [sample['o_aliases']]))
+            gold_ans = []
+            gold_ans.extend(parse_answer_alias_values(sample.get('obj')))
+            gold_ans.extend(parse_answer_alias_values(sample.get('possible_answers')))
+            gold_ans.extend(parse_answer_alias_values(sample.get('o_wiki_title')))
+            gold_ans.extend(parse_answer_alias_values(sample.get('o_aliases')))
         assert gold_ans is not None
-        if isinstance(gold_ans, str):
-            gold_ans = [gold_ans]
-        gold_ans = set(gold_ans)
+        gold_ans = {str(answer).strip() for answer in gold_ans if str(answer).strip()}
         if 'answer_aliases' in sample:
-            gold_ans.update(sample['answer_aliases'])
+            gold_ans.update(parse_answer_alias_values(sample['answer_aliases']))
         gold_answers.append(list(gold_ans))
     return gold_answers
 
@@ -557,9 +595,11 @@ def load_external_pool_query_solutions(pool_json_path: str | Path,
             f"External pool has {len(records)} records, fewer than requested samples ({len(samples)}): {pool_path}"
         )
 
-    payload_dataset = str(payload.get("dataset") or "").strip().lower()
-    expected_dataset = str(dataset_name or "").strip().lower()
-    if payload_dataset and payload_dataset != expected_dataset:
+    payload_dataset = canonical_dataset_name(payload.get("dataset"))
+    expected_dataset = canonical_dataset_name(dataset_name)
+    payload_dataset_stem = canonical_dataset_name(resolve_dataset_file_stem(payload_dataset))
+    expected_dataset_stem = canonical_dataset_name(resolve_dataset_file_stem(expected_dataset))
+    if payload_dataset and payload_dataset_stem != expected_dataset_stem:
         raise ValueError(
             f"External pool dataset mismatch: expected {dataset_name}, found {payload.get('dataset')}"
         )
@@ -7602,7 +7642,19 @@ def main():
                         help="Model name for LLM-extraction binding.")
     parser.add_argument("--llm_binding_cache_path", type=str, default="",
                         help="Optional JSON cache path for LLM-extraction binding calls.")
-    parser.add_argument("--llm_binding_title_match_mode", choices=["exact", "substring", "substring_guarded", "wiki_title"], default="substring",
+    parser.add_argument("--llm_binding_title_match_mode", choices=[
+        "exact",
+        "substring",
+        "substring_guarded",
+        "wiki_title",
+        "title_link",
+        "normalized_title",
+        "entity_title",
+        "wiki_title_unique",
+        "title_link_unique",
+        "normalized_title_unique",
+        "entity_title_unique",
+    ], default="substring",
                         help="How LLM-extracted entities are matched back to candidate pool titles.")
     parser.add_argument("--setwise_late_rerank_enabled", type=string_to_bool, default=False,
                         help="If true, run the LLM once per query to rerank a tiny shortlist of completed bridge_beam evidence sets.")
@@ -7711,8 +7763,9 @@ def main():
         save_dir = f"{save_dir}_{dataset_name}"
     args.save_dir = save_dir
 
-    corpus_path = Path(f"reproduce/dataset/{dataset_name}_corpus.json")
-    sample_path = Path(f"reproduce/dataset/{dataset_name}.json")
+    dataset_file_stem = resolve_dataset_file_stem(dataset_name)
+    corpus_path = Path(f"reproduce/dataset/{dataset_file_stem}_corpus.json")
+    sample_path = Path(f"reproduce/dataset/{dataset_file_stem}.json")
     corpus = json.load(corpus_path.open())
     samples = json.load(sample_path.open())
 
