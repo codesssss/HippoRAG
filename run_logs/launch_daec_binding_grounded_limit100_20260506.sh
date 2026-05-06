@@ -12,6 +12,7 @@ LIMIT=100
 POOL_K=100
 MATCH_MODE="wiki_title"
 VARIANTS=("base" "typeguard" "softcompat" "grounded" "full")
+DATASETS_OVERRIDE="${DATASETS_OVERRIDE:-musique hotpotqa 2wikimultihopqa}"
 
 export HIPPORAG_RERANK_FORCE_NO_THINK=1
 mkdir -p "${OUT_DIR}/evals" "${OUT_DIR}/logs" "${OUT_DIR}/status"
@@ -289,28 +290,25 @@ main() {
   echo "[START] daec_binding_grounded_limit100 time=$(date -Is)" > "${OUT_DIR}/status/launcher.status"
   log_msg "DAEC binding-grounded limit100 begin"
   log_msg "lanes: musique->8041 hotpotqa->8042 2wikimultihopqa->8043"
+  log_msg "datasets: ${DATASETS_OVERRIDE}"
   log_msg "variants: ${VARIANTS[*]}"
 
-  (run_dataset musique) &
-  local pid_musique=$!
-  (run_dataset hotpotqa) &
-  local pid_hotpotqa=$!
-  (run_dataset 2wikimultihopqa) &
-  local pid_2wiki=$!
-
   local status=0
-  if ! wait "${pid_musique}"; then
-    log_msg "FAILED dataset=musique"
-    status=1
-  fi
-  if ! wait "${pid_hotpotqa}"; then
-    log_msg "FAILED dataset=hotpotqa"
-    status=1
-  fi
-  if ! wait "${pid_2wiki}"; then
-    log_msg "FAILED dataset=2wikimultihopqa"
-    status=1
-  fi
+  local pids=()
+  local pid_names=()
+  local dataset
+  for dataset in ${DATASETS_OVERRIDE}; do
+    (run_dataset "${dataset}") &
+    pids+=("$!")
+    pid_names+=("${dataset}")
+  done
+  local idx
+  for idx in "${!pids[@]}"; do
+    if ! wait "${pids[$idx]}"; then
+      log_msg "FAILED dataset=${pid_names[$idx]}"
+      status=1
+    fi
+  done
 
   summarize_results >> "${OUT_DIR}/logs/launcher.log" 2>&1 || status=1
 
