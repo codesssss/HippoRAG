@@ -621,6 +621,25 @@ def _binding_candidate_hit_score(candidate_key: str,
     return 0.0
 
 
+def _llm_binding_compat_score(candidate_title: str,
+                              doc_title: str,
+                              doc_text: str,
+                              *,
+                              body_mention_weight: float = 0.0) -> float:
+    candidate_key = normalize_structure_text(candidate_title)
+    if not candidate_key:
+        return 0.0
+    if _title_match_pool_position(candidate_title, [doc_title]) is not None:
+        return 1.0
+    body_weight = min(max(float(body_mention_weight), 0.0), 1.0)
+    if body_weight <= 0.0:
+        return 0.0
+    normalized_body = normalize_structure_text(_doc_text_body(doc_text))
+    if _contains_normalized_phrase(normalized_body, candidate_key):
+        return body_weight
+    return 0.0
+
+
 def _build_bound_subquery(subquery: str, candidate_title: str) -> str:
     text = str(subquery or "").strip()
     title = str(candidate_title or "").strip()
@@ -895,6 +914,125 @@ def _build_agsto_graph_prior(
             "nonzero_count": int(np.sum(prior > 0.0)),
         }
     return prior, trace
+
+
+def _binding_grounding_scores(
+    *,
+    phi: np.ndarray,
+    active_requirements: Sequence[DTCRequirement],
+    bindings: Sequence[DAECBinding],
+    binding_assignment_rows_by_idx: Sequence[Sequence[Mapping[str, object]]],
+    pool_doc_titles: Sequence[str],
+    pool_limit: int,
+) -> Tuple[np.ndarray, List[Dict[str, object]]]:
+    """Score each binding by upstream phi support for its assigned entity docs."""
+    scores = np.ones(len(bindings), dtype=float)
+    traces: List[Dict[str, object]] = []
+    req_index_by_id = {str(req.unit_id): int(idx) for idx, req in enumerate(active_requirements)}
+    title_limit = list(pool_doc_titles[:pool_limit])
+
+    for binding_idx, binding in enumerate(bindings):
+        rows = list(binding_assignment_rows_by_idx[binding_idx]) if binding_idx < len(binding_assignment_rows_by_idx) else []
+        assignment_scores: List[float] = []
+        assignment_traces: List[Dict[str, object]] = []
+        for row in rows:
+            req_id = str(row.get("requirement_id", "") or "")
+            dep_id = str(row.get("dep", "") or "")
+            title = str(row.get("title", "") or "")
+            try:
+                entity_pos = int(row.get("title_pool_position", -1))
+            except (TypeError, ValueError):
+                entity_pos = -1
+            if entity_pos < 0 or entity_pos >= pool_limit:
+                entity_pos = _title_match_pool_position(title, title_limit)
+                entity_pos = int(entity_pos) if entity_pos is not None else -1
+
+            upstream_idx = req_index_by_id.get(dep_id)
+            grounding = 0.0
+            if upstream_idx is not None and 0 <= entity_pos < pool_limit and 0 <= binding_idx < phi.shape[1]:
+                grounding = float(phi[int(upstream_idx), int(binding_idx), int(entity_pos)])
+            assignment_scores.append(float(grounding))
+            assignment_traces.append({
+                "requirement_id": req_id,
+                "dep": dep_id,
+                "title": title,
+                "title_pool_position": int(entity_pos),
+                "upstream_requirement_index": int(upstream_idx) if upstream_idx is not None else None,
+                "grounding": round(float(grounding), 6),
+            })
+
+        score = float(np.mean(assignment_scores)) if assignment_scores else 1.0
+        scores[int(binding_idx)] = min(max(score, 0.0), 1.0)
+        traces.append({
+            "binding_id": str(binding.binding_id),
+            "score": round(float(scores[int(binding_idx)]), 6),
+            "assignments": assignment_traces,
+        })
+    return scores, traces
+
+
+def _daec_refine_by_single_swaps(
+    *,
+    binding_idx: int,
+    initial_positions: Sequence[int],
+    pool_limit: int,
+    objective_fn: Callable[[int, Sequence[int]], Tuple[float, np.ndarray]],
+    min_gain: float = 0.001,
+    max_passes: int = 1,
+) -> Tuple[List[int], float, np.ndarray, List[Dict[str, object]]]:
+    """Run a small 1-swap local search over the fixed-binding DAEC objective."""
+    current_positions = list(dict.fromkeys(int(pos) for pos in initial_positions if 0 <= int(pos) < pool_limit))
+    current_score, current_coverage = objective_fn(int(binding_idx), current_positions)
+    steps: List[Dict[str, object]] = []
+    max_pass_count = max(0, int(max_passes))
+    min_delta = max(float(min_gain), 0.0)
+    for _ in range(max_pass_count):
+        best_swap: Dict[str, object] | None = None
+        current_set = set(current_positions)
+        for out_pos in list(current_positions):
+            for in_pos in range(pool_limit):
+                if int(in_pos) in current_set:
+                    continue
+                proposed = _daec_replace_at_position(current_positions, int(out_pos), int(in_pos))
+                proposed_score, proposed_coverage = objective_fn(int(binding_idx), proposed)
+                gain = float(proposed_score - current_score)
+                if gain <= min_delta:
+                    continue
+                row = {
+                    "out_position": int(out_pos),
+                    "in_position": int(in_pos),
+                    "objective_gain": gain,
+                    "objective": float(proposed_score),
+                    "coverage": proposed_coverage,
+                }
+                if best_swap is None or (
+                    float(row["objective_gain"]),
+                    float(row["objective"]),
+                    -int(row["in_position"]),
+                ) > (
+                    float(best_swap["objective_gain"]),
+                    float(best_swap["objective"]),
+                    -int(best_swap["in_position"]),
+                ):
+                    best_swap = row
+        if best_swap is None:
+            break
+        current_positions = _daec_replace_at_position(
+            current_positions,
+            int(best_swap["out_position"]),
+            int(best_swap["in_position"]),
+        )
+        current_score = float(best_swap["objective"])
+        current_coverage = np.asarray(best_swap["coverage"], dtype=float)
+        steps.append({
+            "step": int(len(steps) + 1),
+            "mode": "daec_noisyor_single_swap",
+            "out_position": int(best_swap["out_position"]),
+            "in_position": int(best_swap["in_position"]),
+            "objective_gain": round(float(best_swap["objective_gain"]), 6),
+            "objective": round(float(current_score), 6),
+        })
+    return current_positions, float(current_score), np.asarray(current_coverage, dtype=float), steps
 
 
 def _topological_requirement_order(requirements: Sequence[DTCRequirement]) -> List[DTCRequirement]:
@@ -1298,6 +1436,11 @@ def select_daec_noisyor_positions(
     llm_extract_fn: Callable[[str, str], List[str]] | None = None,
     binding_mode: str = "auto",
     llm_binding_title_match_mode: str = "substring",
+    llm_binding_type_filter: bool = False,
+    soft_compat_body_weight: float = 0.0,
+    binding_grounding_enabled: bool = False,
+    swap_refinement_enabled: bool = False,
+    swap_min_gain: float = 0.001,
     gold_titles: Sequence[str] | None = None,
     agsto_metadata: Mapping[str, Any] | None = None,
     graph_prior_beta: float = 0.0,
@@ -1474,10 +1617,12 @@ def select_daec_noisyor_positions(
                     "dep_title": str(pool_doc_titles[int(dep_pos)]),
                     "dep_score": round(float(dep_scores[dep_pos]), 6),
                     "dep_subquery": str(dep_subquery),
+                    "expected_answer_type": str(dep_req.expected_answer_type if dep_req is not None else "unknown"),
                     "raw_entities": [str(ent) for ent in entities],
                     "matched_entities": [],
                     "unmatched_entities": [],
                     "skipped_anchor_entities": [],
+                    "type_incompatible_entities": [],
                     "duplicate_entities": [],
                 }
                 for ent in entities:
@@ -1501,17 +1646,31 @@ def select_daec_noisyor_positions(
                     if title_pos is None:
                         extraction_trace["unmatched_entities"].append(str(ent))
                         continue
+                    matched_title = str(pool_doc_titles[title_pos])
+                    if bool(llm_binding_type_filter) and not _candidate_type_compatible(
+                        matched_title,
+                        dep_req.expected_answer_type if dep_req is not None else "unknown",
+                    ):
+                        extraction_trace["type_incompatible_entities"].append({
+                            "entity": str(ent),
+                            "normalized_entity": str(ent_key),
+                            "match_type": str(match_type),
+                            "title": matched_title,
+                            "title_pool_position": int(title_pos),
+                            "expected_answer_type": str(dep_req.expected_answer_type if dep_req is not None else "unknown"),
+                        })
+                        continue
                     seen_keys.add(ent_key)
                     extraction_trace["matched_entities"].append({
                         "entity": str(ent),
                         "normalized_entity": str(ent_key),
                         "match_type": str(match_type),
-                        "title": str(pool_doc_titles[title_pos]),
+                        "title": matched_title,
                         "title_pool_position": int(title_pos),
                     })
                     rows.append({
                         "requirement_id": req.unit_id,
-                        "title": str(pool_doc_titles[title_pos]),
+                        "title": matched_title,
                         "key": ent_key,
                         "dep": dep,
                         "dep_position": int(dep_pos),
@@ -1623,6 +1782,7 @@ def select_daec_noisyor_positions(
             combo_records = sorted(combo_records, key=lambda item: int(item[1]))
 
         bindings = []
+        binding_assignment_rows_by_idx: List[Tuple[Dict[str, object], ...]] = []
         for binding_idx, (_, _, combo) in enumerate(combo_records):
             assignments = tuple(
                 sorted(
@@ -1634,8 +1794,10 @@ def select_daec_noisyor_positions(
                 )
             )
             bindings.append(DAECBinding(binding_id=f"b{binding_idx}", assignments=assignments))
+            binding_assignment_rows_by_idx.append(tuple(dict(row) for row in combo))
     else:
         bindings = [DAECBinding(binding_id="b0", assignments=())]
+        binding_assignment_rows_by_idx = [tuple()]
     prior = 1.0 / float(max(len(bindings), 1))
     bindings = [
         DAECBinding(binding_id=binding.binding_id, assignments=binding.assignments, prior=prior)
@@ -1672,7 +1834,12 @@ def select_daec_noisyor_positions(
                 candidate_key = normalize_structure_text(assignment)
                 if _binding_mode in ("llm", "random", "oracle"):
                     compat = np.asarray([
-                        1.0 if _title_match_pool_position(assignment, [pool_doc_titles[pos]]) is not None else 0.0
+                        _llm_binding_compat_score(
+                            assignment,
+                            pool_doc_titles[pos],
+                            pool_docs[pos],
+                            body_mention_weight=float(soft_compat_body_weight),
+                        )
                         for pos in range(pool_limit)
                     ], dtype=float)
                 else:
@@ -1704,6 +1871,20 @@ def select_daec_noisyor_positions(
         and bool(agsto_metadata)
         and int((graph_prior_trace.get("stats") or {}).get("nonzero_count", 0) or 0) > 0
     )
+    grounding_scores, grounding_traces = _binding_grounding_scores(
+        phi=phi,
+        active_requirements=active_requirements,
+        bindings=bindings,
+        binding_assignment_rows_by_idx=binding_assignment_rows_by_idx,
+        pool_doc_titles=pool_doc_titles,
+        pool_limit=pool_limit,
+    )
+    grounding_enabled = bool(binding_grounding_enabled)
+    grounding_trace: Dict[str, object] = {
+        "enabled": grounding_enabled,
+        "protocol": "upstream_phi_entity_doc_mean",
+        "scores": grounding_traces[:20],
+    }
 
     def objective(binding_idx: int, positions: Sequence[int]) -> Tuple[float, np.ndarray]:
         coverage = _daec_noisy_or_coverage(phi[:, binding_idx, :], positions)
@@ -1789,15 +1970,26 @@ def select_daec_noisyor_positions(
             "objective": float(current_score),
             "graph_prior_objective": float(current_graph_prior_score),
             "effective_objective": float(current_effective_score),
+            "binding_grounding_score": float(grounding_scores[int(binding_idx)]) if int(binding_idx) < grounding_scores.size else 1.0,
+            "binding_selection_score": (
+                float(current_effective_score)
+                * (
+                    float(grounding_scores[int(binding_idx)])
+                    if grounding_enabled and int(binding_idx) < grounding_scores.size
+                    else 1.0
+                )
+            ),
             "coverage": current_coverage,
             "steps": steps,
         }
         binding_results.append(result)
         if best_result is None or (
+            float(result["binding_selection_score"]),
             float(result["effective_objective"]),
             float(result["objective"]),
             -int(result["binding_idx"]),
         ) > (
+            float(best_result["binding_selection_score"]),
             float(best_result["effective_objective"]),
             float(best_result["objective"]),
             -int(best_result["binding_idx"]),
@@ -1818,6 +2010,7 @@ def select_daec_noisyor_positions(
             "binding_pruned": bool(binding_pruned),
             "phi_shape": [int(dim) for dim in phi.shape],
             "agsto_graph_prior": graph_prior_trace,
+            "binding_grounding": grounding_trace,
             "selected_positions": fallback_positions,
             "selected_titles": [pool_doc_titles[pos] for pos in fallback_positions],
             "selection_steps": [],
@@ -1860,6 +2053,12 @@ def select_daec_noisyor_positions(
     best_coverage = rebuild_coverage
     best_objective = rebuild_objective
     best_steps = list(best_result["steps"])
+    swap_refinement_trace: Dict[str, object] = {
+        "enabled": bool(swap_refinement_enabled),
+        "min_gain": round(float(swap_min_gain), 6),
+        "applied": False,
+        "steps": [],
+    }
     if bool(safe_projection):
         max_swaps = max(0, int(safe_max_swaps))
         preserve_top_m = max(0, int(safe_preserve_top_m))
@@ -1963,6 +2162,22 @@ def select_daec_noisyor_positions(
             best_steps = list(swap_steps)
             safe_trace["safe_swap_steps"] = list(swap_steps)
             safe_trace["safe_decision"] = "minimal_edit_applied" if swap_steps else "fallback_no_eligible_swap"
+    elif bool(swap_refinement_enabled):
+        refined_positions, refined_objective, refined_coverage, refinement_steps = _daec_refine_by_single_swaps(
+            binding_idx=best_binding_idx,
+            initial_positions=best_positions,
+            pool_limit=pool_limit,
+            objective_fn=objective,
+            min_gain=float(swap_min_gain),
+            max_passes=1,
+        )
+        if refinement_steps:
+            best_positions = list(refined_positions)
+            best_objective = float(refined_objective)
+            best_coverage = np.asarray(refined_coverage, dtype=float)
+            best_steps = list(best_steps) + list(refinement_steps)
+            swap_refinement_trace["applied"] = True
+            swap_refinement_trace["steps"] = list(refinement_steps)
 
     covered_count = int(np.sum(best_coverage > 0.0))
     trace = {
@@ -1980,11 +2195,19 @@ def select_daec_noisyor_positions(
         "binding_selection_protocol": "best_binding_final_pool",
         "binding_mode": str(_binding_mode),
         "llm_binding_title_match_mode": str(_llm_binding_title_match_mode),
+        "llm_binding_type_filter": bool(llm_binding_type_filter),
+        "soft_compat_body_weight": round(float(soft_compat_body_weight), 6),
         "llm_binding_extractions": llm_binding_extraction_traces[:50],
         "llm_binding_extraction_count": int(len(llm_binding_extraction_traces)),
         "bindings": [binding.to_trace() for binding in bindings[:20]],
         "selected_binding": best_binding.to_trace(),
         "selected_binding_id": str(best_binding.binding_id),
+        "selected_binding_grounding_score": round(
+            float(grounding_scores[best_binding_idx]) if best_binding_idx < grounding_scores.size else 1.0,
+            6,
+        ),
+        "selected_binding_score": round(float(best_result.get("binding_selection_score", rebuild_effective_objective)), 6),
+        "binding_grounding": grounding_trace,
         "binding_candidates_by_requirement": {
             req_id: [
                 {
@@ -2016,6 +2239,7 @@ def select_daec_noisyor_positions(
         "selected_titles": [pool_doc_titles[pos] for pos in best_positions],
         "selection_steps": list(best_steps),
         "agsto_graph_prior": graph_prior_trace,
+        "swap_refinement_trace": swap_refinement_trace,
         "safe_projection_trace": safe_trace,
         "embedding_available_requirement_count": int(
             sum(_normalize_vector(requirement_embeddings.get(req.unit_id, np.array([]))).size > 0 for req in active_requirements)
@@ -2027,6 +2251,8 @@ def select_daec_noisyor_positions(
                 "objective": round(float(result["objective"]), 6),
                 "graph_prior_objective": round(float(result.get("graph_prior_objective", 0.0)), 6),
                 "effective_objective": round(float(result.get("effective_objective", result["objective"])), 6),
+                "binding_grounding_score": round(float(result.get("binding_grounding_score", 1.0)), 6),
+                "binding_selection_score": round(float(result.get("binding_selection_score", result.get("effective_objective", result["objective"]))), 6),
                 "selected_positions": list(result["positions"]),
             }
             for result in binding_results[:20]

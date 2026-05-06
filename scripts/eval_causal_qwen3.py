@@ -5339,6 +5339,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            daec_graph_prior_w_selected: float = 1.0,
                            daec_graph_prior_w_anchor: float = 0.3,
                            daec_graph_prior_w_rank: float = 0.2,
+                           daec_llm_binding_type_filter: bool = False,
+                           daec_soft_compat_body_weight: float = 0.0,
+                           daec_binding_grounding_enabled: bool = False,
+                           daec_swap_refinement: bool = False,
+                           daec_swap_min_gain: float = 0.001,
                            llm_binding_url: str = "http://localhost:8043/v1",
                            llm_binding_model: str = "qwen3-8b-train",
                            llm_binding_cache_path: str = "",
@@ -5990,6 +5995,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     llm_extract_fn=llm_extract_fn,
                     binding_mode="llm",
                     llm_binding_title_match_mode=str(llm_binding_title_match_mode),
+                    llm_binding_type_filter=bool(daec_llm_binding_type_filter),
+                    soft_compat_body_weight=float(daec_soft_compat_body_weight),
+                    binding_grounding_enabled=bool(daec_binding_grounding_enabled),
+                    swap_refinement_enabled=bool(daec_swap_refinement),
+                    swap_min_gain=float(daec_swap_min_gain),
                     selector_label_override="bridge_append_daec_assemble",
                 )
                 _q_binding_cost = {
@@ -6011,6 +6021,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 daec_assemble_trace["daec_main_objective"] = "frozen_binding_noisy_or"
                 daec_assemble_trace["daec_safe_projection"] = False
                 daec_assemble_trace["daec_binding_mode"] = "llm"
+                daec_assemble_trace["daec_llm_binding_type_filter"] = bool(daec_llm_binding_type_filter)
+                daec_assemble_trace["daec_soft_compat_body_weight"] = float(daec_soft_compat_body_weight)
+                daec_assemble_trace["daec_binding_grounding_enabled"] = bool(daec_binding_grounding_enabled)
+                daec_assemble_trace["daec_swap_refinement"] = bool(daec_swap_refinement)
                 selected_positions = [
                     local_candidate_positions[int(pos)]
                     for pos in local_selected_positions
@@ -6163,6 +6177,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     llm_extract_fn=llm_extract_fn,
                     binding_mode=_daec_binding_mode,
                     llm_binding_title_match_mode=str(llm_binding_title_match_mode),
+                    llm_binding_type_filter=bool(daec_llm_binding_type_filter),
+                    soft_compat_body_weight=float(daec_soft_compat_body_weight),
+                    binding_grounding_enabled=bool(daec_binding_grounding_enabled),
+                    swap_refinement_enabled=bool(daec_swap_refinement),
+                    swap_min_gain=float(daec_swap_min_gain),
                     gold_titles=[extract_doc_title(doc_text) for doc_text in (qs.gold_docs or [])] if selector_name == "daec_noisyor_oracle" else None,
                     agsto_metadata=agsto_metadata if selector_name == "daec_noisyor_llm_agsto" else None,
                     graph_prior_beta=float(daec_graph_prior_beta) if selector_name == "daec_noisyor_llm_agsto" else 0.0,
@@ -6202,6 +6221,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 selector_trace["daec_graph_prior_beta"] = (
                     float(daec_graph_prior_beta) if selector_name == "daec_noisyor_llm_agsto" else 0.0
                 )
+                selector_trace["daec_llm_binding_type_filter"] = bool(daec_llm_binding_type_filter)
+                selector_trace["daec_soft_compat_body_weight"] = float(daec_soft_compat_body_weight)
+                selector_trace["daec_binding_grounding_enabled"] = bool(daec_binding_grounding_enabled)
+                selector_trace["daec_swap_refinement"] = bool(daec_swap_refinement)
             dtc_parse_success_count += int(bool(decomposition_trace.get("parse_succeeded", False)))
             dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
             dtc_requirement_counts.append(int(selector_trace.get("requirement_count", 0) or 0))
@@ -7094,6 +7117,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "daec_graph_prior_w_selected": round(float(daec_graph_prior_w_selected), 6),
                 "daec_graph_prior_w_anchor": round(float(daec_graph_prior_w_anchor), 6),
                 "daec_graph_prior_w_rank": round(float(daec_graph_prior_w_rank), 6),
+                "daec_llm_binding_type_filter": bool(daec_llm_binding_type_filter),
+                "daec_soft_compat_body_weight": round(float(daec_soft_compat_body_weight), 6),
+                "daec_binding_grounding_enabled": bool(daec_binding_grounding_enabled),
+                "daec_swap_refinement": bool(daec_swap_refinement),
+                "daec_swap_min_gain": round(float(daec_swap_min_gain), 6),
             })
             if _llm_binding_query_stats:
                 import statistics as _stats_mod
@@ -7871,6 +7899,16 @@ def main():
                         help="AG-STO graph-prior component weight for native dense-anchor membership.")
     parser.add_argument("--daec_graph_prior_w_rank", type=float, default=0.2,
                         help="AG-STO graph-prior component weight for AG-STO retrieved_doc_indices rank.")
+    parser.add_argument("--daec_llm_binding_type_filter", type=string_to_bool, default=False,
+                        help="For LLM binding, reject matched titles that fail the conservative expected-answer-type guard.")
+    parser.add_argument("--daec_soft_compat_body_weight", type=float, default=0.0,
+                        help="For dependent DAEC demands, give this compatibility weight when the bound entity is mentioned in a candidate document body but the title is not the bound entity.")
+    parser.add_argument("--daec_binding_grounding_enabled", type=string_to_bool, default=False,
+                        help="Rerank frozen bindings by selection-independent upstream-phi grounding of assigned entity documents.")
+    parser.add_argument("--daec_swap_refinement", type=string_to_bool, default=False,
+                        help="After greedy DAEC selection, run one pass of fixed-binding 1-swap local refinement.")
+    parser.add_argument("--daec_swap_min_gain", type=float, default=0.001,
+                        help="Minimum DAEC objective gain required for optional 1-swap refinement.")
     parser.add_argument("--llm_binding_url", type=str, default="http://localhost:8043/v1",
                         help="VLLM endpoint URL for LLM-extraction binding (daec_noisyor_llm).")
     parser.add_argument("--llm_binding_model", type=str, default="qwen3-8b-train",
@@ -8490,6 +8528,11 @@ def main():
             daec_graph_prior_w_selected=float(args.daec_graph_prior_w_selected),
             daec_graph_prior_w_anchor=float(args.daec_graph_prior_w_anchor),
             daec_graph_prior_w_rank=float(args.daec_graph_prior_w_rank),
+            daec_llm_binding_type_filter=bool(args.daec_llm_binding_type_filter),
+            daec_soft_compat_body_weight=float(args.daec_soft_compat_body_weight),
+            daec_binding_grounding_enabled=bool(args.daec_binding_grounding_enabled),
+            daec_swap_refinement=bool(args.daec_swap_refinement),
+            daec_swap_min_gain=float(args.daec_swap_min_gain),
             llm_binding_url=str(args.llm_binding_url),
             llm_binding_model=str(args.llm_binding_model),
             llm_binding_cache_path=str(args.llm_binding_cache_path),
@@ -8996,6 +9039,11 @@ def main():
             "daec_graph_prior_w_selected": float(args.daec_graph_prior_w_selected),
             "daec_graph_prior_w_anchor": float(args.daec_graph_prior_w_anchor),
             "daec_graph_prior_w_rank": float(args.daec_graph_prior_w_rank),
+            "daec_llm_binding_type_filter": bool(args.daec_llm_binding_type_filter),
+            "daec_soft_compat_body_weight": float(args.daec_soft_compat_body_weight),
+            "daec_binding_grounding_enabled": bool(args.daec_binding_grounding_enabled),
+            "daec_swap_refinement": bool(args.daec_swap_refinement),
+            "daec_swap_min_gain": float(args.daec_swap_min_gain),
             "setwise_late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
             "setwise_late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "setwise_late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),

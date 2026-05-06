@@ -1061,6 +1061,206 @@ def test_select_daec_noisyor_llm_binding_traces_entity_matches():
     assert trace["llm_binding_extractions"][0]["matched_entities"][0]["title"] == "Alice Smith"
 
 
+def test_select_daec_noisyor_llm_binding_type_filter_rejects_incompatible_title():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?", expected_answer_type="person"),
+        DTCRequirement(unit_id="s2", subquery="Where was that director born?", depends_on=("s1",)),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X mentions Example Film.",
+        "Example Film\nThis is a film page, not a person page.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.0, 1.0],
+    ])
+
+    _, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1],
+        pool_doc_titles=["Film X", "Example Film"],
+        doc_idx_to_entities={0: {"film x"}, 1: {"example film"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["Example Film"],
+        binding_mode="llm",
+        llm_binding_type_filter=True,
+    )
+
+    assert trace["binding_candidates_by_requirement"]["s2"] == []
+    rejected = trace["llm_binding_extractions"][0]["type_incompatible_entities"]
+    assert rejected[0]["title"] == "Example Film"
+    assert rejected[0]["expected_answer_type"] == "person"
+
+
+def test_select_daec_noisyor_soft_body_compat_rescues_mentioned_answer_doc():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?", expected_answer_type="person"),
+        DTCRequirement(unit_id="s2", subquery="Where was that director born?", depends_on=("s1",)),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0, 0.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice.",
+        "Alice\nAlice is a person page with no birth place.",
+        "Birth Evidence\nAlice was born in Paris.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0],
+        [0.0, 1.0, 0.0],
+    ])
+
+    selected, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Film X", "Alice", "Birth Evidence"],
+        doc_idx_to_entities={0: {"film x", "alice"}, 1: {"alice"}, 2: {"alice", "paris"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0, 0.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["Alice"],
+        binding_mode="llm",
+        soft_compat_body_weight=0.5,
+    )
+
+    assert selected == [0, 2]
+    assert trace["soft_compat_body_weight"] == 0.5
+    assert trace["coverage_by_requirement"]["s2"] == 0.5
+
+
+def test_select_daec_noisyor_binding_grounding_reranks_equal_objective_bindings():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?", expected_answer_type="person"),
+        DTCRequirement(unit_id="s2", subquery="Where was that director born?", depends_on=("s1",)),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0, 0.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice. Bad Topic is also mentioned.",
+        "Bad Topic\nA topical page, not the director entity.",
+        "Alice\nAlice was born in Paris.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.9, 0.0, 0.1],
+    ])
+
+    def embed_bound_texts(texts):
+        values = {}
+        for text in texts:
+            values[text] = np.asarray([0.0, 1.0, 0.0]) if "Bad Topic" in text else np.asarray([0.0, 0.0, 1.0])
+        return values
+
+    _, base_trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Film X", "Bad Topic", "Alice"],
+        doc_idx_to_entities={0: {"film x", "alice", "bad topic"}, 1: {"bad topic"}, 2: {"alice"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=2,
+        embed_texts_fn=embed_bound_texts,
+        llm_extract_fn=lambda subquery, doc_text: ["Bad Topic", "Alice"],
+        binding_mode="llm",
+    )
+    selected, grounded_trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Film X", "Bad Topic", "Alice"],
+        doc_idx_to_entities={0: {"film x", "alice", "bad topic"}, 1: {"bad topic"}, 2: {"alice"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=2,
+        embed_texts_fn=embed_bound_texts,
+        llm_extract_fn=lambda subquery, doc_text: ["Bad Topic", "Alice"],
+        binding_mode="llm",
+        binding_grounding_enabled=True,
+    )
+
+    assert base_trace["selected_binding"]["assignments"] == {"s2": "Bad Topic"}
+    assert grounded_trace["selected_binding"]["assignments"] == {"s2": "Alice"}
+    assert set(selected) == {0, 2}
+    assert grounded_trace["binding_grounding"]["enabled"] is True
+    scores = {row["binding_id"]: row["score"] for row in grounded_trace["binding_grounding"]["scores"]}
+    assert scores["b1"] > scores["b0"]
+
+
+def test_select_daec_noisyor_optional_swap_refinement_improves_greedy_set():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Need evidence A."),
+        DTCRequirement(unit_id="s2", subquery="Need evidence B."),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Mixed\nPartial support for both demands.",
+        "Only A\nStrong support for A.",
+        "Only B\nStrong support for B.",
+    ]
+    passage_embeddings = np.asarray([
+        [0.6, 0.6],
+        [1.0, 0.0],
+        [0.0, 1.0],
+    ])
+
+    base_selected, base_trace = select_daec_noisyor_positions(
+        query="Need A and B.",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Mixed", "Only A", "Only B"],
+        doc_idx_to_entities={0: set(), 1: set(), 2: set()},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+    )
+    refined_selected, refined_trace = select_daec_noisyor_positions(
+        query="Need A and B.",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Mixed", "Only A", "Only B"],
+        doc_idx_to_entities={0: set(), 1: set(), 2: set()},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        swap_refinement_enabled=True,
+        swap_min_gain=0.001,
+    )
+
+    assert base_selected == [0, 1]
+    assert set(refined_selected) == {1, 2}
+    assert refined_trace["objective"] > base_trace["objective"]
+    assert refined_trace["swap_refinement_trace"]["applied"] is True
+
+
 def test_select_daec_noisyor_llm_binding_exact_mode_blocks_substring_title_match():
     requirements = [
         DTCRequirement(unit_id="s1", subquery="Who directed Film X?"),
