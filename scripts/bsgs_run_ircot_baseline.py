@@ -33,12 +33,25 @@ JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
 def get_gold_docs(samples: list[dict[str, Any]]) -> list[list[str]]:
     gold_docs: list[list[str]] = []
     for sample in samples:
+        docs: list[str] = []
         paragraphs = sample.get("paragraphs") or []
-        docs = [
-            para["title"] + "\n" + (para.get("text") or para.get("paragraph_text") or "")
-            for para in paragraphs
-            if para.get("is_supporting") is not False
-        ]
+        if paragraphs:
+            docs = [
+                para["title"] + "\n" + (para.get("text") or para.get("paragraph_text") or "")
+                for para in paragraphs
+                if para.get("is_supporting") is not False
+            ]
+        elif sample.get("context") and sample.get("supporting_facts"):
+            context_by_title = {
+                str(title): " ".join(str(sent) for sent in sentences)
+                for title, sentences in sample.get("context") or []
+            }
+            support_titles = [str(row[0]) for row in sample.get("supporting_facts") or [] if row]
+            docs = [
+                f"{title}\n{context_by_title[title]}"
+                for title in support_titles
+                if title in context_by_title
+            ]
         gold_docs.append(list(dict.fromkeys(docs)))
     return gold_docs
 
@@ -102,6 +115,41 @@ def parse_followup_query(raw: str, fallback: str) -> str:
             pass
     cleaned = " ".join(str(raw or "").split())
     return cleaned[:240] if cleaned else fallback
+
+
+def select_final_docs(
+    step_docs: list[list[str]],
+    score_by_doc: dict[str, float],
+    *,
+    qa_top_k: int,
+    final_doc_order: str,
+) -> tuple[list[str], list[float]]:
+    selected: list[str] = []
+    seen: set[str] = set()
+    normalized_order = str(final_doc_order or "append_order").strip().lower()
+    if normalized_order == "round_robin":
+        max_width = max((len(docs) for docs in step_docs), default=0)
+        for rank in range(max_width):
+            for docs in step_docs:
+                if rank >= len(docs):
+                    continue
+                doc = docs[rank]
+                if doc in seen:
+                    continue
+                selected.append(doc)
+                seen.add(doc)
+                if len(selected) >= int(qa_top_k):
+                    return selected, [float(score_by_doc.get(doc, 1.0)) for doc in selected]
+    else:
+        for docs in step_docs:
+            for doc in docs:
+                if doc in seen:
+                    continue
+                selected.append(doc)
+                seen.add(doc)
+                if len(selected) >= int(qa_top_k):
+                    return selected, [float(score_by_doc.get(doc, 1.0)) for doc in selected]
+    return selected, [float(score_by_doc.get(doc, 1.0)) for doc in selected]
 
 
 def build_config(args: argparse.Namespace, corpus_len: int) -> BaseConfig:
@@ -197,6 +245,8 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
     current_queries = list(queries)
     per_query_docs: list[list[str]] = [[] for _ in queries]
     per_query_scores: list[list[float]] = [[] for _ in queries]
+    per_query_step_docs: list[list[list[str]]] = [[] for _ in queries]
+    per_query_score_by_doc: list[dict[str, float]] = [{} for _ in queries]
     generated_queries: list[list[str]] = [[] for _ in queries]
     llm_query_calls = 0
     llm_errors: list[str] = []
@@ -210,11 +260,16 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
         for q_idx, qs in enumerate(query_solutions):
             seen = set(per_query_docs[q_idx])
             scores = qs.doc_scores.tolist() if qs.doc_scores is not None else [1.0] * len(qs.docs)
+            step_docs: list[str] = []
             for doc, score in zip(qs.docs, scores):
+                per_query_score_by_doc[q_idx].setdefault(doc, float(score))
+                if doc not in set(step_docs):
+                    step_docs.append(doc)
                 if doc not in seen:
                     per_query_docs[q_idx].append(doc)
                     per_query_scores[q_idx].append(float(score))
                     seen.add(doc)
+            per_query_step_docs[q_idx].append(step_docs)
         if step >= int(args.max_iter):
             break
         next_queries: list[str] = []
@@ -233,8 +288,13 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
 
     final_solutions: list[QuerySolution] = []
     for q_idx, question in enumerate(queries):
-        docs_top = per_query_docs[q_idx][: args.qa_top_k]
-        scores_top = np.asarray(per_query_scores[q_idx][: len(docs_top)], dtype=float)
+        docs_top, scores = select_final_docs(
+            per_query_step_docs[q_idx],
+            per_query_score_by_doc[q_idx],
+            qa_top_k=int(args.qa_top_k),
+            final_doc_order=str(args.final_doc_order),
+        )
+        scores_top = np.asarray(scores[: len(docs_top)], dtype=float)
         final_solutions.append(
             QuerySolution(
                 question=question,
@@ -272,6 +332,8 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
                 "qid": samples[q_idx].get("id") or samples[q_idx].get("_id"),
                 "question": queries[q_idx],
                 "generated_queries": generated_queries[q_idx],
+                "final_doc_order": str(args.final_doc_order),
+                "step_docs": per_query_step_docs[q_idx],
                 "answer": answer,
                 "gold_answers": gold_answers[q_idx],
                 "em": em,
@@ -293,6 +355,7 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
         "max_iter": int(args.max_iter),
         "top_k_per_iter": int(args.top_k_per_iter),
         "qa_top_k": int(args.qa_top_k),
+        "final_doc_order": str(args.final_doc_order),
         "answer_em": answer_em_mean,
         "answer_f1": answer_f1_mean,
         "supporting_paragraph_recall": support_recall_mean,
@@ -321,6 +384,7 @@ def main() -> None:
     parser.add_argument("--max_iter", type=int, default=3)
     parser.add_argument("--top_k_per_iter", type=int, default=5)
     parser.add_argument("--qa_top_k", type=int, default=5)
+    parser.add_argument("--final_doc_order", choices=["append_order", "round_robin"], default="round_robin")
     parser.add_argument("--qa_doc_max_chars", type=int, default=2048)
     parser.add_argument("--retrieval_top_k", type=int, default=100)
     parser.add_argument("--linking_top_k", type=int, default=5)
