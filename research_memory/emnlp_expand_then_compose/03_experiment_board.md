@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-04-28
+Last updated: 2026-05-06
 
 ## Canonical Outputs
 
@@ -84,6 +84,10 @@ Last updated: 2026-04-28
 - `Q-BindCert Phase-0 closure`: `research_memory/emnlp_expand_then_compose/36_qbindcert_phase0_closure_20260428.md`
 - `Q-BindCert Phase-0 report`: `reports/qbindcert/phase0_sanity.md`
 - `Q-BindCert Phase-0 implementation`: `scripts/qbindcert_phase0_sanity.py`
+- `DAEC submission critical path`: `research_memory/emnlp_expand_then_compose/39_submission_critical_path_20260506.md`
+- `IRCoT-style full1000 launcher`: `run_logs/launch_ircot_style_full1000_20260506.sh`
+- `LLM-direct-select full1000 launcher`: `run_logs/launch_llm_direct_select_proprag_full1000_20260506.sh`
+- `Reviewer baseline full1000 queue`: `run_logs/launch_reviewer_baselines_full1000_20260506.sh`
 
 ## Done
 
@@ -415,7 +419,8 @@ Method implementation order should be:
    - oracle select@100
    - PropRAG aligned comparison
    - dense-pool comparison
-   - IRCoT-style iterative baseline for BSGS
+   - IRCoT-style (local) iterative baseline for DAEC reviewer control
+   - LLM-direct-select baseline for DAEC reviewer control
 4. Backup line:
    - keep `Requirement-Aware Strongest` documented and runnable as a reserve option
    - do not promote it without at least `HotpotQA` baseline parity plus retained `2Wiki` gains
@@ -458,7 +463,9 @@ Method implementation order should be:
   - gold-vs-best-wrong AUC remains low (`0.570826`, CI upper `0.624433`)
   - conditional top1/top3 improve to `0.595238` / `0.827381`, but this is not clean answer-level separability
   - compositional/inference types remain weak, so the result supports a diagnostic section rather than another method iteration
-- Formal IRCoT MuSiQue-1000 remains unavailable because the run exited before final JSON; this is a baseline gap, not a blocker for the BSGS negative mechanism conclusion
+- Current DAEC submission blockers are tracked in `research_memory/emnlp_expand_then_compose/39_submission_critical_path_20260506.md`.
+- IRCoT-style (local) full1000 and LLM-direct-select full1000 are the active reviewer baselines for the DAEC paper; do not describe them as official IRCoT reproduction.
+- Current-version PropRAG full1000 `nobinding` refresh is required before paper freeze, but must wait until the active reviewer baseline queue finishes.
 
 ## Do Not Drift
 

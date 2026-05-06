@@ -4,6 +4,20 @@ This is the active TODO list for hardening the current paper-facing
 `DAEC-LLM + CTL` line after cross-pool full1000 results. It is intentionally a
 task list, not a new method formulation.
 
+Priority update, 2026-05-06:
+
+- Canonical execution order is now recorded in
+  `research_memory/emnlp_expand_then_compose/39_submission_critical_path_20260506.md`.
+- Current blockers are:
+  1. full1000 `IRCoT-style (local)`;
+  2. full1000 `LLM-direct-select`;
+  3. full1000-only CI and cost tables;
+  4. current-version PropRAG full1000 `nobinding` refresh.
+- Do not mix limit100 and full1000 in the main table. Limit100 results are
+  appendix/pilot diagnostics.
+- Do not start optional leakage, answer-masking, or new verifier experiments
+  before the four blockers above are closed.
+
 ## Current Method Boundary
 
 Paper-safe claim:
@@ -237,4 +251,3 @@ QA candidate-pool substrate
 3. Run demand-only extraction control at limit=100.
 4. Run CTL false-positive and empty-response audit.
 5. Only then test connectivity tie-break / anchor guard at limit=100.
-
