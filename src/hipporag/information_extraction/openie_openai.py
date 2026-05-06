@@ -88,11 +88,12 @@ def parse_causal_relations_response(real_response: str,
 
 
 class OpenIE:
-    def __init__(self, llm_model: CacheOpenAI):
+    def __init__(self, llm_model: CacheOpenAI, triple_extraction_template: str = "triple_extraction"):
         # Init prompt template manager
         self.prompt_template_manager = PromptTemplateManager(role_mapping={"system": "system", "user": "user", "assistant": "assistant"})
         self.llm_model = llm_model
         self.global_config = getattr(llm_model, "global_config", None)
+        self.triple_extraction_template = triple_extraction_template
 
     def ner(self, chunk_key: str, passage: str) -> NerRawOutput:
         # PREPROCESSING
@@ -151,7 +152,7 @@ class OpenIE:
             sanitized_entities = _sanitize_named_entities(named_entities)
             # PREPROCESSING
             messages = self.prompt_template_manager.render(
-                name='triple_extraction',
+                name=self.triple_extraction_template,
                 passage=passage,
                 named_entity_json=json.dumps({"named_entities": sanitized_entities})
             )

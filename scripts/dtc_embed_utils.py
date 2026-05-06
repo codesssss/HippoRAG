@@ -4,7 +4,7 @@ from dataclasses import dataclass, asdict
 import itertools
 import json
 import re
-from typing import Any, Callable, Dict, List, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Sequence, Tuple
 
 import numpy as np
 
@@ -774,6 +774,129 @@ def _daec_replace_at_position(positions: Sequence[int], old_pos: int, new_pos: i
     return updated
 
 
+def _coerce_optional_int(value: Any) -> int | None:
+    try:
+        if value is None:
+            return None
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _coerce_int_list(values: Any) -> List[int]:
+    if values is None:
+        return []
+    if isinstance(values, (str, bytes)):
+        raw_values = [values]
+    elif isinstance(values, Sequence):
+        raw_values = list(values)
+    else:
+        raw_values = [values]
+    coerced: List[int] = []
+    seen: set[int] = set()
+    for value in raw_values:
+        int_value = _coerce_optional_int(value)
+        if int_value is None or int_value in seen:
+            continue
+        coerced.append(int_value)
+        seen.add(int_value)
+    return coerced
+
+
+def _build_agsto_graph_prior(
+    *,
+    agsto_metadata: Mapping[str, Any] | None,
+    pool_doc_ids: Sequence[int | None],
+    pool_limit: int,
+    w_selected: float = 1.0,
+    w_anchor: float = 0.3,
+    w_rank: float = 0.2,
+    dense_anchor_top_k: int = 20,
+) -> Tuple[np.ndarray, Dict[str, object]]:
+    """Build a per-document AG-STO prior aligned to the current DAEC pool."""
+    limit = max(0, min(int(pool_limit), len(pool_doc_ids)))
+    prior = np.zeros(limit, dtype=float)
+    trace: Dict[str, object] = {
+        "metadata_present": bool(agsto_metadata),
+        "component_weights": {
+            "selected": round(float(w_selected), 6),
+            "anchor": round(float(w_anchor), 6),
+            "rank": round(float(w_rank), 6),
+        },
+        "dense_anchor_top_k": int(max(0, dense_anchor_top_k)),
+        "selected_positions": [],
+        "dense_anchor_positions": [],
+        "retrieved_positions": [],
+        "stats": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "nonzero_count": 0,
+        },
+    }
+    if not agsto_metadata or limit <= 0:
+        return prior, trace
+
+    selected_doc_indices = _coerce_int_list(agsto_metadata.get("selected_doc_indices"))
+    selected_evidence_set = agsto_metadata.get("selected_evidence_set")
+    if not selected_doc_indices and isinstance(selected_evidence_set, Mapping):
+        selected_doc_indices = _coerce_int_list(selected_evidence_set.get("doc_indices"))
+    selected_ids = set(selected_doc_indices)
+
+    dense_anchor_doc_indices = _coerce_int_list(agsto_metadata.get("native_dense_doc_indices"))
+    anchor_keep = max(0, int(dense_anchor_top_k))
+    dense_anchor_ids = set(dense_anchor_doc_indices[:anchor_keep] if anchor_keep else [])
+
+    retrieved_doc_indices = _coerce_int_list(agsto_metadata.get("retrieved_doc_indices"))
+    rank_score_by_doc_id: Dict[int, float] = {}
+    if retrieved_doc_indices:
+        denom = float(max(len(retrieved_doc_indices) - 1, 1))
+        for rank, doc_id in enumerate(retrieved_doc_indices):
+            rank_score_by_doc_id.setdefault(int(doc_id), 1.0 - float(rank) / denom)
+
+    positive_weights = [
+        max(float(w_selected), 0.0),
+        max(float(w_anchor), 0.0),
+        max(float(w_rank), 0.0),
+    ]
+    weight_denom = float(sum(positive_weights))
+    if weight_denom <= 1e-12:
+        return prior, trace
+
+    selected_positions: List[int] = []
+    dense_anchor_positions: List[int] = []
+    retrieved_positions: List[int] = []
+    for pos, raw_doc_id in enumerate(pool_doc_ids[:limit]):
+        doc_id = _coerce_optional_int(raw_doc_id)
+        if doc_id is None:
+            continue
+        score = 0.0
+        if positive_weights[0] > 0.0 and doc_id in selected_ids:
+            score += positive_weights[0]
+            selected_positions.append(int(pos))
+        if positive_weights[1] > 0.0 and doc_id in dense_anchor_ids:
+            score += positive_weights[1]
+            dense_anchor_positions.append(int(pos))
+        if positive_weights[2] > 0.0:
+            rank_score = float(rank_score_by_doc_id.get(doc_id, 0.0))
+            if rank_score > 0.0:
+                retrieved_positions.append(int(pos))
+            score += positive_weights[2] * rank_score
+        prior[int(pos)] = min(max(score / weight_denom, 0.0), 1.0)
+
+    trace["selected_positions"] = selected_positions
+    trace["dense_anchor_positions"] = dense_anchor_positions
+    trace["retrieved_positions"] = retrieved_positions
+    if prior.size:
+        trace["stats"] = {
+            "min": round(float(np.min(prior)), 6),
+            "max": round(float(np.max(prior)), 6),
+            "mean": round(float(np.mean(prior)), 6),
+            "nonzero_count": int(np.sum(prior > 0.0)),
+        }
+    return prior, trace
+
+
 def _topological_requirement_order(requirements: Sequence[DTCRequirement]) -> List[DTCRequirement]:
     req_by_id = {str(req.unit_id): req for req in requirements}
     visited: set[str] = set()
@@ -1176,16 +1299,23 @@ def select_daec_noisyor_positions(
     binding_mode: str = "auto",
     llm_binding_title_match_mode: str = "substring",
     gold_titles: Sequence[str] | None = None,
+    agsto_metadata: Mapping[str, Any] | None = None,
+    graph_prior_beta: float = 0.0,
+    graph_prior_w_selected: float = 1.0,
+    graph_prior_w_anchor: float = 0.3,
+    graph_prior_w_rank: float = 0.2,
+    selector_label_override: str | None = None,
 ) -> Tuple[List[int], Dict[str, object]]:
     """Select evidence by frozen-binding noisy-OR demand coverage.
 
     This is the clean DAEC composer path: it freezes an approximate binding set,
     precomputes phi[requirement, binding, document], and then runs greedy
     maximization over a single noisy-OR set objective. Legacy gates, repair
-    filters, rank priors, and selection-time binding mutation intentionally do
-    not participate in this path.
+    filters, and selection-time binding mutation intentionally do not
+    participate in this path. The optional AG-STO graph prior is additive and
+    disabled by default, so beta=0 preserves the pure noisy-OR selector.
     """
-    selector_label = "daec_noisyor_safe" if bool(safe_projection) else "daec_noisyor"
+    selector_label = selector_label_override or ("daec_noisyor_safe" if bool(safe_projection) else "daec_noisyor")
     pool_limit = len(pool_docs)
     target_k = min(max(int(qa_top_k), 0), pool_limit)
     if target_k <= 0:
@@ -1559,6 +1689,21 @@ def select_daec_noisyor_positions(
             phi[req_idx, binding_idx, :] = np.clip(np.asarray(support_scores, dtype=float), 0.0, 1.0)
 
     demand_weights = np.full(len(active_requirements), 1.0 / float(max(len(active_requirements), 1)), dtype=float)
+    graph_beta = max(float(graph_prior_beta), 0.0)
+    graph_prior, graph_prior_trace = _build_agsto_graph_prior(
+        agsto_metadata=agsto_metadata,
+        pool_doc_ids=pool_doc_ids,
+        pool_limit=pool_limit,
+        w_selected=float(graph_prior_w_selected),
+        w_anchor=float(graph_prior_w_anchor),
+        w_rank=float(graph_prior_w_rank),
+    )
+    graph_prior_trace["beta"] = round(float(graph_beta), 6)
+    graph_prior_trace["enabled"] = bool(
+        graph_beta > 0.0
+        and bool(agsto_metadata)
+        and int((graph_prior_trace.get("stats") or {}).get("nonzero_count", 0) or 0) > 0
+    )
 
     def objective(binding_idx: int, positions: Sequence[int]) -> Tuple[float, np.ndarray]:
         coverage = _daec_noisy_or_coverage(phi[:, binding_idx, :], positions)
@@ -1570,6 +1715,8 @@ def select_daec_noisyor_positions(
         selected_positions: List[int] = []
         selected_set: set[int] = set()
         current_score, current_coverage = objective(binding_idx, selected_positions)
+        current_effective_score = float(current_score)
+        current_graph_prior_score = 0.0
         steps: List[Dict[str, object]] = []
         while len(selected_positions) < target_k:
             best_row: Dict[str, object] | None = None
@@ -1579,20 +1726,31 @@ def select_daec_noisyor_positions(
                 proposed_positions = list(selected_positions) + [int(pos)]
                 proposed_score, proposed_coverage = objective(binding_idx, proposed_positions)
                 gain = float(proposed_score - current_score)
-                if gain <= 1e-12:
+                graph_prior_value = float(graph_prior[int(pos)]) if int(pos) < graph_prior.size else 0.0
+                graph_prior_gain = graph_beta * graph_prior_value
+                effective_gain = gain + graph_prior_gain
+                if graph_beta <= 0.0 and gain <= 1e-12:
+                    continue
+                if graph_beta > 0.0 and effective_gain <= 1e-12:
                     continue
                 row = {
                     "pool_position": int(pos),
                     "title": pool_doc_titles[pos],
                     "objective_gain": gain,
                     "objective": float(proposed_score),
+                    "graph_prior": graph_prior_value,
+                    "graph_prior_gain": graph_prior_gain,
+                    "effective_gain": effective_gain,
+                    "effective_objective": current_effective_score + effective_gain,
                     "coverage": proposed_coverage,
                 }
                 if best_row is None or (
+                    float(row["effective_gain"]),
                     float(row["objective_gain"]),
                     float(row["objective"]),
                     -int(row["pool_position"]),
                 ) > (
+                    float(best_row["effective_gain"]),
                     float(best_row["objective_gain"]),
                     float(best_row["objective"]),
                     -int(best_row["pool_position"]),
@@ -1605,6 +1763,8 @@ def select_daec_noisyor_positions(
             selected_set.add(chosen_pos)
             current_score = float(best_row["objective"])
             current_coverage = np.asarray(best_row["coverage"], dtype=float)
+            current_graph_prior_score += float(best_row["graph_prior_gain"])
+            current_effective_score = float(best_row["effective_objective"])
             steps.append({
                 "step": int(len(steps) + 1),
                 "mode": "daec_noisyor_greedy",
@@ -1612,6 +1772,11 @@ def select_daec_noisyor_positions(
                 "title": str(best_row["title"]),
                 "objective_gain": round(float(best_row["objective_gain"]), 6),
                 "objective": round(float(current_score), 6),
+                "coverage_gain": round(float(best_row["objective_gain"]), 6),
+                "graph_prior": round(float(best_row["graph_prior"]), 6),
+                "graph_prior_gain": round(float(best_row["graph_prior_gain"]), 6),
+                "effective_gain": round(float(best_row["effective_gain"]), 6),
+                "effective_objective": round(float(current_effective_score), 6),
                 "coverage_by_requirement": {
                     req.unit_id: round(float(current_coverage[req_idx]), 6)
                     for req_idx, req in enumerate(active_requirements)
@@ -1622,14 +1787,18 @@ def select_daec_noisyor_positions(
             "binding": binding,
             "positions": selected_positions,
             "objective": float(current_score),
+            "graph_prior_objective": float(current_graph_prior_score),
+            "effective_objective": float(current_effective_score),
             "coverage": current_coverage,
             "steps": steps,
         }
         binding_results.append(result)
         if best_result is None or (
+            float(result["effective_objective"]),
             float(result["objective"]),
             -int(result["binding_idx"]),
         ) > (
+            float(best_result["effective_objective"]),
             float(best_result["objective"]),
             -int(best_result["binding_idx"]),
         ):
@@ -1648,6 +1817,7 @@ def select_daec_noisyor_positions(
             "binding_max_bindings": int(DAEC_MAX_BINDINGS),
             "binding_pruned": bool(binding_pruned),
             "phi_shape": [int(dim) for dim in phi.shape],
+            "agsto_graph_prior": graph_prior_trace,
             "selected_positions": fallback_positions,
             "selected_titles": [pool_doc_titles[pos] for pos in fallback_positions],
             "selection_steps": [],
@@ -1656,6 +1826,7 @@ def select_daec_noisyor_positions(
     best_binding_idx = int(best_result["binding_idx"])
     rebuild_positions = list(best_result["positions"])[:target_k]
     rebuild_objective = float(best_result["objective"])
+    rebuild_effective_objective = float(best_result.get("effective_objective", rebuild_objective))
     rebuild_coverage = np.asarray(best_result["coverage"], dtype=float)
     baseline_positions = list(range(target_k))
     baseline_objective, baseline_coverage = objective(best_binding_idx, baseline_positions)
@@ -1672,6 +1843,7 @@ def select_daec_noisyor_positions(
         "rebuild_positions": list(rebuild_positions),
         "rebuild_titles": [pool_doc_titles[pos] for pos in rebuild_positions],
         "rebuild_objective": round(float(rebuild_objective), 6),
+        "rebuild_effective_objective": round(float(rebuild_effective_objective), 6),
         "rebuild_gain_over_baseline": round(float(rebuild_objective - baseline_objective), 6),
         "retriever_margin_top1_to_topk": round(float(retriever_margin), 6),
         "safe_min_objective_gain": round(float(safe_min_objective_gain), 6),
@@ -1843,6 +2015,7 @@ def select_daec_noisyor_positions(
         "selected_positions": best_positions,
         "selected_titles": [pool_doc_titles[pos] for pos in best_positions],
         "selection_steps": list(best_steps),
+        "agsto_graph_prior": graph_prior_trace,
         "safe_projection_trace": safe_trace,
         "embedding_available_requirement_count": int(
             sum(_normalize_vector(requirement_embeddings.get(req.unit_id, np.array([]))).size > 0 for req in active_requirements)
@@ -1852,6 +2025,8 @@ def select_daec_noisyor_positions(
             {
                 "binding_id": str(result["binding"].binding_id),
                 "objective": round(float(result["objective"]), 6),
+                "graph_prior_objective": round(float(result.get("graph_prior_objective", 0.0)), 6),
+                "effective_objective": round(float(result.get("effective_objective", result["objective"])), 6),
                 "selected_positions": list(result["positions"]),
             }
             for result in binding_results[:20]

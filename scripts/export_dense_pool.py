@@ -274,7 +274,7 @@ def main() -> None:
         "records": records,
     }
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
-    args.output_json.write_text(json.dumps(output, ensure_ascii=False, indent=2))
+    args.output_json.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8", errors="replace")
     print(json.dumps({"output_json": str(args.output_json), "dataset": args.dataset, "limit": len(samples), "pool_k": pool_k, "retrieval": recall}, indent=2))
 
 

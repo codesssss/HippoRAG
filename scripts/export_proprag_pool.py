@@ -301,7 +301,7 @@ def main() -> None:
         "records": records,
     }
     output_json.parent.mkdir(parents=True, exist_ok=True)
-    output_json.write_text(json.dumps(output, ensure_ascii=False, indent=2))
+    output_json.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8", errors="replace")
     print(
         json.dumps(
             {

@@ -2,13 +2,24 @@
 
 Date: 2026-04-24
 
-Full current specification:
+2026-04-28 status update:
+
+- DAPG / local absorption is no longer the active plan.
+- Phase 2.5 full1000 controls showed graph absorption is consistently below
+  direct dense-query retrieval in the current substrate.
+- The active direction is DAEC-L1 fixed-pool projection plus negative ablation
+  analysis.
+- Current source of truth: `docs/daec_l1_findings_decision_20260428.md`.
+
+Historical full specification:
 
 - `docs/daec_dapg_full_spec_20260424.md`
 
-This file is the execution summary. The full spec is the source of truth for paper framing, formal objective, theory contract, ablation matrix, and three-week roadmap.
+This file is the historical execution summary. It is no longer the active source
+of truth for paper framing or execution. Use
+`docs/daec_l1_findings_decision_20260428.md` for the current decision.
 
-## Current Framing
+## Historical Framing
 
 The paper should be framed around **Demand-Aligned Evidence Composition (DAEC)**:
 
@@ -157,7 +168,7 @@ Frozen Layer-1 memos:
 - `research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md`
 - `research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md`
 
-Current next step:
+Historical next step before the 2026-04-28 decision:
 
 - Write the paper skeleton around retriever-agnostic fixed-pool composition.
 - Manually audit `MuSiQue` loss cases before making fine-grained qualitative claims.

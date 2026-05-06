@@ -2,9 +2,20 @@
 
 Date: 2026-04-24
 
-This document is the current converged research, method, and execution specification for **Demand-Aligned Evidence Composition (DAEC)** and its end-to-end instantiation **Demand-Aligned Proposition Graph Retrieval (DAPG)**.
+2026-04-28 status update:
 
-The short version:
+This specification is historical. Phase 2.5 full1000 controls rejected the
+DAEC-DAPG / local absorption route as the active method plan: direct NV-Embed
+question cosine outperformed query absorption and demand-union absorption, and
+multi-channel delayed aggregation failed as a mechanism. The current source of
+truth is `docs/daec_l1_findings_decision_20260428.md`.
+
+This document was the converged research, method, and execution specification
+for **Demand-Aligned Evidence Composition (DAEC)** and its end-to-end
+instantiation **Demand-Aligned Proposition Graph Retrieval (DAPG)** before the
+2026-04-28 negative gates.
+
+Original short version:
 
 - **DAEC is the paper's main line**: a retriever-agnostic evidence composition framework that selects a reader-ready top-`k` document set from a fixed pool by optimizing demand-aligned noisy-OR coverage under frozen binding assignments.
 - **DAPG is an instantiation, not the survival condition**: it builds a proposition graph and uses the same DAEC objective for pool expansion and final composition.
@@ -953,7 +964,7 @@ Layer 1 has been executed under the fixed-pool protocol. The completed sequence 
 9. Paired bootstrap/sign-flip significance analysis.
 10. Targeted cross-pool `-binding` ablations.
 
-Current implementation artifacts:
+Historical implementation artifacts:
 
 - `docs/daec_dapg_layered_plan_20260424.md`
 - `scripts/export_proprag_pool.py`
@@ -967,16 +978,19 @@ Current implementation artifacts:
 - `run_logs/run_layer1_targeted_nobinding_20260424.sh`
 - `run_logs/daec_layer1_status_20260424.txt`
 
-Current frozen state:
+Historical frozen state:
 
 - No active Layer-1 DtC/DAEC evaluation jobs are expected to be running.
 - Results are consolidated in `research_memory/emnlp_expand_then_compose/16_layer1_retriever_agnostic_composition_20260424.md`.
 - Follow-up taxonomy, significance, and binding ablation results are consolidated in `research_memory/emnlp_expand_then_compose/17_layer1_followup_taxonomy_significance_20260424.md`.
 
-## M. One-Sentence Commitments
+## M. Original One-Sentence Commitments
 
-- DAEC is the main contribution.
-- DAPG is an instantiation.
+- Original commitment: DAEC was the main contribution.
+- Original commitment: DAPG was an instantiation.
+- 2026-04-28 update: DAPG / local absorption is no longer the active method
+  direction; use `docs/daec_l1_findings_decision_20260428.md` for current
+  execution decisions.
 - PropRAG is both a competitor and a substrate.
 - Frozen binding is required for the theorem.
 - Comparison and aggregation are answer operators, not retrieval demands.

@@ -138,6 +138,70 @@ DEFAULT_CE_MAX_LENGTH = 1024
 _CROSS_ENCODER_RERANKER_CACHE: Dict[Tuple[str, str, bool, int, int], "TransformersCrossEncoderReranker"] = {}
 
 
+def _strip_qwen_thinking(text: str) -> str:
+    import re
+
+    return re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL).strip()
+
+
+def _with_qwen_no_think_messages(messages: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    patched: List[Dict[str, Any]] = []
+    for message in messages:
+        msg = dict(message)
+        content = msg.get("content")
+        if (
+            str(msg.get("role", "")).lower() == "user"
+            and isinstance(content, str)
+            and SETWISE_LLM_NO_THINK_PREFIX not in content[:128]
+        ):
+            msg["content"] = f"{SETWISE_LLM_NO_THINK_PREFIX}\n{content}"
+        patched.append(msg)
+    return patched
+
+
+def install_qwen_disable_thinking(llm_model: Any, enabled: bool) -> None:
+    if not enabled or llm_model is None:
+        return
+    llm_config = getattr(llm_model, "global_config", None)
+    model_name = str(
+        getattr(llm_config, "llm_request_name", None)
+        or getattr(llm_config, "llm_name", None)
+        or getattr(llm_model, "llm_name", "")
+        or ""
+    ).lower()
+    if "qwen" not in model_name:
+        return
+    if getattr(llm_model, "_codex_qwen_disable_thinking_installed", False):
+        return
+
+    cache_file_name = getattr(llm_model, "cache_file_name", None)
+    if isinstance(cache_file_name, str) and cache_file_name:
+        if "_no_think_cache" not in os.path.basename(cache_file_name):
+            if cache_file_name.endswith("_cache.sqlite"):
+                llm_model.cache_file_name = cache_file_name[: -len("_cache.sqlite")] + "_no_think_cache.sqlite"
+            else:
+                root, ext = os.path.splitext(cache_file_name)
+                llm_model.cache_file_name = f"{root}_no_think{ext}"
+
+    original_infer = llm_model.infer
+
+    def no_think_infer(messages, *infer_args, **infer_kwargs):
+        if isinstance(messages, list):
+            messages = _with_qwen_no_think_messages(messages)
+        extra_body = dict(infer_kwargs.get("extra_body") or {})
+        chat_template_kwargs = dict(extra_body.get("chat_template_kwargs") or {})
+        chat_template_kwargs["enable_thinking"] = False
+        extra_body["chat_template_kwargs"] = chat_template_kwargs
+        infer_kwargs["extra_body"] = extra_body
+        result = original_infer(messages, *infer_args, **infer_kwargs)
+        if isinstance(result, tuple) and result and isinstance(result[0], str):
+            return (_strip_qwen_thinking(result[0]), *result[1:])
+        return result
+
+    llm_model.infer = no_think_infer
+    llm_model._codex_qwen_disable_thinking_installed = True
+
+
 def canonical_dataset_name(dataset_name: str | None) -> str:
     return str(dataset_name or "").strip().lower()
 
@@ -680,6 +744,7 @@ def load_external_pool_query_solutions(pool_json_path: str | Path,
                     "external_pool_k": len(aligned_docs),
                     "external_pool_titles": aligned_titles[:100],
                     "external_pool_doc_ids": list(record.get("pool_doc_ids") or [])[:len(aligned_docs)],
+                    "external_pool_agsto": record.get("agsto") or {},
                 },
             )
         )
@@ -3789,6 +3854,7 @@ ASSEMBLE_MODES = {
     "base_score",
     "embedding_similarity",
     "cross_encoder",
+    "daec_noisyor_llm",
 }
 
 APPEND_POLICIES = {
@@ -5269,6 +5335,10 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            daec_safe_preserve_top_m: int = 1,
                            daec_safe_retriever_margin_threshold: float = 1.01,
                            daec_safe_retriever_rank_penalty: float = 0.0,
+                           daec_graph_prior_beta: float = 0.0,
+                           daec_graph_prior_w_selected: float = 1.0,
+                           daec_graph_prior_w_anchor: float = 0.3,
+                           daec_graph_prior_w_rank: float = 0.2,
                            llm_binding_url: str = "http://localhost:8043/v1",
                            llm_binding_model: str = "qwen3-8b-train",
                            llm_binding_cache_path: str = "",
@@ -5278,7 +5348,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
     score_mode = normalize_setwise_score_mode(score_mode)
     normalized_assemble_mode = normalize_assemble_mode(assemble_mode)
     normalized_append_policy = normalize_append_policy(append_policy)
-    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
+    bridge_append_daec_assemble = (
+        selector_name == "bridge_append"
+        and normalized_assemble_mode == "daec_noisyor_llm"
+    )
+    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -5388,7 +5462,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
     _llm_binding_cache: Dict[str, List[str]] = {}
     _llm_binding_cache_file: Path | None = None
     _llm_binding_cache_dirty = False
-    if selector_name in {"daec_noisyor_llm", "daec_noisyor_safe_llm"}:
+    if selector_name in {"daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto"} or bridge_append_daec_assemble:
         import re as _re
         import time as _time
         import requests as _requests
@@ -5436,6 +5510,8 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "max_tokens": 80,
                 "temperature": 0.0,
             }
+            if "qwen" in _llm_binding_model.lower():
+                payload["chat_template_kwargs"] = {"enable_thinking": False}
             try:
                 t0 = _time.monotonic()
                 resp = _requests.post(f"{_llm_binding_url}/chat/completions", json=payload, timeout=30)
@@ -5474,11 +5550,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "daec_noisyor_safe": "string_match",
         "daec_noisyor_llm": "llm",
         "daec_noisyor_safe_llm": "llm",
+        "daec_noisyor_llm_agsto": "llm",
         "daec_noisyor_nobind": "nobind",
         "daec_noisyor_randbind": "random",
         "daec_noisyor_oracle": "oracle",
     }
-    _daec_binding_mode = _DAEC_BINDING_MODE_MAP.get(selector_name, "auto")
+    _daec_binding_mode = "llm" if bridge_append_daec_assemble else _DAEC_BINDING_MODE_MAP.get(selector_name, "auto")
     _llm_binding_query_stats: List[Dict[str, object]] = []
 
     for q_idx, qs in enumerate(query_solutions):
@@ -5851,22 +5928,148 @@ def apply_setwise_selector(hipporag: HippoRAG,
             )
             for pos in selector_trace.get("appended_positions", []) or []:
                 position_sources[int(pos)] = f"append_{normalized_append_policy}"
-            reranked_positions, assemble_trace = rerank_candidate_positions_for_assemble(
-                query=qs.question,
-                pool_docs=pool_docs,
-                pool_doc_ids=pool_doc_ids,
-                pool_doc_scores=pool_scores,
-                candidate_positions=selected_positions,
-                assemble_mode=normalized_assemble_mode,
-                hipporag=hipporag,
-                ce_reranker=assemble_reranker,
-                position_sources=position_sources,
-            )
+            selected_positions_before_assemble = list(selected_positions)
+            if normalized_assemble_mode == "daec_noisyor_llm":
+                normalized_dtc_decomposition_mode = str(dtc_decomposition_mode or "llm").strip().lower()
+                if normalized_dtc_decomposition_mode == "query":
+                    requirements = build_fallback_dtc_requirements(qs.question)
+                    decomposition_trace = {
+                        "mode": "query",
+                        "llm_model": "",
+                        "max_steps": int(dtc_max_steps),
+                        "llm_error": None,
+                        "fallback_used": False,
+                        "parse_succeeded": bool(requirements),
+                        "parse_error": None,
+                        "raw_output_preview": "",
+                        "active_step_count": int(len(requirements)),
+                    }
+                else:
+                    requirements, decomposition_trace = request_dtc_requirements_from_llm(
+                        query=qs.question,
+                        infer_fn=getattr(getattr(hipporag, "llm_model", None), "infer", None),
+                        model_name=str(
+                            getattr(getattr(hipporag, "global_config", None), "llm_request_name", None)
+                            or getattr(getattr(hipporag, "global_config", None), "llm_name", "")
+                            or ""
+                        ),
+                        max_steps=int(dtc_max_steps),
+                        max_completion_tokens=int(dtc_max_completion_tokens),
+                        include_satisfiable_by=bool(dtc_include_satisfiable_by),
+                    )
+                requirement_embeddings = build_dtc_requirement_embeddings(
+                    hipporag=hipporag,
+                    requirements=requirements,
+                )
+
+                def embed_daec_bound_texts(texts: Sequence[str]) -> Dict[str, np.ndarray]:
+                    return build_dtc_text_embeddings(hipporag=hipporag, texts=texts)
+
+                local_candidate_positions = list(dict.fromkeys(
+                    int(pos) for pos in selected_positions_before_assemble
+                    if 0 <= int(pos) < pool_limit
+                ))
+                _q_stats_before = {k: v for k, v in _llm_binding_stats.items()}
+                local_selected_positions, daec_assemble_trace = select_daec_noisyor_positions(
+                    query=qs.question,
+                    requirements=requirements,
+                    requirement_embeddings=requirement_embeddings,
+                    pool_docs=[pool_docs[pos] for pos in local_candidate_positions],
+                    pool_doc_ids=[pool_doc_ids[pos] for pos in local_candidate_positions],
+                    pool_doc_titles=[pool_titles[pos] for pos in local_candidate_positions],
+                    pool_doc_scores=np.asarray(
+                        [pool_scores[pos] for pos in local_candidate_positions],
+                        dtype=float,
+                    ),
+                    doc_idx_to_entities=hipporag.doc_idx_to_structure_entities,
+                    passage_embeddings=np.asarray(getattr(hipporag, "passage_embeddings", np.array([]))),
+                    qa_top_k=qa_top_k,
+                    binding_top_m=int(dtc_binding_max_candidates),
+                    embed_texts_fn=embed_daec_bound_texts,
+                    safe_projection=False,
+                    llm_extract_fn=llm_extract_fn,
+                    binding_mode="llm",
+                    llm_binding_title_match_mode=str(llm_binding_title_match_mode),
+                    selector_label_override="bridge_append_daec_assemble",
+                )
+                _q_binding_cost = {
+                    "attempts": _llm_binding_stats["attempts"] - _q_stats_before["attempts"],
+                    "calls": _llm_binding_stats["calls"] - _q_stats_before["calls"],
+                    "cache_hits": _llm_binding_stats["cache_hits"] - _q_stats_before["cache_hits"],
+                    "successes": _llm_binding_stats["successes"] - _q_stats_before["successes"],
+                    "failures": _llm_binding_stats["failures"] - _q_stats_before["failures"],
+                    "empty_entity_responses": _llm_binding_stats["empty_entity_responses"] - _q_stats_before["empty_entity_responses"],
+                    "prompt_tokens": _llm_binding_stats["prompt_tokens"] - _q_stats_before["prompt_tokens"],
+                    "completion_tokens": _llm_binding_stats["completion_tokens"] - _q_stats_before["completion_tokens"],
+                    "latency_s": round(_llm_binding_stats["total_latency_s"] - _q_stats_before["total_latency_s"], 4),
+                }
+                daec_assemble_trace["llm_binding_cost"] = _q_binding_cost
+                daec_assemble_trace["dtc_max_steps"] = int(dtc_max_steps)
+                daec_assemble_trace["dtc_max_completion_tokens"] = int(dtc_max_completion_tokens)
+                daec_assemble_trace["dtc_decomposition_mode"] = normalized_dtc_decomposition_mode
+                daec_assemble_trace["dtc_include_satisfiable_by"] = bool(dtc_include_satisfiable_by)
+                daec_assemble_trace["daec_main_objective"] = "frozen_binding_noisy_or"
+                daec_assemble_trace["daec_safe_projection"] = False
+                daec_assemble_trace["daec_binding_mode"] = "llm"
+                selected_positions = [
+                    local_candidate_positions[int(pos)]
+                    for pos in local_selected_positions
+                    if 0 <= int(pos) < len(local_candidate_positions)
+                ]
+                assemble_trace = {
+                    "assemble_mode": normalized_assemble_mode,
+                    "candidate_pool_positions": list(local_candidate_positions),
+                    "candidate_titles": [pool_titles[pos] for pos in local_candidate_positions],
+                    "local_selected_positions": list(local_selected_positions),
+                    "ranked_pool_positions": list(selected_positions),
+                    "ranked_titles": [pool_titles[pos] for pos in selected_positions],
+                    "ranking_rows": [
+                        {
+                            "rank": int(rank + 1),
+                            "pool_position": int(pool_pos),
+                            "local_pool_position": int(local_pos),
+                            "doc_id": int(pool_doc_ids[pool_pos]) if pool_doc_ids[pool_pos] is not None else None,
+                            "title": pool_titles[pool_pos],
+                            "source": str(position_sources.get(int(pool_pos), "candidate")),
+                        }
+                        for rank, (local_pos, pool_pos) in enumerate(
+                            (
+                                (int(local_pos), local_candidate_positions[int(local_pos)])
+                                for local_pos in local_selected_positions
+                                if 0 <= int(local_pos) < len(local_candidate_positions)
+                            )
+                        )
+                    ],
+                    "score_field": "daec_noisyor_objective",
+                    "decomposition_trace": decomposition_trace,
+                    "daec_trace": daec_assemble_trace,
+                }
+                dtc_parse_success_count += int(bool(decomposition_trace.get("parse_succeeded", False)))
+                dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
+                dtc_requirement_counts.append(int(daec_assemble_trace.get("requirement_count", 0) or 0))
+                dtc_covered_requirement_rates.append(float(daec_assemble_trace.get("covered_requirement_rate", 0.0) or 0.0))
+                dtc_embedding_available_requirement_counts.append(
+                    int(daec_assemble_trace.get("embedding_available_requirement_count", 0) or 0)
+                )
+                selector_trace["daec_main_objective"] = "local_candidate_frozen_binding_noisy_or"
+                selector_trace["daec_binding_mode"] = "llm"
+            else:
+                reranked_positions, assemble_trace = rerank_candidate_positions_for_assemble(
+                    query=qs.question,
+                    pool_docs=pool_docs,
+                    pool_doc_ids=pool_doc_ids,
+                    pool_doc_scores=pool_scores,
+                    candidate_positions=selected_positions,
+                    assemble_mode=normalized_assemble_mode,
+                    hipporag=hipporag,
+                    ce_reranker=assemble_reranker,
+                    position_sources=position_sources,
+                )
+                selected_positions = list(reranked_positions)
             selector_trace["assemble_trace"] = assemble_trace
             selector_trace["assemble_mode"] = normalized_assemble_mode
-            selector_trace["selected_positions_before_assemble"] = list(selected_positions)
-            selected_positions = list(reranked_positions)
-        elif selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
+            selector_trace["selected_positions_before_assemble"] = list(selected_positions_before_assemble)
+        elif selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
             normalized_dtc_decomposition_mode = str(dtc_decomposition_mode or "llm").strip().lower()
             if normalized_dtc_decomposition_mode == "query":
                 requirements = build_fallback_dtc_requirements(qs.question)
@@ -5934,6 +6137,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 minimal_repair_unmet_counts.append(len(selector_trace.get("unmet_requirement_ids", []) or []))
             else:
                 _q_stats_before = {k: v for k, v in _llm_binding_stats.items()}
+                agsto_metadata = {}
+                if selector_name == "daec_noisyor_llm_agsto":
+                    agsto_metadata = dict((qs.retrieval_trace or {}).get("external_pool_agsto", {}) or {})
                 selected_positions, selector_trace = select_daec_noisyor_positions(
                     query=qs.question,
                     requirements=requirements,
@@ -5958,6 +6164,12 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     binding_mode=_daec_binding_mode,
                     llm_binding_title_match_mode=str(llm_binding_title_match_mode),
                     gold_titles=[extract_doc_title(doc_text) for doc_text in (qs.gold_docs or [])] if selector_name == "daec_noisyor_oracle" else None,
+                    agsto_metadata=agsto_metadata if selector_name == "daec_noisyor_llm_agsto" else None,
+                    graph_prior_beta=float(daec_graph_prior_beta) if selector_name == "daec_noisyor_llm_agsto" else 0.0,
+                    graph_prior_w_selected=float(daec_graph_prior_w_selected),
+                    graph_prior_w_anchor=float(daec_graph_prior_w_anchor),
+                    graph_prior_w_rank=float(daec_graph_prior_w_rank),
+                    selector_label_override=selector_name if selector_name == "daec_noisyor_llm_agsto" else None,
                 )
                 _q_binding_cost = {
                     "attempts": _llm_binding_stats["attempts"] - _q_stats_before["attempts"],
@@ -5987,6 +6199,9 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 selector_trace["daec_main_objective"] = "frozen_binding_noisy_or"
                 selector_trace["daec_safe_projection"] = selector_name in {"daec_noisyor_safe", "daec_noisyor_safe_llm"}
                 selector_trace["daec_binding_mode"] = str(_daec_binding_mode)
+                selector_trace["daec_graph_prior_beta"] = (
+                    float(daec_graph_prior_beta) if selector_name == "daec_noisyor_llm_agsto" else 0.0
+                )
             dtc_parse_success_count += int(bool(decomposition_trace.get("parse_succeeded", False)))
             dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
             dtc_requirement_counts.append(int(selector_trace.get("requirement_count", 0) or 0))
@@ -6782,7 +6997,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         except Exception as exc:
             logger.warning("Failed to write LLM binding cache %s: %s", _llm_binding_cache_file, exc)
 
-    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
+    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"} or bridge_append_daec_assemble:
         summary.update({
             "dtc_max_steps": int(dtc_max_steps),
             "dtc_match_threshold": round(float(dtc_match_threshold), 4),
@@ -6859,7 +7074,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     4,
                 ),
             })
-        if selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle"}:
+        if selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle"} or bridge_append_daec_assemble:
             summary.update({
                 "daec_main_objective": "frozen_binding_noisy_or",
                 "daec_binding_top_m": int(dtc_binding_max_candidates),
@@ -6872,6 +7087,13 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "daec_safe_preserve_top_m": int(daec_safe_preserve_top_m),
                 "daec_safe_retriever_margin_threshold": round(float(daec_safe_retriever_margin_threshold), 6),
                 "daec_safe_retriever_rank_penalty": round(float(daec_safe_retriever_rank_penalty), 6),
+                "daec_graph_prior_beta": round(
+                    float(daec_graph_prior_beta) if selector_name == "daec_noisyor_llm_agsto" else 0.0,
+                    6,
+                ),
+                "daec_graph_prior_w_selected": round(float(daec_graph_prior_w_selected), 6),
+                "daec_graph_prior_w_anchor": round(float(daec_graph_prior_w_anchor), 6),
+                "daec_graph_prior_w_rank": round(float(daec_graph_prior_w_rank), 6),
             })
             if _llm_binding_query_stats:
                 import statistics as _stats_mod
@@ -7391,6 +7613,11 @@ def main():
     parser.add_argument("--embedding_name", type=str, default="VLLM/nvidia/NV-Embed-v2")
     parser.add_argument("--embedding_base_url", type=str, default="http://localhost:8019/v1/embeddings")
     parser.add_argument("--max_retry_attempts", type=int, default=5)
+    parser.add_argument(
+        "--qwen_disable_thinking",
+        action="store_true",
+        help="For Qwen-family chat models, add /no_think and request chat_template_kwargs.enable_thinking=false.",
+    )
     parser.add_argument("--force_index_from_scratch", type=str, default="false")
     parser.add_argument("--force_openie_from_scratch", type=str, default="false")
     parser.add_argument("--openie_mode", choices=["online", "offline", "Transformers-offline"], default="online")
@@ -7468,7 +7695,7 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--expand_base_k", type=int, default=10,
                         help="For --setwise_selector bridge_append, preserve baseline top-B before appending deep-pool bridge candidates.")
@@ -7636,6 +7863,14 @@ def main():
                         help="For --setwise_selector daec_noisyor_safe, keep baseline unchanged when normalized top1-to-topk retriever margin exceeds this threshold. Values >1 disable this fallback.")
     parser.add_argument("--daec_safe_retriever_rank_penalty", type=float, default=0.0,
                         help="For --setwise_selector daec_noisyor_safe, penalize swaps that replace a higher-ranked retriever document with a lower-ranked document.")
+    parser.add_argument("--daec_graph_prior_beta", type=float, default=0.0,
+                        help="For --setwise_selector daec_noisyor_llm_agsto, additive AG-STO graph-prior weight in DAEC greedy selection. 0 preserves daec_noisyor_llm behavior.")
+    parser.add_argument("--daec_graph_prior_w_selected", type=float, default=1.0,
+                        help="AG-STO graph-prior component weight for selected_evidence_set membership.")
+    parser.add_argument("--daec_graph_prior_w_anchor", type=float, default=0.3,
+                        help="AG-STO graph-prior component weight for native dense-anchor membership.")
+    parser.add_argument("--daec_graph_prior_w_rank", type=float, default=0.2,
+                        help="AG-STO graph-prior component weight for AG-STO retrieved_doc_indices rank.")
     parser.add_argument("--llm_binding_url", type=str, default="http://localhost:8043/v1",
                         help="VLLM endpoint URL for LLM-extraction binding (daec_noisyor_llm).")
     parser.add_argument("--llm_binding_model", type=str, default="qwen3-8b-train",
@@ -7783,6 +8018,7 @@ def main():
     oracle_select_ks = [int(x) for x in args.oracle_select_k.split(",") if int(x) > 0]
 
     config = build_config(args, corpus_len=len(corpus))
+    setattr(config, "qwen_disable_thinking", bool(args.qwen_disable_thinking))
     logging.basicConfig(level=logging.INFO)
 
     oracle_reorder_qa_results = None
@@ -7875,6 +8111,10 @@ def main():
     if gold_doc_reader:
         # Exp2: Gold-doc reader — skip retrieval, feed gold docs to reader
         hipporag = HippoRAG(global_config=config)
+        install_qwen_disable_thinking(
+            getattr(hipporag, "llm_model", None),
+            enabled=bool(args.qwen_disable_thinking),
+        )
         hipporag.index(docs)
         gold_query_solutions = [
             QuerySolution(
@@ -7894,6 +8134,10 @@ def main():
         effective_gold_answers = gold_answers
     else:
         hipporag = HippoRAG(global_config=config)
+        install_qwen_disable_thinking(
+            getattr(hipporag, "llm_model", None),
+            enabled=bool(args.qwen_disable_thinking),
+        )
         hipporag.index(docs)
         if external_pool_json:
             query_solutions, external_pool_summary = load_external_pool_query_solutions(
@@ -8242,6 +8486,10 @@ def main():
             daec_safe_preserve_top_m=int(args.daec_safe_preserve_top_m),
             daec_safe_retriever_margin_threshold=float(args.daec_safe_retriever_margin_threshold),
             daec_safe_retriever_rank_penalty=float(args.daec_safe_retriever_rank_penalty),
+            daec_graph_prior_beta=float(args.daec_graph_prior_beta),
+            daec_graph_prior_w_selected=float(args.daec_graph_prior_w_selected),
+            daec_graph_prior_w_anchor=float(args.daec_graph_prior_w_anchor),
+            daec_graph_prior_w_rank=float(args.daec_graph_prior_w_rank),
             llm_binding_url=str(args.llm_binding_url),
             llm_binding_model=str(args.llm_binding_model),
             llm_binding_cache_path=str(args.llm_binding_cache_path),
@@ -8676,6 +8924,7 @@ def main():
             "general_graph_seed_top_k": config.general_graph_seed_top_k,
             "retrieval_only": retrieval_only,
             "gold_doc_reader": gold_doc_reader,
+            "qwen_disable_thinking": bool(args.qwen_disable_thinking),
             "external_pool_json": external_pool_json or None,
             "external_pool_source_name": str(args.external_pool_source_name or "external_pool"),
             "oracle_reorder_k": oracle_reorder_k,
@@ -8743,6 +8992,10 @@ def main():
             "dtc_enable_dependency_binding": bool(args.dtc_enable_dependency_binding),
             "dtc_binding_max_candidates": int(args.dtc_binding_max_candidates),
             "dtc_binding_entity_hit_required": bool(args.dtc_binding_entity_hit_required),
+            "daec_graph_prior_beta": float(args.daec_graph_prior_beta),
+            "daec_graph_prior_w_selected": float(args.daec_graph_prior_w_selected),
+            "daec_graph_prior_w_anchor": float(args.daec_graph_prior_w_anchor),
+            "daec_graph_prior_w_rank": float(args.daec_graph_prior_w_rank),
             "setwise_late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
             "setwise_late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "setwise_late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),
@@ -8829,7 +9082,7 @@ def main():
         output_json = Path(output_json)
         output_json.parent.mkdir(parents=True, exist_ok=True)
 
-    output_json.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+    output_json.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8", errors="replace")
 
     print_result = {
         "output_json": str(output_json),

@@ -66,6 +66,7 @@ from eval_causal_qwen3 import (
     maybe_apply_setwise_reader_order_probe,
     compute_state_path_connectivity_metrics,
     materialize_reader_top_positions,
+    normalize_assemble_mode,
     normalize_setwise_late_rerank_policy,
     parse_setwise_late_rerank_response,
     rerank_completed_evidence_sets_with_llm,
@@ -4627,6 +4628,10 @@ def test_rerank_candidate_positions_for_assemble_supports_similarity_and_ce():
     assert ce_positions == [1, 2, 0]
     assert ce_trace["score_field"] == "cross_encoder_score"
     assert len(ce_reranker.calls) == 1
+
+
+def test_normalize_assemble_mode_accepts_daec_noisyor_llm():
+    assert normalize_assemble_mode("daec_noisyor_llm") == "daec_noisyor_llm"
 
 
 def test_build_expand_assemble_query_traces_surfaces_method_trace():
