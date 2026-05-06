@@ -1,6 +1,6 @@
 # Result Registry
 
-Last updated: 2026-04-27
+Last updated: 2026-05-06
 
 This file stores concrete results only. Every result must have a file path.
 
@@ -639,3 +639,136 @@ Interpretation:
 - DAEC 2Wiki/HotpotQA mainline is robust to same-title concerns under the static audit.
 - MuSiQue duplicate-title exposure is a dataset/pool property inherited from baseline; DAEC does not amplify it.
 - Same-title exclusion remains mandatory for counterfactual perturbation methods such as NREV.
+
+## IRCoT-Style Local Baseline (2026-05-06)
+
+Canonical files:
+- script: `scripts/bsgs_run_ircot_baseline.py`
+- results: `run_logs/ircot_style_limit100_20260506/`
+- summary: `run_logs/ircot_style_limit100_20260506/summary_ircot_style_limit100.md`
+- per-dataset JSONs: `{dataset}_ircot_style.json`
+
+Protocol:
+- Local IRCoT-style, NOT official IRCoT reproduction.
+- 3 iterations of follow-up query generation + retrieval, top-5 per iteration, round-robin merge to final top-5.
+- LLM: Qwen3-8B (`qwen3-8b-train`), Embedding: NV-Embed-v2, Retriever: HippoRAG local stack.
+- Same limit100 queries, same reader, same final top-5 budget as DAEC experiments.
+
+Key difference from official IRCoT:
+- Official uses Elasticsearch BM25 index over full Wikipedia corpus (5.2M docs for HotpotQA), dedicated prompt sets, HP sweep on dev.
+- Ours uses HippoRAG retrieval substrate, simplified follow-up query prompt, fixed 3-iteration config.
+- Purpose: controlled same-environment comparison, not official reproduction.
+
+Results:
+
+| Dataset | Method | EM | F1 | Support R@5 | LLM calls/q | Latency/q |
+|---|---|---:|---:|---:|---:|---:|
+| 2Wiki | Top5 | 0.580 | 0.632 | 0.935 | 0 | — |
+| 2Wiki | DAEC | 0.580 | 0.643 | 0.953 | 1 decomp + N bind | — |
+| 2Wiki | IRCoT-style | 0.570 | 0.615 | 0.850 | 3.0 | 11.46s |
+| HotpotQA | Top5 | 0.570 | 0.691 | 0.930 | 0 | — |
+| HotpotQA | DAEC | 0.570 | 0.691 | 0.950 | 1 decomp + N bind | — |
+| HotpotQA | IRCoT-style | 0.550 | 0.652 | 0.900 | 3.0 | 19.01s |
+| MuSiQue | Top5 | 0.380 | 0.437 | 0.698 | 0 | — |
+| MuSiQue | DAEC | 0.390 | 0.466 | 0.738 | 1 decomp + N bind | — |
+| MuSiQue | IRCoT-style | 0.370 | 0.461 | 0.642 | 3.0 | 17.08s |
+
+Delta IRCoT-style vs DAEC:
+
+| Dataset | dEM | dF1 | dSupport R@5 |
+|---|---:|---:|---:|
+| 2Wiki | −0.010 | −0.028 | −0.103 |
+| HotpotQA | −0.020 | −0.039 | −0.050 |
+| MuSiQue | −0.020 | −0.005 | −0.096 |
+
+Interpretation:
+- Under controlled local protocol, IRCoT-style iterative retrieval does not outperform DAEC on any dataset.
+- R@5 gap is particularly large (0.05–0.10), suggesting demand-aware composition over a fixed expanded pool assembles evidence more efficiently than 3 rounds of iterative retrieval.
+- IRCoT-style does not beat the naive Top5 baseline on 2Wiki or HotpotQA. On MuSiQue it improves F1 over Top5 (0.461 vs 0.437), but still loses EM, support R@5, and remains below DAEC.
+- This supports the paper claim: iterative retrieval is not an automatic substitute for demand-aware composition under the same reader budget.
+- Caveat: this is a simplified local implementation. Official IRCoT with full BM25 index + prompt sets + HP tuning may differ. Paper must label as "IRCoT-style (local)."
+
+## DAEC Binding Posterior Ablation (2026-05-06)
+
+Canonical files:
+- launcher: `run_logs/launch_daec_binding_grounded_limit100_20260506.sh`
+- results CSV: `run_logs/daec_binding_grounded_limit100_20260506/daec_binding_grounded_limit100_results.csv`
+- summary: `run_logs/daec_binding_grounded_limit100_20260506/summary_daec_binding_grounded_limit100.md`
+- memo: `research_memory/emnlp_expand_then_compose/38_daec_binding_posterior_negative_20260506.md`
+
+Protocol:
+- HippoRAG pool100, Qwen3-8B no_think, NV-Embed-v2, wiki_title match, shared binding cache.
+- 5 variants × 3 datasets: base, typeguard, softcompat, grounded, full.
+- base = all features off; typeguard = type filter; softcompat = typeguard + body-mention 0.5; grounded = typeguard + upstream φ posterior; full = all + swap refinement.
+
+Results:
+
+| Dataset | Variant | EM | F1 | R@5 | dEM vs base | dF1 vs base | Type Rejects | Grounding Changes |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 2Wiki | base | 0.53 | 0.5952 | 0.900 | 0.00 | 0.0000 | 0 | 0 |
+| 2Wiki | typeguard | 0.53 | 0.5952 | 0.900 | 0.00 | 0.0000 | 3 | 0 |
+| 2Wiki | softcompat | 0.54 | 0.6085 | 0.900 | +0.01 | +0.0133 | 3 | 0 |
+| 2Wiki | grounded | 0.49 | 0.5347 | 0.863 | −0.04 | −0.0605 | 3 | 13 |
+| 2Wiki | full | 0.51 | 0.558 | 0.868 | −0.02 | −0.0372 | 3 | 13 |
+| HotpotQA | base | 0.60 | 0.7062 | 0.945 | 0.00 | 0.0000 | 0 | 0 |
+| HotpotQA | typeguard | 0.60 | 0.7062 | 0.945 | 0.00 | 0.0000 | 4 | 0 |
+| HotpotQA | softcompat | 0.60 | 0.7062 | 0.945 | 0.00 | 0.0000 | 4 | 0 |
+| HotpotQA | grounded | 0.60 | 0.7062 | 0.945 | 0.00 | 0.0000 | 4 | 10 |
+| HotpotQA | full | 0.60 | 0.7062 | 0.945 | 0.00 | 0.0000 | 4 | 10 |
+| MuSiQue | base | 0.34 | 0.4381 | 0.691 | 0.00 | 0.0000 | 0 | 0 |
+| MuSiQue | typeguard | 0.33 | 0.4281 | 0.683 | −0.01 | −0.0100 | 13 | 0 |
+| MuSiQue | softcompat | 0.35 | 0.4347 | 0.683 | +0.01 | −0.0034 | 13 | 0 |
+| MuSiQue | grounded | 0.33 | 0.4247 | 0.682 | −0.01 | −0.0134 | 13 | 10 |
+| MuSiQue | full | 0.32 | 0.4025 | 0.676 | −0.02 | −0.0356 | 13 | 10 |
+
+Per-query smoking guns (2Wiki grounded, all 4 EM losses):
+
+| Query | Correct Entity (b0) | Grounding | Wrong Entity (selected) | Grounding | Impact |
+|---|---|---:|---|---:|---|
+| Q16 Madame La Presidente director death | Frank Lloyd | 0.184 | Claude Autant-Lara | 0.719 | EM 1→0 |
+| Q71 Dancing in the Rain director death | Boštjan Hladnik | 0.304 | Ian Barry | 0.526 | EM 1→0 |
+| Q80 Atomised director's mother | Oskar Roehler | 0.264 | Claude Weisz | 0.741 | EM 1→0 |
+| Q93 45 Calibre Echo vs Bons Baisers director | Yvan Chiffre | 0.469 | Yonfan | 0.858 | EM 1→0 |
+
+Interpretation:
+- Grounded posterior is **anti-correlated** with binding correctness. All objectives saturate to 1.0; the grounding multiplier becomes the sole discriminator; it systematically favors salient-but-wrong entities.
+- Softcompat gains are reader noise: 2Wiki Q40 has identical selected titles; MuSiQue Q42/Q62 gain EM on entirely wrong docs.
+- Type filter is a code-consistency fix (matching frozen-binding behavior), not a method contribution.
+- Swap refinement never triggers because greedy already near-optimizes the submodular objective.
+
+## DAEC Saturation-Aware Binding Verifier Probe (2026-05-06)
+
+Canonical files:
+- script: `scripts/audit_daec_binding_verifier.py`
+- design doc: `docs/daec_saturation_binding_verifier_probe_20260506.md`
+- reports: `reports/daec_binding_verifier_20260506/`, `reports/daec_binding_verifier_20260506_selected_companion/`
+- commit: `3bec440`
+
+Protocol:
+- Offline probe reading base DAEC traces + HippoRAG pool100. No selector change, no reader rerun.
+- Saturation trigger: only flip binding when all bindings have tied objective (within epsilon).
+- Two support modes: `extraction_or_companion` (entity appears in upstream extraction doc or selected companion), `selected_companion` (entity appears in binding's own selected evidence companion docs).
+
+Results (extraction_or_companion, epsilon=0):
+
+| Dataset | Tied | Base Supported | Flips | SC 1→0 | SC 0→1 | dRecall |
+|---|---:|---:|---:|---:|---:|---:|
+| 2Wiki | 21 | 87% | 3 | 1 | 1 | 0.000 |
+| HotpotQA | 21 | 72% | 2 | 0 | 0 | 0.000 |
+| MuSiQue | 24 | 61% | 4 | 0 | 0 | 0.000 |
+
+Key case: Q14 (Maurice, Prince of Orange's father) — co-mention flipped from correct "William the Silent" to "William I, Count of Nassau-Dillenburg" because William I co-occurs with Maurice through one-hop family relations, but is not the entity the query asks for.
+
+Results (selected_companion, epsilon=0):
+
+| Dataset | Flips | SC 1→0 | SC 0→1 | dRecall |
+|---|---:|---:|---:|---:|
+| 2Wiki | 1 | 0 | 0 | 0.000 |
+| HotpotQA | 0 | 0 | 0 | 0.000 |
+| MuSiQue | 3 | 0 | 0 | +0.0025 |
+
+Interpretation:
+- Text co-mention is not safe as a binding verifier: entity co-mention ≠ relation entailment.
+- Base binding support rate is already high (87% on 2Wiki), so the correction surface is small and the risk-reward ratio is poor.
+- Wider epsilon (0.001, 0.01) increased flips without improving recall; MuSiQue regressed at ε=0.001.
+- This confirms the same root cause as the grounded posterior failure: no train-free signal short of relation-level verification can safely correct bindings.
