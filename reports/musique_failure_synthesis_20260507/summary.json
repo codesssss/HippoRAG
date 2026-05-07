@@ -1,0 +1,92 @@
+{
+  "report": "MuSiQue Failure Synthesis",
+  "date": "2026-05-07",
+  "status": "internal_decision_memo",
+  "recommendation": "Stop MuSiQue-fix pilots for now and move to DBEC paper writing. Run a D-BIR-LLM probe only under a strict <=3 day kill-switch if explicitly needed.",
+  "core_claim": "MuSiQue residual failures are dominated by candidate visibility under long dependency chains, not by DBEC backend admission, scoring, or fixed-pool rank arbitration.",
+  "key_numbers": {
+    "candidate_quality_audit": {
+      "musique_missing_gold_titles": 204,
+      "gold_source_only_not_rank_or_dbec": {
+        "count": 96,
+        "rate": 0.471,
+        "mean_source_rank": 36.0,
+        "p50_source_rank": 27,
+        "p75_source_rank": 58,
+        "p90_source_rank": 79
+      },
+      "gold_recovered_by_dbec_final": {
+        "count": 77,
+        "rate": 0.377
+      },
+      "gold_absent_from_source_pool": {
+        "count": 25,
+        "rate": 0.123
+      },
+      "gold_in_rank_fill_not_dbec": {
+        "count": 4,
+        "rate": 0.020
+      },
+      "gold_in_binding_candidates_not_selected": {
+        "count": 2,
+        "rate": 0.010
+      }
+    },
+    "chain_walking_probe_query_primary": {
+      "queries": 62,
+      "missing_gold_titles": 86,
+      "parse_ok_rate": 1.0,
+      "new_recall_at_5": 0.105,
+      "new_recall_at_10": 0.186,
+      "new_recall_at_20": 0.198,
+      "decision": "weak_future_work"
+    },
+    "anchor_variants_query_primary": {
+      "current_all_new_at_5": 0.105,
+      "title_strict_new_at_5": 0.070,
+      "title_only_new_at_5": 0.105,
+      "demand_entity_title_new_at_5": 0.093,
+      "decision": "stop_anchor_tuning"
+    },
+    "dbir_pilot_query_primary": {
+      "source_visible": {
+        "dbir_det_final_new_at_5": 0.023,
+        "context_iterative_lite_final_new_at_5": 0.058,
+        "dbir_det_expanded_recall_at_100": 0.186,
+        "context_iterative_lite_expanded_recall_at_100": 0.198
+      },
+      "pool_absent": {
+        "dbir_det_pool_absent_recovery_at_100": 0.120,
+        "independent_demand_pool_absent_recovery_at_100": 0.280,
+        "rank_expansion_pool_absent_recovery_at_100": 0.280
+      },
+      "decision": "stop_or_pivot"
+    },
+    "repair_gated_reader": {
+      "musique_best_f1": 0.2922,
+      "musique_delta_vs_dbec": -0.0171,
+      "musique_delta_vs_rank_fill5": -0.0470,
+      "decision": "stop"
+    }
+  },
+  "allowed_claims": [
+    "DBEC's main support-repair mechanism remains supported, especially on 2Wiki and under-selected slices.",
+    "MuSiQue residual failures are mostly front-end candidate visibility failures.",
+    "Backend admission/scoring/arbitration explains only a small fraction of the missing-gold bucket.",
+    "Entity-anchor chain walking has measurable but weak signal in the fixed pool.",
+    "Strict title-only anchor matching does not improve the chain-walking probe.",
+    "Deterministic dependency-bound lexical expansion does not show an independent advantage over simpler expansion policies."
+  ],
+  "not_allowed_claims": [
+    "D-BIR solves the fixed-pool ceiling.",
+    "Dependency-bound control is the active component for retrieval expansion.",
+    "Strict anchors improve chain walking.",
+    "Admission or scoring is the main MuSiQue bottleneck.",
+    "The practical MuSiQue ceiling is a formal theorem rather than a diagnostic estimate."
+  ],
+  "artifacts": {
+    "summary_md": "reports/musique_failure_synthesis_20260507/summary.md",
+    "evidence_table_csv": "reports/musique_failure_synthesis_20260507/evidence_table.csv",
+    "decision_matrix_csv": "reports/musique_failure_synthesis_20260507/decision_matrix.csv"
+  }
+}
