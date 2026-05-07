@@ -1,0 +1,13 @@
+dataset,bucket,source_visible_missing_titles,mean_source_best_gold_rank,p50_source_best_gold_rank,p75_source_best_gold_rank,p90_source_best_gold_rank,min_source_best_gold_rank,max_source_best_gold_rank
+2Wiki,gold_absent_from_source_pool,0,,,,,,
+2Wiki,gold_in_binding_candidates_not_selected,17,16.0,4,17,44,2,80
+2Wiki,gold_in_rank_fill_not_dbec,1,0.0,0,0,0,0,0
+2Wiki,gold_recovered_by_dbec_final,151,8.668874172185431,2,5,27,0,87
+2Wiki,gold_source_only_not_rank_or_dbec,3,29.333333333333332,25,57,57,6,57
+HotpotQA,gold_recovered_by_dbec_final,27,2.4074074074074074,1,2,4,0,23
+HotpotQA,gold_source_only_not_rank_or_dbec,5,24.6,14,30,62,8,62
+MuSiQue,gold_absent_from_source_pool,0,,,,,,
+MuSiQue,gold_in_binding_candidates_not_selected,2,7.0,5,9,9,5,9
+MuSiQue,gold_in_rank_fill_not_dbec,4,3.0,4,4,4,1,4
+MuSiQue,gold_recovered_by_dbec_final,77,6.233766233766234,1,3,14,0,80
+MuSiQue,gold_source_only_not_rank_or_dbec,96,36.020833333333336,27,58,79,4,96
