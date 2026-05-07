@@ -1,0 +1,3103 @@
+{
+  "dataset": "hotpotqa_repair_gated_underselect_20260507",
+  "base_dataset": "hotpotqa",
+  "limit": 32,
+  "pool_k": 5,
+  "source": "repair_gated_rq1_mr3_g010_branchstrict",
+  "source_pool_json": "run_logs/proprag_pool_exports_full1000_20260424/hotpotqa_pool100.json",
+  "offline_report_dir": "reports/repair_gated_arbitration_offline_20260507",
+  "records": [
+    {
+      "query_idx": 0,
+      "question": "This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?",
+      "gold_answers": [
+        "13 seasons"
+      ],
+      "gold_docs": [
+        "Howie Long\nHoward Matthew Moses \"Howie\" Long (born January 6, 1960) is an American former National Football League (NFL) defensive end, actor and sports analyst. He played in the NFL for 13 seasons and spent the entirety of his career with the Raiders franchise. During his tenure as a player, Long was named to eight Pro Bowls and helped the Raiders win a Super Bowl title in XVIII. He was inducted into the Pro Football Hall of Fame in 2000.",
+        "The Experts Network\nThe Experts Network, also known as TXN and TXN Sports, is an interactive digital sports network consisting of sports analysts Cris Collinsworth, Boomer Esiason, Nick Faldo, Howie Long, Cal Ripken Jr. and Phil Simms."
+      ],
+      "gold_titles": [
+        "Howie Long",
+        "The Experts Network"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Howie Long\nHoward Matthew Moses \"Howie\" Long (born January 6, 1960) is an American former National Football League (NFL) defensive end, actor and sports analyst. He played in the NFL for 13 seasons and spent the entirety of his career with the Raiders franchise. During his tenure as a player, Long was named to eight Pro Bowls and helped the Raiders win a Super Bowl title in XVIII. He was inducted into the Pro Football Hall of Fame in 2000.",
+        "The Experts Network\nThe Experts Network, also known as TXN and TXN Sports, is an interactive digital sports network consisting of sports analysts Cris Collinsworth, Boomer Esiason, Nick Faldo, Howie Long, Cal Ripken Jr. and Phil Simms.",
+        "Marshall Faulk\nMarshall William Faulk (born February 26, 1973) is a former American football player who was a running back in the National Football League (NFL) for twelve seasons. He played college football for San Diego State University, and was a two-time consensus All-American. He was selected by the Indianapolis Colts as the second overall pick in the 1994 NFL Draft, and he also played professionally for the NFL's St. Louis Rams. Faulk is one of only three NFL players (Marcus Allen and Tiki Barber being the others) to reach at least 10,000 rushing yards and 5,000 receiving yards; he is the only one to amass 12,000 yards rushing and 6,000 yards receiving. Faulk was inducted into the Pro Football Hall of Fame in 2011 and the College Football Hall of Fame in 2017. He is currently a pro football analyst for \"NFL Total Access\", \"Thursday Night Football\", and \"NFL GameDay Morning\" on the NFL Network.",
+        "Kurt Warner\nKurtis Eugene Warner (born June 22, 1971) is a former American football quarterback, a current part-time TV football analyst, and a philanthropist. He played for three National Football League (NFL) teams: the St. Louis Rams, the New York Giants, and the Arizona Cardinals. He was originally signed by the Green Bay Packers as an undrafted free agent in 1994 after playing college football at Northern Iowa. Warner went on to be considered the best undrafted NFL player of all time, following a 12-year career regarded as one of the greatest stories in NFL history. Warner was inducted into the Pro Football Hall of Fame in 2017, and is the only person inducted into both the Pro Football Hall of Fame and the Arena Football Hall of Fame.",
+        "Terry Bradshaw\nTerry Paxton Bradshaw (born September 2, 1948) is a former American football quarterback who played professionally in the National Football League (NFL). Since 1994, he has been a TV analyst and co-host of \"Fox NFL Sunday\". Bradshaw is also an actor, having participated in many television shows and films, most notably starring in the movie \"Failure To Launch\". He played for 14 seasons with Pittsburgh, won four Super Bowl titles in a six-year period (1974, 1975, 1978, and 1979), becoming the first quarterback to win three and four Super Bowls, and led the Steelers to eight AFC Central championships. He was inducted into the Pro Football Hall of Fame in 1989, his first year of eligibility. Bradshaw was inducted into the College Football Hall of Fame in 1996."
+      ],
+      "pool_titles": [
+        "Howie Long",
+        "The Experts Network",
+        "Marshall Faulk",
+        "Kurt Warner",
+        "Terry Bradshaw"
+      ],
+      "pool_doc_scores": [
+        0.007438896550194301,
+        0.019769661050505278,
+        0.004409009979082152,
+        0.004179253740114028,
+        0.004091067967479682
+      ],
+      "pool_doc_ids": [
+        235,
+        242,
+        240,
+        241,
+        236
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 24,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Howie Long",
+          "The Experts Network",
+          "Marshall Faulk",
+          "Kurt Warner",
+          "Terry Bradshaw"
+        ],
+        "accepted_repair_positions": [
+          0
+        ],
+        "accepted_repair_titles": [
+          "The Experts Network"
+        ],
+        "accepted_repair_gains": [
+          0.135024
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 1,
+      "question": "What music school did the singer of The Search for Everything: Wave One attend?",
+      "gold_answers": [
+        "Berklee College of Music"
+      ],
+      "gold_docs": [
+        "John Mayer\nJohn Clayton Mayer ( ; born October 16, 1977) is an American singer-songwriter, guitarist, and producer. He was born in Bridgeport, Connecticut, and raised in nearby Fairfield. He attended Berklee College of Music in Boston, but disenrolled and moved to Atlanta in 1997 with Clay Cook. Together, they formed a short-lived two-man band called Lo-Fi Masters. After their split, Mayer continued to play local clubs—refining his skills and gaining a following. After his appearance at the 2001 South by Southwest Festival, he was signed to Aware Records, and then Columbia Records, which released his first EP, \"Inside Wants Out\". His following two full-length albums—\"Room for Squares\" (2001) and \"Heavier Things\" (2003)—did well commercially, achieving multi-platinum status. In 2003, he won the Grammy Award for Best Male Pop Vocal Performance for the single \"Your Body Is a Wonderland\".",
+        "The Search for Everything: Wave One\nThe Search for Everything: Wave One (also shortened as Wave One) is an extended play (EP) by American singer John Mayer. Released on January 20, 2017, the EP contains the first four tracks from Mayer's seventh studio album, \"The Search for Everything\". It includes the lead single \"Love on the Weekend\" and three new tracks."
+      ],
+      "gold_titles": [
+        "John Mayer",
+        "The Search for Everything: Wave One"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "John Mayer\nJohn Clayton Mayer ( ; born October 16, 1977) is an American singer-songwriter, guitarist, and producer. He was born in Bridgeport, Connecticut, and raised in nearby Fairfield. He attended Berklee College of Music in Boston, but disenrolled and moved to Atlanta in 1997 with Clay Cook. Together, they formed a short-lived two-man band called Lo-Fi Masters. After their split, Mayer continued to play local clubs—refining his skills and gaining a following. After his appearance at the 2001 South by Southwest Festival, he was signed to Aware Records, and then Columbia Records, which released his first EP, \"Inside Wants Out\". His following two full-length albums—\"Room for Squares\" (2001) and \"Heavier Things\" (2003)—did well commercially, achieving multi-platinum status. In 2003, he won the Grammy Award for Best Male Pop Vocal Performance for the single \"Your Body Is a Wonderland\".",
+        "The Search for Everything: Wave One\nThe Search for Everything: Wave One (also shortened as Wave One) is an extended play (EP) by American singer John Mayer. Released on January 20, 2017, the EP contains the first four tracks from Mayer's seventh studio album, \"The Search for Everything\". It includes the lead single \"Love on the Weekend\" and three new tracks.",
+        "The Search for Everything: Wave Two\nThe Search for Everything: Wave Two (also shortened as Wave Two) is an extended play (EP) by American singer-songwriter John Mayer. Released on February 24, 2017 by Columbia and Sony Music, the EP contains four tracks from Mayer's seventh studio album, \"The Search for Everything\", and is a follow-up to its predecessor EP, \"\". It includes the lead single \"Still Feel Like Your Man\".",
+        "Let Freedom Ring (EP)\nLet Freedom Ring is the first extended play (EP) by Japanese singer and songwriter Hiroya Ozaki, released on 22 March 2017 by Toy's Factory.",
+        "Sree Rama Varma Music School\nSree Rama Varma Music School (മലയാളം: ) is a music school situated in Thrissur city in Kerala, India and it is the first music school in Kerala state. The school is also known as S.R.V. Music School. In 2016, the institution was upgraded as a music college with the name of S.R.V. (Sreerama Varma) Govt. College Of Music And Performing Arts."
+      ],
+      "pool_titles": [
+        "John Mayer",
+        "The Search for Everything: Wave One",
+        "The Search for Everything: Wave Two",
+        "Let Freedom Ring (EP)",
+        "Sree Rama Varma Music School"
+      ],
+      "pool_doc_scores": [
+        0.013350755342103395,
+        0.020810346734789837,
+        0.008926822689498709,
+        0.00397534843374582,
+        0.002554253404079835
+      ],
+      "pool_doc_ids": [
+        759,
+        763,
+        755,
+        8851,
+        762
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 76,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "John Mayer",
+          "The Search for Everything: Wave One",
+          "The Search for Everything: Wave Two",
+          "Let Freedom Ring (EP)",
+          "Sree Rama Varma Music School"
+        ],
+        "accepted_repair_positions": [
+          0
+        ],
+        "accepted_repair_titles": [
+          "The Search for Everything: Wave One"
+        ],
+        "accepted_repair_gains": [
+          0.295588
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 2,
+      "question": "In which poetic form is Mad Girl's Love Song written and appears in the novel The Bell Jar by Sylvia Plath?",
+      "gold_answers": [
+        "the villanelle poetic form"
+      ],
+      "gold_docs": [
+        "Mad Girl's Love Song\n\"Mad Girl's Love Song\" is a poem written by Sylvia Plath in 1951, while she was a student at Smith College. It is written in the villanelle poetic form and is generally included in the biographical note appended to Plath's novel, \"The Bell Jar\".",
+        "The Bell Jar\nThe Bell Jar is the only novel written by the American writer and poet Sylvia Plath. Originally published under the pseudonym \"Victoria Lucas\" in 1963, the novel is semi-autobiographical, with the names of places and people changed. The book is often regarded as a \"roman à clef\" since the protagonist's descent into mental illness parallels Plath's own experiences with what may have been clinical depression. Plath died by suicide a month after its first UK publication. The novel was published under Plath's name for the first time in 1967 and was not published in the United States until 1971, in accordance with the wishes of both Plath's husband, Ted Hughes, and her mother. The novel has been translated into nearly a dozen languages. The novel, though dark, is often read in high school English classes."
+      ],
+      "gold_titles": [
+        "Mad Girl's Love Song",
+        "The Bell Jar"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Mad Girl's Love Song\n\"Mad Girl's Love Song\" is a poem written by Sylvia Plath in 1951, while she was a student at Smith College. It is written in the villanelle poetic form and is generally included in the biographical note appended to Plath's novel, \"The Bell Jar\".",
+        "The Bell Jar\nThe Bell Jar is the only novel written by the American writer and poet Sylvia Plath. Originally published under the pseudonym \"Victoria Lucas\" in 1963, the novel is semi-autobiographical, with the names of places and people changed. The book is often regarded as a \"roman à clef\" since the protagonist's descent into mental illness parallels Plath's own experiences with what may have been clinical depression. Plath died by suicide a month after its first UK publication. The novel was published under Plath's name for the first time in 1967 and was not published in the United States until 1971, in accordance with the wishes of both Plath's husband, Ted Hughes, and her mother. The novel has been translated into nearly a dozen languages. The novel, though dark, is often read in high school English classes.",
+        "The Bell Jar (film)\nThe Bell Jar is a 1979 film based on Sylvia Plath's 1963 book \"The Bell Jar\". It was directed by Larry Peerce, and stars Marilyn Hassett and Julie Harris. The story follows a young woman's summer in New York City working for a women's magazine, her return home to New England, and her subsequent psychological breakdown within the context of the difficulties of the 1950s—ranging from the Rosenbergs' execution, to the disturbing aspects of pop culture, to the distraction of predatory college boys.",
+        "Hypoxia (Kathryn Williams album)\nHypoxia is Kathryn Williams 12th album and was released by One Little Indian on 15 June 2015. The songs were initially conceived as a result of a 2013 writing commission from New Writing North in conjunction with the Durham Book Festival's 50th anniversary celebration of the publication of Sylvia Plath's 'The Bell Jar' novel.",
+        "Czesław Miłosz\nCzesław Miłosz ( ; 30 June 1911 – 14 August 2004) was a Polish poet, prose writer, translator and diplomat. His World War II-era sequence \"The World\" is a collection of twenty \"naïve\" poems. Following the war, he served as Polish cultural attaché in Paris and Washington, D.C., then in 1951 defected to the West. His nonfiction book \"The Captive Mind\" (1953) became a classic of anti-Stalinism. From 1961 to 1998 he was a professor of Slavic Languages and Literatures at the University of California, Berkeley. He became a U.S. citizen in 1970. In 1978 he was awarded the Neustadt International Prize for Literature, and in 1980 the Nobel Prize in Literature. In 1999 he was named a Puterbaugh Fellow. After the fall of the Iron Curtain, he divided his time between Berkeley, California, and Kraków, Poland."
+      ],
+      "pool_titles": [
+        "Mad Girl's Love Song",
+        "The Bell Jar",
+        "The Bell Jar (film)",
+        "Hypoxia (Kathryn Williams album)",
+        "Czesław Miłosz"
+      ],
+      "pool_doc_scores": [
+        0.02254202489583013,
+        0.004654317899802022,
+        0.004158274266636535,
+        0.0032946830232098902,
+        0.0027752726328875432
+      ],
+      "pool_doc_ids": [
+        865,
+        870,
+        873,
+        867,
+        9428
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 87,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Mad Girl's Love Song",
+          "The Bell Jar",
+          "The Bell Jar (film)",
+          "Hypoxia (Kathryn Williams album)",
+          "Czesław Miłosz"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 3,
+      "question": "Kadeem Jack is a player in a league that started with how many teams?",
+      "gold_answers": [
+        "eight"
+      ],
+      "gold_docs": [
+        "NBA G League\nThe NBA G League is the National Basketball Association's official minor league basketball organization. The league was known as the National Basketball Development League (NBDL) from 2001 to 2005, and the NBA Development League (NBA D-League) from 2005 until 2017. The league started with eight teams until NBA commissioner David Stern announced a plan to expand the NBA D-League to fifteen teams and develop it into a true minor league farm system, with each NBA D-League team affiliated with one or more NBA teams in March 2005. At the conclusion of the 2013–14 NBA season, 33% of NBA players had spent time in the NBA D-League, up from 23% in 2011. As of the 2017–18 season, the league consists of 26 teams, all of which are either single-affiliated or owned by an NBA team.",
+        "Kadeem Jack\nKadeem Jack (born October 27, 1992) is an American professional basketball player for the Sioux Falls Skyforce of the NBA G League. He played college basketball for Rutgers."
+      ],
+      "gold_titles": [
+        "NBA G League",
+        "Kadeem Jack"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "NBA G League\nThe NBA G League is the National Basketball Association's official minor league basketball organization. The league was known as the National Basketball Development League (NBDL) from 2001 to 2005, and the NBA Development League (NBA D-League) from 2005 until 2017. The league started with eight teams until NBA commissioner David Stern announced a plan to expand the NBA D-League to fifteen teams and develop it into a true minor league farm system, with each NBA D-League team affiliated with one or more NBA teams in March 2005. At the conclusion of the 2013–14 NBA season, 33% of NBA players had spent time in the NBA D-League, up from 23% in 2011. As of the 2017–18 season, the league consists of 26 teams, all of which are either single-affiliated or owned by an NBA team.",
+        "Kadeem Jack\nKadeem Jack (born October 27, 1992) is an American professional basketball player for the Sioux Falls Skyforce of the NBA G League. He played college basketball for Rutgers.",
+        "Derrick Walton\nDerrick Walton Jr. (born April 3, 1995) is an American basketball player for the Miami Heat of the National Basketball Association (NBA), on a two-way contract with the Heat's NBA G League affiliate, the Sioux Falls Skyforce. Walton played college basketball for the Michigan Wolverines. In high school, he was a 2013 \"Parade\" All-American, the 2013 Michigan Boys Basketball Gatorade Player of the Year and the runner up in the 2013 Mr. Basketball of Michigan as a senior at Chandler Park Academy. He was a 2013–14 Big Ten Conference men's basketball season All-Freshman selection in the Big Ten for the 2013–14 team, which won the 2013–14 Big Ten Conference regular-season championship outright. He was a 2015–16 Big Ten Conference men's basketball season All-Big Ten third team selection by the coaches and honorable mention selection by the media as a junior. He was a 2016–17 Big Ten Conference men's basketball season All-Big Ten second team selection by the coaches and the media as a senior. Walton is the only Wolverine with 1,000-points, 500-rebounds and 400-assists and holds the school single-game assist record (16). He was the Most Outstanding Player of the 2017 Big Ten Conference Men's Basketball Tournament for the tournament champion 2016–17 Wolverines.",
+        "Jalen Jones\nJalen Jones (born May 27, 1993) is an American professional basketball player for the New Orleans Pelicans of the National Basketball Association (NBA). He was signed on a two-way contract with the NBA G League. He played college basketball for Southern Methodist and Texas A&M.",
+        "Kevin Durant\nKevin Wayne Durant (born September 29, 1988) is an American professional basketball player for the Golden State Warriors of the National Basketball Association (NBA). He has won an NBA championship, an NBA Most Valuable Player Award, the Bill Russell NBA Finals Most Valuable Player Award, the NBA All-Star Game Most Valuable Player Award, four NBA scoring titles, the NBA Rookie of the Year Award, and two Olympic gold medals. Durant has also been selected to seven All-NBA teams and eight NBA All-Star teams."
+      ],
+      "pool_titles": [
+        "NBA G League",
+        "Kadeem Jack",
+        "Derrick Walton",
+        "Jalen Jones",
+        "Kevin Durant"
+      ],
+      "pool_doc_scores": [
+        0.005548023227319381,
+        0.018665157650621288,
+        0.004106551697251308,
+        0.003960224745953324,
+        0.0033234860791566626
+      ],
+      "pool_doc_ids": [
+        894,
+        895,
+        6977,
+        6472,
+        163
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 90,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "NBA G League",
+          "Kadeem Jack",
+          "Derrick Walton",
+          "Jalen Jones",
+          "Kevin Durant"
+        ],
+        "accepted_repair_positions": [
+          0
+        ],
+        "accepted_repair_titles": [
+          "Kadeem Jack"
+        ],
+        "accepted_repair_gains": [
+          0.239548
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 4,
+      "question": "What state was the dissenter in Kessler v. Treat from?",
+      "gold_answers": [
+        "Kentucky"
+      ],
+      "gold_docs": [
+        "John Marshall Harlan\nJohn Marshall Harlan (June 1, 1833October 14, 1911) was an American lawyer and politician from Kentucky who served as an associate justice on the U.S. Supreme Court.",
+        "Kessler v. Treat\nKessler v. Treat, 205 U.S. 33 (1907), was a decision in which the Supreme Court of the United States adjudicated allegations that prisoners were unlawfully imprisoned by Morgan treat, the United States Marshall for the Eastern District of Virginia. In a one-sentence opinion written by Chief Justice Melville Fuller, the Court identified ten cases for which the Court entered the same decree as the one issued in \"Tinsley v. Treat\". Justice John Marshall Harlan dissented without writing a separate opinion."
+      ],
+      "gold_titles": [
+        "John Marshall Harlan",
+        "Kessler v. Treat"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Kessler v. Treat\nKessler v. Treat, 205 U.S. 33 (1907), was a decision in which the Supreme Court of the United States adjudicated allegations that prisoners were unlawfully imprisoned by Morgan treat, the United States Marshall for the Eastern District of Virginia. In a one-sentence opinion written by Chief Justice Melville Fuller, the Court identified ten cases for which the Court entered the same decree as the one issued in \"Tinsley v. Treat\". Justice John Marshall Harlan dissented without writing a separate opinion.",
+        "John Marshall Harlan\nJohn Marshall Harlan (June 1, 1833October 14, 1911) was an American lawyer and politician from Kentucky who served as an associate justice on the U.S. Supreme Court.",
+        "Rule of reason\nUpon its development some critics of \"Standard Oil\", including the lone dissenter Justice John Marshall Harlan, argued that \"Standard Oil\" and its rule of reason were a departure from previous Sherman Act case law, which purportedly had interpreted the language of the Sherman Act to hold that all contracts restraining trade were prohibited, regardless of whether the restraint actually produced ill effects. These critics emphasized in particular the Court's decision in \"United States v. Trans-Missouri Freight Association\", 166 U.S. 290 (1897), which contains some language suggesting that a mere restriction on the autonomy of traders would suffice to establish that an agreement restrained trade within the meaning of the Act.",
+        "Kessler v. Eldred\nKessler v. Eldred, 206 U.S. 285 (1907) 27 S.Ct. 611, was a United States Supreme Court case in which the Court defined some effects of a court decision that an inventor had not infringed on a patent.",
+        "Marie Louise v. Marot\nMarie Louise v. Marot (1836) was a freedom suit heard by the Louisiana state district court and appealed to the Louisiana Supreme Court. The Court held that a slave who is taken to a territory prohibitive of slavery cannot be again reduced to slavery on returning to a territory allowing of slavery. The ruling was cited as precedent to the 1856 landmark \"Dred Scott v. Sandford\" case heard by the U.S. Supreme Court. Supreme Court Justice John McLean cited the precedent in his dissent of the majority ruling. Six of eight justices did not abide by the precedent in what has been considered the worst decision ever made by the Supreme Court."
+      ],
+      "pool_titles": [
+        "Kessler v. Treat",
+        "John Marshall Harlan",
+        "Rule of reason",
+        "Kessler v. Eldred",
+        "Marie Louise v. Marot"
+      ],
+      "pool_doc_scores": [
+        0.02410508078829721,
+        0.003649966988195727,
+        0.006848812299599345,
+        0.0052593017393206916,
+        0.003965325607846651
+      ],
+      "pool_doc_ids": [
+        1383,
+        1387,
+        1380,
+        1386,
+        4743
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 139,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          4,
+          1,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Kessler v. Treat",
+          "John Marshall Harlan",
+          "Rule of reason",
+          "Kessler v. Eldred",
+          "Marie Louise v. Marot"
+        ],
+        "accepted_repair_positions": [
+          4
+        ],
+        "accepted_repair_titles": [
+          "John Marshall Harlan"
+        ],
+        "accepted_repair_gains": [
+          0.700014
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 5,
+      "question": "Who was known for playing a fictionalized version of the wild politician who was the face of communist scare tact's in the early 1950's?",
+      "gold_answers": [
+        "James Gregory"
+      ],
+      "gold_docs": [
+        "Joseph McCarthy\nJoseph Raymond McCarthy (November 14, 1908 – May 2, 1957) was an American politician who served as U.S. Senator from the state of Wisconsin from 1947 until his death in 1957. Beginning in 1950, McCarthy became the most visible public face of a period in the United States in which Cold War tensions fueled fears of widespread Communist subversion. He is known for alleging that numerous Communists and Soviet spies and sympathizers had infiltrated the United States federal government, universities, film industry, and elsewhere. Ultimately, the smear tactics he used led him to be censured by the U.S. Senate. The term \"McCarthyism\", coined in 1950 in reference to McCarthy's practices, was soon applied to similar anti-communist activities. Today, the term is used in reference to what are considered demagogic, reckless, and unsubstantiated accusations, as well as public attacks on the character or patriotism of political opponents.",
+        "James Gregory (actor)\nJames Gregory (December 23, 1911 – September 16, 2002) was an American character actor known for his deep, gravelly voice and playing brash roles such as the McCarthy-like Sen. John Iselin in \"The Manchurian Candidate\" (1962), the audacious General Ursus in \"Beneath the Planet of the Apes\" (1970), and crusty Inspector Frank Luger in the television sitcom \"Barney Miller\" (1975–1982)."
+      ],
+      "gold_titles": [
+        "Joseph McCarthy",
+        "James Gregory (actor)"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "James Gregory (actor)\nJames Gregory (December 23, 1911 – September 16, 2002) was an American character actor known for his deep, gravelly voice and playing brash roles such as the McCarthy-like Sen. John Iselin in \"The Manchurian Candidate\" (1962), the audacious General Ursus in \"Beneath the Planet of the Apes\" (1970), and crusty Inspector Frank Luger in the television sitcom \"Barney Miller\" (1975–1982).",
+        "Joseph McCarthy\nJoseph Raymond McCarthy (November 14, 1908 – May 2, 1957) was an American politician who served as U.S. Senator from the state of Wisconsin from 1947 until his death in 1957. Beginning in 1950, McCarthy became the most visible public face of a period in the United States in which Cold War tensions fueled fears of widespread Communist subversion. He is known for alleging that numerous Communists and Soviet spies and sympathizers had infiltrated the United States federal government, universities, film industry, and elsewhere. Ultimately, the smear tactics he used led him to be censured by the U.S. Senate. The term \"McCarthyism\", coined in 1950 in reference to McCarthy's practices, was soon applied to similar anti-communist activities. Today, the term is used in reference to what are considered demagogic, reckless, and unsubstantiated accusations, as well as public attacks on the character or patriotism of political opponents.",
+        "The Great Impostor\nThe Great Impostor is a 1961 movie based on the true story of an impostor named Ferdinand Waldo Demara. The film is loosely based on Robert Crichton's 1959 biography of the same name, it stars Tony Curtis in the title role, and was directed by Robert Mulligan. The film only loosely follows Demara's real-life exploits, and is much lighter in tone than the book on which it is based.",
+        "Red-baiting\nRed-baiting, also reductio ad Stalinum, is an informal logical fallacy that intends to discredit the validity of an opponent's logical argument by accusing, denouncing, attacking or persecuting an individual or group as communist, socialist, or anarchist, or sympathetic toward communism, socialism, or anarchism. In the United States the term \"red-baiting\" dates from at least 1927. In 1928, black-listing by the Daughters of the American Revolution was characterized as a \"red-baiting relic\". It is a term commonly used in the United States, and in United States history, red-baiting is most often associated with McCarthyism, which originated in the two historic Red Scare periods of the 1920s (First Red Scare) and 1950s (Second Red Scare). In the 21st century, red-baiting does not have quite the same effect it previously did due to the fall of Soviet-style Communism, but some pundits have argued that notable events in current American politics indicate a resurgence of red-baiting consistent with the 1950s.",
+        "Lavender scare\nThe lavender scare refers to a witch hunt and the mass firings of gay people in the 1950s from the United States government. It paralleled the anti-communist campaign known as McCarthyism and the Second Red Scare. Gay men and lesbians were said to be security risks and communist sympathizers, which led to the call to remove them from state employment."
+      ],
+      "pool_titles": [
+        "James Gregory (actor)",
+        "Joseph McCarthy",
+        "The Great Impostor",
+        "Red-baiting",
+        "Lavender scare"
+      ],
+      "pool_doc_scores": [
+        0.002473640316650718,
+        0.011343203375460171,
+        4.0444004893660077e-10,
+        0.0038808206992865545,
+        0.0037236016016742907
+      ],
+      "pool_doc_ids": [
+        1444,
+        1442,
+        1008,
+        1440,
+        1443
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 145,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          13
+        ],
+        "final_order_positions": [
+          13,
+          0,
+          98,
+          1,
+          2
+        ],
+        "final_titles": [
+          "James Gregory (actor)",
+          "Joseph McCarthy",
+          "The Great Impostor",
+          "Red-baiting",
+          "Lavender scare"
+        ],
+        "accepted_repair_positions": [
+          0,
+          98
+        ],
+        "accepted_repair_titles": [
+          "Joseph McCarthy",
+          "The Great Impostor"
+        ],
+        "accepted_repair_gains": [
+          0.604985,
+          0.346034
+        ],
+        "accepted_repair_branch_status": [
+          "support",
+          "support"
+        ],
+        "rank_fill_positions": [
+          13,
+          0,
+          1,
+          2,
+          3
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 0.5,
+          "dbec_support_complete": 0,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 6,
+      "question": "What key role did the stadium's snowplow operated play in the game following the Dolphins win against the Minnesota Vikings?",
+      "gold_answers": [
+        "cleared a spot on the snowy field specifically for New England kicker John Smith"
+      ],
+      "gold_docs": [
+        "1982 Miami Dolphins season\nThe 1982 Miami Dolphins season was the team's seventeenth in the National Football League. The team was coming off an unexpected 11-4-1 1981 season and a devastating loss to the San Diego Chargers in the Divisional Round the previous season in a game dubbed the Epic in Miami. The Dolphins had clinched the 2 seed and were picked by many to reach the Super Bowl during the 1981 season. Because of the high number of picks to reach the Super Bowl the previous season, many more fans picked them to win it during the 1982 season. The Dolphins looked to improve on their 11-4-1 record from 1981. However, a players strike cancelled 7 of the team's 16 games. Because of this, the NFL schedule was shrunk to 9 games. The Dolphins started out fresh, winning their first 2 games prior to the strike. When season play resumed 2 months later, the Dolphins defeated the Buffalo Bills 9-7 in Buffalo to clinch a 3-0 start. After a loss to Tampa Bay, they defeated the Minnesota Vikings 22-14. The next week, they lost a brisk game against the Patriots 3-0 in a game called the Snowplow Game. The Dolphins would then win 3 straight games to end the season 7-2, tied for 2nd in the AFC with the Cincinnati Bengals. The Dolphins won 2nd place over them by virtue of a series of tiebreakers. In the playoffs, they defeated the Patriots in a rematch by the score of 28-13. They then defeated the Chargers in a rematch of the 1981 Divisional Playoffs by a score of 34-13. In the AFC Championship game, they shutout the Jets, 14-0 to reach the Super Bowl for the first time since 1973. In Super Bowl XVII, they lost to the Redskins 27-17 in a rematch of Super Bowl VII which concluded Miami's perfect 1972 season.",
+        "Snowplow Game\nIn National Football League lore, the Snowplow Game was a regular-season game played between the Miami Dolphins and New England Patriots on December 12, 1982, at Schaefer Stadium in Foxborough, Massachusetts. The stadium's snowplow operator, Mark Henderson, cleared a spot on the snowy field specifically for New England kicker John Smith so he could kick the game-winning field goal to give the Patriots a 3–0 win."
+      ],
+      "gold_titles": [
+        "1982 Miami Dolphins season",
+        "Snowplow Game"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Snowplow Game\nIn National Football League lore, the Snowplow Game was a regular-season game played between the Miami Dolphins and New England Patriots on December 12, 1982, at Schaefer Stadium in Foxborough, Massachusetts. The stadium's snowplow operator, Mark Henderson, cleared a spot on the snowy field specifically for New England kicker John Smith so he could kick the game-winning field goal to give the Patriots a 3–0 win.",
+        "1997 Minnesota Vikings season\nThe Minnesota Vikings season was the 37th year of season play for the Minnesota Vikings and the 78th regular season of the National Football League. The Vikings finished with a record of nine wins and seven losses. Their record was good enough to qualify for a wild card berth. In the wild card round against the New York Giants, the Vikings came back from a 22–13 deficit with 90 seconds to play to defeat the Giants 23–22. It was their first playoff victory since 1988 and their first under head coach Dennis Green. In the Divisional round, the Vikings were defeated by the San Francisco 49ers, 38–22.",
+        "1982 Miami Dolphins season\nThe 1982 Miami Dolphins season was the team's seventeenth in the National Football League. The team was coming off an unexpected 11-4-1 1981 season and a devastating loss to the San Diego Chargers in the Divisional Round the previous season in a game dubbed the Epic in Miami. The Dolphins had clinched the 2 seed and were picked by many to reach the Super Bowl during the 1981 season. Because of the high number of picks to reach the Super Bowl the previous season, many more fans picked them to win it during the 1982 season. The Dolphins looked to improve on their 11-4-1 record from 1981. However, a players strike cancelled 7 of the team's 16 games. Because of this, the NFL schedule was shrunk to 9 games. The Dolphins started out fresh, winning their first 2 games prior to the strike. When season play resumed 2 months later, the Dolphins defeated the Buffalo Bills 9-7 in Buffalo to clinch a 3-0 start. After a loss to Tampa Bay, they defeated the Minnesota Vikings 22-14. The next week, they lost a brisk game against the Patriots 3-0 in a game called the Snowplow Game. The Dolphins would then win 3 straight games to end the season 7-2, tied for 2nd in the AFC with the Cincinnati Bengals. The Dolphins won 2nd place over them by virtue of a series of tiebreakers. In the playoffs, they defeated the Patriots in a rematch by the score of 28-13. They then defeated the Chargers in a rematch of the 1981 Divisional Playoffs by a score of 34-13. In the AFC Championship game, they shutout the Jets, 14-0 to reach the Super Bowl for the first time since 1973. In Super Bowl XVII, they lost to the Redskins 27-17 in a rematch of Super Bowl VII which concluded Miami's perfect 1972 season.",
+        "Super Bowl VIII\nSuper Bowl VIII was an American football game between the National Football Conference (NFC) champion Minnesota Vikings and the American Football Conference (AFC) champion Miami Dolphins to decide the National Football League (NFL) champion for the 1973 season. The Dolphins defeated the Vikings by the score of 24–7 to win their second consecutive Super Bowl, the first team to do so since the Green Bay Packers in Super Bowls I and II, and the first AFC team to do so.",
+        "1982 Minnesota Vikings season\nThe Minnesota Vikings season was the franchise's 22nd season in the National Football League. This was Minnesota's first season in the newly constructed Hubert H. Humphrey Metrodome. The team was looking to improve on its 7-9 record from 1981. However, a players strike cancelled 7 of the team's 16 games, and each NFL team was only allowed to play 9 games. The Vikings would win their opener against the Tampa Bay Buccaneers before losing the next week to the Buffalo Bills, a game in which they had a 19-0 lead before the Bills pulled off a miraculous comeback to win 23-22. After the strike ended, the Vikings would get embarrassed in Green Bay against the Packers 26-7 before beating the Bears the next week 35-7 to sit at 2-2. After a loss to the Dolphins, the Vikings would win their next 2 games to sit at 4-3. In their final game of the season, they would upset the Dallas Cowboys 31-27 to clinch the NFC's 4th place spot in the playoffs (as divisions were ignored in 1982 and the standings were determined by conference). In the playoffs, the Vikings would defeat the Atlanta Falcons 30-24 to reach the divisional round. However, in that game, they would lose 21-7 to the eventual champion Redskins."
+      ],
+      "pool_titles": [
+        "Snowplow Game",
+        "1997 Minnesota Vikings season",
+        "1982 Miami Dolphins season",
+        "Super Bowl VIII",
+        "1982 Minnesota Vikings season"
+      ],
+      "pool_doc_scores": [
+        0.011864697462522372,
+        0.004069548557073312,
+        0.014184632767623287,
+        0.0039020753541882678,
+        0.003761344444392591
+      ],
+      "pool_doc_ids": [
+        1839,
+        1843,
+        1841,
+        1846,
+        1847
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 185,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          2,
+          0,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Snowplow Game",
+          "1997 Minnesota Vikings season",
+          "1982 Miami Dolphins season",
+          "Super Bowl VIII",
+          "1982 Minnesota Vikings season"
+        ],
+        "accepted_repair_positions": [
+          2
+        ],
+        "accepted_repair_titles": [
+          "1997 Minnesota Vikings season"
+        ],
+        "accepted_repair_gains": [
+          0.9229
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 7,
+      "question": "What is special about the wristwatches that Favre-Leuba manufactures?",
+      "gold_answers": [
+        "Swiss made"
+      ],
+      "gold_docs": [
+        "Favre-Leuba\nFavre-Leuba is a Swiss manufacturer of wristwatches headquartered in Solothurn, Switzerland. It was a pioneer in watch design, manufacturing and distribution, thus contributing immensely to the Swiss watchmaking industry. The foundation of the brand was laid in 1737 when Abraham Favre was registered as a watchmaker, so it has been reported as the second-oldest watch brand in Switzerland.",
+        "Swiss made\nSwiss made is a label used to indicate that a product was made in Switzerland."
+      ],
+      "gold_titles": [
+        "Favre-Leuba",
+        "Swiss made"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Favre-Leuba\nFavre-Leuba is a Swiss manufacturer of wristwatches headquartered in Solothurn, Switzerland. It was a pioneer in watch design, manufacturing and distribution, thus contributing immensely to the Swiss watchmaking industry. The foundation of the brand was laid in 1737 when Abraham Favre was registered as a watchmaker, so it has been reported as the second-oldest watch brand in Switzerland.",
+        "Swiss made\nSwiss made is a label used to indicate that a product was made in Switzerland.",
+        "Lavet type stepping motor\nThe Lavet type stepping motor has widespread use as a drive in electro-mechanical clocks and is a special kind of single-phase stepping motor. Both analog and stepped-movement quartz clocks use the Lavet type stepping motor. See Quartz clock. Through miniaturization it can be used in wristwatches and requires very little power, making a battery last for many years. The French engineer Marius Lavet is known as the inventor for this kind of drives and described it in 1936 in his patent application FR823395.",
+        "Lemania\nLemania was a Swiss watch manufacturer and manufacturer of watch movements.",
+        "Patek Philippe &amp; Co.\nPatek Philippe & Co. is a Swiss watch manufacturer founded in 1851, located in Geneva and the Vallée de Joux. It designs and manufactures timepieces and movements, including some of the most complicated mechanical watches. It is considered by many experts and aficionados to be one of the most prestigious watch manufacturers."
+      ],
+      "pool_titles": [
+        "Favre-Leuba",
+        "Swiss made",
+        "Lavet type stepping motor",
+        "Lemania",
+        "Patek Philippe &amp; Co."
+      ],
+      "pool_doc_scores": [
+        0.017251935632041006,
+        0.0025627753268115646,
+        0.004659592361448681,
+        0.0040770680942154415,
+        0.0038272631515553304
+      ],
+      "pool_doc_ids": [
+        1988,
+        1994,
+        1991,
+        769,
+        768
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 200,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          14,
+          1,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Favre-Leuba",
+          "Swiss made",
+          "Lavet type stepping motor",
+          "Lemania",
+          "Patek Philippe &amp; Co."
+        ],
+        "accepted_repair_positions": [
+          14
+        ],
+        "accepted_repair_titles": [
+          "Swiss made"
+        ],
+        "accepted_repair_gains": [
+          0.196621
+        ],
+        "accepted_repair_branch_status": [
+          "unknown"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 0.5,
+          "rank_support_complete": 0,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 1,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 8,
+      "question": "Who won the 2007 Copa America Final, with help from Julio Baptista?",
+      "gold_answers": [
+        "Brazil"
+      ],
+      "gold_docs": [
+        "Júlio Baptista\nJúlio César Clemente Baptista (born 1 October 1981) is a Brazilian professional footballer who played most recently as an attacking midfielder or forward for Major League Soccer club Orlando City SC. He is nicknamed \"The Beast\" due to his size and physical presence on the football field.",
+        "2007 Copa América Final\nThe 2007 Copa América Final was the final match of the 2007 Copa América. It was held on 15 July 2007 in Maracaibo, Venezuela, between Brazil and Argentina. Brazil won 3–0, with goals from Júlio Baptista, a Roberto Ayala own goal and Dani Alves. Brazil won their eighth title, while Argentina could have won their fifteenth."
+      ],
+      "gold_titles": [
+        "Júlio Baptista",
+        "2007 Copa América Final"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "2007 Copa América Final\nThe 2007 Copa América Final was the final match of the 2007 Copa América. It was held on 15 July 2007 in Maracaibo, Venezuela, between Brazil and Argentina. Brazil won 3–0, with goals from Júlio Baptista, a Roberto Ayala own goal and Dani Alves. Brazil won their eighth title, while Argentina could have won their fifteenth.",
+        "Júlio Baptista\nJúlio César Clemente Baptista (born 1 October 1981) is a Brazilian professional footballer who played most recently as an attacking midfielder or forward for Major League Soccer club Orlando City SC. He is nicknamed \"The Beast\" due to his size and physical presence on the football field.",
+        "2007 Copa América\nThe 2007 Campeonato Sudamericano Copa América, known simply as the 2007 Copa América or 2007 Copa América Venezuela, was the 42nd edition of the Copa América, the South-American championship for international association football teams. The competition was organized by CONMEBOL, South America's football governing body, and was held between 26 June and 15 July in Venezuela, which hosted the tournament for the first time. The defending champions were Brazil.",
+        "2007 Copa Libertadores Finals\nThe 2007 Copa Libertadores Final was a two-legged football match-up to determine the 2007 Copa Libertadores champion. The series was contested between Club Atlético Boca Juniors from Buenos Aires, Argentina, and Grêmio, from Porto Alegre, Brazil. The first leg of the tie was played on June 13 at Boca Juniors' home field, with the second leg played on June 20 at Gremio's.",
+        "2007 Copa Sudamericana Finals\nThe 2007 Copa Sudamericana Finals was a two-legged football match-up to determine the 2007 Copa Sudamericana champion."
+      ],
+      "pool_titles": [
+        "2007 Copa América Final",
+        "Júlio Baptista",
+        "2007 Copa América",
+        "2007 Copa Libertadores Finals",
+        "2007 Copa Sudamericana Finals"
+      ],
+      "pool_doc_scores": [
+        0.015470318232165598,
+        0.0042034029985586205,
+        0.005592572458547254,
+        0.004462862860926169,
+        0.0038920113711020422
+      ],
+      "pool_doc_ids": [
+        2120,
+        2117,
+        2121,
+        2118,
+        2124
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 214,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          3,
+          1,
+          2,
+          4
+        ],
+        "final_titles": [
+          "2007 Copa América Final",
+          "Júlio Baptista",
+          "2007 Copa América",
+          "2007 Copa Libertadores Finals",
+          "2007 Copa Sudamericana Finals"
+        ],
+        "accepted_repair_positions": [
+          3
+        ],
+        "accepted_repair_titles": [
+          "Júlio Baptista"
+        ],
+        "accepted_repair_gains": [
+          0.174746
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 9,
+      "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+      "gold_answers": [
+        "Franconia, New Hampshire"
+      ],
+      "gold_docs": [
+        "The Frost Place\nThe Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States.",
+        "Jeanne Marie Beaumont\nJeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997). Her work has appeared in \"Boston Review, Barrow Street, Colorado Review, Court Green, Harper’s, Harvard Review, Manhattan Review, The Nation, New American Writing, Ploughshares, Poetry Northwest, Witness,\" and \"World Literature Today,\" and she has had poems featured on \"The Writer's Almanac with Garrison Keillor.\" In 2006, San Francisco film-maker Jay Rosenblatt made a film based on her poem \"Afraid So\" as narrated by Garrison Keillor. The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010. Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000. She was judge for the 2011 Cider Press Review Book Award. She grew up in the suburban Philadelphia area and moved to New York City in 1983. She earned her B.A. from Eastern College and an M.F.A. in Writing from Columbia University. She has taught at Rutgers University and regularly teaches at the 92nd Street Y. She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing."
+      ],
+      "gold_titles": [
+        "The Frost Place",
+        "Jeanne Marie Beaumont"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Jeanne Marie Beaumont\nJeanne Marie Beaumont is an American poet, author of four poetry collections, most recently, \"Letters from Limbo\" (CavanKerry Press, 2016), and \"Burning of the Three Fires\" (BOA Editions, Ltd. 2010), \"Curious Conduct\" (BOA Editions, Ltd., 2004), and \"Placebo Effects\" (Norton, 1997). Her work has appeared in \"Boston Review, Barrow Street, Colorado Review, Court Green, Harper’s, Harvard Review, Manhattan Review, The Nation, New American Writing, Ploughshares, Poetry Northwest, Witness,\" and \"World Literature Today,\" and she has had poems featured on \"The Writer's Almanac with Garrison Keillor.\" In 2006, San Francisco film-maker Jay Rosenblatt made a film based on her poem \"Afraid So\" as narrated by Garrison Keillor. The film has been shown at several major international film festivals, and included on a program of Rosenblatt's work screened at the Museum of Modern Art in October 2010. Beaumont was co-editor of \"American Letters & Commentary\" from 1992 to 2000. She was judge for the 2011 Cider Press Review Book Award. She grew up in the suburban Philadelphia area and moved to New York City in 1983. She earned her B.A. from Eastern College and an M.F.A. in Writing from Columbia University. She has taught at Rutgers University and regularly teaches at the 92nd Street Y. She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing.",
+        "Jeanne Golay\nJeanne Marie Golay (born April 16, 1962) is an American former road bicycle racing professional from Coral Gables, Florida. She won the 1992, 1994 and 1995 United States National Road Race Championships, and the 1992 world team time-trial championship, and competed in the 1992 Barcelona Olympics and 1996 Atlanta Olympics.",
+        "Jeanne Marie Ford\nJeanne Marie Ford (previously known as \"Jeanne Marie Grunwell\") is an American television soap opera writer. She is also an English teacher at Hagerstown Community College.",
+        "Rita Mae Reese\nRita Mae Reese is an American poet, fiction writer, and marketing director at Headmistress Press, an independent publisher of chapbooks and full-length collections by lesbian poets. She was born and raised in Charleston, West Virginia and lives in Madison, Wisconsin. She earned a B.A. in American Studies and an M.A. in Creative Writing at Florida State University, and an M.F.A. at the University of Wisconsin-Madison. Her first collection, \"The Alphabet Conspiracy\" (Red Hen Press), won the 2012 Drake Emerging Writers Award. Other awards include the Rona Jaffe Foundation Writers' Award for fiction in 2006, a Wallace Stegner Fellowship from Stanford University, the Paumanok Poetry Award, and a Discovery/The Nation award. Her latest book, \"The Book of Hulga\", won the Felix Pollak Prize and will be published in 2016. Her work has been published in many journals and anthologies, including \"Poetry From Sojourner: A Feminist Anthology\" (2004) and Robert Olen Butler's \"From Where You Dream: The Process of Writing Fiction\" (2005).",
+        "Reginald Gibbons\nReginald Gibbons (born 1947) is an American poet, fiction writer, translator, literary critic, and Professor of English and Classics at Northwestern University and Director of the Center for the Writing Arts there. Gibbons has published numerous books, as well as poems, short stories, essays and reviews in journals and magazines, has held Guggenheim Foundation and NEA fellowships in poetry and a research fellowship from the Center for Hellenic Studies in Washington D.C. He has won the Anisfield-Wolf Book Award, the Carl Sandburg Prize, the Folger Shakespeare Library's O. B. Hardison, Jr. Poetry Prize, and other honors, among them the inclusion of his work in \"Best American Poetry\" and \"Pushcart Prize\" anthologies. His book \"Creatures of a Day\" was a finalist for the 2008 National Book Award for poetry. He attended public school in Spring Branch (at that time, outside Houston, Texas; now incorporated into the city), Princeton University (BA Spanish and Portuguese), and Stanford University (MA in English and Creative Writing; PhD in Comparative Literature). Before moving to Northwestern University, he taught creative writing at Princeton and Columbia. At Northwestern, he was the editor of \"TriQuarterly\" magazine from 1981 to 1997, and co-founded TriQuarterly Books (after 1997, an imprint of Northwestern University Press). As the editor of \"TriQuarterly\", he edited or co-edited the special issues \"Chicago\" (1984), \"From South Africa: New Writing, Photography and Art\" (1987), \"A Window on Poland\" (1983), \"Prose from Spain\" (1983), \"New Writing from Mexico\" (1992), and others, as well as many general issues of the magazine. He edited two works of William Goyen (1915-1983): the 50th Anniversary edition of \"The House of Breath\" and the Goyen's posthumously published second novel, \"Half a Look of Cain\" (both published by Northwestern University Press). In 1989, he was one of a group of co-founders of the Guild Literary Complex (Chicago), a literary presenting organization, where he continues to volunteer, and he is a member of the large team that is creating the American Writers Museum (Chicago; opening in 2017)."
+      ],
+      "pool_titles": [
+        "Jeanne Marie Beaumont",
+        "Jeanne Golay",
+        "Jeanne Marie Ford",
+        "Rita Mae Reese",
+        "Reginald Gibbons"
+      ],
+      "pool_doc_scores": [
+        0.014781584381790542,
+        0.01569487338623779,
+        0.0049245669270775805,
+        0.0026770788730274683,
+        0.0025625566108697707
+      ],
+      "pool_doc_ids": [
+        2213,
+        2208,
+        2212,
+        944,
+        946
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 223,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Jeanne Marie Beaumont",
+          "Jeanne Golay",
+          "Jeanne Marie Ford",
+          "Rita Mae Reese",
+          "Reginald Gibbons"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 0.5,
+          "final_support_complete": 0,
+          "rank_support_recall": 0.5,
+          "rank_support_complete": 0,
+          "dbec_support_recall": 0.5,
+          "dbec_support_complete": 0,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 10,
+      "question": "Who was the Goal keeper for Iraq in the 1996 AFC Asian Cup played in the United Arab Emirates?",
+      "gold_answers": [
+        "Emad Hashim"
+      ],
+      "gold_docs": [
+        "Emad Hashim\nEmad Hashim (born 10 February 1969) is an Iraqi football Goalkeeper who played for Iraq in the 1996 AFC Asian Cup & 2000 AFC Asian Cup. He also played club football with Al Shorta for 14 years.",
+        "1996 AFC Asian Cup\nThe Asian Football Confederation's 1996 AFC Asian Cup finals were held in the United Arab Emirates between 4 and 21 December. Saudi Arabia defeated host nation U.A.E. in the final match in Abu Dhabi As the Runners-up, U.A.E. represented the AFC in the 1997 FIFA Confederations Cup because Saudi Arabia qualified automatically as host."
+      ],
+      "gold_titles": [
+        "Emad Hashim",
+        "1996 AFC Asian Cup"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Emad Hashim\nEmad Hashim (born 10 February 1969) is an Iraqi football Goalkeeper who played for Iraq in the 1996 AFC Asian Cup & 2000 AFC Asian Cup. He also played club football with Al Shorta for 14 years.",
+        "1996 AFC Asian Cup\nThe Asian Football Confederation's 1996 AFC Asian Cup finals were held in the United Arab Emirates between 4 and 21 December. Saudi Arabia defeated host nation U.A.E. in the final match in Abu Dhabi As the Runners-up, U.A.E. represented the AFC in the 1997 FIFA Confederations Cup because Saudi Arabia qualified automatically as host.",
+        "1996 AFC Asian Cup squads\nThis article lists the squads for the 1996 AFC Asian Cup played in United Arab Emirates. Players marked (c) were named as captain for their national squad. Number of caps counts until the start of the tournament, including all pre-tournament friendlies. Player's age is their age on the opening day of the tournament, which was 4 December 1996.",
+        "Kazakhstan national football team 1996\nThe 1996 football (soccer) season was the fourth one in Kazakhstan as an independent nation. The Kazakhstan national football team played five international matches in 1996 under manager Serik Berdalin, trying to qualify for the 1996 AFC Asian Cup in the United Arab Emirates.",
+        "1996 AFC Asian Cup qualification\nThe 1996 AFC Asian Cup qualification involved 33 participating teams. The United Arab Emirates (hosts) and Japan (holders) qualified automatically for the 1996 AFC Asian Cup."
+      ],
+      "pool_titles": [
+        "Emad Hashim",
+        "1996 AFC Asian Cup",
+        "1996 AFC Asian Cup squads",
+        "Kazakhstan national football team 1996",
+        "1996 AFC Asian Cup qualification"
+      ],
+      "pool_doc_scores": [
+        0.010802782739570672,
+        0.009554871583530073,
+        0.005757004562297025,
+        0.004616225659863996,
+        0.004540943373811285
+      ],
+      "pool_doc_ids": [
+        2278,
+        2271,
+        2272,
+        2276,
+        2270
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 230,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Emad Hashim",
+          "1996 AFC Asian Cup",
+          "1996 AFC Asian Cup squads",
+          "Kazakhstan national football team 1996",
+          "1996 AFC Asian Cup qualification"
+        ],
+        "accepted_repair_positions": [
+          1
+        ],
+        "accepted_repair_titles": [
+          "1996 AFC Asian Cup"
+        ],
+        "accepted_repair_gains": [
+          0.867304
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 11,
+      "question": "How many times has the national team Joseph Raich Garriga played for in 1941 participated in FIFA World Cups?",
+      "gold_answers": [
+        "14"
+      ],
+      "gold_docs": [
+        "Spain national football team\nThe Spain national football team (Spanish: \"Selección de fútbol de España\" ) represents Spain in men's International association football and is controlled by the Royal Spanish Football Federation, the governing body for football in Spain. The current head coach is Julen Lopetegui after Vicente del Bosque stepped down following Euro 2016. The Spanish side is commonly referred to as \"La Roja\" (\"The Red [One]\"), \"La Furia Roja\" (\"The Red Fury\"), \"La Furia Española\" (\"The Spanish Fury\") or simply \"La Furia\" (\"The Fury\"). Spain became a member of FIFA in 1904 even though the Spanish Football Federation was first established in 1909. Spain's national team debuted in 1920. Since then, the Spanish national team has participated in a total of 14 of 20 FIFA World Cups and 10 of 15 UEFA European Championships.",
+        "Josep Raich\nJosep Raich Garriga (August 28, 1913 - 25 July 1988) is a former Spanish footballer of Catalan ethnicity who played for Joventut FC, CE Júpiter and FC Barcelona in Spain and FC Sète and Troyes AC in France. He played once for Spain in 1941."
+      ],
+      "gold_titles": [
+        "Spain national football team",
+        "Josep Raich"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Josep Raich\nJosep Raich Garriga (August 28, 1913 - 25 July 1988) is a former Spanish footballer of Catalan ethnicity who played for Joventut FC, CE Júpiter and FC Barcelona in Spain and FC Sète and Troyes AC in France. He played once for Spain in 1941.",
+        "Argentina at the FIFA World Cup\nThis is a record of Argentina's results at the FIFA World Cup. Argentina is one of the most successful national football teams in the world, having won 2 World Cups in 1978 and 1986. Argentina has been runners up three times in the 1930, 1990 and 2014. The team was present in all but four of the World Cups, being behind only Brazil, Italy and Germany in number of appearances. Argentina has also won the Copa América 14 times, one less than Uruguay. Moreover, Argentina has also won the Confederations Cup and the gold medal at the Olympic football tournament in 2004 and 2008. Prior to that occasion Argentina had obtained two silver medals in the 1928 and 1996 editions. On other levels of international competition Argentina has won the FIFA U-20 World Cup a record six times. The FIFA U-17 World Cup is the only FIFA international competition yet to be obtained.",
+        "Luis Suárez (footballer, born 1935)\nLuis Suárez Miramontes (] ; born 2 May 1935), also known by the diminutive Luisito, is a Spanish former footballer and manager. He played as a midfielder for Deportivo de La Coruña, CD España Industrial, FC Barcelona, Inter Milan, Sampdoria and Spain. Suárez is regarded as one of Spain's greatest players; he was noted for his elegant, fluid, graceful style of play. Nicknamed \"El Arquitecto\" (The Architect) he was noted for his perceptive passing and explosive shot and in 1960 he became the only Spanish-born player to be voted Ballon d'Or. In 1964 he helped Spain win the European Championship. Suarez originally achieved prominence as a creative inside forward or attacking midfielder for the great Barcelona team of the 1950s before he joined Inter Milan where he reached his prime as deep lying playmaker for the legendary \"Grande Inter\" team of the 1960s. He played a pivotal role in the success Herrera's Inter Milan side, and was one of the primary creative forces in the squad, due to his ball skills, vision, and passing range. He retired as a player in 1973, after three seasons at Sampdoria.",
+        "Spain national football team\nThe Spain national football team (Spanish: \"Selección de fútbol de España\" ) represents Spain in men's International association football and is controlled by the Royal Spanish Football Federation, the governing body for football in Spain. The current head coach is Julen Lopetegui after Vicente del Bosque stepped down following Euro 2016. The Spanish side is commonly referred to as \"La Roja\" (\"The Red [One]\"), \"La Furia Roja\" (\"The Red Fury\"), \"La Furia Española\" (\"The Spanish Fury\") or simply \"La Furia\" (\"The Fury\"). Spain became a member of FIFA in 1904 even though the Spanish Football Federation was first established in 1909. Spain's national team debuted in 1920. Since then, the Spanish national team has participated in a total of 14 of 20 FIFA World Cups and 10 of 15 UEFA European Championships.",
+        "History of the Scotland national football team\nThe history of the Scotland national football team dates back to the first ever international football match in 1872. Until the Second World War, Scotland mainly competed against the other Home Nations in the British Home Championship, with the most keenly contested fixture being the match with England. The Scottish Football Association, which governs the team, joined the international governing body FIFA in 1910, but along with the other Home Nations withdrew from FIFA in 1928. This meant that Scotland did not participate in the World Cups of 1930, 1934 or 1938. The Home Nations rejoined FIFA after the Second World War and Scotland then started to participate in international competitions. Scotland have since participated in eight World Cups and two European Championship tournaments, but have never progressed beyond the first stage. Scotland have not qualified for a tournament since the 1998 World Cup."
+      ],
+      "pool_titles": [
+        "Josep Raich",
+        "Argentina at the FIFA World Cup",
+        "Luis Suárez (footballer, born 1935)",
+        "Spain national football team",
+        "History of the Scotland national football team"
+      ],
+      "pool_doc_scores": [
+        0.012446399063931406,
+        0.0037889950152071666,
+        0.005111771283778526,
+        0.005031243855723779,
+        0.0037748421961964927
+      ],
+      "pool_doc_ids": [
+        2340,
+        2341,
+        6789,
+        2343,
+        2347
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 237,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          3,
+          1,
+          2,
+          4
+        ],
+        "final_titles": [
+          "Josep Raich",
+          "Argentina at the FIFA World Cup",
+          "Luis Suárez (footballer, born 1935)",
+          "Spain national football team",
+          "History of the Scotland national football team"
+        ],
+        "accepted_repair_positions": [
+          3
+        ],
+        "accepted_repair_titles": [
+          "Argentina at the FIFA World Cup"
+        ],
+        "accepted_repair_gains": [
+          0.764496
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 12,
+      "question": "Who was the director of 2004 American teen comedy adventure film in which Michelle Christine Trachtenberg appeared?",
+      "gold_answers": [
+        "Schaffer"
+      ],
+      "gold_docs": [
+        "Michelle Trachtenberg\nMichelle Christine Trachtenberg (born October 11, 1985) is an American actress. She is known for portraying Nona F. Mecklenberg in \"The Adventures of Pete & Pete\" (1994–96), Dawn Summers in \"Buffy the Vampire Slayer\" (2000–03), Celeste in \"Six Feet Under\" (2004), and Georgina Sparks in \"Gossip Girl\" (2008–12). She has also appeared in films such as \"Harriet the Spy\" (1996), \"Inspector Gadget\" (1999), \"EuroTrip\" (2004), \"Ice Princess\" (2005), \"Black Christmas\" (2006), \"17 Again\" (2009), \"Cop Out\" (2010), \"Weeds\" (2011), and \"Killing Kennedy\" (2013).",
+        "EuroTrip\nEuroTrip is a 2004 American teen comedy adventure film written by Alec Berg, David Mandel, and Jeff Schaffer, and directed by Schaffer. The film stars Scott Mechlowicz, Jacob Pitts, Michelle Trachtenberg, Travis Wester, and Jessica Boehrs. Mechlowicz portrays Scott \"Scotty\" Thomas, an American teenager who travels across Europe in search of his German pen pal, Mieke (Boehrs). Accompanied by his friend Cooper (Pitts) and siblings Jenny and Jamie (Trachtenberg and Wester), Scott's quest takes him to London, Paris, Amsterdam, Bratislava, Berlin, and Rome, encountering awkward and embarrassing situations along the way. The film received a 2004 Teen Choice Award nomination for \"Choice Movie Your Parents Didn't Want You to See\"."
+      ],
+      "gold_titles": [
+        "Michelle Trachtenberg",
+        "EuroTrip"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "EuroTrip\nEuroTrip is a 2004 American teen comedy adventure film written by Alec Berg, David Mandel, and Jeff Schaffer, and directed by Schaffer. The film stars Scott Mechlowicz, Jacob Pitts, Michelle Trachtenberg, Travis Wester, and Jessica Boehrs. Mechlowicz portrays Scott \"Scotty\" Thomas, an American teenager who travels across Europe in search of his German pen pal, Mieke (Boehrs). Accompanied by his friend Cooper (Pitts) and siblings Jenny and Jamie (Trachtenberg and Wester), Scott's quest takes him to London, Paris, Amsterdam, Bratislava, Berlin, and Rome, encountering awkward and embarrassing situations along the way. The film received a 2004 Teen Choice Award nomination for \"Choice Movie Your Parents Didn't Want You to See\".",
+        "The Notorious Bettie Page\nThe Notorious Bettie Page is a 2005 biographical film directed by Mary Harron. The screenplay by Harron and Guinevere Turner focuses on 1950s pinup and bondage model Bettie Page.",
+        "Michelle Trachtenberg\nMichelle Christine Trachtenberg (born October 11, 1985) is an American actress. She is known for portraying Nona F. Mecklenberg in \"The Adventures of Pete & Pete\" (1994–96), Dawn Summers in \"Buffy the Vampire Slayer\" (2000–03), Celeste in \"Six Feet Under\" (2004), and Georgina Sparks in \"Gossip Girl\" (2008–12). She has also appeared in films such as \"Harriet the Spy\" (1996), \"Inspector Gadget\" (1999), \"EuroTrip\" (2004), \"Ice Princess\" (2005), \"Black Christmas\" (2006), \"17 Again\" (2009), \"Cop Out\" (2010), \"Weeds\" (2011), and \"Killing Kennedy\" (2013).",
+        "Mean Girls\nMean Girls is a 2004 American teen comedy film directed by Mark Waters and written by Tina Fey. The movie is based in part on Rosalind Wiseman's non-fiction self-help book \"Queen Bees and Wannabes\", which describes female high school social cliques and the damaging effects they can have on girls.",
+        "New York Minute (film)\nNew York Minute is a 2004 American teen comedy film starring Mary-Kate Olsen, Ashley Olsen and Eugene Levy. It was directed by Dennie Gordon and released on May 7, 2004. In the film Mary-Kate and Ashley play twins with opposing personalities who have a series of misadventures around New York City. \"New York Minute\" reunited Mary-Kate and Ashley with their \"Full House\" co-star, Bob Saget. It was the Olsen twins' first theatrical film release since 1995's \"It Takes Two\". It was also the last film featured by Olsen twins, and the last film released by Dualstar Entertainment before it went into dormancy."
+      ],
+      "pool_titles": [
+        "EuroTrip",
+        "The Notorious Bettie Page",
+        "Michelle Trachtenberg",
+        "Mean Girls",
+        "New York Minute (film)"
+      ],
+      "pool_doc_scores": [
+        0.006805780026412099,
+        8.10696468412543e-10,
+        0.013616061492441923,
+        0.0034413258715689497,
+        0.002992933275652443
+      ],
+      "pool_doc_ids": [
+        3706,
+        4701,
+        3710,
+        3708,
+        3713
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 374,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          76,
+          0,
+          2,
+          3
+        ],
+        "final_titles": [
+          "EuroTrip",
+          "The Notorious Bettie Page",
+          "Michelle Trachtenberg",
+          "Mean Girls",
+          "New York Minute (film)"
+        ],
+        "accepted_repair_positions": [
+          76
+        ],
+        "accepted_repair_titles": [
+          "The Notorious Bettie Page"
+        ],
+        "accepted_repair_gains": [
+          0.200737
+        ],
+        "accepted_repair_branch_status": [
+          "unknown"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 13,
+      "question": "Falling Stars is a role-playing game published by the company based out of what country?",
+      "gold_answers": [
+        "Lithuania"
+      ],
+      "gold_docs": [
+        "Falling Stars (video game)\nFalling Stars is a role-playing video game developed by Ivolgamus and published by Nordcurrent in Europe and by Agetec in North America. It was released on August 24, 2007 in Europe for Microsoft Windows and the PlayStation 2 and on August 26, 2008 in the United States for the PlayStation 2. The game is aimed at young children and was released with a price point lower than most PS2 games.",
+        "Nordcurrent\nNordcurrent is a Lithuanian and international developer and publisher of casual game and Freemium games for the iOS, Android, Amazon, PC and Mac platforms."
+      ],
+      "gold_titles": [
+        "Falling Stars (video game)",
+        "Nordcurrent"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Falling Stars (video game)\nFalling Stars is a role-playing video game developed by Ivolgamus and published by Nordcurrent in Europe and by Agetec in North America. It was released on August 24, 2007 in Europe for Microsoft Windows and the PlayStation 2 and on August 26, 2008 in the United States for the PlayStation 2. The game is aimed at young children and was released with a price point lower than most PS2 games.",
+        "Nordcurrent\nNordcurrent is a Lithuanian and international developer and publisher of casual game and Freemium games for the iOS, Android, Amazon, PC and Mac platforms.",
+        "Agatha Christie (video game series)\nThe \"Agatha Christie\" series is a series of adventure games developed by AWE Games and published by The Adventure Company and DreamCatcher Interactive, based on the works of the English mystery writer Agatha Christie.",
+        "Guardian's Crusade\nGuardian's Crusade, known in Japan as Knight & Baby (ナイトアンドベイビー , Naito ando Beibī ) , is a role-playing video game developed by Tamsoft and released for the PlayStation by Activision in 1999. The gameplay is that of a standard turn based role playing game with non-random encounters. While intended for an adult audience as well, the game was something of an introduction to RPGs for children. The game did not enjoy commercial success, though it still maintains a cult following.",
+        "EverQuest Role-Playing Game\nEverQuest Role-Playing Game is a role-playing game based on the \"EverQuest\" fantasy massively multiplayer online role-playing game (MMORPG). The game was published by White Wolf under its Sword and Sorcery Studios imprint. \"EverQuest Role-Playing Game\" shares many things with the MMORPG, such as setting, available races and classes, monsters, spells, and items."
+      ],
+      "pool_titles": [
+        "Falling Stars (video game)",
+        "Nordcurrent",
+        "Agatha Christie (video game series)",
+        "Guardian's Crusade",
+        "EverQuest Role-Playing Game"
+      ],
+      "pool_doc_scores": [
+        0.022925679492739156,
+        0.002261975227925119,
+        0.0038563395308022015,
+        0.003316475756755146,
+        0.0032227201804382465
+      ],
+      "pool_doc_ids": [
+        3739,
+        3740,
+        4843,
+        6389,
+        3744
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 377,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          23,
+          1,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Falling Stars (video game)",
+          "Nordcurrent",
+          "Agatha Christie (video game series)",
+          "Guardian's Crusade",
+          "EverQuest Role-Playing Game"
+        ],
+        "accepted_repair_positions": [
+          23
+        ],
+        "accepted_repair_titles": [
+          "Nordcurrent"
+        ],
+        "accepted_repair_gains": [
+          0.71681
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 0.5,
+          "rank_support_complete": 0,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 1,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 14,
+      "question": "What medieval fortress is believed to refer to a chapel at the bottom of a hill?",
+      "gold_answers": [
+        "Bonkyll Castle"
+      ],
+      "gold_docs": [
+        "Bonkyll Castle\nBonkyll Castle (also variously spelled Bonkyl, Boncle, Buncle, Bunkle or Bonkill) was a medieval fortress situated in the eastern Scottish Borders of which little remains. The site is protected as a scheduled monument.",
+        "Buncle\nBuncle is a Celtic derived surname originating from Bonkyll Castle, Berwickshire, Scotland. It has many modern variations that are phonetically similar, for example: Bonkle, Bonkyll, Bonkill, Bonkylle, Bonkile, Bunkle, Bunkall and Bonckle. The names' meaning is believed to refer to a chapel at the bottom of hill."
+      ],
+      "gold_titles": [
+        "Bonkyll Castle",
+        "Buncle"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Buncle\nBuncle is a Celtic derived surname originating from Bonkyll Castle, Berwickshire, Scotland. It has many modern variations that are phonetically similar, for example: Bonkle, Bonkyll, Bonkill, Bonkylle, Bonkile, Bunkle, Bunkall and Bonckle. The names' meaning is believed to refer to a chapel at the bottom of hill.",
+        "Bonkyll Castle\nBonkyll Castle (also variously spelled Bonkyl, Boncle, Buncle, Bunkle or Bonkill) was a medieval fortress situated in the eastern Scottish Borders of which little remains. The site is protected as a scheduled monument.",
+        "Asen's Fortress\nAsen's Fortress (Bulgarian: Асенова крепост , \"Asenova krepost\"), identified by some researchers as Petrich (Петрич), is a medieval fortress in the Bulgarian Rhodope Mountains, 2 to south of the town of Asenovgrad, on a high rocky ridge on the left bank of the Asenitsa River. Asen's Fortress is 279 m above sea level.",
+        "Fortress of Klis\nThe Klis Fortress (Croatian: \"Tvrđava Klis\" ) is a medieval fortress situated above a village bearing the same name, near the city of Split, in central Dalmatia, Croatia. From its origin as a small stronghold built by the ancient Illyrian tribe Dalmatae, becoming a royal castle that was the seat of many Croatian kings, to its final development as a large fortress during the Ottoman wars in Europe, Klis Fortress has guarded the frontier, being lost and re-conquered several times throughout its more-than-two-thousand-year-long history. Due to its location on a pass that separates the mountains Mosor and Kozjak, the fortress served as a major source of defense in Dalmatia, especially against the Ottoman advance, and has been a key crossroad between the Mediterranean belt and the Balkan rear.",
+        "Tønsberg Fortress\nTønsberg Fortress (\"Tunsberg festning\") was a medieval fortress, located in Tønsberg, Norway which was defended by the fortress for over 300 years."
+      ],
+      "pool_titles": [
+        "Buncle",
+        "Bonkyll Castle",
+        "Asen's Fortress",
+        "Fortress of Klis",
+        "Tønsberg Fortress"
+      ],
+      "pool_doc_scores": [
+        0.017562137847728254,
+        0.00493197504248402,
+        0.010771541535580208,
+        0.0075126051898687434,
+        0.004933995856290521
+      ],
+      "pool_doc_ids": [
+        4075,
+        4076,
+        4073,
+        4069,
+        4068
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 411,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          4,
+          1,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Buncle",
+          "Bonkyll Castle",
+          "Asen's Fortress",
+          "Fortress of Klis",
+          "Tønsberg Fortress"
+        ],
+        "accepted_repair_positions": [
+          4
+        ],
+        "accepted_repair_titles": [
+          "Bonkyll Castle"
+        ],
+        "accepted_repair_gains": [
+          1.0
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 15,
+      "question": "What position does Kyle York hold at the internet performance management company Dyn?",
+      "gold_answers": [
+        "Chief Strategy Officer"
+      ],
+      "gold_docs": [
+        "Kyle York (entrepreneur)\nKyle York (born November 26, 1982) is an Internet entrepreneur, startup advisor, angel investor, cloud and Infrastructure-as-a-Service expert and sought-after global public speaker on cloud migration, internet security and hybrid cloud strategy. York is an executive at Dyn, currently serving as Chief Strategy Officer. Dyn was acquired by Oracle on November 21, 2016. York also sits on the boards of Datanyze, CloudApp and 3rd Generation family business, YORK Athletics MFG. where he is a co-founder. York is also an active angel investor and advisor in dozens of fast growth Internet companies. He has been part of eight successful exits as an investor and employee. Companies he has invested in and worked as a go-to-market (GTM) leader have been acquired by Cisco, Cognizant, New Relic, Oracle and Sophos.",
+        "Dyn (company)\nDyn, Inc. ( ) is an Internet performance management company, offering products to monitor, control, and optimize online infrastructure, and also domain registration services and email products. The company was acquired by Oracle Corporation in 2016."
+      ],
+      "gold_titles": [
+        "Kyle York (entrepreneur)",
+        "Dyn (company)"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Kyle York (entrepreneur)\nKyle York (born November 26, 1982) is an Internet entrepreneur, startup advisor, angel investor, cloud and Infrastructure-as-a-Service expert and sought-after global public speaker on cloud migration, internet security and hybrid cloud strategy. York is an executive at Dyn, currently serving as Chief Strategy Officer. Dyn was acquired by Oracle on November 21, 2016. York also sits on the boards of Datanyze, CloudApp and 3rd Generation family business, YORK Athletics MFG. where he is a co-founder. York is also an active angel investor and advisor in dozens of fast growth Internet companies. He has been part of eight successful exits as an investor and employee. Companies he has invested in and worked as a go-to-market (GTM) leader have been acquired by Cisco, Cognizant, New Relic, Oracle and Sophos.",
+        "Dyn (company)\nDyn, Inc. ( ) is an Internet performance management company, offering products to monitor, control, and optimize online infrastructure, and also domain registration services and email products. The company was acquired by Oracle Corporation in 2016.",
+        "Carole Post\nCarole Post is the Deputy Chief Operating Officer of USF Health at the University of South Florida. She was formerly the Executive Vice President at New York Law School and serves as the school's Chief Operating Officer and first Chief Strategy Officer. Before her tenure at New York Law School, she served as the Commissioner of the New York City Department of Information Technology and Telecommunications (DoITT) and New York City's Chief Information Officer (CIO). She was appointed by Mayor Michael R. Bloomberg on December 30, 2009 and assumed the official position on January 19, 2010. She is the first woman to have held this office at the City of New York. Post modernized New York City government practices and infrastructure to advance open government and improve services to the public.",
+        "Verelo\nVerelo, originally based in Toronto, Canada and acquired by infrastructure as a service company Dyn in January 2013, was a website monitoring service that tracks a website's uptime, downtime, and performance. Verelo monitored websites from multiple locations globally so that it could distinguish actual downtime from routing and access problems. Verelo argued that downtime can be costly and even take lives, and is now based in Manchester, New Hampshire.",
+        "Dynatrace\nDynatrace is an American application performance management (APM) software company with products aimed at the information technology departments and digital business owners of medium and large businesses. The company's services include performance management software for programs running on-premises and in the cloud. This software manages the availability and performance of software applications and the impact on user experience in the form of deep transaction tracing, synthetic monitoring, real user monitoring, and network monitoring. The company separated from Compuware in December 2014 after being sold into private equity firm Thoma Bravo establishing it as a standalone company."
+      ],
+      "pool_titles": [
+        "Kyle York (entrepreneur)",
+        "Dyn (company)",
+        "Carole Post",
+        "Verelo",
+        "Dynatrace"
+      ],
+      "pool_doc_scores": [
+        0.017228675797913543,
+        0.01549942287836807,
+        0.00572086571782037,
+        0.0054610003639991005,
+        0.0030959227058582404
+      ],
+      "pool_doc_ids": [
+        5051,
+        5057,
+        3922,
+        5055,
+        5054
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 511,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Kyle York (entrepreneur)",
+          "Dyn (company)",
+          "Carole Post",
+          "Verelo",
+          "Dynatrace"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 16,
+      "question": "What is the name of one the Italian Navy's new warship?",
+      "gold_answers": [
+        "PPA, Pattugliatore Polivalente d'Altura"
+      ],
+      "gold_docs": [
+        "PPA, Pattugliatori Polivalenti d'Altura\nPPA, Pattugliatore Polivalente d'Altura (Offshore Multipurpose Patrol Ship) is a new Frigate class of the Italian Navy.<br>",
+        "Frigate\nA frigate is any of several types of warship, the term having been used for ships of various sizes and roles over the last few centuries."
+      ],
+      "gold_titles": [
+        "PPA, Pattugliatori Polivalenti d'Altura",
+        "Frigate"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "PPA, Pattugliatori Polivalenti d'Altura\nPPA, Pattugliatore Polivalente d'Altura (Offshore Multipurpose Patrol Ship) is a new Frigate class of the Italian Navy.<br>",
+        "Italian Navy\nThe Italian Navy (Italian: \"Marina Militare\" , \"Military Navy\"; abbreviated as MM) is the maritime defence force of the Italian Republic. It is one of the four branches of Italian Armed Forces and was formed in 1946 from what remained of the \"Regia Marina\" (Royal Navy) after World War II. As of August 2014, the Italian Navy had a strength of 30,923 active personnel with approximately 184 vessels in service, including minor auxiliary vessels.",
+        "Frigate\nA frigate is any of several types of warship, the term having been used for ships of various sizes and roles over the last few centuries.",
+        "Ship-of-the-line captain\nShip-of-the-line captain (French: \"capitaine de vaisseau\"; German: \"linienschiffskapitän\" (Austro-Hungarian Navy), \"Kapitän zur See\" (German and the Royal Netherlands navies); Italian Navy: \"capitano di vascello\"; Spanish Navy: \"capitán de navío\"; Croatian Navy: \"kapetan bojnog broda\") is a rank that appears in several navies. The name of the rank derives from the fact the rank corresponded to command of a warship of the largest class, the ship-of-the-line, as opposed to smaller types (corvettes and frigates). It is normally above the rank of frigate captain.",
+        "Italian ship Anteo (A5309)\nAnteo (A5309) is a submarine rescue ship of the Italian Navy, assigned to Raggruppamento Subacquei ed Incursori \"Teseo Tesei\" (COMSUBIN). ITS \"Anteo\" is the third ship to bear this name in the Italian Navy. The ship’s design was developed by the “Ufficio Navi Speciali del Reparto Progetti Navi” (Special Office of the Ships Projects Division), according to the guidelines provided by the Navy General Staff. The ship was built at Cantiere Navale Breda di Porto Marghera and commissioned to the Italian Navy on 31 July 1980."
+      ],
+      "pool_titles": [
+        "PPA, Pattugliatori Polivalenti d'Altura",
+        "Italian Navy",
+        "Frigate",
+        "Ship-of-the-line captain",
+        "Italian ship Anteo (A5309)"
+      ],
+      "pool_doc_scores": [
+        0.011887712867729362,
+        0.008943771175075391,
+        0.0075744337882113905,
+        0.00570529792799943,
+        0.00417696925512354
+      ],
+      "pool_doc_ids": [
+        5402,
+        5401,
+        5399,
+        5406,
+        5404
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 547,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "PPA, Pattugliatori Polivalenti d'Altura",
+          "Italian Navy",
+          "Frigate",
+          "Ship-of-the-line captain",
+          "Italian ship Anteo (A5309)"
+        ],
+        "accepted_repair_positions": [
+          1
+        ],
+        "accepted_repair_titles": [
+          "Italian Navy"
+        ],
+        "accepted_repair_gains": [
+          1.0
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 17,
+      "question": "Which rock band chose its name by drawing it out of a hat, Switchfoot or Midnight Oil?",
+      "gold_answers": [
+        "Midnight Oil"
+      ],
+      "gold_docs": [
+        "Switchfoot\nSwitchfoot is an American alternative rock band from San Diego, California. The band's members are Jon Foreman (lead vocals, guitar), Tim Foreman (bass guitar, backing vocals), Chad Butler (drums, percussion), Jerome Fontamillas (guitar, keyboards, backing vocals), and Drew Shirley (guitar, backing vocals).",
+        "Midnight Oil\nMidnight Oil (also known informally as \"The Oils\" to fans) are an Australian rock band, who originally performed as Farm from 1972 with drummer Rob Hirst, bass guitarist Andrew James and keyboard player/lead guitarist Jim Moginie. While vocalist Peter Garrett was studying at Australian National University in Canberra, he answered an advertisement for a spot in Farm, and by 1975 the band was touring the east coast of Australia. By late 1976, Garrett moved to Sydney to complete his law degree, and Farm changed its name to Midnight Oil by drawing the name out of a hat."
+      ],
+      "gold_titles": [
+        "Switchfoot",
+        "Midnight Oil"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Midnight Oil\nMidnight Oil (also known informally as \"The Oils\" to fans) are an Australian rock band, who originally performed as Farm from 1972 with drummer Rob Hirst, bass guitarist Andrew James and keyboard player/lead guitarist Jim Moginie. While vocalist Peter Garrett was studying at Australian National University in Canberra, he answered an advertisement for a spot in Farm, and by 1975 the band was touring the east coast of Australia. By late 1976, Garrett moved to Sydney to complete his law degree, and Farm changed its name to Midnight Oil by drawing the name out of a hat.",
+        "Fountains of Wayne\nFountains of Wayne was an American rock band that formed in New York City in 1995. The band consisted of Chris Collingwood, Adam Schlesinger, Jody Porter, and Brian Young. The band was best known for their 2003 Grammy-nominated single \"Stacy's Mom\".",
+        "Switchfoot\nSwitchfoot is an American alternative rock band from San Diego, California. The band's members are Jon Foreman (lead vocals, guitar), Tim Foreman (bass guitar, backing vocals), Chad Butler (drums, percussion), Jerome Fontamillas (guitar, keyboards, backing vocals), and Drew Shirley (guitar, backing vocals).",
+        "Jeremiah Burton\nJeremiah Burton (1814 – January 9, 1902) was a farmer. He was born about 1814 in South Carolina before moving to Rabun County, Georgia and first settled at Jones Ford on the Tallulah River. The town of Burton, Georgia was named after its Postmaster Jacob Silas Burton, Jeremiah's son. Jeremiah Burton was a popular area citizen who occasionally served as a bailiff for the local superior court. According to family legend, he was buried with his hat on.",
+        "Captain 11\nCaptain 11 was a popular after-school children's program for over 41 years on KELO-TV, broadcast on channel 11 from Sioux Falls, South Dakota. Station weatherman Dave Dedrick donned a yellow-trimmed blue pilot uniform with hat and daily (later weekly as cable TV began to cut into its ratings) became the jolly host of the show. The show primarily played cartoons and other children's fare, and featured the Captain having all the kids (his \"crew\") introduce themselves on the air, guessing to win the toy chest, and children with birthdays working the Captain's control panel of lights and switches. The show ended with the Captain playing the \"freezeberg\" game with the children, having them: Face the camera and wave one hand: then wave both hands: followed by wave both hands and one foot then wave both hands and both feet which usually resulted in most of the kids jumping up and down while facing the camera. Finally, the Captain would tell them to \"freeze\", not moving a muscle as the camera panned over the crowd of kids attempting to remain still."
+      ],
+      "pool_titles": [
+        "Midnight Oil",
+        "Fountains of Wayne",
+        "Switchfoot",
+        "Jeremiah Burton",
+        "Captain 11"
+      ],
+      "pool_doc_scores": [
+        0.010816271411084153,
+        8.904541462954974e-10,
+        0.00558520065249348,
+        0.0048905405315175085,
+        0.004601828506769913
+      ],
+      "pool_doc_ids": [
+        5574,
+        6446,
+        5571,
+        9151,
+        754
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 564,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          95,
+          1,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Midnight Oil",
+          "Fountains of Wayne",
+          "Switchfoot",
+          "Jeremiah Burton",
+          "Captain 11"
+        ],
+        "accepted_repair_positions": [
+          95
+        ],
+        "accepted_repair_titles": [
+          "Fountains of Wayne"
+        ],
+        "accepted_repair_gains": [
+          0.929096
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 18,
+      "question": "What album starring Ed Sheeran was released on 3 March 2017?",
+      "gold_answers": [
+        "÷ (pronounced \"divide\") is the third studio album by English singer-songwriter Ed Sheeran."
+      ],
+      "gold_docs": [
+        "÷ (album)\n÷ (pronounced \"divide\") is the third studio album by English singer-songwriter Ed Sheeran. It was released on 3 March 2017 through Asylum Records and Atlantic Records. \"Castle on the Hill\" and \"Shape of You\" were released as the album's lead singles on 6 January 2017.",
+        "Castle on the Hill (song)\n\"Castle on the Hill\" is a song by English singer-songwriter Ed Sheeran. It was released as a digital download on 6 January 2017 as one of the double lead singles from his third studio album \"÷\" (2017), along with \"Shape of You\". \"Castle on the Hill\" was written and produced by Ed Sheeran and Benny Blanco."
+      ],
+      "gold_titles": [
+        "÷ (album)",
+        "Castle on the Hill (song)"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "÷ (album)\n÷ (pronounced \"divide\") is the third studio album by English singer-songwriter Ed Sheeran. It was released on 3 March 2017 through Asylum Records and Atlantic Records. \"Castle on the Hill\" and \"Shape of You\" were released as the album's lead singles on 6 January 2017.",
+        "What About Us (Livin Out Loud album)\nWhat About Us is the third studio album of American R&B group Livin Out Loud. It was released first in the United Kingdom. As of July 2, 2006, it ranked number 7 on the World Hip Hop Chart and number 7 also on the UK Hip Hop Chart.",
+        "Castle on the Hill (song)\n\"Castle on the Hill\" is a song by English singer-songwriter Ed Sheeran. It was released as a digital download on 6 January 2017 as one of the double lead singles from his third studio album \"÷\" (2017), along with \"Shape of You\". \"Castle on the Hill\" was written and produced by Ed Sheeran and Benny Blanco.",
+        "Drunk (Ed Sheeran song)\n\"Drunk\" is a song by English singer-songwriter Ed Sheeran. It was released as the fourth single lifted from the debut studio album \"+\" on 17 February 2012. The song was written by Ed Sheeran and Jake Gosling and produced by Gosling. The single entered the UK Singles Chart at number 63. The week after, it climbed to number 29. Later on, it climbed to number 9, making it his fourth top ten single.",
+        "Sing (Ed Sheeran song)\n\"Sing\" is a song by English singer-songwriter, Ed Sheeran. It was written by Sheeran and Pharrell Williams, who also produced it and provided uncredited background vocals. The song was released on 7 April 2014, serving as the lead single from Sheeran's second studio album, \"×\" (2014). The song became Sheeran's first UK number-one single and also topped the charts in Australia, New Zealand and Ireland. It also peaked at No. 13 on the US \"Billboard\" Hot 100."
+      ],
+      "pool_titles": [
+        "÷ (album)",
+        "What About Us (Livin Out Loud album)",
+        "Castle on the Hill (song)",
+        "Drunk (Ed Sheeran song)",
+        "Sing (Ed Sheeran song)"
+      ],
+      "pool_doc_scores": [
+        0.009678943771755882,
+        0.002276915020934399,
+        0.008270097130544636,
+        0.0023310682047697267,
+        0.0023278896863513513
+      ],
+      "pool_doc_ids": [
+        6080,
+        1160,
+        6086,
+        6078,
+        6084
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 617,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          5,
+          1,
+          2,
+          3
+        ],
+        "final_titles": [
+          "÷ (album)",
+          "What About Us (Livin Out Loud album)",
+          "Castle on the Hill (song)",
+          "Drunk (Ed Sheeran song)",
+          "Sing (Ed Sheeran song)"
+        ],
+        "accepted_repair_positions": [
+          5
+        ],
+        "accepted_repair_titles": [
+          "What About Us (Livin Out Loud album)"
+        ],
+        "accepted_repair_gains": [
+          0.892557
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 19,
+      "question": "What drum machine was introduced in 1989 and allowed 32 notes to be played simultaneously?",
+      "gold_answers": [
+        "The R-8 Human Rhythm Composer"
+      ],
+      "gold_docs": [
+        "Roland R-8\nThe R-8 Human Rhythm Composer is an electronic drum machine introduced in 1989 by Roland Corporation, using PCM voices. The R-8 features velocity- and pressure-sensitive trigger pads, and the ability to create loops of beats. The device has eight individual outputs, 32-voice polyphony, and four-part multitimbral MIDI.",
+        "Polyphony and monophony in instruments\nPolyphony is a property of musical instruments that means that they can play multiple notes simultaneously. Instruments featuring polyphony are said to be polyphonic. Instruments that are not capable of polyphony are monophonic or paraphonic."
+      ],
+      "gold_titles": [
+        "Roland R-8",
+        "Polyphony and monophony in instruments"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Roland R-8\nThe R-8 Human Rhythm Composer is an electronic drum machine introduced in 1989 by Roland Corporation, using PCM voices. The R-8 features velocity- and pressure-sensitive trigger pads, and the ability to create loops of beats. The device has eight individual outputs, 32-voice polyphony, and four-part multitimbral MIDI.",
+        "Roland TR-909\nThe Roland TR-909 Rhythm Composer is a drum machine introduced by the Roland Corporation in 1983. It was the first Roland drum machine to use samples (for its cymbal and hi-hat sounds) alongside analog sounds. Designed by Tadao Kikumoto, who also designed the Roland TB-303 synthesizer, the 909 features a 16-step step sequencer and drum sounds that aimed for realism and cost-effectiveness. It is fully programmable, and like its predecessor, the TR-808, it can store entire songs with multiple sections, as opposed to simply storing patterns. It was the first MIDI-equipped drum machine. Around 10,000 units were produced.",
+        "Boss Doctor Rhythm DR-110\nThe Boss Doctor Rhythm DR-110 Graphic is a drum machine produced by the Boss product division of the Japanese Roland Corporation in 1983. It featured advances in technology compared to previous Roland drum machines: it had an LCD graphic display, showing a step-programming grid for the various drum voices. The DR-110 allowed the drum sounds to be played manually from rubber pads (as well as programmed). Like all Roland's previous drum machines, the DR-110's synthesized drum \"voices\" (synthesizer sounds) used analog synthesizer circuits. Tempo was continuously variable between 45 and 300 beats per minute (BPM). The DR-110 used a 4-bit Hitachi microprocessor and 1KB of μPD444C RAM memory.",
+        "Movement Systems Drum Computer\nThe Movement Drum System I/II (generally referred to as the Movement MCS Percussion Computer) was a very rare British-made drum machine produced approximately between 1981 (MKI) and 1983 (MKII). Both retailed at £1999.00 ex vat at March 1983 from 'Movement Audio Visual', 61 Taunton Road, Bridgwater, Somerset, TA6 3LP, UK. Both models combined two technologies; analogue synthesized drum sounds similar to Simmons SDS-V and basic digital 8-bit drum samples. In total 14 independent voice modules could be played (5 of which can be digital). Also notable for its computer-like design and its ability to display drum notes and sequencing graphically on a green black cathode ray tube display unit perhaps similar to page R on the fairlight CMI. The Movement Drum Systems are known to have been expensive upon release, and it is estimated that approximately thirty were made.",
+        "The Simpsons Theme\n\"The Simpsons\" Theme\", also referred to as \"The Simpsons\" Main Title Theme\" in album releases, is the theme music of the animated television series \"The Simpsons\". It plays during the opening sequence and was composed by Danny Elfman in 1989, after series creator Matt Groening approached him requesting a retro-style theme. The piece, which took 3 days, 2 hours, 48 minutes, and 19 seconds to create, has been noted by Elfman as the most popular of his career. The theme, as used for the opening sequence, was re-arranged during season 2, and the current arrangement by Alf Clausen was introduced at the beginning of the third season."
+      ],
+      "pool_titles": [
+        "Roland R-8",
+        "Roland TR-909",
+        "Boss Doctor Rhythm DR-110",
+        "Movement Systems Drum Computer",
+        "The Simpsons Theme"
+      ],
+      "pool_doc_scores": [
+        0.013201299299784565,
+        0.01758355619853134,
+        0.006132445336677682,
+        0.00355892468640728,
+        0.002606090131771677
+      ],
+      "pool_doc_ids": [
+        6130,
+        6131,
+        6132,
+        6128,
+        1536
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 622,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Roland R-8",
+          "Roland TR-909",
+          "Boss Doctor Rhythm DR-110",
+          "Movement Systems Drum Computer",
+          "The Simpsons Theme"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 0.5,
+          "final_support_complete": 0,
+          "rank_support_recall": 0.5,
+          "rank_support_complete": 0,
+          "dbec_support_recall": 0.5,
+          "dbec_support_complete": 0,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 20,
+      "question": "What festival is held every June in Bartlesville, Oklahoma?",
+      "gold_answers": [
+        "OK Mozart"
+      ],
+      "gold_docs": [
+        "OK Mozart Festival\nOK Mozart is an annual Classical music festival held each June in Bartlesville, Oklahoma. Considered Oklahoma's Premiere Music Festival, OK MOZART brings the highest quality professional musical and cultural experiences to the state of Oklahoma and the middle United States. The festival is a multi-day, multi-location event with professional orchestra musicians, concert artists and musical performances of artistic excellence for an event with international significance.",
+        "Bartlesville, Oklahoma\nBartlesville is a city mostly in Washington County in the U.S. state of Oklahoma. The population was 35,750 at the 2010 census, with a 2015 estimate of 36,595 according to the U.S. Census Bureau. Bartlesville is 47 mi north of Tulsa and 18 mi south of the Kansas border. It is the county seat of Washington County. The Caney River runs through Bartlesville."
+      ],
+      "gold_titles": [
+        "OK Mozart Festival",
+        "Bartlesville, Oklahoma"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "OK Mozart Festival\nOK Mozart is an annual Classical music festival held each June in Bartlesville, Oklahoma. Considered Oklahoma's Premiere Music Festival, OK MOZART brings the highest quality professional musical and cultural experiences to the state of Oklahoma and the middle United States. The festival is a multi-day, multi-location event with professional orchestra musicians, concert artists and musical performances of artistic excellence for an event with international significance.",
+        "Des Moines Arts Festival\nThe Des Moines Arts Festival is an arts festival held every June in Western Gateway Park in Des Moines, Iowa. The three-day festival frequently draws in excess of 200,000 people and has been ranked among the top festivals in the United States.",
+        "Bartlesville, Oklahoma\nBartlesville is a city mostly in Washington County in the U.S. state of Oklahoma. The population was 35,750 at the 2010 census, with a 2015 estimate of 36,595 according to the U.S. Census Bureau. Bartlesville is 47 mi north of Tulsa and 18 mi south of the Kansas border. It is the county seat of Washington County. The Caney River runs through Bartlesville.",
+        "Kastav Film Festival\nKastav Film Festival is an international film festival founded in 2009. Since then, the festival is held every June in Kastav, Croatia.",
+        "Cabourg Film Festival\nThe Cabourg Film Festival (French: Festival du Film de Cabourg – Journées romantiques or simply Festival du Film de Cabourg ) is an annual film festival held every June in Cabourg, France. Founded in 1983 by writer-journalist Gonzague Saint Bris, the festival is dedicated to films in the romantic genre and films with elements of romanticism."
+      ],
+      "pool_titles": [
+        "OK Mozart Festival",
+        "Des Moines Arts Festival",
+        "Bartlesville, Oklahoma",
+        "Kastav Film Festival",
+        "Cabourg Film Festival"
+      ],
+      "pool_doc_scores": [
+        0.012541748594166253,
+        0.013183761783423394,
+        0.004618392781404598,
+        0.002708065931739675,
+        0.0025504928368292393
+      ],
+      "pool_doc_ids": [
+        6497,
+        6502,
+        6503,
+        6499,
+        6494
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 659,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "OK Mozart Festival",
+          "Des Moines Arts Festival",
+          "Bartlesville, Oklahoma",
+          "Kastav Film Festival",
+          "Cabourg Film Festival"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 21,
+      "question": "In what capacity did the author of the book,  An Inconvenient Truth,  serve in the United States government ? ",
+      "gold_answers": [
+        "Vice President"
+      ],
+      "gold_docs": [
+        "An Inconvenient Truth (book)\nAn Inconvenient Truth: The Planetary Emergency of Global Warming and What We Can Do About It is a 2006 book by Al Gore released in conjunction with the film \"An Inconvenient Truth\". It is published by Rodale Press in Emmaus, Pennsylvania, in the United States.",
+        "Al Gore\nAlbert Arnold Gore Jr. (born March 31, 1948) is an American politician and environmentalist who served as the 45th Vice President of the United States from 1993 to 2001. Gore was Bill Clinton's running mate in their successful campaign in 1992, and the pair were re-elected in 1996. Near the end of President Clinton's second term, Gore was selected as the Democratic nominee for the 2000 presidential election but did not win the election. After his term as vice-president ended in 2001, Gore remained prominent as an author and environmental activist, whose work in climate change activism earned him (jointly with the IPCC) the Nobel Peace Prize in 2007."
+      ],
+      "gold_titles": [
+        "An Inconvenient Truth (book)",
+        "Al Gore"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Al Gore\nAlbert Arnold Gore Jr. (born March 31, 1948) is an American politician and environmentalist who served as the 45th Vice President of the United States from 1993 to 2001. Gore was Bill Clinton's running mate in their successful campaign in 1992, and the pair were re-elected in 1996. Near the end of President Clinton's second term, Gore was selected as the Democratic nominee for the 2000 presidential election but did not win the election. After his term as vice-president ended in 2001, Gore remained prominent as an author and environmental activist, whose work in climate change activism earned him (jointly with the IPCC) the Nobel Peace Prize in 2007.",
+        "An Inconvenient Truth (book)\nAn Inconvenient Truth: The Planetary Emergency of Global Warming and What We Can Do About It is a 2006 book by Al Gore released in conjunction with the film \"An Inconvenient Truth\". It is published by Rodale Press in Emmaus, Pennsylvania, in the United States.",
+        "An Inconvenient Truth\nAn Inconvenient Truth is a 2006 American documentary film directed by Davis Guggenheim about former United States Vice President Al Gore's campaign to educate citizens about global warming via a comprehensive slide show that, by his own estimate made in the film, he has given more than a thousand times. The idea to document his efforts came from producer Laurie David, who saw his presentation at a town-hall meeting on global warming, which coincided with the opening of \"The Day After Tomorrow\". Laurie David was so inspired by Gore's slide show that she, with producer Lawrence Bender, met with Guggenheim to adapt the presentation into a film.",
+        "An Inconvenient Sequel: Truth to Power\nAn Inconvenient Sequel: Truth to Power is a 2017 American documentary film directed by Bonni Cohen and Jon Shenk about former United States Vice President Al Gore's continuing mission to battle climate change. The sequel to \"An Inconvenient Truth\" (2006), the film addresses the progress made to tackle the problem and Gore's global efforts to persuade governmental leaders to invest in renewable energy, culminating in the landmark signing of 2016's Paris Agreement. The film was released on July 28, 2017, by Paramount Pictures.",
+        "Richard Haag\nRichard Haag (born October 23, 1923) is a United States landscape architect. He is famous for his work on Gas Works Park in Seattle, Washington and on the Bloedel Reserve on Bainbridge Island. He is also noted for founding the Landscape Architecture Program at the University of Washington and for holding multiple design awards. His designs call to mind the current trend of being one with and improving the environment. Although Al Gore's \"An Inconvenient Truth\" is after Richard Haag's heyday, the ideals evoked from the film are shown in his designs. The social movement that created the hybrid car also demanded sustainable design, and Richard Haag provided it in the most distinctive and astounding ways. Richard Haag's modernist and minimalist ideals set the tone for northwestern landscape design and has placed the northwest on the road towards ecologically-minded design."
+      ],
+      "pool_titles": [
+        "Al Gore",
+        "An Inconvenient Truth (book)",
+        "An Inconvenient Truth",
+        "An Inconvenient Sequel: Truth to Power",
+        "Richard Haag"
+      ],
+      "pool_doc_scores": [
+        0.006652011845820773,
+        0.007335186000025977,
+        0.004668972756833005,
+        0.004104916815640056,
+        0.00312419784704764
+      ],
+      "pool_doc_ids": [
+        6650,
+        6645,
+        6644,
+        6651,
+        6643
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 674,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Al Gore",
+          "An Inconvenient Truth (book)",
+          "An Inconvenient Truth",
+          "An Inconvenient Sequel: Truth to Power",
+          "Richard Haag"
+        ],
+        "accepted_repair_positions": [
+          0
+        ],
+        "accepted_repair_titles": [
+          "An Inconvenient Truth (book)"
+        ],
+        "accepted_repair_gains": [
+          0.207932
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 22,
+      "question": "Why are many of the band, Hirsute Pursuit's songs considered controversial?",
+      "gold_answers": [
+        "men who have sex with men"
+      ],
+      "gold_docs": [
+        "Gay sexual practices\nGay sexual practices are sexual activities involving men who have sex with men (MSM), regardless of their sexual orientation or sexual identity. The authors of the Kinsey Reports state that 37% of their male subjects had at least one homosexual experience. Evidence shows that sex between men is significantly underreported in surveys due to social desirability bias.",
+        "Hirsute Pursuit\nHirsute Pursuit is an American industrial/EDM group from New York City, formed by Bryin Dall and Harley Phoenix in 2006-2007. The band collaborates frequently with artists such as Peter Christopherson (before his death in 2010), Boyd Rice and many others. Thematically, the group focuses on homosexuality, gay sex, and the gay bear subculture. Due to the controversial and explicit nature of many of their songs, the band has frequently dealt with their videos being taken down off YouTube. The band is known for their cover of David Bowie's 1979 song \"Boys Keep Swinging\" with Boyd Rice providing vocals."
+      ],
+      "gold_titles": [
+        "Gay sexual practices",
+        "Hirsute Pursuit"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Hirsute Pursuit\nHirsute Pursuit is an American industrial/EDM group from New York City, formed by Bryin Dall and Harley Phoenix in 2006-2007. The band collaborates frequently with artists such as Peter Christopherson (before his death in 2010), Boyd Rice and many others. Thematically, the group focuses on homosexuality, gay sex, and the gay bear subculture. Due to the controversial and explicit nature of many of their songs, the band has frequently dealt with their videos being taken down off YouTube. The band is known for their cover of David Bowie's 1979 song \"Boys Keep Swinging\" with Boyd Rice providing vocals.",
+        "Sister Outsider\nSister Outsider: Essays and Speeches is a collection of essays and speeches by Audre Lorde, poet and feminist writer. The book is considered a classic volume of Lorde's most influential works of non-fiction prose and has been groundbreaking and formative in the development of contemporary feminist theories. In fifteen essays and speeches dating from 1976 to 1984, Lorde explores the complexities of intersectional identity, drawing from her personal experiences with oppression, including sexism, heterosexism, racism, homophobia, classism, and ageism. The book examines a broad range of topics, including love, war, imperialism, police brutality, coalition building, violence against women, Black feminism, and movements towards equality. Lorde's distrust for and internalization of the widespread system of dominant values within the United States is apparent throughout the collection. The work is considered controversial as Lorde expresses unapologetic anger at the injustices of society. The essays in this collection are extensively taught and have become a popular subject of academic analysis. Lorde's theorizing of oppressions as complex and interlocking within the collection are considered a significant contribution to critical social theory.",
+        "Queer (song)\n\"Queer\" is a song written and produced by alternative rock band Garbage for the band's self-titled debut album. The song started as a demo during sessions between band members Butch Vig, Duke Erikson and Steve Marker, and had its composition finished after singer Shirley Manson joined the band. Manson rewrote the sexualized lyrics to be more ambiguous, and rearranged the song into a subdued trip hop and rock crossover structure.",
+        "Born This Way (Glee)\n\"Born This Way\" is the eighteenth episode of the second season of the American television series \"Glee\", and the fortieth episode overall. It originally aired on Fox in the United States on April 26, 2011. The episode was written by Brad Falchuk and directed by Alfonso Gomez-Rejon, and is a tribute to Lady Gaga, the second such tribute to the artist in the show's history; the first one was \"Theatricality\". Most of the major plots of the episode center on the topic of homosexuality, as Kurt (Chris Colfer) lays the groundwork for his longtime bully Dave Karofsky (Max Adler) to come to terms with his sexuality, and Santana (Naya Rivera) plots to run for school prom queen in the hopes of winning her love interest Brittany (Heather Morris) from Artie (Kevin McHale).",
+        "A Jihad for Love\nA Jihad for Love (also known by the working title In the Name of Allah) is a 2007 documentary film on the coexistence of Islam and homosexuality. The film is directed by Parvez Sharma, and produced by Sharma and \"Trembling Before G-d\" director Sandi DuBowski."
+      ],
+      "pool_titles": [
+        "Hirsute Pursuit",
+        "Sister Outsider",
+        "Queer (song)",
+        "Born This Way (Glee)",
+        "A Jihad for Love"
+      ],
+      "pool_doc_scores": [
+        0.013005235020954402,
+        0.001728219372513215,
+        0.003293035207934746,
+        0.0025858515527815255,
+        0.0021837144461161564
+      ],
+      "pool_doc_ids": [
+        6871,
+        6874,
+        1678,
+        443,
+        7277
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 697,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          30,
+          1,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Hirsute Pursuit",
+          "Sister Outsider",
+          "Queer (song)",
+          "Born This Way (Glee)",
+          "A Jihad for Love"
+        ],
+        "accepted_repair_positions": [
+          30
+        ],
+        "accepted_repair_titles": [
+          "Sister Outsider"
+        ],
+        "accepted_repair_gains": [
+          0.715862
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 0.5,
+          "final_support_complete": 0,
+          "rank_support_recall": 0.5,
+          "rank_support_complete": 0,
+          "dbec_support_recall": 0.5,
+          "dbec_support_complete": 0,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 23,
+      "question": "In what ecclesiastical province is Stephen Conway currently part of?",
+      "gold_answers": [
+        "Province of Canterbury"
+      ],
+      "gold_docs": [
+        "Bishop of Ely\nThe Bishop of Ely is the ordinary of the Church of England Diocese of Ely in the Province of Canterbury. The diocese roughly covers the county of Cambridgeshire (with the exception of the Soke of Peterborough), together with a section of north-west Norfolk and has its episcopal see in the City of Ely, Cambridgeshire, where the seat is located at the Cathedral Church of the Holy Trinity. The current bishop is Stephen Conway, who signs \"+Stephen Elien:\" (abbreviation of the Latin adjective \"Eliensis\", meaning \"of Ely\"). The diocesan bishops now reside in Bishop's House, Ely, the former cathedral deanery. Conway became Bishop of Ely in 2010, translated from the Diocese of Salisbury where he was Bishop suffragan of Ramsbury.",
+        "Diocese of Salisbury\nThe Diocese of Salisbury is a Church of England diocese in the south of England, within the ecclesiastical Province of Canterbury. The diocese covers most of Dorset (excepting the deaneries of Bournemouth and Christchurch, which fall within the Diocese of Winchester), and most of Wiltshire (excepting a part in the north and Swindon). The diocese is led by the Bishop of Salisbury (Nick Holtam) and the diocesan synod. The bishop's seat is at Salisbury Cathedral."
+      ],
+      "gold_titles": [
+        "Bishop of Ely",
+        "Diocese of Salisbury"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Bishop of Ely\nThe Bishop of Ely is the ordinary of the Church of England Diocese of Ely in the Province of Canterbury. The diocese roughly covers the county of Cambridgeshire (with the exception of the Soke of Peterborough), together with a section of north-west Norfolk and has its episcopal see in the City of Ely, Cambridgeshire, where the seat is located at the Cathedral Church of the Holy Trinity. The current bishop is Stephen Conway, who signs \"+Stephen Elien:\" (abbreviation of the Latin adjective \"Eliensis\", meaning \"of Ely\"). The diocesan bishops now reside in Bishop's House, Ely, the former cathedral deanery. Conway became Bishop of Ely in 2010, translated from the Diocese of Salisbury where he was Bishop suffragan of Ramsbury.",
+        "Ecclesiastical province\nAn ecclesiastical province is a general term for one of the basic forms of jurisdiction in Christian Churches with traditional hierarchical structure, including Western Christianity and Eastern Christianity. In general, ecclesiastical province is consisted of several dioceses (or eparchies), one of them being the archdiocese (or archeparchy), headed by metropolitan bishop or archbishop who has ecclesiastical jurisdiction over all other bishops of the province.",
+        "Diocese of Salisbury\nThe Diocese of Salisbury is a Church of England diocese in the south of England, within the ecclesiastical Province of Canterbury. The diocese covers most of Dorset (excepting the deaneries of Bournemouth and Christchurch, which fall within the Diocese of Winchester), and most of Wiltshire (excepting a part in the north and Swindon). The diocese is led by the Bishop of Salisbury (Nick Holtam) and the diocesan synod. The bishop's seat is at Salisbury Cathedral.",
+        "Roman Catholic Ecclesiastical Province of Miami\nThe Ecclesiastical Province of Miami is a Catholic ecclesiastical province covering the U.S. state of Florida. Its metropolitan bishop is the Archbishop of Miami, head of the Archdiocese of Miami. The province additionally includes the suffragan dioceses of Orlando, Palm Beach, Pensacola-Tallahassee, St. Augustine, St. Petersburg, and Venice.",
+        "Ecclesiastical Province of Ontario\nThe Ecclesiastical Province of Ontario is one of the Anglican Church of Canada's four ecclesiastical provinces. It was established in 1912 out of six dioceses of the Ecclesiastical Province of Canada located in the civil Province of Ontario, and the Diocese of Moosonee from the Ecclesiastical Province of Rupert's Land."
+      ],
+      "pool_titles": [
+        "Bishop of Ely",
+        "Ecclesiastical province",
+        "Diocese of Salisbury",
+        "Roman Catholic Ecclesiastical Province of Miami",
+        "Ecclesiastical Province of Ontario"
+      ],
+      "pool_doc_scores": [
+        0.018890410836372117,
+        0.005288289988985435,
+        0.008730234793703317,
+        0.003408406076776519,
+        0.0032915233050848825
+      ],
+      "pool_doc_ids": [
+        7769,
+        7768,
+        7770,
+        7774,
+        7777
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 790,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          2,
+          1,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Bishop of Ely",
+          "Ecclesiastical province",
+          "Diocese of Salisbury",
+          "Roman Catholic Ecclesiastical Province of Miami",
+          "Ecclesiastical Province of Ontario"
+        ],
+        "accepted_repair_positions": [
+          2
+        ],
+        "accepted_repair_titles": [
+          "Ecclesiastical province"
+        ],
+        "accepted_repair_gains": [
+          1.0
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 24,
+      "question": "What university did the winner of the 2014 CFL's Most Outstanding Defensive Player Award attend?",
+      "gold_answers": [
+        "University of Hawaii at Manoa"
+      ],
+      "gold_docs": [
+        "Solomon Elimimian\nSolomon Elimimian (born October 21, 1986) is a Canadian football linebacker for the BC Lions of the Canadian Football League (CFL). He was named the CFL's Most Outstanding Rookie in 2010. In 2014, he won the CFL's Most Outstanding Defensive Player Award and Most Outstanding Player Award. Elimimian is the first purely defensive player to win the league's Most Outstanding Player Award as well as the first player to win three different CFL awards in his career. He played college football for the Hawaii Warriors and attended Crenshaw High School in South Los Angeles, California.",
+        "Hawaii Rainbow Warriors football\nThe Hawaii Rainbow Warriors football team represents the University of Hawaii at Manoa in NCAA Division I FBS college football. On November 27, 2015, Nick Rolovich was hired as the new head football coach at the University of Hawaii replacing Norm Chow. It was part of the Western Athletic Conference until July 2012, when the team joined the Mountain West Conference."
+      ],
+      "gold_titles": [
+        "Solomon Elimimian",
+        "Hawaii Rainbow Warriors football"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Solomon Elimimian\nSolomon Elimimian (born October 21, 1986) is a Canadian football linebacker for the BC Lions of the Canadian Football League (CFL). He was named the CFL's Most Outstanding Rookie in 2010. In 2014, he won the CFL's Most Outstanding Defensive Player Award and Most Outstanding Player Award. Elimimian is the first purely defensive player to win the league's Most Outstanding Player Award as well as the first player to win three different CFL awards in his career. He played college football for the Hawaii Warriors and attended Crenshaw High School in South Los Angeles, California.",
+        "Massachusetts Institute of Technology\nThe Massachusetts Institute of Technology (MIT) is a private research university in Cambridge, Massachusetts. It is often ranked as one of the world's most prestigious universities.",
+        "CFL's Most Outstanding Defensive Player Award\nThe Most Outstanding Defensive Player Award is annually awarded to the best defensive player in the Canadian Football League. The winner of the award is selected by members of the Football Reporters of Canada along with the head coaches in the CFL. The two nominees for the award are the James P. McCaffrey Trophy winner from the East Division, and the Norm Fieldgate Trophy winner from the West Division. Between the years of 1955 to 1973, both defensive players and offensive lineman had to compete for the CFL's Most Outstanding Lineman Award. By the 1974 season, the league decided to make two separate awards for both defensive players and offensive lineman.",
+        "Jung-Yul Kim\nJung-Yul Kim (born February 9, 1973) is a former Canadian football offensive tackle who played six seasons in the Canadian Football League with the Calgary Stampeders and Toronto Argonauts. He was drafted by the Calgary Stampeders in the fifth round of the 1996 CFL Draft. Kim played CIS football at the University of Toronto. He won the 29th Vanier Cup with the Toronto Varsity Blues. He was also a member of the Calgary Stampeders team that won the 86th Grey Cup. Kim is also an actor. He has served as a constable in the Toronto Police Service as well.",
+        "David Ménard\nDavid Ménard (born May 13, 1989) is a Canadian football defensive lineman for the BC Lions of the Canadian Football League (CFL). He was selected in the fourth round and 32nd overall by the Lions in the 2014 CFL Draft and signed with the team on May 27, 2014. He was ranked as the 13th best player in the Canadian Football League’s Amateur Scouting Bureau final rankings for players eligible in the 2014 CFL Draft. He played CIS football with the Montreal Carabins."
+      ],
+      "pool_titles": [
+        "Solomon Elimimian",
+        "Massachusetts Institute of Technology",
+        "CFL's Most Outstanding Defensive Player Award",
+        "Jung-Yul Kim",
+        "David Ménard"
+      ],
+      "pool_doc_scores": [
+        0.006357118389826668,
+        0.002313394666587241,
+        0.011504698785391506,
+        0.005432558434838869,
+        0.005229873235250947
+      ],
+      "pool_doc_ids": [
+        7973,
+        2183,
+        7974,
+        4548,
+        7977
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 811,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          10,
+          0,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Solomon Elimimian",
+          "Massachusetts Institute of Technology",
+          "CFL's Most Outstanding Defensive Player Award",
+          "Jung-Yul Kim",
+          "David Ménard"
+        ],
+        "accepted_repair_positions": [
+          10,
+          0
+        ],
+        "accepted_repair_titles": [
+          "Massachusetts Institute of Technology",
+          "CFL's Most Outstanding Defensive Player Award"
+        ],
+        "accepted_repair_gains": [
+          0.600556,
+          0.399444
+        ],
+        "accepted_repair_branch_status": [
+          "unknown",
+          "support"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 0.5,
+          "final_support_complete": 0,
+          "rank_support_recall": 0.5,
+          "rank_support_complete": 0,
+          "dbec_support_recall": 0.5,
+          "dbec_support_complete": 0,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 25,
+      "question": "Which Republican Chairman was born June 1, 1956? ",
+      "gold_answers": [
+        "Gregg Harper"
+      ],
+      "gold_docs": [
+        "Charlie Ross (state senator)\nCharlie Ross is an American politician and attorney who lives in Brandon, Mississippi. He served as Senator from District 20 in the Mississippi Senate until 2007. District 20 comprises parts of Madison and Rankin Counties. Ross was first elected to the Senate in 1997 after serving as the representative from District 59 in the Mississippi House of Representatives. Prior to his legislative service, he served as the Chairman of the Rankin County Republican Executive Committee. In 2008, Ross ran for Congress in Mississippi's 3rd congressional district, but was defeated in the primary by Rankin County Republican Chairman Gregg Harper.",
+        "Gregg Harper\nGregory Livingston Harper (born June 1, 1956) is the U.S. Representative for Mississippi 's 3 congressional district , serving since 2009. He is a member of the Republican Party. The district includes the wealthier portions of the state capital, Jackson, along with most of that city's suburbs. Other cities in the district include Meridian, Natchez, Starkville, and Brookhaven."
+      ],
+      "gold_titles": [
+        "Charlie Ross (state senator)",
+        "Gregg Harper"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Gregg Harper\nGregory Livingston Harper (born June 1, 1956) is the U.S. Representative for Mississippi 's 3 congressional district , serving since 2009. He is a member of the Republican Party. The district includes the wealthier portions of the state capital, Jackson, along with most of that city's suburbs. Other cities in the district include Meridian, Natchez, Starkville, and Brookhaven.",
+        "Ron Marsico\nRonald S. \"Ron\" Marsico (born October 30, 1947) is a Republican member of the Pennsylvania House of Representatives for the 105th District and was elected in 1988. He is the Republican Chairman of the House Judiciary Committee and also serves on the House Transportation Committee.",
+        "Leonard Lance\nLeonard J. Lance (born June 25, 1952) is the U.S. Representative for New Jersey 's 7 congressional district , serving since 2009. He is a member of the Republican Party. He previously served in the New Jersey Senate and the New Jersey General Assembly where he had been lauded by legislative peers as a moderate Republican. Since 2009, however, his positions have shifted to conservative Republican positions, such as against environmental regulation, and against Planned Parenthood. He has been a staunch opponent of the Affordable Care Act and against abortion rights; in 2017 he voted against federally funded insurance plans which provide coverage for abortion.",
+        "Jonathan Paton\nJonathan Paton (born June 10, 1971) is a former Arizona Republican candidate for the U.S. House of Representatives in Arizona's 8th District and an intelligence officer in the U.S. Army Reserve who served in Operation Iraqi Freedom. Paton was first elected to southern Arizona's Legislative District 30 as a member of the Arizona House of Representatives in 2004. He won reelection and began his second term in February 2007. In 2008, he was elected to the Arizona Senate, again representing Legislative District 30. On January 17, 2010, Paton announced he would be challenging Democratic U.S. Representative Gabrielle Giffords. He subsequently resigned from the state Senate to focus his efforts on campaigning for Congress. Paton lost in the 2010 Republican primary and endorsed his former opponent, Jesse Kelly. He ran for Congress again in 2012, this time in Arizona's newly formed 1st Congressional District, ending in close defeat against Democratic opponent Ann Kirkpatrick.",
+        "Peter Balakian\nPeter Balakian (Armenian: Փիթըր Պալաքեան , born June 13, 1951) is an Armenian American poet, writer and academic, the Donald M. and Constance H. Rebar Professor of Humanities at Colgate University. He was awarded the Pulitzer Prize for Poetry in 2016."
+      ],
+      "pool_titles": [
+        "Gregg Harper",
+        "Ron Marsico",
+        "Leonard Lance",
+        "Jonathan Paton",
+        "Peter Balakian"
+      ],
+      "pool_doc_scores": [
+        0.010657858961848315,
+        0.003733704551814166,
+        0.010754773527112895,
+        0.009555974294314823,
+        0.004229573085353956
+      ],
+      "pool_doc_ids": [
+        8051,
+        8056,
+        6304,
+        6298,
+        7501
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 819,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          1
+        ],
+        "final_order_positions": [
+          1,
+          8,
+          0,
+          2,
+          3
+        ],
+        "final_titles": [
+          "Gregg Harper",
+          "Ron Marsico",
+          "Leonard Lance",
+          "Jonathan Paton",
+          "Peter Balakian"
+        ],
+        "accepted_repair_positions": [
+          8
+        ],
+        "accepted_repair_titles": [
+          "Ron Marsico"
+        ],
+        "accepted_repair_gains": [
+          1.0
+        ],
+        "accepted_repair_branch_status": [
+          "unknown"
+        ],
+        "rank_fill_positions": [
+          1,
+          0,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 0.5,
+          "final_support_complete": 0,
+          "rank_support_recall": 0.5,
+          "rank_support_complete": 0,
+          "dbec_support_recall": 0.5,
+          "dbec_support_complete": 0,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 26,
+      "question": "When did Senator Ted Kennedy helped dedicate a new room at the location to his maternal grandfather, John F. Fitzgerald.",
+      "gold_answers": [
+        "St. Patrick's Day in 1988"
+      ],
+      "gold_docs": [
+        "Doyle's Cafe\nDoyle's Cafe is a bar / restaurant located on Washington Street in the Jamaica Plain neighborhood of Boston, Massachusetts. Doyle's Cafe was established in 1882 and is located near the Samuel Adams Brewery. Its close proximity to the Samuel Adams Brewery affords Doyle's the unique opportunity to serve new or experimental Samuel Adams beers. It is also where Samuel Adams Boston Lager was first put on tap. Throughout its history, Doyle's has been known as a favorite watering hole for both local and national politicians. On St. Patrick's Day in 1988, Senator Ted Kennedy helped dedicate a new room at the location to his maternal grandfather, John F. Fitzgerald.",
+        "John F. Fitzgerald\nJohn Francis \"Honey Fitz\" Fitzgerald (February 11, 1863 – October 2, 1950) was an American politician, father of Rose Kennedy and maternal grandfather of President John F. Kennedy."
+      ],
+      "gold_titles": [
+        "Doyle's Cafe",
+        "John F. Fitzgerald"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Doyle's Cafe\nDoyle's Cafe is a bar / restaurant located on Washington Street in the Jamaica Plain neighborhood of Boston, Massachusetts. Doyle's Cafe was established in 1882 and is located near the Samuel Adams Brewery. Its close proximity to the Samuel Adams Brewery affords Doyle's the unique opportunity to serve new or experimental Samuel Adams beers. It is also where Samuel Adams Boston Lager was first put on tap. Throughout its history, Doyle's has been known as a favorite watering hole for both local and national politicians. On St. Patrick's Day in 1988, Senator Ted Kennedy helped dedicate a new room at the location to his maternal grandfather, John F. Fitzgerald.",
+        "John F. Fitzgerald\nJohn Francis \"Honey Fitz\" Fitzgerald (February 11, 1863 – October 2, 1950) was an American politician, father of Rose Kennedy and maternal grandfather of President John F. Kennedy.",
+        "Kennedy Compound\nThe Kennedy Compound consists of three houses on six acres (24,000 m²) of waterfront property on Cape Cod along Nantucket Sound in Hyannis Port, Massachusetts, United States. It was once the home of American businessman and political figure Joseph P. Kennedy Sr., his wife Rose, and two of their sons, President John F. Kennedy and Senator Robert F. Kennedy. Their youngest son, Senator Ted Kennedy, lived in his parents' house, and it was his main residence from 1982 to 2009. He died of brain cancer at the compound in August 2009.",
+        "Anthony Shriver\nAnthony Paul Kennedy Shriver (born July 20, 1965) is an American activist for people with intellectual disabilities. In 1989, he founded Best Buddies International, an international organization that helps people with intellectual disabilities to find employment and social opportunities. Through his mother, he is a nephew of World War II casualty Joseph P. Kennedy, Jr., President John F. Kennedy, Senator Robert F. Kennedy, and Senator Ted Kennedy.",
+        "Patrick Kennedy (1823–1858)\nPatrick Kennedy (February 16, 1823 – November 22, 1858) was an Irish farmer, businessman, and politician who moved to East Boston, Massachusetts from County Wexford, Ireland. He was born in New Ross, Ireland. He was the father of businessman/politician P. J. Kennedy, paternal grandfather of businessman/politician Joseph P. Kennedy Sr., and patrilineal great-grandfather of World War II casualty Joseph P. Kennedy Jr., President John F. Kennedy, Senator Robert F. Kennedy, and longtime Senator Ted Kennedy."
+      ],
+      "pool_titles": [
+        "Doyle's Cafe",
+        "John F. Fitzgerald",
+        "Kennedy Compound",
+        "Anthony Shriver",
+        "Patrick Kennedy (1823–1858)"
+      ],
+      "pool_doc_scores": [
+        0.016889282694700348,
+        0.007927103319183988,
+        0.004704051199290201,
+        0.0036919966407505224,
+        0.0036046471693515865
+      ],
+      "pool_doc_ids": [
+        8213,
+        8212,
+        8220,
+        8214,
+        8219
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 836,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Doyle's Cafe",
+          "John F. Fitzgerald",
+          "Kennedy Compound",
+          "Anthony Shriver",
+          "Patrick Kennedy (1823–1858)"
+        ],
+        "accepted_repair_positions": [
+          1
+        ],
+        "accepted_repair_titles": [
+          "John F. Fitzgerald"
+        ],
+        "accepted_repair_gains": [
+          1.0
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 27,
+      "question": "Who was known by his stage name Aladin and helped organizations improve their performance as a consultant?",
+      "gold_answers": [
+        "Eenasul Fateh"
+      ],
+      "gold_docs": [
+        "Eenasul Fateh\nEenasul Fateh (Bengali: ঈনাসুল ফাতেহ ; born 3 April 1959), also known by his stage name Aladin, is a Bangladeshi-British cultural practitioner, magician, live artist and former international management consultant.",
+        "Management consulting\nManagement consulting is the practice of helping organizations to improve their performance, operating primarily through the analysis of existing organizational problems and the development of plans for improvement. Organizations may draw upon the services of management consultants for a number of reasons, including gaining external (and presumably objective) advice and access to the consultants' specialized expertise."
+      ],
+      "gold_titles": [
+        "Eenasul Fateh",
+        "Management consulting"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Eenasul Fateh\nEenasul Fateh (Bengali: ঈনাসুল ফাতেহ ; born 3 April 1959), also known by his stage name Aladin, is a Bangladeshi-British cultural practitioner, magician, live artist and former international management consultant.",
+        "Management consulting\nManagement consulting is the practice of helping organizations to improve their performance, operating primarily through the analysis of existing organizational problems and the development of plans for improvement. Organizations may draw upon the services of management consultants for a number of reasons, including gaining external (and presumably objective) advice and access to the consultants' specialized expertise.",
+        "Dynatrace\nDynatrace is an American application performance management (APM) software company with products aimed at the information technology departments and digital business owners of medium and large businesses. The company's services include performance management software for programs running on-premises and in the cloud. This software manages the availability and performance of software applications and the impact on user experience in the form of deep transaction tracing, synthetic monitoring, real user monitoring, and network monitoring. The company separated from Compuware in December 2014 after being sold into private equity firm Thoma Bravo establishing it as a standalone company.",
+        "Bill Cosby: Himself\nBill Cosby: Himself is a 1983 stand-up comedy film featuring Bill Cosby. Filmed before a live audience at the Hamilton Place Theatre, in Hamilton, Ontario, Cosby gives the audience his views ranging from marriage to parenthood. The film also showcases Cosby's trademark conversational style of stand-up comedy. For most of the performance, Cosby is seated at the center of the stage, only getting up to emphasize a joke.",
+        "Incident Command Post\nAccording to the National Incident Management System (NIMS), and the Incident Command System (ICS), the Incident Command Post (ICP) is one of five predesignated temporary facilities and signifies the physical location of the tactical-level, on-scene incident command and management organization. It typically comprises the Incident Commander and immediate staff and may include other designated incident management officials and responders from Federal, State, local, and tribal agencies, as well as private-sector, nongovernmental, and volunteer organizations."
+      ],
+      "pool_titles": [
+        "Eenasul Fateh",
+        "Management consulting",
+        "Dynatrace",
+        "Bill Cosby: Himself",
+        "Incident Command Post"
+      ],
+      "pool_doc_scores": [
+        0.0222966551315563,
+        0.011021262136830844,
+        0.0037383214715484125,
+        0.0036457193106343186,
+        0.003630500897761784
+      ],
+      "pool_doc_ids": [
+        8244,
+        8248,
+        5054,
+        2078,
+        3886
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 839,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Eenasul Fateh",
+          "Management consulting",
+          "Dynatrace",
+          "Bill Cosby: Himself",
+          "Incident Command Post"
+        ],
+        "accepted_repair_positions": [
+          1
+        ],
+        "accepted_repair_titles": [
+          "Management consulting"
+        ],
+        "accepted_repair_gains": [
+          0.21959
+        ],
+        "accepted_repair_branch_status": [
+          "support"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 28,
+      "question": "What was the code name of The landing barge primarily used to provide hot meals to the landing crew?",
+      "gold_answers": [
+        "Operation Neptune"
+      ],
+      "gold_docs": [
+        "Normandy landings\nThe Normandy landings (codenamed Operation Neptune) were the landing operations on Tuesday, 6 June 1944 (termed D-Day) of the Allied invasion of Normandy in Operation Overlord during World War II. The largest seaborne invasion in history, the operation began the liberation of German-occupied northwestern Europe from Nazi control, and contributed to the Allied victory on the Western Front.",
+        "Landing Barge, Kitchen\nThe Landing Barge, Kitchen or LBK was a landing craft used to support amphibious landings in North Western Europe during and after the Normandy invasion in the Second World War. Its primary purpose was to provide hot meals to the crews of the many minor landing craft not fitted with galley facilities. Constructed of steel, this shallow-draft lighter had storage and serving space to feed 900 men for one week. The kitchen capacity was able to provide 1,600 hot meals and 800 cold meals a day."
+      ],
+      "gold_titles": [
+        "Normandy landings",
+        "Landing Barge, Kitchen"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Landing Barge, Kitchen\nThe Landing Barge, Kitchen or LBK was a landing craft used to support amphibious landings in North Western Europe during and after the Normandy invasion in the Second World War. Its primary purpose was to provide hot meals to the crews of the many minor landing craft not fitted with galley facilities. Constructed of steel, this shallow-draft lighter had storage and serving space to feed 900 men for one week. The kitchen capacity was able to provide 1,600 hot meals and 800 cold meals a day.",
+        "Normandy landings\nThe Normandy landings (codenamed Operation Neptune) were the landing operations on Tuesday, 6 June 1944 (termed D-Day) of the Allied invasion of Normandy in Operation Overlord during World War II. The largest seaborne invasion in history, the operation began the liberation of German-occupied northwestern Europe from Nazi control, and contributed to the Allied victory on the Western Front.",
+        "Landing Craft Support\nThe Landing Craft, Support (Large) — later reclassified Landing Ship Support, Large — class of amphibious warfare ships were used by the United States Navy in World War II in the Pacific. They were primarily used for close support before landing forces on beaches. They also performed radar picket duty and fire fighting. They were nicknamed the \"Mighty Midgets\".",
+        "Sword Beach\nSword, commonly known as Sword Beach, was the code name given to one of the five main landing areas along the Normandy coast during the initial assault phase, Operation Neptune, of Operation Overlord, the Allied invasion of German-occupied France that commenced on 6 June 1944. Stretching 8 km from Ouistreham to Saint-Aubin-sur-Mer, the beach was the easternmost landing site of the invasion. Taking Sword was to be the responsibility of the British Army with sea transport, mine sweeping, and a naval bombardment force provided by the British Royal Navy as well as elements from the Polish, Norwegian and other Allied navies.",
+        "Meals on Wheels\nMeals on Wheels is a program that delivers meals to individuals at home who are unable to purchase or prepare their own meals. The name is often used generically to refer to home-delivered meals programs, not all of which are actually named \"Meals on Wheels\". Because they are housebound, many of the recipients are the elderly, and many of the volunteers are also elderly but able-bodied and able to drive automobiles."
+      ],
+      "pool_titles": [
+        "Landing Barge, Kitchen",
+        "Normandy landings",
+        "Landing Craft Support",
+        "Sword Beach",
+        "Meals on Wheels"
+      ],
+      "pool_doc_scores": [
+        0.03217435187545496,
+        0.004188344814177227,
+        0.0028524095136273167,
+        0.0024325937842021236,
+        0.0021273449435290034
+      ],
+      "pool_doc_ids": [
+        8381,
+        8382,
+        8384,
+        8387,
+        8383
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 853,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Landing Barge, Kitchen",
+          "Normandy landings",
+          "Landing Craft Support",
+          "Sword Beach",
+          "Meals on Wheels"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 29,
+      "question": "Rostker v. Goldberg held that the practice of what way of filling armed forces vacancies was consitutional?",
+      "gold_answers": [
+        "Conscription"
+      ],
+      "gold_docs": [
+        "Conscription in the United States\nConscription in the United States, commonly known as the draft, has been employed by the federal government of the United States in four conflicts: the American Civil War, World War I, World War II, and the Cold War (including both the Korean and Vietnam Wars). The third incarnation of the draft came into being in 1940 through the Selective Training and Service Act. It was the country's first peacetime draft. From 1940 until 1973, during both peacetime and periods of conflict, men were drafted to fill vacancies in the United States Armed Forces that could not be filled through voluntary means. The draft was ended when the United States Armed Forces moved to an all-volunteer military force. However, the Selective Service System remains in place as a contingency plan; all male civilians between the ages of 18 and 25 are required to register so that a draft can be readily resumed if needed.",
+        "Rostker v. Goldberg\nRostker v. Goldberg, 453 U.S. 57 (1981) , was a decision of the United States Supreme Court holding that the practice of requiring only men to register for the draft was constitutional. After extensive hearings, floor debate and committee sessions on the matter, the United States Congress enacted the law, as it had previously been, to apply to men only. Several attorneys, including Robert L. Goldberg, subsequently challenged the gender distinction as unconstitutional. (The named defendant is Bernard D. Rostker, Director of the Selective Service System.) In a 6-3 decision, the Supreme Court held that this gender distinction was not a violation of the equal protection component of the due process clause, and that the Act would stand as passed."
+      ],
+      "gold_titles": [
+        "Conscription in the United States",
+        "Rostker v. Goldberg"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "Rostker v. Goldberg\nRostker v. Goldberg, 453 U.S. 57 (1981) , was a decision of the United States Supreme Court holding that the practice of requiring only men to register for the draft was constitutional. After extensive hearings, floor debate and committee sessions on the matter, the United States Congress enacted the law, as it had previously been, to apply to men only. Several attorneys, including Robert L. Goldberg, subsequently challenged the gender distinction as unconstitutional. (The named defendant is Bernard D. Rostker, Director of the Selective Service System.) In a 6-3 decision, the Supreme Court held that this gender distinction was not a violation of the equal protection component of the due process clause, and that the Act would stand as passed.",
+        "Conscription in the United States\nConscription in the United States, commonly known as the draft, has been employed by the federal government of the United States in four conflicts: the American Civil War, World War I, World War II, and the Cold War (including both the Korean and Vietnam Wars). The third incarnation of the draft came into being in 1940 through the Selective Training and Service Act. It was the country's first peacetime draft. From 1940 until 1973, during both peacetime and periods of conflict, men were drafted to fill vacancies in the United States Armed Forces that could not be filled through voluntary means. The draft was ended when the United States Armed Forces moved to an all-volunteer military force. However, the Selective Service System remains in place as a contingency plan; all male civilians between the ages of 18 and 25 are required to register so that a draft can be readily resumed if needed.",
+        "Duren v. Missouri\nDuren v. Missouri, 439 U.S. 357 (1979) , was a United States Supreme Court case related to the Sixth Amendment. Ruth Bader Ginsburg, who later became a Supreme Court Justice herself, and Lee Nation argued for Duren in what became Ginsburg's last case before the Supreme Court as an attorney. Part of her argument was that making jury duty optional for women should be struck down because it treated women's service on juries as less valuable than men's.",
+        "Triple Crown of Surfing\nThe Vans Triple Crown of Surfing is a Hawaiian specialty series of professional surfing events, offering three events to men and three events to women. For the men, those events are the Reef Hawaiian Pro at Haleiwa Ali'i Beach Park; the O'Neill World Cup of Surfing at Sunset Beach; and the Billabong Pipeline Masters at the Banzai Pipeline. The women's events are the Vans Hawaiian Pro at Haleiwa Ali'i Beach Park; the Roxy Pro at Sunset Beach; and the Billabong Pro Maui at Honolua Bay, Maui.",
+        "Rodríguez v. Popular Democratic Party\nRodríguez v. Popular Democratic Party, 457 U.S. 1 (1982) , was a case in which the Supreme Court of the United States heard on appeal from the Supreme Court of Puerto Rico whether Puerto Rico may by statute vest in a political party the power to fill an interim vacancy in the Puerto Rico Legislature. The Supreme Court of Puerto Rico held that such a procedure did not violate the United States Constitution, and the US Supreme Court upheld the decision of the Supreme Court of Puerto Rico. The case was of some interest to close followers of the Court as it featured the one and only return of former associate justice, Abe Fortas, now in private practice, at oral argument on behalf of the appellee."
+      ],
+      "pool_titles": [
+        "Rostker v. Goldberg",
+        "Conscription in the United States",
+        "Duren v. Missouri",
+        "Triple Crown of Surfing",
+        "Rodríguez v. Popular Democratic Party"
+      ],
+      "pool_doc_scores": [
+        0.02576307210312025,
+        0.004158934225620708,
+        0.002967206777554832,
+        0.002141477442653132,
+        0.002128579688824851
+      ],
+      "pool_doc_ids": [
+        8998,
+        9003,
+        4745,
+        8610,
+        4747
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 916,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "final_titles": [
+          "Rostker v. Goldberg",
+          "Conscription in the United States",
+          "Duren v. Missouri",
+          "Triple Crown of Surfing",
+          "Rodríguez v. Popular Democratic Party"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 30,
+      "question": "In what year did Australian-born comedian Peter Helliar write I Love you Too?",
+      "gold_answers": [
+        "2010"
+      ],
+      "gold_docs": [
+        "Peter Helliar\nPeter Helliar (born 16 June 1975) is an Australian-born comedian, actor, radio & television presenter, writer, producer and director. From January 2014, he is one of two regular hosts of \"The Project\" on Network Ten with Carrie Bickmore, replacing previous presenter Dave Hughes. Previously he was best known for his work on television as Rove McManus' sidekick on \"The Loft Live\" from 1997 to 1998 and on \"Rove\" from 1999 and 2009. He also appeared in \"Before the Game\" as alter ego Bryan Strauchan. Helliar initially worked the Melbourne comedy circuit in the mid nineties, performing in various venues and the annual Melbourne International Comedy Festival. He has performed in numerous television ads, most notably for Fernwood Fitness.",
+        "I Love You Too (2010 film)\nI Love You Too is a 2010 Australian romantic comedy film, and the directorial film debut of Daina Reid. The screenplay was written by first-time writer Peter Helliar. It stars Brendan Cowell, Peter Dinklage, Yvonne Strahovski, Peter Helliar and Megan Gale, and was produced by Princess Pictures on a budget of . Principal photography began on 4 May 2009 and took place in Melbourne."
+      ],
+      "gold_titles": [
+        "Peter Helliar",
+        "I Love You Too (2010 film)"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "I Love You Too (2010 film)\nI Love You Too is a 2010 Australian romantic comedy film, and the directorial film debut of Daina Reid. The screenplay was written by first-time writer Peter Helliar. It stars Brendan Cowell, Peter Dinklage, Yvonne Strahovski, Peter Helliar and Megan Gale, and was produced by Princess Pictures on a budget of . Principal photography began on 4 May 2009 and took place in Melbourne.",
+        "I, Too (Langston Hughes poem)\nI, Too is a poem written by Langston Hughes that demonstrates a yearning for equality through perseverance while disproving the idea that patriotism is limited by race. It was first published in 1926, and published in \"The First Collection of Poems of Langston Hughes.\" This poem, along with other works by Hughes, helped define the Harlem Renaissance, a period in the early 1920s and 30s of newfound cultural identity for blacks in America who had discovered the power of literature, art, music, and poetry as a means of personal and collective expression in the scope of civil rights.",
+        "Yasir Hussain\nYasir Hussain is a Pakistani actor and writer from Islamabad best known for his comic roles.",
+        "Peter Helliar\nPeter Helliar (born 16 June 1975) is an Australian-born comedian, actor, radio & television presenter, writer, producer and director. From January 2014, he is one of two regular hosts of \"The Project\" on Network Ten with Carrie Bickmore, replacing previous presenter Dave Hughes. Previously he was best known for his work on television as Rove McManus' sidekick on \"The Loft Live\" from 1997 to 1998 and on \"Rove\" from 1999 and 2009. He also appeared in \"Before the Game\" as alter ego Bryan Strauchan. Helliar initially worked the Melbourne comedy circuit in the mid nineties, performing in various venues and the annual Melbourne International Comedy Festival. He has performed in numerous television ads, most notably for Fernwood Fitness.",
+        "Love Actually\nLove Actually is a 2003 Christmas-themed romantic comedy film written and directed by Richard Curtis. It features an ensemble cast, many of whom had worked with Curtis in previous film and television projects. The screenplay delves into different aspects of love as shown through ten separate stories involving a wide variety of individuals, many of whom are shown to be interlinked as their tales progress. Most of the film was filmed on location in London. The story begins five weeks before Christmas and is played out in a weekly countdown until the holiday, followed by an epilogue that takes place one month later."
+      ],
+      "pool_titles": [
+        "I Love You Too (2010 film)",
+        "I, Too (Langston Hughes poem)",
+        "Yasir Hussain",
+        "Peter Helliar",
+        "Love Actually"
+      ],
+      "pool_doc_scores": [
+        0.013416170547217386,
+        0.0025286221472280604,
+        4.670209518922136e-10,
+        0.005249727815443517,
+        0.004288583515933084
+      ],
+      "pool_doc_ids": [
+        9029,
+        9534,
+        7431,
+        9032,
+        3120
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 919,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          0
+        ],
+        "final_order_positions": [
+          0,
+          11,
+          78,
+          1,
+          2
+        ],
+        "final_titles": [
+          "I Love You Too (2010 film)",
+          "I, Too (Langston Hughes poem)",
+          "Yasir Hussain",
+          "Peter Helliar",
+          "Love Actually"
+        ],
+        "accepted_repair_positions": [
+          11,
+          78
+        ],
+        "accepted_repair_titles": [
+          "I, Too (Langston Hughes poem)",
+          "Yasir Hussain"
+        ],
+        "accepted_repair_gains": [
+          0.81721,
+          0.18279
+        ],
+        "accepted_repair_branch_status": [
+          "support",
+          "unknown"
+        ],
+        "rank_fill_positions": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    },
+    {
+      "query_idx": 31,
+      "question": "Following The Simple Things a featurette directed by Burny Mattinson was produced, called what?",
+      "gold_answers": [
+        "Mickey's Christmas Carol"
+      ],
+      "gold_docs": [
+        "Mickey's Christmas Carol\nMickey's Christmas Carol is a 1983 American animated featurette produced by Walt Disney Productions and released by Buena Vista Distribution. It was directed and produced by Burny Mattinson. The cartoon is an adaptation of Charles Dickens' \"A Christmas Carol\", starring Scrooge McDuck as Ebenezer Scrooge. Many other Disney characters, primarily from the Mickey Mouse universe, \"Robin Hood\", and \"The Adventures of Ichabod and Mr. Toad\", were cast throughout the film.",
+        "The Simple Things\nThe Simple Things is a 1953 animated short subject, part of the \"Mickey Mouse\" series, produced by Walt Disney Productions. Released by RKO Radio Pictures on April 18, 1953, the short is notable as the final regular entry in the \"Mickey Mouse\" theatrical cartoon series. Following this short, one-shot Mickey shorts were produced: the featurettes \"Mickey's Christmas Carol\" (1983) and \"The Prince and the Pauper\" (1990), and the shorts \"Runaway Brain\" (1995), and \"Get a Horse!\" (2013)."
+      ],
+      "gold_titles": [
+        "Mickey's Christmas Carol",
+        "The Simple Things"
+      ],
+      "pool_k": 100,
+      "pool_docs": [
+        "The Simple Things\nThe Simple Things is a 1953 animated short subject, part of the \"Mickey Mouse\" series, produced by Walt Disney Productions. Released by RKO Radio Pictures on April 18, 1953, the short is notable as the final regular entry in the \"Mickey Mouse\" theatrical cartoon series. Following this short, one-shot Mickey shorts were produced: the featurettes \"Mickey's Christmas Carol\" (1983) and \"The Prince and the Pauper\" (1990), and the shorts \"Runaway Brain\" (1995), and \"Get a Horse!\" (2013).",
+        "Mickey's Christmas Carol\nMickey's Christmas Carol is a 1983 American animated featurette produced by Walt Disney Productions and released by Buena Vista Distribution. It was directed and produced by Burny Mattinson. The cartoon is an adaptation of Charles Dickens' \"A Christmas Carol\", starring Scrooge McDuck as Ebenezer Scrooge. Many other Disney characters, primarily from the Mickey Mouse universe, \"Robin Hood\", and \"The Adventures of Ichabod and Mr. Toad\", were cast throughout the film.",
+        "The Great Mouse Detective\nThe Great Mouse Detective is a 1986 American animated mystery comedy film produced by Walt Disney Feature Animation and released by Walt Disney Pictures. The 26th Disney animated feature film, the film was directed by Burny Mattinson, David Michener, and the team of John Musker and Ron Clements, who later directed Disney's hit films \"The Little Mermaid\" and \"Aladdin\". The film was also known as The Adventures of the Great Mouse Detective for its 1992 theatrical re-release and Basil the Great Mouse Detective in some countries. The main characters are all mice and rats living in Victorian London.",
+        "Once Upon a Mouse\nOnce Upon a Mouse is a 1981 American theatrical featurette directed by Jerry Kramer and Gary Rocklen, produced in association with Walt Disney Productions by Kramer/Rocklen Studios. It was released on July 10, 1981 on a double bill with \"The Fox and the Hound.",
+        "Mickey's Twice Upon a Christmas\nMickey's Twice Upon a Christmas is a 2004 computer-animated direct-to-video fantasy comedy anthology film produced by Disney Toon Studios and the sequel to 1999's \"Mickey's Once Upon a Christmas\". The segments in this video feature Mickey Mouse, Minnie Mouse, Pluto, Goofy, Max, Donald Duck, Daisy Duck, Huey, Dewey and Louie, and Scrooge McDuck in five different segments. Along with the Mickey's PhilharMagic theme park attraction, this production was one of the first to depict the Mickey Mouse series characters with 3D computer animation. It is the final direct-to-video film to feature both Wayne Allwine and Alan Young, who both died in different years."
+      ],
+      "pool_titles": [
+        "The Simple Things",
+        "Mickey's Christmas Carol",
+        "The Great Mouse Detective",
+        "Once Upon a Mouse",
+        "Mickey's Twice Upon a Christmas"
+      ],
+      "pool_doc_scores": [
+        0.008816586139391167,
+        0.013321693775243452,
+        0.01308565993133201,
+        0.004256604864114156,
+        0.0033488989686225466
+      ],
+      "pool_doc_ids": [
+        9591,
+        9593,
+        3942,
+        9589,
+        3313
+      ],
+      "repair_gated_trace": {
+        "source_query_idx": 977,
+        "variant": "rq1_mr3_g010_branchstrict",
+        "rank_quota": 1,
+        "max_repairs": 3,
+        "min_gain": 0.1,
+        "branch_policy": "strict",
+        "seed_positions": [
+          2
+        ],
+        "final_order_positions": [
+          2,
+          0,
+          1,
+          3,
+          4
+        ],
+        "final_titles": [
+          "The Simple Things",
+          "Mickey's Christmas Carol",
+          "The Great Mouse Detective",
+          "Once Upon a Mouse",
+          "Mickey's Twice Upon a Christmas"
+        ],
+        "accepted_repair_positions": [],
+        "accepted_repair_titles": [],
+        "accepted_repair_gains": [],
+        "accepted_repair_branch_status": [],
+        "rank_fill_positions": [
+          2,
+          0,
+          1,
+          3,
+          4
+        ],
+        "offline_support": {
+          "final_support_recall": 1.0,
+          "final_support_complete": 1,
+          "rank_support_recall": 1.0,
+          "rank_support_complete": 1,
+          "dbec_support_recall": 1.0,
+          "dbec_support_complete": 1,
+          "net_gold_delta_vs_rank": 0,
+          "harmful_replacement": 0
+        }
+      }
+    }
+  ],
+  "repair_gated_arbitration": {
+    "variant": "rq1_mr3_g010_branchstrict",
+    "top_k": 5,
+    "records": 32,
+    "avg_accepted_repair_count": 0.84375,
+    "avg_rank_fill_count": 3.15625,
+    "avg_offline_delta_support_complete_vs_rank": 0.0625
+  }
+}

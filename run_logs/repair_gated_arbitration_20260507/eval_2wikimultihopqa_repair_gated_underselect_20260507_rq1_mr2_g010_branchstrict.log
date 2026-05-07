@@ -1,0 +1,311 @@
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_nvembed_2wikimultihopqa_repair_gated_underselect_20260507/qwen3-8b_VLLM_nvidia_NV-Embed-v2/graph.pickle with 56422 nodes, 876137 edges
+INFO:src.hipporag.embedding_store:Loaded 6119 records from outputs_step0_general_nvembed_2wikimultihopqa_repair_gated_underselect_20260507/qwen3-8b_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 50303 records from outputs_step0_general_nvembed_2wikimultihopqa_repair_gated_underselect_20260507/qwen3-8b_VLLM_nvidia_NV-Embed-v2/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 67159 records from outputs_step0_general_nvembed_2wikimultihopqa_repair_gated_underselect_20260507/qwen3-8b_VLLM_nvidia_NV-Embed-v2/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 6119 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_nvembed_2wikimultihopqa_repair_gated_underselect_20260507/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 50303 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 67159 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]2243it [00:00, 22411.37it/s]4485it [00:00, 9086.67it/s] 6119it [00:00, 11343.32it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]6119it [00:00, 3037271.74it/s]
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+Collecting QA prompts:   0%|          | 0/122 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 122/122 [00:00<00:00, 21618.30it/s]
+QA Reading:   0%|          | 0/122 [00:00<?, ?it/s]QA Reading: 100%|██████████| 122/122 [00:00<00:00, 2254.56it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 122it [00:00, 9501.71it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.9344, 'F1': 0.9344}
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+WARNING:src.hipporag.evaluation.retrieval_eval:Length of retrieved docs (5) is smaller than largest topk for recall score (200)
+{
+  "output_json": "/mnt/nvme/code/HippoRAG/reports/repair_gated_arbitration_reader_20260507/2wikimultihopqa_repair_gated_underselect_20260507_rq1_mr2_g010_branchstrict.eval.json",
+  "overall_recomputed": {
+    "Recall@1": 0.248,
+    "Recall@2": 0.4939,
+    "Recall@5": 0.9324,
+    "Recall@10": 0.9324,
+    "Recall@20": 0.9324,
+    "Recall@30": 0.9324,
+    "Recall@50": 0.9324,
+    "Recall@100": 0.9324,
+    "Recall@150": 0.9324,
+    "Recall@200": 0.9324,
+    "ExactMatch": 0.9344262295081968,
+    "F1": 0.9344262295081968,
+    "num_queries": 122
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "external_pool": {
+    "enabled": true,
+    "path": "run_logs/repair_gated_arbitration_20260507/2wikimultihopqa_repair_gated_underselect_20260507_rq1_mr2_g010_branchstrict.pool.json",
+    "source": "repair_gated_rq1_mr2_g010_branchstrict",
+    "dataset": "2wikimultihopqa_repair_gated_underselect_20260507",
+    "records_loaded": 122,
+    "records_available": 122,
+    "pool_k_payload": 5,
+    "min_pool_size": 5,
+    "max_pool_size": 5,
+    "mean_pool_size": 5.0,
+    "total_pool_docs": 610,
+    "exact_doc_text_match_count": 610,
+    "title_fallback_match_count": 0,
+    "unmatched_doc_count": 0,
+    "question_mismatch_count": 0,
+    "query_idx_mismatch_count": 0,
+    "payload_retrieval": {}
+  }
+}
