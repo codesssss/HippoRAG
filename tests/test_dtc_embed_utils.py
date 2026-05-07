@@ -1061,6 +1061,114 @@ def test_select_daec_noisyor_llm_binding_traces_entity_matches():
     assert trace["llm_binding_extractions"][0]["matched_entities"][0]["title"] == "Alice Smith"
 
 
+def test_select_daec_noisyor_selective_titleuniq_abstains_on_duplicate_titles():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?", role="bridge"),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Where was that director born?",
+            depends_on=("s1",),
+            role="answer",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice Smith.",
+        "Alice Smith\nAlice Smith was born in Paris.",
+        "Alice Smith\nA duplicate-title distractor.",
+        "Filler\nNo useful evidence.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.0, 1.0],
+        [0.0, 1.0],
+        [0.2, 0.1],
+    ])
+
+    _, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2, 3],
+        pool_doc_titles=["Film X", "Alice Smith", "Alice Smith", "Filler"],
+        doc_idx_to_entities={
+            0: {"film x", "alice smith"},
+            1: {"alice smith", "paris"},
+            2: {"alice smith"},
+            3: set(),
+        },
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["Alice Smith"],
+        binding_mode="llm",
+        selective_binding_title_unique_threshold=0.88,
+    )
+
+    assert trace["selective_binding_enabled"] is True
+    assert trace["selective_binding_decision"] == "abstain"
+    assert trace["effective_binding_mode"] == "nobind"
+    assert trace["selective_binding"]["candidate_count"] == 1
+    assert trace["selective_binding"]["title_unique_rate"] == 0.0
+    assert trace["binding_candidates_by_requirement"] == {}
+    assert trace["selected_binding"]["assignments"] == {}
+
+
+def test_select_daec_noisyor_selective_titleuniq_keeps_unique_binding():
+    requirements = [
+        DTCRequirement(unit_id="s1", subquery="Who directed Film X?", role="bridge"),
+        DTCRequirement(
+            unit_id="s2",
+            subquery="Where was that director born?",
+            depends_on=("s1",),
+            role="answer",
+        ),
+    ]
+    requirement_embeddings = {
+        "s1": np.asarray([1.0, 0.0]),
+        "s2": np.asarray([0.0, 1.0]),
+    }
+    pool_docs = [
+        "Film X\nFilm X was directed by Alice Smith.",
+        "Filler\nNo useful evidence.",
+        "Alice Smith\nAlice Smith was born in Paris.",
+    ]
+    passage_embeddings = np.asarray([
+        [1.0, 0.0],
+        [0.2, 0.1],
+        [0.0, 1.0],
+    ])
+
+    selected, trace = select_daec_noisyor_positions(
+        query="Where was the director of Film X born?",
+        requirements=requirements,
+        requirement_embeddings=requirement_embeddings,
+        pool_docs=pool_docs,
+        pool_doc_ids=[0, 1, 2],
+        pool_doc_titles=["Film X", "Filler", "Alice Smith"],
+        doc_idx_to_entities={0: {"film x", "alice smith"}, 1: set(), 2: {"alice smith", "paris"}},
+        passage_embeddings=passage_embeddings,
+        qa_top_k=2,
+        binding_top_m=1,
+        embed_texts_fn=lambda texts: {text: np.asarray([0.0, 1.0]) for text in texts},
+        llm_extract_fn=lambda subquery, doc_text: ["Alice Smith"],
+        binding_mode="llm",
+        selective_binding_title_unique_threshold=0.88,
+    )
+
+    assert selected == [0, 2]
+    assert trace["selective_binding_enabled"] is True
+    assert trace["selective_binding_decision"] == "bind"
+    assert trace["effective_binding_mode"] == "llm"
+    assert trace["selective_binding"]["title_unique_rate"] == 1.0
+    assert trace["selected_binding"]["assignments"] == {"s2": "Alice Smith"}
+
+
 def test_select_daec_noisyor_llm_binding_type_filter_rejects_incompatible_title():
     requirements = [
         DTCRequirement(unit_id="s1", subquery="Who directed Film X?", expected_answer_type="person"),

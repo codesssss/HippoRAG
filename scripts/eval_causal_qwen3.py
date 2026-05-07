@@ -5344,6 +5344,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                            daec_binding_grounding_enabled: bool = False,
                            daec_swap_refinement: bool = False,
                            daec_swap_min_gain: float = 0.001,
+                           daec_selective_title_unique_threshold: float = 0.88,
                            llm_binding_url: str = "http://localhost:8043/v1",
                            llm_binding_model: str = "qwen3-8b-train",
                            llm_binding_cache_path: str = "",
@@ -5357,7 +5358,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         selector_name == "bridge_append"
         and normalized_assemble_mode == "daec_noisyor_llm"
     )
-    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
+    if selector_name not in {"bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_selective_titleuniq", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
         raise ValueError(f"Unsupported setwise selector: {selector_name}")
 
     selected_solutions: List[QuerySolution] = []
@@ -5467,7 +5468,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
     _llm_binding_cache: Dict[str, List[str]] = {}
     _llm_binding_cache_file: Path | None = None
     _llm_binding_cache_dirty = False
-    if selector_name in {"daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto"} or bridge_append_daec_assemble:
+    if selector_name in {"daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_selective_titleuniq"} or bridge_append_daec_assemble:
         import re as _re
         import time as _time
         import requests as _requests
@@ -5556,6 +5557,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         "daec_noisyor_llm": "llm",
         "daec_noisyor_safe_llm": "llm",
         "daec_noisyor_llm_agsto": "llm",
+        "daec_noisyor_selective_titleuniq": "llm",
         "daec_noisyor_nobind": "nobind",
         "daec_noisyor_randbind": "random",
         "daec_noisyor_oracle": "oracle",
@@ -6083,7 +6085,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
             selector_trace["assemble_trace"] = assemble_trace
             selector_trace["assemble_mode"] = normalized_assemble_mode
             selector_trace["selected_positions_before_assemble"] = list(selected_positions_before_assemble)
-        elif selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
+        elif selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_selective_titleuniq", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"}:
             normalized_dtc_decomposition_mode = str(dtc_decomposition_mode or "llm").strip().lower()
             if normalized_dtc_decomposition_mode == "query":
                 requirements = build_fallback_dtc_requirements(qs.question)
@@ -6176,6 +6178,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     safe_retriever_rank_penalty=float(daec_safe_retriever_rank_penalty),
                     llm_extract_fn=llm_extract_fn,
                     binding_mode=_daec_binding_mode,
+                    selective_binding_title_unique_threshold=(
+                        float(daec_selective_title_unique_threshold)
+                        if selector_name == "daec_noisyor_selective_titleuniq"
+                        else None
+                    ),
                     llm_binding_title_match_mode=str(llm_binding_title_match_mode),
                     llm_binding_type_filter=bool(daec_llm_binding_type_filter),
                     soft_compat_body_weight=float(daec_soft_compat_body_weight),
@@ -6188,7 +6195,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     graph_prior_w_selected=float(daec_graph_prior_w_selected),
                     graph_prior_w_anchor=float(daec_graph_prior_w_anchor),
                     graph_prior_w_rank=float(daec_graph_prior_w_rank),
-                    selector_label_override=selector_name if selector_name == "daec_noisyor_llm_agsto" else None,
+                    selector_label_override=selector_name if selector_name in {"daec_noisyor_llm_agsto", "daec_noisyor_selective_titleuniq"} else None,
                 )
                 _q_binding_cost = {
                     "attempts": _llm_binding_stats["attempts"] - _q_stats_before["attempts"],
@@ -6225,6 +6232,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 selector_trace["daec_soft_compat_body_weight"] = float(daec_soft_compat_body_weight)
                 selector_trace["daec_binding_grounding_enabled"] = bool(daec_binding_grounding_enabled)
                 selector_trace["daec_swap_refinement"] = bool(daec_swap_refinement)
+                selector_trace["daec_selective_title_unique_threshold"] = (
+                    float(daec_selective_title_unique_threshold)
+                    if selector_name == "daec_noisyor_selective_titleuniq"
+                    else None
+                )
             dtc_parse_success_count += int(bool(decomposition_trace.get("parse_succeeded", False)))
             dtc_fallback_count += int(bool(decomposition_trace.get("fallback_used", False)))
             dtc_requirement_counts.append(int(selector_trace.get("requirement_count", 0) or 0))
@@ -7020,7 +7032,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
         except Exception as exc:
             logger.warning("Failed to write LLM binding cache %s: %s", _llm_binding_cache_file, exc)
 
-    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"} or bridge_append_daec_assemble:
+    if selector_name in {"dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_selective_titleuniq", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"} or bridge_append_daec_assemble:
         summary.update({
             "dtc_max_steps": int(dtc_max_steps),
             "dtc_match_threshold": round(float(dtc_match_threshold), 4),
@@ -7097,7 +7109,7 @@ def apply_setwise_selector(hipporag: HippoRAG,
                     4,
                 ),
             })
-        if selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle"} or bridge_append_daec_assemble:
+        if selector_name in {"daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_selective_titleuniq", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle"} or bridge_append_daec_assemble:
             summary.update({
                 "daec_main_objective": "frozen_binding_noisy_or",
                 "daec_binding_top_m": int(dtc_binding_max_candidates),
@@ -7122,6 +7134,11 @@ def apply_setwise_selector(hipporag: HippoRAG,
                 "daec_binding_grounding_enabled": bool(daec_binding_grounding_enabled),
                 "daec_swap_refinement": bool(daec_swap_refinement),
                 "daec_swap_min_gain": round(float(daec_swap_min_gain), 6),
+                "daec_selective_title_unique_threshold": (
+                    round(float(daec_selective_title_unique_threshold), 6)
+                    if selector_name == "daec_noisyor_selective_titleuniq"
+                    else None
+                ),
             })
             if _llm_binding_query_stats:
                 import statistics as _stats_mod
@@ -7723,7 +7740,7 @@ def main():
                         help="Number of top docs to rerank with cross-encoder.")
     parser.add_argument("--ce_device", type=str, default="cuda:1",
                         help="Device for cross-encoder model.")
-    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"], default="none",
+    parser.add_argument("--setwise_selector", choices=["none", "bridge_greedy", "bridge_beam", "bridge_append", "learned_greedy", "requirement_beam", "dtc_embed", "daec_noisyor", "daec_noisyor_safe", "daec_noisyor_llm", "daec_noisyor_safe_llm", "daec_noisyor_llm_agsto", "daec_noisyor_selective_titleuniq", "daec_noisyor_nobind", "daec_noisyor_randbind", "daec_noisyor_oracle", "minimal_demand_repair", "minimal_demand_repair_nli"], default="none",
                         help="Apply a non-oracle setwise selector over a larger pool before reader top-k truncation.")
     parser.add_argument("--expand_base_k", type=int, default=10,
                         help="For --setwise_selector bridge_append, preserve baseline top-B before appending deep-pool bridge candidates.")
@@ -7909,6 +7926,8 @@ def main():
                         help="After greedy DAEC selection, run one pass of fixed-binding 1-swap local refinement.")
     parser.add_argument("--daec_swap_min_gain", type=float, default=0.001,
                         help="Minimum DAEC objective gain required for optional 1-swap refinement.")
+    parser.add_argument("--daec_selective_title_unique_threshold", type=float, default=0.88,
+                        help="For --setwise_selector daec_noisyor_selective_titleuniq, query-level binding confidence threshold. Frozen at 0.88 for Phase-1 fresh runs.")
     parser.add_argument("--llm_binding_url", type=str, default="http://localhost:8043/v1",
                         help="VLLM endpoint URL for LLM-extraction binding (daec_noisyor_llm).")
     parser.add_argument("--llm_binding_model", type=str, default="qwen3-8b-train",
@@ -8533,6 +8552,7 @@ def main():
             daec_binding_grounding_enabled=bool(args.daec_binding_grounding_enabled),
             daec_swap_refinement=bool(args.daec_swap_refinement),
             daec_swap_min_gain=float(args.daec_swap_min_gain),
+            daec_selective_title_unique_threshold=float(args.daec_selective_title_unique_threshold),
             llm_binding_url=str(args.llm_binding_url),
             llm_binding_model=str(args.llm_binding_model),
             llm_binding_cache_path=str(args.llm_binding_cache_path),
@@ -9044,6 +9064,7 @@ def main():
             "daec_binding_grounding_enabled": bool(args.daec_binding_grounding_enabled),
             "daec_swap_refinement": bool(args.daec_swap_refinement),
             "daec_swap_min_gain": float(args.daec_swap_min_gain),
+            "daec_selective_title_unique_threshold": float(args.daec_selective_title_unique_threshold),
             "setwise_late_rerank_enabled": bool(args.setwise_late_rerank_enabled),
             "setwise_late_rerank_candidate_count": int(args.setwise_late_rerank_candidate_count),
             "setwise_late_rerank_include_baseline": bool(args.setwise_late_rerank_include_baseline),

@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 
 SCRIPT_DIR = Path(__file__).resolve().parents[1] / "scripts"
@@ -7,9 +8,9 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from analyze_pool_support_depth import analyze_record, coverage_by_query
-from apply_setr_selection_to_pool import apply_selection_to_record, reorder_positions
+from apply_setr_selection_to_pool import apply_selection_to_record, rank_order_fill_to_k_positions, reorder_positions
 from export_setr_inputs import build_setr_record
-from run_setr_style_selector import parse_setr_selection
+from run_setr_style_selector import call_selector, parse_setr_selection
 from run_setr_windowed_selector import run_windowed_record, stage1_windows
 
 
@@ -19,8 +20,67 @@ def test_parse_setr_selection_prefers_final_selection_and_filters_invalid_ids():
     assert parse_setr_selection(text, max_position=4) == [2, 0, 1]
 
 
+def test_call_selector_records_usage_latency_and_prompt_size():
+    class FakeCompletions:
+        def create(self, **kwargs):
+            assert kwargs["model"] == "fake-model"
+            assert kwargs["temperature"] == 0.0
+            return SimpleNamespace(
+                choices=[
+                    SimpleNamespace(
+                        message=SimpleNamespace(content="### Final Selection: [2] [1]"),
+                        finish_reason="stop",
+                    )
+                ],
+                usage=SimpleNamespace(prompt_tokens=123, completion_tokens=7, total_tokens=130),
+            )
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=FakeCompletions()))
+    record = {
+        "query_idx": 4,
+        "question": "Where was Alice born?",
+        "pool_k": 2,
+        "contexts": [
+            {"position": 1, "title": "Alice", "text": "Alice was born in Paris."},
+            {"position": 2, "title": "Paris", "text": "Paris is a city."},
+        ],
+    }
+
+    row = call_selector(
+        client,
+        record,
+        model="fake-model",
+        max_tokens=64,
+        temperature=0.0,
+        append_no_think=True,
+    )
+
+    assert row["selected_positions"] == [1, 0]
+    assert row["usage"] == {
+        "prompt_tokens": 123,
+        "completion_tokens": 7,
+        "total_tokens": 130,
+        "finish_reason": "stop",
+    }
+    assert row["latency_s"] >= 0.0
+    assert row["prompt_chars"] > 0
+    assert row["completion_chars"] == len("### Final Selection: [2] [1]")
+
+
 def test_reorder_positions_frontloads_selection_then_rank_order_fallback():
     assert reorder_positions([2, 0, 2], pool_size=5) == [2, 0, 1, 3, 4]
+
+
+def test_rank_order_fill_to_k_positions_truncates_and_fills_to_budget():
+    order, fallback_count = rank_order_fill_to_k_positions([2, 0, 2], pool_size=5, fill_to_k=4)
+
+    assert order == [2, 0, 1, 3]
+    assert fallback_count == 2
+
+    order, fallback_count = rank_order_fill_to_k_positions([4, 3, 2, 1, 0], pool_size=5, fill_to_k=3)
+
+    assert order == [4, 3, 2]
+    assert fallback_count == 0
 
 
 def test_apply_selection_to_record_reorders_all_pool_fields_consistently():
@@ -38,6 +98,78 @@ def test_apply_selection_to_record_reorders_all_pool_fields_consistently():
     assert selected["pool_doc_scores"] == [0.7, 0.9, 0.8]
     assert selected["pool_doc_ids"] == ["d2", "d0", "d1"]
     assert trace["selected_1based"] == [3, 1]
+    assert trace["fallback_mode"] == "rank_order_fill"
+
+
+def test_apply_selection_to_record_rank_order_fill_to_k_truncates_pool():
+    record = {
+        "query_idx": 7,
+        "pool_docs": ["doc0", "doc1", "doc2", "doc3", "doc4"],
+        "pool_titles": ["t0", "t1", "t2", "t3", "t4"],
+        "pool_doc_scores": [0.9, 0.8, 0.7, 0.6, 0.5],
+        "pool_doc_ids": ["d0", "d1", "d2", "d3", "d4"],
+    }
+    selected, trace = apply_selection_to_record(
+        record,
+        {"selected_positions": [2, 0, 2]},
+        fallback_mode="rank_order_fill_to_k",
+        fill_to_k=4,
+    )
+
+    assert selected["pool_docs"] == ["doc2", "doc0", "doc1", "doc3"]
+    assert selected["pool_titles"] == ["t2", "t0", "t1", "t3"]
+    assert selected["pool_doc_scores"] == [0.7, 0.9, 0.8, 0.6]
+    assert selected["pool_doc_ids"] == ["d2", "d0", "d1", "d3"]
+    assert trace["fallback_mode"] == "rank_order_fill_to_k"
+    assert trace["fill_to_k"] == 4
+    assert trace["fallback_count"] == 2
+    assert trace["reader_pool_size"] == 4
+
+
+def test_apply_selection_to_record_selected_only_does_not_rank_fill():
+    record = {
+        "query_idx": 7,
+        "pool_docs": ["doc0", "doc1", "doc2"],
+        "pool_titles": ["t0", "t1", "t2"],
+        "pool_doc_scores": [0.9, 0.8, 0.7],
+        "pool_doc_ids": ["d0", "d1", "d2"],
+    }
+    selected, trace = apply_selection_to_record(
+        record,
+        {"selected_positions": [2, 0]},
+        fallback_mode="selected_only",
+    )
+
+    assert selected["pool_docs"] == ["doc2", "doc0"]
+    assert selected["pool_titles"] == ["t2", "t0"]
+    assert selected["pool_doc_scores"] == [0.7, 0.9]
+    assert selected["pool_doc_ids"] == ["d2", "d0"]
+    assert trace["fallback_mode"] == "selected_only"
+    assert trace["fallback_count"] == 0
+    assert trace["reader_pool_size"] == 2
+
+
+def test_apply_selection_to_record_selected_only_empty_fallback_top1():
+    record = {
+        "query_idx": 7,
+        "pool_docs": ["doc0", "doc1", "doc2"],
+        "pool_titles": ["t0", "t1", "t2"],
+        "pool_doc_scores": [0.9, 0.8, 0.7],
+        "pool_doc_ids": ["d0", "d1", "d2"],
+    }
+    selected, trace = apply_selection_to_record(
+        record,
+        {"selected_positions": []},
+        fallback_mode="selected_only",
+        empty_fallback_top_n=1,
+    )
+
+    assert selected["pool_docs"] == ["doc0"]
+    assert selected["pool_titles"] == ["t0"]
+    assert trace["parse_success"] is False
+    assert trace["empty_fallback_used"] is True
+    assert trace["fallback_count"] == 1
+    assert trace["reader_pool_size"] == 1
 
 
 def test_build_setr_record_truncates_contexts_and_preserves_positions():
@@ -120,3 +252,7 @@ def test_windowed_selector_maps_local_stage_outputs_to_global_positions():
     assert row["selected_positions"] == [0, 1, 5]
     assert row["selected_1based"] == [1, 2, 6]
     assert row["stage1_parse_success_rate"] == 1.0
+    assert row["selector_call_count"] == 4
+    assert row["usage"] == {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+    assert row["latency_s"] == 0.0
+    assert row["completion_chars"] > 0

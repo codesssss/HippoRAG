@@ -1,0 +1,50 @@
+[
+  {
+    "dataset": "2Wiki",
+    "query_count": 1000,
+    "bind_count": 698,
+    "abstain_count": 302,
+    "null_rate": 0.302,
+    "all_selective_titles_same_as_daec": 1000,
+    "all_selective_answers_same_as_daec": 1000,
+    "all_selective_metrics_same_as_daec": 1000,
+    "abstain_selective_titles_same_as_daec": 302,
+    "abstain_selective_titles_same_as_nobind": 302,
+    "abstain_daec_titles_same_as_nobind": 302,
+    "abstain_selective_answers_same_as_daec": 302,
+    "abstain_selective_answers_same_as_nobind": 302,
+    "abstain_daec_answers_same_as_nobind": 302
+  },
+  {
+    "dataset": "HotpotQA",
+    "query_count": 1000,
+    "bind_count": 657,
+    "abstain_count": 343,
+    "null_rate": 0.343,
+    "all_selective_titles_same_as_daec": 1000,
+    "all_selective_answers_same_as_daec": 1000,
+    "all_selective_metrics_same_as_daec": 1000,
+    "abstain_selective_titles_same_as_daec": 343,
+    "abstain_selective_titles_same_as_nobind": 343,
+    "abstain_daec_titles_same_as_nobind": 343,
+    "abstain_selective_answers_same_as_daec": 343,
+    "abstain_selective_answers_same_as_nobind": 343,
+    "abstain_daec_answers_same_as_nobind": 343
+  },
+  {
+    "dataset": "MuSiQue",
+    "query_count": 1000,
+    "bind_count": 371,
+    "abstain_count": 629,
+    "null_rate": 0.629,
+    "all_selective_titles_same_as_daec": 738,
+    "all_selective_answers_same_as_daec": 853,
+    "all_selective_metrics_same_as_daec": 932,
+    "abstain_selective_titles_same_as_daec": 367,
+    "abstain_selective_titles_same_as_nobind": 629,
+    "abstain_daec_titles_same_as_nobind": 367,
+    "abstain_selective_answers_same_as_daec": 482,
+    "abstain_selective_answers_same_as_nobind": 629,
+    "abstain_daec_answers_same_as_nobind": 482
+  }
+]

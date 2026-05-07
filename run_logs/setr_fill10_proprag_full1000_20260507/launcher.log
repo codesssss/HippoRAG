@@ -1,0 +1,13 @@
+[START] setr_fill10_proprag_full1000 variant=setr_k20_doc768 fill_to_k=10 start=2026-05-07T10:39:30+08:00
+[2026-05-07T10:39:30+08:00] START apply_2wikimultihopqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:30+08:00] START apply_hotpotqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:30+08:00] START apply_musique_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:31+08:00] DONE apply_2wikimultihopqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:31+08:00] START eval_2wikimultihopqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:31+08:00] DONE apply_hotpotqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:31+08:00] START eval_hotpotqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:31+08:00] DONE apply_musique_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:39:31+08:00] START eval_musique_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:47:46+08:00] DONE eval_hotpotqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:48:42+08:00] DONE eval_2wikimultihopqa_proprag_setr_k20_doc768_fill10
+[2026-05-07T10:51:12+08:00] DONE eval_musique_proprag_setr_k20_doc768_fill10

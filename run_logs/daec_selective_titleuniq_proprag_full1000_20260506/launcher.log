@@ -1,0 +1,4 @@
+[START] daec_selective_titleuniq_proprag_full1000 threshold=0.88 start=2026-05-06T20:24:10+08:00
+[JOB_START] pool=proprag match=wiki_title selector=daec_noisyor_selective_titleuniq dataset=2wikimultihopqa start=2026-05-06T20:24:10+08:00
+[JOB_START] pool=proprag match=wiki_title selector=daec_noisyor_selective_titleuniq dataset=hotpotqa start=2026-05-06T20:24:10+08:00
+[JOB_START] pool=proprag match=wiki_title selector=daec_noisyor_selective_titleuniq dataset=musique start=2026-05-06T20:24:10+08:00

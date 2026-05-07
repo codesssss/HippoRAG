@@ -85,9 +85,30 @@ Last updated: 2026-05-06
 - `Q-BindCert Phase-0 report`: `reports/qbindcert/phase0_sanity.md`
 - `Q-BindCert Phase-0 implementation`: `scripts/qbindcert_phase0_sanity.py`
 - `DAEC submission critical path`: `research_memory/emnlp_expand_then_compose/39_submission_critical_path_20260506.md`
+- `SetR-style full1000 positioning memo`: `research_memory/emnlp_expand_then_compose/40_setr_style_full1000_positioning_20260506.md`
+- `SetR-style full1000 launcher`: `run_logs/launch_setr_full1000_20260503.sh`
+- `SetR-style full1000 results`: `reports/setr_full1000_20260503/`
 - `IRCoT-style full1000 launcher`: `run_logs/launch_ircot_style_full1000_20260506.sh`
+- `IRCoT-style full1000 results`: `run_logs/ircot_style_full1000_20260506/`
 - `LLM-direct-select full1000 launcher`: `run_logs/launch_llm_direct_select_proprag_full1000_20260506.sh`
+- `LLM-direct-select full1000 results`: `run_logs/llm_direct_select_proprag_full1000_20260506/`
 - `Reviewer baseline full1000 queue`: `run_logs/launch_reviewer_baselines_full1000_20260506.sh`
+- `PropRAG nobinding full1000 refresh launcher`: `run_logs/launch_daec_nobinding_proprag_full1000_20260506.sh`
+- `PropRAG nobinding full1000 refresh results`: `run_logs/daec_nobinding_proprag_full1000_20260506/`
+- `PropRAG nobinding full1000 refresh tmux`: `daec_nobinding_proprag_full1000_20260506` (started 2026-05-06T18:59:11+08:00; ports 8041/8042/8043)
+- `DAEC-selective title-uniqueness Phase 1 report`: `reports/daec_selective_binding_phase1_20260506/phase1_report.md`
+- `DAEC-selective title-uniqueness paired CI`: `reports/daec_selective_binding_phase1_20260506/phase1_paired_bootstrap_ci.csv`
+- `DAEC-selective title-uniqueness sanity audit`: `reports/daec_selective_binding_phase1_20260506/phase1_sanity_audit.md`
+- `DAEC-selective title-uniqueness launcher`: `run_logs/launch_daec_selective_titleuniq_proprag_full1000_20260506.sh`
+- `DAEC-selective title-uniqueness results`: `run_logs/daec_selective_titleuniq_proprag_full1000_20260506/`
+- `Reviewer-baseline cost/calls report`: `reports/reviewer_baseline_costs_20260506/cost_table.md`
+- `Reviewer-baseline cost/calls script`: `scripts/analyze_reviewer_baseline_costs.py`
+- `Reviewer-baseline paired CI report`: `reports/reviewer_baseline_ci_20260506/paired_ci.md`
+- `Reviewer-baseline paired CI script`: `scripts/analyze_reviewer_baseline_paired_ci.py`
+- `Reviewer-baseline gold-doc-count hard-slice report`: `reports/reviewer_baseline_ci_20260506/hard_slice_gold_doc_count.md`
+- `Reviewer-baseline gold-doc-count hard-slice script`: `scripts/analyze_reviewer_baseline_hard_slices.py`
+- `DAEC-selective dense/hipporag full1000 launcher`: `run_logs/launch_daec_selective_titleuniq_dense_hipporag_full1000_20260506.sh`
+- `DAEC-selective dense/hipporag full1000 active run`: `run_logs/daec_selective_titleuniq_dense_hipporag_full1000_20260506/`
 
 ## Done
 
@@ -433,6 +454,7 @@ Method implementation order should be:
 - Full1000 DtC is positive but still leaves most oracle headroom unused
 - `MuSiQue` has large oracle headroom but low DAEC/DtC gap recovery, so selector/scoring remains the main weakness there
 - Targeted cross-pool `nobinding` supports dependency binding as a main component, but rank prior and repair typing are not yet supported as necessary components
+- Reviewer full1000 baselines are complete: IRCoT-style and LLM-direct-title/snippet128 all trail DAEC-LLM+CTL on PropRAG full1000. SetR-style remains the stronger LLM set-selection baseline.
 - Hard-crossing cuts wins more than losses, so hard per-candidate gates remain rejected
 - The strongest/GBC backup line is coherent, but it still lacks a positive shallow-dataset end-to-end result
 - QBF terminal-schema backward flow fails as a retrieval operator on 2Wiki and MuSiQue pilot100; the issue appears operator-level rather than hyperparameter-level
@@ -464,8 +486,16 @@ Method implementation order should be:
   - conditional top1/top3 improve to `0.595238` / `0.827381`, but this is not clean answer-level separability
   - compositional/inference types remain weak, so the result supports a diagnostic section rather than another method iteration
 - Current DAEC submission blockers are tracked in `research_memory/emnlp_expand_then_compose/39_submission_critical_path_20260506.md`.
-- IRCoT-style (local) full1000 and LLM-direct-select full1000 are the active reviewer baselines for the DAEC paper; do not describe them as official IRCoT reproduction.
-- Current-version PropRAG full1000 `nobinding` refresh is required before paper freeze, but must wait until the active reviewer baseline queue finishes.
+- IRCoT-style (local) full1000 and LLM-direct-select full1000 are complete reviewer baselines for the DAEC paper; do not describe them as official IRCoT reproduction.
+- Current-version PropRAG full1000 `nobinding` refresh is complete:
+  - 2Wiki: DAEC `0.7118` F1 / `0.9410` R@5 vs nobinding `0.6120` F1 / `0.8610` R@5.
+  - HotpotQA: DAEC `0.7473` F1 / `0.9605` R@5 vs nobinding `0.7387` F1 / `0.9545` R@5.
+  - MuSiQue: DAEC `0.4359` F1 / `0.7269` R@5 vs nobinding `0.4458` F1 / `0.7297` R@5.
+  - Binding is a strong 2Wiki/deep-composition mechanism, but not a universal gain.
+- Selective title-uniqueness binding Phase-1 fresh run is complete:
+  - frozen rule `bind_conf_title_unique >= 0.88` passes fresh-vs-Phase0 consistency within ±0.005 F1 on all three datasets.
+  - 2Wiki stays `0.7118` F1, HotpotQA stays `0.7473` F1, MuSiQue improves `0.4359 -> 0.4548` F1 and `0.7269 -> 0.7469` R@5.
+  - Treat as an abstention-aware binding confidence gate, not as a relation-level verifier.
 
 ## Do Not Drift
 

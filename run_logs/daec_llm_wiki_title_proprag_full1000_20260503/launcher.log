@@ -1,0 +1,4 @@
+[START] daec_llm_wiki_title_proprag_full1000 start=2026-05-03T17:18:57+08:00
+[JOB_START] pool=proprag match=wiki_title dataset=2wikimultihopqa start=2026-05-03T17:18:57+08:00
+[JOB_START] pool=proprag match=wiki_title dataset=hotpotqa start=2026-05-03T17:18:57+08:00
+[JOB_START] pool=proprag match=wiki_title dataset=musique start=2026-05-03T17:18:57+08:00

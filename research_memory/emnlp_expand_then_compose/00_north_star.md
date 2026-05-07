@@ -1,15 +1,30 @@
 # EMNLP Main North Star
 
-Last updated: 2026-03-28
+Last updated: 2026-05-07
 
-## Objective
+## Current Paper Framing (LOCKED 2026-05-07)
+
+Final framing is in `41_dbec_paper_framing_locked_20260507.md`. All paper-facing content from this point uses **DBEC** naming. Read that document before writing or re-litigating positioning.
+
+Locked decisions:
+- Method name: **DBEC** (Dependency-Bound Evidence Composition), not DAEC
+- Title: **DBEC: Dependency-Bound Evidence Composition for Multi-Hop Retrieval-Augmented Generation**
+- Scope: Multi-Hop RAG (not general RAG, not Multi-Hop QA)
+- Story arc: composition gap → dependency-bound mechanism → controlled evaluation → under-selection mechanism → honest budget limitation
+- SetR is one of 5 baselines, not paper narrative center
+
+The "Expand-then-Compose" framing below is superseded; it is preserved here for historical context only.
+
+---
+
+## Objective (historical, superseded)
 
 Build an EMNLP main-track paper around a clean empirical and methodological claim:
 
 > The main bottleneck in multi-hop GraphRAG is not better pointwise reranking of individual documents. The bottleneck is composing a top-5 evidence set that contains a complete reasoning chain. Harder queries therefore require expanding the candidate pool before composing the final evidence subset.
 
 Short name for the story:
-- `Expand-then-Compose`
+- `Expand-then-Compose` (historical; superseded by DBEC framing)
 
 Alternative method names:
 - `Chain-Complete Evidence Selection`

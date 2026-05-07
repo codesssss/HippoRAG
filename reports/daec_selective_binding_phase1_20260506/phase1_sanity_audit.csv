@@ -1,0 +1,4 @@
+dataset,query_count,bind_count,abstain_count,null_rate,all_selective_titles_same_as_daec,all_selective_answers_same_as_daec,all_selective_metrics_same_as_daec,abstain_selective_titles_same_as_daec,abstain_selective_titles_same_as_nobind,abstain_daec_titles_same_as_nobind,abstain_selective_answers_same_as_daec,abstain_selective_answers_same_as_nobind,abstain_daec_answers_same_as_nobind
+2Wiki,1000,698,302,0.302,1000,1000,1000,302,302,302,302,302,302
+HotpotQA,1000,657,343,0.343,1000,1000,1000,343,343,343,343,343,343
+MuSiQue,1000,371,629,0.629,738,853,932,367,629,367,482,629,482

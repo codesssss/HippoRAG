@@ -640,6 +640,115 @@ Interpretation:
 - MuSiQue duplicate-title exposure is a dataset/pool property inherited from baseline; DAEC does not amplify it.
 - Same-title exclusion remains mandatory for counterfactual perturbation methods such as NREV.
 
+## SetR-Style Full1000 Baseline (2026-05-06)
+
+Canonical files:
+- memo: `research_memory/emnlp_expand_then_compose/40_setr_style_full1000_positioning_20260506.md`
+- launcher: `run_logs/launch_setr_full1000_20260503.sh`
+- run logs: `run_logs/setr_full1000_20260503/`
+- eval reports: `reports/setr_full1000_20260503/`
+- scripts:
+  - `scripts/export_setr_inputs.py`
+  - `scripts/run_setr_style_selector.py`
+  - `scripts/apply_setr_selection_to_pool.py`
+  - `scripts/run_setr_windowed_selector.py`
+- tests: `tests/test_setr_adapter.py`
+
+Completion:
+
+```text
+[DONE] setr_full1000 2026-05-04T02:04:10+08:00
+```
+
+Protocol:
+- Local SetR-style IRI selector, NOT official SetR reproduction.
+- Uses SetR's information-requirement-identification prompt shape:
+  list requirements, find passages per requirement, then output final selected ids.
+- LLM: Qwen3-8B (`qwen3-8b-train`), same Qwen reader, same full1000 subsets.
+- Pools: Dense, HippoRAG, PropRAG pool100.
+- Variants:
+  - `setr_k20_doc768`: direct top20 prompt, 768 chars/doc.
+  - `setr_k100_doc160`: compressed direct top100 prompt, 160 chars/doc.
+  - `setr_windowed_k50_doc768`: two-stage windowed top50 prompt, 768 chars/doc.
+- The SetR-style prompt permits an unlimited number of selections. The adapter
+  frontloads parsed selections and fills remaining reader top5 slots by original
+  rank order. Paper tables must label this as `SetR-style IRI + rank-order fallback`.
+
+PropRAG main comparison against current DAEC-LLM+CTL full1000:
+
+| Dataset | DAEC EM/F1/R@5 | SetR-style k20 EM/F1/R@5 | dF1 vs DAEC | SetR-windowed k50 EM/F1/R@5 | dF1 vs DAEC |
+|---|---:|---:|---:|---:|---:|
+| 2Wiki | 0.642 / 0.712 / 0.941 | 0.624 / 0.694 / 0.942 | -0.018 | 0.620 / 0.692 / 0.941 | -0.019 |
+| HotpotQA | 0.620 / 0.747 / 0.961 | 0.629 / 0.755 / 0.973 | +0.008 | 0.630 / 0.755 / 0.974 | +0.007 |
+| MuSiQue | 0.337 / 0.436 / 0.727 | 0.377 / 0.476 / 0.755 | +0.040 | 0.365 / 0.467 / 0.746 | +0.032 |
+
+Full SetR-style matrix:
+
+| Dataset | Pool | Variant | EM | F1 | R@5 |
+|---|---|---|---:|---:|---:|
+| 2Wiki | dense | `setr_k100_doc160` | 0.517 | 0.570 | 0.793 |
+| 2Wiki | dense | `setr_k20_doc768` | 0.514 | 0.565 | 0.780 |
+| 2Wiki | dense | `setr_windowed_k50_doc768` | 0.506 | 0.562 | 0.792 |
+| 2Wiki | hipporag | `setr_k100_doc160` | 0.571 | 0.638 | 0.876 |
+| 2Wiki | hipporag | `setr_k20_doc768` | 0.572 | 0.641 | 0.877 |
+| 2Wiki | hipporag | `setr_windowed_k50_doc768` | 0.574 | 0.643 | 0.882 |
+| 2Wiki | proprag | `setr_k100_doc160` | 0.612 | 0.672 | 0.921 |
+| 2Wiki | proprag | `setr_k20_doc768` | 0.624 | 0.694 | 0.942 |
+| 2Wiki | proprag | `setr_windowed_k50_doc768` | 0.620 | 0.692 | 0.941 |
+| HotpotQA | dense | `setr_k100_doc160` | 0.604 | 0.722 | 0.906 |
+| HotpotQA | dense | `setr_k20_doc768` | 0.627 | 0.747 | 0.962 |
+| HotpotQA | dense | `setr_windowed_k50_doc768` | 0.629 | 0.747 | 0.964 |
+| HotpotQA | hipporag | `setr_k100_doc160` | 0.591 | 0.711 | 0.900 |
+| HotpotQA | hipporag | `setr_k20_doc768` | 0.625 | 0.749 | 0.963 |
+| HotpotQA | hipporag | `setr_windowed_k50_doc768` | 0.620 | 0.747 | 0.961 |
+| HotpotQA | proprag | `setr_k100_doc160` | 0.597 | 0.717 | 0.907 |
+| HotpotQA | proprag | `setr_k20_doc768` | 0.629 | 0.755 | 0.973 |
+| HotpotQA | proprag | `setr_windowed_k50_doc768` | 0.630 | 0.755 | 0.974 |
+| MuSiQue | dense | `setr_k100_doc160` | 0.294 | 0.389 | 0.617 |
+| MuSiQue | dense | `setr_k20_doc768` | 0.310 | 0.411 | 0.705 |
+| MuSiQue | dense | `setr_windowed_k50_doc768` | 0.327 | 0.425 | 0.702 |
+| MuSiQue | hipporag | `setr_k100_doc160` | 0.316 | 0.408 | 0.628 |
+| MuSiQue | hipporag | `setr_k20_doc768` | 0.339 | 0.439 | 0.717 |
+| MuSiQue | hipporag | `setr_windowed_k50_doc768` | 0.342 | 0.444 | 0.713 |
+| MuSiQue | proprag | `setr_k100_doc160` | 0.328 | 0.418 | 0.657 |
+| MuSiQue | proprag | `setr_k20_doc768` | 0.377 | 0.476 | 0.755 |
+| MuSiQue | proprag | `setr_windowed_k50_doc768` | 0.365 | 0.467 | 0.746 |
+
+PropRAG selection statistics:
+
+| Dataset | Variant | Rows | Parse Success | Mean Selected | Mean Fallback in Top5 | Selected < 5 |
+|---|---|---:|---:|---:|---:|---:|
+| 2Wiki | `setr_k20_doc768` | 1000 | 1000 | 2.58 | 2.48 | 959 |
+| HotpotQA | `setr_k20_doc768` | 1000 | 1000 | 2.74 | 2.43 | 912 |
+| MuSiQue | `setr_k20_doc768` | 1000 | 1000 | 3.62 | 1.70 | 771 |
+| 2Wiki | `setr_windowed_k50_doc768` | 1000 | 996 | 2.23 | 2.77 | 993 |
+| HotpotQA | `setr_windowed_k50_doc768` | 1000 | 999 | 2.28 | 2.73 | 957 |
+| MuSiQue | `setr_windowed_k50_doc768` | 1000 | 997 | 2.79 | 2.23 | 887 |
+
+PropRAG `setr_k20_doc768` selection-depth audit:
+
+| Dataset | Mean Selected | Mean Fallback in Top5 | Selected Positions from Original Top5 | pos0 Selected | pos1 Selected |
+|---|---:|---:|---:|---:|---:|
+| 2Wiki | 2.58 | 2.48 | 86.5% | 88.5% | 72.3% |
+| HotpotQA | 2.74 | 2.43 | 80.7% | 88.5% | 78.7% |
+| MuSiQue | 3.62 | 1.70 | 57.2% | 75.6% | 58.0% |
+
+Interpretation:
+- SetR-style is a strong baseline, not a negative control.
+- DAEC cannot claim that explicit noisy-OR composition generally beats LLM set selection: SetR-style wins PropRAG HotpotQA/MuSiQue on F1 and support R@5.
+- DAEC still wins PropRAG 2Wiki on EM/F1 while matching support R@5.
+- Local SetR-style is shallow on 2Wiki/HotpotQA: it mostly confirms the
+  retriever's top anchors and then relies on rank-order fallback to complete the
+  reader top5. It performs more meaningful deeper selection on MuSiQue.
+- The paper label must therefore be `SetR-style IRI + rank-order fallback`, not
+  pure SetR or pure five-document set selection.
+- Generic "RAG set selection" is not a safe novelty claim. Paper positioning must focus on DAEC's explicit dependency binding and requirement-by-binding-by-document support tensor.
+- Current-version PropRAG full1000 `nobinding` refresh is now critical: if binding is not load-bearing, DAEC becomes much harder to distinguish from SetR-style flat information-requirement selection.
+- R@5 values must be reported with a named field/source. Existing files contain
+  multiple recall fields (`overall_recomputed`, DAEC selector metrics, source
+  pool payload recall, and custom title recomputations), and they should not be
+  mixed in the same comparison table.
+
 ## IRCoT-Style Local Baseline (2026-05-06)
 
 Canonical files:
@@ -687,6 +796,247 @@ Interpretation:
 - IRCoT-style does not beat the naive Top5 baseline on 2Wiki or HotpotQA. On MuSiQue it improves F1 over Top5 (0.461 vs 0.437), but still loses EM, support R@5, and remains below DAEC.
 - This supports the paper claim: iterative retrieval is not an automatic substitute for demand-aware composition under the same reader budget.
 - Caveat: this is a simplified local implementation. Official IRCoT with full BM25 index + prompt sets + HP tuning may differ. Paper must label as "IRCoT-style (local)."
+
+## Reviewer Baselines Full1000: IRCoT-Style and LLM-Direct (2026-05-06)
+
+Canonical files:
+- reviewer queue launcher: `run_logs/launch_reviewer_baselines_full1000_20260506.sh`
+- reviewer queue logs/status: `run_logs/reviewer_baselines_full1000_20260506/`
+- IRCoT-style launcher: `run_logs/launch_ircot_style_full1000_20260506.sh`
+- IRCoT-style results: `run_logs/ircot_style_full1000_20260506/`
+- LLM-direct launcher: `run_logs/launch_llm_direct_select_proprag_full1000_20260506.sh`
+- LLM-direct results: `run_logs/llm_direct_select_proprag_full1000_20260506/`
+- cost/calls script: `scripts/analyze_reviewer_baseline_costs.py`
+- cost/calls table: `reports/reviewer_baseline_costs_20260506/cost_table.md`
+- paired CI script: `scripts/analyze_reviewer_baseline_paired_ci.py`
+- paired CI report: `reports/reviewer_baseline_ci_20260506/paired_ci.md`
+
+Completion:
+
+```text
+[DONE] reviewer baselines full1000 queue 2026-05-06T18:44:42+08:00
+```
+
+Protocol:
+- Same 1000-query subsets, Qwen3-8B reader, `qa_top_k=5`, `qa_doc_max_chars=2048`, and NV-Embed endpoint as the DAEC-LLM+CTL full1000 runs.
+- Pool for LLM-direct: PropRAG pool100 from `run_logs/proprag_pool_exports_full1000_20260424/`.
+- IRCoT-style is local and simplified: 3 follow-up retrieval rounds, top-5 per round, round-robin merge to final top-5. It is not an official IRCoT reproduction.
+- LLM-direct has two variants:
+  - `title`: Qwen3-8B selects 5 docs from the pool using titles only.
+  - `snippet128`: Qwen3-8B selects 5 docs from titles plus 128-char snippets.
+
+Main comparison against current DAEC-LLM+CTL PropRAG full1000:
+
+| Dataset | Method | EM | F1 | Support R@5 | dEM vs DAEC | dF1 vs DAEC | dR@5 vs DAEC |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 2Wiki | DAEC-LLM+CTL | 0.642 | 0.7118 | 0.9410 | — | — | — |
+| 2Wiki | IRCoT-style (local) | 0.564 | 0.6293 | 0.8763 | -0.078 | -0.0825 | -0.0648 |
+| 2Wiki | LLM-direct-title | 0.519 | 0.5697 | 0.8160 | -0.123 | -0.1421 | -0.1250 |
+| 2Wiki | LLM-direct-snippet128 | 0.588 | 0.6535 | 0.8882 | -0.054 | -0.0583 | -0.0528 |
+| HotpotQA | DAEC-LLM+CTL | 0.620 | 0.7473 | 0.9605 | — | — | — |
+| HotpotQA | IRCoT-style (local) | 0.590 | 0.7079 | 0.9150 | -0.030 | -0.0394 | -0.0455 |
+| HotpotQA | LLM-direct-title | 0.537 | 0.6478 | 0.8255 | -0.083 | -0.0995 | -0.1350 |
+| HotpotQA | LLM-direct-snippet128 | 0.545 | 0.6544 | 0.8130 | -0.075 | -0.0929 | -0.1475 |
+| MuSiQue | DAEC-LLM+CTL | 0.337 | 0.4359 | 0.7269 | — | — | — |
+| MuSiQue | IRCoT-style (local) | 0.327 | 0.4254 | 0.6698 | -0.010 | -0.0105 | -0.0571 |
+| MuSiQue | LLM-direct-title | 0.272 | 0.3582 | 0.5562 | -0.065 | -0.0777 | -0.1707 |
+| MuSiQue | LLM-direct-snippet128 | 0.294 | 0.3850 | 0.5753 | -0.043 | -0.0509 | -0.1516 |
+
+Interpretation:
+- Neither IRCoT-style nor LLM-direct beats DAEC-LLM+CTL on any of the three PropRAG full1000 datasets.
+- The strongest direct LLM selector here is `snippet128`, but it still trails DAEC by `0.058` F1 on 2Wiki, `0.093` F1 on HotpotQA, and `0.051` F1 on MuSiQue.
+- IRCoT-style is closer on MuSiQue answer F1 but still loses support R@5 by `0.057`, which supports the fixed-pool composition claim.
+- These baselines answer two reviewer attacks: "why not iterative retrieval?" and "why not just let the LLM select from the pool?" Under this controlled local protocol, neither substitutes for DAEC.
+- Caveat: SetR-style remains the stronger LLM set-selection baseline and must stay in the main comparison. DAEC should not claim general superiority over all LLM set selectors.
+
+Cost/calls table (selector-side; SetR token counts are chars/4 estimates):
+
+| Dataset | Method | Logical LLM calls/q | Extra retrieval calls/q | Prompt tokens/q | Latency/q |
+|---|---|---:|---:|---:|---:|
+| 2Wiki | DAEC-LLM+CTL | 8.44 | 0.00 | 991.4 tok | 0.660s |
+| 2Wiki | SetR-style k20 | 1.00 | 0.00 | ~1908.9 est | 0.258s |
+| 2Wiki | IRCoT-style | 3.00 | 3.00 | n/a | 4.169s |
+| 2Wiki | LLM-direct snippet128 | 1.00 | 0.00 | 4353.5 tok | 0.395s |
+| HotpotQA | DAEC-LLM+CTL | 7.32 | 0.00 | 1129.1 tok | 0.711s |
+| HotpotQA | SetR-style k20 | 1.00 | 0.00 | ~2790.1 est | 0.280s |
+| HotpotQA | IRCoT-style | 3.00 | 3.00 | n/a | 6.635s |
+| HotpotQA | LLM-direct snippet128 | 1.00 | 0.00 | 4898.2 tok | 0.416s |
+| MuSiQue | DAEC-LLM+CTL | 7.72 | 0.00 | 1247.8 tok | 0.755s |
+| MuSiQue | SetR-style k20 | 1.00 | 0.00 | ~2829.5 est | 0.307s |
+| MuSiQue | IRCoT-style | 3.00 | 3.00 | n/a | 6.969s |
+| MuSiQue | LLM-direct snippet128 | 1.00 | 0.00 | 4727.3 tok | 0.412s |
+
+Cost caveats:
+- DAEC token/latency fields measure binding extraction only; logical calls add
+  one decomposition call/query whose token usage is not instrumented here.
+- DAEC-selective is not a cost-reduction method; cold-equivalent cost equals
+  DAEC because the abstention gate runs after binding extraction.
+- Historical SetR-style rows predate token instrumentation; token counts are
+  reconstructed as prompt/completion characters divided by 4 and are not exact
+  API tokens.
+
+Paired bootstrap CI, answer F1:
+
+| Dataset | Comparison | dF1 | 95% CI | Excludes 0 |
+|---|---|---:|---:|---:|
+| 2Wiki | DAEC-selective - Top5 | +0.0661 | [+0.0444, +0.0883] | yes |
+| 2Wiki | DAEC-selective - SetR-style k20 | +0.0182 | [-0.0016, +0.0378] | no |
+| 2Wiki | DAEC-selective - IRCoT-style | +0.0825 | [+0.0572, +0.1083] | yes |
+| 2Wiki | DAEC-selective - LLM-direct snippet128 | +0.0583 | [+0.0349, +0.0823] | yes |
+| HotpotQA | DAEC-selective - Top5 | +0.0246 | [+0.0110, +0.0381] | yes |
+| HotpotQA | DAEC-selective - SetR-style k20 | -0.0079 | [-0.0222, +0.0065] | no |
+| HotpotQA | DAEC-selective - IRCoT-style | +0.0394 | [+0.0205, +0.0583] | yes |
+| HotpotQA | DAEC-selective - LLM-direct snippet128 | +0.0929 | [+0.0706, +0.1156] | yes |
+| MuSiQue | DAEC-selective - Top5 | +0.0282 | [+0.0076, +0.0488] | yes |
+| MuSiQue | DAEC-selective - SetR-style k20 | -0.0212 | [-0.0445, +0.0019] | no |
+| MuSiQue | DAEC-selective - IRCoT-style | +0.0294 | [+0.0028, +0.0563] | yes |
+| MuSiQue | DAEC-selective - LLM-direct snippet128 | +0.0698 | [+0.0420, +0.0980] | yes |
+
+Unified title-multiset support R@5 CI:
+
+| Dataset | Comparison | dR@5 | 95% CI | Excludes 0 |
+|---|---|---:|---:|---:|
+| 2Wiki | DAEC-selective - Top5 | +0.0382 | [+0.0265, +0.0498] | yes |
+| 2Wiki | DAEC-selective - SetR-style k20 | -0.0015 | [-0.0118, +0.0088] | no |
+| 2Wiki | DAEC-selective - IRCoT-style | +0.0630 | [+0.0483, +0.0783] | yes |
+| HotpotQA | DAEC-selective - Top5 | +0.0105 | [+0.0040, +0.0175] | yes |
+| HotpotQA | DAEC-selective - SetR-style k20 | -0.0110 | [-0.0200, -0.0020] | yes, SetR higher |
+| HotpotQA | DAEC-selective - IRCoT-style | +0.0425 | [+0.0300, +0.0555] | yes |
+| MuSiQue | DAEC-selective - Top5 | +0.0367 | [+0.0250, +0.0486] | yes |
+| MuSiQue | DAEC-selective - SetR-style k20 | -0.0092 | [-0.0230, +0.0044] | no |
+| MuSiQue | DAEC-selective - IRCoT-style | +0.0776 | [+0.0614, +0.0938] | yes |
+
+CI interpretation:
+- DAEC-selective significantly beats Top5, IRCoT-style, and both LLM-direct
+  variants on answer F1 across all three datasets.
+- DAEC-selective does not significantly beat SetR-style on answer F1 on any
+  dataset. SetR must remain a strong/mixed baseline, not a defeated strawman.
+- Unified title-multiset support R@5 shows the same pattern: DAEC-selective
+  beats Top5/IRCoT-style/LLM-direct, but SetR-style remains tied or stronger on
+  support. Use the unified support table for paper-facing CI, not mixed stored
+  aggregate fields.
+
+## Current-Version Nobinding Full1000 Refresh (2026-05-06)
+
+Canonical files:
+- launcher: `run_logs/launch_daec_nobinding_proprag_full1000_20260506.sh`
+- results: `run_logs/daec_nobinding_proprag_full1000_20260506/`
+- comparison baseline: `run_logs/daec_llm_wiki_title_proprag_full1000_20260503/`
+
+Completion:
+
+```text
+[DONE] daec_nobinding_proprag_full1000 end=2026-05-06T19:33:42+08:00
+```
+
+Protocol:
+- Same PropRAG pool100, 1000-query subsets, Qwen3-8B reader, `qa_top_k=5`,
+  `qa_doc_max_chars=2048`, wiki-title matching, and NV-Embed endpoint as the
+  20260503 DAEC-LLM+CTL full1000 run.
+- Selector: `daec_noisyor_nobind`.
+- Code path disables DAEC binding candidates (`binding_mode=nobind`) while
+  retaining demand decomposition and noisy-OR fixed-pool composition.
+
+Results:
+
+| Dataset | Method | EM | F1 | Support R@5 | dEM vs DAEC | dF1 vs DAEC | dR@5 vs DAEC |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 2Wiki | DAEC-LLM+CTL | 0.642 | 0.7118 | 0.9410 | — | — | — |
+| 2Wiki | Nobinding | 0.548 | 0.6120 | 0.8610 | -0.094 | -0.0998 | -0.0800 |
+| HotpotQA | DAEC-LLM+CTL | 0.620 | 0.7473 | 0.9605 | — | — | — |
+| HotpotQA | Nobinding | 0.616 | 0.7387 | 0.9545 | -0.004 | -0.0086 | -0.0060 |
+| MuSiQue | DAEC-LLM+CTL | 0.337 | 0.4359 | 0.7269 | — | — | — |
+| MuSiQue | Nobinding | 0.343 | 0.4458 | 0.7297 | +0.006 | +0.0099 | +0.0028 |
+
+Interpretation:
+- Binding is strongly load-bearing on 2Wiki: removing it costs `0.100` F1 and
+  `0.080` support R@5 under the same current protocol.
+- HotpotQA is shallow/saturated: nobinding is only slightly worse (`-0.009` F1).
+- MuSiQue is the boundary case: nobinding is slightly better on answer metrics
+  and support R@5, so binding should not be claimed as uniformly beneficial.
+- Paper use: binding can be presented as the mechanism explaining DAEC's 2Wiki
+  advantage over flat/LLM set-selection baselines, but the contribution must be
+  stated as dataset- and structure-dependent rather than universal.
+- Next analysis: paired bootstrap CI for DAEC vs nobinding, especially 2Wiki
+  where the effect size is large and central to the SetR-style distinction.
+
+## Selective Binding Phase-0 Offline Feasibility (2026-05-06)
+
+Canonical files:
+- script: `scripts/analyze_daec_selective_binding_phase0.py`
+- report: `reports/daec_selective_binding_phase0_20260506/phase0_report.md`
+- machine report: `reports/daec_selective_binding_phase0_20260506/phase0_report.json`
+- query features: `reports/daec_selective_binding_phase0_20260506/query_features.csv`
+- feature AUC: `reports/daec_selective_binding_phase0_20260506/feature_auc.csv`
+- threshold curve: `reports/daec_selective_binding_phase0_20260506/threshold_curve.csv`
+- threshold curve figure: `reports/daec_selective_binding_phase0_20260506/threshold_curve.svg`
+
+Protocol:
+- Offline only: no LLM calls and no reader rerun.
+- Inputs are paired current DAEC-LLM+CTL full1000 and current nobinding
+  full1000 reports.
+- Labels use only strong flips: `|dF1| >= 0.5` or answer EM flip.
+- Split is stable hash dev/test, not first-N.
+- Primary router features are selection-independent and exclude dep-score
+  margin. Dep-score margin remains diagnostic only because it is close to the
+  failed embedding-posterior signal.
+
+Strong flip counts:
+
+| Dataset | Strong Cases | Abstain Helpful | Bind Helpful | Ignored/Noisy |
+|---|---:|---:|---:|---:|
+| 2Wiki | 159 | 23 | 136 | 841 |
+| HotpotQA | 57 | 25 | 32 | 943 |
+| MuSiQue | 130 | 69 | 61 | 870 |
+
+Feature separability:
+- Best global signal family is title ambiguity / extraction ambiguity:
+  - `unmatched_entity_count`: ALL AUC `0.650` for abstain-helpful.
+  - `raw_entity_count`: ALL AUC `0.643`.
+  - `avg_candidate_title_occurrences`: ALL AUC `0.624`.
+  - `bind_conf_title_unique`: ALL AUC `0.378`, i.e. high title uniqueness
+    predicts bind-helpful; low uniqueness predicts abstain-helpful.
+- MuSiQue-specific signals are consistent:
+  - `duplicate_entity_count`: AUC `0.647`.
+  - `avg_candidate_title_occurrences`: AUC `0.637`.
+  - `title_nonunique_rate`: AUC `0.635`.
+  - `title_unique_rate`: AUC `0.365`, i.e. inverse AUC `0.635` for abstention.
+
+Threshold simulation:
+
+The dev-optimal gate (`bind_conf_match_quality >= 0.18`) overfits dev and does
+not materially improve MuSiQue on held-out test (`+0.0003 F1`). The robust
+exploratory gate that passes both dev and test is title uniqueness:
+
+```text
+if bind_conf_title_unique >= 0.88:
+    use DAEC binding
+else:
+    abstain to nobinding
+```
+
+Offline all-split simulation for this robust gate:
+
+| Dataset | DAEC F1 | Nobind F1 | Selective Offline F1 | dF1 vs DAEC | Null Rate |
+|---|---:|---:|---:|---:|---:|
+| 2Wiki | 0.7118 | 0.6120 | 0.7090 | -0.0029 | 0.312 |
+| HotpotQA | 0.7473 | 0.7387 | 0.7493 | +0.0020 | 0.372 |
+| MuSiQue | 0.4359 | 0.4458 | 0.4553 | +0.0194 | 0.638 |
+
+Held-out test split for the same gate:
+
+| Dataset | dF1 vs DAEC | Null Rate |
+|---|---:|---:|
+| 2Wiki | -0.0017 | 0.308 |
+| HotpotQA | +0.0026 | 0.368 |
+| MuSiQue | +0.0214 | 0.638 |
+
+Interpretation:
+- Phase-0 is a `go_phase1` signal for implementing a minimal query-level
+  selective binding router.
+- The implementation should freeze the title-uniqueness rule before any new
+  reader run. Do not tune thresholds against the same full1000 test numbers.
+- This is exploratory evidence of separability, not final method evidence.
 
 ## DAEC Binding Posterior Ablation (2026-05-06)
 
@@ -772,3 +1122,116 @@ Interpretation:
 - Base binding support rate is already high (87% on 2Wiki), so the correction surface is small and the risk-reward ratio is poor.
 - Wider epsilon (0.001, 0.01) increased flips without improving recall; MuSiQue regressed at ε=0.001.
 - This confirms the same root cause as the grounded posterior failure: no train-free signal short of relation-level verification can safely correct bindings.
+
+## DAEC Selective Title-Uniqueness Binding (2026-05-06)
+
+Canonical files:
+- Phase-0 offline script: `scripts/analyze_daec_selective_binding_phase0.py`
+- Phase-0 report: `reports/daec_selective_binding_phase0_20260506/phase0_report.md`
+- Phase-1 implementation: `scripts/dtc_embed_utils.py`, `scripts/eval_causal_qwen3.py`
+- Phase-1 launcher: `run_logs/launch_daec_selective_titleuniq_proprag_full1000_20260506.sh`
+- Phase-1 results: `run_logs/daec_selective_titleuniq_proprag_full1000_20260506/`
+- Phase-1 report: `reports/daec_selective_binding_phase1_20260506/phase1_report.md`
+- Phase-1 paired bootstrap CI:
+  `reports/daec_selective_binding_phase1_20260506/phase1_paired_bootstrap_ci.csv`
+- Phase-1 sanity audit:
+  `reports/daec_selective_binding_phase1_20260506/phase1_sanity_audit.md`
+- Reviewer-baseline hard-slice audit:
+  `reports/reviewer_baseline_ci_20260506/hard_slice_gold_doc_count.md`
+
+Protocol:
+- PropRAG pool100 full1000, same Qwen3-8B reader/decomposition, NV-Embed-v2, `wiki_title` LLM binding.
+- Query-level router only; no per-requirement NULL binding.
+- Frozen rule before fresh run:
+  `bind_conf_title_unique >= 0.88` -> use DAEC LLM binding; otherwise abstain to nobinding.
+- Phase-1 reused the base DAEC binding-extraction cache because the selective
+  variant differs only by a post-binding query-level abstention gate. This
+  isolates the gate from LLM extraction stochasticity while rerunning the
+  selective selector/evaluation path.
+- Allowed signal is selection-independent: entity-title uniqueness in the pool after binding extraction.
+- Forbidden signals were not used: dep-margin, φ posterior, selected-doc co-mention, reader output.
+
+Phase-0 robust band:
+
+| Dataset | Phase-0 DAEC F1 | Phase-0 Selective F1 | dF1 | Null Rate |
+|---|---:|---:|---:|---:|
+| 2Wiki | 0.7118 | 0.7090 | -0.0029 | 0.312 |
+| HotpotQA | 0.7473 | 0.7493 | +0.0020 | 0.372 |
+| MuSiQue | 0.4359 | 0.4553 | +0.0194 | 0.638 |
+
+Fresh full1000 results:
+
+| Dataset | Method | EM | F1 | R@5 |
+|---|---|---:|---:|---:|
+| 2Wiki | DAEC | 0.642 | 0.7118 | 0.9410 |
+| 2Wiki | Nobind | 0.548 | 0.6120 | 0.8610 |
+| 2Wiki | DAEC-selective | 0.642 | 0.7118 | 0.9410 |
+| HotpotQA | DAEC | 0.620 | 0.7473 | 0.9605 |
+| HotpotQA | Nobind | 0.616 | 0.7387 | 0.9545 |
+| HotpotQA | DAEC-selective | 0.620 | 0.7473 | 0.9605 |
+| MuSiQue | DAEC | 0.337 | 0.4359 | 0.7269 |
+| MuSiQue | Nobind | 0.343 | 0.4458 | 0.7297 |
+| MuSiQue | DAEC-selective | 0.353 | 0.4548 | 0.7469 |
+
+Fresh-vs-Phase0 consistency:
+
+| Dataset | Phase-0 F1 | Fresh F1 | Fresh - Phase0 | Phase-0 Null | Fresh Null | Expected Selection Agreement |
+|---|---:|---:|---:|---:|---:|---:|
+| 2Wiki | 0.7090 | 0.7118 | +0.0028 | 0.312 | 0.302 | 1000/1000 |
+| HotpotQA | 0.7493 | 0.7473 | -0.0020 | 0.372 | 0.343 | 1000/1000 |
+| MuSiQue | 0.4553 | 0.4548 | -0.0005 | 0.638 | 0.629 | 1000/1000 |
+
+Router behavior:
+
+| Dataset | Bind | Abstain | Abstain Same As DAEC | Abstain Changed From DAEC |
+|---|---:|---:|---:|---:|
+| 2Wiki | 698 | 302 | 302 | 0 |
+| HotpotQA | 657 | 343 | 343 | 0 |
+| MuSiQue | 371 | 629 | 367 | 262 |
+
+Sanity audit for exact-zero deltas:
+
+| Dataset | Null Rate | Selective titles = DAEC | Selective answers = DAEC | Abstain DAEC titles = Nobind |
+|---|---:|---:|---:|---:|
+| 2Wiki | 0.302 | 1000/1000 | 1000/1000 | 302/302 |
+| HotpotQA | 0.343 | 1000/1000 | 1000/1000 | 343/343 |
+| MuSiQue | 0.629 | 738/1000 | 853/1000 | 367/629 |
+
+Interpretation of the exact `DAEC-selective - DAEC = 0` CI on
+2Wiki/HotpotQA: the gate does trigger, but every abstained query has identical
+DAEC and Nobind top-5 titles. Selective binding changes the binding mode but not
+the reader input on those two datasets. MuSiQue is the only dataset where
+abstention materially changes the evidence set.
+
+Paired bootstrap CI, answer F1:
+
+| Dataset | Comparison | dF1 | 95% CI | Excludes 0 |
+|---|---|---:|---:|---:|
+| 2Wiki | DAEC-selective - Nobind | +0.0998 | [+0.0791, +0.1216] | yes |
+| 2Wiki | DAEC-selective - SetR-style k20 | +0.0182 | [-0.0019, +0.0379] | no |
+| HotpotQA | DAEC-selective - Nobind | +0.0086 | [-0.0039, +0.0211] | no |
+| HotpotQA | DAEC-selective - SetR-style k20 | -0.0079 | [-0.0225, +0.0066] | no |
+| MuSiQue | DAEC-selective - DAEC | +0.0189 | [+0.0076, +0.0309] | yes |
+| MuSiQue | DAEC-selective - SetR-style k20 | -0.0212 | [-0.0443, +0.0018] | no |
+
+Gold-support-count hard slice, DAEC-selective vs SetR-style k20:
+
+| Dataset | Slice | N | dF1 | F1 95% CI | dR@5 | R@5 95% CI | Interpretation |
+|---|---|---:|---:|---:|---:|---:|---|
+| 2Wiki | `gold_doc_count>=3` (= 4-doc) | 235 | +0.0454 | [+0.0014, +0.0894] | +0.0106 | [-0.0106, +0.0319] | DAEC-selective wins answer F1 on the deep subset; support tied. |
+| HotpotQA | `gold_doc_count>=3` | 0 | -- | -- | -- | -- | No deep-support slice. |
+| MuSiQue | `gold_doc_count>=3` | 482 | -0.0083 | [-0.0431, +0.0260] | -0.0003 | [-0.0201, +0.0197] | Tied; SetR-style not overturned. |
+
+Interpretation:
+- Phase-1 passes the fresh-vs-offline consistency gate: all F1 deviations are within ±0.005.
+- On 2Wiki and HotpotQA, abstention does not alter the selected evidence set relative to DAEC, so selective binding preserves DAEC.
+- On MuSiQue, 262 abstentions change the DAEC evidence set and recover the predicted improvement: F1 improves from 0.4359 to 0.4548 and R@5 from 0.7269 to 0.7469.
+- MuSiQue's abstain rate is high (`62.9%`), but selective does not reduce to
+  Nobind: Nobind F1 is `0.4458` and DAEC-selective F1 is `0.4548`. The extra
+  `+0.0090` comes from the `37.1%` retained-binding subset.
+- Selective binding does not beat SetR-style on MuSiQue answer F1 (0.4548 vs 0.4761), but it narrows the gap and improves evidence coverage. Use as a calibrated binding-abstention improvement, not as a claim that DAEC dominates LLM set selection.
+- Statistical wording should be conservative: binding is significantly
+  load-bearing vs Nobind on 2Wiki, and selective binding significantly improves
+  MuSiQue over base DAEC. The DAEC-selective vs SetR-style differences do not
+  support a general significant-win claim, although the pre-specified 2Wiki
+  4-doc hard slice gives a significant deep-composition win over SetR-style.

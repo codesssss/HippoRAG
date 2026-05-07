@@ -1,0 +1,22 @@
+dataset,method,em,f1,support_r5,logical_selector_llm_calls_per_q,recorded_api_calls_per_q,extra_retrieval_calls_per_q,prompt_tokens_per_q,completion_tokens_per_q,prompt_chars_per_q,completion_chars_per_q,selector_latency_s_per_q,cost_source
+2Wiki,Top5 / original PropRAG pool order,0.575,0.6457,0.9028,0.0,0.0,0.0,,,,,,No selector.
+2Wiki,DAEC-LLM+CTL,0.642,0.7118,0.941,8.442,7.442,0.0,991.396,64.293,,,0.6601608000000002,Measured binding extraction only; logical calls add one decomposition call/query whose token usage is not instrumented.
+2Wiki,DAEC-selective titleuniq,0.642,0.7118,0.941,8.442,7.442,0.0,991.396,64.293,,,0.6601608000000002,"Table reports cold-equivalent cost, equal to DAEC-LLM+CTL. The fresh run recorded 0.00 binding API calls/query because it used the binding cache."
+2Wiki,SetR-style k20 doc768,0.624,0.6936320929070926,0.9423,1.0,1.0,0.0,1908.8685,12.376,7635.474,49.504,0.258,Historical run predates token instrumentation; prompt/completion chars reconstructed and token counts estimated as chars/4.
+2Wiki,IRCoT-style local,0.564,0.6293160256410256,0.87625,3.0,3.0,3.0,,,,,4.168715258393437,"Local IRCoT-style JSON stores calls, retrieval rounds, and wall-clock latency, not token usage."
+2Wiki,LLM-direct title,0.519,0.5696894078144078,0.816,1.0,1.0,0.0,1346.583,25.668,,,0.2909841,Measured selector usage; parse_success=1.000.
+2Wiki,LLM-direct snippet128,0.588,0.6535053634274222,0.8882,1.0,1.0,0.0,4353.49,25.548,,,0.3953155,Measured selector usage; parse_success=1.000.
+HotpotQA,Top5 / original PropRAG pool order,0.595,0.7227,0.95,0.0,0.0,0.0,,,,,,No selector.
+HotpotQA,DAEC-LLM+CTL,0.62,0.7473,0.9605,7.322,6.322,0.0,1129.141,71.747,,,0.7113259999999997,Measured binding extraction only; logical calls add one decomposition call/query whose token usage is not instrumented.
+HotpotQA,DAEC-selective titleuniq,0.62,0.7473,0.9605,7.322,6.322,0.0,1129.141,71.747,,,0.7113259999999997,"Table reports cold-equivalent cost, equal to DAEC-LLM+CTL. The fresh run recorded 0.00 binding API calls/query because it used the binding cache."
+HotpotQA,SetR-style k20 doc768,0.629,0.7551750575705675,0.973,1.0,1.0,0.0,2790.0615,12.559,11160.246,50.236,0.28,Historical run predates token instrumentation; prompt/completion chars reconstructed and token counts estimated as chars/4.
+HotpotQA,IRCoT-style local,0.59,0.7078637660842769,0.915,3.0,3.0,3.0,,,,,6.63474251158908,"Local IRCoT-style JSON stores calls, retrieval rounds, and wall-clock latency, not token usage."
+HotpotQA,LLM-direct title,0.537,0.6477992444947546,0.8255,1.0,1.0,0.0,1334.15,25.71,,,0.2870263,Measured selector usage; parse_success=1.000.
+HotpotQA,LLM-direct snippet128,0.545,0.6544034291989392,0.813,1.0,1.0,0.0,4898.226,25.571,,,0.4157857,Measured selector usage; parse_success=1.000.
+MuSiQue,Top5 / original PropRAG pool order,0.33,0.4266,0.7131,0.0,0.0,0.0,,,,,,No selector.
+MuSiQue,DAEC-LLM+CTL,0.337,0.4359,0.7269,7.724,6.724,0.0,1247.807,75.917,,,0.754502900000001,Measured binding extraction only; logical calls add one decomposition call/query whose token usage is not instrumented.
+MuSiQue,DAEC-selective titleuniq,0.353,0.4548,0.7469,7.724,6.724,0.0,1247.807,75.917,,,0.754502900000001,"Table reports cold-equivalent cost, equal to DAEC-LLM+CTL. The fresh run recorded 0.00 binding API calls/query because it used the binding cache."
+MuSiQue,SetR-style k20 doc768,0.377,0.47605608635430596,0.7547,1.0,1.0,0.0,2829.49725,13.64875,11317.989,54.595,0.307,Historical run predates token instrumentation; prompt/completion chars reconstructed and token counts estimated as chars/4.
+MuSiQue,IRCoT-style local,0.327,0.4254130907448245,0.6698333333333333,3.0,3.0,3.0,,,,,6.96864700210467,"Local IRCoT-style JSON stores calls, retrieval rounds, and wall-clock latency, not token usage."
+MuSiQue,LLM-direct title,0.272,0.3582032700959172,0.5562,1.0,1.0,0.0,1275.429,26.431,,,0.2776059,Measured selector usage; parse_success=1.000.
+MuSiQue,LLM-direct snippet128,0.294,0.38499627621260774,0.5753,1.0,1.0,0.0,4727.334,26.229,,,0.412237,Measured selector usage; parse_success=1.000.

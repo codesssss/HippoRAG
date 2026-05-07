@@ -1,6 +1,6 @@
 # Decision Log
 
-Last updated: 2026-04-27
+Last updated: 2026-05-06
 
 ## 2026-03-26: Freeze the retrieval backbone
 
@@ -240,6 +240,37 @@ Consequence:
   - `research_memory/emnlp_expand_then_compose/32_nrev_day0_sanity_20260427.md`
   - `reports/nrev/day0_sanity.md`
   - `reports/nrev/day0_audit.md`
+
+## 2026-05-06: Stop embedding-derived binding posterior and text co-mention verifier
+
+Decision:
+- Do not add binding posterior correction to DAEC.
+- Do not tune grounding decay, soft compat weight, or objective epsilon.
+- Do not expand grounded/full variants to full1000.
+- Treat both experiments as negative diagnostics.
+
+Reason:
+- **Grounded posterior** (embedding-derived): All 13 binding flips on 2Wiki were wrong. The multiplier `binding_selection_score = effective_objective × grounding_score` becomes the sole discriminator when objectives saturate to 1.0. Upstream φ (embedding cosine) systematically favors salient-but-wrong entities over correct-but-obscure ones. Result: 2Wiki EM −4, F1 −6.05. Every changed query lost a gold document.
+- **Soft compat** (body-mention partial φ): 2Wiki +1 EM from reader non-determinism on identical doc sets; MuSiQue +1 EM from reader luck on wrong docs. No mechanistically explainable retrieval improvement.
+- **Type filter**: Only 3–13 rejections across datasets; no EM/F1 effect. Code consistency fix, not a method contribution.
+- **Swap refinement**: Triggered once across all experiments. Greedy already near-optimizes the submodular objective.
+- **Saturation-aware verifier probe** (text co-mention): At most 3 flips on 2Wiki with `extraction_or_companion` mode; 1 rescue + 1 regression (William the Silent → William I of Nassau co-mention confusion). `selected_companion` mode was too inert to flip anything meaningful. Wider epsilon (0.001, 0.01) increased flips without improving recall.
+
+Root cause convergence:
+- Grounded posterior: **embedding similarity ≠ factual entailment**
+- Verifier probe: **entity co-mention ≠ relation entailment**
+- Both failures point to the same conclusion: no train-free binding correction is safe without relation-level signal that verifies the specific predicate (directed_by, born_in, etc.), not just entity co-occurrence.
+
+Consequence:
+- DAEC paper framing stays as train-free decomposition-aware evidence selection. Binding posterior is not a contribution.
+- Honest limitations section: latent binding correctness depends on decomposition/extraction quality; embedding φ is not factual entailment; coverage objective saturates even with wrong bindings.
+- If binding correction is revisited, it must be relation-aware (e.g., checking if the upstream doc contains "X directed Y"), not co-mention or embedding-based.
+- Canonical notes:
+  - `scripts/audit_daec_binding_verifier.py`
+  - `docs/daec_saturation_binding_verifier_probe_20260506.md`
+  - `run_logs/launch_daec_binding_grounded_limit100_20260506.sh`
+  - `reports/daec_binding_verifier_20260506/`
+  - `research_memory/emnlp_expand_then_compose/38_daec_binding_posterior_negative_20260506.md`
 
 ## 2026-04-27: Close same-title paper-integrity audit
 

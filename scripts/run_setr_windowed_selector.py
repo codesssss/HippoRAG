@@ -110,11 +110,16 @@ def unique_in_order(values: Sequence[int]) -> list[int]:
 
 def mock_select(record: dict[str, Any], max_count: int) -> dict[str, Any]:
     selected = list(range(min(max_count, len(record.get("contexts") or []))))
+    raw_output = "### Final Selection: " + " ".join(f"[{pos + 1}]" for pos in selected)
     return {
-        "raw_output": "### Final Selection: " + " ".join(f"[{pos + 1}]" for pos in selected),
+        "raw_output": raw_output,
         "selected_positions": selected,
         "selected_1based": [pos + 1 for pos in selected],
         "parse_success": True,
+        "usage": {},
+        "latency_s": 0.0,
+        "prompt_chars": 0,
+        "completion_chars": len(raw_output),
     }
 
 
@@ -149,6 +154,10 @@ def safe_call_selector(
             "error_type": type(exc).__name__,
             "error": str(exc),
             "traceback": traceback.format_exc(limit=5),
+            "usage": {},
+            "latency_s": 0.0,
+            "prompt_chars": 0,
+            "completion_chars": 0,
         }
 
 
@@ -216,6 +225,10 @@ def run_windowed_record(
                 "error_type": selection.get("error_type"),
                 "error": selection.get("error"),
                 "raw_output": selection.get("raw_output", ""),
+                "usage": dict(selection.get("usage") or {}),
+                "latency_s": float(selection.get("latency_s", 0.0) or 0.0),
+                "prompt_chars": int(selection.get("prompt_chars", 0) or 0),
+                "completion_chars": int(selection.get("completion_chars", 0) or 0),
             }
         )
 
@@ -254,11 +267,24 @@ def run_windowed_record(
             "selected_1based": [],
             "parse_success": False,
             "error": "no_stage1_candidates",
+            "usage": {},
+            "latency_s": 0.0,
+            "prompt_chars": 0,
+            "completion_chars": 0,
         }
         stage2_local = []
         selected_global = []
 
     stage1_success_count = sum(1 for row in stage1_rows if row.get("parse_success"))
+    stage_rows_for_cost = list(stage1_rows) + ([stage2] if candidates else [])
+    prompt_tokens = sum(int((row.get("usage") or {}).get("prompt_tokens", 0) or 0) for row in stage_rows_for_cost)
+    completion_tokens = sum(int((row.get("usage") or {}).get("completion_tokens", 0) or 0) for row in stage_rows_for_cost)
+    total_tokens = sum(int((row.get("usage") or {}).get("total_tokens", 0) or 0) for row in stage_rows_for_cost)
+    if total_tokens <= 0:
+        total_tokens = prompt_tokens + completion_tokens
+    latency_s = sum(float(row.get("latency_s", 0.0) or 0.0) for row in stage_rows_for_cost)
+    prompt_chars = sum(int(row.get("prompt_chars", 0) or 0) for row in stage_rows_for_cost)
+    completion_chars = sum(int(row.get("completion_chars", 0) or 0) for row in stage_rows_for_cost)
     return {
         "query_idx": record.get("query_idx"),
         "question": record.get("question"),
@@ -273,6 +299,8 @@ def run_windowed_record(
         "stage2_selected_candidate_positions": stage2_local,
         "stage2_raw_output": stage2.get("raw_output", ""),
         "stage2_parse_success": bool(stage2.get("parse_success")),
+        "stage2_usage": dict(stage2.get("usage") or {}),
+        "stage2_latency_s": float(stage2.get("latency_s", 0.0) or 0.0),
         "selected_positions": selected_global,
         "selected_1based": [pos + 1 for pos in selected_global],
         "parse_success": bool(selected_global),
@@ -280,6 +308,15 @@ def run_windowed_record(
         "prompt_mode": "selection_IRI_windowed_2stage",
         "append_no_think": append_no_think,
         "model": model,
+        "selector_call_count": len(stage_rows_for_cost),
+        "usage": {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+        },
+        "latency_s": round(float(latency_s), 4),
+        "prompt_chars": prompt_chars,
+        "completion_chars": completion_chars,
         "stage2_error_type": stage2.get("error_type"),
         "stage2_error": stage2.get("error"),
     }

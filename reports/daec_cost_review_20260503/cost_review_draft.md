@@ -1,6 +1,18 @@
 # DAEC / SetR Cost Review Draft - 2026-05-03
 
-This draft uses completed full1000 artifacts available at generation time. SetR is still running; append new rows as reports arrive.
+This draft uses completed full1000 artifacts available at generation time.
+SetR-style full1000 rows were later completed under
+`reports/setr_full1000_20260503/`.
+
+Instrumentation update, 2026-05-06:
+
+- `scripts/run_setr_style_selector.py` now records API usage, selector latency,
+  prompt chars, and completion chars for new SetR-style runs.
+- `scripts/run_setr_windowed_selector.py` now aggregates stage-level usage,
+  latency, prompt chars, and completion chars for new windowed SetR-style runs.
+- Existing `setr_full1000_20260503` outputs were produced before this patch, so
+  token usage for those rows remains unavailable except by prompt-character
+  estimation.
 
 ## DAEC-LLM + CTL Selector Cost
 
@@ -23,7 +35,10 @@ This draft uses completed full1000 artifacts available at generation time. SetR 
 
 ## Completed SetR Rows
 
-SetR selection artifacts currently do not store API token usage. Calls/query are exact for direct SetR variants (`1` selector call/query); token/query should be instrumented or estimated from prompt serialization.
+Historical SetR selection artifacts do not store API token usage. Calls/query
+are exact for direct SetR variants (`1` selector call/query); token/query should
+be estimated from prompt serialization for the existing full1000 run. New runs
+after the 2026-05-06 instrumentation patch will store API token usage directly.
 
 | Pool | Dataset | Variant | EM | F1 | R@5 | Selector calls/q |
 |---|---|---|---:|---:|---:|---:|
@@ -46,5 +61,8 @@ SetR selection artifacts currently do not store API token usage. Calls/query are
 
 - DAEC-LLM + CTL averages about `6.82` selector LLM calls/query and `1178` selector tokens/query across 9 pool x dataset settings.
 - Empty extractor responses are frequent, about `4.18` per query on average; this supports adding an empty-response audit rather than hand-waving it away.
-- Direct SetR gives a clean call-count baseline: `1` selector LLM call/query, but token usage is not yet captured by the adapter.
-- For a fair cost table, add token accounting to SetR selection or estimate prompt tokens consistently from the serialized prompt/input.
+- Direct SetR gives a clean call-count baseline: `1` selector LLM call/query.
+- For existing SetR-style full1000 rows, estimate prompt tokens consistently
+  from serialized prompt/input chars.
+- For new SetR-style rows, prefer recorded API token usage from the selector
+  output JSONL.

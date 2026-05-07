@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass, asdict
 import itertools
 import json
@@ -638,6 +639,41 @@ def _llm_binding_compat_score(candidate_title: str,
     if _contains_normalized_phrase(normalized_body, candidate_key):
         return body_weight
     return 0.0
+
+
+def _binding_title_resolution_stats(
+    binding_candidates_by_req: Mapping[str, Sequence[Mapping[str, object]]],
+    pool_doc_titles: Sequence[str],
+) -> Dict[str, object]:
+    all_candidates: List[Mapping[str, object]] = []
+    for rows in binding_candidates_by_req.values():
+        all_candidates.extend(row for row in rows if isinstance(row, Mapping))
+
+    pool_title_counts = Counter(
+        normalize_structure_text(title)
+        for title in pool_doc_titles
+        if normalize_structure_text(title)
+    )
+    title_occurrences = [
+        int(pool_title_counts.get(normalize_structure_text(row.get("title", "")), 0))
+        for row in all_candidates
+        if normalize_structure_text(row.get("title", ""))
+    ]
+    candidate_count = int(len(all_candidates))
+    unique_count = int(sum(1 for count in title_occurrences if count == 1))
+    nonunique_count = int(sum(1 for count in title_occurrences if count > 1))
+    title_unique_rate = float(unique_count) / float(candidate_count) if candidate_count else 0.0
+    title_nonunique_rate = float(nonunique_count) / float(candidate_count) if candidate_count else 0.0
+    avg_occurrences = float(np.mean(title_occurrences)) if title_occurrences else 0.0
+    return {
+        "candidate_count": candidate_count,
+        "candidate_requirement_count": int(sum(1 for rows in binding_candidates_by_req.values() if rows)),
+        "unique_candidate_title_count": unique_count,
+        "nonunique_candidate_title_count": nonunique_count,
+        "title_unique_rate": round(float(title_unique_rate), 6),
+        "title_nonunique_rate": round(float(title_nonunique_rate), 6),
+        "avg_candidate_title_occurrences": round(float(avg_occurrences), 6),
+    }
 
 
 def _build_bound_subquery(subquery: str, candidate_title: str) -> str:
@@ -1435,6 +1471,7 @@ def select_daec_noisyor_positions(
     safe_retriever_rank_penalty: float = 0.0,
     llm_extract_fn: Callable[[str, str], List[str]] | None = None,
     binding_mode: str = "auto",
+    selective_binding_title_unique_threshold: float | None = None,
     llm_binding_title_match_mode: str = "substring",
     llm_binding_type_filter: bool = False,
     soft_compat_body_weight: float = 0.0,
@@ -1765,6 +1802,34 @@ def select_daec_noisyor_positions(
             for req in active_requirements
             if req.depends_on
         }
+    selective_binding_trace: Dict[str, object] = {
+        "enabled": False,
+        "policy": "disabled",
+        "decision": "bind",
+    }
+    threshold_value: float | None = None
+    if selective_binding_title_unique_threshold is not None:
+        try:
+            threshold_value = float(selective_binding_title_unique_threshold)
+        except (TypeError, ValueError):
+            threshold_value = None
+        if threshold_value is not None and not np.isfinite(threshold_value):
+            threshold_value = None
+    if threshold_value is not None:
+        stats = _binding_title_resolution_stats(binding_candidates_by_req, pool_doc_titles[:pool_limit])
+        title_unique_rate = float(stats.get("title_unique_rate", 0.0) or 0.0)
+        decision = "bind" if title_unique_rate >= float(threshold_value) else "abstain"
+        selective_binding_trace = {
+            "enabled": True,
+            "policy": "query_level_title_unique",
+            "threshold": round(float(threshold_value), 6),
+            "score_name": "bind_conf_title_unique",
+            "title_unique_rate": round(float(title_unique_rate), 6),
+            "decision": decision,
+            **stats,
+        }
+        if decision == "abstain":
+            binding_candidates_by_req = {}
     candidate_lists: List[List[Dict[str, object]]] = [
         rows for rows in binding_candidates_by_req.values() if rows
     ]
@@ -2194,6 +2259,12 @@ def select_daec_noisyor_positions(
         "binding_pruned": bool(binding_pruned),
         "binding_selection_protocol": "best_binding_final_pool",
         "binding_mode": str(_binding_mode),
+        "effective_binding_mode": "nobind" if selective_binding_trace.get("decision") == "abstain" else str(_binding_mode),
+        "selective_binding": selective_binding_trace,
+        "selective_binding_enabled": bool(selective_binding_trace.get("enabled", False)),
+        "selective_binding_decision": str(selective_binding_trace.get("decision", "bind")),
+        "selective_binding_title_unique_rate": float(selective_binding_trace.get("title_unique_rate", 0.0) or 0.0),
+        "selective_binding_threshold": selective_binding_trace.get("threshold"),
         "llm_binding_title_match_mode": str(_llm_binding_title_match_mode),
         "llm_binding_type_filter": bool(llm_binding_type_filter),
         "soft_compat_body_weight": round(float(soft_compat_body_weight), 6),

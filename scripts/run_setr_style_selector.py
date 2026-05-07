@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import re
+import time
 import traceback
 from typing import Any
 from urllib.parse import urlparse
@@ -58,6 +59,12 @@ def parse_setr_selection(text: str, max_position: int) -> list[int]:
             positions.append(pos)
             seen.add(pos)
     return positions
+
+
+def usage_value(usage: Any, key: str) -> int:
+    if isinstance(usage, dict):
+        return int(usage.get(key, 0) or 0)
+    return int(getattr(usage, key, 0) or 0)
 
 
 def build_context_text(record: dict[str, Any]) -> str:
@@ -119,6 +126,7 @@ def call_selector(
     append_no_think: bool,
 ) -> dict[str, Any]:
     user_prompt = build_prompt(record, append_no_think=append_no_think)
+    start = time.monotonic()
     response = client.chat.completions.create(
         model=model,
         messages=[
@@ -129,8 +137,16 @@ def call_selector(
         max_tokens=max_tokens,
         stream=False,
     )
+    latency_s = time.monotonic() - start
     output_text = response.choices[0].message.content or ""
     parsed = parse_setr_selection(output_text, max_position=len(record.get("contexts") or []))
+    usage = getattr(response, "usage", None)
+    finish_reason = None
+    if getattr(response, "choices", None):
+        finish_reason = getattr(response.choices[0], "finish_reason", None)
+    prompt_tokens = usage_value(usage, "prompt_tokens")
+    completion_tokens = usage_value(usage, "completion_tokens")
+    total_tokens = usage_value(usage, "total_tokens") or (prompt_tokens + completion_tokens)
     return {
         "query_idx": record.get("query_idx"),
         "question": record.get("question"),
@@ -142,6 +158,15 @@ def call_selector(
         "prompt_mode": "selection_IRI",
         "append_no_think": append_no_think,
         "model": model,
+        "usage": {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "finish_reason": str(finish_reason or ""),
+        },
+        "latency_s": round(float(latency_s), 4),
+        "prompt_chars": len(user_prompt),
+        "completion_chars": len(output_text),
     }
 
 
@@ -157,6 +182,10 @@ def build_error_row(record: dict[str, Any], *, model: str, error: BaseException,
         "prompt_mode": "selection_IRI",
         "append_no_think": append_no_think,
         "model": model,
+        "usage": {},
+        "latency_s": 0.0,
+        "prompt_chars": 0,
+        "completion_chars": 0,
         "error_type": type(error).__name__,
         "error": str(error),
         "traceback": traceback.format_exc(limit=5),
@@ -206,17 +235,22 @@ def main() -> None:
     def run_one(row: dict[str, Any]) -> dict[str, Any]:
         if args.mock_rank_order:
             positions = list(range(min(5, len(row.get("contexts") or []))))
+            raw_output = "### Final Selection: " + " ".join(f"[{pos + 1}]" for pos in positions)
             return {
                 "query_idx": row.get("query_idx"),
                 "question": row.get("question"),
                 "pool_k": row.get("pool_k"),
-                "raw_output": "### Final Selection: " + " ".join(f"[{pos + 1}]" for pos in positions),
+                "raw_output": raw_output,
                 "selected_positions": positions,
                 "selected_1based": [pos + 1 for pos in positions],
                 "parse_success": True,
                 "prompt_mode": "selection_IRI_mock_rank_order",
                 "append_no_think": not args.no_append_no_think,
                 "model": args.model,
+                "usage": {},
+                "latency_s": 0.0,
+                "prompt_chars": 0,
+                "completion_chars": len(raw_output),
             }
         client = build_openai_client(args.llm_base_url, args.api_key)
         try:

@@ -60,14 +60,83 @@ def reorder_positions(selected_positions: Sequence[int], pool_size: int) -> list
     return ordered
 
 
+def rank_order_fill_to_k_positions(
+    selected_positions: Sequence[int],
+    pool_size: int,
+    *,
+    fill_to_k: int,
+) -> tuple[list[int], int]:
+    target_k = min(max(int(fill_to_k), 0), pool_size)
+    seen = set()
+    ordered = []
+    for pos in selected_positions:
+        if len(ordered) >= target_k:
+            break
+        if 0 <= int(pos) < pool_size and int(pos) not in seen:
+            ordered.append(int(pos))
+            seen.add(int(pos))
+    selected_kept_count = len(ordered)
+    for pos in range(pool_size):
+        if len(ordered) >= target_k:
+            break
+        if pos not in seen:
+            ordered.append(pos)
+            seen.add(pos)
+    return ordered, max(0, len(ordered) - selected_kept_count)
+
+
+def selected_only_positions(
+    selected_positions: Sequence[int],
+    pool_size: int,
+    *,
+    empty_fallback_top_n: int,
+) -> tuple[list[int], bool]:
+    seen = set()
+    ordered = []
+    for pos in selected_positions:
+        if 0 <= int(pos) < pool_size and int(pos) not in seen:
+            ordered.append(int(pos))
+            seen.add(int(pos))
+    if ordered:
+        return ordered, False
+    fallback_count = min(max(int(empty_fallback_top_n), 0), pool_size)
+    return list(range(fallback_count)), bool(fallback_count)
+
+
 def reorder_list(values: list[Any], order: Sequence[int]) -> list[Any]:
     return [values[pos] for pos in order if pos < len(values)]
 
 
-def apply_selection_to_record(record: dict[str, Any], selection_row: dict[str, Any] | None) -> tuple[dict[str, Any], dict[str, Any]]:
+def apply_selection_to_record(
+    record: dict[str, Any],
+    selection_row: dict[str, Any] | None,
+    *,
+    fallback_mode: str = "rank_order_fill",
+    empty_fallback_top_n: int = 1,
+    fill_to_k: int = 5,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     pool_size = len(record.get("pool_docs") or [])
     selected = selected_positions_from_row(selection_row or {}, pool_size=pool_size) if selection_row else []
-    order = reorder_positions(selected, pool_size=pool_size)
+    if fallback_mode == "rank_order_fill":
+        order = reorder_positions(selected, pool_size=pool_size)
+        empty_fallback_used = False
+        rank_order_fallback_count = max(0, min(5, pool_size) - min(len(selected), 5))
+    elif fallback_mode == "rank_order_fill_to_k":
+        order, rank_order_fallback_count = rank_order_fill_to_k_positions(
+            selected,
+            pool_size=pool_size,
+            fill_to_k=fill_to_k,
+        )
+        empty_fallback_used = False
+    elif fallback_mode == "selected_only":
+        order, empty_fallback_used = selected_only_positions(
+            selected,
+            pool_size=pool_size,
+            empty_fallback_top_n=empty_fallback_top_n,
+        )
+        rank_order_fallback_count = int(empty_fallback_top_n) if empty_fallback_used else 0
+    else:
+        raise ValueError(f"Unsupported fallback_mode: {fallback_mode}")
     out = dict(record)
     for key in POOL_LIST_KEYS:
         values = list(record.get(key) or [])
@@ -78,7 +147,11 @@ def apply_selection_to_record(record: dict[str, Any], selection_row: dict[str, A
         "parse_success": bool(selected),
         "selected_positions": selected,
         "selected_1based": [pos + 1 for pos in selected],
-        "fallback_count": max(0, min(5, pool_size) - min(len(selected), 5)),
+        "fallback_mode": fallback_mode,
+        "fallback_count": rank_order_fallback_count,
+        "fill_to_k": int(fill_to_k) if fallback_mode == "rank_order_fill_to_k" else None,
+        "empty_fallback_used": bool(empty_fallback_used),
+        "reader_pool_size": len(order),
         "pool_size": pool_size,
     }
     out.setdefault("setr_selection_trace", trace)
@@ -92,6 +165,28 @@ def main() -> None:
     parser.add_argument("--selection_jsonl", required=True)
     parser.add_argument("--output_pool_json", required=True)
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument(
+        "--fallback_mode",
+        choices=("rank_order_fill", "rank_order_fill_to_k", "selected_only"),
+        default="rank_order_fill",
+        help=(
+            "rank_order_fill preserves the previous SetR-padded behavior; "
+            "rank_order_fill_to_k keeps selected passages plus rank-order fallback up to --fill_to_k; "
+            "selected_only keeps only LLM-selected passages."
+        ),
+    )
+    parser.add_argument(
+        "--fill_to_k",
+        type=int,
+        default=5,
+        help="Target pool size for rank_order_fill_to_k.",
+    )
+    parser.add_argument(
+        "--empty_fallback_top_n",
+        type=int,
+        default=1,
+        help="Engineering fallback for selected_only when parsing yields no selected passages.",
+    )
     args = parser.parse_args()
 
     pool_path = Path(args.pool_json)
@@ -106,7 +201,13 @@ def main() -> None:
     traces = []
     for idx, record in enumerate(records):
         key = str(record.get("query_idx")) if record.get("query_idx") is not None else str(record.get("question") or "")
-        selected_record, trace = apply_selection_to_record(record, selection_by_key.get(key))
+        selected_record, trace = apply_selection_to_record(
+            record,
+            selection_by_key.get(key),
+            fallback_mode=str(args.fallback_mode),
+            empty_fallback_top_n=int(args.empty_fallback_top_n),
+            fill_to_k=int(args.fill_to_k),
+        )
         out_records.append(selected_record)
         traces.append(trace)
 
@@ -115,8 +216,18 @@ def main() -> None:
     out_payload["setr_selection"] = {
         "selection_jsonl": str(args.selection_jsonl),
         "records_reordered": len(out_records),
+        "fallback_mode": str(args.fallback_mode),
+        "fill_to_k": int(args.fill_to_k) if str(args.fallback_mode) == "rank_order_fill_to_k" else None,
+        "empty_fallback_top_n": int(args.empty_fallback_top_n),
         "parse_success_count": sum(1 for trace in traces if trace["parse_success"]),
         "parse_failure_count": sum(1 for trace in traces if not trace["parse_success"]),
+        "empty_fallback_count": sum(1 for trace in traces if trace.get("empty_fallback_used")),
+        "avg_fallback_count": (
+            sum(int(trace.get("fallback_count", 0) or 0) for trace in traces) / len(traces) if traces else 0.0
+        ),
+        "avg_reader_pool_size": (
+            sum(int(trace.get("reader_pool_size", 0) or 0) for trace in traces) / len(traces) if traces else 0.0
+        ),
         "avg_selected_count": (
             sum(len(trace["selected_positions"]) for trace in traces) / len(traces) if traces else 0.0
         ),

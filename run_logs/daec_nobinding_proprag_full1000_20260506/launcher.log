@@ -1,0 +1,4 @@
+[START] daec_nobinding_proprag_full1000 start=2026-05-06T18:59:11+08:00
+[JOB_START] pool=proprag match=wiki_title selector=daec_noisyor_nobind dataset=2wikimultihopqa start=2026-05-06T18:59:11+08:00
+[JOB_START] pool=proprag match=wiki_title selector=daec_noisyor_nobind dataset=hotpotqa start=2026-05-06T18:59:11+08:00
+[JOB_START] pool=proprag match=wiki_title selector=daec_noisyor_nobind dataset=musique start=2026-05-06T18:59:11+08:00
