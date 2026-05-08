@@ -1,0 +1,4 @@
+source,method,missing_gold_titles,queries,hit_at_5,new_at_5
+single_pass,rankgpt_rank5_no_think,96,72,0.20833333333333334,0.20833333333333334
+single_pass,rankgpt_select5_no_think,96,72,0.25,0.25
+sliding,rankgpt_sliding20_step10_no_think,96,72,0.23958333333333334,0.23958333333333334

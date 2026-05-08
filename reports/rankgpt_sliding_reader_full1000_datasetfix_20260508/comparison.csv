@@ -1,0 +1,10 @@
+dataset,method,n,EM,F1,reader_recall_at_5,R5_TITLE_CI_RECOMPUTED,selector_diagnostic_support_recall_at_5,selector_diagnostic_complete_at_5,parse_ok_rate,pipeline_recall_at_5,external_proprag_recall_at_5,external_recomputed_title_recall_at_5,question_mismatch_count,unmatched_doc_count,llm_calls_per_query,sequential_llm_calls_per_query
+2Wiki,DAEC-selective,1000,0.642,0.7118277000000001,0.941,0.941,0.941,0.863,,,,,,,,
+2Wiki,SetR-faithful,1000,0.603,0.6746146325896326,0.883,0.884,0.9425,0.855,,,,,,,,
+2Wiki,RankGPT-style sliding,1000,0.602,0.6658764652014652,0.9117,0.91175,0.91175,0.8,0.901,0.9117,0.9028,0.9028,0,0,9,9
+HotpotQA,DAEC-selective,1000,0.62,0.7473044,0.9605,0.9625,0.9625,0.93,,,,,,,,
+HotpotQA,SetR-faithful,1000,0.625,0.7434934946890055,0.9235,0.9245,0.9735,0.949,,,,,,,,
+HotpotQA,RankGPT-style sliding,1000,0.566,0.6844810404765513,0.878,0.8805,0.8805,0.784,0.954,0.878,0.95,0.95,0,0,9,9
+MuSiQue,DAEC-selective,1000,0.353,0.45480810000000005,0.7469,0.7745,0.774499999999999,0.527,,,,,,,,
+MuSiQue,SetR-faithful,1000,0.344,0.44665059935764273,0.659,0.6909166666666667,0.7836666666666655,0.542,,,,,,,,
+MuSiQue,RankGPT-style sliding,1000,0.319,0.40930187867687867,0.6254,0.6630833333333332,0.6630833333333328,0.395,0.992,0.6254,0.7131,0.7372,0,0,9,9

@@ -2,7 +2,7 @@
   "report": "MuSiQue Failure Synthesis",
   "date": "2026-05-08",
   "status": "internal_decision_memo",
-  "recommendation": "Stop MuSiQue-fix pilots for now and move to DBEC paper writing. The RankGPT-style selector baseline is useful reviewer defense, but broad reader runs should be avoided unless the draft specifically needs them.",
+  "recommendation": "Stop MuSiQue-fix pilots for now and move to DBEC paper writing. The corrected RankGPT-style sliding-window reader run is paper-ready reviewer defense and complementary-headroom evidence; no more RankGPT variants are needed before drafting.",
   "core_claim": "MuSiQue residual failures are dominated by candidate visibility under long dependency chains, not by DBEC backend admission, scoring, or fixed-pool rank arbitration.",
   "key_numbers": {
     "candidate_quality_audit": {
@@ -25,11 +25,11 @@
       },
       "gold_in_rank_fill_not_dbec": {
         "count": 4,
-        "rate": 0.020
+        "rate": 0.02
       },
       "gold_in_binding_candidates_not_selected": {
         "count": 2,
-        "rate": 0.010
+        "rate": 0.01
       }
     },
     "chain_walking_probe_query_primary": {
@@ -43,7 +43,7 @@
     },
     "anchor_variants_query_primary": {
       "current_all_new_at_5": 0.105,
-      "title_strict_new_at_5": 0.070,
+      "title_strict_new_at_5": 0.07,
       "title_only_new_at_5": 0.105,
       "demand_entity_title_new_at_5": 0.093,
       "decision": "stop_anchor_tuning"
@@ -56,9 +56,9 @@
         "context_iterative_lite_expanded_recall_at_100": 0.198
       },
       "pool_absent": {
-        "dbir_det_pool_absent_recovery_at_100": 0.120,
-        "independent_demand_pool_absent_recovery_at_100": 0.280,
-        "rank_expansion_pool_absent_recovery_at_100": 0.280
+        "dbir_det_pool_absent_recovery_at_100": 0.12,
+        "independent_demand_pool_absent_recovery_at_100": 0.28,
+        "rank_expansion_pool_absent_recovery_at_100": 0.28
       },
       "decision": "stop_or_pivot"
     },
@@ -80,53 +80,71 @@
         "missing_gold_titles": 96,
         "llm_query_reform_new_at_5": 0.052,
         "llm_demand_hyde_new_at_5": 0.115,
-        "llm_listwise_select_new_at_5": 0.250,
+        "llm_listwise_select_new_at_5": 0.25,
         "llm_listwise_select_new_at_10": 0.271,
-        "llm_listwise_select_policy_recall_at_5": 0.250,
+        "llm_listwise_select_policy_recall_at_5": 0.25,
         "llm_listwise_select_policy_recall_at_10": 0.323,
         "decision": "mixed_fixed_pool_signal"
       }
     },
     "rankgpt_fixed_pool_baseline": {
       "strict_fixed_pool": true,
-      "selector_only": true,
-      "reader_run": false,
+      "selector_only": false,
+      "reader_run": true,
       "llm_model": "qwen3-8b-train",
       "no_think": true,
       "passage_id_convention": "1-based",
+      "rankgpt_reproduction": "sliding-window local adaptation, not GPT-3.5/4 RankGPT reproduction",
+      "sliding_window": {
+        "window_size": 20,
+        "step": 10,
+        "rank_start": 0,
+        "rank_end": 100,
+        "calls_per_query": 9,
+        "sequential_calls_per_query": 9
+      },
       "datasets": {
         "2wikimultihopqa": {
           "queries": 1000,
-          "dbec_selective_support_recall_at_5": 0.941,
-          "dbec_selective_support_complete_at_5": 0.863,
-          "setr_faithful_support_recall_at_5": 0.942,
-          "setr_faithful_support_complete_at_5": 0.855,
-          "rankgpt_rank5_support_recall_at_5": 0.896,
-          "rankgpt_rank5_support_complete_at_5": 0.787,
-          "rankgpt_select5_support_recall_at_5": 0.885,
-          "rankgpt_select5_support_complete_at_5": 0.752
+          "daec_selective_em": 0.642,
+          "daec_selective_f1": 0.7118277000000001,
+          "daec_selective_reader_recall_at_5": 0.941,
+          "setr_faithful_em": 0.603,
+          "setr_faithful_f1": 0.6746146325896326,
+          "setr_faithful_reader_recall_at_5": 0.883,
+          "rankgpt_sliding_em": 0.602,
+          "rankgpt_sliding_f1": 0.6658764652014652,
+          "rankgpt_sliding_reader_recall_at_5": 0.9117,
+          "rankgpt_sliding_selector_support_recall_at_5": 0.91175,
+          "rankgpt_sliding_selector_complete_at_5": 0.8
         },
         "hotpotqa": {
           "queries": 1000,
-          "dbec_selective_support_recall_at_5": 0.962,
-          "dbec_selective_support_complete_at_5": 0.930,
-          "setr_faithful_support_recall_at_5": 0.974,
-          "setr_faithful_support_complete_at_5": 0.949,
-          "rankgpt_rank5_support_recall_at_5": 0.866,
-          "rankgpt_rank5_support_complete_at_5": 0.762,
-          "rankgpt_select5_support_recall_at_5": 0.850,
-          "rankgpt_select5_support_complete_at_5": 0.733
+          "daec_selective_em": 0.62,
+          "daec_selective_f1": 0.7473044,
+          "daec_selective_reader_recall_at_5": 0.9605,
+          "setr_faithful_em": 0.625,
+          "setr_faithful_f1": 0.7434934946890055,
+          "setr_faithful_reader_recall_at_5": 0.9235,
+          "rankgpt_sliding_em": 0.566,
+          "rankgpt_sliding_f1": 0.6844810404765513,
+          "rankgpt_sliding_reader_recall_at_5": 0.878,
+          "rankgpt_sliding_selector_support_recall_at_5": 0.8805,
+          "rankgpt_sliding_selector_complete_at_5": 0.784
         },
         "musique": {
           "queries": 1000,
-          "dbec_selective_support_recall_at_5": 0.774,
-          "dbec_selective_support_complete_at_5": 0.527,
-          "setr_faithful_support_recall_at_5": 0.784,
-          "setr_faithful_support_complete_at_5": 0.542,
-          "rankgpt_rank5_support_recall_at_5": 0.658,
-          "rankgpt_rank5_support_complete_at_5": 0.374,
-          "rankgpt_select5_support_recall_at_5": 0.652,
-          "rankgpt_select5_support_complete_at_5": 0.366
+          "daec_selective_em": 0.353,
+          "daec_selective_f1": 0.45480810000000005,
+          "daec_selective_reader_recall_at_5": 0.7469,
+          "setr_faithful_em": 0.344,
+          "setr_faithful_f1": 0.44665059935764273,
+          "setr_faithful_reader_recall_at_5": 0.659,
+          "rankgpt_sliding_em": 0.319,
+          "rankgpt_sliding_f1": 0.40930187867687867,
+          "rankgpt_sliding_reader_recall_at_5": 0.6254,
+          "rankgpt_sliding_selector_support_recall_at_5": 0.6630833333333328,
+          "rankgpt_sliding_selector_complete_at_5": 0.395
         }
       },
       "musique_source_visible_missing_slice": {
@@ -134,15 +152,16 @@
         "missing_gold_titles": 96,
         "dbec_selective_new_at_5": 0.0,
         "setr_faithful_new_at_5": 0.0,
-        "rankgpt_rank5_new_at_5": 0.208,
-        "rankgpt_select5_new_at_5": 0.250
+        "rankgpt_rank5_new_at_5": 0.20833333333333334,
+        "rankgpt_select5_new_at_5": 0.25,
+        "rankgpt_sliding_new_at_5": 0.23958333333333334
       },
       "decision": "reviewer_defense_not_replacement"
     },
     "repair_gated_reader": {
       "musique_best_f1": 0.2922,
       "musique_delta_vs_dbec": -0.0171,
-      "musique_delta_vs_rank_fill5": -0.0470,
+      "musique_delta_vs_rank_fill5": -0.047,
       "decision": "stop"
     }
   },
@@ -154,7 +173,7 @@
     "Strict title-only anchor matching does not improve the chain-walking probe.",
     "Deterministic dependency-bound lexical expansion does not show an independent advantage over simpler expansion policies.",
     "Strict fixed-pool LLM listwise selection shows nontrivial headroom, but query reformulation and demand-HyDE remain weak and the listwise variant is not yet a practical DBEC method component.",
-    "Under the controlled Qwen3-8B /no_think fixed-pool selector setup, RankGPT-style listwise selection is weaker than DBEC/SetR on overall Support R@5 and Complete@5 across 2Wiki, HotpotQA, and MuSiQue, while still showing MuSiQue missing-slice New@5 headroom of 20.8-25.0%."
+    "Under the controlled Qwen3-8B /no_think fixed-pool setup, RankGPT-style sliding-window local adaptation is weaker than DAEC/SetR on reader F1 across 2Wiki, HotpotQA, and MuSiQue, while still showing MuSiQue missing-slice New@5 headroom of 24.0%."
   ],
   "not_allowed_claims": [
     "D-BIR solves the fixed-pool ceiling.",
@@ -164,14 +183,16 @@
     "The practical MuSiQue ceiling is a formal theorem rather than a diagnostic estimate.",
     "Fixed-pool candidate generation has been proven exhausted.",
     "Query reformulation or demand-HyDE alone solves the MuSiQue candidate visibility gap.",
-    "LLM listwise pool selection improves reader F1 before a reader evaluation is run.",
-    "The RankGPT-style baseline is a full GPT-4 RankGPT reproduction; it is a Qwen3-8B /no_think RankGPT-style selector baseline.",
-    "RankGPT-style selector reader F1 is known before a reader evaluation is run."
+    "The RankGPT-style baseline is a full GPT-4 RankGPT reproduction; it is a Qwen3-8B /no_think sliding-window local adaptation.",
+    "RankGPT-style listwise selection is universally worse or useless; it recovers a complementary MuSiQue missing-support subset even though its full1000 reader F1 is lower."
   ],
   "artifacts": {
     "summary_md": "reports/musique_failure_synthesis_20260507/summary.md",
     "evidence_table_csv": "reports/musique_failure_synthesis_20260507/evidence_table.csv",
     "decision_matrix_csv": "reports/musique_failure_synthesis_20260507/decision_matrix.csv",
-    "rankgpt_fixed_pool_baseline": "reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/summary.md"
+    "rankgpt_fixed_pool_baseline": "reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/summary.md",
+    "rankgpt_fixed_pool_baseline_single_pass": "reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/summary.md",
+    "rankgpt_fixed_pool_baseline_sliding": "reports/rankgpt_fixed_pool_baseline_sliding_full1000_20260508/summary.md",
+    "rankgpt_sliding_reader_datasetfix": "reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/summary.md"
   }
 }

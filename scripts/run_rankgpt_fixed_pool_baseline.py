@@ -5,10 +5,12 @@ This script evaluates selector-level support metrics for RankGPT-style listwise
 reranking over the existing PropRAG pool100.  It does not retrieve new
 documents and does not run the answer reader.
 
-Two no-thinking variants are supported:
+Three no-thinking variants are supported:
 
 * ``rank5_no_think``: ask the model to rank the top 5 passages by relevance.
 * ``select5_no_think``: ask the model to directly select 5 support passages.
+* ``sliding20_step10_no_think``: RankGPT-style back-to-front sliding-window
+  permutation reranking with window size 20 and step 10.
 
 Both prompts include ``/no_think`` and require strict JSON output with pool
 positions.  The output order is filled with the original source order after the
@@ -49,7 +51,6 @@ from analyze_repair_gated_arbitration_offline import (  # noqa: E402
     safe_float,
     safe_int,
     support_match,
-    write_csv,
     write_json,
 )
 from probe_chain_walking_binding import (  # noqa: E402
@@ -71,13 +72,19 @@ from probe_fixed_pool_candidate_generation import (  # noqa: E402
 
 REPORT_DIR = Path("reports/rankgpt_fixed_pool_baseline_20260508")
 PROMPT_VERSION = "rankgpt_fixed_pool_v1_no_think"
+SLIDING_PROMPT_VERSION = "rankgpt_sliding_window_v1_no_think"
 DATASETS = ("2wikimultihopqa", "hotpotqa", "musique")
 DATASET_LABELS = {
     "2wikimultihopqa": "2Wiki",
     "hotpotqa": "HotpotQA",
     "musique": "MuSiQue",
 }
-VARIANTS = ("rank5_no_think", "select5_no_think")
+VARIANTS = ("rank5_no_think", "select5_no_think", "sliding20_step10_no_think")
+SLIDING_VARIANT = "sliding20_step10_no_think"
+SLIDING_WINDOW_SIZE = 20
+SLIDING_STEP = 10
+SLIDING_RANK_START = 0
+SLIDING_RANK_END = 100
 
 
 def write_csv_lf(rows: Sequence[Mapping[str, Any]], path: str | Path) -> None:
@@ -134,6 +141,10 @@ def pool_doc_list(record: Mapping[str, Any], *, max_doc_chars: int, one_based_id
     return "\n\n".join(lines)
 
 
+def is_sliding_variant(variant: str) -> bool:
+    return str(variant) == SLIDING_VARIANT
+
+
 def build_messages(
     *,
     variant: str,
@@ -178,6 +189,44 @@ def build_messages(
     ]
 
 
+def build_sliding_window_messages(
+    *,
+    question: str,
+    window_titles: Sequence[Any],
+    window_docs: Sequence[Any],
+    max_doc_chars: int,
+    one_based_ids: bool = True,
+) -> list[dict[str, str]]:
+    record = {
+        "pool_titles": list(window_titles),
+        "pool_docs": list(window_docs),
+    }
+    docs = pool_doc_list(record, max_doc_chars=max_doc_chars, one_based_ids=one_based_ids)
+    window_len = len(window_titles)
+    id_note = (
+        f"Passage ids are 1-based: valid ids are integers from 1 to {window_len}."
+        if one_based_ids
+        else f"Passage ids are 0-based: valid ids are integers from 0 to {max(window_len - 1, 0)}."
+    )
+    task = (
+        "You are RankGPT, an assistant that ranks passages by relevance to a query.\n"
+        "I will provide one sliding-window subset from a fixed retrieval pool.\n"
+        "Rank all passages in this window from most useful to least useful for answering the query.\n"
+        f"{id_note} Use only passage ids that appear below. Do not invent ids. Do not explain.\n"
+        "Return strict JSON only: {\"ranking\": [integer, ...]}."
+    )
+    user = (
+        "/no_think\n"
+        f"{task}\n\n"
+        f"Query: {question}\n\n"
+        f"Candidate passages:\n{docs}\n"
+    )
+    return [
+        {"role": "system", "content": "You are a listwise passage reranker. Output JSON only."},
+        {"role": "user", "content": user},
+    ]
+
+
 def extract_positions_from_raw(
     raw: Any,
     *,
@@ -210,6 +259,44 @@ def extract_positions_from_raw(
         if len(output) >= int(top_k):
             break
     return output, source
+
+
+def apply_window_permutation(
+    current_order: Sequence[int],
+    *,
+    start: int,
+    end: int,
+    local_positions: Sequence[int],
+) -> list[int]:
+    output = list(current_order)
+    window = output[int(start) : int(end)]
+    local_order = fill_source_order(local_positions, pool_size=len(window))
+    output[int(start) : int(end)] = [window[pos] for pos in local_order]
+    return output
+
+
+def sliding_window_ranges(
+    *,
+    pool_size: int,
+    window_size: int,
+    step: int,
+    rank_start: int,
+    rank_end: int,
+) -> list[tuple[int, int]]:
+    end = min(max(int(rank_end), 0), int(pool_size))
+    start_floor = min(max(int(rank_start), 0), end)
+    width = min(max(int(window_size), 1), max(end - start_floor, 1))
+    stride = max(int(step), 1)
+    start = end - width
+    ranges: list[tuple[int, int]] = []
+    while start >= start_floor:
+        ranges.append((start, start + width))
+        start -= stride
+    if ranges and ranges[-1][0] != start_floor:
+        ranges.append((start_floor, min(start_floor + width, end)))
+    if not ranges and end > start_floor:
+        ranges.append((start_floor, end))
+    return ranges
 
 
 def selected_titles(order: Sequence[int], record: Mapping[str, Any], *, top_k: int = TOP_K) -> list[str]:
@@ -261,6 +348,7 @@ def build_tasks(
 ) -> tuple[list[dict[str, Any]], dict[str, list[dict[str, Any]]]]:
     tasks: list[dict[str, Any]] = []
     records_by_dataset: dict[str, list[dict[str, Any]]] = {}
+    non_sliding_variants = [variant for variant in variants if not is_sliding_variant(variant)]
     for dataset in datasets:
         records = list(read_json(source_pool_path(dataset)).get("records") or [])
         if int(limit) > 0:
@@ -268,7 +356,7 @@ def build_tasks(
         records_by_dataset[dataset] = records
         for query_index, record in enumerate(records):
             question = str(record.get("question") or "")
-            for variant in variants:
+            for variant in non_sliding_variants:
                 messages = build_messages(
                     variant=variant,
                     question=question,
@@ -375,6 +463,252 @@ def run_llm_tasks(
         for future in as_completed(futures):
             rows.append(future.result())
     return sorted(rows, key=lambda row: (row["dataset"], safe_int(row["query_index"]), row["variant"]))
+
+
+def call_llm_with_cache(
+    *,
+    task: Mapping[str, Any],
+    task_index: int,
+    cache: JsonlCache,
+    cache_lock: threading.Lock,
+    run_llm: bool,
+    base_urls: Sequence[str],
+    model: str,
+    max_tokens: int,
+    timeout: int,
+) -> tuple[str, str, int, str]:
+    key = str(task["key"])
+    with cache_lock:
+        raw = cache.get(key)
+    cache_hit = int(raw is not None)
+    endpoint = ""
+    error = ""
+    if raw is None and run_llm:
+        for attempt in range(max(1, len(base_urls))):
+            endpoint = base_urls[(task_index + attempt) % len(base_urls)]
+            try:
+                raw = chat_completion_raw(
+                    base_url=endpoint,
+                    model=model,
+                    messages=list(task["messages"]),
+                    max_tokens=max_tokens,
+                    timeout=timeout,
+                )
+                with cache_lock:
+                    cache.set(
+                        key,
+                        raw,
+                        {
+                            "dataset": task.get("dataset"),
+                            "query_index": task.get("query_index"),
+                            "variant": task.get("variant"),
+                            "window_index": task.get("window_index"),
+                            "window_start": task.get("window_start"),
+                            "window_end": task.get("window_end"),
+                            "endpoint": endpoint,
+                        },
+                    )
+                break
+            except Exception as exc:  # pragma: no cover - integration behavior
+                error = str(exc)
+                raw = None
+    return str(raw or ""), endpoint, cache_hit, error
+
+
+def run_sliding_variant_tasks(
+    *,
+    datasets: Sequence[str],
+    limit: int,
+    max_doc_chars: int,
+    llm_model: str,
+    cache: JsonlCache,
+    run_llm: bool,
+    base_urls: Sequence[str],
+    max_tokens: int,
+    timeout: int,
+    workers: int,
+    one_based_ids: bool,
+    window_size: int,
+    step: int,
+    rank_start: int,
+    rank_end: int,
+) -> list[dict[str, Any]]:
+    cache_lock = threading.Lock()
+    query_jobs: list[dict[str, Any]] = []
+    for dataset in datasets:
+        records = list(read_json(source_pool_path(dataset)).get("records") or [])
+        if int(limit) > 0:
+            records = records[: int(limit)]
+        for query_index, record in enumerate(records):
+            query_jobs.append(
+                {
+                    "dataset": dataset,
+                    "query_index": query_index,
+                    "record": record,
+                }
+            )
+
+    def one_query(job_index: int, job: Mapping[str, Any]) -> list[dict[str, Any]]:
+        dataset = str(job["dataset"])
+        query_index = safe_int(job["query_index"])
+        record = job["record"]
+        question = str(record.get("question") or "")
+        pool_titles = list(record.get("pool_titles") or [])
+        pool_docs = list(record.get("pool_docs") or [])
+        current_order = list(range(len(pool_titles)))
+        prompt_rows: list[dict[str, Any]] = []
+        ranges = sliding_window_ranges(
+            pool_size=len(pool_titles),
+            window_size=window_size,
+            step=step,
+            rank_start=rank_start,
+            rank_end=rank_end,
+        )
+        parse_ok_count = 0
+        for window_index, (start, end) in enumerate(ranges):
+            window_positions = current_order[start:end]
+            window_titles = [pool_titles[pos] for pos in window_positions]
+            window_docs = [pool_docs[pos] for pos in window_positions]
+            messages = build_sliding_window_messages(
+                question=question,
+                window_titles=window_titles,
+                window_docs=window_docs,
+                max_doc_chars=max_doc_chars,
+                one_based_ids=one_based_ids,
+            )
+            key = stable_hash(
+                {
+                    "prompt_version": SLIDING_PROMPT_VERSION,
+                    "dataset": dataset,
+                    "query_index": query_index,
+                    "query_idx": record.get("query_idx"),
+                    "question": question,
+                    "variant": SLIDING_VARIANT,
+                    "window_index": window_index,
+                    "window_start": start,
+                    "window_end": end,
+                    "window_positions_hash": stable_hash(window_positions),
+                    "window_title_hash": stable_hash(window_titles),
+                    "llm_model": llm_model,
+                    "max_doc_chars": max_doc_chars,
+                    "one_based_ids": one_based_ids,
+                }
+            )
+            task = {
+                "key": key,
+                "dataset": dataset,
+                "query_index": query_index,
+                "variant": f"{SLIDING_VARIANT}__window",
+                "window_index": window_index,
+                "window_start": start,
+                "window_end": end,
+                "messages": messages,
+            }
+            raw, endpoint, cache_hit, error = call_llm_with_cache(
+                task=task,
+                task_index=(job_index * max(1, len(ranges))) + window_index,
+                cache=cache,
+                cache_lock=cache_lock,
+                run_llm=run_llm,
+                base_urls=base_urls,
+                model=llm_model,
+                max_tokens=max_tokens,
+                timeout=timeout,
+            )
+            local_positions, parse_source = extract_positions_from_raw(
+                raw,
+                pool_size=len(window_positions),
+                top_k=len(window_positions),
+                one_based_ids=one_based_ids,
+            )
+            parse_ok = int(bool(local_positions))
+            parse_ok_count += parse_ok
+            current_order = apply_window_permutation(
+                current_order,
+                start=start,
+                end=end,
+                local_positions=local_positions,
+            )
+            prompt_rows.append(
+                {
+                    "key": key,
+                    "dataset": dataset,
+                    "dataset_label": DATASET_LABELS.get(dataset, dataset),
+                    "query_index": query_index,
+                    "variant": f"{SLIDING_VARIANT}__window",
+                    "endpoint": endpoint,
+                    "cache_hit": cache_hit,
+                    "run_llm": int(run_llm),
+                    "prompt_has_no_think": int(prompt_has_no_think(messages)),
+                    "parse_ok": parse_ok,
+                    "raw": raw,
+                    "error": error,
+                    "window_index": window_index,
+                    "window_start": start,
+                    "window_end": end,
+                    "window_positions_json": json.dumps(window_positions, ensure_ascii=False),
+                    "parsed_local_positions_json": json.dumps(local_positions, ensure_ascii=False),
+                    "parse_source": parse_source,
+                    "row_type": "sliding_window",
+                }
+            )
+
+        final_positions = current_order[:TOP_K]
+        final_raw = json.dumps(
+            {"ranking": [pos + 1 if one_based_ids else pos for pos in final_positions]},
+            ensure_ascii=False,
+        )
+        prompt_rows.append(
+            {
+                "key": stable_hash(
+                    {
+                        "prompt_version": SLIDING_PROMPT_VERSION,
+                        "dataset": dataset,
+                        "query_index": query_index,
+                        "query_idx": record.get("query_idx"),
+                        "variant": SLIDING_VARIANT,
+                        "final_order_hash": stable_hash(current_order),
+                    }
+                ),
+                "dataset": dataset,
+                "dataset_label": DATASET_LABELS.get(dataset, dataset),
+                "query_index": query_index,
+                "variant": SLIDING_VARIANT,
+                "endpoint": "",
+                "cache_hit": 0,
+                "run_llm": int(run_llm),
+                "prompt_has_no_think": 1,
+                "parse_ok": int(parse_ok_count == len(ranges)),
+                "raw": final_raw,
+                "error": "",
+                "window_index": "",
+                "window_start": "",
+                "window_end": "",
+                "window_positions_json": "",
+                "parsed_local_positions_json": "",
+                "parse_source": "sliding_final_top5",
+                "row_type": "sliding_final",
+                "sliding_window_count": len(ranges),
+                "sliding_window_parse_ok_count": parse_ok_count,
+                "final_order_top20_json": json.dumps(current_order[:20], ensure_ascii=False),
+            }
+        )
+        return prompt_rows
+
+    rows: list[dict[str, Any]] = []
+    with ThreadPoolExecutor(max_workers=max(1, int(workers))) as executor:
+        futures = [executor.submit(one_query, idx, job) for idx, job in enumerate(query_jobs)]
+        for future in as_completed(futures):
+            rows.extend(future.result())
+    return sorted(
+        rows,
+        key=lambda row: (
+            str(row.get("dataset")),
+            safe_int(row.get("query_index")),
+            str(row.get("variant")),
+            safe_int(row.get("window_index"), default=999),
+        ),
+    )
 
 
 def prompt_rows_by_key(rows: Sequence[Mapping[str, Any]]) -> dict[tuple[str, int, str], Mapping[str, Any]]:
@@ -654,6 +988,35 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         timeout=int(args.timeout),
         workers=int(args.workers),
     )
+    if any(is_sliding_variant(variant) for variant in variants):
+        prompt_rows.extend(
+            run_sliding_variant_tasks(
+                datasets=datasets,
+                limit=int(args.limit),
+                max_doc_chars=int(args.max_doc_chars),
+                llm_model=str(args.llm_model),
+                cache=cache,
+                run_llm=bool(args.run_llm),
+                base_urls=active_urls,
+                max_tokens=int(args.max_tokens),
+                timeout=int(args.timeout),
+                workers=int(args.workers),
+                one_based_ids=not bool(args.zero_based_ids),
+                window_size=int(args.sliding_window_size),
+                step=int(args.sliding_step),
+                rank_start=int(args.sliding_rank_start),
+                rank_end=int(args.sliding_rank_end),
+            )
+        )
+        prompt_rows = sorted(
+            prompt_rows,
+            key=lambda row: (
+                str(row.get("dataset")),
+                safe_int(row.get("query_index")),
+                str(row.get("variant")),
+                safe_int(row.get("window_index"), default=999),
+            ),
+        )
     selector_rows = build_eval_rows(
         datasets=datasets,
         variants=variants,
@@ -678,7 +1041,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "one_based_ids": not bool(args.zero_based_ids),
         "cache_path": str(cache_path),
         "prompt_count": len(prompt_rows),
+        "llm_call_count": sum(1 for row in prompt_rows if str(row.get("row_type")) != "sliding_final"),
         "all_prompts_no_think": all(safe_int(row.get("prompt_has_no_think")) for row in prompt_rows) if prompt_rows else True,
+        "sliding_window_size": int(args.sliding_window_size),
+        "sliding_step": int(args.sliding_step),
+        "sliding_rank_start": int(args.sliding_rank_start),
+        "sliding_rank_end": int(args.sliding_rank_end),
         "elapsed_seconds": round(time.perf_counter() - started, 3),
     }
     payload = {
@@ -719,6 +1087,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_tokens", type=int, default=256)
     parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument("--max_doc_chars", type=int, default=180)
+    parser.add_argument("--sliding_window_size", type=int, default=SLIDING_WINDOW_SIZE)
+    parser.add_argument("--sliding_step", type=int, default=SLIDING_STEP)
+    parser.add_argument("--sliding_rank_start", type=int, default=SLIDING_RANK_START)
+    parser.add_argument("--sliding_rank_end", type=int, default=SLIDING_RANK_END)
     parser.add_argument("--zero_based_ids", action="store_true")
     return parser.parse_args()
 
