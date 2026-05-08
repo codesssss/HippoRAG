@@ -4,6 +4,49 @@ Last updated: 2026-05-08
 
 This file stores concrete results only. Every result must have a file path.
 
+## DAEC-Selective Cross-Pool CI
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/42_daec_selective_cross_pool_ci_20260508.md`
+
+Primary reports:
+- `reports/daec_selective_cross_pool_20260508/summary.md`
+- `reports/daec_selective_cross_pool_20260508/method_summary.csv`
+- `reports/daec_selective_cross_pool_20260508/paired_ci.csv`
+- `reports/daec_selective_cross_pool_20260508/router_behavior.csv`
+- `reports/daec_selective_cross_pool_20260508/summary.json`
+
+Implementation:
+- `scripts/analyze_daec_selective_cross_pool.py`
+- `tests/test_daec_selective_cross_pool.py`
+
+Protocol:
+- Fixed Dense/HippoRAG/PropRAG pool100.
+- Qwen3-8B `/no_think`.
+- Reader `qa_top_k=5`, `qa_doc_max_chars=2048`.
+- Title-uniqueness threshold `0.88`.
+- Query-paired percentile bootstrap with 10,000 resamples.
+- No new LLM calls.
+
+Main result:
+
+| Pool | Dataset | Top-5 F1 | DAEC F1 | DAEC-selective F1 | Selective - Top-5 F1 | 95% CI | Selective - DAEC F1 | 95% CI |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Dense | 2Wiki | 0.4984 | 0.5798 | 0.5798 | +0.0814 | [+0.0556, +0.1076] | +0.0000 | [+0.0000, +0.0000] |
+| Dense | HotpotQA | 0.7106 | 0.7483 | 0.7483 | +0.0378 | [+0.0234, +0.0527] | +0.0000 | [+0.0000, +0.0000] |
+| Dense | MuSiQue | 0.3896 | 0.3918 | 0.4002 | +0.0106 | [-0.0097, +0.0305] | +0.0084 | [-0.0031, +0.0200] |
+| HippoRAG | 2Wiki | 0.5850 | 0.6431 | 0.6431 | +0.0581 | [+0.0329, +0.0834] | +0.0000 | [+0.0000, +0.0000] |
+| HippoRAG | HotpotQA | 0.7010 | 0.7403 | 0.7403 | +0.0393 | [+0.0241, +0.0553] | +0.0000 | [+0.0000, +0.0000] |
+| HippoRAG | MuSiQue | 0.3947 | 0.4142 | 0.4206 | +0.0259 | [+0.0052, +0.0462] | +0.0064 | [-0.0050, +0.0181] |
+| PropRAG | 2Wiki | 0.6457 | 0.7118 | 0.7118 | +0.0661 | [+0.0444, +0.0879] | +0.0000 | [+0.0000, +0.0000] |
+| PropRAG | HotpotQA | 0.7227 | 0.7473 | 0.7473 | +0.0246 | [+0.0112, +0.0385] | +0.0000 | [+0.0000, +0.0000] |
+| PropRAG | MuSiQue | 0.4266 | 0.4359 | 0.4548 | +0.0282 | [+0.0076, +0.0492] | +0.0189 | [+0.0081, +0.0302] |
+
+Decision:
+- Use as the paper-ready paired-CI support for cross-pool stability.
+- Claim DAEC-selective is a conservative safety layer with concentrated MuSiQue benefit.
+- Do not claim the gate is a large universal improvement mechanism.
+
 ## RankGPT-Style Sliding and MuSiQue Fixed-Pool Deposition
 
 Summary note:
@@ -15,14 +58,18 @@ Primary reports:
 - `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/summary.md`
 - `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/comparison.csv`
 - `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/paired_ci.md`
+- `reports/rankgpt_hard_slices_20260508/summary.md`
+- `reports/rankgpt_hard_slices_20260508/hard_slice_ci.csv`
 - `reports/musique_failure_synthesis_20260507/summary.md`
 
 Implementation:
 - `scripts/run_rankgpt_fixed_pool_baseline.py`
 - `scripts/apply_rankgpt_selection_to_pool.py`
 - `scripts/analyze_rankgpt_sliding_reader.py`
+- `scripts/analyze_rankgpt_hard_slices.py`
 - `tests/test_rankgpt_fixed_pool_baseline.py`
 - `tests/test_apply_rankgpt_selection_to_pool.py`
+- `tests/test_rankgpt_hard_slices.py`
 
 Protocol:
 - Fixed PropRAG pool100.
@@ -50,6 +97,14 @@ Paired F1 CI summary:
 | 2Wiki | SetR-faithful - RankGPT-style sliding | +0.0087 | [-0.0139, +0.0316] |
 | HotpotQA | SetR-faithful - RankGPT-style sliding | +0.0590 | [+0.0380, +0.0802] |
 | MuSiQue | SetR-faithful - RankGPT-style sliding | +0.0373 | [+0.0117, +0.0625] |
+
+Hard-slice reviewer check:
+
+| Dataset / Slice | N | Comparison | Metric | Left | Right | Delta | 95% CI | Result |
+|---|---:|---|---|---:|---:|---:|---:|---|
+| 2Wiki `gold_doc_count>=3` | 235 | DAEC-selective - RankGPT-style sliding | F1 | 0.9149 | 0.8567 | +0.0582 | [+0.0142, +0.1035] | DAEC wins |
+| 2Wiki `gold_doc_count>=3` | 235 | SetR-faithful - RankGPT-style sliding | F1 | 0.7712 | 0.8567 | -0.0856 | [-0.1452, -0.0260] | RankGPT-style wins over SetR |
+| 2Wiki `gold_doc_count>=3` | 235 | DAEC-selective - SetR-faithful | F1 | 0.9149 | 0.7712 | +0.1437 | [+0.0879, +0.1991] | DAEC wins |
 
 MuSiQue source-visible missing-support headroom:
 

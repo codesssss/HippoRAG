@@ -24,6 +24,8 @@ Under the controlled Qwen3-8B `/no_think` substrate, the sliding-window RankGPT-
 | HotpotQA | 0.7473 | 0.7435 | 0.6845 | DAEC/SetR both win |
 | MuSiQue | 0.4548 | 0.4467 | 0.4093 | DAEC/SetR both win |
 
+The 2Wiki hard-slice reviewer check is also now closed. On the aligned 2Wiki 4-document subset (`gold_doc_count>=3`, `N=235`), DAEC-selective beats RankGPT-style sliding by `+0.0582` F1 with a 95% paired-bootstrap CI `[+0.0142, +0.1035]`. RankGPT-style sliding is stronger than SetR-faithful on this slice, so the hard-slice result is not only a weak-baseline artifact.
+
 But RankGPT-style listwise full-pool inspection still recovers a complementary subset of MuSiQue source-visible missing supports:
 
 | Method | MuSiQue source-visible missing New@5 |
@@ -52,6 +54,12 @@ Primary paper-ready report:
 - `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/paired_ci.csv`
 - `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/summary.json`
 
+Hard-slice reviewer-defense report:
+
+- `reports/rankgpt_hard_slices_20260508/summary.md`
+- `reports/rankgpt_hard_slices_20260508/hard_slice_ci.csv`
+- `reports/rankgpt_hard_slices_20260508/hard_slice_ci.json`
+
 Selector-level sliding-window report:
 
 - `reports/rankgpt_fixed_pool_baseline_sliding_full1000_20260508/summary.md`
@@ -75,8 +83,10 @@ Implementation:
 - `scripts/run_rankgpt_fixed_pool_baseline.py`
 - `scripts/apply_rankgpt_selection_to_pool.py`
 - `scripts/analyze_rankgpt_sliding_reader.py`
+- `scripts/analyze_rankgpt_hard_slices.py`
 - `tests/test_rankgpt_fixed_pool_baseline.py`
 - `tests/test_apply_rankgpt_selection_to_pool.py`
+- `tests/test_rankgpt_hard_slices.py`
 
 Commit:
 
@@ -189,6 +199,39 @@ Interpretation:
 - DAEC-selective beats RankGPT-style sliding on all three datasets.
 - SetR-faithful is statistically tied with RankGPT-style sliding on 2Wiki F1, but beats it on HotpotQA and MuSiQue.
 - RankGPT-style sliding is not a stronger full1000 baseline under the controlled local substrate.
+
+## Hard-Slice Reviewer Check
+
+The strict reviewer concern was that the 2Wiki 4-document hard-slice claim should be checked against the strongest listwise baseline, not only SetR-faithful. This is now addressed using existing full1000 reader outputs and query-paired percentile bootstrap; no new LLM calls are involved.
+
+Primary slice:
+
+- Dataset: `2Wiki`
+- Slice: `gold_doc_count>=3`
+- Size: `N=235`
+- Interpretation: exactly the 4-document subset in the aligned full1000 split.
+
+| Comparison | Metric | Left | Right | Delta | 95% CI | Decision |
+|---|---:|---:|---:|---:|---:|---|
+| DAEC-selective - RankGPT-style sliding | F1 | 0.9149 | 0.8567 | +0.0582 | [+0.0142, +0.1035] | DAEC wins |
+| DAEC-selective - RankGPT-style sliding | EM | 0.9149 | 0.8553 | +0.0596 | [+0.0128, +0.1064] | DAEC wins |
+| DAEC-selective - RankGPT-style sliding | R5_TITLE | 0.9298 | 0.9053 | +0.0245 | [+0.0021, +0.0468] | DAEC wins |
+| SetR-faithful - RankGPT-style sliding | F1 | 0.7712 | 0.8567 | -0.0856 | [-0.1452, -0.0260] | RankGPT-style wins over SetR |
+| DAEC-selective - SetR-faithful | F1 | 0.9149 | 0.7712 | +0.1437 | [+0.0879, +0.1991] | DAEC wins |
+
+Paper-safe claim:
+
+```text
+On 2Wiki 4-document queries, DAEC-selective dramatically outperforms
+SetR-faithful and significantly outperforms RankGPT-style sliding-window
+reranking under the same Qwen3-8B /no_think substrate.
+```
+
+Do not claim:
+
+```text
+DAEC outperforms original GPT-3.5/4 RankGPT on hard multi-hop questions.
+```
 
 ## MuSiQue Missing-Slice Interpretation
 

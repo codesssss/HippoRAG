@@ -1,0 +1,10 @@
+pool,dataset,n,bind_count,abstain_count,bind_rate,abstain_rate,same_as_daec_count,same_as_daec_rate,same_as_top5_count,same_as_top5_rate,abstain_same_as_daec,abstain_changed_from_daec
+Dense,2Wiki,1000,598,402,0.598,0.402,1000,1.0,108,0.108,402,0
+Dense,HotpotQA,1000,648,352,0.648,0.352,1000,1.0,344,0.344,352,0
+Dense,MuSiQue,1000,379,621,0.379,0.621,774,0.774,164,0.164,395,226
+HippoRAG,2Wiki,1000,682,318,0.682,0.318,1000,1.0,61,0.061,318,0
+HippoRAG,HotpotQA,1000,649,351,0.649,0.351,1000,1.0,194,0.194,351,0
+HippoRAG,MuSiQue,1000,380,620,0.38,0.62,767,0.767,105,0.105,387,233
+PropRAG,2Wiki,1000,698,302,0.698,0.302,1000,1.0,104,0.104,302,0
+PropRAG,HotpotQA,1000,657,343,0.657,0.343,1000,1.0,282,0.282,343,0
+PropRAG,MuSiQue,1000,371,629,0.371,0.629,738,0.738,131,0.131,367,262

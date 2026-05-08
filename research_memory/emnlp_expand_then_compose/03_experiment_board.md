@@ -114,7 +114,10 @@ Last updated: 2026-05-08
 - `RankGPT-style sliding selector baseline`: `reports/rankgpt_fixed_pool_baseline_sliding_full1000_20260508/summary.md`
 - `RankGPT-style corrected sliding reader comparison`: `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/summary.md`
 - `RankGPT-style corrected sliding reader paired CI`: `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/paired_ci.md`
+- `RankGPT-style hard-slice reviewer check`: `reports/rankgpt_hard_slices_20260508/summary.md`
 - `MuSiQue failure synthesis after RankGPT-style reader`: `reports/musique_failure_synthesis_20260507/summary.md`
+- `DAEC-selective cross-pool CI deposition`: `research_memory/emnlp_expand_then_compose/42_daec_selective_cross_pool_ci_20260508.md`
+- `DAEC-selective cross-pool paired-CI report`: `reports/daec_selective_cross_pool_20260508/summary.md`
 
 ## Done
 
