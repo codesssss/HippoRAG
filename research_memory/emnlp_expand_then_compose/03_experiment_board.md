@@ -120,6 +120,8 @@ Last updated: 2026-05-08
 - `DAEC-selective cross-pool paired-CI report`: `reports/daec_selective_cross_pool_20260508/summary.md`
 - `DAEC-selective vs SetR cross-pool CI deposition`: `research_memory/emnlp_expand_then_compose/43_daec_setr_cross_pool_ci_20260508.md`
 - `DAEC-selective vs SetR cross-pool paired-CI report`: `reports/daec_setr_cross_pool_ci_20260508/summary.md`
+- `DBEC depth x gate-resolvability conditional deposition`: `research_memory/emnlp_expand_then_compose/44_daec_depth_resolvability_conditional_20260508.md`
+- `DBEC depth x gate-resolvability conditional report`: `reports/daec_depth_resolvability_20260508/summary.md`
 
 ## Done
 

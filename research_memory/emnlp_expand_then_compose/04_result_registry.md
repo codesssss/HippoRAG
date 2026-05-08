@@ -4,6 +4,47 @@ Last updated: 2026-05-08
 
 This file stores concrete results only. Every result must have a file path.
 
+## DBEC Depth x Gate-Resolvability Conditional Analysis
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/44_daec_depth_resolvability_conditional_20260508.md`
+
+Primary reports:
+- `reports/daec_depth_resolvability_20260508/summary.md`
+- `reports/daec_depth_resolvability_20260508/slice_profile.csv`
+- `reports/daec_depth_resolvability_20260508/method_summary.csv`
+- `reports/daec_depth_resolvability_20260508/paired_ci.csv`
+- `reports/daec_depth_resolvability_20260508/summary.json`
+
+Implementation:
+- `scripts/analyze_daec_depth_resolvability.py`
+- `tests/test_daec_depth_resolvability.py`
+
+Protocol:
+- Existing outputs only; no new LLM calls.
+- Fixed PropRAG pool100.
+- Qwen3-8B `/no_think`.
+- Reader `qa_top_k=5`, `qa_doc_max_chars=2048`.
+- Slices by support depth (`gold_doc_count`) and DBEC-IG title-uniqueness gate decision.
+- Query-paired percentile bootstrap with 10,000 resamples.
+- `R5_TITLE` recomputed uniformly from final reader top-5 titles.
+
+Main result:
+
+| Dataset | Slice | N | DBEC-IG | Nobinding | SetR-faithful | RankGPT-style | DBEC-IG - Nobind F1 | 95% CI | DBEC-IG - SetR F1 | 95% CI | DBEC-IG - RankGPT F1 | 95% CI |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2Wiki | `support_depth>=3|gate=bind` | 233 | 0.9142 | 0.7811 | 0.7778 | 0.8598 | +0.1331 | [+0.0815, +0.1846] | +0.1364 | [+0.0825, +0.1931] | +0.0544 | [+0.0114, +0.0987] |
+| HotpotQA | `gate=bind` | 657 | 0.7630 | 0.7500 | 0.7590 | 0.6815 | +0.0130 | [-0.0065, +0.0320] | +0.0041 | [-0.0181, +0.0262] | +0.0815 | [+0.0544, +0.1100] |
+| MuSiQue | `support_depth>=3|gate=bind` | 159 | 0.3432 | 0.3332 | 0.3406 | 0.3419 | +0.0100 | [-0.0506, +0.0725] | +0.0026 | [-0.0661, +0.0707] | +0.0013 | [-0.0626, +0.0675] |
+| MuSiQue | `support_depth>=4|gate=bind` | 52 | 0.1912 | 0.2588 | 0.2788 | 0.2275 | -0.0676 | [-0.1699, +0.0283] | -0.0876 | [-0.1955, +0.0160] | -0.0362 | [-0.1285, +0.0555] |
+
+Decision:
+- Use as a Section 5.3 mechanism/boundary result.
+- Claim explicit binding is load-bearing on 2Wiki deep gate-resolvable dependencies.
+- Claim MuSiQue is a boundary case showing that support depth alone does not guarantee binding benefit.
+- Do not claim universal superiority of explicit binding on all deep multi-hop queries.
+- Do not call the gate decision a ground-truth identifiability label.
+
 ## DAEC-Selective vs SetR Cross-Pool CI
 
 Summary note:
