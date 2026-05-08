@@ -8,14 +8,16 @@ This memo consolidates the MuSiQue diagnostics run after the DBEC support-repair
 
 Stop the current MuSiQue-fix line and move to DBEC paper writing.
 
-The evidence is now consistent across seven independent diagnostics:
+The evidence is now consistent across eight independent diagnostics:
 
 1. DBEC's core support-repair mechanism is real, but MuSiQue is the hardest residual case.
 2. MuSiQue residual error is dominated by candidate visibility and fixed-pool limits, not by backend admission, scoring, or rank arbitration.
-3. Chain-walking entity anchors have signal, but the signal is weak: `10.5%` New@5 and `19.8%` New@20 on the query-primary source-visible bucket.
-4. Strict anchor policies do not fix the weakness: `title_strict` drops to `7.0%` New@5.
-5. Deterministic dependency-bound retrieval expansion does not show an independent advantage: `dbir_det` is weaker than `context_iterative_lite` on source-visible Final New@5 and weaker than `independent_demand` / `rank_expansion` on pool-absent recovery.
-6. A stricter fixed-pool LLM probe changes the ceiling story: query reformulation and demand-HyDE are still weak, but listwise LLM selection over the given pool100 reaches `25.0-26.7%` New@5.
+3. Repair-gated arbitration does not rescue MuSiQue: the best reader F1 is `0.2922`, below both DBEC and rank-fill controls on the under-selected slice.
+4. Chain-walking entity anchors have signal, but the signal is weak: `10.5%` New@5 and `19.8%` New@20 on the query-primary source-visible bucket.
+5. Strict anchor policies do not fix the weakness: `title_strict` drops to `7.0%` New@5.
+6. Deterministic dependency-bound retrieval expansion does not show an independent advantage: `dbir_det` is weaker than `context_iterative_lite` on source-visible Final New@5 and weaker than `independent_demand` / `rank_expansion` on pool-absent recovery.
+7. A stricter fixed-pool LLM probe changes the ceiling story: query reformulation and demand-HyDE are still weak, but listwise LLM selection over the given pool100 reaches `25.0-26.7%` New@5.
+8. A full1000 RankGPT-style selector check confirms that no-thinking listwise pool selection is not a drop-in replacement for DBEC/SetR: it is lower on overall Support R@5 and Complete@5 across 2Wiki, HotpotQA, and MuSiQue, while still recovering `20.8-25.0%` New@5 on the MuSiQue source-visible missing-gold slice.
 
 The recommended next action is still DBEC paper writing, but the limitation wording should be more precise: fixed-pool candidate generation is not theoretically exhausted; current DBEC-style binding and cheap reformulation probes are insufficient, while expensive listwise LLM pool selection exposes remaining headroom.
 
@@ -30,6 +32,7 @@ The recommended next action is still DBEC paper writing, but the limitation word
 | Anchor variants | Strict or demand-conditioned anchor matching can clean up broad anchors. | `current_all` New@5 `10.5%`; `title_strict` `7.0%`; `demand_entity_title` `9.3%`. | Stop anchor tuning. |
 | D-BIR lexical pilot | Dependency-bound iterative retrieval has independent expansion value. | Source-visible Final New@5: `dbir_det` `2.3%` vs `context_iterative_lite` `5.8%`; pool-absent@100: `dbir_det` `12.0%` vs `independent_demand` / `rank_expansion` `28.0%`. | Stop or pivot. |
 | Fixed-pool candidate generation V2 | Query reformulation, demand-HyDE, or listwise LLM pool selection can rescue source-visible gold without pool expansion. | Query-primary New@5: `llm_query_reform` `5.8%`, `llm_demand_hyde` `11.6%`, `llm_listwise_select` `26.7%`. All-title New@5: `5.2%`, `11.5%`, `25.0%`. | Mixed signal; not a new-paper trigger. |
+| RankGPT-style fixed-pool baseline | A stronger listwise reranker may dominate DBEC/SetR on the same PropRAG pool100. | Full1000 Support R@5: 2Wiki `89.6%` RankGPT-rank vs `94.1%` DBEC / `94.2%` SetR; HotpotQA `86.6%` vs `96.2%` / `97.4%`; MuSiQue `65.8%` vs `77.4%` / `78.4%`. MuSiQue missing-slice New@5: `20.8-25.0%`. | Keep as reviewer-defense baseline; not a method replacement. |
 
 Full machine-readable table: `reports/musique_failure_synthesis_20260507/evidence_table.csv`.
 
@@ -146,6 +149,38 @@ This revises the earlier limitation story. Cheap reformulation and demand-HyDE d
 
 Paper implication: do not claim fixed-pool candidate generation is at a fundamental ceiling. The safer claim is that simple binding anchors, query reformulation, demand-HyDE, and deterministic dependency expansion are insufficient, while listwise LLM pool selection exposes remaining headroom that is not yet converted into a practical low-cost DBEC component.
 
+### 7. RankGPT-style listwise selection is useful but not stronger overall
+
+The follow-up RankGPT-style baseline tested whether a more paper-recognizable listwise reranker would dominate DBEC/SetR when constrained to the same fixed PropRAG pool100. This was a selector-only evaluation, not a reader run. It used Qwen3-8B, `/no_think`, 1-based passage ids, three local endpoints, and `1000` queries per dataset.
+
+Overall support metrics favor DBEC/SetR over RankGPT-style no-thinking listwise selection:
+
+| Dataset | Method | Support R@5 | Support Complete@5 |
+|---|---:|---:|---:|
+| 2Wiki | `dbec_selective` | 94.1% | 86.3% |
+| 2Wiki | `rankgpt_rank5_no_think` | 89.6% | 78.7% |
+| 2Wiki | `rankgpt_select5_no_think` | 88.5% | 75.2% |
+| 2Wiki | `setr_faithful` | 94.2% | 85.5% |
+| HotpotQA | `dbec_selective` | 96.2% | 93.0% |
+| HotpotQA | `rankgpt_rank5_no_think` | 86.6% | 76.2% |
+| HotpotQA | `rankgpt_select5_no_think` | 85.0% | 73.3% |
+| HotpotQA | `setr_faithful` | 97.4% | 94.9% |
+| MuSiQue | `dbec_selective` | 77.4% | 52.7% |
+| MuSiQue | `rankgpt_rank5_no_think` | 65.8% | 37.4% |
+| MuSiQue | `rankgpt_select5_no_think` | 65.2% | 36.6% |
+| MuSiQue | `setr_faithful` | 78.4% | 54.2% |
+
+The MuSiQue source-visible missing-gold slice still shows local listwise headroom:
+
+| Method | Missing titles | Queries | New@5 |
+|---|---:|---:|---:|
+| `dbec_selective` | 96 | 72 | 0.0% |
+| `rankgpt_rank5_no_think` | 96 | 72 | 20.8% |
+| `rankgpt_select5_no_think` | 96 | 72 | 25.0% |
+| `setr_faithful` | 96 | 72 | 0.0% |
+
+Paper implication: include this as a strong reviewer-defense baseline. The honest claim is that DBEC/SetR remain stronger fixed-pool selectors overall under the controlled Qwen3-8B `/no_think` substrate, while RankGPT-style listwise selection confirms that some MuSiQue residual supports are still discoverable by expensive full-pool inspection. Do not claim reader F1 effects until a reader evaluation is run.
+
 ## Unified Interpretation
 
 The consistent mechanism is:
@@ -157,6 +192,7 @@ The consistent mechanism is:
 5. Stricter matching hurts rather than helps.
 6. Deterministic dependency-bound expansion is not stronger than simpler expansion baselines.
 7. Strict fixed-pool LLM listwise selection can recover a nontrivial fraction, so the fixed pool is not theoretically exhausted.
+8. RankGPT-style full-pool listwise selection does not dominate DBEC/SetR on overall support metrics, so listwise headroom is local rather than a replacement for the DBEC selector.
 
 Therefore, the remaining MuSiQue gap likely requires a stronger front-end candidate-generation mechanism. The new evidence narrows that statement: lightweight semantic query reformulation is not enough, but direct listwise reasoning over the fixed pool can find some missing supports. That is beyond the current DBEC composition claim and needs reader/cost validation before becoming a method component.
 
@@ -185,6 +221,7 @@ Allowed claims:
 - Strict title anchoring does not improve the chain-walking signal.
 - Deterministic dependency-bound retrieval expansion did not show independent value over simpler lexical expansion baselines.
 - Fixed-pool LLM listwise selection shows nontrivial candidate-generation headroom: `25.0-26.7%` New@5 on the source-visible MuSiQue bucket.
+- Under the controlled Qwen3-8B `/no_think` fixed-pool selector setup, RankGPT-style listwise selection is weaker than DBEC/SetR on overall Support R@5 and Complete@5 across 2Wiki, HotpotQA, and MuSiQue, while still showing MuSiQue missing-slice New@5 headroom of `20.8-25.0%`.
 
 Do not claim:
 
@@ -196,6 +233,8 @@ Do not claim:
 - Fixed-pool candidate generation has been proven exhausted.
 - Query reformulation or demand-HyDE alone solves MuSiQue.
 - LLM listwise pool selection improves reader F1 before a reader run confirms it.
+- The RankGPT-style baseline is a full GPT-4 RankGPT reproduction; it is a Qwen3-8B `/no_think` RankGPT-style selector baseline.
+- RankGPT-style selector reader F1 is known before a reader evaluation is run.
 
 ## Recommended Next Steps
 
@@ -203,7 +242,7 @@ Do not claim:
 2. Use this synthesis as Section 6 material: "Failure analysis and fixed-pool limitations on MuSiQue."
 3. Include the candidate-quality audit table and one compact probe table, not every negative ablation.
 4. If a second paper is still desired, pause engineering until a literature review identifies a defensible non-overlapping claim.
-5. If a final fixed-pool follow-up is needed for the paper, run a small reader evaluation using `llm_listwise_select` top-5 on the same MuSiQue slice. Treat it as a limitation/upper-bound analysis, not as a new method line.
+5. If a final fixed-pool follow-up is needed for the paper, run a small reader evaluation using the best listwise top-5 selector on the MuSiQue slice only. Do not launch a broad RankGPT reader matrix unless the paper draft specifically needs it.
 
 ## Source Artifacts
 
@@ -217,6 +256,7 @@ Do not claim:
 - `reports/dbir_pilot_musique_alltitles_20260507/summary.md`
 - `reports/fixed_pool_candidate_generation_probe_primary_20260508/summary.md`
 - `reports/fixed_pool_candidate_generation_probe_alltitles_20260508/summary.md`
+- `reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/summary.md`
 
 ## Companion Files
 

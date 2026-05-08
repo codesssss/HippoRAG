@@ -2,7 +2,7 @@
   "report": "MuSiQue Failure Synthesis",
   "date": "2026-05-08",
   "status": "internal_decision_memo",
-  "recommendation": "Stop MuSiQue-fix pilots for now and move to DBEC paper writing. Run a D-BIR-LLM probe only under a strict <=3 day kill-switch if explicitly needed.",
+  "recommendation": "Stop MuSiQue-fix pilots for now and move to DBEC paper writing. The RankGPT-style selector baseline is useful reviewer defense, but broad reader runs should be avoided unless the draft specifically needs them.",
   "core_claim": "MuSiQue residual failures are dominated by candidate visibility under long dependency chains, not by DBEC backend admission, scoring, or fixed-pool rank arbitration.",
   "key_numbers": {
     "candidate_quality_audit": {
@@ -87,6 +87,58 @@
         "decision": "mixed_fixed_pool_signal"
       }
     },
+    "rankgpt_fixed_pool_baseline": {
+      "strict_fixed_pool": true,
+      "selector_only": true,
+      "reader_run": false,
+      "llm_model": "qwen3-8b-train",
+      "no_think": true,
+      "passage_id_convention": "1-based",
+      "datasets": {
+        "2wikimultihopqa": {
+          "queries": 1000,
+          "dbec_selective_support_recall_at_5": 0.941,
+          "dbec_selective_support_complete_at_5": 0.863,
+          "setr_faithful_support_recall_at_5": 0.942,
+          "setr_faithful_support_complete_at_5": 0.855,
+          "rankgpt_rank5_support_recall_at_5": 0.896,
+          "rankgpt_rank5_support_complete_at_5": 0.787,
+          "rankgpt_select5_support_recall_at_5": 0.885,
+          "rankgpt_select5_support_complete_at_5": 0.752
+        },
+        "hotpotqa": {
+          "queries": 1000,
+          "dbec_selective_support_recall_at_5": 0.962,
+          "dbec_selective_support_complete_at_5": 0.930,
+          "setr_faithful_support_recall_at_5": 0.974,
+          "setr_faithful_support_complete_at_5": 0.949,
+          "rankgpt_rank5_support_recall_at_5": 0.866,
+          "rankgpt_rank5_support_complete_at_5": 0.762,
+          "rankgpt_select5_support_recall_at_5": 0.850,
+          "rankgpt_select5_support_complete_at_5": 0.733
+        },
+        "musique": {
+          "queries": 1000,
+          "dbec_selective_support_recall_at_5": 0.774,
+          "dbec_selective_support_complete_at_5": 0.527,
+          "setr_faithful_support_recall_at_5": 0.784,
+          "setr_faithful_support_complete_at_5": 0.542,
+          "rankgpt_rank5_support_recall_at_5": 0.658,
+          "rankgpt_rank5_support_complete_at_5": 0.374,
+          "rankgpt_select5_support_recall_at_5": 0.652,
+          "rankgpt_select5_support_complete_at_5": 0.366
+        }
+      },
+      "musique_source_visible_missing_slice": {
+        "queries": 72,
+        "missing_gold_titles": 96,
+        "dbec_selective_new_at_5": 0.0,
+        "setr_faithful_new_at_5": 0.0,
+        "rankgpt_rank5_new_at_5": 0.208,
+        "rankgpt_select5_new_at_5": 0.250
+      },
+      "decision": "reviewer_defense_not_replacement"
+    },
     "repair_gated_reader": {
       "musique_best_f1": 0.2922,
       "musique_delta_vs_dbec": -0.0171,
@@ -101,7 +153,8 @@
     "Entity-anchor chain walking has measurable but weak signal in the fixed pool.",
     "Strict title-only anchor matching does not improve the chain-walking probe.",
     "Deterministic dependency-bound lexical expansion does not show an independent advantage over simpler expansion policies.",
-    "Strict fixed-pool LLM listwise selection shows nontrivial headroom, but query reformulation and demand-HyDE remain weak and the listwise variant is not yet a practical DBEC method component."
+    "Strict fixed-pool LLM listwise selection shows nontrivial headroom, but query reformulation and demand-HyDE remain weak and the listwise variant is not yet a practical DBEC method component.",
+    "Under the controlled Qwen3-8B /no_think fixed-pool selector setup, RankGPT-style listwise selection is weaker than DBEC/SetR on overall Support R@5 and Complete@5 across 2Wiki, HotpotQA, and MuSiQue, while still showing MuSiQue missing-slice New@5 headroom of 20.8-25.0%."
   ],
   "not_allowed_claims": [
     "D-BIR solves the fixed-pool ceiling.",
@@ -111,11 +164,14 @@
     "The practical MuSiQue ceiling is a formal theorem rather than a diagnostic estimate.",
     "Fixed-pool candidate generation has been proven exhausted.",
     "Query reformulation or demand-HyDE alone solves the MuSiQue candidate visibility gap.",
-    "LLM listwise pool selection improves reader F1 before a reader evaluation is run."
+    "LLM listwise pool selection improves reader F1 before a reader evaluation is run.",
+    "The RankGPT-style baseline is a full GPT-4 RankGPT reproduction; it is a Qwen3-8B /no_think RankGPT-style selector baseline.",
+    "RankGPT-style selector reader F1 is known before a reader evaluation is run."
   ],
   "artifacts": {
     "summary_md": "reports/musique_failure_synthesis_20260507/summary.md",
     "evidence_table_csv": "reports/musique_failure_synthesis_20260507/evidence_table.csv",
-    "decision_matrix_csv": "reports/musique_failure_synthesis_20260507/decision_matrix.csv"
+    "decision_matrix_csv": "reports/musique_failure_synthesis_20260507/decision_matrix.csv",
+    "rankgpt_fixed_pool_baseline": "reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/summary.md"
   }
 }

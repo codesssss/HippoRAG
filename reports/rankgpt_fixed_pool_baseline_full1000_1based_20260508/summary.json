@@ -1,0 +1,243 @@
+{
+  "metadata": {
+    "datasets": [
+      "2wikimultihopqa",
+      "hotpotqa",
+      "musique"
+    ],
+    "limit": 1000,
+    "variants": [
+      "rank5_no_think",
+      "select5_no_think"
+    ],
+    "strict_fixed_pool": true,
+    "run_llm": true,
+    "llm_base_urls": [
+      "http://localhost:8041/v1",
+      "http://localhost:8042/v1",
+      "http://localhost:8043/v1"
+    ],
+    "llm_model": "qwen3-8b-train",
+    "llm_probes": {
+      "http://localhost:8041/v1": {
+        "available": true,
+        "raw": "<think>\n\n</think>\n\nOK",
+        "stripped": "OK",
+        "error": ""
+      },
+      "http://localhost:8042/v1": {
+        "available": true,
+        "raw": "<think>\n\n</think>\n\nOK",
+        "stripped": "OK",
+        "error": ""
+      },
+      "http://localhost:8043/v1": {
+        "available": true,
+        "raw": "<think>\n\n</think>\n\nOK",
+        "stripped": "OK",
+        "error": ""
+      }
+    },
+    "workers": 9,
+    "max_doc_chars": 180,
+    "one_based_ids": true,
+    "cache_path": "reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/llm_cache.jsonl",
+    "prompt_count": 6000,
+    "all_prompts_no_think": true,
+    "elapsed_seconds": 483.55
+  },
+  "method_summary": [
+    {
+      "dataset": "2Wiki",
+      "method": "dbec_selective",
+      "queries": 1000,
+      "support_recall_at_5": 0.941,
+      "support_complete_at_5": 0.863,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "2Wiki",
+      "method": "rankgpt_rank5_no_think",
+      "queries": 1000,
+      "support_recall_at_5": 0.8965,
+      "support_complete_at_5": 0.787,
+      "parse_ok_rate": 1.0,
+      "prompt_no_think_rate": 1.0,
+      "mean_selected_count": 4.975
+    },
+    {
+      "dataset": "2Wiki",
+      "method": "rankgpt_select5_no_think",
+      "queries": 1000,
+      "support_recall_at_5": 0.88525,
+      "support_complete_at_5": 0.752,
+      "parse_ok_rate": 1.0,
+      "prompt_no_think_rate": 1.0,
+      "mean_selected_count": 4.999
+    },
+    {
+      "dataset": "2Wiki",
+      "method": "setr_faithful",
+      "queries": 1000,
+      "support_recall_at_5": 0.9425,
+      "support_complete_at_5": 0.855,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "2Wiki",
+      "method": "source_order",
+      "queries": 1000,
+      "support_recall_at_5": 0.90275,
+      "support_complete_at_5": 0.772,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "HotpotQA",
+      "method": "dbec_selective",
+      "queries": 1000,
+      "support_recall_at_5": 0.9625,
+      "support_complete_at_5": 0.93,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "HotpotQA",
+      "method": "rankgpt_rank5_no_think",
+      "queries": 1000,
+      "support_recall_at_5": 0.866,
+      "support_complete_at_5": 0.762,
+      "parse_ok_rate": 1.0,
+      "prompt_no_think_rate": 1.0,
+      "mean_selected_count": 4.986
+    },
+    {
+      "dataset": "HotpotQA",
+      "method": "rankgpt_select5_no_think",
+      "queries": 1000,
+      "support_recall_at_5": 0.85,
+      "support_complete_at_5": 0.733,
+      "parse_ok_rate": 1.0,
+      "prompt_no_think_rate": 1.0,
+      "mean_selected_count": 4.995
+    },
+    {
+      "dataset": "HotpotQA",
+      "method": "setr_faithful",
+      "queries": 1000,
+      "support_recall_at_5": 0.9735,
+      "support_complete_at_5": 0.949,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "HotpotQA",
+      "method": "source_order",
+      "queries": 1000,
+      "support_recall_at_5": 0.952,
+      "support_complete_at_5": 0.907,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "dbec_selective",
+      "queries": 1000,
+      "support_recall_at_5": 0.774499999999999,
+      "support_complete_at_5": 0.527,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "rankgpt_rank5_no_think",
+      "queries": 1000,
+      "support_recall_at_5": 0.6581666666666669,
+      "support_complete_at_5": 0.374,
+      "parse_ok_rate": 1.0,
+      "prompt_no_think_rate": 1.0,
+      "mean_selected_count": 4.989
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "rankgpt_select5_no_think",
+      "queries": 1000,
+      "support_recall_at_5": 0.6520833333333331,
+      "support_complete_at_5": 0.366,
+      "parse_ok_rate": 1.0,
+      "prompt_no_think_rate": 1.0,
+      "mean_selected_count": 4.999
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "setr_faithful",
+      "queries": 1000,
+      "support_recall_at_5": 0.7836666666666655,
+      "support_complete_at_5": 0.542,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "source_order",
+      "queries": 1000,
+      "support_recall_at_5": 0.7377499999999994,
+      "support_complete_at_5": 0.483,
+      "parse_ok_rate": "",
+      "prompt_no_think_rate": "",
+      "mean_selected_count": ""
+    }
+  ],
+  "musique_missing_summary": [
+    {
+      "dataset": "MuSiQue",
+      "method": "dbec_selective",
+      "missing_gold_titles": 96,
+      "queries": 72,
+      "hit_at_5": 0.0,
+      "new_at_5": 0.0
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "rankgpt_rank5_no_think",
+      "missing_gold_titles": 96,
+      "queries": 72,
+      "hit_at_5": 0.20833333333333334,
+      "new_at_5": 0.20833333333333334
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "rankgpt_select5_no_think",
+      "missing_gold_titles": 96,
+      "queries": 72,
+      "hit_at_5": 0.25,
+      "new_at_5": 0.25
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "setr_faithful",
+      "missing_gold_titles": 96,
+      "queries": 72,
+      "hit_at_5": 0.0,
+      "new_at_5": 0.0
+    },
+    {
+      "dataset": "MuSiQue",
+      "method": "source_order",
+      "missing_gold_titles": 96,
+      "queries": 72,
+      "hit_at_5": 0.010416666666666666,
+      "new_at_5": 0.0
+    }
+  ]
+}
