@@ -1,6 +1,6 @@
 {
   "report": "MuSiQue Failure Synthesis",
-  "date": "2026-05-07",
+  "date": "2026-05-08",
   "status": "internal_decision_memo",
   "recommendation": "Stop MuSiQue-fix pilots for now and move to DBEC paper writing. Run a D-BIR-LLM probe only under a strict <=3 day kill-switch if explicitly needed.",
   "core_claim": "MuSiQue residual failures are dominated by candidate visibility under long dependency chains, not by DBEC backend admission, scoring, or fixed-pool rank arbitration.",
@@ -62,6 +62,31 @@
       },
       "decision": "stop_or_pivot"
     },
+    "fixed_pool_candidate_generation_v2": {
+      "strict_fixed_pool": true,
+      "query_primary": {
+        "queries": 62,
+        "missing_gold_titles": 86,
+        "llm_query_reform_new_at_5": 0.058,
+        "llm_demand_hyde_new_at_5": 0.116,
+        "llm_listwise_select_new_at_5": 0.267,
+        "llm_listwise_select_new_at_10": 0.279,
+        "llm_listwise_select_policy_recall_at_5": 0.267,
+        "llm_listwise_select_policy_recall_at_10": 0.337,
+        "decision": "mixed_fixed_pool_signal"
+      },
+      "all_titles": {
+        "queries": 72,
+        "missing_gold_titles": 96,
+        "llm_query_reform_new_at_5": 0.052,
+        "llm_demand_hyde_new_at_5": 0.115,
+        "llm_listwise_select_new_at_5": 0.250,
+        "llm_listwise_select_new_at_10": 0.271,
+        "llm_listwise_select_policy_recall_at_5": 0.250,
+        "llm_listwise_select_policy_recall_at_10": 0.323,
+        "decision": "mixed_fixed_pool_signal"
+      }
+    },
     "repair_gated_reader": {
       "musique_best_f1": 0.2922,
       "musique_delta_vs_dbec": -0.0171,
@@ -75,14 +100,18 @@
     "Backend admission/scoring/arbitration explains only a small fraction of the missing-gold bucket.",
     "Entity-anchor chain walking has measurable but weak signal in the fixed pool.",
     "Strict title-only anchor matching does not improve the chain-walking probe.",
-    "Deterministic dependency-bound lexical expansion does not show an independent advantage over simpler expansion policies."
+    "Deterministic dependency-bound lexical expansion does not show an independent advantage over simpler expansion policies.",
+    "Strict fixed-pool LLM listwise selection shows nontrivial headroom, but query reformulation and demand-HyDE remain weak and the listwise variant is not yet a practical DBEC method component."
   ],
   "not_allowed_claims": [
     "D-BIR solves the fixed-pool ceiling.",
     "Dependency-bound control is the active component for retrieval expansion.",
     "Strict anchors improve chain walking.",
     "Admission or scoring is the main MuSiQue bottleneck.",
-    "The practical MuSiQue ceiling is a formal theorem rather than a diagnostic estimate."
+    "The practical MuSiQue ceiling is a formal theorem rather than a diagnostic estimate.",
+    "Fixed-pool candidate generation has been proven exhausted.",
+    "Query reformulation or demand-HyDE alone solves the MuSiQue candidate visibility gap.",
+    "LLM listwise pool selection improves reader F1 before a reader evaluation is run."
   ],
   "artifacts": {
     "summary_md": "reports/musique_failure_synthesis_20260507/summary.md",

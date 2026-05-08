@@ -1,6 +1,6 @@
 # MuSiQue Failure Synthesis
 
-Date: 2026-05-07
+Date: 2026-05-08
 
 This memo consolidates the MuSiQue diagnostics run after the DBEC support-repair audit. It is an internal go/no-go document: the goal is to decide whether more MuSiQue-fix engineering is justified, and what can be safely written in the DBEC paper.
 
@@ -8,15 +8,16 @@ This memo consolidates the MuSiQue diagnostics run after the DBEC support-repair
 
 Stop the current MuSiQue-fix line and move to DBEC paper writing.
 
-The evidence is now consistent across six independent diagnostics:
+The evidence is now consistent across seven independent diagnostics:
 
 1. DBEC's core support-repair mechanism is real, but MuSiQue is the hardest residual case.
 2. MuSiQue residual error is dominated by candidate visibility and fixed-pool limits, not by backend admission, scoring, or rank arbitration.
 3. Chain-walking entity anchors have signal, but the signal is weak: `10.5%` New@5 and `19.8%` New@20 on the query-primary source-visible bucket.
 4. Strict anchor policies do not fix the weakness: `title_strict` drops to `7.0%` New@5.
 5. Deterministic dependency-bound retrieval expansion does not show an independent advantage: `dbir_det` is weaker than `context_iterative_lite` on source-visible Final New@5 and weaker than `independent_demand` / `rank_expansion` on pool-absent recovery.
+6. A stricter fixed-pool LLM probe changes the ceiling story: query reformulation and demand-HyDE are still weak, but listwise LLM selection over the given pool100 reaches `25.0-26.7%` New@5.
 
-The recommended next action is DBEC paper writing with a quantified MuSiQue limitation section. A D-BIR-LLM probe is only worth doing as a final, strictly budgeted kill-switch experiment, not as the default next step.
+The recommended next action is still DBEC paper writing, but the limitation wording should be more precise: fixed-pool candidate generation is not theoretically exhausted; current DBEC-style binding and cheap reformulation probes are insufficient, while expensive listwise LLM pool selection exposes remaining headroom.
 
 ## Evidence Table
 
@@ -28,6 +29,7 @@ The recommended next action is DBEC paper writing with a quantified MuSiQue limi
 | Chain-walking probe | Upstream-doc entity extraction can rescue deep fixed-pool gold. | Query-primary: parse ok `100.0%`, New@5 `10.5%`, New@10 `18.6%`, New@20 `19.8%`. | Future-work only. |
 | Anchor variants | Strict or demand-conditioned anchor matching can clean up broad anchors. | `current_all` New@5 `10.5%`; `title_strict` `7.0%`; `demand_entity_title` `9.3%`. | Stop anchor tuning. |
 | D-BIR lexical pilot | Dependency-bound iterative retrieval has independent expansion value. | Source-visible Final New@5: `dbir_det` `2.3%` vs `context_iterative_lite` `5.8%`; pool-absent@100: `dbir_det` `12.0%` vs `independent_demand` / `rank_expansion` `28.0%`. | Stop or pivot. |
+| Fixed-pool candidate generation V2 | Query reformulation, demand-HyDE, or listwise LLM pool selection can rescue source-visible gold without pool expansion. | Query-primary New@5: `llm_query_reform` `5.8%`, `llm_demand_hyde` `11.6%`, `llm_listwise_select` `26.7%`. All-title New@5: `5.2%`, `11.5%`, `25.0%`. | Mixed signal; not a new-paper trigger. |
 
 Full machine-readable table: `reports/musique_failure_synthesis_20260507/evidence_table.csv`.
 
@@ -118,6 +120,32 @@ The important point is not that all expansion is impossible. It is that dependen
 
 Paper implication: do not launch a full "Dependency-Bound Iterative Retrieval" paper from this pilot. At minimum, it would need an LLM reformulation kill-switch comparison against an equally strong no-dependency LLM reformulation baseline.
 
+### 6. Fixed-pool candidate generation is not exhausted
+
+The follow-up fixed-pool candidate-generation probe tested query reformulation, demand-HyDE, and listwise LLM pool selection while keeping the candidate universe strictly fixed to the original PropRAG pool100. It used `/no_think` prompts, three Qwen3-8B endpoints, and no reader.
+
+Query-primary results:
+
+| Policy | New@5 | New@10 | Policy R@5 | Policy R@10 |
+|---|---:|---:|---:|---:|
+| `llm_query_reform` | 5.8% | 4.7% | 5.8% | 7.0% |
+| `llm_demand_reform` | 5.8% | 8.1% | 5.8% | 10.5% |
+| `llm_demand_hyde` | 11.6% | 14.0% | 11.6% | 17.4% |
+| `llm_listwise_select` | 26.7% | 27.9% | 26.7% | 33.7% |
+
+All-title results are similar:
+
+| Policy | New@5 | New@10 | Policy R@5 | Policy R@10 |
+|---|---:|---:|---:|---:|
+| `llm_query_reform` | 5.2% | 4.2% | 5.2% | 6.2% |
+| `llm_demand_reform` | 5.2% | 8.3% | 5.2% | 10.4% |
+| `llm_demand_hyde` | 11.5% | 13.5% | 11.5% | 16.7% |
+| `llm_listwise_select` | 25.0% | 27.1% | 25.0% | 32.3% |
+
+This revises the earlier limitation story. Cheap reformulation and demand-HyDE do not materially beat chain-walking. However, when the LLM is allowed to inspect the fixed pool100 title/snippet list and choose document ids directly, it recovers about a quarter of the source-visible missing gold into top-5. That means the fixed pool itself still contains usable signal, but extracting it requires an expensive listwise pool-selection operation rather than the current DBEC binding candidate path.
+
+Paper implication: do not claim fixed-pool candidate generation is at a fundamental ceiling. The safer claim is that simple binding anchors, query reformulation, demand-HyDE, and deterministic dependency expansion are insufficient, while listwise LLM pool selection exposes remaining headroom that is not yet converted into a practical low-cost DBEC component.
+
 ## Unified Interpretation
 
 The consistent mechanism is:
@@ -128,8 +156,9 @@ The consistent mechanism is:
 4. Entity-anchor chain-walking only recovers a small fraction of them.
 5. Stricter matching hurts rather than helps.
 6. Deterministic dependency-bound expansion is not stronger than simpler expansion baselines.
+7. Strict fixed-pool LLM listwise selection can recover a nontrivial fraction, so the fixed pool is not theoretically exhausted.
 
-Therefore, the remaining MuSiQue gap likely requires a stronger front-end retrieval mechanism: semantic query reformulation, iterative retrieval with real retrieval expansion, or a different learned policy. That is beyond the current fixed-pool DBEC composition claim.
+Therefore, the remaining MuSiQue gap likely requires a stronger front-end candidate-generation mechanism. The new evidence narrows that statement: lightweight semantic query reformulation is not enough, but direct listwise reasoning over the fixed pool can find some missing supports. That is beyond the current DBEC composition claim and needs reader/cost validation before becoming a method component.
 
 ## Practical Ceiling Estimate
 
@@ -143,7 +172,7 @@ A conservative fixed-pool anchor-style recovery estimate is:
 0.20 * 0.471 * 0.198 ~= 0.019 F1
 ```
 
-Even with optimistic composition and reader effects, this supports a practical headroom of roughly `+0.02` to `+0.05` F1 for simple train-free MuSiQue fixes, not a large second-paper-scale gain.
+Even with optimistic composition and reader effects, this supports a practical headroom of roughly `+0.02` to `+0.05` F1 for anchor-style and cheap reformulation fixes. The listwise fixed-pool probe changes the upper-bound intuition: fixed-pool headroom is larger than the chain-walking estimate, but accessing it currently requires having the LLM read and select from pool100 directly. That is a different cost profile and should not be counted as a low-cost DBEC repair until reader F1 and latency are measured.
 
 ## Paper-Facing Claims
 
@@ -155,6 +184,7 @@ Allowed claims:
 - Chain-walking entity extraction has weak but nonzero fixed-pool signal.
 - Strict title anchoring does not improve the chain-walking signal.
 - Deterministic dependency-bound retrieval expansion did not show independent value over simpler lexical expansion baselines.
+- Fixed-pool LLM listwise selection shows nontrivial candidate-generation headroom: `25.0-26.7%` New@5 on the source-visible MuSiQue bucket.
 
 Do not claim:
 
@@ -163,6 +193,9 @@ Do not claim:
 - Strict anchors improve chain-walking.
 - Admission/scoring is the main MuSiQue bottleneck.
 - The `+0.02` to `+0.05` practical headroom estimate is a formal upper bound.
+- Fixed-pool candidate generation has been proven exhausted.
+- Query reformulation or demand-HyDE alone solves MuSiQue.
+- LLM listwise pool selection improves reader F1 before a reader run confirms it.
 
 ## Recommended Next Steps
 
@@ -170,10 +203,7 @@ Do not claim:
 2. Use this synthesis as Section 6 material: "Failure analysis and fixed-pool limitations on MuSiQue."
 3. Include the candidate-quality audit table and one compact probe table, not every negative ablation.
 4. If a second paper is still desired, pause engineering until a literature review identifies a defensible non-overlapping claim.
-5. If the user insists on one last D-BIR check, run only a `<=3` day D-BIR-LLM kill-switch probe:
-   - Compare `D-BIR-LLM with upstream binding` against `LLM-reformulate-independent-demand`.
-   - Use the same MuSiQue source-visible and pool-absent slices.
-   - Continue only if D-BIR-LLM beats the no-dependency LLM baseline by at least `10` percentage points on Exp@50 and reaches at least `15-20%` Final New@5.
+5. If a final fixed-pool follow-up is needed for the paper, run a small reader evaluation using `llm_listwise_select` top-5 on the same MuSiQue slice. Treat it as a limitation/upper-bound analysis, not as a new method line.
 
 ## Source Artifacts
 
@@ -185,6 +215,8 @@ Do not claim:
 - `reports/chain_walking_anchor_variants_primary_20260507/summary.md`
 - `reports/dbir_pilot_musique_20260507/summary.md`
 - `reports/dbir_pilot_musique_alltitles_20260507/summary.md`
+- `reports/fixed_pool_candidate_generation_probe_primary_20260508/summary.md`
+- `reports/fixed_pool_candidate_generation_probe_alltitles_20260508/summary.md`
 
 ## Companion Files
 
