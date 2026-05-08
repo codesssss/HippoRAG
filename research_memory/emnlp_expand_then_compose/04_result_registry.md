@@ -1,8 +1,74 @@
 # Result Registry
 
-Last updated: 2026-05-06
+Last updated: 2026-05-08
 
 This file stores concrete results only. Every result must have a file path.
+
+## RankGPT-Style Sliding and MuSiQue Fixed-Pool Deposition
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/41_rankgpt_sliding_result_deposition_20260508.md`
+
+Primary reports:
+- `reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/summary.md`
+- `reports/rankgpt_fixed_pool_baseline_sliding_full1000_20260508/summary.md`
+- `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/summary.md`
+- `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/comparison.csv`
+- `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/paired_ci.md`
+- `reports/musique_failure_synthesis_20260507/summary.md`
+
+Implementation:
+- `scripts/run_rankgpt_fixed_pool_baseline.py`
+- `scripts/apply_rankgpt_selection_to_pool.py`
+- `scripts/analyze_rankgpt_sliding_reader.py`
+- `tests/test_rankgpt_fixed_pool_baseline.py`
+- `tests/test_apply_rankgpt_selection_to_pool.py`
+
+Protocol:
+- Fixed PropRAG pool100.
+- Qwen3-8B local endpoints.
+- `/no_think`.
+- Reader `qa_top_k=5`, `qa_doc_max_chars=2048`.
+- RankGPT-style sliding local adaptation: window size `20`, step `10`, ranks `0..100`, back-to-front permutation updates.
+- 9 sequential listwise LLM calls/query for the sliding-window selector.
+
+Main reader result:
+
+| Dataset | DAEC-selective F1 | SetR-faithful F1 | RankGPT-style sliding F1 | Result |
+|---|---:|---:|---:|---|
+| 2Wiki | 0.7118 | 0.6746 | 0.6659 | DAEC wins; SetR vs RankGPT-style tie-range |
+| HotpotQA | 0.7473 | 0.7435 | 0.6845 | DAEC/SetR win |
+| MuSiQue | 0.4548 | 0.4467 | 0.4093 | DAEC/SetR win |
+
+Paired F1 CI summary:
+
+| Dataset | Comparison | Delta F1 | 95% CI |
+|---|---|---:|---:|
+| 2Wiki | DAEC-selective - RankGPT-style sliding | +0.0460 | [+0.0244, +0.0674] |
+| HotpotQA | DAEC-selective - RankGPT-style sliding | +0.0628 | [+0.0418, +0.0838] |
+| MuSiQue | DAEC-selective - RankGPT-style sliding | +0.0455 | [+0.0185, +0.0733] |
+| 2Wiki | SetR-faithful - RankGPT-style sliding | +0.0087 | [-0.0139, +0.0316] |
+| HotpotQA | SetR-faithful - RankGPT-style sliding | +0.0590 | [+0.0380, +0.0802] |
+| MuSiQue | SetR-faithful - RankGPT-style sliding | +0.0373 | [+0.0117, +0.0625] |
+
+MuSiQue source-visible missing-support headroom:
+
+| Method | Missing titles | Queries | New@5 |
+|---|---:|---:|---:|
+| DBEC / DAEC | 96 | 72 | 0.0% |
+| SetR-faithful | 96 | 72 | 0.0% |
+| RankGPT single-pass rank5 | 96 | 72 | 20.8% |
+| RankGPT single-pass select5 | 96 | 72 | 25.0% |
+| RankGPT sliding20_step10 | 96 | 72 | 24.0% |
+
+Decision:
+- Use the RankGPT-style sliding reader run as a paper-ready reviewer-defense baseline.
+- Do not claim reproduction of GPT-3.5/4 RankGPT.
+- Do not claim "DBEC beats RankGPT"; claim only that DAEC/DBEC beats this controlled Qwen3-8B `/no_think` local adaptation.
+- Do not run more RankGPT variants before paper drafting.
+
+Invalidated artifact:
+- `reports/rankgpt_sliding_reader_full1000_20260508/` is superseded by `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/` because selected-pool materialization originally keyed rows only by `query_index` without dataset filtering.
 
 ## Non-Oracle Pilot Summary
 

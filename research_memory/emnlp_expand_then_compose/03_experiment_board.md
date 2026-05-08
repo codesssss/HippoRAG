@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-05-06
+Last updated: 2026-05-08
 
 ## Canonical Outputs
 
@@ -109,6 +109,12 @@ Last updated: 2026-05-06
 - `Reviewer-baseline gold-doc-count hard-slice script`: `scripts/analyze_reviewer_baseline_hard_slices.py`
 - `DAEC-selective dense/hipporag full1000 launcher`: `run_logs/launch_daec_selective_titleuniq_dense_hipporag_full1000_20260506.sh`
 - `DAEC-selective dense/hipporag full1000 active run`: `run_logs/daec_selective_titleuniq_dense_hipporag_full1000_20260506/`
+- `RankGPT-style sliding result deposition`: `research_memory/emnlp_expand_then_compose/41_rankgpt_sliding_result_deposition_20260508.md`
+- `RankGPT-style single-pass fixed-pool baseline`: `reports/rankgpt_fixed_pool_baseline_full1000_1based_20260508/summary.md`
+- `RankGPT-style sliding selector baseline`: `reports/rankgpt_fixed_pool_baseline_sliding_full1000_20260508/summary.md`
+- `RankGPT-style corrected sliding reader comparison`: `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/summary.md`
+- `RankGPT-style corrected sliding reader paired CI`: `reports/rankgpt_sliding_reader_full1000_datasetfix_20260508/paired_ci.md`
+- `MuSiQue failure synthesis after RankGPT-style reader`: `reports/musique_failure_synthesis_20260507/summary.md`
 
 ## Done
 
