@@ -118,6 +118,8 @@ Last updated: 2026-05-08
 - `MuSiQue failure synthesis after RankGPT-style reader`: `reports/musique_failure_synthesis_20260507/summary.md`
 - `DAEC-selective cross-pool CI deposition`: `research_memory/emnlp_expand_then_compose/42_daec_selective_cross_pool_ci_20260508.md`
 - `DAEC-selective cross-pool paired-CI report`: `reports/daec_selective_cross_pool_20260508/summary.md`
+- `DAEC-selective vs SetR cross-pool CI deposition`: `research_memory/emnlp_expand_then_compose/43_daec_setr_cross_pool_ci_20260508.md`
+- `DAEC-selective vs SetR cross-pool paired-CI report`: `reports/daec_setr_cross_pool_ci_20260508/summary.md`
 
 ## Done
 

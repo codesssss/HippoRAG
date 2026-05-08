@@ -4,6 +4,49 @@ Last updated: 2026-05-08
 
 This file stores concrete results only. Every result must have a file path.
 
+## DAEC-Selective vs SetR Cross-Pool CI
+
+Summary note:
+- `research_memory/emnlp_expand_then_compose/43_daec_setr_cross_pool_ci_20260508.md`
+
+Primary reports:
+- `reports/daec_setr_cross_pool_ci_20260508/summary.md`
+- `reports/daec_setr_cross_pool_ci_20260508/method_summary.csv`
+- `reports/daec_setr_cross_pool_ci_20260508/paired_ci.csv`
+- `reports/daec_setr_cross_pool_ci_20260508/summary.json`
+
+Implementation:
+- `scripts/analyze_daec_setr_cross_pool_ci.py`
+- `tests/test_daec_setr_cross_pool_ci.py`
+
+Protocol:
+- Existing outputs only; no new LLM calls.
+- Fixed Dense/HippoRAG/PropRAG pool100.
+- Qwen3-8B `/no_think`.
+- Reader `qa_top_k=5`, `qa_doc_max_chars=2048`.
+- SetR-style row: `k20_doc768`.
+- Query-paired percentile bootstrap with 10,000 resamples.
+- `R5_TITLE` recomputed uniformly from final reader top-5 titles.
+
+Main result:
+
+| Pool | Dataset | Top-5 F1 | SetR-style F1 | DAEC-selective F1 | DAEC-selective - SetR F1 | 95% CI |
+|---|---|---:|---:|---:|---:|---:|
+| Dense | 2Wiki | 0.4984 | 0.5655 | 0.5798 | +0.0144 | [-0.0105, +0.0387] |
+| Dense | HotpotQA | 0.7106 | 0.7470 | 0.7483 | +0.0013 | [-0.0139, +0.0164] |
+| Dense | MuSiQue | 0.3896 | 0.4108 | 0.4002 | -0.0106 | [-0.0332, +0.0125] |
+| HippoRAG | 2Wiki | 0.5850 | 0.6409 | 0.6431 | +0.0023 | [-0.0206, +0.0251] |
+| HippoRAG | HotpotQA | 0.7010 | 0.7491 | 0.7403 | -0.0088 | [-0.0234, +0.0056] |
+| HippoRAG | MuSiQue | 0.3947 | 0.4391 | 0.4206 | -0.0185 | [-0.0411, +0.0039] |
+| PropRAG | 2Wiki | 0.6457 | 0.6936 | 0.7118 | +0.0182 | [-0.0013, +0.0384] |
+| PropRAG | HotpotQA | 0.7227 | 0.7552 | 0.7473 | -0.0079 | [-0.0226, +0.0067] |
+| PropRAG | MuSiQue | 0.4266 | 0.4761 | 0.4548 | -0.0212 | [-0.0442, +0.0015] |
+
+Decision:
+- Use this as the paper-ready cross-pool paired-CI result against SetR-style.
+- Claim answer-F1 tie-range across all 9 pool-dataset cells.
+- Do not claim DAEC-selective uniformly outperforms SetR-style.
+
 ## DAEC-Selective Cross-Pool CI
 
 Summary note:
