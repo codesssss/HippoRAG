@@ -38,6 +38,13 @@ CANDIDATE_UNIVERSE_CONTRACT: Mapping[str, bool | str] = {
 }
 
 
+def prefix_queries_with_instruction(queries: Sequence[str], instruction: str) -> List[str]:
+    normalized_instruction = str(instruction or "").strip()
+    if not normalized_instruction:
+        return [str(query) for query in queries]
+    return [f"Instruct: {normalized_instruction}\nQuery: {str(query)}" for query in queries]
+
+
 @dataclass(frozen=True)
 class CandidateUniverse:
     """A query-local candidate universe before graph construction."""
@@ -1436,7 +1443,6 @@ class _OpenAICompatibleQueryEncoder:
         return self._cache[query]
 
     def _request(self, queries: Sequence[str]) -> Sequence[Sequence[float]]:
-        from src.hipporag.embedding_model.base import prefix_queries_with_instruction
         import requests
 
         payload = {

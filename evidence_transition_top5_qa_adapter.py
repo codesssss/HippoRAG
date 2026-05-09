@@ -65,6 +65,28 @@ if not hasattr(_TARGET, "METHOD_DOC_KEYS"):
 
 _TARGET.METHOD_DOC_KEYS[METHOD_NAME] = QA_DOC_KEY
 
+
+if hasattr(_TARGET, "load_sfb_rows") and hasattr(_TARGET, "load_json"):
+    _ORIGINAL_LOAD_SFB_ROWS = _TARGET.load_sfb_rows
+
+    def _load_sfb_rows_with_minimal_report_fallback(source_report_path):
+        try:
+            return _ORIGINAL_LOAD_SFB_ROWS(source_report_path)
+        except KeyError:
+            payload = _TARGET.load_json(Path(str(source_report_path)))
+            variants = payload.get("variants", {}) if isinstance(payload, dict) else {}
+            rows = variants.get("hipporag_v2") if isinstance(variants, dict) else None
+            if rows is None and isinstance(variants, dict):
+                rows = next(
+                    (value for value in variants.values() if isinstance(value, list)),
+                    None,
+                )
+            if rows is None:
+                raise
+            return {int(row["query_index"]): row for row in rows}
+
+    _TARGET.load_sfb_rows = _load_sfb_rows_with_minimal_report_fallback
+
 main = _TARGET.main
 
 

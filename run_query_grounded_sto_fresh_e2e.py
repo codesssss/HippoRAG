@@ -21,7 +21,7 @@ import json
 import logging
 import os
 import shutil
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence
 from urllib.parse import urlparse
@@ -191,6 +191,16 @@ def _ordered_chunk_rows(docs: Sequence[str], store: EmbeddingStore) -> Dict[str,
     return ordered
 
 
+def _split_openie_batch_results(openie_results: Any) -> tuple[Dict[str, Any], Dict[str, Any]]:
+    """Return NER and triple outputs across HippoRAG OpenIE API versions."""
+    if not isinstance(openie_results, tuple) or len(openie_results) < 2:
+        raise TypeError(
+            "OpenIE.batch_openie must return at least (ner_results, triple_results); "
+            f"got {type(openie_results).__name__}"
+        )
+    return openie_results[0], openie_results[1]
+
+
 def _save_openie_payload(openie_path: Path, all_openie_info: Sequence[Mapping[str, Any]]) -> None:
     num_phrases = sum(len(row.get("extracted_entities", []) or []) for row in all_openie_info)
     sum_phrase_chars = sum(
@@ -251,19 +261,23 @@ def build_fresh_sto_index(
         embedding_name=runtime_embedding_name,
     )
 
-    config = BaseConfig(
-        save_dir=str(save_dir),
-        llm_base_url=str(llm_base_url or ""),
-        llm_name=str(llm_name),
-        embedding_base_url=str(embedding_base_url or ""),
-        embedding_model_name=runtime_embedding_name,
-        embedding_batch_size=max(int(embedding_batch_size), 1),
-        max_new_tokens=max_new_tokens,
-        max_retry_attempts=max(int(max_retry_attempts), 1),
-        force_index_from_scratch=True,
-        force_openie_from_scratch=True,
-        qwen_disable_thinking=bool(qwen_disable_thinking),
-    )
+    config_field_names = {field_info.name for field_info in fields(BaseConfig)}
+    config_kwargs = {
+        "save_dir": str(save_dir),
+        "llm_base_url": str(llm_base_url or ""),
+        "llm_name": str(llm_name),
+        "embedding_base_url": str(embedding_base_url or ""),
+        "embedding_model_name": runtime_embedding_name,
+        "embedding_batch_size": max(int(embedding_batch_size), 1),
+        "max_new_tokens": max_new_tokens,
+        "max_retry_attempts": max(int(max_retry_attempts), 1),
+        "force_index_from_scratch": True,
+        "force_openie_from_scratch": True,
+        "qwen_disable_thinking": bool(qwen_disable_thinking),
+    }
+    config = BaseConfig(**{key: value for key, value in config_kwargs.items() if key in config_field_names})
+    if "qwen_disable_thinking" not in config_field_names:
+        setattr(config, "qwen_disable_thinking", bool(qwen_disable_thinking))
 
     embedding_model = _get_embedding_model_class(runtime_embedding_name)(
         global_config=config,
@@ -282,7 +296,7 @@ def build_fresh_sto_index(
     llm_model = _get_llm_class(config)
     openie = OpenIE(llm_model=llm_model)
     logger.info("Running fresh OpenIE for %d corpus passages.", len(chunk_rows))
-    ner_results, triple_results = openie.batch_openie(chunk_rows)
+    ner_results, triple_results = _split_openie_batch_results(openie.batch_openie(chunk_rows))
 
     all_openie_info: List[Dict[str, Any]] = []
     for chunk_key, row in chunk_rows.items():
