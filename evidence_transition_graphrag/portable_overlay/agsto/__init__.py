@@ -1,0 +1,43 @@
+"""Compatibility import for the source-layout AG-STO package."""
+
+from src.agsto import (
+    AGSTOConfig,
+    AGSTORetriever,
+    apply_graph_obligated_completion,
+    build_corpus_unit_index,
+    build_query_local_sto_graph,
+    order_local_sto_balanced_source_prior,
+    order_local_sto_coverage_source_prior,
+    order_local_sto_dual_source_prior,
+    order_local_sto_admission_preserving_source_prior,
+    order_local_sto_layered_source_prior,
+    order_local_sto_root_preserving_source_prior,
+    order_local_sto_source_prior,
+    rank_docs_bm25,
+    rank_sto_proposal_consensus_docs,
+    score_anchor_guided_evidence_set,
+    score_docs_bm25,
+    select_local_sto_evidence_docs,
+    unique_ranked,
+)
+
+__all__ = [
+    "AGSTOConfig",
+    "AGSTORetriever",
+    "apply_graph_obligated_completion",
+    "build_corpus_unit_index",
+    "build_query_local_sto_graph",
+    "order_local_sto_balanced_source_prior",
+    "order_local_sto_coverage_source_prior",
+    "order_local_sto_dual_source_prior",
+    "order_local_sto_admission_preserving_source_prior",
+    "order_local_sto_layered_source_prior",
+    "order_local_sto_root_preserving_source_prior",
+    "order_local_sto_source_prior",
+    "rank_docs_bm25",
+    "rank_sto_proposal_consensus_docs",
+    "score_anchor_guided_evidence_set",
+    "score_docs_bm25",
+    "select_local_sto_evidence_docs",
+    "unique_ranked",
+]
