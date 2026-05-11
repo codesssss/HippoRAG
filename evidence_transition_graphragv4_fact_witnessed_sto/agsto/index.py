@@ -274,6 +274,7 @@ def build_corpus_unit_index(openie_docs: Sequence[Mapping[str, Any]]) -> Dict[st
     endpoint_to_units: Dict[str, List[int]] = defaultdict(list)
     doc_to_endpoints: Dict[int, Set[str]] = defaultdict(set)
     endpoint_to_docs: Dict[str, Set[int]] = defaultdict(set)
+    endpoint_token_to_endpoints: Dict[str, Set[str]] = defaultdict(set)
     token_to_units: Dict[str, List[int]] = defaultdict(list)
     token_to_docs: Dict[str, Set[int]] = defaultdict(set)
     doc_token_counts: Dict[int, Counter[str]] = defaultdict(Counter)
@@ -315,6 +316,8 @@ def build_corpus_unit_index(openie_docs: Sequence[Mapping[str, Any]]) -> Dict[st
                 endpoint_to_units[endpoint].append(unit_id)
                 doc_to_endpoints[int(doc_index)].add(endpoint)
                 endpoint_to_docs[endpoint].add(int(doc_index))
+                for token in content_tokens(endpoint):
+                    endpoint_token_to_endpoints[token].add(endpoint)
             for token in tokens:
                 token_to_units[token].append(unit_id)
                 token_to_docs[token].add(int(doc_index))
@@ -335,13 +338,23 @@ def build_corpus_unit_index(openie_docs: Sequence[Mapping[str, Any]]) -> Dict[st
     }
     doc_lengths = {doc_idx: sum(counter.values()) for doc_idx, counter in doc_token_counts.items()}
     avg_doc_length = sum(doc_lengths.values()) / float(max(len(doc_lengths), 1))
+    unit_by_id = {int(unit.get("_unit_int_id", index)): unit for index, unit in enumerate(units)}
+    fact_units_by_doc: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
+    for unit in units:
+        if str(unit.get("unit_type") or "") == "openie_fact":
+            fact_units_by_doc[int(unit.get("doc_index", -1))].append(unit)
 
     return {
         "units": units,
+        "unit_by_id": unit_by_id,
+        "fact_units_by_doc": dict(fact_units_by_doc),
         "doc_to_units": dict(doc_to_units),
         "endpoint_to_units": dict(endpoint_to_units),
         "doc_to_endpoints": {doc_idx: sorted(endpoints) for doc_idx, endpoints in doc_to_endpoints.items()},
         "endpoint_to_docs": {endpoint: sorted(doc_ids) for endpoint, doc_ids in endpoint_to_docs.items()},
+        "endpoint_token_to_endpoints": {
+            token: sorted(endpoints) for token, endpoints in endpoint_token_to_endpoints.items()
+        },
         "endpoint_idf": endpoint_idf,
         "token_to_units": dict(token_to_units),
         "token_to_docs": {token: sorted(doc_ids) for token, doc_ids in token_to_docs.items()},

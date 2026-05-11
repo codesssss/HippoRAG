@@ -12,6 +12,7 @@ from collections import deque
 import json
 import os
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Protocol, Sequence, Tuple
 
 from .candidate_expansion import (
@@ -335,6 +336,7 @@ class AGSTOLocalGraphCandidateGenerator:
     closure_hops: int = 2
     enable_query_supported_same_object_handoff: bool = False
     enable_variable_flow_traversal: bool = False
+    enable_timing_profile: bool = False
 
     @classmethod
     def build(
@@ -346,6 +348,7 @@ class AGSTOLocalGraphCandidateGenerator:
         closure_hops: int = 2,
         enable_query_supported_same_object_handoff: bool = False,
         enable_variable_flow_traversal: bool = False,
+        enable_timing_profile: bool = False,
     ) -> "AGSTOLocalGraphCandidateGenerator":
         from evidence_transition_graphragv4_fact_witnessed_sto.agsto.index import (
             build_corpus_unit_index,
@@ -379,6 +382,7 @@ class AGSTOLocalGraphCandidateGenerator:
             closure_hops=max(int(closure_hops), 0),
             enable_query_supported_same_object_handoff=bool(enable_query_supported_same_object_handoff),
             enable_variable_flow_traversal=bool(enable_variable_flow_traversal),
+            enable_timing_profile=bool(enable_timing_profile),
         )
 
     def generate(
@@ -393,6 +397,8 @@ class AGSTOLocalGraphCandidateGenerator:
             build_query_local_sto_graph,
         )
 
+        timing_enabled = bool(self.enable_timing_profile)
+        timing_start = perf_counter() if timing_enabled else 0.0
         local_graph = build_query_local_sto_graph(
             query=str(query),
             corpus_index=self.corpus_index,
@@ -404,9 +410,49 @@ class AGSTOLocalGraphCandidateGenerator:
             candidate_limit=max(int(top_n), 1),
             enable_query_supported_same_object_handoff=bool(self.enable_query_supported_same_object_handoff),
             enable_variable_flow_traversal=bool(self.enable_variable_flow_traversal),
+            enable_timing_profile=timing_enabled,
         )
+        local_graph_elapsed = perf_counter() - timing_start if timing_enabled else 0.0
         docs = tuple(unique_ints(local_graph.get("admitted_doc_indices", []) or [])[: max(int(top_n), 1)])
         stats = dict(local_graph.get("stats", {}) or {})
+        trace = {
+            **dict(CANDIDATE_UNIVERSE_CONTRACT),
+            "candidate_generator": "agsto_local_graph_candidate_generator",
+            "candidate_source": "method_owned_agsto_local_graph",
+            "query_index": int(query_index),
+            "candidate_count": len(docs),
+            "textual_seed_top_k": int(self.textual_seed_top_k),
+            "max_endpoint_degree": int(self.max_endpoint_degree),
+            "closure_hops": int(self.closure_hops),
+            "role_graph_edge_count": int(stats.get("role_graph_edge_count", 0) or 0),
+            "local_edge_count": int(stats.get("local_edge_count", 0) or 0),
+            "seed_doc_indices": tuple(unique_ints(local_graph.get("seed_doc_indices", []) or [])),
+            "symbolic_anchor_endpoints": tuple(
+                str(endpoint) for endpoint in local_graph.get("symbolic_anchor_endpoints", []) or []
+            ),
+            "symbolic_seed_doc_indices": tuple(
+                unique_ints(local_graph.get("symbolic_seed_doc_indices", []) or [])
+            ),
+            "textual_seed_doc_indices": tuple(
+                unique_ints(local_graph.get("textual_seed_doc_indices", []) or [])
+            ),
+            "dense_topk_is_final_answer_default": False,
+            "uses_weighted_score_fusion": False,
+            "uses_external_baseline_frontier": False,
+            "uses_replay_candidate_cache": False,
+            "uses_hipporag_v2_runtime_graph_retrieval": False,
+            "uses_sto_role_graph_admission": True,
+            "ablation_query_supported_same_object_handoff": bool(
+                self.enable_query_supported_same_object_handoff
+            ),
+            "uses_variable_flow_traversal": bool(self.enable_variable_flow_traversal),
+        }
+        if timing_enabled:
+            trace["timing_profile"] = {
+                "candidate_total_seconds": round(float(local_graph_elapsed), 6),
+                "local_graph_seconds": round(float(local_graph_elapsed), 6),
+                "local_graph": dict(stats.get("timing_profile", {}) or {}),
+            }
         return CandidateUniverse(
             doc_indices=docs,
             graph_payload={
@@ -414,38 +460,7 @@ class AGSTOLocalGraphCandidateGenerator:
                 "agsto_role_graph": self.role_graph,
                 "agsto_local_graph": local_graph,
             },
-            trace={
-                **dict(CANDIDATE_UNIVERSE_CONTRACT),
-                "candidate_generator": "agsto_local_graph_candidate_generator",
-                "candidate_source": "method_owned_agsto_local_graph",
-                "query_index": int(query_index),
-                "candidate_count": len(docs),
-                "textual_seed_top_k": int(self.textual_seed_top_k),
-                "max_endpoint_degree": int(self.max_endpoint_degree),
-                "closure_hops": int(self.closure_hops),
-                "role_graph_edge_count": int(stats.get("role_graph_edge_count", 0) or 0),
-                "local_edge_count": int(stats.get("local_edge_count", 0) or 0),
-                "seed_doc_indices": tuple(unique_ints(local_graph.get("seed_doc_indices", []) or [])),
-                "symbolic_anchor_endpoints": tuple(
-                    str(endpoint) for endpoint in local_graph.get("symbolic_anchor_endpoints", []) or []
-                ),
-                "symbolic_seed_doc_indices": tuple(
-                    unique_ints(local_graph.get("symbolic_seed_doc_indices", []) or [])
-                ),
-                "textual_seed_doc_indices": tuple(
-                    unique_ints(local_graph.get("textual_seed_doc_indices", []) or [])
-                ),
-                "dense_topk_is_final_answer_default": False,
-                "uses_weighted_score_fusion": False,
-                "uses_external_baseline_frontier": False,
-                "uses_replay_candidate_cache": False,
-                "uses_hipporag_v2_runtime_graph_retrieval": False,
-                "uses_sto_role_graph_admission": True,
-                "ablation_query_supported_same_object_handoff": bool(
-                    self.enable_query_supported_same_object_handoff
-                ),
-                "uses_variable_flow_traversal": bool(self.enable_variable_flow_traversal),
-            },
+            trace=trace,
         )
 
 
@@ -462,6 +477,7 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
     agsto_generator: AGSTOLocalGraphCandidateGenerator
     dense_seed_count: int = 20
     source_prior_prefix_count: int = 5
+    enable_timing_profile: bool = False
 
     @classmethod
     def from_parquet(
@@ -478,6 +494,7 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
         agsto_closure_hops: int = 2,
         enable_query_supported_same_object_handoff: bool = False,
         enable_variable_flow_traversal: bool = False,
+        enable_timing_profile: bool = False,
     ) -> "DenseSeededAGSTOLocalGraphCandidateGenerator":
         return cls(
             dense_generator=DenseEmbeddingCandidateGenerator.from_parquet(
@@ -495,9 +512,11 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
                     enable_query_supported_same_object_handoff
                 ),
                 enable_variable_flow_traversal=bool(enable_variable_flow_traversal),
+                enable_timing_profile=bool(enable_timing_profile),
             ),
             dense_seed_count=max(int(dense_seed_count), 1),
             source_prior_prefix_count=max(int(source_prior_prefix_count), 1),
+            enable_timing_profile=bool(enable_timing_profile),
         )
 
     def prepare_queries(self, queries: Sequence[str]) -> None:
@@ -513,16 +532,20 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
         row: Mapping[str, Any],
         top_n: int,
     ) -> CandidateUniverse:
+        timing_enabled = bool(self.enable_timing_profile)
+        timing_start = perf_counter() if timing_enabled else 0.0
         dense_universe = self.dense_generator.generate(
             query=str(query),
             query_index=int(query_index),
             row=row,
             top_n=max(int(top_n), int(self.dense_seed_count), int(self.source_prior_prefix_count)),
         )
+        dense_elapsed = perf_counter() - timing_start if timing_enabled else 0.0
         from evidence_transition_graphragv4_fact_witnessed_sto.agsto.local_graph import (
             build_query_local_sto_graph,
         )
 
+        local_graph_start = perf_counter() if timing_enabled else 0.0
         local_graph = build_query_local_sto_graph(
             query=str(query),
             corpus_index=self.agsto_generator.corpus_index,
@@ -536,7 +559,9 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
                 self.agsto_generator.enable_query_supported_same_object_handoff
             ),
             enable_variable_flow_traversal=bool(self.agsto_generator.enable_variable_flow_traversal),
+            enable_timing_profile=timing_enabled,
         )
+        local_graph_elapsed = perf_counter() - local_graph_start if timing_enabled else 0.0
         admitted = tuple(unique_ints(local_graph.get("admitted_doc_indices", []) or []))
         prefix_count = min(max(int(self.source_prior_prefix_count), 1), max(int(top_n), 1))
         source_prior_prefix = tuple(dense_universe.doc_indices[:prefix_count])
@@ -545,6 +570,50 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
             unique_ints([*source_prior_prefix, *graph_tail, *dense_universe.doc_indices])[: max(int(top_n), 1)]
         )
         stats = dict(local_graph.get("stats", {}) or {})
+        trace = {
+            **dict(CANDIDATE_UNIVERSE_CONTRACT),
+            "candidate_generator": "dense_seeded_agsto_local_graph_candidate_generator",
+            "candidate_source": "method_owned_dense_seeded_agsto_local_graph",
+            "query_index": int(query_index),
+            "candidate_count": len(docs),
+            "dense_seed_count": int(self.dense_seed_count),
+            "source_prior_prefix_count": int(self.source_prior_prefix_count),
+            "source_prior_prefix_doc_indices": source_prior_prefix,
+            "agsto_admitted_doc_count": len(admitted),
+            "agsto_local_edge_count": int(stats.get("local_edge_count", 0) or 0),
+            "agsto_role_graph_edge_count": int(stats.get("role_graph_edge_count", 0) or 0),
+            "agsto_seed_doc_indices": tuple(unique_ints(local_graph.get("seed_doc_indices", []) or [])),
+            "agsto_symbolic_seed_doc_indices": tuple(
+                unique_ints(local_graph.get("symbolic_seed_doc_indices", []) or [])
+            ),
+            "agsto_graph_tail_doc_indices": graph_tail[: max(int(top_n), 1)],
+            "dense_trace": dict(dense_universe.trace),
+            "candidate_order_policy": "dense_head_then_agsto_admitted_tail_then_remaining_dense",
+            "dense_topk_is_final_answer_default": False,
+            "uses_weighted_score_fusion": False,
+            "uses_external_baseline_frontier": False,
+            "uses_replay_candidate_cache": False,
+            "uses_hipporag_v2_runtime_graph_retrieval": False,
+            "uses_dense_only_as_graph_entry": True,
+            "uses_sto_role_graph_admission": True,
+            "ablation_query_supported_same_object_handoff": bool(
+                self.agsto_generator.enable_query_supported_same_object_handoff
+            ),
+            "uses_variable_flow_traversal": bool(
+                self.agsto_generator.enable_variable_flow_traversal
+            ),
+        }
+        if timing_enabled:
+            trace["timing_profile"] = {
+                "candidate_total_seconds": round(float(perf_counter() - timing_start), 6),
+                "dense_generate_seconds": round(float(dense_elapsed), 6),
+                "local_graph_seconds": round(float(local_graph_elapsed), 6),
+                "candidate_assembly_seconds": round(
+                    max(float(perf_counter() - timing_start - dense_elapsed - local_graph_elapsed), 0.0),
+                    6,
+                ),
+                "local_graph": dict(stats.get("timing_profile", {}) or {}),
+            }
         return CandidateUniverse(
             doc_indices=docs,
             admissible_doc_indices=tuple(
@@ -555,39 +624,7 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
                 "agsto_role_graph": self.agsto_generator.role_graph,
                 "agsto_local_graph": local_graph,
             },
-            trace={
-                **dict(CANDIDATE_UNIVERSE_CONTRACT),
-                "candidate_generator": "dense_seeded_agsto_local_graph_candidate_generator",
-                "candidate_source": "method_owned_dense_seeded_agsto_local_graph",
-                "query_index": int(query_index),
-                "candidate_count": len(docs),
-                "dense_seed_count": int(self.dense_seed_count),
-                "source_prior_prefix_count": int(self.source_prior_prefix_count),
-                "source_prior_prefix_doc_indices": source_prior_prefix,
-                "agsto_admitted_doc_count": len(admitted),
-                "agsto_local_edge_count": int(stats.get("local_edge_count", 0) or 0),
-                "agsto_role_graph_edge_count": int(stats.get("role_graph_edge_count", 0) or 0),
-                "agsto_seed_doc_indices": tuple(unique_ints(local_graph.get("seed_doc_indices", []) or [])),
-                "agsto_symbolic_seed_doc_indices": tuple(
-                    unique_ints(local_graph.get("symbolic_seed_doc_indices", []) or [])
-                ),
-                "agsto_graph_tail_doc_indices": graph_tail[: max(int(top_n), 1)],
-                "dense_trace": dict(dense_universe.trace),
-                "candidate_order_policy": "dense_head_then_agsto_admitted_tail_then_remaining_dense",
-                "dense_topk_is_final_answer_default": False,
-                "uses_weighted_score_fusion": False,
-                "uses_external_baseline_frontier": False,
-                "uses_replay_candidate_cache": False,
-                "uses_hipporag_v2_runtime_graph_retrieval": False,
-                "uses_dense_only_as_graph_entry": True,
-                "uses_sto_role_graph_admission": True,
-                "ablation_query_supported_same_object_handoff": bool(
-                    self.agsto_generator.enable_query_supported_same_object_handoff
-                ),
-                "uses_variable_flow_traversal": bool(
-                    self.agsto_generator.enable_variable_flow_traversal
-                ),
-            },
+            trace=trace,
         )
 
 
@@ -606,6 +643,7 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
     agsto_generator: AGSTOLocalGraphCandidateGenerator
     preserved_dense_count: int = 200
     dense_seed_count: int = 20
+    enable_timing_profile: bool = False
 
     @classmethod
     def from_parquet(
@@ -622,6 +660,7 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
         agsto_closure_hops: int = 2,
         enable_query_supported_same_object_handoff: bool = False,
         enable_variable_flow_traversal: bool = False,
+        enable_timing_profile: bool = False,
     ) -> "DensePreservingAGSTOLocalGraphCandidateGenerator":
         return cls(
             dense_generator=DenseEmbeddingCandidateGenerator.from_parquet(
@@ -639,9 +678,11 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
                     enable_query_supported_same_object_handoff
                 ),
                 enable_variable_flow_traversal=bool(enable_variable_flow_traversal),
+                enable_timing_profile=bool(enable_timing_profile),
             ),
             preserved_dense_count=max(int(preserved_dense_count), 1),
             dense_seed_count=max(int(dense_seed_count), 1),
+            enable_timing_profile=bool(enable_timing_profile),
         )
 
     def prepare_queries(self, queries: Sequence[str]) -> None:
@@ -658,16 +699,20 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
         top_n: int,
     ) -> CandidateUniverse:
         preserved_count = min(max(int(self.preserved_dense_count), 1), max(int(top_n), 1))
+        timing_enabled = bool(self.enable_timing_profile)
+        timing_start = perf_counter() if timing_enabled else 0.0
         dense_universe = self.dense_generator.generate(
             query=str(query),
             query_index=int(query_index),
             row=row,
             top_n=preserved_count,
         )
+        dense_elapsed = perf_counter() - timing_start if timing_enabled else 0.0
         from evidence_transition_graphragv4_fact_witnessed_sto.agsto.local_graph import (
             build_query_local_sto_graph,
         )
 
+        local_graph_start = perf_counter() if timing_enabled else 0.0
         local_graph = build_query_local_sto_graph(
             query=str(query),
             corpus_index=self.agsto_generator.corpus_index,
@@ -681,11 +726,54 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
                 self.agsto_generator.enable_query_supported_same_object_handoff
             ),
             enable_variable_flow_traversal=bool(self.agsto_generator.enable_variable_flow_traversal),
+            enable_timing_profile=timing_enabled,
         )
+        local_graph_elapsed = perf_counter() - local_graph_start if timing_enabled else 0.0
         admitted = tuple(unique_ints(local_graph.get("admitted_doc_indices", []) or []))
         graph_tail = tuple(doc_index for doc_index in admitted if int(doc_index) not in set(dense_universe.doc_indices))
         docs = tuple(unique_ints([*dense_universe.doc_indices, *graph_tail])[: max(int(top_n), 1)])
         stats = dict(local_graph.get("stats", {}) or {})
+        trace = {
+            **dict(CANDIDATE_UNIVERSE_CONTRACT),
+            "candidate_generator": "dense_preserving_agsto_local_graph_candidate_generator",
+            "candidate_source": "method_owned_dense_preserving_agsto_local_graph",
+            "query_index": int(query_index),
+            "candidate_count": len(docs),
+            "preserved_dense_count": int(preserved_count),
+            "dense_seed_count": int(self.dense_seed_count),
+            "agsto_admitted_doc_count": len(admitted),
+            "agsto_appended_doc_count": len([doc for doc in graph_tail if int(doc) in set(docs)]),
+            "agsto_local_edge_count": int(stats.get("local_edge_count", 0) or 0),
+            "agsto_role_graph_edge_count": int(stats.get("role_graph_edge_count", 0) or 0),
+            "agsto_graph_tail_doc_indices": graph_tail[: max(int(top_n), 1)],
+            "dense_trace": dict(dense_universe.trace),
+            "candidate_order_policy": "preserve_dense_universe_then_append_agsto_admitted_tail",
+            "dense_topk_is_final_answer_default": False,
+            "uses_weighted_score_fusion": False,
+            "uses_external_baseline_frontier": False,
+            "uses_replay_candidate_cache": False,
+            "uses_hipporag_v2_runtime_graph_retrieval": False,
+            "uses_dense_only_as_graph_entry": True,
+            "uses_sto_role_graph_admission": True,
+            "preserves_dense_candidate_universe": True,
+            "ablation_query_supported_same_object_handoff": bool(
+                self.agsto_generator.enable_query_supported_same_object_handoff
+            ),
+            "uses_variable_flow_traversal": bool(
+                self.agsto_generator.enable_variable_flow_traversal
+            ),
+        }
+        if timing_enabled:
+            trace["timing_profile"] = {
+                "candidate_total_seconds": round(float(perf_counter() - timing_start), 6),
+                "dense_generate_seconds": round(float(dense_elapsed), 6),
+                "local_graph_seconds": round(float(local_graph_elapsed), 6),
+                "candidate_assembly_seconds": round(
+                    max(float(perf_counter() - timing_start - dense_elapsed - local_graph_elapsed), 0.0),
+                    6,
+                ),
+                "local_graph": dict(stats.get("timing_profile", {}) or {}),
+            }
         return CandidateUniverse(
             doc_indices=docs,
             admissible_doc_indices=tuple(
@@ -696,36 +784,7 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
                 "agsto_role_graph": self.agsto_generator.role_graph,
                 "agsto_local_graph": local_graph,
             },
-            trace={
-                **dict(CANDIDATE_UNIVERSE_CONTRACT),
-                "candidate_generator": "dense_preserving_agsto_local_graph_candidate_generator",
-                "candidate_source": "method_owned_dense_preserving_agsto_local_graph",
-                "query_index": int(query_index),
-                "candidate_count": len(docs),
-                "preserved_dense_count": int(preserved_count),
-                "dense_seed_count": int(self.dense_seed_count),
-                "agsto_admitted_doc_count": len(admitted),
-                "agsto_appended_doc_count": len([doc for doc in graph_tail if int(doc) in set(docs)]),
-                "agsto_local_edge_count": int(stats.get("local_edge_count", 0) or 0),
-                "agsto_role_graph_edge_count": int(stats.get("role_graph_edge_count", 0) or 0),
-                "agsto_graph_tail_doc_indices": graph_tail[: max(int(top_n), 1)],
-                "dense_trace": dict(dense_universe.trace),
-                "candidate_order_policy": "preserve_dense_universe_then_append_agsto_admitted_tail",
-                "dense_topk_is_final_answer_default": False,
-                "uses_weighted_score_fusion": False,
-                "uses_external_baseline_frontier": False,
-                "uses_replay_candidate_cache": False,
-                "uses_hipporag_v2_runtime_graph_retrieval": False,
-                "uses_dense_only_as_graph_entry": True,
-                "uses_sto_role_graph_admission": True,
-                "preserves_dense_candidate_universe": True,
-                "ablation_query_supported_same_object_handoff": bool(
-                    self.agsto_generator.enable_query_supported_same_object_handoff
-                ),
-                "uses_variable_flow_traversal": bool(
-                    self.agsto_generator.enable_variable_flow_traversal
-                ),
-            },
+            trace=trace,
         )
 
 

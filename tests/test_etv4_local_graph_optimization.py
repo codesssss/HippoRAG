@@ -2,7 +2,12 @@ from collections import Counter
 
 from evidence_transition_graphragv4_fact_witnessed_sto.agsto.local_graph import (
     _doc_query_token_coverage_map,
+    _fact_units_by_doc,
     _induced_local_edges,
+    _unit_by_id,
+)
+from evidence_transition_graphragv4_fact_witnessed_sto.agsto.query_grounding import (
+    ground_query_endpoints,
 )
 from evidence_transition_graphragv4_fact_witnessed_sto.agsto.role_transition import (
     ROLE_BRIDGE,
@@ -140,3 +145,46 @@ def test_doc_query_token_coverage_falls_back_without_inverted_index():
         1: ("beta",),
         2: ("beta",),
     }
+
+
+def test_cached_unit_views_match_scan_paths():
+    units = [
+        {"_unit_int_id": 0, "doc_index": 1, "unit_type": "source_span"},
+        {"_unit_int_id": 1, "doc_index": 1, "unit_type": "openie_fact"},
+        {"_unit_int_id": 2, "doc_index": 2, "unit_type": "openie_fact"},
+    ]
+    scan_index = {"units": units}
+    cached_index = {
+        "units": units,
+        "unit_by_id": {0: units[0], 1: units[1], 2: units[2]},
+        "fact_units_by_doc": {1: [units[1]], 2: [units[2]]},
+    }
+
+    assert _unit_by_id(cached_index) == _unit_by_id(scan_index)
+    assert _fact_units_by_doc(cached_index) == _fact_units_by_doc(scan_index)
+
+
+def test_endpoint_token_index_grounding_matches_full_endpoint_scan():
+    endpoint_to_docs = {
+        "alpha beta": [1],
+        "alpha": [2],
+        "gamma": [3],
+        "unrelated": [4],
+    }
+    endpoint_token_to_endpoints = {
+        "alpha": ["alpha", "alpha beta"],
+        "beta": ["alpha beta"],
+        "gamma": ["gamma"],
+        "unrelated": ["unrelated"],
+    }
+    kwargs = {
+        "query": "Which Alpha Beta entity connects to Gamma?",
+        "endpoint_to_docs": endpoint_to_docs,
+        "max_endpoint_degree": 10,
+        "title_endpoints": {"alpha beta", "gamma"},
+    }
+
+    full_scan = ground_query_endpoints(**kwargs)
+    indexed = ground_query_endpoints(**kwargs, endpoint_token_to_endpoints=endpoint_token_to_endpoints)
+
+    assert indexed == full_scan

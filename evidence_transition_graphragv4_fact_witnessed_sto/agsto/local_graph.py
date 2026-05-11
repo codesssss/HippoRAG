@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections import deque
 from itertools import combinations
+from time import perf_counter
 from typing import Any, Deque, Dict, List, Mapping, Sequence, Set, Tuple
 
 from .index import content_tokens
@@ -119,6 +120,20 @@ def _edge_variable_flow_traversal_kinds(
 
 
 def _unit_by_id(corpus_index: Mapping[str, Any]) -> Dict[int, Mapping[str, Any]]:
+    cached = corpus_index.get("unit_by_id", {}) or {}
+    if cached:
+        output: Dict[int, Mapping[str, Any]] = {}
+        for raw_unit_id, unit in cached.items():
+            if not isinstance(unit, Mapping):
+                continue
+            try:
+                unit_id = int(raw_unit_id)
+            except (TypeError, ValueError):
+                continue
+            output[unit_id] = unit
+        if output:
+            return output
+
     units: Dict[int, Mapping[str, Any]] = {}
     for unit in corpus_index.get("units", []) or []:
         if not isinstance(unit, Mapping):
@@ -132,6 +147,20 @@ def _unit_by_id(corpus_index: Mapping[str, Any]) -> Dict[int, Mapping[str, Any]]
 
 
 def _fact_units_by_doc(corpus_index: Mapping[str, Any]) -> Dict[int, List[Mapping[str, Any]]]:
+    cached = corpus_index.get("fact_units_by_doc", {}) or {}
+    if cached:
+        output: Dict[int, List[Mapping[str, Any]]] = {}
+        for raw_doc_idx, units in cached.items():
+            try:
+                doc_idx = int(raw_doc_idx)
+            except (TypeError, ValueError):
+                continue
+            clean_units = [unit for unit in units or [] if isinstance(unit, Mapping)]
+            if clean_units:
+                output[doc_idx] = clean_units
+        if output:
+            return output
+
     facts_by_doc: Dict[int, List[Mapping[str, Any]]] = {}
     for unit in corpus_index.get("units", []) or []:
         if not isinstance(unit, Mapping):
@@ -3304,6 +3333,7 @@ def build_query_local_sto_graph(
     candidate_limit: int = 120,
     enable_query_supported_same_object_handoff: bool = False,
     enable_variable_flow_traversal: bool = False,
+    enable_timing_profile: bool = False,
 ) -> Dict[str, Any]:
     """Build a query-local evidence graph admitted from the global STO graph.
 
@@ -3327,12 +3357,25 @@ def build_query_local_sto_graph(
     clean_candidate_limit = max(int(candidate_limit), 1)
     clean_closure_hops = max(int(closure_hops), 0)
     clean_textual_top_k = max(int(textual_seed_top_k), 0)
+    timing_enabled = bool(enable_timing_profile)
+    timing_profile: Dict[str, float] = {}
+    timing_start = perf_counter() if timing_enabled else 0.0
+    timing_last = timing_start
+
+    def mark_timing(stage: str) -> None:
+        nonlocal timing_last
+        if not timing_enabled:
+            return
+        now = perf_counter()
+        timing_profile[str(stage)] = round(float(now - timing_last), 6)
+        timing_last = now
 
     resolved_role_graph = role_graph or build_role_transition_graph(
         corpus_index=corpus_index,
         max_endpoint_degree=max_endpoint_degree,
         include_title_role_grounding=True,
     )
+    mark_timing("resolve_role_graph_seconds")
     endpoint_to_docs: Mapping[str, Sequence[int]] = corpus_index.get("endpoint_to_docs", {}) or {}
     query_tokens = content_tokens(query)
     query_token_stems = _token_stems(query_tokens)
@@ -3340,6 +3383,7 @@ def build_query_local_sto_graph(
         corpus_index=corpus_index,
         query_tokens=query_tokens,
     )
+    mark_timing("query_token_coverage_seconds")
     corpus_unit_by_id = _unit_by_id(corpus_index)
     facts_by_doc = _fact_units_by_doc(corpus_index)
     role_graph_doc_titles = {
@@ -3348,17 +3392,20 @@ def build_query_local_sto_graph(
         if str(endpoint or "").strip()
     }
     title_endpoints = {str(endpoint) for endpoint in role_graph_doc_titles.values() if str(endpoint).strip()}
+    mark_timing("index_view_seconds")
     query_grounding = ground_query_endpoints(
         query=query,
         endpoint_to_docs=endpoint_to_docs,
         max_endpoint_degree=max_endpoint_degree,
         title_endpoints=title_endpoints,
+        endpoint_token_to_endpoints=corpus_index.get("endpoint_token_to_endpoints", {}) or {},
     )
     query_endpoints = [str(endpoint) for endpoint in query_grounding.get("query_endpoints", []) or []]
     endpoint_seed_docs = _endpoint_seed_docs(endpoints=query_endpoints, endpoint_to_docs=endpoint_to_docs)
     symbolic_seed_doc_indices = unique_ranked(
         doc_idx for endpoint in query_endpoints for doc_idx in endpoint_seed_docs.get(endpoint, []) or []
     )
+    mark_timing("query_grounding_seconds")
 
     if textual_seed_doc_indices is None:
         textual_seed_docs = rank_docs_bm25(
@@ -3368,6 +3415,7 @@ def build_query_local_sto_graph(
         )
     else:
         textual_seed_docs = _clean_doc_indices(textual_seed_doc_indices)[:clean_textual_top_k]
+    mark_timing("textual_seed_seconds")
 
     seed_docs = unique_ranked([*textual_seed_docs, *symbolic_seed_doc_indices])
     admitted_docs: List[int] = []
@@ -3379,6 +3427,7 @@ def build_query_local_sto_graph(
     variable_flow_doc_pair_ranks: Dict[str, int] = {}
     variable_flow_update_count = 0
     queue: Deque[Tuple[int, int]] = deque()
+    mark_timing("seed_preparation_seconds")
 
     def set_doc_flow(doc_idx: int, active_endpoint_ranks: Mapping[str, int]) -> bool:
         doc = int(doc_idx)
@@ -3535,9 +3584,39 @@ def build_query_local_sto_graph(
             queue.append((neighbor, int(distance + 1)))
             if len(admitted_docs) >= clean_candidate_limit:
                 break
+    mark_timing("admission_bfs_seconds")
 
     local_edges = _induced_local_edges(role_graph=resolved_role_graph, admitted_docs=admitted_docs)
     local_edge_tier_counts = _local_edge_tier_counts(local_edges)
+    mark_timing("local_edge_induction_seconds")
+    if timing_enabled:
+        timing_profile["total_local_graph_seconds"] = round(float(perf_counter() - timing_start), 6)
+    stats = {
+        "textual_seed_count": len(textual_seed_docs),
+        "symbolic_anchor_count": len(query_endpoints),
+        "symbolic_seed_doc_count": len(symbolic_seed_doc_indices),
+        "seed_doc_count": len(seed_docs),
+        "admitted_doc_count": len(admitted_docs),
+        "local_edge_count": len(local_edges),
+        "local_edge_tier_counts": local_edge_tier_counts,
+        "closure_hops": clean_closure_hops,
+        "candidate_limit": clean_candidate_limit,
+        "allowed_edge_kinds": sorted(LOCAL_EVIDENCE_EDGE_KINDS),
+        "traversal_edge_kinds": sorted(LOCAL_TRAVERSAL_EDGE_KINDS),
+        "local_evidence_edge_kinds": sorted(LOCAL_EVIDENCE_EDGE_KINDS),
+        "query_supported_same_object_handoff_enabled": bool(enable_query_supported_same_object_handoff),
+        "variable_flow_traversal_enabled": bool(enable_variable_flow_traversal),
+        "variable_flow_doc_count": len(doc_variable_flow_endpoints),
+        "variable_flow_edge_count": len(variable_flow_doc_pair_keys),
+        "variable_flow_update_count": int(variable_flow_update_count),
+        "allowed_edge_tiers": [EVIDENCE_TRANSITION_TIER, WEAK_CONNECTIVITY_TIER],
+        "role_graph_edge_count": int((resolved_role_graph.get("stats", {}) or {}).get("edge_count", 0) or 0),
+        "role_graph_edge_tier_counts": dict(
+            (resolved_role_graph.get("stats", {}) or {}).get("edge_tier_counts", {}) or {}
+        ),
+    }
+    if timing_enabled:
+        stats["timing_profile"] = dict(timing_profile)
     return {
         "method": "query_local_sto_graph_admission",
         "query": str(query or ""),
@@ -3573,28 +3652,5 @@ def build_query_local_sto_graph(
         "variable_flow_doc_pair_keys": sorted(variable_flow_doc_pair_keys),
         "variable_flow_doc_pair_ranks": dict(sorted(variable_flow_doc_pair_ranks.items())),
         "query_token_stems": sorted(query_token_stems),
-        "stats": {
-            "textual_seed_count": len(textual_seed_docs),
-            "symbolic_anchor_count": len(query_endpoints),
-            "symbolic_seed_doc_count": len(symbolic_seed_doc_indices),
-            "seed_doc_count": len(seed_docs),
-            "admitted_doc_count": len(admitted_docs),
-            "local_edge_count": len(local_edges),
-            "local_edge_tier_counts": local_edge_tier_counts,
-            "closure_hops": clean_closure_hops,
-            "candidate_limit": clean_candidate_limit,
-            "allowed_edge_kinds": sorted(LOCAL_EVIDENCE_EDGE_KINDS),
-            "traversal_edge_kinds": sorted(LOCAL_TRAVERSAL_EDGE_KINDS),
-            "local_evidence_edge_kinds": sorted(LOCAL_EVIDENCE_EDGE_KINDS),
-            "query_supported_same_object_handoff_enabled": bool(enable_query_supported_same_object_handoff),
-            "variable_flow_traversal_enabled": bool(enable_variable_flow_traversal),
-            "variable_flow_doc_count": len(doc_variable_flow_endpoints),
-            "variable_flow_edge_count": len(variable_flow_doc_pair_keys),
-            "variable_flow_update_count": int(variable_flow_update_count),
-            "allowed_edge_tiers": [EVIDENCE_TRANSITION_TIER, WEAK_CONNECTIVITY_TIER],
-            "role_graph_edge_count": int((resolved_role_graph.get("stats", {}) or {}).get("edge_count", 0) or 0),
-            "role_graph_edge_tier_counts": dict(
-                (resolved_role_graph.get("stats", {}) or {}).get("edge_tier_counts", {}) or {}
-            ),
-        },
+        "stats": stats,
     }

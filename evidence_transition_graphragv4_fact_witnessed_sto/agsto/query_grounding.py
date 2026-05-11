@@ -37,6 +37,20 @@ def _endpoint_degree(endpoint_to_docs: Mapping[str, Sequence[int]], endpoint: st
     return len(endpoint_to_docs.get(str(endpoint), []) or [])
 
 
+def _candidate_endpoints_for_tokens(
+    *,
+    tokens: Set[str],
+    endpoint_to_docs: Mapping[str, Sequence[int]],
+    endpoint_token_to_endpoints: Mapping[str, Sequence[str]] | None,
+) -> List[str]:
+    if not endpoint_token_to_endpoints:
+        return [str(endpoint) for endpoint in endpoint_to_docs.keys()]
+    candidates: Set[str] = set()
+    for token in tokens:
+        candidates.update(str(endpoint) for endpoint in endpoint_token_to_endpoints.get(str(token), []) or [])
+    return sorted(endpoint for endpoint in candidates if endpoint in endpoint_to_docs)
+
+
 def capitalized_content_tokens(query: str) -> Set[str]:
     """Return normalized query content tokens that are capitalized in surface form."""
 
@@ -55,13 +69,19 @@ def lexical_query_endpoints(
     query: str,
     endpoint_to_docs: Mapping[str, Sequence[int]],
     max_endpoint_degree: int,
+    endpoint_token_to_endpoints: Mapping[str, Sequence[str]] | None = None,
 ) -> List[str]:
     """Ground query tokens to maximal non-hub STO endpoints."""
 
     query_tokens = content_tokens(query) - QUERY_FUNCTION_TOKENS
     matched: List[Tuple[str, Set[str]]] = []
-    for endpoint, doc_indices in endpoint_to_docs.items():
+    for endpoint in _candidate_endpoints_for_tokens(
+        tokens=query_tokens,
+        endpoint_to_docs=endpoint_to_docs,
+        endpoint_token_to_endpoints=endpoint_token_to_endpoints,
+    ):
         endpoint = str(endpoint)
+        doc_indices = endpoint_to_docs.get(endpoint, []) or []
         endpoint_tokens = content_tokens(endpoint)
         if not endpoint_tokens or not endpoint_tokens.issubset(query_tokens):
             continue
@@ -83,6 +103,7 @@ def named_anchor_query_endpoints(
     endpoint_to_docs: Mapping[str, Sequence[int]],
     max_endpoint_degree: int,
     title_endpoints: Set[str] | None = None,
+    endpoint_token_to_endpoints: Mapping[str, Sequence[str]] | None = None,
 ) -> List[str]:
     """Keep endpoint anchors that are named mentions in the query surface."""
 
@@ -90,6 +111,7 @@ def named_anchor_query_endpoints(
         query=query,
         endpoint_to_docs=endpoint_to_docs,
         max_endpoint_degree=max_endpoint_degree,
+        endpoint_token_to_endpoints=endpoint_token_to_endpoints,
     )
     capitalized_tokens = capitalized_content_tokens(query)
     if not capitalized_tokens:
@@ -98,6 +120,7 @@ def named_anchor_query_endpoints(
         query=query,
         endpoint_to_docs=endpoint_to_docs,
         max_endpoint_degree=max_endpoint_degree,
+        endpoint_token_to_endpoints=endpoint_token_to_endpoints,
     )
     if exact_anchors:
         return exact_anchors
@@ -117,14 +140,20 @@ def exact_mentioned_query_endpoints(
     query: str,
     endpoint_to_docs: Mapping[str, Sequence[int]],
     max_endpoint_degree: int,
+    endpoint_token_to_endpoints: Mapping[str, Sequence[str]] | None = None,
 ) -> List[str]:
     """Ground endpoints whose normalized phrase appears in the query."""
 
     query_norm = f" {normalize_text(query)} "
     capitalized_tokens = capitalized_content_tokens(query)
     matched: List[Tuple[str, str]] = []
-    for endpoint, doc_indices in endpoint_to_docs.items():
+    for endpoint in _candidate_endpoints_for_tokens(
+        tokens=capitalized_tokens,
+        endpoint_to_docs=endpoint_to_docs,
+        endpoint_token_to_endpoints=endpoint_token_to_endpoints,
+    ):
         endpoint = str(endpoint)
+        doc_indices = endpoint_to_docs.get(endpoint, []) or []
         if len(doc_indices or []) > max_endpoint_degree:
             continue
         endpoint_norm = normalize_text(endpoint)
@@ -152,6 +181,7 @@ def ground_query_endpoints(
     max_endpoint_degree: int,
     prefer_named_anchors: bool = True,
     title_endpoints: Set[str] | None = None,
+    endpoint_token_to_endpoints: Mapping[str, Sequence[str]] | None = None,
 ) -> Dict[str, Any]:
     """Ground entity-like query endpoints for symbolic STO graph entry.
 
@@ -166,6 +196,7 @@ def ground_query_endpoints(
         query=query,
         endpoint_to_docs=endpoint_to_docs,
         max_endpoint_degree=max_endpoint_degree,
+        endpoint_token_to_endpoints=endpoint_token_to_endpoints,
     )
     named = (
         named_anchor_query_endpoints(
@@ -173,6 +204,7 @@ def ground_query_endpoints(
             endpoint_to_docs=endpoint_to_docs,
             max_endpoint_degree=max_endpoint_degree,
             title_endpoints=title_endpoints,
+            endpoint_token_to_endpoints=endpoint_token_to_endpoints,
         )
         if prefer_named_anchors
         else []

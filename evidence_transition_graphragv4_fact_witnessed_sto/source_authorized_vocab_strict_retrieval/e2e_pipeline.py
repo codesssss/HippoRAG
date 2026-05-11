@@ -10,6 +10,7 @@ Reader QA stays in the existing fixed-top5 QA runner.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import perf_counter
 from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
 from .candidate_expansion import build_source_text_candidate_expansion_index
@@ -165,17 +166,22 @@ def retrieve_one_e2e(
     allow_frontier_pair_insertion: bool = True,
     assembly_policy: str = "source_prior_preserving_tail_insertion",
     source_prior_policy: str = "dense_head",
+    enable_timing_profile: bool = False,
 ) -> E2ERetrievalResult:
     """Run one query through candidate generation and STO retrieval."""
 
+    timing_enabled = bool(enable_timing_profile)
+    timing_start = perf_counter() if timing_enabled else 0.0
     candidate_universe = candidate_generator.generate(
         query=str(query),
         query_index=int(query_index),
         row=row,
         top_n=max(int(candidate_pool_k), int(top_k)),
     )
+    candidate_elapsed = perf_counter() - timing_start if timing_enabled else 0.0
     candidates = candidate_universe.doc_indices
     runner = str(runner)
+    retrieval_start = perf_counter() if timing_enabled else 0.0
     if runner == "graph_native":
         result = source_authorized_graph_native_pipeline_retrieve(
             query=str(query),
@@ -385,6 +391,16 @@ def retrieve_one_e2e(
         )
         certified = result.retrieval.certified_doc_indices
         retrieval_trace = dict(result.trace)
+    retrieval_elapsed = perf_counter() - retrieval_start if timing_enabled else 0.0
+
+    timing_profile = {}
+    if timing_enabled:
+        timing_profile = {
+            "total_retrieve_one_seconds": round(float(perf_counter() - timing_start), 6),
+            "candidate_generate_seconds": round(float(candidate_elapsed), 6),
+            "graph_retrieval_seconds": round(float(retrieval_elapsed), 6),
+            "candidate_generator": dict(candidate_universe.trace.get("timing_profile", {}) or {}),
+        }
 
     return E2ERetrievalResult(
         doc_indices=tuple(unique_ints(result.doc_indices)),
@@ -400,6 +416,7 @@ def retrieve_one_e2e(
                 ),
             },
             "retrieval": retrieval_trace,
+            **({"timing_profile": timing_profile} if timing_enabled else {}),
         },
     )
 
@@ -418,6 +435,7 @@ def evaluate_e2e_rows(
     allow_frontier_pair_insertion: bool = True,
     assembly_policy: str = "source_prior_preserving_tail_insertion",
     source_prior_policy: str = "dense_head",
+    enable_timing_profile: bool = False,
 ) -> Dict[str, Any]:
     """Evaluate STO GraphRAG retrieval on already-loaded query rows."""
 
@@ -425,6 +443,7 @@ def evaluate_e2e_rows(
     r5_values: List[float] = []
     all_gold_values: List[float] = []
     certified_counts: List[int] = []
+    timing_rows: List[Mapping[str, Any]] = []
     graph_index = SourceTextGraphIndex.build(nodes) if str(runner) == "graph_native" else None
     candidate_expansion_index = (
         build_source_text_candidate_expansion_index(nodes)
@@ -461,6 +480,7 @@ def evaluate_e2e_rows(
             allow_frontier_pair_insertion=allow_frontier_pair_insertion,
             assembly_policy=str(assembly_policy),
             source_prior_policy=str(source_prior_policy),
+            enable_timing_profile=bool(enable_timing_profile),
         )
         retrieved = list(result.doc_indices)
         r5 = recall_at_k(gold, retrieved, top_k)
@@ -468,6 +488,8 @@ def evaluate_e2e_rows(
         r5_values.append(float(r5))
         all_gold_values.append(1.0 if all_gold5 else 0.0)
         certified_counts.append(len(result.certified_doc_indices))
+        if bool(enable_timing_profile):
+            timing_rows.append(dict(result.trace.get("timing_profile", {}) or {}))
         output_rows.append(
             {
                 "query_index": query_index,
@@ -484,7 +506,7 @@ def evaluate_e2e_rows(
 
     row_count = len(output_rows)
     denom = float(max(row_count, 1))
-    return {
+    output = {
         "row_count": row_count,
         "metrics": {
             "r5": round(sum(r5_values) / denom, 6),
@@ -493,6 +515,39 @@ def evaluate_e2e_rows(
         },
         "rows": output_rows,
     }
+    if bool(enable_timing_profile):
+        output["timing_profile_summary"] = _summarize_timing_profiles(timing_rows)
+    return output
+
+
+def _flatten_timing_profile(prefix: str, value: Any, output: Dict[str, List[float]]) -> None:
+    if isinstance(value, Mapping):
+        for key, nested in value.items():
+            next_prefix = f"{prefix}.{key}" if prefix else str(key)
+            _flatten_timing_profile(next_prefix, nested, output)
+        return
+    if isinstance(value, (int, float)):
+        output.setdefault(prefix, []).append(float(value))
+
+
+def _summarize_timing_profiles(timing_rows: Sequence[Mapping[str, Any]]) -> Mapping[str, Any]:
+    flattened: Dict[str, List[float]] = {}
+    for row in timing_rows:
+        _flatten_timing_profile("", row, flattened)
+    summary: Dict[str, Mapping[str, float | int]] = {}
+    for key, values in sorted(flattened.items()):
+        if not values:
+            continue
+        ordered = sorted(values)
+        count = len(ordered)
+        summary[key] = {
+            "count": count,
+            "mean_seconds": round(sum(ordered) / float(count), 6),
+            "p50_seconds": round(ordered[count // 2], 6),
+            "max_seconds": round(ordered[-1], 6),
+            "sum_seconds": round(sum(ordered), 6),
+        }
+    return summary
 
 
 def method_name_for_runner(runner: str) -> str:

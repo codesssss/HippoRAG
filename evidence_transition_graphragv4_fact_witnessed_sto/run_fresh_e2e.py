@@ -520,6 +520,7 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
                 args.ablation_query_supported_object_handoff
             ),
             enable_variable_flow_traversal=bool(args.enable_variable_flow_traversal),
+            enable_timing_profile=bool(args.profile_retrieval),
         )
         runner = select_runner(
             candidate_mode=candidate_mode,
@@ -552,6 +553,7 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
                     args.ablation_query_supported_object_handoff
                 ),
                 enable_variable_flow_traversal=bool(args.enable_variable_flow_traversal),
+                enable_timing_profile=bool(args.profile_retrieval),
             )
         else:
             candidate_generator = DenseSeededAGSTOLocalGraphCandidateGenerator.from_parquet(
@@ -568,6 +570,7 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
                     args.ablation_query_supported_object_handoff
                 ),
                 enable_variable_flow_traversal=bool(args.enable_variable_flow_traversal),
+                enable_timing_profile=bool(args.profile_retrieval),
             )
         runner = select_runner(
             candidate_mode=candidate_mode,
@@ -586,6 +589,7 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
         allow_frontier_pair_insertion=False,
         assembly_policy="baseline_aligned_graph_entry_no_weighted_fusion",
         source_prior_policy="dense_entry_source_prior" if candidate_mode != GRAPH_ONLY_CANDIDATE_GENERATOR_MODE else "none",
+        enable_timing_profile=bool(args.profile_retrieval),
     )
     chunk_embedding_store_path = str(getattr(artifacts, "chunk_embedding_store_path", "") or "")
 
@@ -693,6 +697,7 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
                 args.ablation_query_supported_object_handoff
             ),
             "enable_variable_flow_traversal": bool(args.enable_variable_flow_traversal),
+            "profile_retrieval": bool(args.profile_retrieval),
         },
         **dataset_result,
     }
@@ -858,6 +863,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "are traversable only when their shared endpoint is active in the "
             "current document's fact flow. This is a closed-form graph semantic, "
             "not a relation-trigger ablation."
+        ),
+    )
+    parser.add_argument(
+        "--profile-retrieval",
+        action="store_true",
+        help=(
+            "Write per-query retrieval timing diagnostics into route_trace and "
+            "a dataset-level timing_profile_summary. Disabled by default and "
+            "does not participate in ranking."
         ),
     )
     parser.add_argument("--reuse-current-fresh-index", action="store_true")
