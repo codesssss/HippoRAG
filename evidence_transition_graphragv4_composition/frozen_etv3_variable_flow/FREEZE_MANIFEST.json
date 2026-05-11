@@ -1,0 +1,294 @@
+{
+  "file_count": 57,
+  "files": [
+    {
+      "bytes": 1281,
+      "path": "FREEZE.md",
+      "sha256": "93500588acdf8885c0aa72a93fbd0ef3aee27e6d55f6876bbb1cd8ef60324be3"
+    },
+    {
+      "bytes": 2357,
+      "path": "README.md",
+      "sha256": "fb9091c75508097ed498d62d8c5d6466dfef4c48c7bc365ab5b73c928cf81d80"
+    },
+    {
+      "bytes": 254,
+      "path": "__init__.py",
+      "sha256": "20e741f4ee8f3f31e0aaefab87e1471afff73a8f6b98d0b299566a2980e68485"
+    },
+    {
+      "bytes": 3789,
+      "path": "agsto/__init__.py",
+      "sha256": "ba5b8b01c0de91f0e7b4199ebfddb463f0770faca0fbcb0ae6a9d81053973fd9"
+    },
+    {
+      "bytes": 7036,
+      "path": "agsto/completion.py",
+      "sha256": "5bcf182a441674229b7803baf03933aedbc2b0f3746a761debdfa6941746ec38"
+    },
+    {
+      "bytes": 2346,
+      "path": "agsto/config.py",
+      "sha256": "7b8ae9da58d5ec3a033d514f1e9a5e87eff8db05d0253194c7ce8d9a5bfacc09"
+    },
+    {
+      "bytes": 12677,
+      "path": "agsto/index.py",
+      "sha256": "33471a8ff574bc4e4fb3e835b0f5ef32692e6fe87dd304957036136848b52e43"
+    },
+    {
+      "bytes": 2316,
+      "path": "agsto/lexical.py",
+      "sha256": "fe923166ccd8f38ae4e64d7bf91720f20bcc74f3e96ba0a12149eb7991d9dc94"
+    },
+    {
+      "bytes": 103607,
+      "path": "agsto/local_graph.py",
+      "sha256": "04dddc049d805d120782358c946ddf6c74661875cbd6307cce17a152e990f65b"
+    },
+    {
+      "bytes": 32735,
+      "path": "agsto/local_ppr.py",
+      "sha256": "fb2c7a30a78603f5070c484ced5576c2aa90c604617ae503335db5bb3fe70dd2"
+    },
+    {
+      "bytes": 16693,
+      "path": "agsto/proposal_roles.py",
+      "sha256": "b2ea476bbd7792914741b8c642773fa4cbab8abeb5c8fb7edcd0cadd6a4d9c96"
+    },
+    {
+      "bytes": 32187,
+      "path": "agsto/proposals.py",
+      "sha256": "6c57cce76d272c3f2f922c99768ac5e72bfe8a68b415a1b817721f556b28c392"
+    },
+    {
+      "bytes": 5982,
+      "path": "agsto/query_grounding.py",
+      "sha256": "861cd35a669e369488023d5101a0d7f6a9bb9d6779671242d42a5d97b12ce4d2"
+    },
+    {
+      "bytes": 2024,
+      "path": "agsto/ranking.py",
+      "sha256": "e278d27603ca69d5e7328f1c7d94e818bb7c0a6dbbbacf3786ce22f2e8d52462"
+    },
+    {
+      "bytes": 6056,
+      "path": "agsto/retriever.py",
+      "sha256": "a00d5b89fb8b172fdc62b4109b04198e5c7a9eac1ed8e6df5cf560a40a413a7f"
+    },
+    {
+      "bytes": 21795,
+      "path": "agsto/role_transition.py",
+      "sha256": "a9b782fb9fb7e05bf34fb3c6afe6da7678d0b42cb89b950747a9ba3c35e34c78"
+    },
+    {
+      "bytes": 9312,
+      "path": "agsto/scoring.py",
+      "sha256": "119fc0e03872e6ab92fdddd3c98aa1fdd7a008ccc8ea249cdad5643342d18b15"
+    },
+    {
+      "bytes": 40004,
+      "path": "agsto/selector.py",
+      "sha256": "cfbcbd28f41983baeb62d11ba0a0e79f54bbd89e431e74de6920e45a0cd29ba9"
+    },
+    {
+      "bytes": 8239,
+      "path": "agsto/slot_state.py",
+      "sha256": "e5facff76c98d969dbc35af2f35a9bdc7c3864f32eb0422506e4676896658354"
+    },
+    {
+      "bytes": 1600,
+      "path": "contract.py",
+      "sha256": "6d84413f7f217730a6b4009e7bfc747b2bd8bc9bf085c95e63892a1edd915e81"
+    },
+    {
+      "bytes": 35519,
+      "path": "run_fresh_e2e.py",
+      "sha256": "3c49daf40a1c893160c23b6e0db0818c701712aafb51ccb2c6c2c5f2655a2752"
+    },
+    {
+      "bytes": 22676,
+      "path": "run_reader_qa.py",
+      "sha256": "970f53f75790bacb0e8e906b0c2b89eaca0b53626ac44dd727f53e648a2c4379"
+    },
+    {
+      "bytes": 10728,
+      "path": "source_authorized_vocab_strict_retrieval/README.md",
+      "sha256": "87865b444ea82cb57947cc315af623ef0a2e5ff040f7ae6fb2c8b5c0084c4009"
+    },
+    {
+      "bytes": 5226,
+      "path": "source_authorized_vocab_strict_retrieval/__init__.py",
+      "sha256": "db0d3cb51c0d418f621a48f9598ccdb85b46f887f4d1615d4d07e92298b942c5"
+    },
+    {
+      "bytes": 12590,
+      "path": "source_authorized_vocab_strict_retrieval/active_certificate_graph.py",
+      "sha256": "4fd60c81233a4cebdc850ae0b21c92c87dc443fdfc32ee07f8c01d30a1e4857e"
+    },
+    {
+      "bytes": 25643,
+      "path": "source_authorized_vocab_strict_retrieval/active_edge_audit.py",
+      "sha256": "7f58df82de9604735efbbccfc0a7b8c12af5ae10e221d7d91b6f78ca41301844"
+    },
+    {
+      "bytes": 17151,
+      "path": "source_authorized_vocab_strict_retrieval/attribution.py",
+      "sha256": "0c97138e4c02ae79842849ce7935b300a732a543756171550f5f0b512288b8ad"
+    },
+    {
+      "bytes": 10198,
+      "path": "source_authorized_vocab_strict_retrieval/build_minimal_per_query_report.py",
+      "sha256": "49d76c94b312eeda99899fa9578d4c71458779813d071e331fd647e6ff876e0b"
+    },
+    {
+      "bytes": 7265,
+      "path": "source_authorized_vocab_strict_retrieval/candidate_expansion.py",
+      "sha256": "8baeb6ffdadb40af830c232575973167c4b5beeec0a9d9f1959990df5aa28a8d"
+    },
+    {
+      "bytes": 63867,
+      "path": "source_authorized_vocab_strict_retrieval/candidate_generator.py",
+      "sha256": "3bf676e1c316e3c4cf85e4f18889f3ec0c61c34ee6d595cbf8c9eeff7c5ea8e1"
+    },
+    {
+      "bytes": 37676,
+      "path": "source_authorized_vocab_strict_retrieval/certificate_graph.py",
+      "sha256": "7d0961b4c63c0c7dd41444e70b2918dfd682ba43fb3e0c8fdf4b9f45cb67f5b8"
+    },
+    {
+      "bytes": 8590,
+      "path": "source_authorized_vocab_strict_retrieval/compare_per_query.py",
+      "sha256": "5d09552ab680d8ec6df354e91d5cf0750b45563792ff341958293e96ec09dd51"
+    },
+    {
+      "bytes": 5420,
+      "path": "source_authorized_vocab_strict_retrieval/compare_reproduction.py",
+      "sha256": "d5297d7c7c2c61268cf975f17a33116709381a243015a3e938ac7fd6e7c9541a"
+    },
+    {
+      "bytes": 6868,
+      "path": "source_authorized_vocab_strict_retrieval/contract.py",
+      "sha256": "ed846be9ae3309e5608b991ad9ee75197fd249beb78fef53dd444251b179dc04"
+    },
+    {
+      "bytes": 59071,
+      "path": "source_authorized_vocab_strict_retrieval/e2e_pipeline.py",
+      "sha256": "dab24e1a1ec0217eb4e3e977ec122f1dabe03e498c4b63ed91a90d637cc5f5c0"
+    },
+    {
+      "bytes": 3185,
+      "path": "source_authorized_vocab_strict_retrieval/entry_grounding.py",
+      "sha256": "57df28db7a7504437b2252957061b18d868331a67ff8fd11c889c9feb5492dad"
+    },
+    {
+      "bytes": 17550,
+      "path": "source_authorized_vocab_strict_retrieval/evaluate_report.py",
+      "sha256": "6afe00970416aa2ebe23bf3d6ef16883837486be6e2349c30be3199f80861731"
+    },
+    {
+      "bytes": 17868,
+      "path": "source_authorized_vocab_strict_retrieval/evidence_completion.py",
+      "sha256": "9249e54d4d7d9f05f203201601666c9cfc54a530c83594ec339d3d5caa4d17ab"
+    },
+    {
+      "bytes": 34921,
+      "path": "source_authorized_vocab_strict_retrieval/evidence_set_selector.py",
+      "sha256": "bb7d098a41c2ddd6617ce10d322fa187d5cd0da2c0be5bbc0d8a018c101f480b"
+    },
+    {
+      "bytes": 3683,
+      "path": "source_authorized_vocab_strict_retrieval/export_qa_transition_report.py",
+      "sha256": "ca989640bc86699e60ab4929534dc5332a7db4366d684bc7b429e89ab3b7f932"
+    },
+    {
+      "bytes": 4766,
+      "path": "source_authorized_vocab_strict_retrieval/frontier.py",
+      "sha256": "5a2c427bf56add6fd8b5627af3865a1f980780fcd74e1a8afe7b4a8fd75a1e25"
+    },
+    {
+      "bytes": 4253,
+      "path": "source_authorized_vocab_strict_retrieval/graph_index.py",
+      "sha256": "c8b3c46b64660198afe0e6b49c7114bfa20f764ba275627ed9b209c14360670c"
+    },
+    {
+      "bytes": 3274,
+      "path": "source_authorized_vocab_strict_retrieval/graph_native_pipeline.py",
+      "sha256": "03382c5d3640e9068accd35ddf100e4f22bb01d100da796ee5531098a770608b"
+    },
+    {
+      "bytes": 12658,
+      "path": "source_authorized_vocab_strict_retrieval/missing_gold_reachability_audit.py",
+      "sha256": "adc83c63d20d1b02e6f332fb1294e682a5c83d98ce187dce1db2aa5333990d7f"
+    },
+    {
+      "bytes": 2220,
+      "path": "source_authorized_vocab_strict_retrieval/normalize.py",
+      "sha256": "92ba6b5495548806f59603e74cf2fbe390b1e66dff4814bc89ea5f4090e504ff"
+    },
+    {
+      "bytes": 22525,
+      "path": "source_authorized_vocab_strict_retrieval/pipeline.py",
+      "sha256": "ab3326c525602d95686de1fd1f76b613533a0ed7d35f157d21a19022307493e7"
+    },
+    {
+      "bytes": 30774,
+      "path": "source_authorized_vocab_strict_retrieval/predication_transition_exposure.py",
+      "sha256": "14deb570238eaceafd278d6e8133fdc6b32d3fd81cc628de106edde177ad040b"
+    },
+    {
+      "bytes": 7181,
+      "path": "source_authorized_vocab_strict_retrieval/query_conditioning.py",
+      "sha256": "cb7793ba8ca72929d4c7774fa173f5399055ea5a079a8bbb861d459f36d6f6af"
+    },
+    {
+      "bytes": 8258,
+      "path": "source_authorized_vocab_strict_retrieval/query_demand.py",
+      "sha256": "c5e8265ab7d6cd827655650ac2735d989ed51cda9ee5415ca657cbc71fbfba33"
+    },
+    {
+      "bytes": 1979,
+      "path": "source_authorized_vocab_strict_retrieval/query_mentions.py",
+      "sha256": "017041f7e1f8a9c08344e9465a97e3877aa0e8049f30b99f9e0580923de94b57"
+    },
+    {
+      "bytes": 7619,
+      "path": "source_authorized_vocab_strict_retrieval/report_summary.py",
+      "sha256": "71c19c660ee9850dc1258041066468dacdf36d0ef042a4f842a6d2a22cb5d854"
+    },
+    {
+      "bytes": 27902,
+      "path": "source_authorized_vocab_strict_retrieval/retriever.py",
+      "sha256": "85215fd5343c7c735b30c9e9534fc59a92ac41fe0a5fa3c5cfe38c9171c4244e"
+    },
+    {
+      "bytes": 10408,
+      "path": "source_authorized_vocab_strict_retrieval/stage_gate.py",
+      "sha256": "30eb053d356c35f2c6d7ef900a57fc6bdc3bfe72c6246952856d0bb392f65410"
+    },
+    {
+      "bytes": 46691,
+      "path": "source_authorized_vocab_strict_retrieval/transition_witness_audit.py",
+      "sha256": "61d0ea56e1a0897762cbf0577533e2882176b3bfa5010297356db2fc8fbb7e3d"
+    },
+    {
+      "bytes": 12524,
+      "path": "source_authorized_vocab_strict_retrieval/trust_region_repair.py",
+      "sha256": "b5f62b410ce016f5b6adcae979f5c8b3a2b6c52d92baf66980349a1856493854"
+    },
+    {
+      "bytes": 7028,
+      "path": "source_authorized_vocab_strict_retrieval/witness_atoms.py",
+      "sha256": "bc7c0a744f0c837c08c82aa1866f92966e9636e8880e3a53769d6287f67f3dc0"
+    },
+    {
+      "bytes": 33818,
+      "path": "source_authorized_vocab_strict_retrieval/witness_audit.py",
+      "sha256": "87bda781e019bf22dabc48d0f6169b45b3ed6908ca5449c0cc3af94abb4102fa"
+    }
+  ],
+  "freeze_date": "2026-05-10",
+  "frozen_package": "evidence_transition_graphragv4_composition.frozen_etv3_variable_flow",
+  "manifest_version": 1,
+  "source_package": "evidence_transition_graphragv3_variable_flow"
+}
