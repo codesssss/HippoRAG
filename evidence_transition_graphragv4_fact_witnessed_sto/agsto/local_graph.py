@@ -792,9 +792,27 @@ def _induced_local_edges(
     role_graph: Mapping[str, Any],
     admitted_docs: Sequence[int],
 ) -> List[Dict[str, Any]]:
-    admitted = set(_clean_doc_indices(admitted_docs))
+    clean_admitted_docs = _clean_doc_indices(admitted_docs)
+    admitted = set(clean_admitted_docs)
     edges: List[Dict[str, Any]] = []
-    for edge in (role_graph.get("edges", {}) or {}).values():
+
+    adjacency = role_graph.get("adjacency", {}) or {}
+    seen_edge_pairs: Set[Tuple[int, int]] = set()
+    if adjacency:
+        candidate_edges: List[Mapping[str, Any]] = []
+        for doc_idx in clean_admitted_docs:
+            for edge in adjacency.get(int(doc_idx), []) or []:
+                left = int(edge.get("left_doc", -1))
+                right = int(edge.get("right_doc", -1))
+                edge_pair = (left, right)
+                if edge_pair in seen_edge_pairs:
+                    continue
+                seen_edge_pairs.add(edge_pair)
+                candidate_edges.append(edge)
+    else:
+        candidate_edges = list((role_graph.get("edges", {}) or {}).values())
+
+    for edge in candidate_edges:
         left = int(edge.get("left_doc", -1))
         right = int(edge.get("right_doc", -1))
         allowed_kinds = _edge_allowed_kinds(edge)
@@ -851,6 +869,21 @@ def _doc_query_token_coverage_map(
     corpus_index: Mapping[str, Any],
     query_tokens: Set[str],
 ) -> Dict[int, Tuple[str, ...]]:
+    token_to_docs = corpus_index.get("token_to_docs", {}) or {}
+    if token_to_docs:
+        coverage_sets: Dict[int, Set[str]] = {}
+        for token in query_tokens:
+            clean_token = str(token)
+            if not clean_token:
+                continue
+            for raw_doc_idx in token_to_docs.get(clean_token, []) or []:
+                try:
+                    doc_idx = int(raw_doc_idx)
+                except (TypeError, ValueError):
+                    continue
+                coverage_sets.setdefault(doc_idx, set()).add(clean_token)
+        return {doc_idx: tuple(sorted(tokens)) for doc_idx, tokens in coverage_sets.items() if tokens}
+
     coverage: Dict[int, Tuple[str, ...]] = {}
     for doc_idx, counts in (corpus_index.get("doc_token_counts", {}) or {}).items():
         covered = set((counts or {}).keys()) & query_tokens
@@ -3301,11 +3334,6 @@ def build_query_local_sto_graph(
         include_title_role_grounding=True,
     )
     endpoint_to_docs: Mapping[str, Sequence[int]] = corpus_index.get("endpoint_to_docs", {}) or {}
-    query_grounding = ground_query_endpoints(
-        query=query,
-        endpoint_to_docs=endpoint_to_docs,
-        max_endpoint_degree=max_endpoint_degree,
-    )
     query_tokens = content_tokens(query)
     query_token_stems = _token_stems(query_tokens)
     doc_query_token_coverage = _doc_query_token_coverage_map(
