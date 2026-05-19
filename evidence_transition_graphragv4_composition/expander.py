@@ -28,8 +28,12 @@ from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.source
 )
 from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.source_authorized_vocab_strict_retrieval.candidate_generator import (
     AGSTOLocalGraphCandidateGenerator,
+    DEFAULT_ROLE_GRAPH_EDGE_POLICY,
     DensePreservingAGSTOLocalGraphCandidateGenerator,
     DenseSeededAGSTOLocalGraphCandidateGenerator,
+    NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY,
+    PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY,
+    normalize_role_graph_edge_policy,
 )
 from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.source_authorized_vocab_strict_retrieval.e2e_pipeline import (
     retrieve_one_e2e,
@@ -161,6 +165,7 @@ class FrozenETv3Expander:
     agsto_max_endpoint_degree: int = 30
     agsto_closure_hops: int = 2
     enable_variable_flow_traversal: bool = True
+    role_graph_edge_policy: str = DEFAULT_ROLE_GRAPH_EDGE_POLICY
 
     def __post_init__(self) -> None:
         self.data_root = Path(self.data_root)
@@ -196,6 +201,7 @@ class FrozenETv3Expander:
             candidate_mode=str(self.candidate_generator_mode),
             readout_policy=str(self.readout_policy),
         )
+        self.role_graph_edge_policy = normalize_role_graph_edge_policy(self.role_graph_edge_policy)
         self.candidate_generator = self._build_candidate_generator()
         self._prepared_count = 0
 
@@ -209,6 +215,7 @@ class FrozenETv3Expander:
                 closure_hops=max(int(self.agsto_closure_hops), 0),
                 enable_query_supported_same_object_handoff=False,
                 enable_variable_flow_traversal=bool(self.enable_variable_flow_traversal),
+                role_graph_edge_policy=str(self.role_graph_edge_policy),
             )
         chunk_embedding_store_path = Path(getattr(self.artifacts, "chunk_embedding_store_path", ""))
         embedding_model_id = embedding_endpoint_model_id(
@@ -230,6 +237,7 @@ class FrozenETv3Expander:
                 agsto_closure_hops=max(int(self.agsto_closure_hops), 0),
                 enable_query_supported_same_object_handoff=False,
                 enable_variable_flow_traversal=bool(self.enable_variable_flow_traversal),
+                role_graph_edge_policy=str(self.role_graph_edge_policy),
             )
         return DenseSeededAGSTOLocalGraphCandidateGenerator.from_parquet(
             nodes=tuple(self.nodes),
@@ -243,6 +251,7 @@ class FrozenETv3Expander:
             agsto_closure_hops=max(int(self.agsto_closure_hops), 0),
             enable_query_supported_same_object_handoff=False,
             enable_variable_flow_traversal=bool(self.enable_variable_flow_traversal),
+            role_graph_edge_policy=str(self.role_graph_edge_policy),
         )
 
     def prepare_queries(self, *, max_queries: int = 0) -> None:
@@ -330,5 +339,8 @@ class FrozenETv3Expander:
             "variant": str(self.variant),
             "readout_policy": str(self.readout_policy),
             "enable_variable_flow_traversal": bool(self.enable_variable_flow_traversal),
+            "role_graph_edge_policy": str(self.role_graph_edge_policy),
+            "ablation_no_fact_witness": str(self.role_graph_edge_policy) == NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY,
+            "ablation_phrase_source_only": str(self.role_graph_edge_policy) == PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY,
             "prepared_query_count": int(self._prepared_count),
         }

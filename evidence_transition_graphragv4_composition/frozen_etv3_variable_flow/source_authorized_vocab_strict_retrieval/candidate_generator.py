@@ -38,6 +38,15 @@ CANDIDATE_UNIVERSE_CONTRACT: Mapping[str, bool | str] = {
     "uses_external_baseline_frontier": False,
 }
 
+DEFAULT_ROLE_GRAPH_EDGE_POLICY = "default"
+NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY = "no_fact_witness"
+PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY = "phrase_source_only"
+ROLE_GRAPH_EDGE_POLICIES = (
+    DEFAULT_ROLE_GRAPH_EDGE_POLICY,
+    NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY,
+    PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY,
+)
+
 
 def prefix_queries_with_instruction(queries: Sequence[str], instruction: str) -> List[str]:
     if os.environ.get("HIPPO_DISABLE_QUERY_INSTRUCTION_PREFIX") == "1":
@@ -46,6 +55,47 @@ def prefix_queries_with_instruction(queries: Sequence[str], instruction: str) ->
         return [str(query) for query in queries]
     prefix = f"Instruct: {instruction}\nQuery: "
     return [prefix + str(query) for query in queries]
+
+
+def normalize_role_graph_edge_policy(value: str | None) -> str:
+    policy = str(value or DEFAULT_ROLE_GRAPH_EDGE_POLICY).strip().lower()
+    if policy not in set(ROLE_GRAPH_EDGE_POLICIES):
+        raise ValueError(f"unsupported role_graph_edge_policy={value!r}; supported={ROLE_GRAPH_EDGE_POLICIES}")
+    return policy
+
+
+def apply_role_graph_edge_policy(role_graph: Mapping[str, Any], *, policy: str) -> Mapping[str, Any]:
+    clean_policy = normalize_role_graph_edge_policy(policy)
+    if clean_policy == DEFAULT_ROLE_GRAPH_EDGE_POLICY:
+        return role_graph
+    from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.role_transition import (
+        ROLE_BRIDGE,
+        SAME_OBJECT,
+        SAME_SUBJECT,
+        SOURCE_ENDPOINT_INCIDENCE,
+        TITLE_ROLE_GROUNDING,
+        filter_role_transition_graph,
+    )
+
+    if clean_policy == NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY:
+        return filter_role_transition_graph(
+            role_graph=role_graph,
+            allowed_kinds={
+                ROLE_BRIDGE,
+                SAME_SUBJECT,
+                SAME_OBJECT,
+                SOURCE_ENDPOINT_INCIDENCE,
+            },
+        )
+    if clean_policy == PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY:
+        return filter_role_transition_graph(
+            role_graph=role_graph,
+            allowed_kinds={
+                SOURCE_ENDPOINT_INCIDENCE,
+                TITLE_ROLE_GROUNDING,
+            },
+        )
+    raise AssertionError(f"unhandled role_graph_edge_policy={clean_policy!r}")
 
 
 @dataclass(frozen=True)
@@ -335,6 +385,7 @@ class AGSTOLocalGraphCandidateGenerator:
     closure_hops: int = 2
     enable_query_supported_same_object_handoff: bool = False
     enable_variable_flow_traversal: bool = False
+    role_graph_edge_policy: str = DEFAULT_ROLE_GRAPH_EDGE_POLICY
 
     @classmethod
     def build(
@@ -346,6 +397,7 @@ class AGSTOLocalGraphCandidateGenerator:
         closure_hops: int = 2,
         enable_query_supported_same_object_handoff: bool = False,
         enable_variable_flow_traversal: bool = False,
+        role_graph_edge_policy: str = DEFAULT_ROLE_GRAPH_EDGE_POLICY,
     ) -> "AGSTOLocalGraphCandidateGenerator":
         from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.index import (
             build_corpus_unit_index,
@@ -370,6 +422,10 @@ class AGSTOLocalGraphCandidateGenerator:
             max_endpoint_degree=max(int(max_endpoint_degree), 1),
             include_title_role_grounding=True,
         )
+        role_graph = apply_role_graph_edge_policy(
+            role_graph,
+            policy=normalize_role_graph_edge_policy(role_graph_edge_policy),
+        )
         return cls(
             nodes=node_tuple,
             corpus_index=corpus_index,
@@ -379,6 +435,7 @@ class AGSTOLocalGraphCandidateGenerator:
             closure_hops=max(int(closure_hops), 0),
             enable_query_supported_same_object_handoff=bool(enable_query_supported_same_object_handoff),
             enable_variable_flow_traversal=bool(enable_variable_flow_traversal),
+            role_graph_edge_policy=normalize_role_graph_edge_policy(role_graph_edge_policy),
         )
 
     def generate(
@@ -445,6 +502,11 @@ class AGSTOLocalGraphCandidateGenerator:
                     self.enable_query_supported_same_object_handoff
                 ),
                 "uses_variable_flow_traversal": bool(self.enable_variable_flow_traversal),
+                "role_graph_edge_policy": str(self.role_graph_edge_policy),
+                "ablation_no_fact_witness": str(self.role_graph_edge_policy)
+                == NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY,
+                "ablation_phrase_source_only": str(self.role_graph_edge_policy)
+                == PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY,
             },
         )
 
@@ -478,6 +540,7 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
         agsto_closure_hops: int = 2,
         enable_query_supported_same_object_handoff: bool = False,
         enable_variable_flow_traversal: bool = False,
+        role_graph_edge_policy: str = DEFAULT_ROLE_GRAPH_EDGE_POLICY,
     ) -> "DenseSeededAGSTOLocalGraphCandidateGenerator":
         return cls(
             dense_generator=DenseEmbeddingCandidateGenerator.from_parquet(
@@ -495,6 +558,7 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
                     enable_query_supported_same_object_handoff
                 ),
                 enable_variable_flow_traversal=bool(enable_variable_flow_traversal),
+                role_graph_edge_policy=normalize_role_graph_edge_policy(role_graph_edge_policy),
             ),
             dense_seed_count=max(int(dense_seed_count), 1),
             source_prior_prefix_count=max(int(source_prior_prefix_count), 1),
@@ -587,6 +651,11 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
                 "uses_variable_flow_traversal": bool(
                     self.agsto_generator.enable_variable_flow_traversal
                 ),
+                "role_graph_edge_policy": str(self.agsto_generator.role_graph_edge_policy),
+                "ablation_no_fact_witness": str(self.agsto_generator.role_graph_edge_policy)
+                == NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY,
+                "ablation_phrase_source_only": str(self.agsto_generator.role_graph_edge_policy)
+                == PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY,
             },
         )
 
@@ -622,6 +691,7 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
         agsto_closure_hops: int = 2,
         enable_query_supported_same_object_handoff: bool = False,
         enable_variable_flow_traversal: bool = False,
+        role_graph_edge_policy: str = DEFAULT_ROLE_GRAPH_EDGE_POLICY,
     ) -> "DensePreservingAGSTOLocalGraphCandidateGenerator":
         return cls(
             dense_generator=DenseEmbeddingCandidateGenerator.from_parquet(
@@ -639,6 +709,7 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
                     enable_query_supported_same_object_handoff
                 ),
                 enable_variable_flow_traversal=bool(enable_variable_flow_traversal),
+                role_graph_edge_policy=normalize_role_graph_edge_policy(role_graph_edge_policy),
             ),
             preserved_dense_count=max(int(preserved_dense_count), 1),
             dense_seed_count=max(int(dense_seed_count), 1),
@@ -725,6 +796,11 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
                 "uses_variable_flow_traversal": bool(
                     self.agsto_generator.enable_variable_flow_traversal
                 ),
+                "role_graph_edge_policy": str(self.agsto_generator.role_graph_edge_policy),
+                "ablation_no_fact_witness": str(self.agsto_generator.role_graph_edge_policy)
+                == NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY,
+                "ablation_phrase_source_only": str(self.agsto_generator.role_graph_edge_policy)
+                == PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY,
             },
         )
 

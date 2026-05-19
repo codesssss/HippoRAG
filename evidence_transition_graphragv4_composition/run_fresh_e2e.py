@@ -38,6 +38,12 @@ from evidence_transition_graphragv4_composition.expander import (  # noqa: E402
     DEFAULT_FROZEN_ETV3_RUNS_ROOT,
     FrozenETv3Expander,
 )
+from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.source_authorized_vocab_strict_retrieval.candidate_generator import (  # noqa: E402
+    DEFAULT_ROLE_GRAPH_EDGE_POLICY,
+    NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY,
+    PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY,
+    ROLE_GRAPH_EDGE_POLICIES,
+)
 from evidence_transition_graphragv4_composition.native_readout import compose_pcec_readout  # noqa: E402
 from evidence_transition_graphragv4_composition.pcec_types import PCECQueryState  # noqa: E402
 from evidence_transition_graphragv4_composition.pool_alignment import (  # noqa: E402
@@ -102,6 +108,25 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--llm-binding-title-match-mode", default="wiki_title")
     parser.add_argument("--daec-safe-min-objective-gain", type=float, default=DEFAULT_SAFE_MIN_OBJECTIVE_GAIN)
     parser.add_argument("--daec-safe-min-swap-gain", type=float, default=DEFAULT_SAFE_MIN_SWAP_GAIN)
+    parser.add_argument(
+        "--role-graph-edge-policy",
+        choices=ROLE_GRAPH_EDGE_POLICIES,
+        default=DEFAULT_ROLE_GRAPH_EDGE_POLICY,
+        help=(
+            "Role-graph edge filter for ablations. default keeps all ETv3 edge kinds; "
+            "no_fact_witness removes direct evidence-transition/title-grounding witnesses "
+            "and keeps weak STO connectivity; phrase_source_only keeps passage--phrase "
+            "incidence/grounding edges while removing cross-fact transition edges."
+        ),
+    )
+    parser.add_argument(
+        "--ablation-no-fact-witness",
+        action="store_true",
+        help=(
+            "Alias for --role-graph-edge-policy no_fact_witness. This disables direct "
+            "fact-witnessed transition edges while preserving the same ETv3/PCEC protocol."
+        ),
+    )
     parser.add_argument("--allow-missing-requirements", action="store_true")
     parser.add_argument("--progress-every", type=int, default=50)
     return parser
@@ -139,6 +164,11 @@ def run_fresh_e2e(args: argparse.Namespace) -> dict[str, Any]:
     if not hasattr(hipporag, "passage_node_key_to_doc_idx") or not bool(getattr(hipporag, "ready_to_retrieve", False)):
         hipporag.prepare_retrieval_objects()
 
+    role_graph_edge_policy = (
+        NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY
+        if bool(args.ablation_no_fact_witness)
+        else str(args.role_graph_edge_policy)
+    )
     expander = FrozenETv3Expander(
         dataset=dataset,
         candidate_pool_k=int(args.candidate_pool_k),
@@ -149,6 +179,7 @@ def run_fresh_e2e(args: argparse.Namespace) -> dict[str, Any]:
         llm_name=str(args.llm_request_name),
         embedding_name=str(args.expander_embedding_name),
         embedding_base_url=str(args.embedding_base_url),
+        role_graph_edge_policy=role_graph_edge_policy,
     )
     limit = len(expander.samples) if max_queries <= 0 else min(max_queries, len(expander.samples))
     print(
@@ -239,6 +270,13 @@ def run_fresh_e2e(args: argparse.Namespace) -> dict[str, Any]:
             "et_candidate_pool_k": int(args.et_candidate_pool_k),
             "daec_safe_min_objective_gain": float(args.daec_safe_min_objective_gain),
             "daec_safe_min_swap_gain": float(args.daec_safe_min_swap_gain),
+            "role_graph_edge_policy": str(role_graph_edge_policy),
+            "ablation_no_fact_witness": bool(
+                str(role_graph_edge_policy) == NO_FACT_WITNESS_ROLE_GRAPH_EDGE_POLICY
+            ),
+            "ablation_phrase_source_only": bool(
+                str(role_graph_edge_policy) == PHRASE_SOURCE_ONLY_ROLE_GRAPH_EDGE_POLICY
+            ),
         },
         "requirement_provider": {
             **requirement_provider.summary(),
