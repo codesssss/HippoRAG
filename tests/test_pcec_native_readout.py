@@ -4,14 +4,14 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-from evidence_transition_graphragv4_composition.native_readout import compose_pcec_readout
-from evidence_transition_graphragv4_composition.pool_alignment import (
+from evidenceflow.native_readout import compose_pcec_readout
+from evidenceflow.pool_alignment import (
     align_pool_record,
     build_doc_text_to_chunk_id,
 )
-from evidence_transition_graphragv4_composition.requirements import FrozenReportRequirementProvider
-from evidence_transition_graphragv4_composition.pcec_types import PCECQueryState
-from evidence_transition_graphragv4_composition.run_native_pool import build_report_row
+from evidenceflow.requirements import FrozenReportRequirementProvider
+from evidenceflow.pcec_types import PCECQueryState
+from evidenceflow.run_native_pool import build_report_row
 
 
 class DummyUtilityProvider:

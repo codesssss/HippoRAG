@@ -1,7 +1,9 @@
-"""Isolated entry package for Evidence Transition GraphRAG v3 variable-flow."""
+"""Compatibility shim for :mod:`evidenceflow.frozen_etv3_variable_flow`."""
 
-from .contract import METHOD_CONTRACT
-from .contract import METHOD_NAME
-from .contract import METHOD_VERSION
+from __future__ import annotations
 
-__all__ = ["METHOD_CONTRACT", "METHOD_NAME", "METHOD_VERSION"]
+from pathlib import Path
+
+import evidenceflow.frozen_etv3_variable_flow as _frozen
+
+__path__ = [str(Path(__file__).resolve().parent), *list(_frozen.__path__)]

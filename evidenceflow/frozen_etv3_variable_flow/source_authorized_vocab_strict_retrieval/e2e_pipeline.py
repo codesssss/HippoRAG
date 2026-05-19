@@ -36,9 +36,9 @@ from .pipeline import (
     source_authorized_vocab_strict_pipeline_retrieve,
     source_certified_evidence_completion_pipeline_retrieve,
 )
-from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.index import content_tokens
-from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.contract import METHOD_NAME as EVIDENCE_TRANSITION_V3_METHOD_NAME
-from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.contract import METHOD_TRACE_NAME as EVIDENCE_TRANSITION_TRACE_NAME
+from evidenceflow.frozen_etv3_variable_flow.agsto.index import content_tokens
+from evidenceflow.frozen_etv3_variable_flow.contract import METHOD_NAME as EVIDENCE_TRANSITION_V3_METHOD_NAME
+from evidenceflow.frozen_etv3_variable_flow.contract import METHOD_TRACE_NAME as EVIDENCE_TRANSITION_TRACE_NAME
 
 
 E2E_PIPELINE_CONTRACT: Mapping[str, bool | str] = {
@@ -621,7 +621,7 @@ def _agsto_graph_native_v2_retrieve(
             "that provides agsto_corpus_index and agsto_local_graph in graph_payload"
         )
 
-    from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.local_graph import (
+    from evidenceflow.frozen_etv3_variable_flow.agsto.local_graph import (
         select_local_sto_evidence_docs,
     )
 
@@ -712,7 +712,7 @@ def _agsto_graph_native_retrieve(
             "provides agsto_corpus_index and agsto_local_graph in graph_payload"
         )
 
-    from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.local_graph import (
+    from evidenceflow.frozen_etv3_variable_flow.agsto.local_graph import (
         order_local_sto_admission_preserving_source_prior,
         order_local_sto_layered_source_prior,
         order_local_sto_root_balanced_transition,

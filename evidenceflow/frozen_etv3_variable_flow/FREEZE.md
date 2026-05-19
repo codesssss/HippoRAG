@@ -30,7 +30,7 @@ The frozen package intentionally keeps the original ETv3 method strings in
 been rewritten to use:
 
 ```text
-evidence_transition_graphragv4_composition.frozen_etv3_variable_flow
+evidenceflow.frozen_etv3_variable_flow
 ```
 
 instead of the live `evidence_transition_graphragv3_variable_flow` package.

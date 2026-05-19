@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from evidence_transition_graphragv4_composition.expander import build_pool_record_from_retrieval
-from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.source_authorized_vocab_strict_retrieval.candidate_generator import (
+from evidenceflow.expander import build_pool_record_from_retrieval
+from evidenceflow.frozen_etv3_variable_flow.source_authorized_vocab_strict_retrieval.candidate_generator import (
     apply_role_graph_edge_policy,
 )
 

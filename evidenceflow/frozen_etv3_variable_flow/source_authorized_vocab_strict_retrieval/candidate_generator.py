@@ -68,7 +68,7 @@ def apply_role_graph_edge_policy(role_graph: Mapping[str, Any], *, policy: str) 
     clean_policy = normalize_role_graph_edge_policy(policy)
     if clean_policy == DEFAULT_ROLE_GRAPH_EDGE_POLICY:
         return role_graph
-    from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.role_transition import (
+    from evidenceflow.frozen_etv3_variable_flow.agsto.role_transition import (
         ROLE_BRIDGE,
         SAME_OBJECT,
         SAME_SUBJECT,
@@ -399,10 +399,10 @@ class AGSTOLocalGraphCandidateGenerator:
         enable_variable_flow_traversal: bool = False,
         role_graph_edge_policy: str = DEFAULT_ROLE_GRAPH_EDGE_POLICY,
     ) -> "AGSTOLocalGraphCandidateGenerator":
-        from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.index import (
+        from evidenceflow.frozen_etv3_variable_flow.agsto.index import (
             build_corpus_unit_index,
         )
-        from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.role_transition import (
+        from evidenceflow.frozen_etv3_variable_flow.agsto.role_transition import (
             build_role_transition_graph,
         )
 
@@ -446,7 +446,7 @@ class AGSTOLocalGraphCandidateGenerator:
         row: Mapping[str, Any],
         top_n: int,
     ) -> CandidateUniverse:
-        from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.local_graph import (
+        from evidenceflow.frozen_etv3_variable_flow.agsto.local_graph import (
             build_query_local_sto_graph,
         )
 
@@ -583,7 +583,7 @@ class DenseSeededAGSTOLocalGraphCandidateGenerator:
             row=row,
             top_n=max(int(top_n), int(self.dense_seed_count), int(self.source_prior_prefix_count)),
         )
-        from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.local_graph import (
+        from evidenceflow.frozen_etv3_variable_flow.agsto.local_graph import (
             build_query_local_sto_graph,
         )
 
@@ -735,7 +735,7 @@ class DensePreservingAGSTOLocalGraphCandidateGenerator:
             row=row,
             top_n=preserved_count,
         )
-        from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.agsto.local_graph import (
+        from evidenceflow.frozen_etv3_variable_flow.agsto.local_graph import (
             build_query_local_sto_graph,
         )
 

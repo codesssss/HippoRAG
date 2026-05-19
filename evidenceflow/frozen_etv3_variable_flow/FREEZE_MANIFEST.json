@@ -2,9 +2,9 @@
   "file_count": 57,
   "files": [
     {
-      "bytes": 1281,
+      "bytes": 1250,
       "path": "FREEZE.md",
-      "sha256": "93500588acdf8885c0aa72a93fbd0ef3aee27e6d55f6876bbb1cd8ef60324be3"
+      "sha256": "58307c228ccc2ab2f495a2ddbced43adf53045f132a73b6727977cee194a7bc6"
     },
     {
       "bytes": 2357,
@@ -102,14 +102,14 @@
       "sha256": "6d84413f7f217730a6b4009e7bfc747b2bd8bc9bf085c95e63892a1edd915e81"
     },
     {
-      "bytes": 35519,
+      "bytes": 35339,
       "path": "run_fresh_e2e.py",
-      "sha256": "3c49daf40a1c893160c23b6e0db0818c701712aafb51ccb2c6c2c5f2655a2752"
+      "sha256": "519d5a194d998284626868b3def9913973925f952dd67656a5691a9dfaa83934"
     },
     {
-      "bytes": 22676,
+      "bytes": 23202,
       "path": "run_reader_qa.py",
-      "sha256": "970f53f75790bacb0e8e906b0c2b89eaca0b53626ac44dd727f53e648a2c4379"
+      "sha256": "f1a2b15c1339aef7a4fd5eee9dcb6508191c1876e0bca93728debbcd408aa4b3"
     },
     {
       "bytes": 10728,
@@ -147,9 +147,9 @@
       "sha256": "8baeb6ffdadb40af830c232575973167c4b5beeec0a9d9f1959990df5aa28a8d"
     },
     {
-      "bytes": 63867,
+      "bytes": 67431,
       "path": "source_authorized_vocab_strict_retrieval/candidate_generator.py",
-      "sha256": "3bf676e1c316e3c4cf85e4f18889f3ec0c61c34ee6d595cbf8c9eeff7c5ea8e1"
+      "sha256": "c509fcb2d01c0d82228f171071ab85a5c6ba8b87076261f0deee57ca3448421f"
     },
     {
       "bytes": 37676,
@@ -172,9 +172,9 @@
       "sha256": "ed846be9ae3309e5608b991ad9ee75197fd249beb78fef53dd444251b179dc04"
     },
     {
-      "bytes": 59071,
+      "bytes": 58921,
       "path": "source_authorized_vocab_strict_retrieval/e2e_pipeline.py",
-      "sha256": "dab24e1a1ec0217eb4e3e977ec122f1dabe03e498c4b63ed91a90d637cc5f5c0"
+      "sha256": "be08d2454b884b3b23ce5ac102001146aa267d3548001e6971a5d30ab7690489"
     },
     {
       "bytes": 3185,
@@ -262,9 +262,9 @@
       "sha256": "85215fd5343c7c735b30c9e9534fc59a92ac41fe0a5fa3c5cfe38c9171c4244e"
     },
     {
-      "bytes": 10408,
+      "bytes": 10407,
       "path": "source_authorized_vocab_strict_retrieval/stage_gate.py",
-      "sha256": "30eb053d356c35f2c6d7ef900a57fc6bdc3bfe72c6246952856d0bb392f65410"
+      "sha256": "c091f84e03e39b309938fc9507b099c67882ba3dce48d819c0d362c3f57e0a41"
     },
     {
       "bytes": 46691,
@@ -288,7 +288,7 @@
     }
   ],
   "freeze_date": "2026-05-10",
-  "frozen_package": "evidence_transition_graphragv4_composition.frozen_etv3_variable_flow",
+  "frozen_package": "evidenceflow.frozen_etv3_variable_flow",
   "manifest_version": 1,
   "source_package": "evidence_transition_graphragv3_variable_flow"
 }

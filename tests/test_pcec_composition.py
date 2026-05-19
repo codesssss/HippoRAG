@@ -4,12 +4,12 @@ from pathlib import Path
 
 import pytest
 
-from evidence_transition_graphragv4_composition.contract import (
+from evidenceflow.contract import (
     METHOD_CONTRACT,
     residual_budget,
     validate_budgets,
 )
-from evidence_transition_graphragv4_composition.readout import (
+from evidenceflow.readout import (
     enrich_payload,
     pcec_readout_trace,
     summarize_pcec_traces,
@@ -67,7 +67,7 @@ def test_contract_exposes_pcec_method_boundary() -> None:
     assert METHOD_CONTRACT["paper_facing_method_name"] == "Preservation-Constrained Evidence Composition"
     assert (
         METHOD_CONTRACT["frozen_base_expander_package"]
-        == "evidence_transition_graphragv4_composition.frozen_etv3_variable_flow"
+        == "evidenceflow.frozen_etv3_variable_flow"
     )
     assert METHOD_CONTRACT["default_reader_budget_k"] == 5
     assert METHOD_CONTRACT["default_prefix_budget_m"] == 4
@@ -79,8 +79,37 @@ def test_contract_exposes_pcec_method_boundary() -> None:
     assert METHOD_CONTRACT["uses_cross_signal_agreement_retention"] is False
 
 
+def test_legacy_package_imports_delegate_to_evidenceflow() -> None:
+    from evidence_transition_graphragv4_composition.contract import (
+        METHOD_CONTRACT as legacy_contract,
+    )
+    from evidence_transition_graphragv4_composition.native_readout import (
+        compose_pcec_readout as legacy_compose_pcec_readout,
+    )
+    from evidence_transition_graphragv4_composition.readout import (
+        pcec_readout_trace as legacy_pcec_readout_trace,
+    )
+    from evidenceflow.native_readout import compose_pcec_readout
+
+    assert legacy_contract is METHOD_CONTRACT
+    assert legacy_compose_pcec_readout is compose_pcec_readout
+    assert legacy_pcec_readout_trace is pcec_readout_trace
+
+
+def test_legacy_runner_paths_remain_available() -> None:
+    root = Path(__file__).resolve().parents[1]
+
+    assert (root / "evidence_transition_graphragv4_composition" / "run_fresh_e2e.py").exists()
+    assert (
+        root
+        / "evidence_transition_graphragv4_composition"
+        / "frozen_etv3_variable_flow"
+        / "run_reader_qa.py"
+    ).exists()
+
+
 def test_frozen_etv3_snapshot_does_not_import_live_etv3_package() -> None:
-    root = Path(__file__).resolve().parents[1] / "evidence_transition_graphragv4_composition" / "frozen_etv3_variable_flow"
+    root = Path(__file__).resolve().parents[1] / "evidenceflow" / "frozen_etv3_variable_flow"
     offenders = []
     for path in root.rglob("*.py"):
         text = path.read_text(encoding="utf-8")
@@ -138,7 +167,7 @@ def test_enrich_payload_adds_contract_summary_and_per_query_trace() -> None:
 
     enriched = enrich_payload(payload, reader_budget_k=5, prefix_budget_m=4, pool_k=100)
 
-    assert enriched["method"] == "evidence_transition_graphragv4_composition"
+    assert enriched["method"] == "evidenceflow"
     assert enriched["pcec_config"]["residual_budget"] == 1
     assert enriched["pcec_summary"]["count"] == 2
     assert enriched["pcec_summary"]["changed_count"] == 1

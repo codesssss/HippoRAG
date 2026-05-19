@@ -1,7 +1,9 @@
-# Preservation-Constrained Evidence Composition
+# EvidenceFlow
 
-This package is the engineering line for the paper-facing method
-**Preservation-Constrained Evidence Composition**.
+This package is the canonical implementation of the current EvidenceFlow
+ETv4 + PCEC retrieval stack.  Source-grounded OpenIE units certify
+query-local document transition graphs, and PCEC performs the fixed-budget
+evidence-coverage readout that produces the reader top-5.
 
 Canonical full1000 protocol and results:
 
@@ -13,7 +15,8 @@ docs/pcec_full1000_protocol_20260511.md
 
 | Item | Setting |
 | --- | --- |
-| Folder | `evidence_transition_graphragv4_composition` |
+| Folder | `evidenceflow` |
+| Compatibility import | `evidence_transition_graphragv4_composition` |
 | Paper-facing name | Preservation-Constrained Evidence Composition |
 | Base expander | frozen ETv3 variable-flow snapshot |
 | Readout | `prefix_residual_admission` |
@@ -24,8 +27,11 @@ docs/pcec_full1000_protocol_20260511.md
 | Admission objective | DBEC frozen-binding noisy-OR marginal coverage |
 | Ordering | Preserve ET prefix order; admitted residual fills the displaced slot |
 
-PCEC is not a weighted reranker and not a dataset router.  It is a train-free
-fixed-budget composition layer:
+EvidenceFlow is not a fact-node PageRank implementation in this mainline.  The
+frozen expander admits a compact document graph from dense/textual seeds and
+source-grounded OpenIE transition witnesses; PCEC then optimizes the final
+reader prefix.  PCEC is not a weighted reranker and not a dataset router.  It is
+a train-free fixed-budget composition layer:
 
 ```text
 S*_m = argmax_{S subset P, |S| = K} U_b*(S)
@@ -41,7 +47,7 @@ DBEC utility improves over the ET top-5 baseline.
 Dry-run the default MuSiQue command:
 
 ```bash
-python evidence_transition_graphragv4_composition/run_eval.py \
+python evidenceflow/run_eval.py \
   --dataset musique \
   --limit 1000 \
   --pool-k 100 \
@@ -52,7 +58,7 @@ python evidence_transition_graphragv4_composition/run_eval.py \
 Use a historical ETv3 pool and binding cache explicitly:
 
 ```bash
-python evidence_transition_graphragv4_composition/run_eval.py \
+python evidenceflow/run_eval.py \
   --dataset 2wikimultihopqa \
   --limit 1000 \
   --pool-json run_logs/etv3_dbec_latest_full1000_20260510/pools/2wikimultihopqa_etv3_pool100_limit1000.json \
@@ -69,7 +75,7 @@ Run native PCEC readout on an existing ETv3 pool without subprocess-running the
 legacy DBEC evaluator:
 
 ```bash
-python evidence_transition_graphragv4_composition/run_native_pool.py \
+python evidenceflow/run_native_pool.py \
   --dataset musique \
   --limit 1000 \
   --pool-k 100 \
@@ -103,7 +109,7 @@ Verified native-pool parity on 2026-05-10:
 Run the Phase 4 native retrieval pipeline:
 
 ```bash
-python evidence_transition_graphragv4_composition/run_fresh_e2e.py \
+python evidenceflow/run_fresh_e2e.py \
   --dataset musique \
   --max-queries 1000 \
   --candidate-pool-k 100 \
@@ -125,9 +131,13 @@ query
 ```
 
 It imports only from the package-local frozen snapshot under
-`evidence_transition_graphragv4_composition/frozen_etv3_variable_flow/`; it
+`evidenceflow/frozen_etv3_variable_flow/`; it
 does not import the live ETv3 branch and does not subprocess-run
 `scripts/eval_causal_qwen3.py`.
+
+Legacy imports and top-level runner paths under
+`evidence_transition_graphragv4_composition/` are compatibility shims.  New
+code should import or execute `evidenceflow/...` directly.
 
 Verified Phase 4 parity:
 

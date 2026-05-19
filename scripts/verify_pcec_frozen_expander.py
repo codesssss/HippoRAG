@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 
-DEFAULT_ROOT = Path("evidence_transition_graphragv4_composition/frozen_etv3_variable_flow")
+DEFAULT_ROOT = Path("evidenceflow/frozen_etv3_variable_flow")
 DEFAULT_MANIFEST = DEFAULT_ROOT / "FREEZE_MANIFEST.json"
 FORBIDDEN_IMPORTS = (
     "from evidence_transition_graphragv3_variable_flow",
@@ -67,7 +67,7 @@ def build_manifest(root: Path, manifest_path: Path) -> dict[str, Any]:
     return {
         "freeze_date": "2026-05-10",
         "source_package": "evidence_transition_graphragv3_variable_flow",
-        "frozen_package": "evidence_transition_graphragv4_composition.frozen_etv3_variable_flow",
+        "frozen_package": "evidenceflow.frozen_etv3_variable_flow",
         "manifest_version": 1,
         "file_count": len(collect_files(root, manifest_path)),
         "files": collect_files(root, manifest_path),
