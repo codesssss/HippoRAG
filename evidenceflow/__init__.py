@@ -1,6 +1,6 @@
-"""EvidenceFlow ETv4 + PCEC retrieval package.
+"""EvidenceFlow package boundary.
 
-The canonical implementation lives under :mod:`evidenceflow`.  The historical
-``evidence_transition_graphragv4_composition`` package remains only as a
-compatibility shim for old launch scripts and experiment artifacts.
+The main EvidenceFlow protocol consumes ETv4 fact-witnessed STO candidate pools
+and applies PCEC native-pool readout.  The bundled frozen ETv3 path is a
+legacy/fresh-parity adapter, not the main upstream retriever.
 """

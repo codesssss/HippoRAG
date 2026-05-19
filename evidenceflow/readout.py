@@ -1,4 +1,4 @@
-"""Trace helpers for Preservation-Constrained Evidence Composition."""
+"""Trace helpers for the PCEC readout component used by EvidenceFlow."""
 
 from __future__ import annotations
 

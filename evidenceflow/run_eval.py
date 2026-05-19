@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run Preservation-Constrained Evidence Composition.
+"""Run the legacy integrated PCEC evaluator.
 
 This is the integrated PCEC runner.  It keeps ETv3 variable-flow expansion as
 the expander and replaces top-k readout with prefix-residual admission:
@@ -8,6 +8,8 @@ the expander and replaces top-k readout with prefix-residual admission:
 
 The implementation intentionally reuses the existing DBEC frozen-binding
 noisy-OR selector path, but exposes only the PCEC hard-constraint interface.
+It is retained for legacy parity; the main EvidenceFlow protocol is ETv4
+fact-witnessed STO pool plus PCEC native-pool readout.
 """
 
 from __future__ import annotations

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Run native PCEC readout over an existing ET candidate pool.
+"""Run EvidenceFlow native-pool readout over an existing ET candidate pool.
 
-This runner is the parity stage for PCEC native readout.  It consumes the same
-ETv3 external-pool JSON and frozen DBEC requirement report used by historical
-top4/max1 experiments, but it does not call ``scripts/eval_causal_qwen3.py`` as
-a subprocess.
+For the main Table-1 EvidenceFlow protocol, the input pool must come from
+``evidence_transition_graphragv4_fact_witnessed_sto``.  The runner still accepts
+older ETv3 pools for compatibility and parity checks, but those outputs are
+marked as non-main protocol in the metadata.
 """
 
 from __future__ import annotations
@@ -33,7 +33,10 @@ from evidenceflow.contract import (  # noqa: E402
     DEFAULT_SAFE_MIN_SWAP_GAIN,
     METHOD_CONTRACT,
     METHOD_NAME,
+    MAIN_UPSTREAM_RETRIEVER_NAME,
     PAPER_FACING_METHOD_NAME,
+    is_main_evidenceflow_pool,
+    pool_upstream_retriever,
 )
 from evidenceflow.dbec_utility import (  # noqa: E402
     NativeDBECUtilityProvider,
@@ -58,6 +61,8 @@ from src.hipporag.utils.config_utils import BaseConfig  # noqa: E402
 DEFAULT_DATA_ROOT = Path("reproduce/dataset")
 DEFAULT_OUTPUT_ROOT = Path("run_logs/evidenceflow_native_pool")
 DEFAULT_SAVE_DIR = "outputs_step0_general_nvembed"
+# Legacy defaults are kept for smoke/parity runs. Main EvidenceFlow experiments
+# pass an explicit ETv4 fact-witnessed STO pool JSON.
 DEFAULT_POOL_ROOT = Path("run_logs/etv3_dbec_latest_full1000_20260510/pools")
 DEFAULT_REQUIREMENT_ROOT = Path("run_logs/etv3_dbec_latest_full1000_20260510/evals")
 DEFAULT_BINDING_ROOT = Path("run_logs/etv3_dbec_latest_full1000_20260510/evals")
@@ -300,10 +305,19 @@ def run_native_pool(args: argparse.Namespace) -> dict[str, Any]:
     retrieval_report = str(pool_payload.get("retrieval_report") or "")
     openie_path = str(pool_payload.get("openie_path") or source_payload.get("openie_path") or "")
     input_report = str(source_payload.get("input_report") or "")
+    upstream_retriever = pool_upstream_retriever(pool_payload)
+    is_main_protocol = is_main_evidenceflow_pool(pool_payload)
     return {
         "method": METHOD_NAME,
         "paper_facing_method": PAPER_FACING_METHOD_NAME,
         "mode": "pcec_native_pool_readout",
+        "pool_protocol": {
+            "role": "main_evidenceflow" if is_main_protocol else "compatibility_or_ablation",
+            "is_main_table_evidenceflow": bool(is_main_protocol),
+            "upstream_retriever": upstream_retriever,
+            "expected_main_upstream_retriever": MAIN_UPSTREAM_RETRIEVER_NAME,
+            "pool_provenance_key": "retrieval.input_method",
+        },
         "dataset": str(args.dataset),
         "limit": int(len(records)),
         "pool_json": str(args.pool_json),

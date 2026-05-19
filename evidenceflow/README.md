@@ -1,9 +1,16 @@
 # EvidenceFlow
 
-This package is the canonical implementation of the current EvidenceFlow
-ETv4 + PCEC retrieval stack.  Source-grounded OpenIE units certify
-query-local document transition graphs, and PCEC performs the fixed-budget
-evidence-coverage readout that produces the reader top-5.
+This package is the canonical implementation boundary for EvidenceFlow.
+The main reported protocol is:
+
+```text
+ETv4 fact-witnessed STO candidate pool
+-> PCEC native-pool readout
+-> reader-compatible top5 passage list
+```
+
+The bundled frozen ETv3 path is retained for legacy/fresh parity experiments.
+It is not the upstream retriever for the main Table-1 EvidenceFlow row.
 
 Canonical full1000 protocol and results:
 
@@ -17,21 +24,26 @@ docs/pcec_full1000_protocol_20260511.md
 | --- | --- |
 | Folder | `evidenceflow` |
 | Compatibility import | `evidence_transition_graphragv4_composition` |
-| Paper-facing name | Preservation-Constrained Evidence Composition |
-| Base expander | frozen ETv3 variable-flow snapshot |
-| Readout | `prefix_residual_admission` |
+| Paper-facing method | EvidenceFlow |
+| Main upstream retriever | `evidence_transition_graphragv4_fact_witnessed_sto` |
+| Main entrypoint | `evidenceflow/run_native_pool.py` |
+| Main pool provenance key | `retrieval.input_method` |
+| Required main-pool value | `evidence_transition_graphragv4_fact_witnessed_sto` |
+| Readout component | Preservation-Constrained Evidence Composition (PCEC) |
+| Readout object | `pcec_prefix_residual_admission` |
+| Legacy fresh adapter | `evidenceflow/frozen_etv3_variable_flow` |
 | Default reader budget | `K=5` |
 | Default preservation prefix | `m=4` |
 | Default residual budget | `K-m=1` |
-| Candidate pool | ETv3 pool100 by default |
+| Candidate pool | ETv4 pool100 for main results |
 | Admission objective | DBEC frozen-binding noisy-OR marginal coverage |
 | Ordering | Preserve ET prefix order; admitted residual fills the displaced slot |
 
-EvidenceFlow is not a fact-node PageRank implementation in this mainline.  The
-frozen expander admits a compact document graph from dense/textual seeds and
-source-grounded OpenIE transition witnesses; PCEC then optimizes the final
-reader prefix.  PCEC is not a weighted reranker and not a dataset router.  It is
-a train-free fixed-budget composition layer:
+EvidenceFlow is not a fact-node PageRank implementation, and the main reported
+row is not produced by the frozen ETv3 fresh adapter.  The ETv4 upstream
+retriever exports a source-grounded document-transition pool; PCEC then
+optimizes the fixed reader prefix.  PCEC is not a weighted reranker and not a
+dataset router.  It is a train-free fixed-budget composition layer:
 
 ```text
 S*_m = argmax_{S subset P, |S| = K} U_b*(S)
@@ -44,7 +56,26 @@ DBEC utility improves over the ET top-5 baseline.
 
 ## Run
 
-Dry-run the default MuSiQue command:
+Run the main EvidenceFlow readout on an exported ETv4 pool and matching
+requirement/binding artifacts:
+
+```bash
+python evidenceflow/run_native_pool.py \
+  --dataset 2wikimultihopqa \
+  --limit 1000 \
+  --pool-k 100 \
+  --prefix-budget-m 4 \
+  --reader-budget-k 5 \
+  --pool-json run_logs/etv4_pcec_qwen32b_gpt4omini_none_full1000_20260514/pools/2wikimultihopqa_etv4_pool100_limit1000.json \
+  --requirement-report run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514/dbec_assets/etv4/evals/2wikimultihopqa_etv4_pool100_dbec_qwen32b_stable_limit1000.json \
+  --binding-cache-path run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514/dbec_assets/etv4/evals/2wikimultihopqa_etv4_pool100_dbec_qwen32b.binding_cache.json
+```
+
+The output is a reader-compatible top-5 retrieval report.  It records
+`pool_protocol.is_main_table_evidenceflow=true` only when the pool JSON has
+`retrieval.input_method=evidence_transition_graphragv4_fact_witnessed_sto`.
+
+The older integrated evaluator is retained for legacy ETv3/PCEC parity checks:
 
 ```bash
 python evidenceflow/run_eval.py \
@@ -55,24 +86,15 @@ python evidenceflow/run_eval.py \
   --dry-run
 ```
 
-Use a historical ETv3 pool and binding cache explicitly:
-
-```bash
-python evidenceflow/run_eval.py \
-  --dataset 2wikimultihopqa \
-  --limit 1000 \
-  --pool-json run_logs/etv3_dbec_latest_full1000_20260510/pools/2wikimultihopqa_etv3_pool100_limit1000.json \
-  --binding-cache-path run_logs/etv3_dbec_latest_full1000_20260510/evals/2wikimultihopqa_etv3_pool100_dbec_latest.binding_cache.json \
-  --qwen-disable-thinking
-```
-
 The output JSON is postprocessed with `pcec_contract`, `pcec_config`,
 `pcec_summary`, and per-query `pcec_readout` traces.
 
 ## Native Pool Readout
 
-Run native PCEC readout on an existing ETv3 pool without subprocess-running the
-legacy DBEC evaluator:
+Run native PCEC readout on an existing exported pool without subprocess-running
+the legacy DBEC evaluator.  This is the main EvidenceFlow entrypoint when the
+pool JSON records `retrieval.input_method =
+evidence_transition_graphragv4_fact_witnessed_sto`.
 
 ```bash
 python evidenceflow/run_native_pool.py \
@@ -81,12 +103,14 @@ python evidenceflow/run_native_pool.py \
   --pool-k 100 \
   --prefix-budget-m 4 \
   --reader-budget-k 5 \
-  --qwen-disable-thinking
+  --pool-json run_logs/etv4_pcec_qwen32b_gpt4omini_none_full1000_20260514/pools/musique_etv4_pool100_limit1000.json \
+  --requirement-report run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514/dbec_assets/etv4/evals/musique_etv4_pool100_dbec_qwen32b_stable_limit1000.json \
+  --binding-cache-path run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514/dbec_assets/etv4/evals/musique_etv4_pool100_dbec_qwen32b.binding_cache.json
 ```
 
 The native runner consumes:
 
-- historical ETv3 pool JSON,
+- exported ETv4 fact-witnessed STO pool JSON for main results,
 - frozen DBEC requirement report,
 - DBEC binding cache,
 - HippoRAG passage embeddings/entities.
@@ -104,9 +128,9 @@ Verified native-pool parity on 2026-05-10:
 | HotpotQA | 1000/1000 |
 | MuSiQue | 1000/1000 |
 
-## Fresh Frozen E2E Retrieval
+## Legacy Frozen ETv3 Fresh Path
 
-Run the Phase 4 native retrieval pipeline:
+Run the legacy frozen-ETv3 fresh path:
 
 ```bash
 python evidenceflow/run_fresh_e2e.py \
@@ -118,8 +142,8 @@ python evidenceflow/run_fresh_e2e.py \
   --qwen-disable-thinking
 ```
 
-This path replaces the historical ETv3 pool JSON with
-`FrozenETv3Expander`, while keeping frozen historical DBEC requirements:
+This path replaces an external pool JSON with `FrozenETv3Expander`, while
+keeping frozen historical DBEC requirements:
 
 ```text
 query
@@ -134,6 +158,8 @@ It imports only from the package-local frozen snapshot under
 `evidenceflow/frozen_etv3_variable_flow/`; it
 does not import the live ETv3 branch and does not subprocess-run
 `scripts/eval_causal_qwen3.py`.
+Its output metadata is marked as `legacy_etv3_fresh_adapter`; it should not be
+used as the provenance for the main EvidenceFlow table row.
 
 Legacy imports and top-level runner paths under
 `evidence_transition_graphragv4_composition/` are compatibility shims.  New

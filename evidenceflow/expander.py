@@ -1,4 +1,8 @@
-"""Frozen ETv3 expander adapter for native PCEC."""
+"""Legacy frozen-ETv3 expander adapter for PCEC parity runs.
+
+Main EvidenceFlow results do not use this adapter as their upstream retriever;
+they consume ETv4 fact-witnessed STO pools through ``run_native_pool.py``.
+"""
 
 from __future__ import annotations
 

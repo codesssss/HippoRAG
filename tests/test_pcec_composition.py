@@ -5,7 +5,10 @@ from pathlib import Path
 import pytest
 
 from evidenceflow.contract import (
+    MAIN_UPSTREAM_RETRIEVER_NAME,
     METHOD_CONTRACT,
+    is_main_evidenceflow_pool,
+    pool_upstream_retriever,
     residual_budget,
     validate_budgets,
 )
@@ -64,11 +67,20 @@ def test_budget_validation_and_residual_budget() -> None:
 
 
 def test_contract_exposes_pcec_method_boundary() -> None:
-    assert METHOD_CONTRACT["paper_facing_method_name"] == "Preservation-Constrained Evidence Composition"
+    assert METHOD_CONTRACT["paper_facing_method_name"] == "EvidenceFlow"
+    assert METHOD_CONTRACT["main_protocol"] == "etv4_fact_witnessed_sto_pool_to_pcec_native_readout"
+    assert METHOD_CONTRACT["main_entrypoint"] == "evidenceflow/run_native_pool.py"
+    assert METHOD_CONTRACT["main_upstream_retriever"] == MAIN_UPSTREAM_RETRIEVER_NAME
+    assert METHOD_CONTRACT["main_pool_provenance_key"] == "retrieval.input_method"
+    assert METHOD_CONTRACT["uses_etv4_fact_witnessed_sto_pool_for_main_table"] is True
+    assert METHOD_CONTRACT["uses_frozen_etv3_for_main_table"] is False
+    assert METHOD_CONTRACT["legacy_fresh_expander_is_main_table_retriever"] is False
     assert (
-        METHOD_CONTRACT["frozen_base_expander_package"]
+        METHOD_CONTRACT["legacy_fresh_expander_package"]
         == "evidenceflow.frozen_etv3_variable_flow"
     )
+    assert METHOD_CONTRACT["readout_component"] == "Preservation-Constrained Evidence Composition"
+    assert METHOD_CONTRACT["readout_component_abbreviation"] == "PCEC"
     assert METHOD_CONTRACT["default_reader_budget_k"] == 5
     assert METHOD_CONTRACT["default_prefix_budget_m"] == 4
     assert METHOD_CONTRACT["default_residual_budget"] == 1
@@ -77,6 +89,17 @@ def test_contract_exposes_pcec_method_boundary() -> None:
     assert METHOD_CONTRACT["uses_weighted_score_fusion"] is False
     assert METHOD_CONTRACT["uses_dataset_routing"] is False
     assert METHOD_CONTRACT["uses_cross_signal_agreement_retention"] is False
+
+
+def test_pool_protocol_helpers_identify_main_etv4_pool() -> None:
+    main_pool = {"retrieval": {"input_method": MAIN_UPSTREAM_RETRIEVER_NAME}}
+    legacy_pool = {"retrieval": {"input_method": "evidence_transition_graphragv3_variable_flow"}}
+    missing_pool = {"rows": []}
+
+    assert pool_upstream_retriever(main_pool) == MAIN_UPSTREAM_RETRIEVER_NAME
+    assert is_main_evidenceflow_pool(main_pool) is True
+    assert is_main_evidenceflow_pool(legacy_pool) is False
+    assert is_main_evidenceflow_pool(missing_pool) is False
 
 
 def test_legacy_package_imports_delegate_to_evidenceflow() -> None:

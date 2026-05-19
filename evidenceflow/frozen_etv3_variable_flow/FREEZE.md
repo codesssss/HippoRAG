@@ -8,8 +8,9 @@ This directory is a package-local snapshot of:
 evidence_transition_graphragv3_variable_flow/
 ```
 
-It exists so Preservation-Constrained Evidence Composition can become a native
-algorithmic E2E method without depending on a moving ETv3 development branch.
+It exists so legacy/fresh PCEC parity runs can execute without depending on a
+moving ETv3 development branch.  It is not the upstream retriever for the main
+Table-1 EvidenceFlow results.
 
 ## Boundary
 

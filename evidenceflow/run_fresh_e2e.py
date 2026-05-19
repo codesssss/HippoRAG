@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Run PCEC with fresh frozen-ETv3 expansion and native PrefixResidualReadout.
+"""Run the legacy frozen-ETv3 fresh path with PCEC readout.
 
-This Phase-4 runner stops at retrieval/top-5 output. It does not run reader QA.
+This runner is retained for parity and ablation checks. It is not the upstream
+retriever for the main Table-1 EvidenceFlow protocol, which consumes ETv4
+fact-witnessed STO pools through ``run_native_pool.py``.
 """
 
 from __future__ import annotations
@@ -252,7 +254,13 @@ def run_fresh_e2e(args: argparse.Namespace) -> dict[str, Any]:
     payload = {
         "method": METHOD_NAME,
         "paper_facing_method": PAPER_FACING_METHOD_NAME,
-        "mode": "pcec_fresh_frozen_etv3_e2e",
+        "mode": "legacy_etv3_fresh_pcec_e2e",
+        "pool_protocol": {
+            "role": "legacy_etv3_fresh_adapter",
+            "is_main_table_evidenceflow": False,
+            "upstream_retriever": "evidence_transition_graphragv3_variable_flow",
+            "expected_main_upstream_retriever": METHOD_CONTRACT["main_upstream_retriever"],
+        },
         "dataset": dataset,
         "limit": int(limit),
         "pool_json": "",
