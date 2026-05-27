@@ -23,12 +23,16 @@ data/
 clear_outputs_and_logs.sh
 # Ignore the env file
 .env
+.secrets/
 .ace-tool/
 .codex
 .venv/
 .venv-hipporag/
 nohup.out
 src/hipporag.egg-info/
+backups/
+*.zip
+outputs_*/
 
 # Research run artifacts that are too large/noisy for git.
 # Keep scripts and compact reports in git; raw run directories can be

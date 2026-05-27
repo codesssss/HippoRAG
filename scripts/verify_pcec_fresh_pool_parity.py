@@ -20,6 +20,10 @@ from evidence_transition_graphragv4_composition.expander import (  # noqa: E402
     DEFAULT_FROZEN_ETV3_RUNS_ROOT,
     FrozenETv3Expander,
 )
+from evidence_transition_graphragv4_composition.frozen_etv3_variable_flow.source_authorized_vocab_strict_retrieval.candidate_generator import (  # noqa: E402
+    DEFAULT_ROLE_GRAPH_EDGE_POLICY,
+    ROLE_GRAPH_EDGE_POLICIES,
+)
 
 
 DEFAULT_DATASETS = ("2wikimultihopqa", "hotpotqa", "musique")
@@ -136,6 +140,7 @@ def run_dataset(args: argparse.Namespace, dataset: str) -> dict[str, Any]:
         llm_name=str(args.llm_name),
         embedding_name=str(args.embedding_name),
         embedding_base_url=str(args.embedding_base_url),
+        role_graph_edge_policy=str(args.role_graph_edge_policy),
     )
     print(
         f"[READY] dataset={dataset} limit={limit} runner={expander.runner} "
@@ -283,6 +288,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--llm-name", default="qwen3-8b-train")
     parser.add_argument("--embedding-name", default="nvidia/NV-Embed-v2")
     parser.add_argument("--embedding-base-url", default="http://localhost:8019/v1/embeddings")
+    parser.add_argument(
+        "--role-graph-edge-policy",
+        choices=ROLE_GRAPH_EDGE_POLICIES,
+        default=DEFAULT_ROLE_GRAPH_EDGE_POLICY,
+    )
     parser.add_argument("--output-json", type=Path, default=DEFAULT_OUTPUT_JSON)
     parser.add_argument("--output-md", type=Path, default=DEFAULT_OUTPUT_MD)
     parser.add_argument("--max-examples", type=int, default=10)
@@ -316,6 +326,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "reader_budget_k": int(args.reader_budget_k),
             "et_candidate_pool_k": int(args.et_candidate_pool_k),
             "score_eps": float(args.score_eps),
+            "role_graph_edge_policy": str(args.role_graph_edge_policy),
         },
     }
     write_json(output, args.output_json)

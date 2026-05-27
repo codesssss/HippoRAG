@@ -1,8 +1,54 @@
 # Result Registry
 
-Last updated: 2026-05-08
+Last updated: 2026-05-13
 
 This file stores concrete results only. Every result must have a file path.
+
+## ETv4 Query-Local GraphRAG Full1000 Comparison
+
+Summary note:
+- `docs/etv4_qwen32b_full1000_graphrag_comparison_20260513.md`
+
+Primary outputs:
+- `run_logs/etv4_clean_mainline_qwen32b_nothink_full1000_20260512/`
+- `run_logs/etv4_clean_mainline_qwen32b_reader_gpt4omini_20260512/reports/`
+- `run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/`
+
+Protocol:
+- Full1000 on `2wikimultihopqa`, `hotpotqa`, and `musique`.
+- Graph / OpenIE LLM: Qwen3-32B `/no_think`.
+- Reader: `gpt-4o-mini`, top5 full passages, `max_new_tokens=none`.
+- Embedding: `VLLM/nvidia/NV-Embed-v2`.
+- Retrieval metrics are title-level for consistency with HippoRAG/PropRAG
+  exports.
+- For ETV4, `R@20/100/200` and `All@20/100/200` append the remaining
+  query-local candidate universe after the graph-selected top5.  Reader QA
+  always uses top5.
+
+Main result:
+
+| Dataset | Method | R@5 | R@20 | R@100 | R@200 | All@5 | All@20 | EM | F1 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2Wiki | HippoRAG | 0.7238 | 0.7990 | 0.8770 | 0.9120 | 0.4290 | 0.5580 | 0.5170 | 0.5619 |
+| 2Wiki | PropRAG | 0.9090 | 0.9633 | 0.9910 | 0.9960 | 0.7800 | 0.9050 | 0.6110 | 0.6909 |
+| 2Wiki | ETV4 | 0.9350 | 0.9688 | 0.9925 | 0.9932 | 0.8260 | 0.9150 | 0.6470 | 0.7329 |
+| HotpotQA | HippoRAG | 0.9305 | 0.9830 | 0.9925 | 0.9945 | 0.8640 | 0.9680 | 0.6050 | 0.7368 |
+| HotpotQA | PropRAG | 0.9510 | 0.9945 | 0.9995 | 0.9995 | 0.9070 | 0.9900 | 0.6180 | 0.7510 |
+| HotpotQA | ETV4 | 0.9505 | 0.9885 | 0.9975 | 0.9980 | 0.9050 | 0.9780 | 0.6100 | 0.7413 |
+| MuSiQue | HippoRAG | 0.6888 | 0.8318 | 0.9091 | 0.9365 | 0.3860 | 0.6180 | 0.3300 | 0.4330 |
+| MuSiQue | PropRAG | 0.7424 | 0.9037 | 0.9737 | 0.9841 | 0.4760 | 0.7600 | 0.3650 | 0.4760 |
+| MuSiQue | ETV4 | 0.7442 | 0.8666 | 0.9432 | 0.9602 | 0.4720 | 0.6830 | 0.3670 | 0.4801 |
+
+Decision:
+- Use this as the aligned Qwen32B GraphRAG E2E comparison table.
+- Frame ETV4 as a query-local GraphRAG pipeline, not as a dense reranker.
+- Claim strong 2Wiki performance, HotpotQA near-tie retrieval with a small QA
+  gap, and MuSiQue top5/QA competitiveness with weaker broad-pool coverage.
+- Do not claim universal dominance.
+- Audit update 2026-05-13: the current Qwen32B `HippoRAG` rows are invalid as
+  HippoRAG graph baselines because the exporter fell back to dense retrieval
+  after failing to find OpenIE results.  Treat them as dense-fallback audit rows
+  until a corrected HippoRAG graph rerun is completed.
 
 ## DBEC Depth x Gate-Resolvability Conditional Analysis
 

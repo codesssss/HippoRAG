@@ -1,0 +1,83 @@
+% =====================================================================
+% Section 2: Related Work
+% =====================================================================
+%
+% Status: Draft §2 Related Work v7 (2026-05-19)
+%   v7: half-page advisor-driven rewrite.
+%       Three buckets (Standard RAG / Graph RAG / Evidence-enhanced
+%       RAG), each ending with an explicit limitations sentence.
+%       Closing Summary keeps the §1 conversion-problem tie-back.
+%   v6: see archive/02_related_v6_pre-half-page-rewrite_20260519.tex
+%
+% =====================================================================
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Standard RAG.}
+Standard retrieval-augmented generation methods rank passages by
+lexical or dense similarity to the question, with BM25
+\citep{robertson2009bm25} and DPR \citep{karpukhin2020dpr} as the
+canonical sparse and dense baselines. RAPTOR
+\citep{sarthi2024raptor} addresses limited cross-passage context by
+recursively clustering and summarizing passages into a retrieval
+tree. Iterative chain-of-thought retrievers such as IRCoT
+\citep{trivedi2023ircot} and Self-Ask \citep{press2023selfask}
+drive multi-hop retrieval through language-model-generated reasoning
+steps, alternating between generation and lookup. \emph{Limitation.}
+These systems score each passage independently or follow flat
+neighbor relations, so the retrieval state remains a list or beam
+of passages without an explicit cross-document structure; bridge
+passages whose surface similarity to the question is low are
+systematically underweighted.
+
+\paragraph{Graph RAG.}
+A second line of work organizes the corpus into an explicit graph
+to expose cross-document connections. HippoRAG~2
+\citep{gutierrez2025hipporag} extracts OpenIE facts and runs
+personalized PageRank over a corpus-wide passage--phrase graph
+seeded from the question; PropRAG \citep{wang2025proprag} replaces
+triples with propositions and discovers multi-hop evidence by beam
+search; GraphRAG \citep{edge2024graphrag} builds community-summary
+graphs over the corpus; HGRAG \citep{hgrag2024} models entities and
+passages within a hypergraph and propagates relevance across
+granularities. Recent variants explore hierarchical multi-granular
+graphs \citep{hu2026mgrangrag}, sentence-level graphs
+\citep{liang2026sentgraph}, and CPU-only PageRank-style retrieval
+\citep{wang2026sprig}, while earlier graph-based readers integrate
+evidence via graph neural message passing
+\citep{qiu2019dfgn,song2022evidenceintegration}.
+\emph{Limitation.} These systems condition on a pre-built global
+structure, so question conditioning enters only through seed
+distributions or post-hoc search; the resulting node-level
+relevance does not directly translate into a short reader-facing
+passage list that is both connected across documents and covering
+of the entities and relations the question asks about.
+
+\paragraph{Evidence-enhanced RAG.}
+A third line uses graph or KG signals to refine the evidence that
+reaches the reader. NeocorRAG \citep{peng2026neocorrag} mines
+\emph{evidence chains} from retrieved text via activation-based
+candidate search and constrained decoding, using the chains to
+filter and re-present passages. Relink \citep{huang2026relink}
+addresses KG incompleteness by reconstructing query-specific
+evidence graphs and repairing missing facts at query time. ToG
+\citep{sun2024tog} performs LLM-guided traversal over a pre-built
+knowledge graph, while KAPING \citep{baek2023kaping} retrieves
+subgraphs from a KG and prompts a language model with the
+subgraph as context. \emph{Limitation.} These methods operate
+\emph{on top of} an underlying retriever or KG: chain mining
+inherits any miss made by the upstream retriever, KG-based
+reconstruction depends on KG completeness, and per-question
+LLM-guided traversal is expensive at scale.
+
+\paragraph{Summary.}
+Standard RAG, Graph RAG, and Evidence-enhanced RAG sharpen
+respectively passage-level similarity, corpus-level graph
+structure, and post-retrieval evidence selection. None of the three
+takes the conversion of graph relevance into a connected and
+covering reader-facing passage list as its central object.
+\methodname{} addresses this conversion within the GraphRAG family
+by combining query-local propagation over a fact-source substrate
+with evidence-need mining and coverage-aware reranking on top of
+an offline OpenIE graph.

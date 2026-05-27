@@ -1,0 +1,57 @@
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
+
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+
+\newcommand{\methodname}{EvidenceFlow}
+
+\title{EvidenceFlow: Query-Conditioned Evidence Propagation for Multi-Hop Retrieval}
+\author{Anonymous ACL submission}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Multi-hop question answering requires retrieval systems to surface
+evidence that is not only individually relevant to a question, but also
+connected across documents and covering the entities and relations needed
+by a downstream reader. We present \methodname{}, a graph-based retrieval
+framework that models multi-hop retrieval as query-conditioned evidence
+propagation over a document-grounded OpenIE graph. \methodname{} builds a
+fact-source substrate that promotes each OpenIE fact to a graph node and
+binds it to its source passage, runs query-local personalized PageRank
+over induced fact nodes with passage provenance to obtain an evidence
+flow, and refines the final ranked list through relation-grounded
+expansion and coverage-aware reranking. Experiments on HotpotQA,
+2WikiMultiHopQA, and MuSiQue compare \methodname{} against
+no-retrieval, sparse and dense, hierarchical tree, OpenIE-based graph,
+and path/chain-oriented baselines under a unified GPT-4o-mini reader.
+The results show consistent gains in
+retrieval quality and downstream QA, with ablations isolating the
+contribution of local evidence propagation, evidence-need mining,
+and coverage-aware reranking.
+\end{abstract}
+
+\input{sections/01_intro}
+\input{sections/02_related}
+\input{sections/03_problem_formulation}
+\input{sections/04_method}
+\input{sections/05_experiments}
+\input{sections/06_conclusion}
+\input{sections/07_limitations}
+
+\bibliography{related_refs}
+
+\appendix
+\input{sections/A_appendix}
+
+\end{document}

@@ -11,12 +11,15 @@ from evidence_transition_graphrag.contract import (
     LEGACY_METHOD_NAMES,
     LEGACY_QA_DOC_KEYS,
     METHOD_NAME as EVIDENCE_TRANSITION_QA_METHOD,
+    METHOD_V2_NAME as EVIDENCE_TRANSITION_V2_QA_METHOD,
     QA_DOC_KEY as EVIDENCE_TRANSITION_QA_DOC_KEY,
+    QA_V2_DOC_KEY as EVIDENCE_TRANSITION_V2_QA_DOC_KEY,
 )
 from .contract import CANONICAL_CLEAN_METHOD_NAME
 
 QA_RUNNER_PUBLIC_METHOD = "source_authorized_vocab_strict_graphrag"
 QUERY_GROUNDED_STO_QA_METHOD = EVIDENCE_TRANSITION_QA_METHOD
+QUERY_GROUNDED_STO_V2_QA_METHOD = EVIDENCE_TRANSITION_V2_QA_METHOD
 QUERY_GROUNDED_STO_LEGACY_QA_METHOD = "query_grounded_sto_graphrag"
 LEGACY_QA_DOC_KEY = "source_authorized_vocab_strict_doc_indices_top5"
 QUERY_GROUNDED_STO_QA_DOC_KEY = "query_grounded_sto_doc_indices_top5"
@@ -40,6 +43,7 @@ def export_qa_transition_report(
             copied = dict(row)
             top5 = list(row.get("retrieved_doc_indices_top5", []) or [])[:5]
             copied[EVIDENCE_TRANSITION_QA_DOC_KEY] = top5
+            copied[EVIDENCE_TRANSITION_V2_QA_DOC_KEY] = top5
             copied[QUERY_GROUNDED_STO_QA_DOC_KEY] = top5
             copied[LEGACY_QA_DOC_KEY] = top5
             rows.append(copied)
@@ -56,16 +60,22 @@ def export_qa_transition_report(
 
     clean_public_method = str(public_method)
     canonical_method = (
-        EVIDENCE_TRANSITION_QA_METHOD
-        if clean_public_method == EVIDENCE_TRANSITION_QA_METHOD
+        clean_public_method
+        if clean_public_method
+        in {EVIDENCE_TRANSITION_QA_METHOD, EVIDENCE_TRANSITION_V2_QA_METHOD}
         else CANONICAL_CLEAN_METHOD_NAME
+    )
+    public_doc_key = (
+        EVIDENCE_TRANSITION_V2_QA_DOC_KEY
+        if clean_public_method == EVIDENCE_TRANSITION_V2_QA_METHOD
+        else EVIDENCE_TRANSITION_QA_DOC_KEY
     )
     output = {
         "method": clean_public_method,
         "legacy_method_alias": QA_RUNNER_PUBLIC_METHOD,
         "legacy_method_aliases": [QA_RUNNER_PUBLIC_METHOD, *LEGACY_METHOD_NAMES],
         "legacy_doc_key_aliases": list(LEGACY_QA_DOC_KEYS),
-        "public_doc_key": EVIDENCE_TRANSITION_QA_DOC_KEY,
+        "public_doc_key": public_doc_key,
         "canonical_method": canonical_method,
         "legacy_canonical_method_alias": CANONICAL_CLEAN_METHOD_NAME,
         "format": "transition_top5_qa_input",

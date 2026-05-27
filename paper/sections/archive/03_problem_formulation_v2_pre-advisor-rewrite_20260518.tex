@@ -1,0 +1,55 @@
+% =====================================================================
+% Section 3: Problem Formulation
+% =====================================================================
+%
+% Status: Draft Section 3 Problem Formulation v2 (2026-05-17)
+% Revision note (v2 vs v1):
+%   - Section title renamed from "Task Formulation" to
+%     "Problem Formulation" per advisor feedback (align with §4 method
+%     formulation language).
+%   - Label renamed: sec:task -> sec:problem.
+%   - Body unchanged; only the framing word changed.
+%
+% Purpose:
+%   - Define the retrieval-first interface for EvidenceFlow
+%   - Introduce ranked evidence list R_q and reader prefix
+%   - Define document-grounded fact units and provenance
+%   - Avoid Method details such as G_q, PPR, expansion, and noisy-OR
+%
+% =====================================================================
+
+\section{Problem Formulation}
+\label{sec:problem}
+
+Given a natural language question $q$ and a corpus
+$\mathcal{D}=\{d_i\}_{i=1}^{N}$, multi-hop question answering requires a
+system to gather evidence from multiple passages before producing an
+answer. Because $\mathcal{D}$ is too large to provide directly to a
+reader model, the retriever outputs an ordered evidence list
+\[
+\begin{aligned}
+R_q &= (d_{(1)},d_{(2)},\ldots), \\
+R_q^{(K)} &= (d_{(1)},\ldots,d_{(K)}), \\
+\hat{a}_q &= \mathrm{LLM}(\mathrm{prompt}(q,R_q^{(K)})).
+\end{aligned}
+\]
+Earlier passages in $R_q$ are expected to contain more useful evidence
+for answering $q$, and the reader consumes a prefix $R_q^{(K)}$ to
+generate the answer $\hat{a}_q$. Retrieval quality is evaluated by
+whether prefixes of $R_q$ contain the gold supporting passages, while
+end-to-end QA quality is evaluated by comparing $\hat{a}_q$ with the
+reference answer.
+
+This work focuses on the retrieval stage rather than on symbolic
+reasoning or reader-side generation. During indexing, each passage is
+associated with document-grounded OpenIE facts. A fact unit is written as
+$f=(h,r,t)$, where $h$ and $t$ are argument phrases and $r$ is a relation
+phrase. Each fact retains its provenance
+$\mathrm{src}(f)\in\mathcal{D}$, and
+\[
+\mathcal{F}_d=\{f\in\mathcal{F}: \mathrm{src}(f)=d\}
+\]
+denotes the facts extracted from passage $d$. The goal of
+\methodname{} is to use these provenance-linked facts to rank passages
+so that prefixes of $R_q$ preserve connected and covering evidence for
+$q$.

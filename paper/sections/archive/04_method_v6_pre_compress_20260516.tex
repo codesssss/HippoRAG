@@ -1,0 +1,207 @@
+% =====================================================================
+% Section 4: Method — EvidenceFlow
+% =====================================================================
+%
+% Status: Draft §4 Method v5 — advisor rewrite (2026-05-16)
+%   v1: 5 subsections — backed up at archive/04_method_v1_5sections_20260515.tex
+%   v2: 3 subsections — collapsed §4.3+§4.4+§4.5 into "Query-Local Evidence Flow"
+%   v3: unnumbered overview + 3 mechanism subsections
+%   v4: §4.1 rewritten as Offline Indexing (PropRAG-style)
+%   v5: full rewrite per advisor feedback —
+%        - Method body never references other systems (deferred to §2 Related Work)
+%        - §4.3 reframed from reader-boundary to retrieval enhancement
+%        - §4.2 explicitly includes local-PPR over query-local subgraph
+%        - All "fact-witness" compound terms removed; "OpenIE facts" + "provenance" retained
+% Framing reference: research_memory/emnlp_expand_then_compose/46_*.md
+% Writing discipline: research_memory/emnlp_expand_then_compose/45_*.md
+%
+% Method name: \methodname (defined via \newcommand in main file)
+%
+% Discipline checklist (v5):
+%   - No internal codename anywhere in main paper
+%   - No reverse-framing sentences ("not X, but Y" against other systems) inside Method
+%   - All baseline contrasts deferred to §2 Related Work
+%   - Reader budget K is an implementation detail, not a method-level objective
+%   - Output is a ranked evidence list R_q over passages, truncatable for any reader
+%
+% =====================================================================
+
+\section{Method: \methodname{}}
+\label{sec:method}
+
+We introduce \methodname{}, a graph-based retrieval framework for multi-hop
+question answering. Given a question $q$ and a corpus $\mathcal{D}$,
+\methodname{} returns a ranked evidence list $R_q$ over passages in
+$\mathcal{D}$. The method has three components: an offline
+document-grounded OpenIE graph that supplies entity anchors and relational
+structure (\S\ref{sec:method:substrate}), an evidence-driven local graph
+retrieval procedure that ranks passages over a question-induced subgraph
+(\S\ref{sec:method:retrieval}), and a retrieval-enhancement step that
+improves multi-hop coverage on top of the local ranking
+(\S\ref{sec:method:enhancement}). The central object underlying these
+components is a query-conditioned mass distribution $\pi_q$---which we
+refer to as the \emph{evidence flow}---propagated from question anchors
+through provenance-grounded edges of the offline graph; \methodname{}
+names this propagation together with the two enhancement steps that
+operate on top of it.
+
+\subsection{Offline Indexing: Document-Grounded Multi-Layer OpenIE Graph}
+\label{sec:method:substrate}
+
+We build a document-grounded multi-layer OpenIE graph
+$\mathcal{G}_{\mathcal{D}}=(\mathcal{V}_{\mathcal{D}},\mathcal{E}_{\mathcal{D}})$
+over the corpus $\mathcal{D}$ during offline indexing. The graph supplies
+the entity anchors and relational structure that \methodname{} draws on at
+query time (\S\ref{sec:method:retrieval}). Following standard OpenIE
+practice \citep{angeli2015leveraging,gutierrez2025hipporag}, we extract
+salient assertions from each document and organize them into the graph
+below; the extractor itself is not a contribution of this work.
+
+\paragraph{OpenIE fact extraction.}
+For each document $d \in \mathcal{D}$, a language model extracts a set of
+OpenIE facts $f = (h, r, t)$, where $h$ and $t$ are head and tail entities
+and $r$ is the relation phrase that connects them. We retain each fact
+together with its provenance $\mathrm{src}(f) \in \mathcal{D}$, so that
+every fact can be traced back to the document from which it was extracted.
+The resulting fact set is denoted $\mathcal{F}$.
+
+\paragraph{Graph construction.}
+The graph $\mathcal{G}_{\mathcal{D}}$ contains two node types and three
+edge types. Nodes are: (i) \emph{passage nodes}, one per document
+$d \in \mathcal{D}$, carrying the natural-language content that a
+downstream reader will consume; and (ii) \emph{phrase nodes}, one per
+distinct entity surface form extracted across $\mathcal{F}$. Edges are:
+(i) \emph{passage--phrase} edges that connect each document to the
+entities it mentions; (ii) \emph{relational} edges that connect a pair of
+phrase nodes $(h, t)$ whenever some fact $f = (h, r, t) \in \mathcal{F}$
+asserts a relation between them, with $r$ retained as an edge attribute
+and $\mathrm{src}(f)$ retained as the edge provenance; and (iii)
+\emph{synonymy} edges that connect phrase nodes whose dense embeddings
+are highly similar, providing alias coverage across surface variants of
+the same entity.
+
+\paragraph{Indexing for retrieval.}
+We pre-compute dense embeddings for all passage and phrase nodes, and
+materialize $\mathcal{G}_{\mathcal{D}}$ as an adjacency index keyed by
+node identifier. The graph is built once and reused across all questions:
+at query time, no new OpenIE extraction or fact generation is performed
+over $\mathcal{D}$. The artifacts produced by offline indexing---phrase
+nodes, passage--phrase links, relational edges with provenance, and
+synonymy edges---are exactly the pieces \methodname{} draws on when it
+constructs a query-local subgraph and ranks passages by graph propagation
+(\S\ref{sec:method:retrieval}).
+
+\subsection{Evidence-Driven Local Graph Retrieval}
+\label{sec:method:retrieval}
+
+Given a question $q$, \methodname{} induces a query-local subgraph
+$G_q = (V_q, A_q)$ from $\mathcal{G}_{\mathcal{D}}$ and runs personalized
+PageRank locally over $G_q$ to rank passages. The subgraph isolates the
+neighborhood of $\mathcal{G}_{\mathcal{D}}$ that is relevant to $q$, and
+local propagation lets passage relevance be shaped by entity and
+relational connectivity rather than by independent surface similarity to
+$q$.
+
+\paragraph{Query-local subgraph construction.}
+We extract a question anchor set $A(q) \subseteq \mathcal{E}$ from $q$ by
+identifying entity mentions in the question, using a controlled language
+model that is applied to the question only, never to retrieved documents.
+We also compute an entry signal $\mathrm{Entry}(q) \subseteq \mathcal{D}$
+from a standard dense retriever to seed activation. The subgraph $G_q$ is
+initialized with (i) phrase nodes corresponding to anchors in $A(q)$, (ii)
+passage nodes in $\mathrm{Entry}(q)$, and (iii) every passage node that is
+the provenance of at least one relational edge whose endpoints include an
+anchor in $A(q)$. Starting from this seed set, we expand $G_q$ along
+relational, passage--phrase, and synonymy edges of
+$\mathcal{G}_{\mathcal{D}}$ for a bounded number of hops, keeping the
+activated region compact relative to $\mathcal{D}$ while still allowing
+passages reachable only through multi-hop entity chains to enter $V_q$
+even when their surface similarity to $q$ is low.
+
+\paragraph{Local personalized PageRank.}
+Within $G_q$, OpenIE facts act as the propagation units of the evidence
+flow: two facts $f_i, f_j \in \mathcal{F}$ are connected when they share
+an activated entity, and a fact $f$ is linked to its provenance passage
+$\mathrm{src}(f)$. The seed distribution $s_q$ places mass on facts whose
+arguments include an anchor in $A(q)$, weighted by the entry scores of
+their provenance passages and any entry-side mass on $\mathrm{Entry}(q)$.
+We solve, by power iteration restricted to $G_q$,
+\begin{equation}
+\label{eq:local-ppr}
+\pi_q = \alpha\, s_q + (1-\alpha)\, P_q^{\!\top}\, \pi_q,
+\end{equation}
+where $P_q$ is the local transition matrix induced by these fact-fact
+and fact-passage links. We then read out a passage score by aggregating
+the stationary mass on the facts that ground the passage:
+\begin{equation}
+\label{eq:passage-score}
+s_{\mathrm{ppr}}(d \mid q)
+=
+|\mathcal{F}_d|^{-1/2}
+\sum_{f \in \mathcal{F}_d} \pi_q(f).
+\end{equation}
+Here, $\mathcal{F}_d = \{\, f \in \mathcal{F} : \mathrm{src}(f) = d \,\}$
+is the set of OpenIE facts grounded in passage $d$.
+The square-root normalization avoids penalizing passages whose facts have
+been deduplicated more aggressively. Because propagation is restricted to
+$G_q$, the resulting scores depend on whether a passage is connected to
+$q$ through entity-relation evidence in $\mathcal{G}_{\mathcal{D}}$, and
+not only on whether it is independently similar to $q$. The output of
+local retrieval is the resulting ranked list of passages in $V_q$, which
+the next subsection refines.
+
+\subsection{Retrieval Enhancement with Relational Evidence}
+\label{sec:method:enhancement}
+
+Local propagation yields an initial graph-aware ranking, but two failure
+modes remain. First, passages that lie on a multi-hop chain but are far
+from question anchors in $G_q$ can receive low propagated mass, even when
+they carry the relational evidence required to complete the chain.
+Second, the top of the local ranking can be dominated by passages that
+cluster around a single entity neighborhood, leaving other entities or
+relations demanded by $q$ under-covered. We address both with a
+retrieval-enhancement step that operates on top of the local-PPR scores.
+
+\paragraph{Relation-grounded expansion.}
+For each high-scoring node in $\pi_q$, \methodname{} follows the relational
+edges of $\mathcal{G}_{\mathcal{D}}$ to retrieve additional passages whose
+provenance realizes a relation that has not yet been covered by the
+current top of the ranking. Concretely, for a phrase or passage node $u$
+with high $\pi_q(u)$, we enumerate the relational edges incident to $u$
+whose relation phrase $r$ is compatible with the relations that $q$ asks
+about, and admit the provenance passages of those edges as expansion
+candidates. Each expansion candidate inherits a score that combines
+$\pi_q(u)$ with an edge-level score derived from the dense similarity
+between the relation phrase $r$ and the question. This step brings in
+bridge passages and tail-entity passages that are required by the
+question's relational structure but are not lexically similar to $q$.
+
+\paragraph{Coverage-aware reranking.}
+After expansion, we rerank the combined candidate set under a noisy-OR
+coverage model over a small set of question-side requirements
+$B(q) = \{b_1, b_2, \ldots\}$, where each $b \in B(q)$ is an entity- or
+relation-bearing slot that $q$ expects the evidence to jointly resolve.
+The requirements are extracted from $q$ by the same controlled language
+model used for the anchor set; they are applied to the question only,
+never to retrieved documents, and do not generate evidence chains. For a
+passage $d$ and a requirement $b$, we associate a contribution
+$\phi_{d,b} \in [0,1]$ derived from dense similarity between $d$ and $b$
+under $q$. The coverage of a candidate set $R$ for requirement $b$ is
+\begin{equation}
+\label{eq:noisy-or}
+\mathrm{cov}_q(R \mid b)
+\;=\;
+1 - \prod_{d \in R}\bigl(1 - \phi_{d,b}\bigr),
+\end{equation}
+which saturates at $1$ once any passage in $R$ contributes substantially
+to $b$, and rewards diverse contributions across passages otherwise. We
+form $R_q$ greedily by adding, at each step, the candidate $d$ that
+maximizes the marginal gain
+$\sum_{b \in B(q)}\bigl[\mathrm{cov}_q(R \cup \{d\} \mid b) - \mathrm{cov}_q(R \mid b)\bigr]$
+weighted against $s_{\mathrm{ppr}}(d \mid q)$. Because the noisy-OR
+coverage saturates per requirement, passages whose neighborhoods are
+already covered by higher-ranked candidates receive diminishing marginal
+gain, while passages addressing previously-uncovered requirements are
+promoted. The reranked output is the final ranked evidence list $R_q$
+over passages in $\mathcal{D}$; downstream systems may consume any prefix
+of $R_q$.

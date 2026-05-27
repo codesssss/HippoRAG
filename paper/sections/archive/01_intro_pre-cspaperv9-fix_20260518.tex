@@ -1,0 +1,138 @@
+% =====================================================================
+% Section 1: Introduction — EvidenceFlow
+% =====================================================================
+%
+% Status: Draft §1 Introduction v5 (2026-05-18)
+%   v5: advisor-driven 5-paragraph reorganization.
+%       Para 1 (~80w):   RAG primer.
+%       Para 2 (~200w):  Text RAG → GraphRAG landscape, open issue.
+%       Para 3 (~350w):  Failure modes + fig:motivation + framing.
+%       Para 4 (~300w):  Method preview (mirrors §4 sub-headings).
+%       Para 5 (~150w):  2–3 contribution bullets.
+%   v4: see archive/01_intro_v4_pre-advisor-rewrite_20260518.tex
+%
+% =====================================================================
+
+\section{Introduction}
+\label{sec:intro}
+
+Retrieval-augmented generation (RAG) couples a large language model
+with a retrieval module that fetches passages from an external
+corpus, so that the model can ground its outputs in evidence rather
+than rely on parameters alone. RAG is the standard recipe for open
+question answering and for any setting where the answer depends on
+documents the model was not trained on, because the retrieved
+passages provide a check on what the language model says.
+
+The current RAG landscape spans two families of systems. Classic
+text RAG ranks each passage independently against the question.
+Sparse and dense retrievers such as BM25
+\citep{robertson2009bm25} and DPR \citep{karpukhin2020dpr} are the
+standard backbones, and hierarchical schemes like RAPTOR
+\citep{sarthi2024raptor} cluster and summarize passages into a
+retrieval tree to recover broader context. These systems work well
+on single-hop questions but tend to miss bridge passages whose
+surface similarity to the question is low. A second family,
+GraphRAG, organizes the corpus into a structure that exposes
+cross-document connections, biasing retrieval toward that structure
+rather than toward surface similarity. HippoRAG and HippoRAG~2
+\citep{jimenez2024hipporag,gutierrez2025hipporag} run personalized
+PageRank over a corpus-wide passage--phrase graph; PropRAG
+\citep{wang2025proprag} discovers chains by beam search over a
+proposition graph; GraphRAG \citep{edge2024graphrag} builds
+community-summary graphs; HGRAG \citep{hgrag2024} represents
+entities and passages within a hypergraph. These systems improve
+multi-hop coverage at the level of graph relevance, but they still
+have to hand the reader a short ranked list of natural-language
+passages under a small budget, and graph relevance does not
+automatically yield such a list.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.92\linewidth}{\centering\vspace{1.5em}
+\textit{Two failure modes of converting graph relevance into a top-$K$ reader prefix.}\\[0.3em]
+Left panel: bridge underweighting --- a bridge passage on a multi-hop chain receives little PPR mass and falls outside the top-$K$.\\[0.3em]
+Right panel: entity-neighborhood crowding --- the top-$K$ list concentrates around one entity neighborhood and leaves other question-side requirements uncovered.
+\vspace{1.5em}}}
+\caption{Motivating failure modes of GraphRAG retrieval. A useful
+top-$K$ list should preserve cross-document bridges and cover the
+distinct entities and relations the question asks about. Existing
+graph-propagation operators address neither problem on their own.}
+\label{fig:motivation}
+\end{figure}
+
+These routes all face the same downstream constraint, and two
+failure modes recur in this conversion. First, propagation puts
+mass on the strongest seed neighborhood, so a top-$K$ list can look
+on-topic and still omit the bridge passages that connect to the
+answer. Pointwise dense retrieval makes the same mistake from the
+opposite direction: it scores passages by question-passage
+similarity and therefore underweights bridges whose surface
+similarity to the question is low. Second, a list of high-scoring
+passages can crowd around a single entity in the question while
+leaving other entities or relations entirely uncovered, so the
+reader has the ingredients for one hop and nothing for the next.
+Path search and summary representations can shift where this
+conversion is handled but still leave the retriever with a final
+reader-facing ordering decision. Figure~\ref{fig:motivation}
+visualizes both failure modes on a stylized multi-hop query.
+
+The problem is therefore not only how to propagate relevance over a
+graph, but how to turn propagated relevance into evidence that is
+both \emph{connected}---preserving the bridge relations that span
+documents---and \emph{covering}, in the sense that the selected
+passages collectively address the distinct question-side entities
+and relations a reader has to resolve. We treat this conversion as
+the core retrieval problem and keep the interface simple. The
+system outputs a ranked evidence list $R_q$ of natural-language
+passages, not a symbolic path or a generated reasoning chain, and
+the reader consumes a prefix of $R_q$.
+
+We propose \methodname{}, a graph-based retrieval framework
+operationalized through a staged retrieval pipeline. Offline
+indexing builds a fact-source substrate that promotes each OpenIE
+fact to a graph node and binds it to its source passage through
+endpoint and source edges (\S\ref{sec:method:substrate}). At query
+time, an entity-anchor extractor and a dense entry retriever
+together induce a query-local subgraph $G_q$ over this substrate,
+restricting propagation to passages and facts the question can
+plausibly need. We then run a personalized PageRank on a derived
+graph $H_q$ over local fact nodes; the resulting evidence flow
+$\pi_q$ scores each passage by aggregating mass on its grounded
+facts (\S\ref{sec:method:retrieval}). Because $\pi_q$ can still
+underweight bridges several hops from any anchor, \methodname{}
+mines the evidence the query still needs by following
+relation-grounded edges to admit bridge and tail-entity passages,
+and then applies a coverage-aware reranking step that selects a
+final list under a noisy-OR coverage model over question-side
+requirements (\S\ref{sec:method:enhancement}). The query-local
+diffusion stage keeps retrieval focused, evidence-need mining
+repairs missing bridges, and coverage-aware reranking prevents the
+final list from collapsing into a single entity neighborhood. We
+evaluate \methodname{} on HotpotQA, 2WikiMultiHopQA, and MuSiQue
+under a unified GPT-4o-mini reader, comparing against classic text
+RAG, GraphRAG, and evidence-enhanced GraphRAG baselines, and we
+report retrieval quality, downstream QA, ablations of each
+operator, a substrate isolation experiment, and an
+upstream-extractor sensitivity check.
+
+The main contributions are as follows.
+\begin{itemize}
+    \item We frame retrieval-first multi-hop QA as a conversion
+    problem of turning graph-level relevance into a connected and
+    covering evidence list under a small reader budget, identifying
+    bridge underweighting and entity-neighborhood crowding as the
+    two failure modes this conversion must address.
+    \item We instantiate this framing in \methodname{} on top of a
+    fact-source substrate that promotes each OpenIE fact to a graph
+    node and binds it to its source passage. Query-local
+    personalized PageRank, evidence-need mining, and noisy-OR
+    coverage reranking jointly target focused propagation, bridge
+    recovery, and requirement coverage.
+    \item We show on HotpotQA, 2WikiMultiHopQA, and MuSiQue that
+    this design improves retrieval and answer quality over classic
+    text RAG, GraphRAG, and evidence-enhanced GraphRAG baselines
+    under a unified reader, with component ablations, a substrate
+    isolation experiment, and an upstream-extractor sensitivity
+    check that preserves the ranking of the top systems.
+\end{itemize}

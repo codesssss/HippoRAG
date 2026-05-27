@@ -1,0 +1,21 @@
+\section{Limitations}
+\label{sec:limitations}
+
+\methodname{} depends on the quality of OpenIE extraction and phrase
+normalization. Missing, overly generic, or incorrectly normalized
+facts can remove useful bridge edges or introduce spurious endpoint
+matches, especially for rare entities and relations with non-canonical
+surface forms. The query-side anchor and requirement extraction also
+uses a local instruction model, so errors in that analysis can make the
+query-local graph too narrow or steer coverage reranking toward the
+wrong requirements.
+
+The current experiments use English Wikipedia-style corpora and a
+fixed top-five reader budget. Results may differ for noisier domains,
+longer documents, or settings where the reader can consume much larger
+contexts. The method also incurs offline indexing cost from OpenIE
+extraction and graph construction, and a deployed system should report
+latency and memory under its target corpus scale. Finally, any
+evidence-selecting retriever can be misused to assemble selective
+evidence bundles, so downstream applications should expose retrieved
+sources and preserve uncertainty when answers are presented to users.

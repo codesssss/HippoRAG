@@ -1,4 +1,27 @@
-# DBEC Paper Framing — LOCKED
+# DBEC Paper Framing — SUPERSEDED
+
+> ⚠️ **SUPERSEDED 2026-05-15**. This document is no longer the active paper framing.
+>
+> The active framing is **v3.2.2 EvidenceFlow** in
+> `46_evidence_flow_over_graphs_framing_skeleton_20260514.md`.
+>
+> What 41_ still has value for:
+> - Historical experiment data anchors (oracle@100 gaps, under-selection rates)
+> - The 12 locked-out language entries (still useful as paper writing rules)
+> - The 6 honest limitations list (template, still adaptable)
+> - SetR-style baseline design context (40_ for full details)
+>
+> What 41_ should NOT be used for any more:
+> - Method name (DBEC → being replaced; see 46_ for naming discussion)
+> - Title (was "DBEC: Dependency-Bound Evidence Composition..."; now "Evidence Flow over Graphs")
+> - Section 4 method structure (was demand decomposition / binding / coverage / IG gate; now mechanism components of EvidenceFlow as a single end-to-end process — see 46_ §4)
+> - Abstract (entirely re-drafted under v3.2.2)
+> - Contribution wording (4 contributions of 41_ → 3 contributions of 46_)
+> - "SetR as main competitor" framing (now appendix-only under v3)
+
+---
+
+(Historical content below preserved for data anchor / limitation template reference.)
 
 Locked: 2026-05-07
 Status: Final framing for paper writing. Do not modify without explicit re-review.

@@ -12,7 +12,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
-from evidence_transition_graphrag.contract import METHOD_TRACE_NAME as EVIDENCE_TRANSITION_TRACE_NAME
+from evidence_transition_graphrag.contract import (
+    METHOD_TRACE_NAME as EVIDENCE_TRANSITION_TRACE_NAME,
+    METHOD_V2_TRACE_NAME as EVIDENCE_TRANSITION_V2_TRACE_NAME,
+)
 from .candidate_expansion import build_source_text_candidate_expansion_index
 from .candidate_generator import CandidateUniverseGenerator
 from .certificate_graph import (
@@ -50,10 +53,18 @@ E2E_PIPELINE_CONTRACT: Mapping[str, bool | str] = {
 }
 
 AGSTO_GRAPH_NATIVE_METHOD_NAME = EVIDENCE_TRANSITION_TRACE_NAME
+AGSTO_GRAPH_NATIVE_V2_METHOD_NAME = EVIDENCE_TRANSITION_V2_TRACE_NAME
 QUERY_GROUNDED_STO_RUNNERS = frozenset(
     {
         "agsto_graph_native",
         "query_grounded_sto_graph_native",
+    }
+)
+QUERY_GROUNDED_STO_V2_RUNNERS = frozenset(
+    {
+        "agsto_graph_native_v2",
+        "query_grounded_sto_graph_native_v2",
+        "evidence_transition_v2",
     }
 )
 
@@ -151,6 +162,17 @@ def retrieve_one_e2e(
         retrieval_trace = dict(result.trace)
     elif runner in QUERY_GROUNDED_STO_RUNNERS:
         result = _agsto_graph_native_retrieve(
+            query=str(query),
+            nodes=nodes,
+            candidate_doc_indices=candidates,
+            graph_payload=candidate_universe.graph_payload,
+            top_k=top_k,
+            certificate_policy=certificate_policy,
+        )
+        certified = result.certified_doc_indices
+        retrieval_trace = dict(result.trace)
+    elif runner in QUERY_GROUNDED_STO_V2_RUNNERS:
+        result = _agsto_graph_native_v2_retrieve(
             query=str(query),
             nodes=nodes,
             candidate_doc_indices=candidates,
@@ -297,6 +319,8 @@ def method_name_for_runner(runner: str) -> str:
         return ACTIVE_TRANSITION_CLOSURE_METHOD_NAME
     if str(runner) in QUERY_GROUNDED_STO_RUNNERS:
         return AGSTO_GRAPH_NATIVE_METHOD_NAME
+    if str(runner) in QUERY_GROUNDED_STO_V2_RUNNERS:
+        return AGSTO_GRAPH_NATIVE_V2_METHOD_NAME
     if str(runner) == "graph_native":
         return f"{CANONICAL_CLEAN_METHOD_NAME}_graph_native"
     return CANONICAL_CLEAN_METHOD_NAME
@@ -396,6 +420,144 @@ def _agsto_graph_native_retrieve(
         "uses_agsto_query_local_graph": True,
         "uses_query_grounded_sto_graph": True,
         "uses_graph_native_selection": True,
+        "uses_evidence_transition_audit": True,
+        "evidence_transition_audit_only": True,
+        "uses_source_text_evidence_validation": True,
+        "source_text_evidence_validation_only": True,
+        "uses_replacement_policy": False,
+        "uses_source_prior_repair": False,
+        "uses_agsto_legacy_selector": False,
+        "uses_agsto_weighted_evidence_set_scoring": False,
+        "uses_agsto_proposal_fusion": False,
+        "uses_llm_query_schema": False,
+        "dense_topk_is_final_answer_default": False,
+        "uses_weighted_score_fusion": False,
+        "uses_dataset_routing": False,
+        "uses_external_baseline_frontier": False,
+        "top_k": max(int(top_k), 1),
+        "selected_doc_indices": doc_indices,
+        "certified_doc_indices": certified_doc_indices,
+        "local_graph": _agsto_local_graph_trace(rooted_local_graph),
+        "selection": _agsto_selection_trace(selection),
+        "evidence_transition_audit": dict(closure["trace"]),
+        "source_text_evidence_validation": dict(closure["trace"]),
+    }
+    return AGSTOGraphNativeResult(
+        doc_indices=doc_indices,
+        certified_doc_indices=certified_doc_indices,
+        trace=trace,
+    )
+
+
+def _agsto_graph_native_v2_retrieve(
+    *,
+    query: str,
+    nodes: Sequence[EvidenceNode],
+    candidate_doc_indices: Sequence[int],
+    graph_payload: Mapping[str, object],
+    top_k: int,
+    certificate_policy: str,
+) -> AGSTOGraphNativeResult:
+    """Select reader top-k from channel-balanced query-local AG-STO evidence."""
+
+    corpus_index = graph_payload.get("agsto_corpus_index")
+    local_graph = graph_payload.get("agsto_local_graph")
+    if not isinstance(corpus_index, Mapping) or not isinstance(local_graph, Mapping):
+        raise ValueError(
+            "runner=query_grounded_sto_graph_native_v2 requires a candidate generator that "
+            "provides agsto_corpus_index and agsto_local_graph in graph_payload"
+        )
+
+    from src.agsto.local_graph import (
+        local_sto_evidence_channels,
+        order_local_sto_channel_balanced_source_prior,
+    )
+
+    rooted_local_graph = _agsto_query_rooted_local_graph(local_graph)
+    channel_map = local_sto_evidence_channels(
+        local_graph=rooted_local_graph,
+        max_docs=None,
+    )
+    raw_graph_order = list(
+        unique_ints(
+            order_local_sto_channel_balanced_source_prior(
+                local_graph=rooted_local_graph,
+                max_docs=None,
+            )
+        )
+    )
+    graph_order, delayed_symbolic_entries = _agsto_reader_evidence_order(
+        graph_order=raw_graph_order,
+        local_graph=rooted_local_graph,
+    )
+    certificate_graph = build_source_text_certificate_graph(
+        query=str(query),
+        nodes=nodes,
+        candidate_doc_indices=candidate_doc_indices,
+        source_doc_indices=graph_order[: max(int(top_k), 1)],
+        certificate_policy=certificate_policy,
+    )
+    closure = _agsto_source_text_certificate_closure(
+        graph_order=graph_order,
+        candidate_doc_indices=candidate_doc_indices,
+        certificate_graph=certificate_graph,
+        top_k=top_k,
+    )
+    selected = list(closure["doc_indices"])
+    trace_preview_k = max(int(top_k), 50)
+    selection = {
+        "selection_policy": "etv2_channel_balanced_sto_evidence_exposure",
+        "selected_doc_indices": tuple(selected),
+        "admitted_doc_count": len(
+            unique_ints(rooted_local_graph.get("admitted_doc_indices", []) or [])
+        ),
+        "local_edge_count": len(list(rooted_local_graph.get("local_edges", []) or [])),
+        "graph_order_doc_indices": tuple(graph_order[:trace_preview_k]),
+        "raw_graph_order_doc_indices": tuple(raw_graph_order[:trace_preview_k]),
+        "trace_preview_k": trace_preview_k,
+        "delayed_symbolic_entry_doc_indices": tuple(delayed_symbolic_entries),
+        "query_endpoints": tuple(
+            str(endpoint)
+            for endpoint in rooted_local_graph.get("symbolic_anchor_endpoints", []) or []
+        ),
+        "seed_order_policy": rooted_local_graph.get("seed_order_policy", ""),
+        "evidence_channels": _agsto_evidence_channel_trace(channel_map),
+    }
+    for doc_index in unique_ints(graph_order):
+        if len(selected) >= max(int(top_k), 1):
+            break
+        if int(doc_index) not in selected:
+            selected.append(int(doc_index))
+    for doc_index in unique_ints(candidate_doc_indices):
+        if len(selected) >= max(int(top_k), 1):
+            break
+        if int(doc_index) not in selected:
+            selected.append(int(doc_index))
+    doc_indices = tuple(selected[: max(int(top_k), 1)])
+    certified_doc_indices = tuple(
+        unique_ints(
+            [
+                *_agsto_certified_doc_indices(
+                    doc_indices=doc_indices,
+                    local_graph=rooted_local_graph,
+                ),
+                *closure["certified_doc_indices"],
+            ]
+        )
+    )
+    trace = {
+        "paper_facing_method_name": AGSTO_GRAPH_NATIVE_V2_METHOD_NAME,
+        "pipeline": "query_grounded_sto_graph_to_channel_balanced_reader_evidence",
+        "candidate_entrance": "agsto_graph_payload",
+        "ranked_object": "query_local_graph_channel_exposed_reader_context",
+        "uses_agsto_query_local_graph": True,
+        "uses_query_grounded_sto_graph": True,
+        "uses_graph_native_selection": True,
+        "uses_evidence_channels": True,
+        "uses_channel_balanced_exposure": True,
+        "uses_llm_membership_decision": False,
+        "etv2_diagnostic_readout": True,
+        "v1_frozen_baseline": AGSTO_GRAPH_NATIVE_METHOD_NAME,
         "uses_evidence_transition_audit": True,
         "evidence_transition_audit_only": True,
         "uses_source_text_evidence_validation": True,
@@ -696,6 +858,20 @@ def _agsto_local_graph_trace(local_graph: Mapping[str, object]) -> Mapping[str, 
     }
 
 
+def _agsto_evidence_channel_trace(
+    channels: Mapping[str, Sequence[int]],
+    *,
+    preview_k: int = 20,
+) -> Mapping[str, object]:
+    return {
+        str(name): {
+            "doc_indices": tuple(unique_ints(values)[: max(int(preview_k), 1)]),
+            "doc_count": len(unique_ints(values)),
+        }
+        for name, values in sorted(channels.items(), key=lambda item: str(item[0]))
+    }
+
+
 def _agsto_selection_trace(selection: Mapping[str, object]) -> Mapping[str, object]:
     return {
         "selection_policy": str(selection.get("selection_policy", "")),
@@ -720,4 +896,6 @@ def _agsto_selection_trace(selection: Mapping[str, object]) -> Mapping[str, obje
             if isinstance(row, Mapping)
         ),
         "set_objective": dict(selection.get("set_objective", {}) or {}),
+        "evidence_channels": dict(selection.get("evidence_channels", {}) or {}),
+        "trace_preview_k": int(selection.get("trace_preview_k", 0) or 0),
     }

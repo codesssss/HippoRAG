@@ -62,6 +62,34 @@ def coerce_doc_text(doc: Any) -> str:
     return str(doc or "")
 
 
+def title_from_doc(doc: Any) -> str:
+    return coerce_doc_text(doc).split("\n", 1)[0].strip()
+
+
+def recompute_ircot_title_recall(payload: Mapping[str, Any]) -> Dict[str, float]:
+    if payload.get("format") != "ircot_reader_input_v1":
+        return {}
+    examples = list(payload.get("examples", []) or [])
+    if not examples:
+        return {}
+    metrics: Dict[str, float] = {}
+    for k in (5, 20, 100, 200):
+        scores: List[float] = []
+        for example in examples:
+            gold_titles = {
+                str(title).strip()
+                for title in (example.get("gold_titles", []) or [])
+                if str(title).strip()
+            }
+            docs = [title_from_doc(doc) for doc in (example.get("docs", []) or [])[:k]]
+            if not gold_titles:
+                continue
+            scores.append(len(gold_titles & set(docs)) / len(gold_titles))
+        if scores:
+            metrics[f"Recall@{k}"] = float(np.mean(scores))
+    return metrics
+
+
 def load_pool_records(pool_path: Path) -> Dict[int, Mapping[str, Any]]:
     payload = load_json(pool_path)
     records = payload.get("records", []) if isinstance(payload, Mapping) else []
@@ -113,7 +141,36 @@ def docs_from_exported_pool(
     return [coerce_doc_text(doc) for doc in (record.get("pool_docs", []) or [])[:qa_top_k]]
 
 
+def get_retrieval_metrics(payload: Mapping[str, Any]) -> Dict[str, float]:
+    recomputed_ircot = recompute_ircot_title_recall(payload)
+    if recomputed_ircot:
+        return recomputed_ircot
+    metric_sources = []
+    retrieval = payload.get("retrieval")
+    if isinstance(retrieval, Mapping):
+        metric_sources.append(retrieval.get("recomputed_title_recall"))
+    metric_sources.extend(
+        payload.get(key)
+        for key in ("overall_recomputed", "overall_from_pipeline", "metrics", "overall")
+    )
+    for metrics in metric_sources:
+        if not isinstance(metrics, Mapping):
+            continue
+        result: Dict[str, float] = {}
+        for k in (5, 20, 100, 200):
+            for metric_key in (f"Recall@{k}", f"R@{k}", f"r{k}"):
+                if metric_key in metrics:
+                    result[f"Recall@{k}"] = float(metrics[metric_key])
+                    break
+        if result:
+            return result
+    return {}
+
+
 def get_retrieval_r5(payload: Mapping[str, Any]) -> float | None:
+    retrieval_metrics = get_retrieval_metrics(payload)
+    if "Recall@5" in retrieval_metrics:
+        return float(retrieval_metrics["Recall@5"])
     for key in ("overall_recomputed", "overall_from_pipeline", "metrics", "overall"):
         metrics = payload.get(key)
         if not isinstance(metrics, Mapping):
@@ -226,6 +283,7 @@ def summarize_qa(
     *,
     method_name: str,
     retrieval_r5: float | None,
+    retrieval_metrics: Mapping[str, float],
     qa_result: Mapping[str, Any],
     per_query_base: Sequence[Mapping[str, Any]],
 ) -> Dict[str, Any]:
@@ -253,6 +311,9 @@ def summarize_qa(
             6,
         ),
     }
+    for metric_key in ("Recall@5", "Recall@20", "Recall@100", "Recall@200"):
+        if metric_key in retrieval_metrics:
+            metrics[metric_key] = round(float(retrieval_metrics[metric_key]), 6)
     return {
         "method": method_name,
         "metrics": metrics,
@@ -292,6 +353,7 @@ def evaluate_input_file(
         qa_f1_cls=runtime.QAF1ScoreCls,
         skip_qa=bool(args.skip_qa),
     )
+    retrieval_metrics = get_retrieval_metrics(payload)
     return {
         "dataset": dataset_name,
         "num_queries": len(per_query_base),
@@ -301,7 +363,9 @@ def evaluate_input_file(
             "uses_saved_reader_docs": args.doc_source == "saved_docs",
             "uses_exported_pool_topk_docs": args.doc_source == "external_pool_topk_docs",
             "does_not_modify_retrieval": True,
-            "retrieval_r5_source": "input_file.overall_recomputed.Recall@5",
+            "retrieval_metrics_source": (
+                "input_file.retrieval.recomputed_title_recall or input_file.overall_recomputed"
+            ),
         },
         "reader": {
             "llm_name": getattr(config, "llm_name", None),
@@ -313,6 +377,7 @@ def evaluate_input_file(
             method_name: summarize_qa(
                 method_name=method_name,
                 retrieval_r5=get_retrieval_r5(payload),
+                retrieval_metrics=retrieval_metrics,
                 qa_result=qa_result,
                 per_query_base=per_query_base,
             )
@@ -324,14 +389,17 @@ def write_markdown(payload: Mapping[str, Any], output_md: Path) -> None:
     lines = [
         "# Saved-Docs Reader QA",
         "",
-        "| Dataset | Method | Count | R@5 | EM | F1 | Reader docs | Max tokens |",
-        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Dataset | Method | Count | R@5 | R@20 | R@100 | R@200 | EM | F1 | Reader docs | Max tokens |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for dataset in payload.get("datasets", []) or []:
         reader = dataset.get("reader", {}) or {}
         for method_name, method in (dataset.get("methods", {}) or {}).items():
             metrics = method.get("metrics", {}) or {}
             r5 = metrics.get("r5")
+            r20 = metrics.get("Recall@20")
+            r100 = metrics.get("Recall@100")
+            r200 = metrics.get("Recall@200")
             em = metrics.get("ExactMatch")
             f1 = metrics.get("F1")
             lines.append(
@@ -339,10 +407,13 @@ def write_markdown(payload: Mapping[str, Any], output_md: Path) -> None:
                 f"{method_name} | "
                 f"{int(metrics.get('count', 0) or 0)} | "
                 f"{'' if r5 is None else f'{float(r5):.4f}'} | "
+                f"{'' if r20 is None else f'{float(r20):.4f}'} | "
+                f"{'' if r100 is None else f'{float(r100):.4f}'} | "
+                f"{'' if r200 is None else f'{float(r200):.4f}'} | "
                 f"{'' if em is None else f'{float(em):.4f}'} | "
                 f"{'' if f1 is None else f'{float(f1):.4f}'} | "
                 f"{float(metrics.get('mean_reader_docs', 0.0)):.2f} | "
-                f"{int(reader.get('max_new_tokens', 0) or 0)} |"
+                f"{'unlimited' if reader.get('max_new_tokens') is None else int(reader.get('max_new_tokens', 0) or 0)} |"
             )
     output_md.parent.mkdir(parents=True, exist_ok=True)
     output_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -350,6 +421,15 @@ def write_markdown(payload: Mapping[str, Any], output_md: Path) -> None:
 
 def parse_input_files(value: str) -> List[Path]:
     return [Path(item.strip()).expanduser() for item in str(value).split(",") if item.strip()]
+
+
+def optional_positive_int(value: str | None) -> int | None:
+    if value is None:
+        return None
+    text = str(value).strip().lower()
+    if text in {"", "none", "null", "unlimited"}:
+        return None
+    return max(int(text), 1)
 
 
 def run_docs_reader_qa(args: argparse.Namespace) -> Dict[str, Any]:
@@ -360,7 +440,7 @@ def run_docs_reader_qa(args: argparse.Namespace) -> Dict[str, Any]:
     ]
     payload = {
         "format": "saved_docs_reader_only_qa",
-        "max_new_tokens": int(args.max_new_tokens),
+        "max_new_tokens": None if args.max_new_tokens is None else int(args.max_new_tokens),
         "qa_top_k": int(args.qa_top_k),
         "datasets": datasets,
     }
@@ -393,7 +473,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--save-dir", required=True)
     parser.add_argument("--llm-name", default=None)
     parser.add_argument("--llm-base-url", default=None)
-    parser.add_argument("--max-new-tokens", type=int, default=400)
+    parser.add_argument("--max-new-tokens", type=optional_positive_int, default=None)
     parser.add_argument("--embedding-name", default=None)
     parser.add_argument("--embedding-base-url", default=None)
     parser.add_argument("--embedding-batch-size", type=int, default=16)

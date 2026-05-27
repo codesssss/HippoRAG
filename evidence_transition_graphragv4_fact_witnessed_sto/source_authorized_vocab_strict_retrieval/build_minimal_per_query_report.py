@@ -8,6 +8,7 @@ the local benchmark JSON files without rerunning the legacy compare harness.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
@@ -83,6 +84,58 @@ def _context_passage(item: Sequence[object]) -> str:
 
 def _paragraph_passage(paragraph: Mapping[str, Any]) -> str:
     return f"{paragraph.get('title', '')}\n{paragraph.get('paragraph_text', '')}".strip()
+
+
+def _dict_passage(item: Mapping[str, Any]) -> str:
+    return f"{item.get('title', '')}\n{item.get('text', item.get('paragraph_text', ''))}".strip()
+
+
+def _parse_answer_alias_values(value: Any) -> List[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if not cleaned:
+            return []
+        if cleaned.startswith("[") and cleaned.endswith("]"):
+            try:
+                parsed = ast.literal_eval(cleaned)
+            except (ValueError, SyntaxError):
+                return [cleaned]
+            return _parse_answer_alias_values(parsed)
+        return [cleaned]
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        aliases: List[str] = []
+        for item in value:
+            aliases.extend(_parse_answer_alias_values(item))
+        return aliases
+    return [str(value)]
+
+
+def _gold_from_marked_contexts(
+    *,
+    contexts: Sequence[Mapping[str, Any]],
+    title_to_doc_indices: Mapping[str, Sequence[int]] | None = None,
+    passage_to_doc_index: Mapping[str, int] | None = None,
+    offset: int = 0,
+) -> List[int]:
+    title_to_doc_indices = title_to_doc_indices or {}
+    passage_to_doc_index = passage_to_doc_index or {}
+    output: List[int] = []
+    for local_index, item in enumerate(contexts):
+        if not isinstance(item, Mapping) or not item.get("is_supporting"):
+            continue
+        passage = _dict_passage(item)
+        doc_index = passage_to_doc_index.get(_normalize_passage(passage))
+        if doc_index is not None:
+            output.append(int(doc_index))
+            continue
+        doc_indices = title_to_doc_indices.get(str(item.get("title") or ""), ())
+        if len(doc_indices) == 1:
+            output.append(int(doc_indices[0]))
+            continue
+        output.append(int(offset) + int(local_index))
+    return unique_ints(output)
 
 
 def _gold_from_supporting_facts(
@@ -213,6 +266,68 @@ def _rows_musique(
     return rows
 
 
+def _rows_nq_rear(
+    dataset_rows: Sequence[Mapping[str, Any]],
+    *,
+    title_to_doc_indices: Mapping[str, Sequence[int]] | None = None,
+    passage_to_doc_index: Mapping[str, int] | None = None,
+) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    offset = 0
+    for query_index, row in enumerate(dataset_rows):
+        contexts = list(row.get("contexts", []) or [])
+        gold = _gold_from_marked_contexts(
+            contexts=contexts,
+            title_to_doc_indices=title_to_doc_indices,
+            passage_to_doc_index=passage_to_doc_index,
+            offset=offset,
+        )
+        answers = _parse_answer_alias_values(row.get("reference"))
+        if "answer_aliases" in row:
+            answers.extend(_parse_answer_alias_values(row.get("answer_aliases")))
+        rows.append(
+            {
+                "query_index": int(query_index),
+                "question": str(row.get("question") or ""),
+                "gold_answers": [answer for answer in dict.fromkeys(answers) if answer],
+                "gold_doc_indices": gold,
+            }
+        )
+        offset += len(contexts)
+    return rows
+
+
+def _rows_popqa(
+    dataset_rows: Sequence[Mapping[str, Any]],
+    *,
+    title_to_doc_indices: Mapping[str, Sequence[int]] | None = None,
+    passage_to_doc_index: Mapping[str, int] | None = None,
+) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    offset = 0
+    for query_index, row in enumerate(dataset_rows):
+        paragraphs = list(row.get("paragraphs", []) or [])
+        gold = _gold_from_marked_contexts(
+            contexts=paragraphs,
+            title_to_doc_indices=title_to_doc_indices,
+            passage_to_doc_index=passage_to_doc_index,
+            offset=offset,
+        )
+        answers: List[str] = []
+        for field in ("obj", "possible_answers", "o_wiki_title", "o_aliases", "answer_aliases"):
+            answers.extend(_parse_answer_alias_values(row.get(field)))
+        rows.append(
+            {
+                "query_index": int(query_index),
+                "question": str(row.get("question") or ""),
+                "gold_answers": [answer for answer in dict.fromkeys(answers) if answer],
+                "gold_doc_indices": gold,
+            }
+        )
+        offset += len(paragraphs)
+    return rows
+
+
 def build_minimal_report(
     *,
     dataset: str,
@@ -239,6 +354,18 @@ def build_minimal_report(
         )
     elif normalized_dataset == "hotpotqa":
         rows = _rows_hotpotqa(
+            dataset_rows,
+            title_to_doc_indices=title_to_doc_indices,
+            passage_to_doc_index=passage_to_doc_index,
+        )
+    elif normalized_dataset == "nq_rear":
+        rows = _rows_nq_rear(
+            dataset_rows,
+            title_to_doc_indices=title_to_doc_indices,
+            passage_to_doc_index=passage_to_doc_index,
+        )
+    elif normalized_dataset == "popqa":
+        rows = _rows_popqa(
             dataset_rows,
             title_to_doc_indices=title_to_doc_indices,
             passage_to_doc_index=passage_to_doc_index,

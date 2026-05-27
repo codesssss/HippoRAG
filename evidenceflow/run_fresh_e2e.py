@@ -2,7 +2,7 @@
 """Run the legacy frozen-ETv3 fresh path with PCEC readout.
 
 This runner is retained for parity and ablation checks. It is not the upstream
-retriever for the main Table-1 EvidenceFlow protocol, which consumes ETv4
+retriever for the main Table-1 EvidenceLink protocol, which consumes ETv4
 fact-witnessed STO pools through ``run_native_pool.py``.
 """
 

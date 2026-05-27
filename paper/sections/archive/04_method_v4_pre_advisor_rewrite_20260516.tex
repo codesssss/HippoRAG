@@ -1,0 +1,224 @@
+% =====================================================================
+% Section 4: Method — EvidenceFlow
+% =====================================================================
+%
+% Status: Draft §4 Method v3 — opening overview + 3 mechanism subsections (2026-05-15)
+%   v1: 5 subsections — backed up at archive/04_method_v1_5sections_20260515.tex
+%   v2: 3 subsections — collapsed §4.3+§4.4+§4.5 into "Query-Local Evidence Flow"
+%       to remove pipeline visual cue while keeping all paragraph-level content
+%   v3: unnumbered method overview paragraph + three numbered mechanism subsections
+%       following the Methodology structure of PropRAG / Relink / NeocorRAG
+% Framing reference: research_memory/emnlp_expand_then_compose/46_*.md
+% Writing discipline: research_memory/emnlp_expand_then_compose/45_*.md
+%
+% Method name: \methodname (defined via \newcommand in main file)
+%
+% Discipline checklist:
+%   - No internal codename anywhere in main paper
+%   - No "stage / pool / module / readout / selector / composer"
+%     as method-internal terms (only allowed in reverse-framing sentences)
+%   - No "objective / certify / unified" — use
+%     "criterion / boundary / proxy / formation principle"
+%   - 4.x chapter titles must be mechanism names, not module names
+%
+% =====================================================================
+
+\section{Method: \methodname{}}
+\label{sec:method}
+
+In this section, we introduce \methodname{}, which treats multi-hop retrieval
+as the construction of a document-level evidence chain rather than the
+independent ranking of documents. Given a question $q$, a corpus
+$\mathcal{D}$, a reader budget $K$, and a pre-extracted set of OpenIE facts
+$\mathcal{F}$, \methodname{} returns an evidence set
+$E_K \subseteq \mathcal{D}$ by constructing a query-local document graph
+$G_q=(V_q,A_q)$ and terminating it at the reader boundary. First, we describe
+the offline document-grounded OpenIE graph that supplies entity anchors and
+relational structure (\S\ref{sec:method:substrate}). Second, we show how
+\methodname{} forms a
+query-local evidence graph whose vertices and arcs are activated under $q$
+(\S\ref{sec:method:flow}). Finally, we define the chain-integrity boundary
+that forms $E_K$ under budget (\S\ref{sec:method:boundary}). Chain
+connectivity is treated throughout as a property of the retrieval graph
+itself, not as a relation reconstructed downstream over a flat passage pool.
+
+\subsection{Offline Indexing: Document-Grounded OpenIE Graph}
+\label{sec:method:substrate}
+
+We build a document-grounded graph
+$\mathcal{G}_{\mathcal{D}}=(\mathcal{V}_{\mathcal{D}},\mathcal{E}_{\mathcal{D}})$
+over the corpus $\mathcal{D}$ during offline indexing. The graph supplies
+the entity anchors and relational structure that \methodname{} draws on at
+query time (\S\ref{sec:method:flow}). Following standard OpenIE practice
+\citep{angeli2015leveraging,gutierrez2025hipporag}, we extract salient
+assertions from each document and organize them into the graph below; the
+extractor itself is not a contribution of this work.
+
+\paragraph{OpenIE fact extraction.}
+For each document $d \in \mathcal{D}$, a language model extracts a set of
+OpenIE facts $f = (h, r, t)$, where $h$ and $t$ are head and tail entities
+and $r$ is the relation phrase that connects them. We retain each fact
+together with its provenance $\mathrm{src}(f) \in \mathcal{D}$, so that
+every fact can be traced back to the document from which it was extracted.
+The resulting fact set is denoted $\mathcal{F}$.
+
+\paragraph{Graph construction.}
+The graph $\mathcal{G}_{\mathcal{D}}$ contains two node types and three
+edge types. Nodes are: (i) \emph{passage nodes}, one per document
+$d \in \mathcal{D}$, carrying the natural-language content that a
+downstream reader will eventually consume; and (ii) \emph{phrase nodes},
+one per distinct entity surface form extracted across $\mathcal{F}$.
+Edges are: (i) \emph{passage--phrase} edges that connect each document to
+the entities it mentions; (ii) \emph{relational} edges that connect a pair
+of phrase nodes $(h, t)$ whenever some fact $f = (h, r, t) \in \mathcal{F}$
+asserts a relation between them, with $r$ retained as an edge attribute
+and $\mathrm{src}(f)$ retained as the edge provenance; and (iii)
+\emph{synonymy} edges that connect phrase nodes whose dense embeddings
+are highly similar, providing alias coverage across surface variants of
+the same entity.
+
+\paragraph{Indexing for retrieval.}
+We pre-compute dense embeddings for all passage and phrase nodes, and
+materialize $\mathcal{G}_{\mathcal{D}}$ as an adjacency index keyed by
+node identifier. The graph is built once and reused across all questions:
+at query time, no new OpenIE extraction or fact generation is performed
+over $\mathcal{D}$. The artifacts produced by this stage---phrase nodes,
+passage--phrase links, relational edges with provenance, and synonymy
+edges---are exactly the pieces \methodname{} draws on when it constructs
+a query-local subgraph and ranks documents by graph-grounded propagation
+(\S\ref{sec:method:flow}).
+
+\subsection{Query-Local Evidence Graph}
+\label{sec:method:flow}
+
+Given the offline graph $\mathcal{G}_{\mathcal{D}}$, \methodname{} constructs the query-local
+graph through one continuous evidence-flow process. The process activates a
+compact region of documents from question anchors and entry signals, then
+admits document-to-document transitions when they are witnessed by facts in
+$\mathcal{F}$. We describe these operations as facets of the same graph
+formation process rather than as separate retrieval and selection stages.
+
+\paragraph{Question-anchored activation.}
+\label{sec:method:anchor}
+Evidence flow begins by activating a compact document region
+$V_q \subseteq \mathcal{D}$ around the question. Activation combines two
+complementary signals: a \emph{question anchor} $A(q) \subseteq \mathcal{E}$
+extracted from $q$, where $\mathcal{E}$ is the entity vocabulary induced by
+$\mathcal{F}$, and an \emph{entry signal} $\mathrm{Entry}(q) \subseteq
+\mathcal{D}$ obtained from a standard dense or lexical retriever. The
+anchor identifies which entities $q$ is asking about; the entry signal
+identifies which documents are the most relevant starting points in
+$\mathcal{D}$. Neither signal alone determines the evidence delivered to
+the reader: $V_q$ is initialized from these two signals and then formed
+where they can be connected through facts in $\mathcal{F}$. Concretely,
+$V_q$ is initialized with the union of (i) documents in $\mathrm{Entry}(q)$
+and (ii) documents that are the provenance of at least one fact in
+$\mathcal{F}$ whose arguments include an anchor entity in $A(q)$. From this
+initial vertex set, $V_q$ is expanded through a bounded number of hops
+along facts whose entities are connected to those already activated, with
+the size of $V_q$ bounded to keep the activated region compact relative to
+$\mathcal{D}$, while the reader budget $K$ ultimately constrains $E_K$.
+This activation rule keeps $|V_q|$ small enough to make downstream
+computation tractable, while still allowing documents that are reachable
+only through multi-hop entity chains to enter $V_q$ even when they have
+low surface similarity to $q$. The entry signal seeds activation but does
+not by itself determine $E_K$: documents in $\mathrm{Entry}(q)$ enter
+$V_q$ for consideration, yet their position in the entry ranking is not
+the sole criterion that decides which of them reach the reader. The anchor
+extraction is the mechanism by which $q$ exerts query-conditional control
+over $G_q$: anchors are extracted from entity mentions and relation-bearing
+expressions in $q$, using the same controlled language model used
+throughout our protocol. This extraction is applied to the question, not
+to the retrieved corpus, and does not generate evidence chains; it provides
+the question-side semantic handles that allow $G_q$ to grow toward
+documents that $q$ actually asks about, rather than only toward documents
+that happen to score well on dense similarity.
+
+\paragraph{Fact-grounded transitions.}
+\label{sec:method:transition}
+The activated region becomes a document-level evidence graph only when the
+arcs $A_q$ are admitted under fact witnesses. The aim is to make chain
+connectivity a structural property of $G_q$, audited at the moment of
+admission, so that the evidence chain reaching the reader is constructed
+within the retrieval graph itself rather than reassembled from text
+afterward.
+
+Let $f = (h, r, t) \in \mathcal{F}$ denote a fact extracted from some
+source document $\mathrm{src}(f) \in \mathcal{D}$, with head and tail
+entities $h, t \in \mathcal{E}$. For an ordered pair of documents
+$(d_i, d_j)$, the \emph{witness set} under question $q$ is
+\begin{equation}
+\label{eq:witness-set}
+W_q(d_i, d_j) = \bigl\{\, w \in \mathcal{W}(\mathcal{F}) \;\bigm|\;
+w \text{ links } d_i \text{ and } d_j \text{ under } q \,\bigr\},
+\end{equation}
+where $\mathcal{W}(\mathcal{F})$ ranges over witness objects induced by
+facts in $\mathcal{F}$: a single fact $f$ whose endpoints reach across
+$d_i$ and $d_j$, or a pair of facts $(f_i, f_j)$ with
+$\mathrm{src}(f_i) = d_i$ and $\mathrm{src}(f_j) = d_j$ that share an
+activated argument. A witness $w$ links $d_i$ and $d_j$ under $q$ when one
+of its arguments is activated by $q$ (either through the anchor set
+$A(q)$ or through entities already entered the activated region of $V_q$)
+and a complementary argument grounds the other document. An arc
+$(d_i, d_j)$ is \emph{eligible} for $A_q$ when $W_q(d_i, d_j)$ is
+non-empty; surface similarity between $d_i$ and $d_j$ or their individual
+scores against $q$ may seed activation but are not by themselves
+sufficient to create an arc.
+
+\paragraph{Grounding modes and auditability.}
+Every arc in $A_q$ therefore carries an explicit witness in $\mathcal{F}$:
+each chain that ultimately reaches the reader can be traced back, edge by
+edge, to the source facts and their provenance in $\mathcal{D}$. This is
+what distinguishes \methodname{}'s notion of connectivity from a
+similarity graph in which two documents are joined whenever they share
+topic vectors: similarity may motivate co-occurrence, but it does not
+establish that the two documents support a multi-hop step that $q$ asks
+about. Witness sets provide this support by construction.
+
+Within Eq.~\eqref{eq:witness-set}, two complementary modes of linkage
+naturally arise. A \emph{sentence-grounded witness} is a single fact whose
+head and tail are both anchored in a source sentence that already mentions
+an entity activated by $q$; this captures cases where one document
+explicitly bridges to the other through a $q$-relevant entity within a
+bridging sentence. An \emph{argument-grounded witness} is induced by fact
+arguments grounded in the two documents through a shared activated
+entity, capturing cases where the multi-hop step is realized through
+entity coreference across documents rather than a single bridging
+sentence. Both modes share the same admission condition (a non-empty
+$W_q$) and the same auditability property; they differ only in how the
+witness is realized within $\mathcal{F}$.
+
+A crucial property of Eq.~\eqref{eq:witness-set} is that witnesses range
+over $\mathcal{W}(\mathcal{F})$, which is induced by the pre-extracted
+substrate from \S\ref{sec:method:substrate}, and not over text retrieved
+at query time. At the point of arc admission, the query-conditional
+information used to test witnesses is grounded in $A(q)$ and the current
+state of $V_q$; witnesses themselves are not generated, paraphrased, or
+re-extracted from $\mathcal{D}$ for $q$. Chain structure thus arises as a
+property of the retrieval graph rather than as a relation reconstructed
+from retrieved text at query time.
+
+\subsection{Reader-Boundary Chain Integrity}
+\label{sec:method:boundary}
+The same evidence-flow process terminates when the reader budget $K$ is
+reached: $E_K$ is the budget-bounded outcome of the graph formation, not
+an independent ranking step over the activated documents. We formulate
+this termination as a \emph{chain-integrity boundary} on $G_q$. $E_K$
+should preserve the witnessed connectivity already established in $A_q$,
+and any document admitted into $E_K$ should either extend an existing
+witnessed chain or address a \emph{question-induced obligation} that no
+document already in $E_K$ covers. These obligations --- entity mentions
+and relation-bearing slots that $q$ expects the evidence to jointly
+resolve --- are extracted from $q$ with the same controlled language model
+used for the question anchor; they are applied to the question, not to
+the retrieved corpus, and do not generate evidence chains. Concretely,
+$E_K$ is formed incrementally from $G_q$ in two interleaved modes.
+\emph{Witness-preserving admission} extends $E_K$ along arcs of $A_q$, so
+that documents already supported by a witnessed transition to some
+$d \in E_K$ are preferred to documents that would only enter $E_K$
+through unwitnessed similarity. \emph{Residual admission} is reserved for
+cases where an open obligation remains and a candidate document, not yet
+connected to $E_K$ by a witnessed transition, provides evidence for it.
+Residual admission does not create new unwitnessed arcs: once a document
+is admitted, any further movement involving it in $G_q$ remains subject
+to the same witness conditions described above.

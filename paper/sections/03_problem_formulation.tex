@@ -1,0 +1,40 @@
+% =====================================================================
+% Section 3: Problem Formulation
+% =====================================================================
+%
+% Status: Draft §3 Problem Formulation v4 (2026-05-19)
+%   v4: quarter-page tighten — 100w target.
+%       Single ranked-list interface + evidence-set objective in one
+%       compact aligned block; fact unit reduced to one inline line.
+%       ConnCov instantiation references moved to §4.
+%   v3: see archive/03_problem_formulation_v3_pre-quarter-page_20260519.tex
+%
+% =====================================================================
+
+\section{Problem Formulation}
+\label{sec:problem}
+
+Given a question $q$ and a corpus $\mathcal{D}=\{d_i\}_{i=1}^{N}$,
+the retriever outputs a ranked evidence list
+$R_q=(d_{(1)},d_{(2)},\ldots)$ and the reader consumes its prefix
+$R_q^{(K)}=(d_{(1)},\ldots,d_{(K)})$ to produce
+$\hat{a}_q=\mathrm{LLM}(\mathrm{prompt}(q,R_q^{(K)}))$. Multi-hop
+QA further requires $R_q^{(K)}$ to be \emph{connected} across
+documents and \emph{covering} of the entities and relations $q$
+asks about. Alongside the ranked list, we therefore frame
+retrieval as an evidence-set objective
+\begin{equation}
+\label{eq:evidence-set}
+E_q^{\star}
+=
+\operatorname*{arg\,max}_{E \subseteq \mathcal{D},\,|E|=K}
+\;\mathrm{ConnCov}(E\,;\,q),
+\end{equation}
+where $\mathrm{ConnCov}$ is instantiated by the query-local graph
+linking of \S\ref{sec:method:retrieval} (connectedness) and the
+noisy-OR coverage of \S\ref{sec:method:enhancement} (coverage). At
+indexing time, each fact unit $f=(h,r,t)$ retains its provenance
+$\mathrm{src}(f)\in\mathcal{D}$, and \methodname{} uses these
+provenance-linked facts as evidence records for document transitions and rank
+passages so that prefixes of $R_q$
+approximate $E_q^{\star}$.

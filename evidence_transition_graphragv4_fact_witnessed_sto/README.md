@@ -17,6 +17,27 @@ This folder is an isolated V4 line. It does not modify the V3 package.
 | Certificate closure selection | no in the paper-facing mainline |
 | Forbidden switch | `--ablation-query-supported-object-handoff` |
 
+## Current Claim Note
+
+The current paper-facing claim and MuSiQue chain-consistency diagnostic are
+consolidated in:
+
+```text
+docs/etv4_sto_readout_claim_and_chain_diagnostic_20260512.md
+```
+
+Short version:
+
+```text
+ETv4 is a baseline-aligned GraphRAG method: dense/textual retrieval opens a
+query-local STO document graph, and graph readout selects the final top5.
+
+The strongest evidence is the full1000 same-entry dense-only ablation. The main
+known limitation is MuSiQue 3-hop weakly-connected topical substitution, where
+weak STO graph neighbors can displace answer-tail gold documents at dense ranks
+4 or 5.
+```
+
 ## Algorithm
 
 | Stage | Logic |
@@ -101,7 +122,6 @@ env PYTHONPATH=. /mnt/nvme/code/HippoRAG/.venv-hipporag/bin/python \
   --qa-top-k 5 \
   --llm-name qwen3-8b-train \
   --llm-base-url http://localhost:8043/v1 \
-  --max-new-tokens 400 \
   --embedding-name nvidia/NV-Embed-v2 \
   --embedding-base-url http://localhost:8019/v1/embeddings \
   --output-json run_logs/evidence_transition_graphragv4_fact_witnessed_sto_limit100/reports/evidence_transition_graphragv4_fact_witnessed_sto_reader_only_qa.json \

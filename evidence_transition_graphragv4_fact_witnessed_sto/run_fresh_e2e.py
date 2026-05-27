@@ -73,6 +73,7 @@ TRANSITION_CLOSURE_RUNNER = "query_grounded_sto_transition_closure_v4"
 LAYERED_TRANSITION_RUNNER = "query_grounded_sto_layered_transition_v4"
 ROOT_BALANCED_TRANSITION_RUNNER = "query_grounded_sto_root_balanced_transition_v4"
 BRANCH_BALANCED_RUNNER = "query_grounded_sto_source_confirmed_branch_balanced_v4"
+PIPELINE_GUARD_REPAIR_RUNNER = "pipeline"
 DEFAULT_CANDIDATE_GENERATOR_MODE = "dense_seeded_sto"
 GRAPH_ONLY_CANDIDATE_GENERATOR_MODE = "graph_only"
 FORBIDDEN_FLAGS = frozenset({"--ablation-query-supported-object-handoff"})
@@ -110,6 +111,8 @@ def select_runner(*, candidate_mode: str, readout_policy: str) -> str:
         return ROOT_BALANCED_TRANSITION_RUNNER
     if str(readout_policy) == "branch_balanced":
         return BRANCH_BALANCED_RUNNER
+    if str(readout_policy) == "pipeline_guard_repair":
+        return PIPELINE_GUARD_REPAIR_RUNNER
     if str(readout_policy) == "layered_transition":
         return LAYERED_TRANSITION_RUNNER
     if str(readout_policy) == "transition_closure":
@@ -296,6 +299,15 @@ def parse_datasets(value: str) -> List[str]:
     if unknown:
         raise ValueError(f"unsupported datasets: {unknown}; supported={SUPPORTED_DATASETS}")
     return datasets
+
+
+def optional_positive_int(value: str | None) -> int | None:
+    if value is None:
+        return None
+    text = str(value).strip().lower()
+    if text in {"", "none", "null", "unlimited"}:
+        return None
+    return max(int(text), 1)
 
 
 def write_retrieval_markdown(payload: Mapping[str, Any], output_md: Path) -> None:
@@ -576,6 +588,7 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
             candidate_mode=candidate_mode,
             readout_policy=str(args.readout_policy),
         )
+    enable_pipeline_guard_repair = str(args.readout_policy) == "pipeline_guard_repair"
     dataset_result = evaluate_e2e_rows(
         rows=rows,
         nodes=nodes,
@@ -585,10 +598,20 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
         candidate_pool_k=max(int(args.candidate_pool_k), 1),
         certificate_policy="canonical_source_text",
         enable_pipeline_candidate_expansion=False,
-        enable_pipeline_replacement=False,
+        enable_pipeline_replacement=bool(enable_pipeline_guard_repair),
         allow_frontier_pair_insertion=False,
-        assembly_policy="baseline_aligned_graph_entry_no_weighted_fusion",
-        source_prior_policy="dense_entry_source_prior" if candidate_mode != GRAPH_ONLY_CANDIDATE_GENERATOR_MODE else "none",
+        assembly_policy=(
+            "source_prior_preserving_tail_insertion"
+            if bool(enable_pipeline_guard_repair)
+            else "baseline_aligned_graph_entry_no_weighted_fusion"
+        ),
+        source_prior_policy=(
+            "dense_head"
+            if bool(enable_pipeline_guard_repair)
+            else "dense_entry_source_prior"
+            if candidate_mode != GRAPH_ONLY_CANDIDATE_GENERATOR_MODE
+            else "none"
+        ),
         enable_timing_profile=bool(args.profile_retrieval),
     )
     chunk_embedding_store_path = str(getattr(artifacts, "chunk_embedding_store_path", "") or "")
@@ -633,6 +656,8 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
                     "no_multi_anchor_precision",
                     "raw_sto_adjacency",
                 }
+                else "dense_head"
+                if bool(enable_pipeline_guard_repair)
                 else "entry_only"
                 if str(args.readout_policy) == "transition_closure"
                 else "structural_guard_only"
@@ -656,6 +681,14 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
                 "raw_sto_adjacency",
                 "transition_closure",
             },
+            "uses_replacement_policy": bool(enable_pipeline_guard_repair),
+            "enable_pipeline_replacement": bool(enable_pipeline_guard_repair),
+            "allow_frontier_pair_insertion": False,
+            "assembly_policy": (
+                "source_prior_preserving_tail_insertion"
+                if bool(enable_pipeline_guard_repair)
+                else "baseline_aligned_graph_entry_no_weighted_fusion"
+            ),
             "uses_openie_fact_edge_witnesses": str(args.readout_policy) in {
                 "clean_mainline",
                 "no_multi_anchor_precision",
@@ -663,6 +696,7 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
                 "fact_witnessed_path_cover",
                 "transition_valid_closure",
                 "branch_balanced",
+                "pipeline_guard_repair",
             },
             "uses_llm_generated_propositions": False,
             "candidate_pool_k": max(int(args.candidate_pool_k), 1),
@@ -743,8 +777,6 @@ def run_optional_qa(
         str(args.reader_llm_name),
         "--llm-base-url",
         str(args.reader_llm_base_url),
-        "--max-new-tokens",
-        str(max(int(args.reader_max_new_tokens), 1)),
         "--embedding-name",
         embedding_endpoint_model_id(
             normalize_embedding_name_for_runtime(
@@ -763,6 +795,11 @@ def run_optional_qa(
         "--output-md",
         str(qa_md),
     ]
+    if args.reader_max_new_tokens is not None:
+        qa_args.extend([
+            "--max-new-tokens",
+            str(max(int(args.reader_max_new_tokens), 1)),
+        ])
     if bool(args.reader_qwen_disable_thinking):
         qa_args.append("--qwen-disable-thinking")
     qa_main(qa_args)
@@ -797,6 +834,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "fact_witnessed_path_cover",
             "transition_valid_closure",
             "source_aligned",
+            "pipeline_guard_repair",
             "transition_closure",
             "layered_transition",
             "root_balanced_transition",
@@ -827,7 +865,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "ETv4 graph readout but orders the frontier by STO edge semantic layer. "
             "root_balanced_transition is a negative ablation that always balances "
             "textual/symbolic roots. branch_balanced is the legacy guarded form "
-            "of the clean mainline branch readout."
+            "of the clean mainline branch readout. pipeline_guard_repair reuses "
+            "the same fresh index but restores the legacy source-prior-preserving "
+            "tail insertion and replacement path without candidate expansion."
         ),
     )
     parser.add_argument(
@@ -880,7 +920,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--run-qa", action="store_true")
     parser.add_argument("--reader-llm-name", default=DEFAULT_READER_LLM_NAME)
     parser.add_argument("--reader-llm-base-url", default=DEFAULT_READER_LLM_BASE_URL)
-    parser.add_argument("--reader-max-new-tokens", type=int, default=400)
+    parser.add_argument("--reader-max-new-tokens", type=optional_positive_int, default=None)
     parser.add_argument("--reader-qwen-disable-thinking", action="store_true")
     return parser
 

@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+"""Day-2 AREC residual retrieval smoke."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+from pathlib import Path
+import sys
+
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
+from src.dpathrag.arec.smoke import load_jsonl_map, load_pool_records, residual_row, summarize_by_hop, summarize_numeric
+from src.dpathrag.arec.verifier import build_verifier
+from src.dpathrag.io import write_json, write_jsonl
+
+
+def write_markdown(payload: dict, path: str | Path) -> None:
+    summary = payload.get("summary") or {}
+    lines = [
+        "# AREC-RAG Day 2 Residual Retrieval Smoke",
+        "",
+        f"- Status: `{payload.get('status')}`",
+        f"- Dataset: `{payload.get('dataset')}`",
+        f"- Rows: `{summary.get('rows', 0)}`",
+        f"- Verifier: `{payload.get('verifier_model')}`",
+        f"- IRCoT prompt/query source: `{payload.get('official_ircot_prompt_path_or_fallback_reason')}`",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| arec_missing_hit_rate | {summary.get('arec_missing_hit_rate', 0.0):.4f} |",
+        f"| raw_question_missing_hit_rate | {summary.get('raw_question_missing_hit_rate', 0.0):.4f} |",
+        f"| cot_missing_hit_rate | {summary.get('cot_missing_hit_rate', 0.0):.4f} |",
+        f"| final_support_complete | {summary.get('final_support_complete', 0.0):.4f} |",
+        "",
+        "## By Hop",
+        "",
+        "| Hop | Rows | AREC Hit | Raw Hit | CoT Hit | Final Complete |",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
+    for hop, row in (payload.get("by_hop") or {}).items():
+        lines.append(
+            f"| {hop} | {row.get('rows', 0)} | {row.get('arec_missing_hit_rate', 0.0):.4f} | {row.get('raw_question_missing_hit_rate', 0.0):.4f} | {row.get('cot_missing_hit_rate', 0.0):.4f} | {row.get('final_support_complete', 0.0):.4f} |"
+        )
+    if payload.get("reason"):
+        lines.extend(["", f"Reason: {payload['reason']}"])
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--pool_json", required=True)
+    parser.add_argument("--generated_obligations_jsonl", required=True)
+    parser.add_argument("--cot_queries_jsonl", required=True)
+    parser.add_argument("--ircot_prompt_path", default="")
+    parser.add_argument("--dataset", default="unknown")
+    parser.add_argument("--limit", type=int, default=100)
+    parser.add_argument("--top_k", type=int, default=5)
+    parser.add_argument("--max_docs", type=int, default=100)
+    parser.add_argument("--per_query_k", type=int, default=10)
+    parser.add_argument("--mock_reader_from_gold", action="store_true")
+    parser.add_argument("--verifier_backend", choices=["nli", "lexical_smoke"], default="nli")
+    parser.add_argument("--verifier_model", default="microsoft/deberta-v3-base-mnli")
+    parser.add_argument("--output_md", default="reports/dpathrag/arec_rag_residual_musique_limit100_20260428.md")
+    parser.add_argument("--output_json", default="reports/dpathrag/arec_rag_residual_musique_limit100_20260428.json")
+    parser.add_argument("--rows_jsonl", default="reports/dpathrag/arec_rag_residual_musique_limit100_rows_20260428.jsonl")
+    args = parser.parse_args()
+
+    generated_path = Path(args.generated_obligations_jsonl)
+    cot_path = Path(args.cot_queries_jsonl)
+    if not generated_path.exists():
+        payload = {
+            "status": "needs_generated_obligations",
+            "dataset": str(args.dataset),
+            "pool_json": str(args.pool_json),
+            "generated_obligations_jsonl": str(generated_path),
+            "reason": "Generated obligations are required for Day-2 residual retrieval smoke.",
+            "summary": {"rows": 0},
+        }
+        write_json(payload, args.output_json)
+        write_markdown(payload, args.output_md)
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+    if not cot_path.exists() and not args.ircot_prompt_path:
+        payload = {
+            "status": "needs_cot_queries_or_ircot_prompt",
+            "dataset": str(args.dataset),
+            "pool_json": str(args.pool_json),
+            "cot_queries_jsonl": str(cot_path),
+            "reason": "Frozen IRCoT-style CoT queries or official prompt metadata are required before comparison.",
+            "summary": {"rows": 0},
+        }
+        write_json(payload, args.output_json)
+        write_markdown(payload, args.output_md)
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return
+
+    records = load_pool_records(args.pool_json, int(args.limit))
+    obligation_map = load_jsonl_map(generated_path)
+    cot_map = load_jsonl_map(cot_path) if cot_path.exists() else {}
+    verifier = build_verifier(args.verifier_backend, model_name=str(args.verifier_model))
+    rows = [
+        residual_row(
+            record,
+            index=idx,
+            dataset=str(args.dataset),
+            top_k=int(args.top_k),
+            max_docs=int(args.max_docs),
+            per_query_k=int(args.per_query_k),
+            obligation_map=obligation_map,
+            cot_query_map=cot_map,
+            verifier=verifier,
+            mock_reader_from_gold=bool(args.mock_reader_from_gold),
+        )
+        for idx, record in enumerate(records)
+    ]
+    keys = [
+        "arec_missing_hit_rate",
+        "raw_question_missing_hit_rate",
+        "cot_missing_hit_rate",
+        "final_support_complete",
+        "final_support_recall",
+        "initial_support_complete",
+    ]
+    payload = {
+        "status": "completed",
+        "dataset": str(args.dataset),
+        "pool_json": str(args.pool_json),
+        "generated_obligations_jsonl": str(generated_path),
+        "cot_queries_jsonl": str(cot_path),
+        "official_ircot_prompt_path_or_fallback_reason": str(args.ircot_prompt_path or cot_path),
+        "verifier_model": getattr(verifier, "name", str(args.verifier_model)),
+        "verifier_backend": str(args.verifier_backend),
+        "top_k": int(args.top_k),
+        "per_query_k": int(args.per_query_k),
+        "summary": summarize_numeric(rows, keys) | {"rows": len(rows)},
+        "by_hop": summarize_by_hop(rows, keys),
+    }
+    write_jsonl(rows, args.rows_jsonl)
+    write_json(payload, args.output_json)
+    write_markdown(payload, args.output_md)
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()
+

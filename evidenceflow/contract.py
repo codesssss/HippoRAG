@@ -1,12 +1,12 @@
-"""Contract for EvidenceFlow and its legacy adapters.
+"""Contract for EvidenceLink and its legacy adapters.
 
-The reported EvidenceFlow protocol is:
+The reported EvidenceLink protocol is:
 
     ETv4 fact-witnessed STO pool -> PCEC native-pool readout -> top-5 reader input
 
 The frozen ETv3 package bundled under :mod:`evidenceflow.frozen_etv3_variable_flow`
 is a legacy/fresh-parity adapter.  It is not the upstream retriever for the
-main Table-1 EvidenceFlow row.
+main Table-1 EvidenceLink row.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from typing import Mapping
 METHOD_FAMILY = "evidence_transition_graphrag"
 METHOD_VERSION = "v4_composition"
 METHOD_NAME = "evidenceflow"
-PAPER_FACING_METHOD_NAME = "EvidenceFlow"
+PAPER_FACING_METHOD_NAME = "EvidenceLink"
 READOUT_COMPONENT_NAME = "Preservation-Constrained Evidence Composition"
 READOUT_COMPONENT_ABBREVIATION = "PCEC"
 READOUT_NAME = "pcec_prefix_residual_admission"
@@ -53,7 +53,7 @@ METHOD_CONTRACT: Mapping[str, object] = {
     "main_upstream_retriever": MAIN_UPSTREAM_RETRIEVER_NAME,
     "main_pool_provenance_key": MAIN_POOL_PROVENANCE_KEY,
     "main_pool_contract": (
-        "Table-1 EvidenceFlow requires an external pool whose "
+        "Table-1 EvidenceLink requires an external pool whose "
         "retrieval.input_method is evidence_transition_graphragv4_fact_witnessed_sto."
     ),
     "legacy_fresh_protocol": LEGACY_FRESH_PROTOCOL_NAME,
@@ -107,7 +107,7 @@ def pool_upstream_retriever(pool_payload: Mapping[str, object]) -> str:
 
 
 def is_main_evidenceflow_pool(pool_payload: Mapping[str, object]) -> bool:
-    """Return whether a pool is the main ETv4 input expected by EvidenceFlow."""
+    """Return whether a pool is the main ETv4 input expected by EvidenceLink."""
     return pool_upstream_retriever(pool_payload) == MAIN_UPSTREAM_RETRIEVER_NAME
 
 

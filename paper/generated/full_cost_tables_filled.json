@@ -1,0 +1,76 @@
+{
+  "offline_millions": {
+    "EvLink": {
+      "HotpotQA": 13.168058,
+      "2WikiMultiHopQA": 7.745459,
+      "MuSiQue": 14.623142
+    },
+    "HippoRAG2": {
+      "HotpotQA": 14.900734,
+      "2WikiMultiHopQA": 9.164102,
+      "MuSiQue": 16.392079
+    },
+    "PropRAG": {
+      "HotpotQA": 20.850715,
+      "2WikiMultiHopQA": 12.166023,
+      "MuSiQue": 23.491458
+    },
+    "NeocorRAG-32B": {
+      "HotpotQA": 11.916952,
+      "2WikiMultiHopQA": 7.041608,
+      "MuSiQue": 13.289869
+    },
+    "NeocorRAG-8B": {
+      "HotpotQA": 11.973808,
+      "2WikiMultiHopQA": 6.766237,
+      "MuSiQue": 13.343423
+    },
+    "HGRAG": {
+      "HotpotQA": 2.964242,
+      "2WikiMultiHopQA": 1.712592,
+      "MuSiQue": 3.22883
+    },
+    "RAPTOR": {
+      "HotpotQA": 1.755446,
+      "2WikiMultiHopQA": 0.935692,
+      "MuSiQue": 1.797482
+    }
+  },
+  "online_tokens_per_query": {
+    "EvLink": {
+      "HotpotQA": 1402.807,
+      "2WikiMultiHopQA": 1455.931,
+      "MuSiQue": 1682.472
+    },
+    "HippoRAG2": {
+      "HotpotQA": 638.657,
+      "2WikiMultiHopQA": 635.349,
+      "MuSiQue": 625.445
+    },
+    "PropRAG": {
+      "HotpotQA": 0,
+      "2WikiMultiHopQA": 0,
+      "MuSiQue": 0
+    },
+    "NeocorRAG-32B": {
+      "HotpotQA": 7194.144,
+      "2WikiMultiHopQA": 6830.96,
+      "MuSiQue": 6788.7037037037035
+    },
+    "NeocorRAG-8B": {
+      "HotpotQA": 7472.302,
+      "2WikiMultiHopQA": 7086.285,
+      "MuSiQue": 7000.495495495496
+    },
+    "HGRAG": {
+      "HotpotQA": 125.547,
+      "2WikiMultiHopQA": 119.952,
+      "MuSiQue": 124.141
+    },
+    "RAPTOR": {
+      "HotpotQA": 0,
+      "2WikiMultiHopQA": 0,
+      "MuSiQue": 0
+    }
+  }
+}

@@ -486,6 +486,7 @@ def evaluate_dataset_report(
             "llm_name": getattr(config, "llm_name", None),
             "llm_base_url": getattr(config, "llm_base_url", None),
             "qa_top_k": getattr(config, "qa_top_k", None),
+            "max_new_tokens": getattr(config, "max_new_tokens", None),
         },
         "methods": {
             METHOD_NAME: summarize_result(
@@ -526,6 +527,15 @@ def parse_reports(value: str) -> List[Path]:
     return [Path(item.strip()).expanduser() for item in str(value).split(",") if item.strip()]
 
 
+def optional_positive_int(value: str | None) -> int | None:
+    if value is None:
+        return None
+    text = str(value).strip().lower()
+    if text in {"", "none", "null", "unlimited"}:
+        return None
+    return max(int(text), 1)
+
+
 def run_reader_qa(args: argparse.Namespace) -> Dict[str, Any]:
     runtime = get_worktree_baseline_runtime()
     datasets = [
@@ -564,7 +574,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--save-dir", required=True)
     parser.add_argument("--llm-name", default=None)
     parser.add_argument("--llm-base-url", default=None)
-    parser.add_argument("--max-new-tokens", type=int, default=400)
+    parser.add_argument("--max-new-tokens", type=optional_positive_int, default=None)
     parser.add_argument("--embedding-name", default=None)
     parser.add_argument("--embedding-base-url", default=None)
     parser.add_argument("--embedding-batch-size", type=int, default=16)

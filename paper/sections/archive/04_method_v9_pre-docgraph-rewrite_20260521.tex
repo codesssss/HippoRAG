@@ -1,0 +1,223 @@
+% =====================================================================
+% Section 4: Method — EvidenceLink
+% =====================================================================
+%
+% Status: Draft §4 Method v8 (2026-05-17)
+%   v8: §4 opening rewritten as a Figure 1 walkthrough per advisor
+%       feedback ("opening should be a brief description of the
+%       method figure"). Body §4.1/§4.2/§4.3 untouched in this revision.
+%   v7.5 (pre-opening): §4.3 reframed as Evidence-Aware Retrieval
+%       Optimization, 4 equations, problem-then-solution framing.
+%   v7.4: bodies stable, pre-opening checkpoint archived.
+%
+% Method name: \methodname (defined via \newcommand in main file)
+% Forward reference: fig:overview (figure to be added in figures/)
+%
+% =====================================================================
+
+\section{Method: \methodname{}}
+\label{sec:method}
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.92\linewidth}{\centering\vspace{1.5em}
+\textit{Overview of \methodname{}.}\\[0.3em]
+Indexing: corpus $\to$ fact-source substrate.\\
+Retrieval: $G_q \to H_q \to \pi_q \to s_{\mathrm{ppr}}$.\\
+Optimization: evidence-need mining + coverage-aware reranking $\to R_q$.
+\vspace{1.5em}}}
+\caption{Overview of \methodname{}. Indexing builds a fact-source
+substrate that links each OpenIE fact to its source passage through
+endpoint and source edges. Given a query, a query-local subgraph
+$G_q$ is induced over this substrate, and a personalized PageRank on
+the derived graph $H_q$ produces an evidence flow $\pi_q$ and a base
+passage score $s_{\mathrm{ppr}}$. Two evidence-aware steps then
+extend the candidate pool through evidence-need mining and
+form the final ranked evidence list $R_q$ via coverage-aware
+reranking.}
+\label{fig:overview}
+\end{figure}
+
+We propose \methodname{}, a graph-based retrieval algorithm that
+treats graph propagation as the start of evidence selection rather
+than the final ranking (Figure~\ref{fig:overview}). \methodname{}
+builds a fact-source substrate (\S\ref{sec:method:substrate}),
+induces a query-local subgraph and runs personalized PageRank over
+its fact nodes (\S\ref{sec:method:retrieval}), then refines the
+ranking with evidence-need mining and coverage-aware reranking
+(\S\ref{sec:method:enhancement}).
+
+\subsection{Offline Indexing: A Fact-Source Substrate}
+\label{sec:method:substrate}
+
+Our indexing differs from the standard passage--phrase formulation
+of HippoRAG-style systems in a single move: we promote each OpenIE
+fact to a graph node and tie it to its source passage. The
+resulting \emph{fact-source} substrate is indexed once for the
+corpus, on which the propagation of \S\ref{sec:method:retrieval}
+runs.
+
+\paragraph{Knowledge Extraction.}
+For each document $d \in \mathcal{D}$, a language model extracts
+OpenIE facts $f=(h,r,t)$ with argument phrases $h, t$ and relation
+phrase $r$
+\citep{angeli2015leveraging,gutierrez2025hipporag}. We retain every
+fact as a first-class indexing unit and bind it to its source via
+$\mathrm{src}(f)=d$, yielding a global fact set $\mathcal{F}$ with
+$\mathcal{F}_d = \{f\in\mathcal{F} : \mathrm{src}(f)=d\}$. Retaining
+$f$ together with $\mathrm{src}(f)$ keeps the relational triple
+intact, so a fact's role in retrieval is determined by both its
+argument structure and its source passage rather than by its
+endpoints alone.
+
+\paragraph{Graph Construction.}
+Beyond the passage--phrase edges of standard OpenIE graphs, the
+fact-source substrate adds two structural elements that tie facts
+to provenance. \emph{Endpoint edges} connect two facts that share
+at least one informative argument phrase under
+$\{h,t\}\cap\{h',t'\}\neq\emptyset$ from different source passages,
+encoding cross-document mentions of the same entity.
+\emph{Co-source edges} (used interchangeably with \emph{source
+edges} below) connect facts with
+$\mathrm{src}(f)=\mathrm{src}(f')$, encoding co-assertion within a
+passage. A \emph{provenance link} from each fact to
+$\mathrm{src}(f)$ is a fact-to-passage pointer used only for
+readout, not for PPR propagation. Dense embeddings of fact units
+and relation phrases are pre-computed; the substrate is
+materialized as an adjacency index with a hub-degree cap of $30$
+and a synonymy threshold of $0.85$ on dense endpoint similarity
+(Appendix~\ref{app:hyperparams}).
+
+\subsection{Evidence-Driven Local Graph Retrieval}
+\label{sec:method:retrieval}
+
+\paragraph{Query-local subgraph.}
+Given $q$, \methodname{} first induces a query-local subgraph $G_q$
+that selects the part of the offline fact-source substrate
+considered for the query. We extract entity anchors
+$A(q) \subseteq \mathcal{V}_{\mathrm{phr}}$ from $q$ using a
+controlled language model that operates on the question only,
+never on retrieved documents, and a standard dense retriever
+provides an entry signal $\mathrm{Entry}(q) \subseteq \mathcal{D}$.
+Let $\mathcal{S}_q$ denote the seed passage set, formed by the
+union of $\mathrm{Entry}(q)$ and the source passages of facts whose
+endpoints overlap $A(q)$. From this seed set, $G_q$ is the
+$h$-hop induced subgraph over the substrate of
+\S\ref{sec:method:substrate},
+\begin{equation}
+\label{eq:gq-induced}
+G_q = \mathcal{N}_{h}\!\left(\mathcal{S}_q\right),
+\end{equation}
+where $\mathcal{N}_{h}(\cdot)$ takes the bounded-hop neighborhood
+along endpoint and source edges. $G_q$ keeps the activated region
+compact while still admitting passages reachable through multi-hop
+entity chains even when their surface similarity to $q$ is low.
+
+\paragraph{Local Graph Diffusion.}
+We build a derived graph $H_q$ over the local fact nodes of $G_q$
+and run a personalized PageRank on it: a fact $f$ enters
+$\mathcal{F}_q$ when $\mathrm{src}(f)\in G_q$, endpoint edges carry
+mass across passages, and source edges carry mass within a passage.
+The local PPR equation is
+\begin{equation}
+\label{eq:local-ppr}
+\pi_q = \alpha\, s_q + (1-\alpha)\, P_q^{\!\top}\, \pi_q,
+\end{equation}
+where $s_q$ places mass on facts whose arguments include an anchor
+in $A(q)$, weighted by entry scores of the corresponding passages,
+and $P_q$ is the row-normalized transition matrix over the local
+fact edges (no edge-type balancing beyond the hub cap of
+\S\ref{sec:method:substrate}). We use local push with $\alpha=0.2$
+and residual threshold $10^{-6}$. The passage score aggregates
+stationary mass on facts grounded in $d$,
+$s_{\mathrm{ppr}}(d\mid q)=|\mathcal{F}_{q,d}|^{-1/2}\sum_{f\in\mathcal{F}_{q,d}}\pi_q(f)$
+with $\mathcal{F}_{q,d}=\{f\in\mathcal{F}_q:\mathrm{src}(f)=d\}$;
+the square-root normalization prevents passages with many facts
+from dominating by length while preserving multi-fact evidence.
+We call $\pi_q$ the \emph{evidence flow}, and refer to this stage
+as \emph{local graph retrieval} when discussing ablations
+(\S\ref{sec:experiments:ablation}).
+
+\subsection{Evidence-Coverage-Aware Retrieval Optimization}
+\label{sec:method:enhancement}
+
+The local-graph-retrieval ranking $s_{\mathrm{ppr}}$ is graph-aware
+but treats each passage in isolation, so two reader-facing problems
+remain. A passage on a multi-hop chain can fall outside $G_q$ and
+receive little $\pi_q$-mass even when its relation phrase exactly
+matches what $q$ asks for. The head of the ranking can also crowd
+around a single entity neighborhood, leaving other entities or
+relations demanded by $q$ uncovered in any short prefix. We
+extend $s_{\mathrm{ppr}}$ with two evidence-aware steps. We first
+\emph{mine the evidence the query still needs}, enlarging the
+candidate pool through query-relevant relations. We then apply a
+set-based reranking step to the resulting candidate set, so that
+the final reader prefix addresses distinct question-side
+requirements rather than repeating the strongest neighborhood.
+
+\paragraph{Evidence-need mining.}
+This step targets bridge-underweighting by admitting passages,
+including passages outside $G_q$, whose relation phrase carries
+query-relevant evidence. For a candidate fact $e=(h_e,r_e,t_e)\in
+\mathcal{F}$ with $\mathrm{src}(e)=d$, we combine the largest
+$\pi_q$-mass on a local fact $f=(h_f,r_f,t_f)\in\mathcal{F}_q$
+sharing an argument phrase with $e$ and the dense compatibility
+between $r_e$ and $q$,
+\begin{equation}
+\label{eq:expansion-score}
+\begin{aligned}
+s_{\mathrm{exp}}(d \mid q)
+= {}& \max_{\substack{e:\,\mathrm{src}(e)=d \\ f \in \mathcal{F}_q}}
+\Bigl\{\\[-0.3em]
+&\pi_q(f)\,\bigl[\sigma(\mathbf{r}_e,\mathbf{q})\bigr]_{+}\\
+&{}\cdot\mathbf{1}\!\left[
+\{h_f,t_f\}\cap\{h_e,t_e\}\neq\emptyset
+\right]\Bigr\},
+\end{aligned}
+\end{equation}
+where $\sigma$ is cosine similarity and $[x]_{+}=\max(x,0)$. The
+base score linearly combines the two signals,
+\begin{equation}
+\label{eq:base-score}
+s_{\mathrm{base}}(d \mid q)
+=
+s_{\mathrm{ppr}}(d \mid q)
++
+\eta\,s_{\mathrm{exp}}(d \mid q),
+\end{equation}
+with $\eta$ tuned once on a development split. Let $C_q$ denote
+the union of passages scored by local-graph retrieval and passages
+admitted by evidence-need mining.
+
+\paragraph{Coverage-aware reranking.}
+This step targets entity-neighborhood crowding by selecting
+passages that collectively address the distinct question-side
+requirements $B(q)=\{b_1,b_2,\ldots\}$ extracted from $q$ by the
+same controlled language model used for $A(q)$. For passage $d$
+and requirement $b$, $\phi_{d,b}\in[0,1]$ is the NV-Embed-v2
+cosine similarity between $d$ and the requirement subquery,
+min--max normalized over $C_q$ and multiplied by the normalized
+$d$-to-entity compatibility when $b$ depends on a resolved bridge
+entity. Defining
+$\mathrm{Cov}_q(R)=\sum_{b\in B(q)}\bigl[1-\prod_{d'\in R}(1-\phi_{d',b})\bigr]$,
+the marginal coverage gain of adding $d$ is
+\begin{equation}
+\label{eq:marginal-gain}
+\Delta_q(d \mid R) = \mathrm{Cov}_q(R\cup\{d\}) - \mathrm{Cov}_q(R).
+\end{equation}
+We form $R_q$ through a \emph{preservation-constrained} readout:
+the top-$M$ entries of $s_{\mathrm{base}}$ form a fixed prefix
+$P_q$ with $M=K-1$, and greedy MMR-style set selection
+\citep{carbonell1998mmr,lin2011submodular} fills the residual
+$K-M$ slots, at each step adding
+\begin{equation}
+\label{eq:greedy-rerank}
+d^{*}
+=
+\operatorname*{arg\,max}_{d \in C_q \setminus (P_q \cup R)}
+\lambda\,s_{\mathrm{base}}(d \mid q)
++
+(1-\lambda)\,\Delta_q(d \mid P_q \cup R),
+\end{equation}
+with $\lambda\in[0,1]$ tuned once on a development split. The
+reader consumes any prefix of $R_q$.

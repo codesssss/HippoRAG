@@ -1,4 +1,4 @@
-"""Trace helpers for the PCEC readout component used by EvidenceFlow."""
+"""Trace helpers for the PCEC readout component used by EvidenceLink."""
 
 from __future__ import annotations
 

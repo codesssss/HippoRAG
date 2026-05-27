@@ -28,16 +28,26 @@ from src.hipporag.utils.misc_utils import QuerySolution
 
 
 JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
+THINK_BLOCK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
 
 
-def get_gold_docs(samples: list[dict[str, Any]]) -> list[list[str]]:
+def strip_think_blocks(raw: str) -> str:
+    return THINK_BLOCK_RE.sub("", str(raw or "")).strip()
+
+
+def get_gold_docs(samples: list[dict[str, Any]], corpus_by_title: dict[str, str] | None = None) -> list[list[str]]:
     gold_docs: list[list[str]] = []
     for sample in samples:
         docs: list[str] = []
         paragraphs = sample.get("paragraphs") or []
         if paragraphs:
             docs = [
-                para["title"] + "\n" + (para.get("text") or para.get("paragraph_text") or "")
+                corpus_by_title.get(
+                    str(para["title"]),
+                    para["title"] + "\n" + (para.get("text") or para.get("paragraph_text") or ""),
+                )
+                if corpus_by_title
+                else para["title"] + "\n" + (para.get("text") or para.get("paragraph_text") or "")
                 for para in paragraphs
                 if para.get("is_supporting") is not False
             ]
@@ -48,7 +58,9 @@ def get_gold_docs(samples: list[dict[str, Any]]) -> list[list[str]]:
             }
             support_titles = [str(row[0]) for row in sample.get("supporting_facts") or [] if row]
             docs = [
-                f"{title}\n{context_by_title[title]}"
+                corpus_by_title.get(title, f"{title}\n{context_by_title[title]}")
+                if corpus_by_title
+                else f"{title}\n{context_by_title[title]}"
                 for title in support_titles
                 if title in context_by_title
             ]
@@ -72,6 +84,7 @@ def call_chat(base_url: str, model: str, prompt: str, timeout: int) -> tuple[str
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.0,
         "max_tokens": 256,
+        "chat_template_kwargs": {"enable_thinking": False},
     }
     req = urllib.request.Request(
         url,
@@ -81,7 +94,7 @@ def call_chat(base_url: str, model: str, prompt: str, timeout: int) -> tuple[str
     )
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         payload = json.loads(resp.read().decode("utf-8"))
-    content = payload["choices"][0]["message"]["content"]
+    content = strip_think_blocks(payload["choices"][0]["message"]["content"])
     usage = payload.get("usage") or {}
     return content, usage
 
@@ -104,7 +117,19 @@ def build_followup_prompt(question: str, evidence_docs: list[str], step: int) ->
 
 
 def parse_followup_query(raw: str, fallback: str) -> str:
-    match = JSON_RE.search(raw or "")
+    cleaned_raw = strip_think_blocks(raw)
+    decoder = json.JSONDecoder()
+    for start_idx, char in enumerate(cleaned_raw):
+        if char != "{":
+            continue
+        try:
+            payload, _ = decoder.raw_decode(cleaned_raw[start_idx:])
+            query = str(payload.get("query") or "").strip()
+            if query:
+                return query
+        except (json.JSONDecodeError, AttributeError):
+            continue
+    match = JSON_RE.search(cleaned_raw)
     if match:
         try:
             payload = json.loads(match.group(0))
@@ -113,7 +138,7 @@ def parse_followup_query(raw: str, fallback: str) -> str:
                 return query
         except json.JSONDecodeError:
             pass
-    cleaned = " ".join(str(raw or "").split())
+    cleaned = " ".join(cleaned_raw.split())
     return cleaned[:240] if cleaned else fallback
 
 
@@ -225,6 +250,28 @@ def write_markdown(report: dict[str, Any], path: Path) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def title_from_doc(doc: str) -> str:
+    return str(doc or "").split("\n", 1)[0].strip()
+
+
+def compute_title_recall(
+    gold_docs: list[list[str]],
+    retrieved_docs: list[list[str]],
+    k_list: list[int],
+) -> dict[str, float]:
+    metrics: dict[str, float] = {}
+    for k in sorted(set(k_list)):
+        scores: list[float] = []
+        for example_gold_docs, example_retrieved_docs in zip(gold_docs, retrieved_docs):
+            gold_titles = {title_from_doc(doc) for doc in example_gold_docs}
+            retrieved_titles = {title_from_doc(doc) for doc in example_retrieved_docs[:k]}
+            scores.append(
+                0.0 if not gold_titles else len(gold_titles & retrieved_titles) / len(gold_titles)
+            )
+        metrics[f"Recall@{k}"] = round(float(np.mean(scores)) if scores else 0.0, 4)
+    return metrics
+
+
 def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
     corpus_path = Path(args.dataset_dir) / f"{args.dataset}_corpus.json"
     sample_path = Path(args.dataset_dir) / f"{args.dataset}.json"
@@ -234,8 +281,9 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
         samples = samples[: args.limit]
 
     docs = [f"{doc['title']}\n{doc['text']}" for doc in corpus]
+    corpus_by_title = {title_from_doc(doc): doc for doc in docs}
     queries = [sample["question"] for sample in samples]
-    gold_docs = get_gold_docs(samples)
+    gold_docs = get_gold_docs(samples, corpus_by_title=corpus_by_title)
     gold_answers = get_gold_answers(samples)
     config = build_config(args, corpus_len=len(corpus))
     hipporag = HippoRAG(global_config=config)
@@ -304,16 +352,32 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
             )
         )
 
-    final_solutions, responses, metadata, _, overall_qa_results = hipporag.rag_qa(
-        queries=final_solutions,
-        gold_docs=gold_docs,
-        gold_answers=gold_answers,
-    )
-    retrieval_metrics, _ = RetrievalRecall(global_config=config).calculate_metric_scores(
+    exact_retrieval_metrics, _ = RetrievalRecall(global_config=config).calculate_metric_scores(
         gold_docs=gold_docs,
         retrieved_docs=[qs.docs for qs in final_solutions],
         k_list=[1, 2, 5, 10, 20],
     )
+    title_retrieval_metrics = compute_title_recall(
+        gold_docs=gold_docs,
+        retrieved_docs=[qs.docs for qs in final_solutions],
+        k_list=[1, 2, 5, 10, 20],
+    )
+    retrieval_metrics = {
+        **title_retrieval_metrics,
+        "recomputed_title_recall": title_retrieval_metrics,
+        "exact_doc_recall": exact_retrieval_metrics,
+    }
+
+    if bool(args.skip_qa):
+        responses = [""] * len(final_solutions)
+        metadata = [{} for _ in final_solutions]
+        overall_qa_results: dict[str, Any] = {}
+    else:
+        final_solutions, responses, metadata, _, overall_qa_results = hipporag.rag_qa(
+            queries=final_solutions,
+            gold_docs=gold_docs,
+            gold_answers=gold_answers,
+        )
 
     traces: list[dict[str, Any]] = []
     ems: list[float] = []
@@ -348,8 +412,27 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
     answer_em_mean = float(np.mean(ems)) if ems else 0.0
     answer_f1_mean = float(np.mean(f1s)) if f1s else 0.0
     support_recall_mean = float(np.mean(support_recalls)) if support_recalls else 0.0
+    examples = [
+        {
+            "query_index": q_idx,
+            "question": queries[q_idx],
+            "gold_answers": gold_answers[q_idx],
+            "gold_titles": [title_from_doc(doc) for doc in gold_docs[q_idx]],
+            "docs": final_solutions[q_idx].docs,
+            "retrieved_doc_ids": list(range(len(final_solutions[q_idx].docs))),
+            "retrieval_trace": {
+                "method": "ircot_style",
+                "max_iter": int(args.max_iter),
+                "top_k_per_iter": int(args.top_k_per_iter),
+                "final_doc_order": str(args.final_doc_order),
+                "generated_queries": generated_queries[q_idx],
+            },
+        }
+        for q_idx in range(len(final_solutions))
+    ]
     return {
         "status": "completed",
+        "format": "ircot_reader_input_v1" if bool(args.skip_qa) else "ircot_full_report_v1",
         "dataset": args.dataset,
         "limit": len(samples),
         "max_iter": int(args.max_iter),
@@ -365,12 +448,14 @@ def run_ircot(args: argparse.Namespace) -> dict[str, Any]:
             "supporting_paragraph_recall": support_recall_mean,
         },
         "retrieval": retrieval_metrics,
+        "overall_recomputed": retrieval_metrics,
         "llm_query_calls": llm_query_calls,
-        "llm_calls_per_query": (llm_query_calls + len(samples)) / max(1, len(samples)),
+        "llm_calls_per_query": (llm_query_calls + (0 if bool(args.skip_qa) else len(samples))) / max(1, len(samples)),
         "retrieved_passages_per_query": int(args.max_iter) * int(args.top_k_per_iter),
         "latency_per_query": elapsed / max(1, len(samples)),
         "elapsed_seconds": elapsed,
         "llm_errors": llm_errors[:50],
+        "examples": examples,
         "traces": traces,
         "overall_qa_results": overall_qa_results,
     }
@@ -398,6 +483,7 @@ def main() -> None:
     parser.add_argument("--embedding_name", default="VLLM/nvidia/NV-Embed-v2")
     parser.add_argument("--embedding_base_url", default="http://localhost:8019/v1/embeddings")
     parser.add_argument("--timeout", type=int, default=120)
+    parser.add_argument("--skip_qa", action="store_true")
     parser.add_argument("--replay_report", default="")
     parser.add_argument("--report_json", default="reports/week0/ircot_musique1000.json")
     parser.add_argument("--report_md", default="reports/week0/ircot_baseline.md")

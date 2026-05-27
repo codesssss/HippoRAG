@@ -1,0 +1,52 @@
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
+
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+
+\newcommand{\methodname}{EvidenceFlow}
+
+\title{EvidenceFlow: Query-Conditioned Evidence Propagation for Multi-Hop Retrieval}
+\author{Anonymous ACL submission}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Multi-hop question answering requires retrieval systems to surface
+evidence that is not only individually relevant to a question, but also
+connected across documents and covering the entities and relations needed
+by a downstream reader. We present \methodname{}, a graph-based retrieval
+framework that models multi-hop retrieval as query-conditioned evidence
+propagation over a document-grounded OpenIE graph. \methodname{} builds a
+multi-layer OpenIE graph at indexing time, runs query-local fact-level
+personalized PageRank to obtain an evidence flow, and enhances the final
+ranked evidence list through relation-grounded expansion and
+coverage-aware reranking. Experiments on HotpotQA, 2WikiMultiHopQA, and
+MuSiQue compare \methodname{} with dense, graph-based, and
+chain-oriented retrieval baselines under a unified GPT-4o-mini reader.
+The results show consistent gains in retrieval quality and downstream QA,
+with ablations confirming the contributions of local evidence
+propagation, relation-grounded expansion, and coverage-aware reranking.
+\end{abstract}
+
+\input{sections/01_intro}
+\input{sections/02_related}
+\input{sections/03_problem_formulation}
+\input{sections/04_method}
+\input{sections/05_experiments}
+
+\bibliography{related_refs}
+
+\appendix
+\input{sections/A_appendix}
+
+\end{document}

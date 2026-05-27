@@ -43,6 +43,7 @@ from source_authorized_vocab_strict_retrieval.evaluate_report import (
 )
 from source_authorized_vocab_strict_retrieval.export_qa_transition_report import (
     QUERY_GROUNDED_STO_QA_METHOD,
+    QUERY_GROUNDED_STO_V2_QA_METHOD,
     export_qa_transition_report,
 )
 from src.hipporag.embedding_model import _get_embedding_model_class
@@ -55,7 +56,7 @@ from src.hipporag.utils.misc_utils import compute_mdhash_id
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_DATASETS = ("2wikimultihopqa", "musique", "hotpotqa")
+SUPPORTED_DATASETS = ("2wikimultihopqa", "musique", "hotpotqa", "nq_rear", "popqa")
 DEFAULT_DATA_ROOT = Path("reproduce/dataset")
 DEFAULT_LLM_BASE_URL = "https://yunwu.ai/v1"
 DEFAULT_LLM_NAME = "gpt-4o-mini"
@@ -63,6 +64,28 @@ DEFAULT_EMBEDDING_NAME = "nvidia/NV-Embed-v2"
 DEFAULT_EMBEDDING_BASE_URL = "http://localhost:8019/v1/embeddings"
 DEFAULT_READER_LLM_NAME = "qwen3-8b-train"
 DEFAULT_READER_LLM_BASE_URL = "http://localhost:8041/v1"
+ETV2_RUNNERS = frozenset(
+    {
+        "agsto_graph_native_v2",
+        "query_grounded_sto_graph_native_v2",
+        "evidence_transition_v2",
+    }
+)
+
+
+def retrieval_output_stem(*, dataset: str, runner: str) -> str:
+    method_suffix = "query_grounded_sto_v2" if str(runner) in ETV2_RUNNERS else "query_grounded_sto"
+    return f"{dataset}_fresh_{method_suffix}_retrieval"
+
+
+def qa_output_stem(*, runner: str) -> str:
+    method_suffix = "query_grounded_sto_v2" if str(runner) in ETV2_RUNNERS else "query_grounded_sto"
+    return f"fresh_{method_suffix}_qa"
+
+
+def summary_output_stem(*, runner: str) -> str:
+    method_suffix = "query_grounded_sto_v2" if str(runner) in ETV2_RUNNERS else "query_grounded_sto"
+    return f"fresh_{method_suffix}_summary"
 
 
 @dataclass(frozen=True)
@@ -273,9 +296,13 @@ def build_fresh_sto_index(
         "max_retry_attempts": max(int(max_retry_attempts), 1),
         "force_index_from_scratch": True,
         "force_openie_from_scratch": True,
+        # STO GraphRAG consumes entities/triples only; causal OpenIE is unused here.
+        "causal_enabled": False,
         "qwen_disable_thinking": bool(qwen_disable_thinking),
     }
     config = BaseConfig(**{key: value for key, value in config_kwargs.items() if key in config_field_names})
+    if "causal_enabled" not in config_field_names:
+        setattr(config, "causal_enabled", False)
     if "qwen_disable_thinking" not in config_field_names:
         setattr(config, "qwen_disable_thinking", bool(qwen_disable_thinking))
 
@@ -415,9 +442,13 @@ def write_summary_markdown(
     if qa_payload:
         for dataset in qa_payload.get("datasets", []) or []:
             methods = dataset.get("methods", {}) or {}
-            method_result = methods.get(QUERY_GROUNDED_STO_QA_METHOD, {}) or methods.get(
-                "source_authorized_vocab_strict_graphrag",
-                {},
+            method_result = (
+                methods.get(QUERY_GROUNDED_STO_V2_QA_METHOD, {})
+                or methods.get(QUERY_GROUNDED_STO_QA_METHOD, {})
+                or methods.get(
+                    "source_authorized_vocab_strict_graphrag",
+                    {},
+                )
             )
             qa_by_dataset[str(dataset.get("dataset") or "")] = method_result.get("metrics", {}) or {}
 
@@ -561,11 +592,17 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
         source_prior_policy="dense_head",
     )
 
+    output_stem = retrieval_output_stem(dataset=dataset, runner=str(args.runner))
+    output_json = reports_dir / f"{output_stem}.json"
+    output_md = reports_dir / f"{output_stem}.md"
+
     payload = {
         "method": method_name_for_runner(str(args.runner)),
         "runner": str(args.runner),
         "dataset": dataset,
         "input_report": str(report_path.resolve()),
+        "retrieval_output_json": str(output_json.resolve()),
+        "retrieval_output_md": str(output_md.resolve()),
         "openie_path": str(artifacts.openie_path.resolve()),
         "source_variant": str(args.variant),
         "fresh_index": {
@@ -614,8 +651,6 @@ def run_one_dataset(args: argparse.Namespace, dataset: str) -> Mapping[str, Any]
         },
         **dataset_result,
     }
-    output_json = reports_dir / f"{dataset}_fresh_query_grounded_sto_retrieval.json"
-    output_md = reports_dir / f"{dataset}_fresh_query_grounded_sto_retrieval.md"
     output_json.parent.mkdir(parents=True, exist_ok=True)
     output_json.write_text(
         json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True) + "\n",
@@ -638,25 +673,33 @@ def run_optional_qa(
     install_openai_client_api_key(base_url=str(args.reader_llm_base_url or ""))
     output_root = Path(args.output_root).expanduser()
     retrieval_jsons = [
-        Path(str(payload["input_report"])).parent
+        Path(str(payload.get("retrieval_output_json") or "")).expanduser()
+        if payload.get("retrieval_output_json")
+        else Path(str(payload["input_report"])).parent
         / f"{payload['dataset']}_fresh_query_grounded_sto_retrieval.json"
         for payload in retrieval_payloads
     ]
-    qa_input = output_root / "reports" / "fresh_query_grounded_sto_qa_input.json"
+    qa_method = (
+        QUERY_GROUNDED_STO_V2_QA_METHOD
+        if str(args.runner) in ETV2_RUNNERS
+        else QUERY_GROUNDED_STO_QA_METHOD
+    )
+    qa_stem = qa_output_stem(runner=str(args.runner))
+    qa_input = output_root / "reports" / f"{qa_stem}_input.json"
     export_qa_transition_report(
         input_jsons=retrieval_jsons,
         output_json=qa_input,
-        public_method=QUERY_GROUNDED_STO_QA_METHOD,
+        public_method=qa_method,
     )
-    qa_json = output_root / "reports" / "fresh_query_grounded_sto_qa.json"
-    qa_md = output_root / "reports" / "fresh_query_grounded_sto_qa.md"
+    qa_json = output_root / "reports" / f"{qa_stem}.json"
+    qa_md = output_root / "reports" / f"{qa_stem}.md"
     qa_args = [
         "--transition-report",
         str(qa_input),
         "--datasets",
         ",".join(str(payload["dataset"]) for payload in retrieval_payloads),
         "--methods",
-        QUERY_GROUNDED_STO_QA_METHOD,
+        qa_method,
         "--max-queries",
         str(max(int(args.max_queries), 0)),
         "--qa-top-k",
@@ -724,7 +767,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--variant", default="hipporag_v2")
     parser.add_argument(
         "--runner",
-        choices=("query_grounded_sto_graph_native", "agsto_graph_native"),
+        choices=(
+            "query_grounded_sto_graph_native",
+            "agsto_graph_native",
+            "query_grounded_sto_graph_native_v2",
+            "agsto_graph_native_v2",
+            "evidence_transition_v2",
+        ),
         default="query_grounded_sto_graph_native",
     )
     parser.add_argument(
@@ -775,13 +824,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
     args = build_arg_parser().parse_args(argv)
     if bool(args.reuse_current_fresh_index) and bool(args.overwrite_fresh_index):
         raise ValueError("--reuse-current-fresh-index cannot be combined with --overwrite-fresh-index")
     datasets = parse_datasets(args.datasets)
     retrieval_payloads = [run_one_dataset(args, dataset) for dataset in datasets]
     qa_payload = run_optional_qa(args=args, retrieval_payloads=retrieval_payloads)
-    summary_md = Path(args.output_root).expanduser() / "reports" / "fresh_query_grounded_sto_summary.md"
+    summary_md = (
+        Path(args.output_root).expanduser()
+        / "reports"
+        / f"{summary_output_stem(runner=str(args.runner))}.md"
+    )
     write_summary_markdown(
         output_md=summary_md,
         retrieval_payloads=retrieval_payloads,

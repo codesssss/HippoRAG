@@ -1,6 +1,8 @@
-# EvidenceFlow
+# EvidenceLink
 
-This package is the canonical implementation boundary for EvidenceFlow.
+This package is the canonical implementation boundary for EvidenceLink.  The
+folder remains `evidenceflow` for compatibility with existing run logs and
+scripts.
 The main reported protocol is:
 
 ```text
@@ -10,7 +12,7 @@ ETv4 fact-witnessed STO candidate pool
 ```
 
 The bundled frozen ETv3 path is retained for legacy/fresh parity experiments.
-It is not the upstream retriever for the main Table-1 EvidenceFlow row.
+It is not the upstream retriever for the main Table-1 EvidenceLink row.
 
 Canonical full1000 protocol and results:
 
@@ -24,7 +26,7 @@ docs/pcec_full1000_protocol_20260511.md
 | --- | --- |
 | Folder | `evidenceflow` |
 | Compatibility import | `evidence_transition_graphragv4_composition` |
-| Paper-facing method | EvidenceFlow |
+| Paper-facing method | EvidenceLink |
 | Main upstream retriever | `evidence_transition_graphragv4_fact_witnessed_sto` |
 | Main entrypoint | `evidenceflow/run_native_pool.py` |
 | Main pool provenance key | `retrieval.input_method` |
@@ -39,7 +41,7 @@ docs/pcec_full1000_protocol_20260511.md
 | Admission objective | DBEC frozen-binding noisy-OR marginal coverage |
 | Ordering | Preserve ET prefix order; admitted residual fills the displaced slot |
 
-EvidenceFlow is not a fact-node PageRank implementation, and the main reported
+EvidenceLink is not a fact-node PageRank implementation, and the main reported
 row is not produced by the frozen ETv3 fresh adapter.  The ETv4 upstream
 retriever exports a source-grounded document-transition pool; PCEC then
 optimizes the fixed reader prefix.  PCEC is not a weighted reranker and not a
@@ -56,7 +58,7 @@ DBEC utility improves over the ET top-5 baseline.
 
 ## Run
 
-Run the main EvidenceFlow readout on an exported ETv4 pool and matching
+Run the main EvidenceLink readout on an exported ETv4 pool and matching
 requirement/binding artifacts:
 
 ```bash
@@ -92,7 +94,7 @@ The output JSON is postprocessed with `pcec_contract`, `pcec_config`,
 ## Native Pool Readout
 
 Run native PCEC readout on an existing exported pool without subprocess-running
-the legacy DBEC evaluator.  This is the main EvidenceFlow entrypoint when the
+the legacy DBEC evaluator.  This is the main EvidenceLink entrypoint when the
 pool JSON records `retrieval.input_method =
 evidence_transition_graphragv4_fact_witnessed_sto`.
 
@@ -159,7 +161,7 @@ It imports only from the package-local frozen snapshot under
 does not import the live ETv3 branch and does not subprocess-run
 `scripts/eval_causal_qwen3.py`.
 Its output metadata is marked as `legacy_etv3_fresh_adapter`; it should not be
-used as the provenance for the main EvidenceFlow table row.
+used as the provenance for the main EvidenceLink table row.
 
 Legacy imports and top-level runner paths under
 `evidence_transition_graphragv4_composition/` are compatibility shims.  New

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>EvidenceFlow §4 Method — Bilingual</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  body { font-family: "Times New Roman", "Songti SC", serif; max-width: 1280px; margin: 32px auto; padding: 0 24px; line-height: 1.55; color: #222; }
+  h1 { font-size: 22px; border-bottom: 2px solid #444; padding-bottom: 6px; margin-top: 0; }
+  h2 { font-size: 18px; margin-top: 28px; color: #1a3d6e; border-left: 4px solid #1a3d6e; padding-left: 8px; }
+  h3 { font-size: 15px; margin-top: 20px; color: #444; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; table-layout: fixed; }
+  td { vertical-align: top; padding: 10px 14px; border: 1px solid #ddd; width: 50%; }
+  td.en { background: #fafafa; font-family: "Times New Roman", Cambria, serif; }
+  td.cn { background: #fdfcf6; font-family: "Songti SC", "SimSun", "PingFang SC", serif; }
+  .meta { font-size: 12px; color: #888; margin-bottom: 16px; }
+  .para-label { font-size: 11px; color: #1a3d6e; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+  .eq { background: #f0f4fa; padding: 10px 16px; margin: 8px 0; border-left: 3px solid #1a3d6e; }
+  .term { font-style: italic; font-weight: 600; color: #5c2d8a; }
+  em { color: #5c2d8a; }
+  strong { color: #1a3d6e; }
+  .cite { color: #666; font-size: 90%; }
+  hr { border: none; border-top: 1px dashed #ccc; margin: 22px 0; }
+  .toc { background: #f7f7f7; border: 1px solid #ddd; padding: 12px 18px; margin: 18px 0; font-size: 13px; }
+  .toc a { color: #1a3d6e; text-decoration: none; margin-right: 16px; }
+  @media print {
+    body { max-width: none; margin: 0; padding: 12mm; }
+    h2 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Section 4 — Method: EvidenceFlow（中英对照）</h1>
+<div class="meta">Generated 2026-05-15 · Source: <code>paper/sections/04_method.tex</code> · Math via MathJax</div>
+
+<div class="toc">
+  <strong>目录：</strong>
+  <a href="#s41">§4.1 Overview</a>
+  <a href="#s42">§4.2 Fact Substrate</a>
+  <a href="#s43">§4.3 Question-Anchored Graph</a>
+  <a href="#s44">§4.4 Fact-Witnessed Transitions</a>
+  <a href="#s45">§4.5 Reader-Boundary Chain Integrity</a>
+</div>
+
+<!-- ===================================================================== -->
+<h2 id="s41">§4.1 Overview: Evidence Flow over a Query-Local Graph<br><span style="font-size:14px;color:#888;font-weight:normal;">总览：在查询局部图上的证据流</span></h2>
+
+<div class="para-label">Paragraph 1 — Input/Output + Formation principle</div>
+<table>
+<tr>
+<td class="en">We treat multi-hop retrieval as the construction of a document-level evidence chain, rather than the independent ranking of documents. Given a question $q$, a corpus $\mathcal{D}$, and a pre-extracted fact substrate $\mathcal{F}$ derived from $\mathcal{D}$ during offline indexing, EvidenceFlow returns an evidence set $E_K \subseteq \mathcal{D}$ of size $K$ for the reader. The formation principle of $E_K$ is not that its documents are individually highly ranked against $q$, but that the set is constructed to prioritize connectivity through transitions that are witnessed by facts in $\mathcal{F}$.</td>
+<td class="cn">我们把多跳检索视作构建一条<strong>文档级证据链</strong>的过程，而不是对文档独立打分排序。给定问题 $q$、语料库 $\mathcal{D}$，以及离线索引阶段从 $\mathcal{D}$ 抽取出来的事实底层 $\mathcal{F}$，EvidenceFlow 为 reader 返回一个大小为 $K$ 的证据集 $E_K \subseteq \mathcal{D}$。$E_K$ 的<strong>形成原则</strong>不在于其中的文档<em>单独</em>对 $q$ 打分多高，而在于<strong>该集合被构造为优先考虑通过 $\mathcal{F}$ 中事实背书的 transition 所建立的连接性</strong>。</td>
+</tr>
+</table>
+
+<div class="para-label">Paragraph 2 — Core mechanism (query-local graph + fact-witness admission)</div>
+<table>
+<tr>
+<td class="en">The method operates on a <em>query-local document graph</em> $G_q = (V_q, A_q)$, instantiated per question rather than queried from a static pre-built knowledge graph. Vertices $V_q \subseteq \mathcal{D}$ are documents activated by the question, and an arc $(d_i, d_j) \in A_q$ is admitted only when facts in $\mathcal{F}$ provide a witness for the document-to-document movement implied by $q$. This admission rule is the central mechanism of EvidenceFlow: chain connectivity is a property of the retrieval graph itself, not a relation that a downstream module is asked to reconstruct over a flat passage pool.</td>
+<td class="cn">方法在一张 <span class="term">查询局部文档图</span> $G_q = (V_q, A_q)$ 上运行——这张图是<strong>为每个问题现拉的</strong>，而不是从一张静态预建的知识图谱里查出来的。顶点 $V_q \subseteq \mathcal{D}$ 是被该问题激活的文档；一条弧 $(d_i, d_j) \in A_q$ <strong>只有当 $\mathcal{F}$ 中的事实能为该问题暗含的文档间移动提供 witness 时</strong>才被准入。这条准入规则就是 EvidenceFlow 的核心机制：<strong>链的连接性是检索图本身的属性</strong>，不是某个下游模块被要求在无类型 passage pool 上重新构建的关系。</td>
+</tr>
+</table>
+
+<div class="para-label">Paragraph 3 — Four consequences (forward pointers)</div>
+<table>
+<tr>
+<td class="en">Four consequences follow from this view. <strong>First</strong>, the fact substrate is built once at indexing time and reused across questions (§4.2); <strong>at query time, no language model is invoked to perform OpenIE extraction over $\mathcal{D}$ or to generate evidence chains on retrieved text</strong>. <strong>Second</strong>, the activation of $G_q$ is anchored by entities mentioned in the question, and the entry signal from dense or lexical retrieval only seeds this activation rather than dictating the final evidence (§4.3). <strong>Third</strong>, the movement of evidence through $G_q$ is gated by fact witnesses, which makes each chain auditable back to source facts and their provenance in $\mathcal{D}$ (§4.4). <strong>Fourth</strong>, the reader receives $E_K$ under a chain-integrity boundary that prioritizes witnessed connectivity and admits residual documents when they provide evidence for still-open obligations induced by $q$ (§4.5).</td>
+<td class="cn">由此引出四个后果。<strong>第一</strong>，事实底层在索引阶段一次性建好，跨问题复用（§4.2）；<strong>query 时不调用任何语言模型对 $\mathcal{D}$ 做 OpenIE 抽取，也不调用语言模型在检索到的文本上生成证据链</strong>。<strong>第二</strong>，$G_q$ 的激活由问题里出现的实体来锚定，dense 或词项检索给出的入口信号<strong>只作为该激活的种子，而不决定最终证据</strong>（§4.3）。<strong>第三</strong>，证据在 $G_q$ 上的移动由 fact witness 把关，这使得每一条链都可以<strong>回溯到 $\mathcal{D}$ 中的源事实及其 provenance</strong>（§4.4）。<strong>第四</strong>，reader 在一个<span class="term">链完整性边界</span>下收到 $E_K$：这条边界优先考虑已被见证的连接性，<strong>当 residual 文档为 $q$ 引出的尚未闭合义务提供证据时</strong>才被准入（§4.5）。</td>
+</tr>
+</table>
+
+<div class="para-label">Paragraph 4 — End-to-end declaration</div>
+<table>
+<tr>
+<td class="en">Throughout, EvidenceFlow does not introduce a separate selection stage operating on a materialized candidate pool; the same query-local graph and the same fact-witness representation, together with the query-induced obligations that the boundary enforces, drive both how evidence is activated and how it is delivered to the reader.</td>
+<td class="cn">贯穿整个流程，EvidenceFlow <strong>不引入一个在已物化候选池上运行的独立选择阶段</strong>；同一张查询局部图、同一套 fact-witness 表征，加上边界处所执行的、由 query 引出的义务，<strong>既驱动证据如何被激活，也驱动证据如何被交付给 reader</strong>。</td>
+</tr>
+</table>
+
+<hr>
+
+<!-- ===================================================================== -->
+<h2 id="s42">§4.2 OpenIE Fact Substrate<br><span style="font-size:14px;color:#888;font-weight:normal;">OpenIE 事实底层</span></h2>
+
+<div class="para-label">Paragraph 1 — Substrate definition + "witness layer"</div>
+<table>
+<tr>
+<td class="en">The fact substrate $\mathcal{F}$ stores triples of the form $f = (s, r, o)$ extracted from individual documents in $\mathcal{D}$, with each triple anchored back to its source document via a provenance index. $\mathcal{F}$ is constructed once during offline indexing and is reused unchanged across all questions. Its role in EvidenceFlow is not to replace documents as the unit of evidence: the reader still consumes natural-language passages from $\mathcal{D}$. The substrate is the <em>witness layer</em> for document-to-document movement, supplying the auditable links that justify why two documents may belong to the same evidence chain under a given question.</td>
+<td class="cn">事实底层 $\mathcal{F}$ 存储形如 $f = (s, r, o)$ 的三元组，它们是从 $\mathcal{D}$ 中各篇文档抽取出来的，每个三元组通过 provenance 索引锚回其源文档。$\mathcal{F}$ <strong>在离线索引阶段一次性构造，跨所有问题原样复用</strong>。它在 EvidenceFlow 中的角色<strong>不是</strong>取代文档作为证据单元——reader <strong>仍然消费来自 $\mathcal{D}$ 的自然语言文段</strong>。Substrate 是文档间移动的 <span class="term">witness 层</span>，提供可追溯的连接，用以说明在给定问题下两篇文档为什么可以属于同一条证据链。</td>
+</tr>
+</table>
+
+<div class="para-label">Paragraph 2 — Extraction setup + contribution positioning + protocol red-line</div>
+<table>
+<tr>
+<td class="en">Extraction follows the standard open information extraction setup used in prior graph-based retrieval systems <span class="cite">(Angeli et al., 2015; Gutiérrez et al., 2025)</span>: a language model processes each document and emits its salient $(s, r, o)$ assertions, which are then deduplicated and indexed alongside their source documents. <strong>We deliberately keep the extractor fixed: the contribution of EvidenceFlow is not a new fact extractor, but a different role for the facts it produces — as witnesses for document-level transitions rather than as the reasoning substrate or as prompt augmentation</strong> (§4.4). For the witness layer, this is the <strong>only corpus-level LLM extraction pass</strong>: after indexing, no query triggers fresh OpenIE extraction, fact repair, or chain generation over $\mathcal{D}$.</td>
+<td class="cn">抽取遵循已有 graph-based 检索系统使用的标准 OpenIE 流程（Angeli 等, 2015；Gutiérrez 等, 2025）：一个语言模型逐文档处理并发出其显著的 $(s, r, o)$ 断言，这些断言随后被去重，并连同其源文档一起索引。<strong>我们刻意保持抽取器不变：EvidenceFlow 的贡献不在于一个新的事实抽取器，而在于其输出所担任的不同角色——作为文档级 transition 的 witness，而非作为推理 substrate 或 prompt 增强</strong>（§4.4）。就 witness 层而言，<strong>这是唯一的语料级 LLM 抽取 pass</strong>：一旦索引完成，任何 query 都不会触发对 $\mathcal{D}$ 的新一轮 OpenIE 抽取、事实修复或链生成。</td>
+</tr>
+</table>
+
+<div class="para-label">Paragraph 3 — Boundary against ToG / Relink / NeocorRAG</div>
+<table>
+<tr>
+<td class="en">This separation of roles distinguishes EvidenceFlow from two adjacent lines of work. <strong>Knowledge-graph reasoning approaches</strong> <span class="cite">(Sun et al., 2024; Huang et al., 2026)</span> treat the extracted relations as the reasoning substrate itself — either by traversing a pre-built KG under LLM guidance <span class="cite">(Sun et al., 2024)</span> or by reconstructing missing facts at query time to repair broken paths <span class="cite">(Huang et al., 2026)</span>; EvidenceFlow instead keeps $\mathcal{F}$ fixed and uses it only as a witness layer, so that retrieval does not depend on query-time fact generation or path repair. <strong>Query-time chain-mining approaches</strong> <span class="cite">(Peng et al., 2026)</span> keep documents as the reader unit but invoke a language model on the retrieved text to mine entity-relation chains as prompt augmentation; EvidenceFlow avoids this query-time mining step, and chain structure instead arises from the pre-extracted witnesses that gate document transitions in $G_q$ (§4.4).</td>
+<td class="cn">这种角色分工把 EvidenceFlow 跟两条邻近的工作线区分开来。<strong>知识图谱推理路线</strong>（ToG，Sun et al. 2024；Relink，Huang et al. 2026）把抽取出来的关系<strong>当作推理 substrate 本身</strong>——要么在预建 KG 上由 LLM 引导进行遍历（ToG），要么在 query 时重建缺失事实以修复断裂路径（Relink）；EvidenceFlow 则<strong>让 $\mathcal{F}$ 保持固定，只作为 witness 层使用</strong>，使得检索不依赖于 query 时的事实生成或路径修复。<strong>Query 时链挖掘路线</strong>（NeocorRAG，Peng et al. 2026）保留文档作为 reader 单位，但<strong>在检索到的文本上调用语言模型挖掘 entity-relation 链作为 prompt 增强</strong>；EvidenceFlow <strong>避免这一 query 时挖掘步骤</strong>，链结构反而来自预抽取的 witness——这些 witness 在 §4.4 中把关 $G_q$ 上的文档 transition。</td>
+</tr>
+</table>
+
+<hr>
+
+<!-- ===================================================================== -->
+<h2 id="s43">§4.3 Question-Anchored Document Graph<br><span style="font-size:14px;color:#888;font-weight:normal;">问题锚定的文档图</span></h2>
+
+<div class="para-label">Paragraph 1 — Two complementary signals</div>
+<table>
+<tr>
+<td class="en">Given a question $q$, EvidenceFlow instantiates the query-local document graph $G_q = (V_q, A_q)$ by combining two complementary signals: a <em>question anchor</em> $A(q) \subseteq \mathcal{E}$ extracted from $q$, where $\mathcal{E}$ is the entity vocabulary induced by the fact substrate $\mathcal{F}$, and an <em>entry signal</em> $\mathrm{Entry}(q) \subseteq \mathcal{D}$ obtained from a standard dense or lexical retriever. The anchor identifies which entities $q$ is asking about; the entry signal identifies which documents are the most relevant starting points in $\mathcal{D}$. Neither signal alone determines the evidence delivered to the reader: $V_q$ is initialized from these two signals and then formed where they can be connected through facts in $\mathcal{F}$.</td>
+<td class="cn">给定问题 $q$，EvidenceFlow 通过组合两类<strong>互补信号</strong>来实例化查询局部文档图 $G_q = (V_q, A_q)$：从 $q$ 抽取出来的 <span class="term">问题锚点</span> $A(q) \subseteq \mathcal{E}$（其中 $\mathcal{E}$ 是由事实底层 $\mathcal{F}$ 诱导出的实体词表），以及由标准 dense 或词项检索器给出的 <span class="term">入口信号</span> $\mathrm{Entry}(q) \subseteq \mathcal{D}$。锚点指出 $q$ 在问哪些实体；入口信号指出 $\mathcal{D}$ 里最相关的起点文档。<strong>任何一个信号单独都不决定交付给 reader 的证据</strong>：$V_q$ 由这两类信号初始化，然后在它们能够通过 $\mathcal{F}$ 中事实相互连接的地方成形。</td>
+</tr>
+</table>
+
+<div class="para-label">Paragraph 2 — Concrete activation</div>
+<table>
+<tr>
+<td class="en">Concretely, $V_q$ is initialized with the union of (i) documents in $\mathrm{Entry}(q)$ and (ii) <strong>documents that are the provenance of at least one fact in $\mathcal{F}$ whose arguments include an anchor entity in $A(q)$</strong>. From this initial vertex set, $V_q$ is expanded through a bounded number of hops along facts whose entities are connected to those already activated, with the size of $V_q$ bounded to keep the activated region compact relative to $\mathcal{D}$, while the reader budget $K$ ultimately constrains $E_K$. This activation rule keeps $|V_q|$ small enough to make downstream computation tractable, while still allowing documents that are reachable only through multi-hop entity chains to enter $V_q$ even when they have low surface similarity to $q$.</td>
+<td class="cn">具体地，$V_q$ 初始化为以下两类的并集：(i) $\mathrm{Entry}(q)$ 中的文档；(ii) <strong>$\mathcal{F}$ 中至少存在一个事实，其 argument 包含 $A(q)$ 里某个锚点实体，而这些文档是该事实的 provenance</strong>。从这个初始顶点集出发，$V_q$ 通过<strong>有界跳数</strong>沿事实扩展（只沿那些其实体跟已激活实体相连的事实），$V_q$ 的规模被约束以保持激活区域相对于 $\mathcal{D}$ 紧凑，<strong>而 reader budget $K$ 最终约束 $E_K$</strong>。这一激活规则使 $|V_q|$ 小到足以让下游计算可行，<strong>同时仍然允许那些只能通过多跳实体链才能到达的文档进入 $V_q$，即便它们对 $q$ 的表面相似度低</strong>。</td>
+</tr>
+</table>
+
+<div class="para-label">Paragraph 3 — Two properties (entry-seed + query-conditional anchor)</div>
+<table>
+<tr>
+<td class="en">Two properties of this construction matter for the rest of the method. <strong>First</strong>, the entry signal seeds activation but does not by itself determine $E_K$. Documents in $\mathrm{Entry}(q)$ enter $V_q$ for consideration, but their position in the entry ranking is not the sole criterion that decides which of them reach the reader; what matters downstream is whether they participate in fact-witnessed transitions (§4.4). <strong>Second</strong>, the anchor extraction is the mechanism by which $q$ exerts query-conditional control over $G_q$. Specifically, <strong>anchors are extracted from entity mentions and relation-bearing expressions in $q$</strong>, using the same controlled language model used throughout our protocol. <strong>This extraction is applied to the question, not to the retrieved corpus, and does not generate evidence chains</strong>; it provides the question-side semantic handles that allow $G_q$ to grow toward documents that $q$ actually asks about, rather than only toward documents that happen to score well on dense similarity.</td>
+<td class="cn">该构造的两个性质对方法后续重要。<strong>第一</strong>，<strong>入口信号为激活播种，但不单独决定 $E_K$</strong>——$\mathrm{Entry}(q)$ 中的文档进入 $V_q$ 备选，但它们在入口排名中的位置<strong>并不是决定哪些到达 reader 的唯一准则</strong>；下游真正起作用的，是这些文档是否参与了由事实背书的 transition（§4.4）。<strong>第二</strong>，<strong>锚点抽取是 $q$ 对 $G_q$ 施加 query-conditional 控制的机制</strong>——具体地，<strong>锚点从 $q$ 中的实体提及和承载关系的表达中抽取</strong>，使用整个协议中统一使用的同一个受控语言模型。<strong>这一抽取作用在问题上，不作用在检索到的语料上，也不生成证据链</strong>；它提供问题侧的语义抓手，让 $G_q$ 朝着 $q$ 真正在问的文档生长，而不是只朝着那些恰好在 dense 相似度上得分高的文档生长。</td>
+</tr>
+</table>
+
+<hr>
+
+<!-- ===================================================================== -->
+<h2 id="s44">§4.4 Fact-Witnessed Evidence Transitions<br><span style="font-size:14px;color:#888;font-weight:normal;">事实背书的证据 transition</span></h2>
+
+<div class="para-label">Lead paragraph — Core mechanism positioning</div>
+<table>
+<tr>
+<td class="en">We now turn to the core mechanism of EvidenceFlow: how the arcs $A_q$ of the query-local graph are admitted. The aim is to make chain connectivity a structural property of $G_q$, audited at the moment of admission, so that <strong>the evidence chain reaching the reader is constructed within the retrieval graph itself rather than reassembled from text afterward</strong>.</td>
+<td class="cn">现在转入 EvidenceFlow 的核心机制：<strong>查询局部图的弧 $A_q$ 是如何被准入的</strong>。目标是让 chain 的连接性成为 $G_q$ 的一个<strong>结构性属性</strong>——在准入那一刻就被审计——从而使得<strong>到达 reader 的证据链是在检索图内部构造出来的，而不是事后从文本中重新拼装出来的</strong>。</td>
+</tr>
+</table>
+
+<div class="para-label">§4.4.1 Witness sets</div>
+<table>
+<tr>
+<td class="en">Let $f = (h, r, t) \in \mathcal{F}$ denote a fact extracted from some source document $\mathrm{src}(f) \in \mathcal{D}$, with head and tail entities $h, t \in \mathcal{E}$. For an ordered pair of documents $(d_i, d_j)$, the <em>witness set</em> under question $q$ is
+
+<div class="eq">$$W_q(d_i, d_j) = \bigl\{\, w \in \mathcal{W}(\mathcal{F}) \;\bigm|\; w \text{ links } d_i \text{ and } d_j \text{ under } q \,\bigr\}, \quad (1)$$</div>
+
+where $\mathcal{W}(\mathcal{F})$ ranges over witness objects induced by facts in $\mathcal{F}$: <strong>a single fact $f$ whose endpoints reach across $d_i$ and $d_j$, or a pair of facts $(f_i, f_j)$ with $\mathrm{src}(f_i) = d_i$ and $\mathrm{src}(f_j) = d_j$ that share an activated argument</strong>. A witness $w$ links $d_i$ and $d_j$ under $q$ when one of its arguments is activated by $q$ (either through the anchor set $A(q)$ or through entities already entered the activated region of $V_q$) and a complementary argument grounds the other document. An arc $(d_i, d_j)$ is <em>eligible</em> for $A_q$ when $W_q(d_i, d_j)$ is non-empty; <strong>surface similarity between $d_i$ and $d_j$ or their individual scores against $q$ may seed activation but are not by themselves sufficient to create an arc</strong>.</td>
+
+<td class="cn">令 $f = (h, r, t) \in \mathcal{F}$ 表示从某个源文档 $\mathrm{src}(f) \in \mathcal{D}$ 中抽取出来的一个事实，head 和 tail 实体 $h, t \in \mathcal{E}$。对一对有序文档 $(d_i, d_j)$，在问题 $q$ 下的 <span class="term">witness 集</span> 定义为：
+
+<div class="eq">$$W_q(d_i, d_j) = \bigl\{\, w \in \mathcal{W}(\mathcal{F}) \;\bigm|\; w \text{ 在 } q \text{ 下连接 } d_i \text{ 与 } d_j \,\bigr\}, \quad (1)$$</div>
+
+其中 $\mathcal{W}(\mathcal{F})$ 取值于由 $\mathcal{F}$ 中事实诱导出来的 witness 对象：<strong>可以是一个单一事实 $f$，其端点跨越 $d_i$ 和 $d_j$；也可以是一对事实 $(f_i, f_j)$，$\mathrm{src}(f_i) = d_i$、$\mathrm{src}(f_j) = d_j$，且共享一个被激活的 argument</strong>。当 witness $w$ 的某个 argument 被 $q$ 激活（通过锚点集 $A(q)$，或通过已经进入 $V_q$ 激活区域的实体），并且一个互补的 argument 锚定另一篇文档时，$w$ 在 $q$ 下连接 $d_i$ 与 $d_j$。一条弧 $(d_i, d_j)$ <strong>被准入</strong> $A_q$ 当且仅当 $W_q(d_i, d_j)$ 非空；<strong>$d_i$ 与 $d_j$ 之间的表面相似度、它们各自对 $q$ 的打分，可以为激活播种，但单独不足以建立一条弧</strong>。</td>
+</tr>
+</table>
+
+<div class="para-label">§4.4.2 Auditability</div>
+<table>
+<tr>
+<td class="en">Every arc in $A_q$ therefore carries an explicit witness in $\mathcal{F}$: each chain that ultimately reaches the reader can be traced back, edge by edge, to the source facts and their provenance in $\mathcal{D}$. <strong>This is what distinguishes EvidenceFlow's notion of connectivity from a similarity graph in which two documents are joined whenever they share topic vectors</strong>: similarity may motivate co-occurrence, but it does not establish that the two documents support a multi-hop step that $q$ asks about. Witness sets provide this support by construction.</td>
+<td class="cn">$A_q$ 中的每一条弧因此都携带 $\mathcal{F}$ 中一个显式的 witness：<strong>每一条最终到达 reader 的链都可以被一边一边地回溯到 $\mathcal{D}$ 中的源事实及其 provenance</strong>。<strong>这就是 EvidenceFlow 的连接性概念跟相似度图（只要两篇文档共享 topic vector 就连一条边）的区别</strong>：相似度可以解释共现，<strong>但它无法证明两篇文档支持一个 $q$ 真正在问的多跳步骤</strong>。Witness 集<strong>通过构造</strong>提供这种支持。</td>
+</tr>
+</table>
+
+<div class="para-label">§4.4.3 Witness modes</div>
+<table>
+<tr>
+<td class="en">Within Eq. (1), two complementary modes of linkage naturally arise. A <em>sentence-grounded witness</em> is a single fact whose head and tail are both anchored in a source sentence that already mentions an entity activated by $q$; this captures cases where one document explicitly bridges to the other through a $q$-relevant entity within a bridging sentence. An <em>argument-grounded witness</em> is induced by fact arguments grounded in the two documents through a shared activated entity, capturing cases where the multi-hop step is realized through entity coreference across documents rather than a single bridging sentence. Both modes share the same admission condition (a non-empty $W_q$) and the same auditability property; they differ only in how the witness is realized within $\mathcal{F}$.</td>
+<td class="cn">在式 (1) 内，<strong>两种互补的连接模式</strong>自然涌现。<span class="term">句子锚定的 witness</span> 是 head 和 tail 都被锚定在同一个源句子里的事实，且该句子已经提到了被 $q$ 激活的某个实体——这刻画了 $d_i$（或 $d_j$）中<strong>单个句子</strong>通过 $q$-相关实体显式桥接到另一篇文档的情况。<span class="term">Argument 锚定的 witness</span> 由其 argument <strong>锚定在两篇文档中、通过一个共享激活实体连接</strong>的事实诱导而来，刻画了多跳步骤通过<strong>跨文档的实体共指</strong>实现的情况（而非单一桥接句）。两种模式共享同一个准入条件（$W_q$ 非空）和同一个可审计性属性；它们只在 witness 如何在 $\mathcal{F}$ 中实现的方式上不同。</td>
+</tr>
+</table>
+
+<div class="para-label">§4.4.4 Pre-extracted rather than generated witnesses</div>
+<table>
+<tr>
+<td class="en">A crucial property of Eq. (1) is that <strong>witnesses range over $\mathcal{W}(\mathcal{F})$, which is induced by the pre-extracted substrate from §4.2, and not over text retrieved at query time</strong>. At the point of arc admission, the query-conditional information used to test witnesses is grounded in $A(q)$ and the current state of $V_q$; witnesses themselves are not generated, paraphrased, or re-extracted from $\mathcal{D}$ for $q$. <strong>Chain structure thus arises as a property of the retrieval graph rather than as a relation reconstructed from retrieved text at query time</strong>.</td>
+<td class="cn">式 (1) 的一个关键性质是：<strong>witness 在 $\mathcal{W}(\mathcal{F})$ 上取值——即从 §4.2 预抽取的底层诱导而来——而不是在 query 时检索到的文本上取值</strong>。在弧准入的时刻，用于检验 witness 的 query-conditional 信息<strong>基于</strong>锚点集 $A(q)$ 和 $V_q$ 的当前状态；witness 本身<strong>不会为 $q$ 而被生成、改写或对 $\mathcal{D}$ 重新抽取</strong>。<strong>链结构因此作为检索图的属性涌现，而不是在 query 时对检索到的文本重构出来的关系</strong>。</td>
+</tr>
+</table>
+
+<hr>
+
+<!-- ===================================================================== -->
+<h2 id="s45">§4.5 Reader-Boundary Chain Integrity<br><span style="font-size:14px;color:#888;font-weight:normal;">Reader 边界处的链完整性</span></h2>
+
+<div class="para-label">Lead paragraph — Boundary as graph-formation outcome</div>
+<table>
+<tr>
+<td class="en">The query-local graph $G_q$ constructed in §4.3–§4.4 typically contains more documents than the reader budget $K$ admits. <strong>At the reader boundary, EvidenceFlow forms the evidence set $E_K$ of size $K$ as the budget-bounded outcome of the same graph-formation process</strong>. Rather than treating this as an independent ranking step performed over the activated documents, we formulate it as a <em>chain-integrity boundary</em> on $G_q$: $E_K$ should preserve the witnessed connectivity already established in $A_q$, and any document admitted into $E_K$ should either extend an existing witnessed chain or close a question-induced obligation that no document already in $E_K$ covers.</td>
+<td class="cn">§4.3–§4.4 构造出的查询局部图 $G_q$ 通常包含<strong>比 reader budget $K$ 所能容纳的更多文档</strong>。<strong>在 reader 边界处，EvidenceFlow 把大小为 $K$ 的证据集 $E_K$ 形成为同一图形成过程的预算受限产物</strong>。我们<strong>不把它当作在被激活文档上独立进行的排序步骤</strong>，而是表述为 $G_q$ 上的 <span class="term">链完整性边界</span>：$E_K$ 应<strong>保留 $A_q$ 中已经建立的被见证的连接</strong>，任何被准入 $E_K$ 的文档<strong>要么是延展一条已有的被见证的链，要么是闭合一个 $E_K$ 中现有文档尚未覆盖的、由问题诱导的义务</strong>。</td>
+</tr>
+</table>
+
+<div class="para-label">§4.5.1 Question-induced obligations</div>
+<table>
+<tr>
+<td class="en">For EvidenceFlow to determine whether a candidate document closes a part of $q$ that the current $E_K$ does not yet cover, the chain-integrity boundary is conditioned on a small set of <em>question-induced obligations</em>: entity mentions and relation-bearing slots that $q$ expects the evidence to jointly resolve. These obligations are extracted from $q$ with the same controlled language model used for the question anchor in §4.3, <strong>applied to the question and not to the retrieved corpus, and do not generate evidence chains</strong>. Their role is purely local to the boundary decision: an obligation that is already addressed by an existing document in $E_K$ does not require a further admission, while an obligation still open after the current prefix becomes a precondition for admitting an additional document.</td>
+<td class="cn">为了让 EvidenceFlow 能判断某个候选文档是否闭合了 $q$ 中当前 $E_K$ 尚未覆盖的部分，链完整性边界条件作用于一小组 <span class="term">问题诱导的义务</span>：即 $q$ 期望证据共同解决的<strong>实体提及和承载关系的槽位</strong>。这些义务从 $q$ 中抽取，<strong>使用与 §4.3 中问题锚点相同的受控语言模型</strong>——<strong>作用在问题上，不作用在检索到的语料上，也不生成证据链</strong>。它们的作用纯粹局部于边界决策：已经被 $E_K$ 中某个现有文档处理过的义务不需要进一步准入；而<strong>当前前缀之后仍然 open 的义务，则成为准入额外文档的先决条件</strong>。</td>
+</tr>
+</table>
+
+<div class="para-label">§4.5.2 Witness-preserving formation</div>
+<table>
+<tr>
+<td class="en">Concretely, $E_K$ is formed incrementally from $G_q$ in two interleaved modes. <em>Witness-preserving admission</em> extends $E_K$ along arcs of $A_q$, so that documents already supported by a witnessed transition to some $d \in E_K$ are preferred to documents that would only enter $E_K$ through unwitnessed similarity. <em>Residual admission</em> is reserved for cases where an open obligation remains and a candidate document, not yet connected to $E_K$ by a witnessed transition, provides evidence for it. This second mode is what allows $E_K$ to cover the question's induced relation structure even when the witnessed component of $G_q$ has not yet reached every required document. <strong>Residual admission does not create new unwitnessed arcs</strong>: once a document is admitted, any further movement involving it in $G_q$ remains subject to the same witness conditions of §4.4.</td>
+<td class="cn">具体地，$E_K$ 从 $G_q$ <strong>以两种交错模式增量形成</strong>。<span class="term">Witness 保持的准入</span> 沿 $A_q$ 中的弧延展 $E_K$，使得<strong>已经通过被见证的 transition 连接到某个 $d \in E_K$ 的文档，优于那些只能通过未被见证的相似度进入 $E_K$ 的文档</strong>。<span class="term">残差准入</span> <strong>仅保留用于以下情况</strong>：仍有未闭合的义务，且某个目前与 $E_K$ 之间还没有被见证的 transition 的候选文档<strong>能为该义务提供证据</strong>。这第二种模式使 $E_K$ 能够覆盖问题诱导的关系结构，即便 $G_q$ 中被见证的部分尚未触及每一个所需的文档。<strong>残差准入不会创建新的未被见证的弧</strong>：一旦某文档被准入，$G_q$ 中涉及它的任何后续移动仍然受 §4.4 中相同的 witness 条件约束。</td>
+</tr>
+</table>
+
+<div class="para-label">§4.5.3 Boundary as continuation of graph formation</div>
+<table>
+<tr>
+<td class="en">The chain-integrity boundary is not a separate scoring layer applied to a materialized candidate set. The same graph $G_q$ and the same witness layer $\mathcal{F}$ that drove activation in §4.3–§4.4 also drive the boundary; the boundary is additionally conditioned on the obligation set extracted from $q$. <strong>$E_K$ is thus the reader-budget boundary of the same graph-formation process that built $G_q$, rather than an independently selected set produced by an external scoring procedure</strong>.</td>
+<td class="cn">链完整性边界<strong>不是</strong>在已物化候选集上的独立打分层。在 §4.3–§4.4 中驱动激活的同一张图 $G_q$ 和同一个 witness 层 $\mathcal{F}$ <strong>也驱动边界</strong>；边界<strong>额外受从 $q$ 抽取的义务集所制约</strong>。<strong>$E_K$ 因此是构造 $G_q$ 的同一个图形成过程的预算边界，而不是由某个外部打分流程产生的独立选择集</strong>。</td>
+</tr>
+</table>
+
+<hr>
+
+<div class="meta" style="margin-top:24px;">
+<strong>Source files:</strong> <code>paper/sections/04_method.tex</code> · <strong>Framing:</strong> <code>research_memory/emnlp_expand_then_compose/46_*.md</code> · <strong>Writing discipline:</strong> <code>research_memory/emnlp_expand_then_compose/45_*.md</code>
+</div>
+
+</body>
+</html>

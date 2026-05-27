@@ -858,6 +858,95 @@ def _coerce_int_list(values: Any) -> List[int]:
     return coerced
 
 
+def _daec_positions_for_doc_ids(
+    *,
+    pool_doc_ids: Sequence[int | None],
+    target_doc_ids: Sequence[Any],
+    pool_limit: int,
+) -> List[int]:
+    position_by_doc_id: Dict[int, int] = {}
+    limit = max(0, min(int(pool_limit), len(pool_doc_ids)))
+    for pos, raw_doc_id in enumerate(pool_doc_ids[:limit]):
+        doc_id = _coerce_optional_int(raw_doc_id)
+        if doc_id is None:
+            continue
+        position_by_doc_id.setdefault(int(doc_id), int(pos))
+
+    positions: List[int] = []
+    seen: set[int] = set()
+    for raw_doc_id in target_doc_ids:
+        doc_id = _coerce_optional_int(raw_doc_id)
+        if doc_id is None:
+            continue
+        pos = position_by_doc_id.get(int(doc_id))
+        if pos is None or pos in seen:
+            continue
+        positions.append(int(pos))
+        seen.add(int(pos))
+    return positions
+
+
+def _daec_agreement_retention_scores(
+    *,
+    pool_doc_ids: Sequence[int | None],
+    pool_limit: int,
+    baseline_positions: Sequence[int],
+    rebuild_positions: Sequence[int],
+    agsto_metadata: Mapping[str, Any] | None,
+    include_dbec_signal: bool,
+    agreement_top_k: int,
+) -> Tuple[np.ndarray, Dict[str, object]]:
+    """Count final-budget-aligned corroboration votes for each pool position."""
+    limit = max(0, min(int(pool_limit), len(pool_doc_ids)))
+    scores = np.zeros(limit, dtype=float)
+    top_k = max(1, int(agreement_top_k))
+    signal_positions: Dict[str, List[int]] = {}
+
+    def add_signal(name: str, positions: Sequence[int]) -> None:
+        clean_positions: List[int] = []
+        seen: set[int] = set()
+        for raw_pos in positions:
+            pos = _coerce_optional_int(raw_pos)
+            if pos is None or pos < 0 or pos >= limit or pos in seen:
+                continue
+            clean_positions.append(int(pos))
+            seen.add(int(pos))
+            scores[int(pos)] += 1.0
+            if len(clean_positions) >= top_k:
+                break
+        signal_positions[name] = clean_positions
+
+    add_signal("etv3_topk", list(baseline_positions)[:top_k])
+
+    dense_doc_ids: List[int] = []
+    if isinstance(agsto_metadata, Mapping):
+        dense_doc_ids = _coerce_int_list(agsto_metadata.get("source_prior_prefix_doc_indices"))
+        if not dense_doc_ids:
+            dense_doc_ids = _coerce_int_list(agsto_metadata.get("native_dense_doc_indices"))
+    dense_positions = _daec_positions_for_doc_ids(
+        pool_doc_ids=pool_doc_ids,
+        target_doc_ids=dense_doc_ids[:top_k],
+        pool_limit=limit,
+    )
+    if not dense_positions:
+        dense_positions = list(range(min(top_k, limit)))
+    add_signal("dense_topk", dense_positions)
+
+    if include_dbec_signal:
+        add_signal("dbec_topk", list(rebuild_positions)[:top_k])
+
+    return scores, {
+        "agreement_top_k": int(top_k),
+        "include_dbec_signal": bool(include_dbec_signal),
+        "signal_positions": signal_positions,
+        "signal_count": int(len(signal_positions)),
+        "score_histogram": {
+            str(value): int(np.sum(scores == float(value)))
+            for value in sorted(set(float(item) for item in scores.tolist()))
+        },
+    }
+
+
 def _build_agsto_graph_prior(
     *,
     agsto_metadata: Mapping[str, Any] | None,
@@ -1467,6 +1556,8 @@ def select_daec_noisyor_positions(
     safe_min_swap_gain: float = 0.01,
     safe_max_swaps: int = 2,
     safe_preserve_top_m: int = 1,
+    safe_projection_mode: str = "rank_cutoff",
+    safe_agreement_top_k: int = 5,
     safe_retriever_margin_threshold: float = 1.01,
     safe_retriever_rank_penalty: float = 0.0,
     llm_extract_fn: Callable[[str, str], List[str]] | None = None,
@@ -2093,8 +2184,10 @@ def select_daec_noisyor_positions(
     if rank_scores.size and target_k > 0:
         retriever_margin = float(rank_scores[0] - rank_scores[target_k - 1])
 
+    projection_mode = str(safe_projection_mode or "rank_cutoff").strip().lower()
     safe_trace: Dict[str, object] = {
         "safe_projection": bool(safe_projection),
+        "safe_projection_mode": projection_mode,
         "baseline_positions": list(baseline_positions),
         "baseline_titles": [pool_doc_titles[pos] for pos in baseline_positions],
         "baseline_objective": round(float(baseline_objective), 6),
@@ -2108,6 +2201,7 @@ def select_daec_noisyor_positions(
         "safe_min_swap_gain": round(float(safe_min_swap_gain), 6),
         "safe_max_swaps": int(max(0, safe_max_swaps)),
         "safe_preserve_top_m": int(max(0, safe_preserve_top_m)),
+        "safe_agreement_top_k": int(max(1, safe_agreement_top_k)),
         "safe_retriever_margin_threshold": round(float(safe_retriever_margin_threshold), 6),
         "safe_retriever_rank_penalty": round(float(safe_retriever_rank_penalty), 6),
         "safe_decision": "not_enabled",
@@ -2130,6 +2224,12 @@ def select_daec_noisyor_positions(
         min_total_gain = float(safe_min_objective_gain)
         min_swap_gain = float(safe_min_swap_gain)
         rank_penalty = max(0.0, float(safe_retriever_rank_penalty))
+        agreement_projection = projection_mode in {
+            "agreement_r2_ge",
+            "agreement_r2_gt",
+            "agreement_r3_ge",
+            "agreement_r3_gt",
+        }
         if (
             np.isfinite(float(safe_retriever_margin_threshold))
             and float(safe_retriever_margin_threshold) <= 1.0
@@ -2140,7 +2240,7 @@ def select_daec_noisyor_positions(
             best_coverage = np.asarray(baseline_coverage, dtype=float)
             best_steps = []
             safe_trace["safe_decision"] = "fallback_retriever_margin"
-        elif float(rebuild_objective - baseline_objective) < min_total_gain:
+        elif (not agreement_projection) and float(rebuild_objective - baseline_objective) < min_total_gain:
             best_positions = list(baseline_positions)
             best_objective = float(baseline_objective)
             best_coverage = np.asarray(baseline_coverage, dtype=float)
@@ -2151,82 +2251,168 @@ def select_daec_noisyor_positions(
             current_score = float(baseline_objective)
             current_coverage = np.asarray(baseline_coverage, dtype=float)
             swap_steps: List[Dict[str, object]] = []
-            protected_positions = set(range(min(preserve_top_m, target_k)))
-            for _ in range(max_swaps):
-                current_set = set(current_positions)
-                best_swap: Dict[str, object] | None = None
-                for out_pos in list(current_positions):
-                    if int(out_pos) in protected_positions:
-                        continue
-                    for in_pos in range(pool_limit):
-                        if in_pos in current_set:
-                            continue
-                        proposed_positions = _daec_replace_at_position(current_positions, out_pos, in_pos)
-                        proposed_score, proposed_coverage = objective(best_binding_idx, proposed_positions)
-                        gain = float(proposed_score - current_score)
-                        retriever_rank_loss = 0.0
-                        if rank_scores.size:
-                            retriever_rank_loss = max(
-                                0.0,
-                                float(rank_scores[int(out_pos)]) - float(rank_scores[int(in_pos)]),
-                            )
-                        adjusted_gain = gain - rank_penalty * retriever_rank_loss
-                        if adjusted_gain < min_swap_gain:
-                            continue
-                        row = {
-                            "out_position": int(out_pos),
-                            "out_title": pool_doc_titles[int(out_pos)],
-                            "in_position": int(in_pos),
-                            "in_title": pool_doc_titles[int(in_pos)],
-                            "objective_gain": gain,
-                            "retriever_rank_loss": retriever_rank_loss,
-                            "adjusted_gain": adjusted_gain,
-                            "objective": float(proposed_score),
-                            "coverage": proposed_coverage,
-                        }
-                        if best_swap is None or (
-                            float(row["adjusted_gain"]),
-                            float(row["objective_gain"]),
-                            float(row["objective"]),
-                            -int(row["in_position"]),
-                        ) > (
-                            float(best_swap["adjusted_gain"]),
-                            float(best_swap["objective_gain"]),
-                            float(best_swap["objective"]),
-                            -int(best_swap["in_position"]),
-                        ):
-                            best_swap = row
-                if best_swap is None:
-                    break
-                current_positions = _daec_replace_at_position(
-                    current_positions,
-                    int(best_swap["out_position"]),
-                    int(best_swap["in_position"]),
+            if agreement_projection:
+                include_dbec_signal = "_r3_" in projection_mode
+                strict_retention = projection_mode.endswith("_gt")
+                retention_scores, retention_trace = _daec_agreement_retention_scores(
+                    pool_doc_ids=pool_doc_ids,
+                    pool_limit=pool_limit,
+                    baseline_positions=baseline_positions,
+                    rebuild_positions=rebuild_positions,
+                    agsto_metadata=agsto_metadata,
+                    include_dbec_signal=include_dbec_signal,
+                    agreement_top_k=int(safe_agreement_top_k),
                 )
-                current_score = float(best_swap["objective"])
-                current_coverage = np.asarray(best_swap["coverage"], dtype=float)
-                swap_steps.append({
-                    "step": int(len(swap_steps) + 1),
-                    "mode": "daec_noisyor_safe_swap",
-                    "out_position": int(best_swap["out_position"]),
-                    "out_title": str(best_swap["out_title"]),
-                    "in_position": int(best_swap["in_position"]),
-                    "in_title": str(best_swap["in_title"]),
-                    "objective_gain": round(float(best_swap["objective_gain"]), 6),
-                    "retriever_rank_loss": round(float(best_swap["retriever_rank_loss"]), 6),
-                    "adjusted_gain": round(float(best_swap["adjusted_gain"]), 6),
-                    "objective": round(float(current_score), 6),
-                    "coverage_by_requirement": {
-                        req.unit_id: round(float(current_coverage[req_idx]), 6)
-                        for req_idx, req in enumerate(active_requirements)
-                    },
-                })
+                safe_trace["agreement_retention"] = retention_trace
+                safe_trace["agreement_retention_rule"] = "gt" if strict_retention else "ge"
+                for _ in range(target_k):
+                    current_set = set(current_positions)
+                    best_swap: Dict[str, object] | None = None
+                    for out_pos in list(current_positions):
+                        out_retention = float(retention_scores[int(out_pos)]) if int(out_pos) < retention_scores.size else 0.0
+                        for in_pos in range(pool_limit):
+                            if in_pos in current_set:
+                                continue
+                            in_retention = float(retention_scores[int(in_pos)]) if int(in_pos) < retention_scores.size else 0.0
+                            if strict_retention:
+                                retention_allowed = in_retention > out_retention
+                            else:
+                                retention_allowed = in_retention >= out_retention
+                            if not retention_allowed:
+                                continue
+                            proposed_positions = _daec_replace_at_position(current_positions, out_pos, in_pos)
+                            proposed_score, proposed_coverage = objective(best_binding_idx, proposed_positions)
+                            gain = float(proposed_score - current_score)
+                            if gain <= min_swap_gain:
+                                continue
+                            row = {
+                                "out_position": int(out_pos),
+                                "out_title": pool_doc_titles[int(out_pos)],
+                                "out_retention": out_retention,
+                                "in_position": int(in_pos),
+                                "in_title": pool_doc_titles[int(in_pos)],
+                                "in_retention": in_retention,
+                                "objective_gain": gain,
+                                "objective": float(proposed_score),
+                                "coverage": proposed_coverage,
+                            }
+                            if best_swap is None or (
+                                float(row["objective_gain"]),
+                                float(row["in_retention"] - row["out_retention"]),
+                                float(row["objective"]),
+                                -int(row["in_position"]),
+                            ) > (
+                                float(best_swap["objective_gain"]),
+                                float(best_swap["in_retention"] - best_swap["out_retention"]),
+                                float(best_swap["objective"]),
+                                -int(best_swap["in_position"]),
+                            ):
+                                best_swap = row
+                    if best_swap is None:
+                        break
+                    current_positions = _daec_replace_at_position(
+                        current_positions,
+                        int(best_swap["out_position"]),
+                        int(best_swap["in_position"]),
+                    )
+                    current_score = float(best_swap["objective"])
+                    current_coverage = np.asarray(best_swap["coverage"], dtype=float)
+                    swap_steps.append({
+                        "step": int(len(swap_steps) + 1),
+                        "mode": "daec_noisyor_agreement_swap",
+                        "out_position": int(best_swap["out_position"]),
+                        "out_title": str(best_swap["out_title"]),
+                        "out_retention": round(float(best_swap["out_retention"]), 6),
+                        "in_position": int(best_swap["in_position"]),
+                        "in_title": str(best_swap["in_title"]),
+                        "in_retention": round(float(best_swap["in_retention"]), 6),
+                        "objective_gain": round(float(best_swap["objective_gain"]), 6),
+                        "objective": round(float(current_score), 6),
+                        "coverage_by_requirement": {
+                            req.unit_id: round(float(current_coverage[req_idx]), 6)
+                            for req_idx, req in enumerate(active_requirements)
+                        },
+                    })
+            else:
+                protected_positions = set(range(min(preserve_top_m, target_k)))
+                for _ in range(max_swaps):
+                    current_set = set(current_positions)
+                    best_swap: Dict[str, object] | None = None
+                    for out_pos in list(current_positions):
+                        if int(out_pos) in protected_positions:
+                            continue
+                        for in_pos in range(pool_limit):
+                            if in_pos in current_set:
+                                continue
+                            proposed_positions = _daec_replace_at_position(current_positions, out_pos, in_pos)
+                            proposed_score, proposed_coverage = objective(best_binding_idx, proposed_positions)
+                            gain = float(proposed_score - current_score)
+                            retriever_rank_loss = 0.0
+                            if rank_scores.size:
+                                retriever_rank_loss = max(
+                                    0.0,
+                                    float(rank_scores[int(out_pos)]) - float(rank_scores[int(in_pos)]),
+                                )
+                            adjusted_gain = gain - rank_penalty * retriever_rank_loss
+                            if adjusted_gain < min_swap_gain:
+                                continue
+                            row = {
+                                "out_position": int(out_pos),
+                                "out_title": pool_doc_titles[int(out_pos)],
+                                "in_position": int(in_pos),
+                                "in_title": pool_doc_titles[int(in_pos)],
+                                "objective_gain": gain,
+                                "retriever_rank_loss": retriever_rank_loss,
+                                "adjusted_gain": adjusted_gain,
+                                "objective": float(proposed_score),
+                                "coverage": proposed_coverage,
+                            }
+                            if best_swap is None or (
+                                float(row["adjusted_gain"]),
+                                float(row["objective_gain"]),
+                                float(row["objective"]),
+                                -int(row["in_position"]),
+                            ) > (
+                                float(best_swap["adjusted_gain"]),
+                                float(best_swap["objective_gain"]),
+                                float(best_swap["objective"]),
+                                -int(best_swap["in_position"]),
+                            ):
+                                best_swap = row
+                    if best_swap is None:
+                        break
+                    current_positions = _daec_replace_at_position(
+                        current_positions,
+                        int(best_swap["out_position"]),
+                        int(best_swap["in_position"]),
+                    )
+                    current_score = float(best_swap["objective"])
+                    current_coverage = np.asarray(best_swap["coverage"], dtype=float)
+                    swap_steps.append({
+                        "step": int(len(swap_steps) + 1),
+                        "mode": "daec_noisyor_safe_swap",
+                        "out_position": int(best_swap["out_position"]),
+                        "out_title": str(best_swap["out_title"]),
+                        "in_position": int(best_swap["in_position"]),
+                        "in_title": str(best_swap["in_title"]),
+                        "objective_gain": round(float(best_swap["objective_gain"]), 6),
+                        "retriever_rank_loss": round(float(best_swap["retriever_rank_loss"]), 6),
+                        "adjusted_gain": round(float(best_swap["adjusted_gain"]), 6),
+                        "objective": round(float(current_score), 6),
+                        "coverage_by_requirement": {
+                            req.unit_id: round(float(current_coverage[req_idx]), 6)
+                            for req_idx, req in enumerate(active_requirements)
+                        },
+                    })
             best_positions = list(current_positions)
             best_objective = float(current_score)
             best_coverage = np.asarray(current_coverage, dtype=float)
             best_steps = list(swap_steps)
             safe_trace["safe_swap_steps"] = list(swap_steps)
-            safe_trace["safe_decision"] = "minimal_edit_applied" if swap_steps else "fallback_no_eligible_swap"
+            if agreement_projection:
+                safe_trace["safe_decision"] = "agreement_edit_applied" if swap_steps else "fallback_no_agreement_swap"
+            else:
+                safe_trace["safe_decision"] = "minimal_edit_applied" if swap_steps else "fallback_no_eligible_swap"
     elif bool(swap_refinement_enabled):
         refined_positions, refined_objective, refined_coverage, refinement_steps = _daec_refine_by_single_swaps(
             binding_idx=best_binding_idx,

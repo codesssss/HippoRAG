@@ -67,7 +67,7 @@ def test_budget_validation_and_residual_budget() -> None:
 
 
 def test_contract_exposes_pcec_method_boundary() -> None:
-    assert METHOD_CONTRACT["paper_facing_method_name"] == "EvidenceFlow"
+    assert METHOD_CONTRACT["paper_facing_method_name"] == "EvidenceLink"
     assert METHOD_CONTRACT["main_protocol"] == "etv4_fact_witnessed_sto_pool_to_pcec_native_readout"
     assert METHOD_CONTRACT["main_entrypoint"] == "evidenceflow/run_native_pool.py"
     assert METHOD_CONTRACT["main_upstream_retriever"] == MAIN_UPSTREAM_RETRIEVER_NAME

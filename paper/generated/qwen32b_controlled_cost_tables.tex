@@ -1,0 +1,60 @@
+% Saved Qwen3-32B controlled cost tables.
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrrr}
+\toprule
+Method & HotpotQA & 2Wiki & MuSiQue & Avg \\
+\midrule
+EvLink & 13.17 & 7.75 & 14.62 & 11.85 \\
+HippoRAG2 & 14.90 & 9.16 & 16.39 & 13.49 \\
+PropRAG & 20.85 & 12.17 & 23.49 & 18.84 \\
+NeocorRAG & 14.27 & 8.46 & 15.78 & 12.84 \\
+\bottomrule
+\end{tabular}
+}
+\caption{Offline structuring tokens under the controlled Qwen3-32B protocol, in millions.}
+\label{tab:qwen32b-controlled-offline-cost}
+\end{table}
+
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrrr}
+\toprule
+Method & HotpotQA & 2Wiki & MuSiQue & Avg \\
+\midrule
+EvLink & 1{,}403 & 1{,}456 & 1{,}682 & 1{,}514 \\
+HippoRAG2 & 639 & 635 & 625 & 633 \\
+PropRAG & 0 & 0 & 0 & 0 \\
+NeocorRAG & 7{,}194 & 6{,}831 & 6{,}789 & 6{,}938 \\
+\bottomrule
+\end{tabular}
+}
+\caption{Online auxiliary tokens per query under the controlled Qwen3-32B protocol, excluding the shared GPT-4o-mini reader.}
+\label{tab:qwen32b-controlled-online-cost}
+\end{table}
+
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lrrr}
+\toprule
+Method & Offline Avg M & Online Avg M for 1000q & Total Avg M \\
+\midrule
+EvLink & 11.85 & 1.51 & 13.36 \\
+HippoRAG2 & 13.49 & 0.63 & 14.12 \\
+PropRAG & 18.84 & 0.00 & 18.84 \\
+NeocorRAG & 12.84 & 6.94 & 19.78 \\
+\bottomrule
+\end{tabular}
+}
+\caption{Average total auxiliary generative-token cost across the three multi-hop datasets. Total is offline structuring plus online auxiliary tokens for 1{,}000 queries, excluding the shared GPT-4o-mini reader.}
+\label{tab:qwen32b-controlled-total-cost}
+\end{table}

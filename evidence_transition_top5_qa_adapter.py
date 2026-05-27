@@ -13,7 +13,12 @@ import sys
 from pathlib import Path
 from types import ModuleType
 
-from evidence_transition_graphrag.contract import METHOD_NAME, QA_DOC_KEY
+from evidence_transition_graphrag.contract import (
+    METHOD_NAME,
+    METHOD_V2_NAME,
+    QA_DOC_KEY,
+    QA_V2_DOC_KEY,
+)
 
 
 def _candidate_roots() -> list[Path]:
@@ -64,6 +69,7 @@ if not hasattr(_TARGET, "METHOD_DOC_KEYS"):
     )
 
 _TARGET.METHOD_DOC_KEYS[METHOD_NAME] = QA_DOC_KEY
+_TARGET.METHOD_DOC_KEYS[METHOD_V2_NAME] = QA_V2_DOC_KEY
 
 
 if hasattr(_TARGET, "load_sfb_rows") and hasattr(_TARGET, "load_json"):

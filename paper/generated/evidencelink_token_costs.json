@@ -1,0 +1,82 @@
+{
+  "offline": [
+    {
+      "dataset": "HotpotQA",
+      "docs": 9811,
+      "openie_calls": 19622,
+      "openie_input_tokens": 9642510,
+      "openie_output_tokens": 3525548,
+      "openie_total_tokens": 13168058,
+      "source": "run_logs/etv4_clean_mainline_qwen32b_nothink_full1000_20260512/hotpotqa/index/llm_cache/qwen3-32b-judge_cache.sqlite"
+    },
+    {
+      "dataset": "2WikiMultiHopQA",
+      "docs": 6119,
+      "openie_calls": 12238,
+      "openie_input_tokens": 5752089,
+      "openie_output_tokens": 1993370,
+      "openie_total_tokens": 7745459,
+      "source": "run_logs/etv4_clean_mainline_qwen32b_nothink_full1000_20260512/2wikimultihopqa/index/llm_cache/qwen3-32b-judge_cache.sqlite"
+    },
+    {
+      "dataset": "MuSiQue",
+      "docs": 11656,
+      "openie_calls": 23312,
+      "openie_input_tokens": 10949323,
+      "openie_output_tokens": 3673819,
+      "openie_total_tokens": 14623142,
+      "source": "run_logs/etv4_clean_mainline_qwen32b_nothink_full1000_20260512/musique/index/llm_cache/qwen3-32b-judge_cache.sqlite"
+    }
+  ],
+  "online": [
+    {
+      "aux_total_tokens_est": 1402807,
+      "binding_calls": 5610,
+      "binding_input_tokens": 1048552,
+      "binding_latency_s": 627.0535,
+      "binding_output_tokens": 30276,
+      "binding_total_tokens": 1078828,
+      "dataset": "HotpotQA",
+      "queries": 1000,
+      "requirement_input_tokens_est": 220722,
+      "requirement_output_tokens_est": 103257,
+      "requirement_total_tokens_est": 323979,
+      "source": "run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514/dbec_assets/etv4/evals/hotpotqa_etv4_pool100_dbec_qwen32b_stable_limit1000.json"
+    },
+    {
+      "aux_total_tokens_est": 1455931,
+      "binding_calls": 7038,
+      "binding_input_tokens": 1093046,
+      "binding_latency_s": 722.0414,
+      "binding_output_tokens": 27135,
+      "binding_total_tokens": 1120181,
+      "dataset": "2WikiMultiHopQA",
+      "queries": 1000,
+      "requirement_input_tokens_est": 216874,
+      "requirement_output_tokens_est": 118876,
+      "requirement_total_tokens_est": 335750,
+      "source": "run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514/dbec_assets/etv4/evals/2wikimultihopqa_etv4_pool100_dbec_qwen32b_stable_limit1000.json"
+    },
+    {
+      "aux_total_tokens_est": 1682472,
+      "binding_calls": 6817,
+      "binding_input_tokens": 1315265,
+      "binding_latency_s": 721.9599,
+      "binding_output_tokens": 35145,
+      "binding_total_tokens": 1350410,
+      "dataset": "MuSiQue",
+      "queries": 1000,
+      "requirement_input_tokens_est": 221284,
+      "requirement_output_tokens_est": 110778,
+      "requirement_total_tokens_est": 332062,
+      "source": "run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514/dbec_assets/etv4/evals/musique_etv4_pool100_dbec_qwen32b_stable_limit1000.json"
+    }
+  ],
+  "protocol": {
+    "binding_counts": "exact selector-trace metadata",
+    "offline_counts": "exact OpenAI-compatible usage metadata in Qwen3-32B OpenIE sqlite caches",
+    "reader_policy": "GPT-4o-mini reader excluded because it is shared across methods",
+    "requirement_counts": "estimated from frozen prompt and stored requirement outputs"
+  },
+  "tokenizer": "cl100k_base"
+}

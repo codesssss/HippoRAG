@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>EvidenceFlow §4 Method (v5) — Bilingual</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  body { font-family: "Times New Roman", "Songti SC", serif; max-width: 1280px; margin: 32px auto; padding: 0 24px; line-height: 1.55; color: #222; }
+  h1 { font-size: 22px; border-bottom: 2px solid #444; padding-bottom: 6px; margin-top: 0; }
+  h2 { font-size: 18px; margin-top: 28px; color: #1a3d6e; border-left: 4px solid #1a3d6e; padding-left: 8px; }
+  h3 { font-size: 15px; margin-top: 20px; color: #444; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; table-layout: fixed; }
+  td { vertical-align: top; padding: 9px 13px; border: 1px solid #ddd; width: 50%; }
+  td.en { background: #fafafa; font-family: "Times New Roman", Cambria, serif; }
+  td.cn { background: #fdfcf6; font-family: "Songti SC", "SimSun", "PingFang SC", serif; }
+  .meta { font-size: 12px; color: #888; margin-bottom: 16px; }
+  .para-label { font-size: 11px; color: #1a3d6e; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 14px; }
+  .eq { background: #f0f4fa; padding: 10px 16px; margin: 8px 0; border-left: 3px solid #1a3d6e; }
+  .term { font-style: italic; font-weight: 600; color: #5c2d8a; }
+  em { color: #5c2d8a; }
+  strong { color: #1a3d6e; }
+  .cite { color: #666; font-size: 90%; }
+  hr { border: none; border-top: 1px dashed #ccc; margin: 22px 0; }
+  .toc { background: #f7f7f7; border: 1px solid #ddd; padding: 12px 18px; margin: 18px 0; font-size: 13px; }
+  .toc a { color: #1a3d6e; text-decoration: none; margin-right: 16px; }
+  .v-banner { background: #fff8e6; border-left: 4px solid #cc9933; padding: 10px 14px; margin: 12px 0 22px; font-size: 13px; color: #663300; }
+  @media print {
+    body { max-width: none; margin: 0; padding: 12mm; }
+    h2 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Section 4 — Method: EvidenceFlow（中英对照, v6：科学对象立起来 + 真公式）</h1>
+<div class="meta">Generated 2026-05-16 · Source: <code>paper/sections/04_method.tex</code> · Math via MathJax</div>
+
+<div class="v-banner">
+<strong>v6 主要变化</strong>：（1）opening 段加 <strong>EvidenceFlow 形式化</strong>——明确"the central object is $\pi_q$, which we refer to as the evidence flow"，把方法名跟具体科学对象绑定；（2）§4.2 PPR 描述改为<strong>跑在 fact graph 上</strong>（而非 phrase/passage graph，跟代码 <code>local_ppr.py</code> 一致），加入 <strong>passage readout 公式 (Eq. 2)</strong>：$s_{\mathrm{ppr}}(d|q) = \frac{1}{\sqrt{|\mathcal{F}_d|}}\sum \pi_q(f)$；（3）§4.3 coverage-aware reranking 改为 <strong>noisy-OR coverage model (Eq. 3)</strong>——跟 DBEC 真实代码 <code>_daec_noisy_or_coverage</code> 一致；（4）删除所有 <code>\textbf</code> 强调；（5）§4.3 lead 改更客观（"strong base ranking" → "initial graph-aware ranking"）。公式数从 1 增至 3，字数 1377 → 1552（+13%），仍在范文区间。</div>
+
+<div class="toc">
+  <strong>目录：</strong>
+  <a href="#opening">§4 Opening</a>
+  <a href="#s41">§4.1 Offline Indexing</a>
+  <a href="#s42">§4.2 Evidence-Driven Local Graph Retrieval</a>
+  <a href="#s43">§4.3 Retrieval Enhancement</a>
+</div>
+
+<!-- ===================================================================== -->
+<h2 id="opening">§4 Opening<br><span style="font-size:14px;color:#888;font-weight:normal;">方法节开头</span></h2>
+
+<div class="para-label">Opening — Three components + Evidence Flow formalized</div>
+<table><tr>
+<td class="en">We introduce EvidenceFlow, a graph-based retrieval framework for multi-hop question answering. Given a question $q$ and a corpus $\mathcal{D}$, EvidenceFlow returns a ranked evidence list $R_q$ over passages in $\mathcal{D}$. The method has three components: an offline document-grounded OpenIE graph that supplies entity anchors and relational structure (§4.1), an evidence-driven local graph retrieval procedure that ranks passages over a question-induced subgraph (§4.2), and a retrieval-enhancement step that improves multi-hop coverage on top of the local ranking (§4.3). <strong>The central object underlying these components is a query-conditioned mass distribution $\pi_q$—which we refer to as the <em>evidence flow</em>—propagated from question anchors through provenance-grounded edges of the offline graph; EvidenceFlow names this propagation together with the two enhancement steps that operate on top of it.</strong></td>
+<td class="cn">我们提出 EvidenceFlow，一个面向多跳问答的 graph-based retrieval 框架。给定问题 $q$ 和语料库 $\mathcal{D}$，EvidenceFlow 返回一个对 $\mathcal{D}$ 中段落的 <strong>ranked evidence list $R_q$</strong>。方法包含三个组件：（1）一张离线构建的<strong>文档锚定 OpenIE 图</strong>（§4.1）；（2）一个 <strong>evidence-driven local graph retrieval</strong>（§4.2）；（3）一个 <strong>retrieval enhancement</strong>（§4.3）。<strong>这些组件背后的核心对象是一个 query-conditioned 的质量分布 $\pi_q$——我们称之为<span class="term">证据流（evidence flow）</span>——从 question anchor 出发，沿离线图的 provenance-grounded 边传播；EvidenceFlow 即指这个传播过程和其上的两个增强步骤的组合。</strong></td>
+</tr></table>
+
+<hr>
+
+<!-- ===================================================================== -->
+<h2 id="s41">§4.1 Offline Indexing: Document-Grounded Multi-Layer OpenIE Graph<br><span style="font-size:14px;color:#888;font-weight:normal;">离线索引：文档锚定的多层 OpenIE 图</span></h2>
+
+<div class="para-label">Lead — Offline graph as retrieval substrate</div>
+<table><tr>
+<td class="en">We build a document-grounded multi-layer OpenIE graph $\mathcal{G}_{\mathcal{D}}=(\mathcal{V}_{\mathcal{D}},\mathcal{E}_{\mathcal{D}})$ over the corpus $\mathcal{D}$ during offline indexing. The graph supplies the entity anchors and relational structure that EvidenceFlow draws on at query time (§4.2). Following standard OpenIE practice <span class="cite">(Angeli et al., 2015; Gutiérrez et al., 2025)</span>, we extract salient assertions from each document and organize them into the graph below; the extractor itself is not a contribution of this work.</td>
+<td class="cn">我们在离线索引阶段从 corpus $\mathcal{D}$ 构建一张文档锚定的<strong>多层 OpenIE 图</strong> $\mathcal{G}_{\mathcal{D}}=(\mathcal{V}_{\mathcal{D}},\mathcal{E}_{\mathcal{D}})$。这张图提供 EvidenceFlow 在 query 时所需的实体锚点和关系结构（§4.2）。我们遵循标准 OpenIE 流程（Angeli et al., 2015；Gutiérrez et al., 2025），从每篇文档抽取显著断言，按下面的方式组织进图里；<strong>抽取器本身不是本工作的贡献</strong>。</td>
+</tr></table>
+
+<div class="para-label">OpenIE fact extraction</div>
+<table><tr>
+<td class="en">For each document $d \in \mathcal{D}$, a language model extracts a set of OpenIE facts $f = (h, r, t)$, where $h$ and $t$ are head and tail entities and $r$ is the relation phrase that connects them. We retain each fact together with its provenance $\mathrm{src}(f) \in \mathcal{D}$, so that every fact can be traced back to the document from which it was extracted. The resulting fact set is denoted $\mathcal{F}$.</td>
+<td class="cn">对每篇文档 $d \in \mathcal{D}$，语言模型抽取一组 <strong>OpenIE facts</strong> $f = (h, r, t)$，其中 $h$ 和 $t$ 是 head/tail 实体，$r$ 是连接它们的关系短语。<strong>我们保留每个 fact 连同其 provenance</strong> $\mathrm{src}(f) \in \mathcal{D}$，使得每个 fact 都可以<strong>追溯回它被抽取的源文档</strong>。最终的 fact 集合记为 $\mathcal{F}$。</td>
+</tr></table>
+
+<div class="para-label">Graph construction</div>
+<table><tr>
+<td class="en">The graph $\mathcal{G}_{\mathcal{D}}$ contains <strong>two node types and three edge types</strong>. Nodes are: (i) <em>passage nodes</em>, one per document $d \in \mathcal{D}$, carrying the natural-language content that a downstream reader will consume; and (ii) <em>phrase nodes</em>, one per distinct entity surface form extracted across $\mathcal{F}$. Edges are: (i) <em>passage–phrase</em> edges that connect each document to the entities it mentions; (ii) <em>relational</em> edges that connect a pair of phrase nodes $(h, t)$ whenever some fact $f = (h, r, t) \in \mathcal{F}$ asserts a relation between them, with $r$ retained as an edge attribute and $\mathrm{src}(f)$ retained as the edge provenance; and (iii) <em>synonymy</em> edges that connect phrase nodes whose dense embeddings are highly similar, providing alias coverage across surface variants of the same entity.</td>
+<td class="cn">图 $\mathcal{G}_{\mathcal{D}}$ 包含<strong>两种节点类型和三种边类型</strong>。节点为：(i) <span class="term">passage node</span>，每篇 $d \in \mathcal{D}$ 一个，承载下游 reader 最终消费的自然语言内容；(ii) <span class="term">phrase node</span>，每个在 $\mathcal{F}$ 中抽出的不同实体表面形式一个。边为：(i) <span class="term">passage–phrase 边</span>，把每篇文档连到它提到的实体；(ii) <span class="term">关系边</span>，当 $\mathcal{F}$ 中存在 fact $f = (h, r, t)$ 在两个 phrase node $(h, t)$ 之间断言一个关系时连一条边——<strong>$r$ 作为边属性保留，$\mathrm{src}(f)$ 作为边 provenance 保留</strong>；(iii) <span class="term">synonymy 边</span>，连接 dense 嵌入高度相似的 phrase node，提供同一实体不同表面形式间的别名覆盖。</td>
+</tr></table>
+
+<div class="para-label">Indexing for retrieval</div>
+<table><tr>
+<td class="en">We pre-compute dense embeddings for all passage and phrase nodes, and materialize $\mathcal{G}_{\mathcal{D}}$ as an adjacency index keyed by node identifier. The graph is built once and reused across all questions: at query time, no new OpenIE extraction or fact generation is performed over $\mathcal{D}$. The artifacts produced by offline indexing—phrase nodes, passage–phrase links, relational edges with provenance, and synonymy edges—are exactly the pieces EvidenceFlow draws on when it constructs a query-local subgraph and ranks passages by graph propagation (§4.2).</td>
+<td class="cn">我们为所有 passage 和 phrase 节点预计算 dense 嵌入，并将 $\mathcal{G}_{\mathcal{D}}$ 物化为按节点 id 索引的邻接表。<strong>图建一次，跨所有 query 复用</strong>：query 时不对 $\mathcal{D}$ 做新的 OpenIE 抽取或 fact 生成。<strong>由离线索引产出的产物</strong>——phrase node、passage–phrase 链接、带 provenance 的关系边、synonymy 边——<strong>正是 EvidenceFlow 在 §4.2 构造 query-local 子图并通过图上传播给段落打分时所依赖的全部素材</strong>。</td>
+</tr></table>
+
+<hr>
+
+<!-- ===================================================================== -->
+<h2 id="s42">§4.2 Evidence-Driven Local Graph Retrieval<br><span style="font-size:14px;color:#888;font-weight:normal;">证据驱动的局部图检索</span></h2>
+
+<div class="para-label">Lead — Local subgraph + local-PPR</div>
+<table><tr>
+<td class="en">Given a question $q$, EvidenceFlow induces a query-local subgraph $G_q = (V_q, A_q)$ from $\mathcal{G}_{\mathcal{D}}$ and runs personalized PageRank locally over $G_q$ to rank passages. The subgraph isolates the neighborhood of $\mathcal{G}_{\mathcal{D}}$ that is relevant to $q$, and local propagation lets passage relevance be shaped by entity and relational connectivity rather than by independent surface similarity to $q$.</td>
+<td class="cn">给定问题 $q$，EvidenceFlow 从 $\mathcal{G}_{\mathcal{D}}$ 中诱导一张 query-local 子图 $G_q = (V_q, A_q)$，并在 $G_q$ 上跑 <strong>local personalized PageRank</strong> 给段落打分。子图把 $\mathcal{G}_{\mathcal{D}}$ 中与 $q$ 相关的邻域隔离出来，<strong>局部传播使段落相关性由实体和关系连接性塑造</strong>，而不是只由对 $q$ 的独立表面相似度决定。</td>
+</tr></table>
+
+<div class="para-label">Query-local subgraph construction</div>
+<table><tr>
+<td class="en">We extract a question anchor set $A(q) \subseteq \mathcal{E}$ from $q$ by identifying entity mentions in the question, using a controlled language model that is applied to the question only, never to retrieved documents. We also compute an entry signal $\mathrm{Entry}(q) \subseteq \mathcal{D}$ from a standard dense retriever to seed activation. The subgraph $G_q$ is initialized with (i) phrase nodes corresponding to anchors in $A(q)$, (ii) passage nodes in $\mathrm{Entry}(q)$, and (iii) every passage node that is the provenance of at least one relational edge whose endpoints include an anchor in $A(q)$. Starting from this seed set, we expand $G_q$ along relational, passage–phrase, and synonymy edges of $\mathcal{G}_{\mathcal{D}}$ for a bounded number of hops, keeping the activated region compact relative to $\mathcal{D}$ while still allowing passages reachable only through multi-hop entity chains to enter $V_q$ even when their surface similarity to $q$ is low.</td>
+<td class="cn">我们从 $q$ 抽取 question anchor 集合 $A(q) \subseteq \mathcal{E}$，仅识别<strong>问题中的实体提及</strong>，使用一个<strong>仅作用于问题、绝不作用于检索文档的受控语言模型</strong>。我们同时用一个标准 dense retriever 给出 entry signal $\mathrm{Entry}(q) \subseteq \mathcal{D}$ 作为激活种子。子图 $G_q$ 初始化为：(i) 对应 $A(q)$ 中锚点的 phrase node；(ii) $\mathrm{Entry}(q)$ 中的 passage node；(iii) 每个 passage node——只要它是某条关系边的 provenance，且该边的端点之一在 $A(q)$ 里。从这个种子集出发，我们沿 $\mathcal{G}_{\mathcal{D}}$ 的关系边、passage–phrase 边和 synonymy 边做<strong>有界跳数扩展</strong>，使激活区域相对于 $\mathcal{D}$ 紧凑，<strong>同时仍允许那些只能通过多跳实体链才能到达的段落进入 $V_q$，即便它们对 $q$ 的表面相似度低</strong>。</td>
+</tr></table>
+
+<div class="para-label">Local personalized PageRank</div>
+<table><tr>
+<td class="en">Within $G_q$, OpenIE facts act as the propagation units of the evidence flow: two facts $f_i, f_j \in \mathcal{F}$ are connected when they share an activated entity, and a fact $f$ is linked to its provenance passage $\mathrm{src}(f)$. The seed distribution $s_q$ places mass on facts whose arguments include an anchor in $A(q)$, weighted by the entry scores of their provenance passages and any entry-side mass on $\mathrm{Entry}(q)$. We solve, by power iteration restricted to $G_q$,
+
+<div class="eq">$$\pi_q = \alpha\, s_q + (1-\alpha)\, P_q^{\!\top}\, \pi_q, \quad (1)$$</div>
+
+where $P_q$ is the local transition matrix induced by these fact-fact and fact-passage links. We then read out a passage score by aggregating the stationary mass on the facts that ground the passage:
+
+<div class="eq">$$s_{\mathrm{ppr}}(d \mid q) = \frac{1}{\sqrt{|\mathcal{F}_d|}} \sum_{f \in \mathcal{F}_d} \pi_q(f), \quad \mathcal{F}_d = \{\, f \in \mathcal{F} : \mathrm{src}(f) = d \,\}. \quad (2)$$</div>
+
+The square-root normalization avoids penalizing passages whose facts have been deduplicated more aggressively. Because propagation is restricted to $G_q$, the resulting scores depend on whether a passage is connected to $q$ through entity-relation evidence in $\mathcal{G}_{\mathcal{D}}$, and not only on whether it is independently similar to $q$. The output of local retrieval is the resulting ranked list of passages in $V_q$, which the next subsection refines.</td>
+<td class="cn">在 $G_q$ 内，<strong>OpenIE facts 是 evidence flow 的传播单元</strong>：两个事实 $f_i, f_j \in \mathcal{F}$ 当共享一个被激活的实体时相连，每个 fact $f$ 跟它的 provenance 段落 $\mathrm{src}(f)$ 相连。种子分布 $s_q$ 把质量放在 argument 包含 $A(q)$ 中锚点的 fact 上，按其 provenance 段落的 entry score 和 $\mathrm{Entry}(q)$ 上的 entry-side 质量加权。我们用<strong>限制在 $G_q$ 上的 power iteration</strong> 求解：
+
+<div class="eq">$$\pi_q = \alpha\, s_q + (1-\alpha)\, P_q^{\!\top}\, \pi_q, \quad (1)$$</div>
+
+其中 $P_q$ 是由这些 fact-fact 和 fact-passage 链接诱导的局部传播矩阵。然后通过<strong>聚合锚定该段落的 fact 上的稳态质量</strong>读出段落分数：
+
+<div class="eq">$$s_{\mathrm{ppr}}(d \mid q) = \frac{1}{\sqrt{|\mathcal{F}_d|}} \sum_{f \in \mathcal{F}_d} \pi_q(f), \quad \mathcal{F}_d = \{\, f \in \mathcal{F} : \mathrm{src}(f) = d \,\}. \quad (2)$$</div>
+
+平方根归一化避免对去重更激进的段落产生不公平的惩罚。由于传播被限制在 $G_q$ 上，结果分数取决于段落是否通过 $\mathcal{G}_{\mathcal{D}}$ 中的实体-关系证据与 $q$ 相连，而不仅仅取决于它对 $q$ 的独立相似度。<strong>本节(局部检索)的输出</strong>是 $V_q$ 中段落的排序，下一节对其进行精化。</td>
+</tr></table>
+
+<hr>
+
+<!-- ===================================================================== -->
+<h2 id="s43">§4.3 Retrieval Enhancement with Relational Evidence<br><span style="font-size:14px;color:#888;font-weight:normal;">基于关系证据的检索增强</span></h2>
+
+<div class="para-label">Lead — Two failure modes of local-PPR + enhancement plan</div>
+<table><tr>
+<td class="en">Local propagation yields an initial graph-aware ranking, but two failure modes remain. First, passages that lie on a multi-hop chain but are far from question anchors in $G_q$ can receive low propagated mass, even when they carry the relational evidence required to complete the chain. Second, the top of the local ranking can be dominated by passages that cluster around a single entity neighborhood, leaving other entities or relations demanded by $q$ under-covered. We address both with a retrieval-enhancement step that operates on top of the local-PPR scores.</td>
+<td class="cn">局部传播给出了一个初始的<strong>图感知排序</strong>，但仍有<strong>两种失败模式</strong>。第一，<strong>处于多跳链上、但在 $G_q$ 中离 question anchor 较远的段落</strong>可能拿到较低的传播质量，即便它们携带闭合该链所需的关系证据。第二，<strong>local ranking 顶部可能被聚集在单一实体邻域的段落主导</strong>，导致 $q$ 所需的其他实体或关系覆盖不足。我们用一个 <strong>retrieval enhancement</strong> 步骤同时处理这两种问题，作用在 local-PPR 分数之上。</td>
+</tr></table>
+
+<div class="para-label">Enhancement 1 — Relation-grounded expansion</div>
+<table><tr>
+<td class="en">For each high-scoring node in $\pi_q$, EvidenceFlow follows the relational edges of $\mathcal{G}_{\mathcal{D}}$ to retrieve additional passages whose provenance realizes a relation that has not yet been covered by the current top of the ranking. Concretely, for a phrase or passage node $u$ with high $\pi_q(u)$, we enumerate the relational edges incident to $u$ whose relation phrase $r$ is compatible with the relations that $q$ asks about, and admit the provenance passages of those edges as expansion candidates. Each expansion candidate inherits a score that combines $\pi_q(u)$ with an edge-level score derived from the dense similarity between the relation phrase $r$ and the question. <strong>This step brings in bridge passages and tail-entity passages that are required by the question's relational structure but are not lexically similar to $q$</strong>.</td>
+<td class="cn">对 $\pi_q$ 中的每个高分节点，EvidenceFlow 沿 $\mathcal{G}_{\mathcal{D}}$ 的关系边检索<strong>额外的段落</strong>——这些段落的 provenance 实现了一个尚未被当前排名顶部覆盖的关系。具体地，对一个 $\pi_q(u)$ 高的 phrase 或 passage 节点 $u$，我们枚举与 $u$ 相邻的关系边——只要其关系短语 $r$ 跟 $q$ 所问的关系兼容——并把这些边的 provenance 段落作为<strong>扩展候选</strong>。每个扩展候选继承一个分数，由 $\pi_q(u)$ 与<strong>关系短语 $r$ 跟 question 的 dense 相似度</strong>导出的边级分数组合而成。<strong>这一步把那些被问题关系结构所需要、但跟 $q$ 词汇相似度不高的桥段落和尾实体段落拉进来</strong>。</td>
+</tr></table>
+
+<div class="para-label">Enhancement 2 — Coverage-aware reranking (noisy-OR)</div>
+<table><tr>
+<td class="en">After expansion, we rerank the combined candidate set under a noisy-OR coverage model over a small set of question-side requirements $B(q) = \{b_1, b_2, \ldots\}$, where each $b \in B(q)$ is an entity- or relation-bearing slot that $q$ expects the evidence to jointly resolve. The requirements are extracted from $q$ by the same controlled language model used for the anchor set; <strong>they are applied to the question only, never to retrieved documents, and do not generate evidence chains</strong>. For a passage $d$ and a requirement $b$, we associate a contribution $\phi_{d,b} \in [0,1]$ derived from dense similarity between $d$ and $b$ under $q$. The coverage of a candidate set $R$ for requirement $b$ is
+
+<div class="eq">$$\mathrm{cov}_q(R \mid b) = 1 - \prod_{d \in R}\bigl(1 - \phi_{d,b}\bigr), \quad (3)$$</div>
+
+which saturates at $1$ once any passage in $R$ contributes substantially to $b$, and rewards diverse contributions across passages otherwise. We form $R_q$ greedily by adding, at each step, the candidate $d$ that maximizes the marginal gain $\sum_{b \in B(q)}\bigl[\mathrm{cov}_q(R \cup \{d\} \mid b) - \mathrm{cov}_q(R \mid b)\bigr]$ weighted against $s_{\mathrm{ppr}}(d \mid q)$. <strong>Because the noisy-OR coverage saturates per requirement, passages whose neighborhoods are already covered by higher-ranked candidates receive diminishing marginal gain, while passages addressing previously-uncovered requirements are promoted</strong>. The reranked output is the final ranked evidence list $R_q$ over passages in $\mathcal{D}$; downstream systems may consume any prefix of $R_q$.</td>
+<td class="cn">扩展之后，我们在一组 question-side requirements $B(q) = \{b_1, b_2, \ldots\}$ 之上用 <strong>noisy-OR coverage model</strong> 对扩展后的候选集合进行重排——其中每个 $b \in B(q)$ 是 $q$ 期望证据共同解决的<strong>实体或关系槽位</strong>。这些 requirement 由跟 anchor set 相同的<strong>受控语言模型</strong>从 $q$ 抽取；<strong>它们作用在问题上，绝不作用在检索到的文档上，也不生成证据链</strong>。对每个段落 $d$ 和需求 $b$，我们关联一个贡献 $\phi_{d,b} \in [0,1]$，由 $d$ 和 $b$ 在 $q$ 下的 dense 相似度导出。候选集合 $R$ 对需求 $b$ 的覆盖率是：
+
+<div class="eq">$$\mathrm{cov}_q(R \mid b) = 1 - \prod_{d \in R}\bigl(1 - \phi_{d,b}\bigr), \quad (3)$$</div>
+
+一旦 $R$ 中任意段落对 $b$ 的贡献足够大，覆盖率即<strong>饱和到 1</strong>；否则跨段落的多样化贡献会被奖励。我们以贪心方式构造 $R_q$：每一步加入使得边际增益 $\sum_{b \in B(q)}\bigl[\mathrm{cov}_q(R \cup \{d\} \mid b) - \mathrm{cov}_q(R \mid b)\bigr]$ 最大、并对 $s_{\mathrm{ppr}}(d \mid q)$ 加权的候选 $d$。<strong>由于 noisy-OR coverage 在每个 requirement 上饱和，邻域已被高排名候选覆盖的段落获得递减边际增益，而处理先前未覆盖 requirement 的段落则被提升</strong>。重排后的输出就是最终的 ranked evidence list <strong>$R_q$（对 $\mathcal{D}$ 中段落的排序）；下游系统可以消费 $R_q$ 的任意前缀</strong>。</td>
+</tr></table>
+
+<hr>
+
+<div class="meta" style="margin-top:24px;">
+<strong>Source:</strong> <code>paper/sections/04_method.tex</code>（v5 advisor rewrite） · <strong>Backup v3-final:</strong> <code>archive/04_method_v3-final_codex_3sec_4para_20260516.tex</code> · <strong>Backup v4 pre-rewrite:</strong> <code>archive/04_method_v4_pre_advisor_rewrite_20260516.tex</code>
+</div>
+
+</body>
+</html>

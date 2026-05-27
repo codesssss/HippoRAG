@@ -1,0 +1,253 @@
+% =====================================================================
+% Section 5: Experiments
+% =====================================================================
+%
+% Status: Draft Section 5 Experiments v1 (2026-05-16)
+% Data sources:
+%   - Main graph baselines:
+%     run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512
+%     run_logs/hipporag_qwen32b_valid_graph_top200_full1000_20260513_r2
+%   - NeocorRAG:
+%     run_logs/neocorrag_aligned_k3_all32_full1000_20260514
+%     run_logs/neocorrag_reader_gpt4omini_full1000_20260516
+%   - EvidenceFlow:
+%     run_logs/all32_etv3_etv4_pcec_gpt4omini_none_full1000_20260514
+%   - Ablations:
+%     run_logs/etv4_ablation_relation_coverage_all32_gpt4omini_full1000_20260516
+%   - Dense-entry diagnostic:
+%     run_logs/etv4_full1000_optimized_equivalence_20260511/reports/etv4_ablation6_dense_only_same_entry_full1000.json
+%     run_logs/dense_entry_gpt4omini_reader_full1000_20260516
+%
+% =====================================================================
+
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+\label{sec:experiments:setup}
+
+\paragraph{Datasets.}
+We evaluate on HotpotQA, 2WikiMultiHopQA, and MuSiQue, three standard
+multi-hop question answering benchmarks. For each benchmark, we use a
+1,000-query evaluation split with gold supporting passages. This setting
+allows us to report both retrieval quality and downstream answer quality
+under the same reader protocol.
+
+\paragraph{Baselines.}
+We compare \methodname{} with graph-based and chain-oriented retrieval
+baselines. HippoRAG represents OpenIE-based graph retrieval over a
+passage--phrase graph. PropRAG represents proposition-level graph
+retrieval with path search over proposition units. NeocorRAG represents
+a query-time chain-mining approach that augments the reader context with
+mined entity-relation evidence chains. We also include the dense entry
+ranking from the same NV-Embed-v2 seed retriever to isolate the effect
+of graph-based evidence flow beyond the initial semantic ranking. For
+methods that require language-model-assisted indexing, chain extraction,
+or question-side analysis, we use Qwen3-32B with reasoning traces
+disabled in the output. For the final answer generation step, all methods
+use the same GPT-4o-mini reader.
+
+\paragraph{Metrics.}
+Retrieval is evaluated by supporting-passage recall at the reader cutoff,
+denoted R@5. End-to-end QA is evaluated by exact match (EM) and token F1
+after the reader consumes the top five retrieved passages. For ablations,
+we additionally report All@5, the fraction of questions for which all
+gold supporting passages appear in the reader prefix. All scores are
+reported as percentages.
+
+\paragraph{Implementation details.}
+All retrieval systems produce ranked passage lists and are evaluated with
+the same top-five reader context. All methods are evaluated on the same
+1,000 questions and corpus snapshots for each benchmark. HippoRAG and
+PropRAG retrieve from graph candidate pools capped at 200 passages.
+\methodname{} builds a top-100 native candidate pool from the same
+top-200 frontier, performs query-local propagation over its
+document-grounded OpenIE graph, and passes the resulting ranked list to
+the same reader. Dense embeddings are computed with NV-Embed-v2. The
+reader uses temperature 0, and EM/F1 are computed with the same answer
+normalization across methods. Prompts and hyperparameters for
+question-side analysis and reader generation are provided in the
+Appendix. Unless otherwise stated, \methodname{} uses relation-grounded
+expansion followed by coverage-aware reranking.
+
+\subsection{Main Results}
+\label{sec:experiments:main}
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{lccc ccc ccc}
+\toprule
+& \multicolumn{3}{c}{HotpotQA} &
+\multicolumn{3}{c}{2WikiMultiHopQA} &
+\multicolumn{3}{c}{MuSiQue} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+Method & R@5 & EM & F1 & R@5 & EM & F1 & R@5 & EM & F1 \\
+\midrule
+Dense entry & 93.4 & 59.5 & 73.0 & 75.9 & 55.0 & 60.5 & 68.3 & 35.2 & 46.2 \\
+HippoRAG & 92.6 & 59.3 & 72.5 & 82.8 & 56.7 & 63.4 & 71.0 & 34.9 & 46.5 \\
+PropRAG & 95.1 & 61.8 & 75.1 & 90.9 & 61.1 & 69.1 & \textbf{74.2} & 36.5 & 47.6 \\
+NeocorRAG & 95.0 & 62.1 & 74.8 & 88.9 & 59.8 & 66.5 & 73.1 & 37.1 & 48.1 \\
+\methodname{} & \textbf{96.5} & \textbf{62.8} & \textbf{75.6}
+& \textbf{96.2} & \textbf{65.9} & \textbf{74.7}
+& 73.5 & \textbf{37.2} & \textbf{48.9} \\
+\bottomrule
+\end{tabular}
+\caption{Main results under a unified reader setting. R@5 measures
+supporting-passage recall in the top-five reader context, and EM/F1 are
+computed from the GPT-4o-mini answer generated from that context.}
+\label{tab:main-results}
+\end{table*}
+
+Table~\ref{tab:main-results} shows that \methodname{} gives the strongest
+average retrieval and QA performance among the evaluated methods. The
+clearest gain appears on 2WikiMultiHopQA. Compared with the dense entry
+ranking, \methodname{} improves R@5 from 75.9 to 96.2 and F1 from 60.5
+to 74.7. Compared with the strongest graph baseline on this dataset,
+PropRAG, \methodname{} improves R@5 from 90.9 to 96.2 and F1 from 69.1
+to 74.7. This is the setting where recovering bridge evidence is
+especially important, and the gain suggests that query-local fact
+propagation and enhancement are useful beyond independent semantic,
+proposition, or passage ranking. On HotpotQA, the baselines are already
+strong, but \methodname{} still gives the best R@5, EM, and F1. On
+MuSiQue, PropRAG obtains the highest R@5, while \methodname{} obtains
+the best EM and F1. This indicates that higher supporting-passage recall
+does not always translate linearly into better answer generation,
+especially when questions require longer or more fragmented evidence
+combinations.
+
+NeocorRAG provides a strong chain-oriented baseline under the same reader.
+Its saved reader contexts contain 3.3 to 3.6 passages on average. This
+creates a different precision--coverage trade-off, so we report both
+retrieval and QA metrics under the same reader. \methodname{} improves
+average F1 from 63.1 to 66.4 and average R@5 from 85.7 to 88.7 over
+NeocorRAG. The result supports the central claim that document-grounded
+graph propagation can be converted into an effective evidence list
+without mining new evidence chains from retrieved text at query time.
+
+\subsection{Ablation Study}
+\label{sec:experiments:ablation}
+
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{lccc ccc ccc}
+\toprule
+& \multicolumn{3}{c}{HotpotQA} &
+\multicolumn{3}{c}{2WikiMultiHopQA} &
+\multicolumn{3}{c}{MuSiQue} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+Variant & R@5 & F1 & All@5 & R@5 & F1 & All@5 & R@5 & F1 & All@5 \\
+\midrule
+Full \methodname{} & \textbf{96.5} & \textbf{75.6} & \textbf{93.3}
+& \textbf{96.2} & \textbf{74.7} & \textbf{89.5}
+& \textbf{73.5} & 48.9 & \textbf{45.3} \\
+Dense entry only & 93.4 & 73.0 & 87.1
+& 75.9 & 60.5 & 49.3
+& 68.3 & 46.2 & 37.2 \\
+w/o relation expansion & 95.2 & 74.8 & 90.9
+& 92.8 & 71.1 & 81.1
+& 73.0 & \textbf{49.0} & 43.9 \\
+w/o coverage reranking & 95.0 & 74.8 & 90.5
+& 93.5 & 72.8 & 82.6
+& 71.8 & 48.3 & 42.2 \\
+\bottomrule
+\end{tabular}
+\caption{Ablation results for the retrieval framework and enhancement components.
+All@5 measures whether the top-five reader context contains all gold
+supporting passages.}
+\label{tab:ablation}
+\end{table*}
+
+Table~\ref{tab:ablation} isolates the retrieval framework and the two
+enhancement components in \methodname{}. We use one fixed configuration
+across datasets rather than selecting dataset-specific ablation variants.
+Replacing
+\methodname{} with the dense entry ranking causes the largest drop,
+especially on 2WikiMultiHopQA, where F1 decreases by 14.2 points and
+All@5 decreases by 40.2 points. This shows that the graph-based evidence
+flow is the core source of the retrieval gain, while the enhancement
+components refine the final reader prefix.
+
+Removing relation-grounded expansion hurts 2WikiMultiHopQA most clearly,
+reducing R@5 by 3.4 points, F1 by 3.6 points, and All@5 by 8.4 points.
+This is consistent with the role of expansion in admitting bridge and
+tail-entity passages that receive insufficient mass from local
+propagation alone. The effect is smaller on HotpotQA and mixed on
+MuSiQue. On MuSiQue, the 0.1 F1 difference is small, while the full
+model still improves R@5 and All@5. We therefore treat the MuSiQue result
+as a retrieval-side gain rather than as strong evidence of a QA gain from
+relation expansion.
+
+Removing coverage-aware reranking produces a more uniform retrieval
+drop. R@5 decreases on all three datasets, and All@5 decreases by 2.8,
+6.9, and 3.1 points on HotpotQA, 2WikiMultiHopQA, and MuSiQue,
+respectively. This supports the hypothesis that graph propagation alone
+can leave the top of the ranked list concentrated around high-mass
+neighborhoods. The noisy-OR coverage objective improves the final reader
+prefix by preferring candidates that cover question-side requirements not
+already represented by the selected passages.
+
+\subsection{Diagnostic Analysis}
+\label{sec:experiments:analysis}
+
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccc ccc c}
+\toprule
+Dataset & \multicolumn{3}{c}{R@5} &
+\multicolumn{3}{c}{All@5} &
+Support gain \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+& Dense entry & \methodname{} & $\Delta$ &
+Dense entry & \methodname{} & $\Delta$ & \\
+\midrule
+HotpotQA & 93.4 & 96.5 & +3.1 & 87.1 & 93.3 & +6.2 & 7.2 \\
+2WikiMultiHopQA & 75.9 & 96.2 & +20.4 & 49.3 & 89.5 & +40.2 & 45.1 \\
+MuSiQue & 68.3 & 73.5 & +5.3 & 37.2 & 45.3 & +8.1 & 19.9 \\
+\bottomrule
+\end{tabular}
+\caption{Retrieval-side diagnostic comparing the dense entry ranking
+with \methodname{} under the same top-five reader prefix. Support gain is
+the fraction of queries whose number of retrieved gold supporting
+passages increases in the top-five list.}
+\label{tab:flow-diagnostic}
+\end{table*}
+
+\paragraph{Local evidence flow.}
+Table~\ref{tab:flow-diagnostic} directly compares the dense entry
+ranking with \methodname{} at the retrieval side. The largest gain
+appears on 2WikiMultiHopQA, where R@5 improves by 20.4 points and All@5
+improves by 40.2 points. This confirms that the core propagation step is
+not merely reordering dense neighbors. It changes the top-five evidence
+set for many questions and often increases the number of retrieved gold
+supporting passages.
+
+\paragraph{Effect of relation-grounded expansion.}
+The largest relation-expansion effect in Table~\ref{tab:ablation} also
+appears on 2WikiMultiHopQA, where the task often requires connecting two
+entities through an intermediate document. Without relation expansion,
+the model still performs local fact-level propagation, but passages
+farther from the query anchors are less likely to enter the reader
+prefix. The drop in All@5 shows that the missing passages are not merely
+alternative evidence but often part of the complete support set required
+by the dataset.
+
+\paragraph{Requirement coverage.}
+The coverage ablation confirms that selecting the top local-propagation
+scores is not enough. Even when the candidate pool contains relevant
+passages, the final top-five list can overrepresent one entity
+neighborhood. Coverage-aware reranking gives the largest All@5 gain on
+2WikiMultiHopQA and improves All@5 on all datasets, which directly
+matches the failure mode identified in the introduction.
+
+\paragraph{Retrieval-to-QA conversion.}
+The results also show that retrieval metrics and answer metrics are
+related but not identical. MuSiQue provides the clearest example.
+PropRAG has the highest R@5, while \methodname{} has the highest F1.
+This suggests that a useful multi-hop retriever should not only recover
+individual gold passages, but also place a connected and covering
+evidence set into the reader prefix. This observation motivates reporting
+both retrieval and QA metrics throughout the experiments.

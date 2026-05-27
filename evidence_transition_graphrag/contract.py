@@ -13,6 +13,12 @@ METHOD_NAME = "evidence_transition_graphrag"
 METHOD_TRACE_NAME = "evidence_transition_graph_native_retrieval"
 QA_DOC_KEY = "evidence_transition_doc_indices_top5"
 
+# ET v1 is frozen for already reported experiments. New graph-readout changes
+# must use the v2 identity so retrieval and reader QA outputs cannot be mixed.
+METHOD_V2_NAME = "evidence_transition_graphrag_v2"
+METHOD_V2_TRACE_NAME = "evidence_transition_v2_graph_native_retrieval"
+QA_V2_DOC_KEY = "evidence_transition_v2_doc_indices_top5"
+
 LEGACY_METHOD_NAMES: Tuple[str, ...] = (
     "query_grounded_sto_graphrag",
 )

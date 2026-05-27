@@ -1,6 +1,6 @@
 # Experiment Board
 
-Last updated: 2026-05-08
+Last updated: 2026-05-10
 
 ## Canonical Outputs
 
@@ -122,6 +122,166 @@ Last updated: 2026-05-08
 - `DAEC-selective vs SetR cross-pool paired-CI report`: `reports/daec_setr_cross_pool_ci_20260508/summary.md`
 - `DBEC depth x gate-resolvability conditional deposition`: `research_memory/emnlp_expand_then_compose/44_daec_depth_resolvability_conditional_20260508.md`
 - `DBEC depth x gate-resolvability conditional report`: `reports/daec_depth_resolvability_20260508/summary.md`
+- `ETv3 variable-flow full1000 result deposition`: `docs/etv3_variable_flow_full1000_qwen8b_nv2_20260510.md`
+- `ETv3 variable-flow full1000 launcher`: `run_logs/launch_etv3_full_qwen8b_nv2_20260510.sh`
+- `ETv3 variable-flow full1000 outputs`: `run_logs/evidence_transition_graphragv3_variable_flow_qwen8b_nv2_full_20260510/`
+- `ETv3 native full1000 failure audit`: `reports/etv3_native_full1000_audit_20260510/etv3_native_full1000_failure_audit.md`
+- `ETv3 native full1000 failure audit script`: `scripts/audit_etv3_native_full1000_failures.py`
+- `ETv3 pool + stable DBEC full1000 result deposition`: `docs/etv3_dbec_latest_full1000_20260510.md`
+- `ETv3 pool + stable DBEC full1000 launcher`: `run_logs/launch_etv3_dbec_latest_full1000_20260510.sh`
+- `ETv3 pool + stable DBEC full1000 outputs`: `run_logs/etv3_dbec_latest_full1000_20260510/`
+- `ETv3 pool + stable DBEC residual audit`: `reports/etv3_dbec_latest_full1000_residual_audit_20260510/etv3_dbec_full1000_residual_audit.md`
+- `ETv3 pool + stable DBEC residual audit script`: `scripts/audit_etv3_dbec_full1000_residuals.py`
+- `ETv3 + DBEC additive-only MuSiQue diagnostic`: `docs/etv3_dbec_additive_only_musique_full1000_20260510.md`
+- `ETv3 + DBEC additive-only MuSiQue output`: `run_logs/etv3_dbec_additive_only_full1000_20260510/evals/musique_etv3_pool100_dbec_additive_only_limit1000.json`
+- `ETv3 + DBEC preservation grid full1000`: `docs/etv3_dbec_preservation_grid_full1000_20260510.md`
+- `ETv3 + DBEC preservation grid outputs`: `run_logs/etv3_dbec_preservation_grid_full1000_20260510/evals/`
+- `ETv3 + DBEC selector frontier P1 summary`: `docs/etv3_dbec_selector_frontier_full1000_20260510.md`
+- `ETv3 + DBEC selector frontier P1 machine summary`: `reports/etv3_dbec_selector_frontier_full1000_20260510/summary.json`
+- `ETv3 + DBEC selector frontier P1 runner`: `scripts/run_etv3_dbec_selector_frontier.py`
+- `ETv3 + DBEC selector frontier P1 summarizer`: `scripts/summarize_etv3_dbec_selector_frontier.py`
+- `ETv3 + DBEC selector frontier P1 outputs`: `run_logs/etv3_dbec_selector_frontier_full1000_20260510/evals/`
+- `ETv3 + DBEC frontier reader P2 deposition`: `docs/etv3_dbec_frontier_reader_p2_full1000_20260510.md`
+- `ETv3 + DBEC frontier reader P2 pool exporter`: `scripts/export_selector_frontier_reader_pool.py`
+- `ETv4 query-local GraphRAG full1000 comparison deposition`: `docs/etv4_qwen32b_full1000_graphrag_comparison_20260513.md`
+- `ETv4 Qwen32B graph full1000 outputs`: `run_logs/etv4_clean_mainline_qwen32b_nothink_full1000_20260512/`
+- `ETv4 GPT-4o-mini reader full1000 outputs`: `run_logs/etv4_clean_mainline_qwen32b_reader_gpt4omini_20260512/reports/`
+- `HippoRAG/PropRAG Qwen32B graph + GPT-4o-mini reader baselines`: `run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/`
+- `ETv3 + DBEC frontier reader P2 outputs`: `run_logs/etv3_dbec_frontier_reader_p2_full1000_20260510/`
+- `ETv4-composition A0 dominance runner`: `scripts/run_etv4_composition_a0_selector.py`
+- `ETv4-composition A0 dominance deposition`: `docs/etv4_composition_a0_selector_full1000_20260510.md`
+- `ETv4-composition A0 dominance outputs`: `run_logs/etv4_composition_a0_selector_full1000_20260510/`
+
+## Pre-Registered Next-Step Gates
+
+### ETv3 Pool + Stable DBEC/DAEC Full1000
+
+Purpose: test whether a baseline-stable composition selector can convert ETv3's
+method-owned candidate200 headroom into top5 evidence-set completeness without
+hurting shallow cases.
+
+Primary MuSiQue 4-doc gate:
+
+- If stable DBEC/DAEC reaches `F1 >= 0.3000` on MuSiQue 4-doc, treat the
+  ETv3-pool composition route as the main next line and defer ETv4-binding.
+- If MuSiQue 4-doc `F1` is in `[0.2500, 0.3000)`, run residual audit before
+  choosing between ETv4-composition/state-binding and pool/readout expansion.
+- If MuSiQue 4-doc `F1 < 0.2500`, do not promote DBEC-on-ETv3 as a mainline
+  fix; audit residuals for candidate-boundary and candidate-quality limits
+  before any ETv4-binding implementation.
+
+Regression gate:
+
+- MuSiQue 2-doc `F1` must be at least ETv3 native `0.5168 - 0.0100 = 0.5068`.
+  A method that improves 4-doc while harming 2-doc beyond this gate is not
+  acceptable as the default composition line.
+
+Result:
+
+- Completed on 2026-05-10: `run_logs/etv3_dbec_latest_full1000_20260510/`.
+- Same-run full1000 deltas:
+  - 2Wiki: `F1 0.6516 -> 0.6867` (`+0.0351`).
+  - HotpotQA: `F1 0.7324 -> 0.7368` (`+0.0044`).
+  - MuSiQue: `F1 0.4332 -> 0.3989` (`-0.0343`).
+- MuSiQue depth deltas:
+  - 2-doc: `F1 0.5173 -> 0.4788` (`-0.0384`), fails the `>= 0.5068`
+    regression gate.
+  - 3-doc: `F1 0.3978 -> 0.3594` (`-0.0384`).
+  - 4-doc: `F1 0.2382 -> 0.2245` (`-0.0137`), below the `0.2500`
+    residual-audit gray zone and below the `0.3000` promotion gate.
+- Decision: do not promote direct DBEC-on-ETv3 as the mainline MuSiQue fix.
+  Run residual audit before naming or implementing any ETv4 state/binding
+  mechanism.
+- Residual audit: MuSiQue has `92` worsened queries and all `92` are changed
+  by DBEC; `75 / 92` worsened queries have a gold title swapped out.  Overall
+  MuSiQue title-level set completeness does not improve (`0.4600 -> 0.4520`)
+  despite `740` swaps.  This points to objective miscalibration on MuSiQue, not
+  an under-aggressive edit budget.
+- The remaining `17 / 92` MuSiQue worsened queries without a gold-title
+  swap-out are mostly reader/order/context sensitivity: `6` preserve complete
+  title-level gold coverage, `9` preserve the same title recall, and `2`
+  increase title recall but hurt F1.
+- 2Wiki gains are narrow-domain, not uniform: the 4-doc slice contributes
+  `77.9%` of the overall F1 gain (`4-doc F1 0.7431 -> 0.8596`), while 2-doc
+  contributes only `22.1%`.
+- Additive-only diagnostic (`preserve_top_m=4`, `max_swaps=1`) on MuSiQue
+  validates the preservation-first prior:
+  - overall `F1 0.4332 -> 0.4468` (`+0.0136`);
+  - 2-doc `0.5173 -> 0.5338` (`+0.0166`);
+  - 3-doc `0.3978 -> 0.3946` (`-0.0031`);
+  - 4-doc `0.2382 -> 0.2744` (`+0.0362`);
+  - worsened queries drop from `92` to `51`, and worsened-with-gold-swapped-out
+    drops from `75` to `25`.
+  This supports ETv4-composition as a preservation-constrained add-on objective,
+  not an unconstrained DBEC rebuild/local editor.
+- Cross-dataset preservation grid:
+  - 2Wiki top4/max1: `F1 0.6516 -> 0.7005` (`+0.0489`), 4-doc `0.7431 -> 0.8511`.
+  - HotpotQA top4/max1: `F1 0.7324 -> 0.7480` (`+0.0156`).
+  - MuSiQue top3/max2: `F1 0.4332 -> 0.4379` (`+0.0047`), weaker than MuSiQue top4/max1 `0.4468`.
+  - Decision: top4/max1 is the current strongest parameter-level floor.  Extra
+    admission capacity via top3/max2 does not pass the design test because it
+    relaxes preservation too much.
+- P1 selector-level frontier completed on 2026-05-10:
+  - added missing selector-only points for 2Wiki top3/max2 and top2/max3,
+    HotpotQA top3/max2 and top2/max3, and MuSiQue top2/max3.
+  - 2Wiki title-all@5 peaks at top3/max2: baseline `0.7060`, top4/max1
+    `0.8560`, top3/max2 `0.8790`, top2/max3 `0.8660`, top1/max2 `0.8200`.
+    This means the frontier is not a trivial top4-only result.
+  - HotpotQA title-all@5 peaks at top4/max1: baseline `0.9050`, top4/max1
+    `0.9320`, top3/max2 `0.9260`, top2/max3 `0.9060`, top1/max2 `0.8880`.
+  - MuSiQue title-all@5 also peaks overall at top4/max1: baseline `0.4600`,
+    top4/max1 `0.4850`, top3/max2 `0.4810`, top2/max3 `0.4620`,
+    top1/max2 `0.4520`.
+  - Gold-out queries rise sharply as preservation relaxes:
+    - 2Wiki top4/top3/top2/top1: `13 / 19 / 39 / 94`.
+    - HotpotQA top4/top3/top2/top1: `7 / 15 / 37 / 57`.
+    - MuSiQue top4/top3/top2/top1: `137 / 174 / 241 / 228`.
+  - Decision: keep `top4/max1` as the robust preservation floor, while noting
+    top3/max2 as a 2Wiki set-completeness candidate.  Do not choose ETv4 by
+    selector title-all alone; reader QA should be run only for selected,
+    hypothesis-bearing frontier points.
+- P2 targeted reader QA completed on 2026-05-10:
+  - 2Wiki top3/max2: reader `F1 0.7081`, above top4/max1 `0.7005`,
+    unrestricted stable DBEC `0.6867`, and ETv3 baseline `0.6516`.  This means
+    top4/max1 is not universally reader-optimal; 2Wiki can safely use a looser
+    preservation/admission point.
+  - MuSiQue top2/max3: reader `F1 0.4037`, far below top4/max1 `0.4468`,
+    below top3/max2 `0.4379`, and close to unrestricted stable DBEC `0.3989`.
+    This confirms that looser preservation can damage reader-facing evidence
+    even when selector-level title-all@5 is near baseline (`0.4620` vs
+    baseline `0.4600`).
+  - Decision: the frontier is reader-sensitive and dataset-dependent.  Keep
+    top4/max1 as the robust parameter-level floor, but do not hard-code it as
+    the final ETv4 method.  The next method step should be evidence-level
+    retention/admission, not a blind lowering of `preserve_top_m`.
+- ETv4-composition A0 selector-only dominance probe completed on 2026-05-10:
+  - Implemented opt-in agreement dominance projection in
+    `scripts/dtc_embed_utils.py`; default safe projection remains
+    `rank_cutoff`.
+  - Added runner `scripts/run_etv4_composition_a0_selector.py`.
+  - Tested four variants:
+    - `r2_ge`: ETv3+dense retention, non-strict `R(c) >= R(d)`.
+    - `r2_gt`: ETv3+dense retention, strict `R(c) > R(d)`.
+    - `r3_ge`: ETv3+dense+DBEC retention, non-strict.
+    - `r3_gt`: ETv3+dense+DBEC retention, strict.
+  - Results:
+    - 2Wiki: best A0 title-all@5 is `r3_ge 0.7200`, far below rank top4/max1
+      `0.8560` and top3/max2 `0.8790`; `r3_ge` also raises gold-out to `55`
+      and hurts the 4-doc slice (`0.1447 -> 0.1234`).
+    - HotpotQA: all A0 variants are no-op at `0.9050`, while rank top4/max1
+      reaches `0.9320`.
+    - MuSiQue: A0 variants are no-op or worse; `r3_ge` drops
+      `0.4600 -> 0.4580`, while rank top4/max1 reaches `0.4850`.
+  - Decision: do not run reader QA for these A0 variants.  Naive
+    cross-signal top5 agreement is not a better retention object than ETv3
+    rank-cutoff preservation on this substrate.  Do not patch this with
+    weighted agreement fusion; that would reintroduce heuristic score mixing.
+
+Framing constraint:
+
+- Until residual audit proves a state/binding-specific mechanism, call the next
+  branch `ETv4-composition` or leave it unnamed.  Do not claim
+  `ETv4-state-binding` from native ETv3 audit alone.
 
 ## Done
 

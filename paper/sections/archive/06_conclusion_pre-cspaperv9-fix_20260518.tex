@@ -1,0 +1,34 @@
+% =====================================================================
+% Section 6: Conclusion — EvidenceFlow
+% =====================================================================
+%
+% Status: Draft Section 6 Conclusion v1 (2026-05-17)
+% Length: ~108 words, single paragraph, 5 sentences. No bullet list,
+%         no headline numbers, no new terminology.
+% Style reference: composite of NeocorRAG (problem diagnosis) +
+%                  Relink (principle close) + HGRAG (compact module
+%                  recap), per advisor feedback on conclusion length
+%                  and registers in paper/refer/.
+%
+% =====================================================================
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented \methodname{}, a graph-based retrieval framework that
+treats graph propagation as the start of evidence selection rather
+than the final ranking. \methodname{} builds a fact-source substrate
+that promotes each OpenIE fact to a graph node and binds it to its
+source passage, and runs query-local personalized PageRank on an
+induced fact-and-passage graph to produce a query-conditioned
+evidence flow. Two evidence-aware steps then refine this flow:
+relation-grounded edges to admit bridge passages whose relations
+phrases match the question, and coverage-aware reranking selects a
+list that covers distinct question-side requirements. Experiments
+on three multi-hop QA benchmarks show consistent gains over dense,
+OpenIE-based, and chain-oriented baselines, with ablations
+isolating the contribution of each operator and a substrate-isolation
+experiment showing that fact-source grounding mainly contributes to
+connected evidence coverage on bridge-heavy questions. The results suggest
+that converting propagated relevance into a connected and covering
+evidence list is a productive design axis for GraphRAG.

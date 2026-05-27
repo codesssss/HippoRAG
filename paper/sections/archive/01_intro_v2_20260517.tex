@@ -1,0 +1,114 @@
+% =====================================================================
+% Section 1: Introduction — EvidenceFlow
+% =====================================================================
+%
+% Status: Draft §1 Introduction v2 (2026-05-17)
+% Revision note:
+%   - Rewrite starts directly from GraphRAG, following advisor feedback.
+%   - Narrative: GraphRAG routes -> limitations -> motivation -> method.
+%   - Contribution bullets are provisional until Method is fully frozen.
+%
+% =====================================================================
+
+\section{Introduction}
+\label{sec:intro}
+
+Graph-based retrieval-augmented generation, or GraphRAG, has become a
+natural approach for multi-hop question answering because the evidence
+needed to answer a question is often distributed across several
+passages. Instead of ranking each passage independently, GraphRAG methods
+organize a corpus into a structure of entities, relations, propositions,
+passages, or summaries, and then use this structure to retrieve evidence
+that is connected across documents. This direction is especially relevant
+for multi-hop QA, where a useful retrieval result should not only contain
+passages that resemble the question, but also expose bridge facts and
+tail evidence that allow a reader to connect the question entities to the
+answer.
+
+Existing GraphRAG systems have developed several routes for introducing
+structure into retrieval. One route builds an OpenIE-derived graph over
+the corpus and propagates relevance from question-side seeds. HippoRAG
+and HippoRAG 2 \citep{jimenez2024hipporag,gutierrez2025hipporag}, for
+example, extract OpenIE facts, construct passage--phrase graphs, and use
+personalized PageRank to spread relevance over a corpus-wide graph. This
+route gives dense or lexical retrieval an explicit connectivity layer,
+but its graph operator is still primarily a relevance propagator. In
+practice, propagated mass can concentrate around the closest seed
+neighborhood, while bridge passages several hops away receive weaker
+scores. Moreover, when relation-bearing facts are converted into graph
+connectivity, the final passage ranking still needs a separate mechanism
+to decide whether the selected top-$K$ passages cover the different
+entities and relations required by the question.
+
+A second route makes multi-hop structure more explicit by searching or
+constructing paths. PropRAG \citep{wang2025proprag} uses propositions as
+context-rich graph units and applies beam search to discover reasoning
+paths, while KG-oriented systems such as ToG \citep{sun2024tog} and
+Relink \citep{huang2026relink} traverse or repair relation graphs at
+query time. A third route changes the graph representation itself:
+GraphRAG \citep{edge2024graphrag} retrieves through community summaries,
+and hypergraph-based methods such as HGRAG \citep{hgrag2024} connect
+entities and passages through higher-order structures. These approaches
+address important weaknesses of flat passage ranking, but they also
+leave a tension for retrieval-first multi-hop QA. Path-oriented methods
+can make chains explicit, yet often rely on query-time search or
+language-model-guided construction. Summary and hypergraph methods
+improve corpus-level organization, yet their coarse or mixed-granularity
+representations do not directly specify how propagated relevance should
+be converted into a short evidence list for the reader.
+
+This paper is motivated by the following gap. Graph structure helps
+identify connected evidence, but GraphRAG systems ultimately have to
+return a ranked passage list under a small reader budget. The problem is
+therefore not only how to propagate relevance over a graph, but how to
+turn propagated relevance into evidence that is both connected and
+covering. It should be connected enough to preserve bridge relations
+across documents, and covering enough to expose the distinct
+question-side entities and relations that the reader must resolve. We
+focus on this conversion problem while keeping the retrieval interface
+simple. The system outputs a ranked evidence list $R_q$ of natural
+language passages, rather than a symbolic path or a generated evidence
+chain, and the downstream reader consumes a prefix of this list.
+
+We propose \methodname{}, a graph-based retrieval framework built around
+index-grounded evidence propagation. The key idea is to keep relation
+structure on the indexing side and use query-time computation to
+propagate, expand, and select evidence over a document-grounded OpenIE
+graph. Offline indexing constructs a multi-layer graph that couples
+passages, entity phrases, OpenIE facts, and provenance
+(\S\ref{sec:method:substrate}). At query time, \methodname{} induces a
+query-local view of this graph and runs fact-level personalized PageRank
+to obtain a query-conditioned evidence flow $\pi_q$
+(\S\ref{sec:method:retrieval}). Passage scores are read out from the
+propagated masses of provenance-linked fact units. A retrieval
+enhancement stage then follows relation-grounded edges to admit bridge
+and tail-entity passages, and reranks candidates with a noisy-OR coverage
+model over question-side requirements
+(\S\ref{sec:method:enhancement}). In this way, \methodname{} treats graph
+propagation as the start of multi-hop evidence selection rather than as
+the final ranking by itself.
+
+We evaluate \methodname{} on multi-hop QA benchmarks under a common
+reader protocol, comparing against dense, graph-based, and
+chain-oriented retrieval baselines. The evaluation measures retrieval
+quality and downstream QA performance, and includes ablations for local
+evidence propagation, relation-grounded expansion, and coverage-aware
+reranking. These experiments are designed to test whether the proposed
+conversion from graph relevance to ranked evidence improves both support
+coverage and answer quality.
+% TODO: Add final headline numbers once all main-table results are frozen.
+
+% TODO: Finalize the three contribution bullets after the Method section is
+% frozen. Current provisional wording follows.
+The main contributions are as follows.
+\begin{itemize}
+    \item We introduce \methodname{}, a GraphRAG retrieval framework that
+    models multi-hop evidence selection as query-conditioned propagation
+    over document-grounded OpenIE facts and provenance-linked passages.
+    \item We develop a retrieval mechanism that combines query-local
+    fact-level personalized PageRank with relation-grounded expansion and
+    noisy-OR coverage reranking over question-side requirements.
+    \item We provide an empirical study that evaluates retrieval recall,
+    downstream QA performance, and component ablations under a unified
+    reader setting.
+\end{itemize}

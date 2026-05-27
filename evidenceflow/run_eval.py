@@ -8,7 +8,7 @@ the expander and replaces top-k readout with prefix-residual admission:
 
 The implementation intentionally reuses the existing DBEC frozen-binding
 noisy-OR selector path, but exposes only the PCEC hard-constraint interface.
-It is retained for legacy parity; the main EvidenceFlow protocol is ETv4
+It is retained for legacy parity; the main EvidenceLink protocol is ETv4
 fact-witnessed STO pool plus PCEC native-pool readout.
 """
 

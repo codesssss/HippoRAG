@@ -93,6 +93,7 @@ def align_pool_record(
 ) -> dict[str, Any]:
     pool_docs = list(record.get("pool_docs") or [])
     pool_titles = list(record.get("pool_titles") or [])
+    reader_pool_doc_ids = list(record.get("pool_doc_ids") or [])
     if not pool_docs and pool_titles:
         pool_docs = ["" for _ in pool_titles]
     if len(pool_titles) < len(pool_docs):
@@ -110,4 +111,10 @@ def align_pool_record(
         hipporag=hipporag,
         doc_text_to_chunk_id=doc_text_to_chunk_id,
     )
+    agsto = dict(record.get("agsto") or record.get("et_trace") or {})
+    if reader_pool_doc_ids:
+        agsto.setdefault("external_pool_doc_ids", reader_pool_doc_ids)
+        agsto.setdefault("reader_pool_doc_ids", reader_pool_doc_ids)
+    if agsto:
+        output["agsto"] = agsto
     return output

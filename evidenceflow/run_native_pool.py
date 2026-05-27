@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Run EvidenceFlow native-pool readout over an existing ET candidate pool.
+"""Run EvidenceLink native-pool readout over an existing ET candidate pool.
 
-For the main Table-1 EvidenceFlow protocol, the input pool must come from
+For the main Table-1 EvidenceLink protocol, the input pool must come from
 ``evidence_transition_graphragv4_fact_witnessed_sto``.  The runner still accepts
 older ETv3 pools for compatibility and parity checks, but those outputs are
 marked as non-main protocol in the metadata.
@@ -61,7 +61,7 @@ from src.hipporag.utils.config_utils import BaseConfig  # noqa: E402
 DEFAULT_DATA_ROOT = Path("reproduce/dataset")
 DEFAULT_OUTPUT_ROOT = Path("run_logs/evidenceflow_native_pool")
 DEFAULT_SAVE_DIR = "outputs_step0_general_nvembed"
-# Legacy defaults are kept for smoke/parity runs. Main EvidenceFlow experiments
+# Legacy defaults are kept for smoke/parity runs. Main EvidenceLink experiments
 # pass an explicit ETv4 fact-witnessed STO pool JSON.
 DEFAULT_POOL_ROOT = Path("run_logs/etv3_dbec_latest_full1000_20260510/pools")
 DEFAULT_REQUIREMENT_ROOT = Path("run_logs/etv3_dbec_latest_full1000_20260510/evals")
@@ -189,7 +189,11 @@ def build_report_row(
     source_row: Mapping[str, Any],
     requirement_count: int,
 ) -> dict[str, Any]:
-    reader_doc_ids_source = list((state.et_trace or {}).get("external_pool_doc_ids") or [])
+    reader_doc_ids_source = list(
+        (state.et_trace or {}).get("reader_pool_doc_ids")
+        or (state.et_trace or {}).get("external_pool_doc_ids")
+        or []
+    )
     if len(reader_doc_ids_source) < len(state.pool_doc_ids):
         reader_doc_ids_source = list(state.pool_doc_ids)
     final_doc_ids = [

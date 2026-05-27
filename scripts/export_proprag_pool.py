@@ -16,7 +16,7 @@ import os
 import sys
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence
+from typing import Any, Dict, Iterable, List, Mapping, Sequence
 
 
 DEFAULT_PROPRAG_ROOT = Path("/mnt/nvme/code/PropRAG")
@@ -27,11 +27,48 @@ DATASET_FILE_ALIASES = {
     "nq": "nq_rear",
     "natural_questions": "nq_rear",
 }
+NO_THINK_PREFIX = "/no_think"
 
 
 def resolve_dataset_file_stem(dataset_name: str | None) -> str:
     normalized = str(dataset_name or "").strip().lower()
     return DATASET_FILE_ALIASES.get(normalized, str(dataset_name or "").strip())
+
+
+def _with_qwen_no_think_messages(messages: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    patched = [dict(message) for message in messages]
+    for message in reversed(patched):
+        if str(message.get("role") or "") != "user":
+            continue
+        content = str(message.get("content") or "")
+        if NO_THINK_PREFIX not in content[:128]:
+            message["content"] = f"{NO_THINK_PREFIX}\n{content}"
+        break
+    return patched
+
+
+def install_qwen_disable_thinking(llm_model: Any, *, enabled: bool) -> None:
+    if not enabled or llm_model is None:
+        return
+    llm_name = str(getattr(llm_model, "llm_name", "") or "").lower()
+    if "qwen" not in llm_name:
+        return
+    if getattr(llm_model, "_codex_qwen_disable_thinking_installed", False):
+        return
+
+    original_infer = llm_model.infer
+
+    def no_think_infer(messages, *infer_args, **infer_kwargs):
+        if isinstance(messages, Sequence) and not isinstance(messages, (str, bytes)):
+            messages = _with_qwen_no_think_messages(messages)
+        infer_kwargs.setdefault("extra_body", {})
+        if isinstance(infer_kwargs["extra_body"], dict):
+            infer_kwargs["extra_body"].setdefault("chat_template_kwargs", {})
+            infer_kwargs["extra_body"]["chat_template_kwargs"]["enable_thinking"] = False
+        return original_infer(messages, *infer_args, **infer_kwargs)
+
+    llm_model.infer = no_think_infer
+    llm_model._codex_qwen_disable_thinking_installed = True
 
 
 def string_to_bool(value: Any) -> bool:
@@ -178,6 +215,7 @@ def main() -> None:
     parser.add_argument("--max_path_length", type=int, default=3)
     parser.add_argument("--second_stage_filter_k", type=int, default=40)
     parser.add_argument("--sim_threshold", type=float, default=0.75)
+    parser.add_argument("--qwen_disable_thinking", action="store_true")
     args = parser.parse_args()
 
     proprag_root = args.proprag_root.resolve()
@@ -186,13 +224,15 @@ def main() -> None:
     if not proprag_root.exists():
         raise FileNotFoundError(f"PropRAG root not found: {proprag_root}")
 
-    sys.path.insert(0, str(proprag_root))
+    proprag_src = proprag_root / "src"
+    sys.path.insert(0, str(proprag_src))
+    sys.path.insert(1, str(proprag_root))
     os.chdir(proprag_root)
     os.environ.setdefault("CUDA_DEVICE_ORDER", "PCI_BUS_ID")
     os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
-    from src.proprag.PropRAG import PropRAG  # noqa: WPS433
-    from src.proprag.utils.config_utils import BaseConfig  # noqa: WPS433
+    from proprag.PropRAG import PropRAG  # noqa: WPS433
+    from proprag.utils.config_utils import BaseConfig  # noqa: WPS433
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -246,6 +286,10 @@ def main() -> None:
             target_openie.write_bytes(source_openie.read_bytes())
 
     proprag = PropRAG(global_config=config)
+    install_qwen_disable_thinking(
+        getattr(proprag, "llm_model", None),
+        enabled=bool(args.qwen_disable_thinking),
+    )
     proprag.index(corpus_docs)
     retrieval = proprag.retrieve(
         queries=queries,
@@ -284,7 +328,7 @@ def main() -> None:
     recall_metrics = compute_title_recall(
         gold_docs=gold_docs,
         retrieved_docs=[record["pool_docs"] for record in records],
-        k_values=[5, 20, 100],
+        k_values=[5, 20, 100, 200],
     )
     output = {
         "dataset": str(args.dataset),

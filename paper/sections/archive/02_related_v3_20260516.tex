@@ -1,0 +1,126 @@
+% =====================================================================
+% Section 2: Related Work
+% =====================================================================
+%
+% Status: Draft §2 Related Work v3 (2026-05-16)
+%   v1: three-paragraph structure, 564 words, 18 citations
+%   v2: HGRAG/triples/failure-mode/monoT5 fixes, 573 words
+%   v3: per second GPT review —
+%        - "same offline OpenIE-based indexing strategy" → "builds on the
+%          same OpenIE-based indexing line" + preserves document-grounded
+%          fact units (less overclaim of HippoRAG identity)
+%        - "entity nodes" → "phrase nodes" (terminology aligned with §4)
+%        - removed semicolon in §2.3 (writing discipline: no semicolons)
+%        - softened "do not directly model which entities or relations
+%          remain uncovered" → "makes requirement-level coverage less explicit"
+%        - added a propagation-vs-selection bridge sentence in §2.3 to
+%          connect PPR and coverage-aware reranking more naturally
+%
+% Structure: three-paragraph form (PropRAG/NeocorRAG/Relink-style)
+%   §2.1 Graph-based Retrieval for Multi-hop QA
+%   §2.2 KG Reasoning and Query-time Chain Mining
+%   §2.3 Personalized PageRank and Coverage-aware Reranking
+%
+% Each paragraph ends with an "In contrast / \methodname{} differs ..."
+% sentence positioning our differences without overclaiming prior work
+% weaknesses.
+%
+% Dependencies (BibTeX) — needs finalization:
+%   already in main paper:
+%     angeli2015leveraging, gutierrez2025hipporag, sun2024tog,
+%     huang2026relink, peng2026neocorrag
+%   to add:
+%     jimenez2024hipporag (HippoRAG)
+%     wang2025proprag (PropRAG; verify author + year)
+%     edge2024graphrag (Microsoft GraphRAG)
+%     hgrag202x (HGRAG; verify exact venue/year)
+%     haveliwala2002topic, jeh2003scaling
+%     carbonell1998mmr, lin2011submodular
+%     trivedi2023ircot, press2023selfask
+%     karpukhin2020dpr, robertson2009bm25
+%     baek2023kaping
+%
+% =====================================================================
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Graph-based retrieval for multi-hop QA.}
+Standard retrieval-augmented generation methods rank passages by dense
+or lexical similarity to the question
+\citep{karpukhin2020dpr,robertson2009bm25}, which is effective for
+single-hop questions but tends to miss bridge passages whose surface
+similarity to the question is low. Recent work augments this pipeline
+with explicit graph structure to improve multi-hop coverage.
+HippoRAG \citep{jimenez2024hipporag} and HippoRAG 2
+\citep{gutierrez2025hipporag} extract OpenIE facts from the corpus and
+run personalized PageRank over a corpus-wide graph of passage and
+phrase nodes seeded from the question. PropRAG \citep{wang2025proprag}
+replaces triples with propositions and discovers multi-hop evidence by
+beam search over a proposition graph, motivated by the observation that
+triples can lose context. GraphRAG \citep{edge2024graphrag} builds
+community-summary graphs over the corpus and supports retrieval through
+hierarchical summary aggregation, while hypergraph-based methods such
+as HGRAG \citep{hgrag2024} model entities and passages within a
+hypergraph and propagate relevance across entity-level and
+passage-level representations. These methods mainly differ in the graph
+representation and in the search operator used over the pre-built
+structure, ranging from corpus-wide PageRank to beam search over
+propositions and hierarchical summary aggregation. \methodname{} builds
+on the same OpenIE-based indexing line
+\citep{angeli2015leveraging,gutierrez2025hipporag}, but preserves
+document-grounded fact units for query-local propagation and then
+applies relation-grounded expansion and coverage-aware reranking on top
+of the local ranking.
+
+\paragraph{KG reasoning and query-time chain mining.}
+A second line of work uses extracted relations as a reasoning substrate
+that is traversed or updated at query time. ToG \citep{sun2024tog}
+performs LLM-guided traversal over a pre-built knowledge graph,
+selecting paths step by step, while related KG-RAG approaches
+\citep{baek2023kaping} retrieve subgraphs and pass them to a language
+model as context. Relink \citep{huang2026relink} addresses KG
+incompleteness by dynamically reconstructing query-specific evidence
+graphs and repairing missing facts as needed. NeocorRAG
+\citep{peng2026neocorrag} keeps documents as the reader unit but
+invokes a language model on retrieved text to mine entity-relation
+chains as prompt augmentation. Interleaved chain-of-thought retrieval
+methods such as IRCoT \citep{trivedi2023ircot} and Self-Ask
+\citep{press2023selfask} similarly drive retrieval through
+language-model-generated reasoning traces, alternating between
+generation and lookup. In contrast, \methodname{} keeps the OpenIE
+structure on the indexing side. The offline graph is neither traversed
+by an LLM at query time nor regenerated per question, and chain-aware
+retrieval is computed by graph propagation rather than by query-time
+chain generation over retrieved text. The reader consumes
+natural-language passages, and any query-time language model use is
+restricted to extracting question-side anchors and requirements.
+
+\paragraph{Personalized PageRank and coverage-aware reranking.}
+\methodname{}'s retrieval and enhancement components draw on
+long-standing techniques in information retrieval. Personalized
+PageRank \citep{haveliwala2002topic,jeh2003scaling} provides a
+principled way to bias graph propagation toward a query, and has been
+used in graph-augmented retrieval to score nodes given a seed
+distribution. The propagation view is naturally complemented by a
+selection view: even when graph propagation has found a strong
+candidate set, the order in which candidates enter the final list
+determines what the reader actually sees. MMR \citep{carbonell1998mmr}
+introduced diversity-aware reordering through marginal relevance
+against an already-selected set, and submodular set functions
+\citep{lin2011submodular} formalize coverage and diminishing returns
+when selecting summary or evidence sets. Both perspectives motivate the
+saturation behavior we adopt for $\mathrm{cov}_q$. Pointwise and
+pairwise neural rerankers provide strong passage-level relevance
+estimates, but they usually score candidates independently from the
+current evidence set, which makes requirement-level coverage less
+explicit. \methodname{} adapts both the graph-propagation and the
+coverage-aware perspectives to the multi-hop retrieval setting.
+Propagation is restricted to a query-induced subgraph and runs over
+OpenIE fact units rather than over passage or word nodes directly,
+while the coverage signal is computed under a noisy-OR model over
+question-side entity-relation requirements rather than over query
+tokens or word-level features. The two enhancement steps reuse the
+same offline graph and the same dense embeddings as the local
+propagation, so retrieval and reranking are aligned to the question's
+relational structure rather than to surface similarity alone.

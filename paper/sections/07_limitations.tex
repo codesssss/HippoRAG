@@ -1,0 +1,27 @@
+\section*{Limitations}
+\label{sec:limitations}
+
+EvLink has several limitations. First, our evaluation focuses on English
+Wikipedia-style QA, so its behavior on multilingual, domain-specific, and
+rapidly changing corpora remains untested. Second, evidence links depend on
+OpenIE quality. Missed, noisy, or underspecified facts can prevent useful
+passage transitions or introduce weak links, especially in documents with
+implicit relations. Third, EvLink assumes passage-level retrieval units and a
+fixed top-five reader context, which may not match long-document summarization
+or settings where sentence-level evidence is required. Finally, source-grounded links improve auditability but do not guarantee factual correctness, since the reader can still misinterpret incomplete evidence.
+
+\section*{Ethical Considerations}
+
+This work studies retrieval methods on public QA benchmarks and does
+not introduce new human-subject data, private user logs, or personally
+identifying annotations. The main ethical risks come from the underlying
+corpora and language models: retrieved passages may contain outdated,
+biased, or factually incorrect information, and the reader model may
+still generate unsupported answers when the evidence is incomplete.
+EvLink makes cross-document transitions more auditable by grounding
+them in source text, but this should not be interpreted as a guarantee
+of factual correctness. Systems based on this method should therefore
+include evidence inspection and domain-specific validation before use in
+high-stakes settings such as medical, legal, or financial decision
+support. We also report auxiliary token costs to make the additional
+compute requirements of evidence-link construction transparent.

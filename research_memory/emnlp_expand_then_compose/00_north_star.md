@@ -13,6 +13,21 @@ Locked decisions:
 - Story arc: composition gap → dependency-bound mechanism → controlled evaluation → under-selection mechanism → honest budget limitation
 - SetR is one of 5 baselines, not paper narrative center
 
+## Writing & Ablation Naming Conventions
+
+For all paper-facing writing (intro / method / ablation / related work) and any externally
+visible variant naming, follow `45_chunqiu_brushwork_two_stage_concealment_20260514.md`.
+
+That document specifies:
+- Word blacklist (stage / pool / readout / selector / ...) and whitelist (regime / flow / chain / ...)
+- Method-section chapter structure (expansion regime / convergence regime, not ETv3 / PCEC)
+- Ablation naming as **regime replacement**, not module removal (no `w/o PCEC` style)
+- Figure conventions, key sentence templates, reviewer-question rebuttals
+- Pre-submission self-check list
+
+Internal code, commit messages, and team discussions continue to use ETv3 / PCEC names —
+the convention only applies to externally visible artifacts.
+
 The "Expand-then-Compose" framing below is superseded; it is preserved here for historical context only.
 
 ---

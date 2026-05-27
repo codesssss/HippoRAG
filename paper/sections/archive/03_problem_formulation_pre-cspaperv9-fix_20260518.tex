@@ -1,0 +1,71 @@
+% =====================================================================
+% Section 3: Problem Formulation
+% =====================================================================
+%
+% Status: Draft Section 3 Problem Formulation v2 (2026-05-17)
+% Revision note (v2 vs v1):
+%   - Section title renamed from "Task Formulation" to
+%     "Problem Formulation" per advisor feedback (align with §4 method
+%     formulation language).
+%   - Label renamed: sec:task -> sec:problem.
+%   - Body unchanged; only the framing word changed.
+%
+% Purpose:
+%   - Define the retrieval-first interface for EvidenceFlow
+%   - Introduce ranked evidence list R_q and reader prefix
+%   - Define document-grounded fact units and provenance
+%   - Avoid Method details such as G_q, PPR, expansion, and noisy-OR
+%
+% =====================================================================
+
+\section{Problem Formulation}
+\label{sec:problem}
+
+Given a natural language question $q$ and a corpus
+$\mathcal{D}=\{d_i\}_{i=1}^{N}$, multi-hop question answering
+requires evidence from multiple passages before producing an answer.
+The retriever outputs an ordered evidence list
+\[
+\begin{aligned}
+R_q &= (d_{(1)},d_{(2)},\ldots), \\
+R_q^{(K)} &= (d_{(1)},\ldots,d_{(K)}), \\
+\hat{a}_q &= \mathrm{LLM}(\mathrm{prompt}(q,R_q^{(K)})),
+\end{aligned}
+\]
+and the reader consumes the prefix $R_q^{(K)}$. Retrieval quality
+is evaluated by whether prefixes of $R_q$ contain the gold
+supporting passages, while QA quality compares $\hat{a}_q$ with
+the reference answer.
+
+Pointwise relevance ranks each $d \in \mathcal{D}$ independently,
+but multi-hop QA needs the prefix $R_q^{(K)}$ to be considered
+\emph{as a set}: it should be both \emph{connected} across
+documents, preserving bridge relations that span passages, and
+\emph{covering}, in the sense that the selected $K$ passages
+collectively address the distinct entities and relations $q$ asks
+about. We therefore frame the retrieval problem as an evidence-set
+objective alongside the ranked list,
+\begin{equation}
+\label{eq:evidence-set}
+E_q^{\star}
+=
+\operatorname*{arg\,max}_{E \subseteq \mathcal{D},\,|E|=K}
+\;\mathrm{ConnCov}(E\,;\,q),
+\end{equation}
+where $\mathrm{ConnCov}$ is a connected-and-covering criterion
+that this work instantiates with the noisy-OR coverage score of
+\S\ref{sec:method:enhancement}. The retrieval interface stays a
+ranked list, but the prefix $R_q^{(K)}$ is judged by how close it
+comes to a connected and covering set under
+Eq.~\ref{eq:evidence-set}.
+
+During indexing, each passage is associated with
+document-grounded OpenIE facts. A fact unit is $f=(h,r,t)$, with
+argument phrases $h, t$ and relation phrase $r$. Each fact
+retains its provenance $\mathrm{src}(f)\in\mathcal{D}$, and
+\[
+\mathcal{F}_d=\{f\in\mathcal{F}: \mathrm{src}(f)=d\}
+\]
+denotes the facts extracted from passage $d$. The goal of
+\methodname{} is to use these provenance-linked facts to rank
+passages so that prefixes of $R_q$ approximate $E_q^{\star}$.

@@ -1,0 +1,103 @@
+% =====================================================================
+% Section 2: Related Work
+% =====================================================================
+%
+% Status: Draft §2 Related Work v6 (2026-05-18)
+%   v6: advisor-driven three-bucket reorganization.
+%       Bucket 1: Classic text RAG (BM25, DPR, RAPTOR, IRCoT, Self-Ask).
+%       Bucket 2: GraphRAG (HippoRAG family, PropRAG, GraphRAG, HGRAG,
+%                 MGRag, SentGraph, SPRiG, DFGN, Evidence Integration).
+%       Bucket 3: Evidence-enhanced GraphRAG (NeocorRAG, Relink, ToG,
+%                 KG-RAG).
+%       Closing Summary keeps the §1 conversion-problem tie-back.
+%   v5: see archive/02_related_v5_pre-advisor-rewrite_20260518.tex
+%
+% =====================================================================
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Classic text RAG.}
+Standard retrieval-augmented generation methods rank passages by
+lexical or dense similarity to the question, with BM25
+\citep{robertson2009bm25} and DPR \citep{karpukhin2020dpr} as the
+canonical sparse and dense baselines. These methods are effective
+for single-hop questions but tend to miss bridge passages whose
+surface similarity to the question is low. RAPTOR
+\citep{sarthi2024raptor} addresses limited cross-passage context by
+recursively clustering and summarizing passages into a retrieval
+tree, providing a hierarchical retrieval route over text rather
+than over an explicit graph. Iterative chain-of-thought retrievers
+such as IRCoT \citep{trivedi2023ircot} and Self-Ask
+\citep{press2023selfask} drive multi-hop retrieval through
+language-model-generated reasoning steps, alternating between
+generation and lookup. These systems show that multi-hop retrieval
+needs an explicit mechanism for linking evidence across documents,
+but their retrieval state remains a flat or hierarchical list of
+passages rather than a document-grounded evidence graph.
+
+\paragraph{GraphRAG.}
+A second line of work organizes the corpus into an explicit graph
+to expose cross-document connections. HippoRAG
+\citep{jimenez2024hipporag} and HippoRAG~2
+\citep{gutierrez2025hipporag} extract OpenIE facts from the corpus
+and run personalized PageRank over a corpus-wide graph of passage
+and phrase nodes seeded from the question. PropRAG
+\citep{wang2025proprag} replaces triples with propositions and
+discovers multi-hop evidence through beam search over a proposition
+graph, motivated by the observation that triples can lose context.
+GraphRAG \citep{edge2024graphrag} builds community-summary graphs
+and supports retrieval through hierarchical summary aggregation.
+Hypergraph-based methods such as HGRAG \citep{hgrag2024} model
+entities and passages within a hypergraph and propagate relevance
+across entity-level and passage-level representations. Recent
+variants explore hierarchical multi-granular graphs
+\citep{hu2026mgrangrag}, sentence-level graph structures
+\citep{liang2026sentgraph}, and linear CPU-only PageRank-style
+retrieval \citep{wang2026sprig}. Earlier graph-based multi-hop
+readers also construct document- or entity-level graphs and
+integrate evidence through graph neural message passing
+\citep{qiu2019dfgn,song2022evidenceintegration}. These systems
+mostly differ in graph representation and search operator, ranging
+from corpus-wide PageRank to beam search to hierarchical summary
+aggregation. Many rely on a pre-built global structure or a summary
+hierarchy, with question conditioning entering through seeds or
+through a subsequent search procedure. \methodname{} builds on the
+same OpenIE-based indexing line
+\citep{angeli2015leveraging,gutierrez2025hipporag}, but preserves
+document-grounded fact units for query-local propagation rather
+than corpus-level diffusion.
+
+\paragraph{Evidence-enhanced GraphRAG.}
+A third line uses graph or KG signals to refine which evidence
+reaches the reader. NeocorRAG \citep{peng2026neocorrag} keeps
+documents as the reader unit but mines \emph{evidence chains} from
+retrieved text through an activation-based candidate search
+followed by constrained decoding, using the resulting chains to
+filter and re-present passages to the reader. Relink
+\citep{huang2026relink} addresses KG incompleteness by dynamically
+reconstructing query-specific evidence graphs and repairing missing
+facts as needed. ToG \citep{sun2024tog} performs LLM-guided
+traversal over a pre-built knowledge graph, selecting reasoning
+paths step by step. KAPING \citep{baek2023kaping} retrieves
+subgraphs from a KG and prompts a language model with the
+subgraph as context. These methods improve evidence quality by
+adding chain-mining, repair, or KG-grounding on top of an
+underlying retriever; they typically operate over symbolic chains
+or per-question reconstructions rather than over a fixed offline
+fact-source substrate.
+
+\paragraph{Summary.}
+Existing text-based RAG, GraphRAG, and evidence-enhanced GraphRAG
+systems improve cross-document retrieval through richer
+representations, query-time path construction, or chain-based
+filtering of retrieved text. These approaches mostly target either
+how to build a better corpus-level structure or how to surface
+explicit reasoning chains from retrieved content. The question of
+how to convert graph-level relevance into a short reader-facing
+list that is both connected across documents and covering of
+question-side requirements receives less direct attention.
+\methodname{} addresses this conversion problem within the GraphRAG
+family. It combines query-local propagation over an induced
+fact-and-passage graph with relation-aware evidence admission and
+coverage-aware reranking on top of an offline OpenIE graph.

@@ -171,6 +171,8 @@ def resolve_chunk_embedding_path(save_dir: Path, dataset: str, llm_name: str, em
     suffix = f"{llm_name}_{embedding_name.replace('/', '_')}"
     dataset_file_stem = resolve_dataset_file_stem(dataset)
     candidates = [
+        Path(f"{save_dir}_{dataset}") / suffix / "chunk_embeddings" / "vdb_chunk.parquet",
+        Path(f"{save_dir}_{dataset_file_stem}") / suffix / "chunk_embeddings" / "vdb_chunk.parquet",
         save_dir / f"{dataset}_{suffix}" / "chunk_embeddings" / "vdb_chunk.parquet",
         save_dir / f"{dataset_file_stem}_{suffix}" / "chunk_embeddings" / "vdb_chunk.parquet",
         save_dir / f"{dataset}" / suffix / "chunk_embeddings" / "vdb_chunk.parquet",

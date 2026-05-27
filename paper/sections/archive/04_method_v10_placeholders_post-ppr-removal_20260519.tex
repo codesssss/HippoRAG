@@ -1,0 +1,190 @@
+% =====================================================================
+% Section 4: Method — EvidenceLink
+% =====================================================================
+%
+% Status: Draft §4 Method v10 (2026-05-19)
+%   v10: SYNCHRONIZED WITH evidenceflow PACKAGE MAINLINE (post-1acbfad).
+%        - Removed fact-node PPR narrative (Eq.3 deleted).
+%        - Removed evidence-need mining as an independent step (Eq.4 / Eq.5
+%          deleted; their content is folded into the witness-driven
+%          transition expansion since the frozen ETv3 expander internally
+%          performs both endpoint-transition and relation-grounded scoring).
+%        - Graph nodes are documents; OpenIE facts are cross-document
+%          transition WITNESSES, not propagation nodes.
+%        - §4.2 narrative replaced: PPR → witness-driven transition
+%          expansion that yields a query-local document candidate pool.
+%        - §4.3 retains Eq.6 (marginal coverage gain) and Eq.7
+%          (preservation-constrained argmax). These match the PCEC
+%          native_readout in evidenceflow/native_readout.py.
+%
+%   Equation count: 7 → 4 (Eq.1 [§3], Eq.2 [§4.2], Eq.6 [§4.3], Eq.7 [§4.3])
+%
+% =====================================================================
+
+\section{Method: \methodname{}}
+\label{sec:method}
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.92\linewidth}{\centering\vspace{1.5em}
+\textit{Overview of \methodname{}.}\\[0.3em]
+Indexing: corpus $\to$ source-grounded evidence-link substrate.\\
+Retrieval: $\mathcal{S}_q \to G_q \to C_q$ (top-100 documents).\\
+Composition: top-$m$ preservation $+$ residual admission $\to R_q^{(K)}$.
+\vspace{1.5em}}}
+\caption{Overview of \methodname{}. Indexing extracts OpenIE facts and
+binds each fact to its source passage as a cross-document transition
+witness. At query time, dense entry seeds and question-side anchors
+together induce a query-local document graph $G_q$, and a witness-driven
+transition expansion produces a ranked candidate pool $C_q$. A
+fixed-budget composition step then preserves the top-$m$ entries of
+$C_q$ and admits one residual document into the reader prefix
+$R_q^{(K)}$ via noisy-OR coverage marginal gain.}
+\label{fig:overview}
+\end{figure}
+
+We propose \methodname{}, a graph-based retrieval algorithm that
+treats query-local graph traversal as the start of evidence selection rather
+than the final ranking (Figure~\ref{fig:overview}). \methodname{}
+builds a source-grounded evidence-link substrate
+(\S\ref{sec:method:substrate}), induces a
+query-local document graph and produces a ranked candidate pool
+through witness-driven transition expansion
+(\S\ref{sec:method:retrieval}), then composes the final reader
+prefix under a fixed budget through preservation and residual
+admission (\S\ref{sec:method:enhancement}).
+
+\subsection{Source-Grounded Evidence Indexing}
+\label{sec:method:substrate}
+
+Our indexing departs from prior OpenIE-graph formulations
+\citep{jimenez2024hipporag,gutierrez2025hipporag,wang2025proprag}
+in a single move: graph nodes are documents, and each OpenIE fact
+is bound to its source passage as a
+\emph{cross-document transition witness} rather than as a graph node.
+The source-grounded evidence-link substrate is built once for the corpus and reused at query
+time without any further OpenIE extraction.
+
+\paragraph{Knowledge Extraction.}
+For each document $d \in \mathcal{D}$, a language model extracts
+OpenIE facts $f=(h,r,t)$ with argument phrases $h, t$ and relation
+phrase $r$
+\citep{angeli2015leveraging,gutierrez2025hipporag}. We retain every
+fact as a first-class indexing unit and bind it to its source via
+$\mathrm{src}(f)=d$, yielding a global fact set $\mathcal{F}$ with
+$\mathcal{F}_d = \{f\in\mathcal{F} : \mathrm{src}(f)=d\}$. Retaining
+$f$ together with $\mathrm{src}(f)$ keeps the relational triple
+intact, so the fact's role is determined by both its argument
+structure and its source passage; this provenance binding is what
+turns each fact from a free-floating triple into a
+document-anchored connection witness.
+
+\paragraph{Graph Construction.}
+Documents are connected by two complementary witness families
+derived from the same indexing pass. \emph{Endpoint witnesses}
+certify a transition between two documents $d, d'$ when there exist
+facts $f\in\mathcal{F}_d, f'\in\mathcal{F}_{d'}$ that share at least
+one informative argument phrase under
+$\{h,t\}\cap\{h',t'\}\neq\emptyset$, encoding cross-document mentions
+of the same entity. \emph{Co-source witnesses} group facts within a
+document under $\mathrm{src}(f)=\mathrm{src}(f')$, encoding
+intra-document co-assertion. Each fact also carries a
+\emph{provenance link} to $\mathrm{src}(f)$ used at composition
+time. Dense embeddings of fact units and relation phrases are
+pre-computed; the source-grounded evidence-link substrate is materialized as an adjacency index
+with a hub-degree cap of $30$ and a synonymy threshold of $0.85$ on
+dense endpoint similarity (Appendix~\ref{app:hyperparams}).
+
+\subsection{Query-Local Evidence Linking}
+\label{sec:method:retrieval}
+
+\paragraph{Query-local document graph.}
+Given $q$, \methodname{} first induces a query-local document graph
+$G_q$ over the source-grounded evidence-link substrate. We extract entity anchors
+$A(q) \subseteq \mathcal{V}_{\mathrm{phr}}$ from $q$ using a
+controlled language model that operates on the question only,
+never on retrieved documents, and a standard dense retriever
+provides an entry signal $\mathrm{Entry}(q) \subseteq \mathcal{D}$.
+Let $\mathcal{S}_q$ denote the seed document set, formed by the
+union of $\mathrm{Entry}(q)$ and the source documents of facts
+whose endpoints overlap $A(q)$. From $\mathcal{S}_q$, $G_q$ is the
+$h$-hop induced subgraph along endpoint and co-source witnesses,
+\begin{equation}
+\label{eq:gq-induced}
+G_q = \mathcal{N}_{h}(\mathcal{S}_q),
+\end{equation}
+which keeps the activated region compact while still admitting
+documents reachable through multi-hop entity chains even when their
+surface similarity to $q$ is low.
+
+\paragraph{Witness-driven transition expansion.}
+$G_q$ alone does not produce a passage ranking. We score documents
+in $G_q$ by aggregating witness strengths along the transitions
+that connect them to $\mathcal{S}_q$: for each edge $(d, d')$, the
+endpoint and co-source witnesses contribute additively, weighted by
+the dense relation-phrase similarity $\sigma(\mathbf{r}_f,
+\mathbf{q})$ of the certifying fact $f$ and the rank prior of
+$\mathcal{S}_q$. The resulting score $s_{\mathrm{link}}(d \mid q)$
+is the \emph{evidence-link score} on the document layer: it is local to
+$q$ and grounded by the offline witnesses, but evaluated through a
+deterministic graph traversal rather than through fact-level
+random-walk diffusion. Sorting $G_q$ by $s_{\mathrm{link}}$ yields
+the query-local candidate pool $C_q$ of size $|C_q|=100$, on which
+the composition step of \S\ref{sec:method:enhancement} operates.
+The full traversal procedure, including the hub cap and
+relation-phrase weighting, is detailed in
+Appendix~\ref{app:graph-details}; we refer to this stage as
+\emph{query-local evidence linking} when discussing ablations
+(\S\ref{sec:experiments:ablation}).
+
+\subsection{Evidence-Coverage-Aware Retrieval Optimization}
+\label{sec:method:enhancement}
+
+The candidate pool $C_q$ is ordered but does not yet match the
+reader budget. With a target prefix size $K$ much smaller than
+$|C_q|$, two reader-facing problems remain. First, the head of $C_q$
+can crowd around a single entity neighborhood, leaving other
+question-side requirements uncovered in any short prefix. Second,
+strictly trusting the top-$K$ of $C_q$ commits to a passage-level
+ranking that does not account for set-level coverage of distinct
+requirements. We therefore compose the final reader prefix
+$R_q^{(K)}$ through a \emph{preservation-and-admission} readout
+that is exact at the default budget $K=5$, $m=4$.
+
+\paragraph{Question-side coverage.}
+We extract question-side requirements $B(q)=\{b_1,b_2,\ldots\}$
+from $q$ using the same controlled language model used for $A(q)$.
+For document $d$ and requirement $b$, $\phi_{d,b}\in[0,1]$ is the
+NV-Embed-v2 cosine similarity between $d$ and the requirement
+subquery, min--max normalized over $C_q$ and multiplied by the
+normalized $d$-to-entity compatibility when $b$ depends on a
+resolved bridge entity. Defining
+$\mathrm{Cov}_q(R)=\sum_{b\in B(q)}\bigl[1-\prod_{d'\in R}(1-\phi_{d',b})\bigr]$,
+the marginal coverage gain of adding $d$ is
+\begin{equation}
+\label{eq:marginal-gain}
+\Delta_q(d \mid R) = \mathrm{Cov}_q(R\cup\{d\}) - \mathrm{Cov}_q(R).
+\end{equation}
+
+\paragraph{Preservation and residual admission.}
+We form $R_q^{(K)}$ by preserving the top-$m$ entries of $C_q$ as
+a fixed prefix $P_q$ and admitting the remaining $K-m$ slots
+through greedy coverage-aware selection
+\citep{carbonell1998mmr,lin2011submodular} over the residual pool,
+at each step adding
+\begin{equation}
+\label{eq:greedy-rerank}
+d^{*}
+=
+\operatorname*{arg\,max}_{d \in C_q \setminus (P_q \cup R)}
+\lambda\,s_{\mathrm{link}}(d \mid q)
++
+(1-\lambda)\,\Delta_q(d \mid P_q \cup R),
+\end{equation}
+with $\lambda\in[0,1]$ tuned once on a development split. At the
+default $K=5$, $m=4$ the residual budget is $K-m=1$, so
+\eqref{eq:greedy-rerank} reduces to a one-slot exact admission
+that either accepts the single residual that maximally improves
+coverage or keeps the original $C_q$ top-$K$ unchanged. Larger
+residual budgets recover the full greedy procedure.
+The reader consumes the resulting prefix of length $K$.

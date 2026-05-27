@@ -192,13 +192,16 @@ class CacheOpenAI(BaseLLM):
         config_dict['llm_name'] = self.global_config.llm_name
         config_dict['llm_request_name'] = getattr(self.global_config, "llm_request_name", None)
         config_dict['llm_base_url'] = self.global_config.llm_base_url
-        config_dict['generate_params'] = {
+        generate_params = {
                 "model": request_model_name,
-                "max_completion_tokens": config_dict.get("max_new_tokens", 400),
                 "n": config_dict.get("num_gen_choices", 1),
                 "seed": config_dict.get("seed", 0),
                 "temperature": config_dict.get("temperature", 0.0),
             }
+        max_new_tokens = config_dict.get("max_new_tokens", 400)
+        if max_new_tokens is not None:
+            generate_params["max_completion_tokens"] = max_new_tokens
+        config_dict['generate_params'] = generate_params
 
         self.llm_config = LLMConfig.from_dict(config_dict=config_dict)
         logger.debug(f"Init {self.__class__.__name__}'s llm_config: {self.llm_config}")
@@ -218,7 +221,20 @@ class CacheOpenAI(BaseLLM):
 
         if 'gpt' not in params['model'] or version.parse(openai.__version__) < version.parse("1.45.0"): # if we use vllm to call openai api or if we use openai but the version is too old to use 'max_completion_tokens' argument
             # TODO strange version change in openai protocol, but our current vllm version not changed yet
-            params['max_tokens'] = params.pop('max_completion_tokens')
+            if 'max_completion_tokens' in params:
+                params['max_tokens'] = params.pop('max_completion_tokens')
+
+        model_name = str(params.get("model") or "").lower()
+        force_no_think = os.getenv("HIPPORAG_RERANK_FORCE_NO_THINK", "").strip().lower() in {
+            "1", "true", "yes", "on"
+        }
+        message_text = "\n".join(str(message.get("content") or "") for message in messages)
+        if "qwen" in model_name and (force_no_think or "/no_think" in message_text[:512]):
+            extra_body = dict(params.get("extra_body") or {})
+            chat_template_kwargs = dict(extra_body.get("chat_template_kwargs") or {})
+            chat_template_kwargs["enable_thinking"] = False
+            extra_body["chat_template_kwargs"] = chat_template_kwargs
+            params["extra_body"] = extra_body
 
         response = self.openai_client.chat.completions.create(**params)
 

@@ -1513,6 +1513,173 @@ def order_local_sto_layered_source_prior(
     return ordered
 
 
+def _round_robin_doc_lists(doc_lists: Sequence[Sequence[int]]) -> List[int]:
+    positions = [0 for _ in doc_lists]
+    ordered: List[int] = []
+    seen: Set[int] = set()
+    progressed = True
+    while progressed:
+        progressed = False
+        for list_idx, docs in enumerate(doc_lists):
+            pos = int(positions[list_idx])
+            clean_docs = _clean_doc_indices(docs)
+            while pos < len(clean_docs):
+                candidate = int(clean_docs[pos])
+                pos += 1
+                positions[list_idx] = pos
+                if candidate in seen:
+                    continue
+                seen.add(candidate)
+                ordered.append(candidate)
+                progressed = True
+                break
+            positions[list_idx] = pos
+    return ordered
+
+
+def local_sto_evidence_channels(
+    *,
+    local_graph: Mapping[str, Any],
+    max_docs: int | None = None,
+) -> Dict[str, List[int]]:
+    """Expose deterministic evidence channels from a query-local STO graph.
+
+    This is an ETv2 diagnostic/readout primitive: it does not score channels,
+    route by dataset, or change admission. Each channel is derived from one
+    graph-semantic source of evidence and can be inspected independently before
+    any reader-facing top-k truncation.
+    """
+
+    admitted_docs = _clean_doc_indices(local_graph.get("admitted_doc_indices", []) or [])
+    admitted_set = set(admitted_docs)
+    clean_max = len(admitted_docs) if max_docs is None else max(int(max_docs), 0)
+    if not admitted_docs or clean_max <= 0:
+        return {
+            "entry": [],
+            SENTENCE_GROUNDED_TRANSITION: [],
+            TITLE_ROLE_GROUNDING: [],
+            ROLE_BRIDGE: [],
+            SAME_SUBJECT: [],
+            SOURCE_ENDPOINT_INCIDENCE: [],
+            "source_prior": [],
+        }
+
+    seeds = _clean_doc_indices(local_graph.get("seed_doc_indices", []) or [])
+    if not seeds:
+        seeds = _clean_doc_indices(
+            [
+                *(local_graph.get("textual_seed_doc_indices", []) or []),
+                *(local_graph.get("symbolic_seed_doc_indices", []) or []),
+            ]
+        )
+    seeds = [int(seed) for seed in seeds if int(seed) in admitted_set]
+    if not seeds:
+        seeds = admitted_docs[:]
+
+    stats = local_graph.get("stats", {}) or {}
+    try:
+        closure_hops = int(stats.get("closure_hops", 0) or 0)
+    except (TypeError, ValueError):
+        closure_hops = 0
+    adjacency = _local_edge_adjacency(list(local_graph.get("local_edges", []) or []))
+    doc_query_token_coverage = _local_graph_query_token_coverage(local_graph)
+    query_token_stems = _local_graph_query_token_stems(local_graph)
+
+    def frontier_channel(required_kind: str) -> List[int]:
+        return _round_robin_doc_lists(
+            [
+                _seed_frontier_order(
+                    seed=int(seed),
+                    admitted_set=admitted_set,
+                    adjacency=adjacency,
+                    closure_hops=closure_hops,
+                    required_kinds={str(required_kind)},
+                    doc_query_token_coverage=doc_query_token_coverage,
+                    query_token_stems=query_token_stems,
+                )
+                for seed in seeds
+            ]
+        )
+
+    channels = {
+        "entry": seeds,
+        SENTENCE_GROUNDED_TRANSITION: frontier_channel(SENTENCE_GROUNDED_TRANSITION),
+        TITLE_ROLE_GROUNDING: frontier_channel(TITLE_ROLE_GROUNDING),
+        ROLE_BRIDGE: frontier_channel(ROLE_BRIDGE),
+        SAME_SUBJECT: frontier_channel(SAME_SUBJECT),
+        SOURCE_ENDPOINT_INCIDENCE: frontier_channel(SOURCE_ENDPOINT_INCIDENCE),
+        "source_prior": admitted_docs,
+    }
+    return {
+        name: [
+            int(doc_idx)
+            for doc_idx in _clean_doc_indices(values)
+            if int(doc_idx) in admitted_set
+        ][:clean_max]
+        for name, values in channels.items()
+    }
+
+
+def order_local_sto_channel_balanced_source_prior(
+    *,
+    local_graph: Mapping[str, Any],
+    max_docs: int | None = None,
+) -> List[int]:
+    """Order admitted docs by round-robin exposure over STO evidence channels."""
+
+    admitted_docs = _clean_doc_indices(local_graph.get("admitted_doc_indices", []) or [])
+    if not admitted_docs:
+        return []
+    admitted_set = set(admitted_docs)
+    clean_max = len(admitted_docs) if max_docs is None else max(int(max_docs), 0)
+    if clean_max <= 0:
+        return []
+
+    channels = local_sto_evidence_channels(local_graph=local_graph, max_docs=max_docs)
+    channel_order = (
+        "entry",
+        SENTENCE_GROUNDED_TRANSITION,
+        TITLE_ROLE_GROUNDING,
+        ROLE_BRIDGE,
+        SAME_SUBJECT,
+        SOURCE_ENDPOINT_INCIDENCE,
+    )
+    positions = {name: 0 for name in channel_order}
+    ordered: List[int] = []
+    seen: Set[int] = set()
+
+    def add(doc_idx: int) -> bool:
+        doc = int(doc_idx)
+        if doc not in admitted_set or doc in seen or len(ordered) >= clean_max:
+            return False
+        seen.add(doc)
+        ordered.append(doc)
+        return True
+
+    progressed = True
+    while progressed and len(ordered) < clean_max:
+        progressed = False
+        for channel_name in channel_order:
+            if len(ordered) >= clean_max:
+                break
+            docs = channels.get(str(channel_name), []) or []
+            pos = int(positions.get(str(channel_name), 0) or 0)
+            while pos < len(docs):
+                candidate = int(docs[pos])
+                pos += 1
+                positions[str(channel_name)] = pos
+                if add(candidate):
+                    progressed = True
+                    break
+            positions[str(channel_name)] = pos
+
+    for doc_idx in admitted_docs:
+        if len(ordered) >= clean_max:
+            break
+        add(int(doc_idx))
+    return ordered
+
+
 def _order_selected_evidence_set(
     *,
     doc_indices: Sequence[int],

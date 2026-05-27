@@ -1,0 +1,63 @@
+% =====================================================================
+% Section 2: Related Work
+% =====================================================================
+%
+% Status: Draft §2 Related Work v8 (2026-05-19)
+%   v8: half-page tighten — total 250w target.
+%       Three buckets each end with an explicit Limitation.
+%       Closing Summary keeps the §1 conversion-problem tie-back.
+%   v7: see archive/02_related_v7_pre-half-page-tighten_20260519.tex
+%
+% =====================================================================
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Standard RAG.}
+Standard RAG ranks passages by lexical or dense similarity to the
+question, with BM25 \citep{robertson2009bm25} and
+DPR \citep{karpukhin2020dpr} as canonical baselines and
+RAPTOR \citep{sarthi2024raptor} adding a hierarchical retrieval
+tree. Iterative chain-of-thought retrievers such as
+IRCoT \citep{trivedi2023ircot} and Self-Ask
+\citep{press2023selfask} drive multi-hop retrieval through generated
+reasoning steps. \emph{Limitation.} The retrieval state stays a
+list or beam of passages without explicit cross-document structure,
+so bridge passages with low surface similarity are systematically
+underweighted.
+
+\paragraph{Graph RAG.}
+A second line organizes the corpus into an explicit graph.
+HippoRAG~2 \citep{gutierrez2025hipporag} runs personalized PageRank
+over a passage--phrase graph, PropRAG \citep{wang2025proprag} beam-
+searches over a proposition graph, GraphRAG
+\citep{edge2024graphrag} aggregates community summaries, and
+HGRAG \citep{hgrag2024} propagates over an entity-passage hypergraph;
+recent variants explore multi-granular
+\citep{hu2026mgrangrag}, sentence-level \citep{liang2026sentgraph},
+and CPU-only \citep{wang2026sprig} extensions, while earlier graph
+readers integrate evidence via message
+passing \citep{qiu2019dfgn,song2022evidenceintegration}.
+\emph{Limitation.} These systems condition on a pre-built global
+structure, so question conditioning enters only through seeds or
+post-hoc search; node-level relevance does not directly produce a
+short reader-facing list that is both connected and covering.
+
+\paragraph{Evidence-enhanced RAG.}
+A third line refines the evidence reaching the reader.
+NeocorRAG \citep{peng2026neocorrag} mines evidence chains from
+retrieved text and uses them to filter passages; Relink
+\citep{huang2026relink} reconstructs query-specific evidence graphs
+to repair KG incompleteness; ToG \citep{sun2024tog} and
+KAPING \citep{baek2023kaping} traverse or retrieve subgraphs from a
+pre-built KG. \emph{Limitation.} These methods operate \emph{on top
+of} an underlying retriever or KG, so they inherit upstream misses,
+depend on KG completeness, and incur per-question LLM-guided
+traversal cost.
+
+\paragraph{Summary.}
+None of the three lines treats the conversion of graph relevance
+into a connected and covering reader-facing passage list as its
+central object. \methodname{} addresses this conversion by
+combining query-local propagation over a fact-source substrate
+with evidence-need mining and coverage-aware reranking.

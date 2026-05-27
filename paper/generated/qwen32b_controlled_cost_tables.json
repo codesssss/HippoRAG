@@ -1,0 +1,98 @@
+{
+  "protocol": "qwen3-32b_controlled_shared_gpt4o_mini_reader_excluded",
+  "offline_structuring_tokens": {
+    "unit": "tokens",
+    "rows": [
+      {
+        "method": "EvLink",
+        "hotpotqa": 13168058,
+        "2wikimultihopqa": 7745459,
+        "musique": 14623142,
+        "avg": 11845553
+      },
+      {
+        "method": "HippoRAG2",
+        "hotpotqa": 14900734,
+        "2wikimultihopqa": 9164102,
+        "musique": 16392079,
+        "avg": 13485638
+      },
+      {
+        "method": "PropRAG",
+        "hotpotqa": 20850715,
+        "2wikimultihopqa": 12166023,
+        "musique": 23491458,
+        "avg": 18836065
+      },
+      {
+        "method": "NeocorRAG",
+        "hotpotqa": 14273963,
+        "2wikimultihopqa": 8460161,
+        "musique": 15780584,
+        "avg": 12838236
+      }
+    ]
+  },
+  "online_auxiliary_tokens_per_query": {
+    "unit": "tokens_per_query",
+    "rows": [
+      {
+        "method": "EvLink",
+        "hotpotqa": 1402.807,
+        "2wikimultihopqa": 1455.931,
+        "musique": 1682.472,
+        "avg": 1513.7366666666667
+      },
+      {
+        "method": "HippoRAG2",
+        "hotpotqa": 638.657,
+        "2wikimultihopqa": 635.349,
+        "musique": 625.445,
+        "avg": 633.1503333333333
+      },
+      {
+        "method": "PropRAG",
+        "hotpotqa": 0,
+        "2wikimultihopqa": 0,
+        "musique": 0,
+        "avg": 0
+      },
+      {
+        "method": "NeocorRAG",
+        "hotpotqa": 7194.144,
+        "2wikimultihopqa": 6830.96,
+        "musique": 6788.7037037037035,
+        "avg": 6937.935901234568
+      }
+    ]
+  },
+  "average_total_auxiliary_generative_token_cost": {
+    "unit": "million_tokens",
+    "rows": [
+      {
+        "method": "EvLink",
+        "offline_avg_m": 11.85,
+        "online_avg_for_1000q_m": 1.51,
+        "total_avg_m": 13.36
+      },
+      {
+        "method": "HippoRAG2",
+        "offline_avg_m": 13.49,
+        "online_avg_for_1000q_m": 0.63,
+        "total_avg_m": 14.12
+      },
+      {
+        "method": "PropRAG",
+        "offline_avg_m": 18.84,
+        "online_avg_for_1000q_m": 0.00,
+        "total_avg_m": 18.84
+      },
+      {
+        "method": "NeocorRAG",
+        "offline_avg_m": 12.84,
+        "online_avg_for_1000q_m": 6.94,
+        "total_avg_m": 19.78
+      }
+    ]
+  }
+}

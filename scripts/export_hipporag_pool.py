@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 import re
@@ -25,6 +26,69 @@ DATASET_FILE_ALIASES = {
     "nq": "nq_rear",
     "natural_questions": "nq_rear",
 }
+NO_THINK_PREFIX = "/no_think"
+
+
+def _strip_qwen_thinking(text: str) -> str:
+    return re.sub(r"<think>.*?</think>\s*", "", str(text or ""), flags=re.DOTALL).strip()
+
+
+def _with_qwen_no_think_messages(messages: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    patched: List[Dict[str, Any]] = []
+    for message in messages:
+        msg = dict(message)
+        content = msg.get("content")
+        if (
+            str(msg.get("role", "")).lower() == "user"
+            and isinstance(content, str)
+            and NO_THINK_PREFIX not in content[:128]
+        ):
+            msg["content"] = f"{NO_THINK_PREFIX}\n{content}"
+        patched.append(msg)
+    return patched
+
+
+def install_qwen_disable_thinking(llm_model: Any, enabled: bool) -> None:
+    if not enabled or llm_model is None:
+        return
+    llm_config = getattr(llm_model, "global_config", None)
+    model_name = str(
+        getattr(llm_config, "llm_request_name", None)
+        or getattr(llm_config, "llm_name", None)
+        or getattr(llm_model, "llm_name", "")
+        or ""
+    ).lower()
+    if "qwen" not in model_name:
+        return
+    if getattr(llm_model, "_codex_qwen_disable_thinking_installed", False):
+        return
+
+    cache_file_name = getattr(llm_model, "cache_file_name", None)
+    if isinstance(cache_file_name, str) and cache_file_name:
+        if "_no_think_cache" not in os.path.basename(cache_file_name):
+            if cache_file_name.endswith("_cache.sqlite"):
+                llm_model.cache_file_name = cache_file_name[: -len("_cache.sqlite")] + "_no_think_cache.sqlite"
+            else:
+                root, ext = os.path.splitext(cache_file_name)
+                llm_model.cache_file_name = f"{root}_no_think{ext}"
+
+    original_infer = llm_model.infer
+
+    def no_think_infer(messages, *infer_args, **infer_kwargs):
+        if isinstance(messages, list):
+            messages = _with_qwen_no_think_messages(messages)
+        extra_body = dict(infer_kwargs.get("extra_body") or {})
+        chat_template_kwargs = dict(extra_body.get("chat_template_kwargs") or {})
+        chat_template_kwargs["enable_thinking"] = False
+        extra_body["chat_template_kwargs"] = chat_template_kwargs
+        infer_kwargs["extra_body"] = extra_body
+        result = original_infer(messages, *infer_args, **infer_kwargs)
+        if isinstance(result, tuple) and result and isinstance(result[0], str):
+            return (_strip_qwen_thinking(result[0]), *result[1:])
+        return result
+
+    llm_model.infer = no_think_infer
+    llm_model._codex_qwen_disable_thinking_installed = True
 
 
 def resolve_dataset_file_stem(dataset_name: str | None) -> str:
@@ -60,6 +124,12 @@ def parse_answer_alias_values(value: Any) -> List[str]:
             aliases.extend(parse_answer_alias_values(item))
         return aliases
     return [str(value)]
+
+
+def string_to_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "y", "on"}
 
 
 def build_doc_id_index(docs: Sequence[str]) -> Dict[str, int]:
@@ -167,6 +237,12 @@ def main() -> None:
     parser.add_argument("--embedding_name", default="VLLM/nvidia/NV-Embed-v2")
     parser.add_argument("--embedding_base_url", default="http://localhost:8019/v1/embeddings")
     parser.add_argument("--retrieval_top_k", type=int, default=100)
+    parser.add_argument("--embedding_batch_size", type=int, default=16)
+    parser.add_argument("--max_new_tokens", type=int, default=2048)
+    parser.add_argument("--force_index_from_scratch", type=string_to_bool, default=False)
+    parser.add_argument("--force_openie_from_scratch", type=string_to_bool, default=False)
+    parser.add_argument("--openie_mode", choices=["online", "offline", "Transformers-offline"], default="online")
+    parser.add_argument("--qwen_disable_thinking", action="store_true")
     parser.add_argument("--output_json", type=Path, required=True)
     args = parser.parse_args()
 
@@ -207,16 +283,28 @@ def main() -> None:
         embedding_base_url=args.embedding_base_url,
         save_dir=save_dir,
         retrieval_top_k=args.retrieval_top_k,
+        embedding_batch_size=int(args.embedding_batch_size),
+        max_new_tokens=int(args.max_new_tokens),
+        force_index_from_scratch=bool(args.force_index_from_scratch),
+        force_openie_from_scratch=bool(args.force_openie_from_scratch),
+        openie_mode=str(args.openie_mode),
         corpus_len=len(docs),
         graph_type="facts_and_sim_passage_node_unidirectional",
-        causal_v2_base_retrieval_mode="legacy_fact_graph",
-        causal_engine_version="v2",
+        # Use HippoRAG's legacy graph index/retrieval path. The V2 wrapper with
+        # causal disabled only builds dense chunk embeddings and can silently
+        # fall back to dense ranking for legacy_fact_graph retrieval.
+        causal_v2_base_retrieval_mode="dense",
+        causal_engine_version="legacy",
         causal_enabled=False,
         causal_context_max_items=0,
     )
 
-    print(f"Initializing HippoRAG for {args.dataset} with legacy_fact_graph...")
+    print(f"Initializing HippoRAG for {args.dataset} with legacy graph retrieval...")
     hipporag = HippoRAG(global_config=config)
+    install_qwen_disable_thinking(
+        getattr(hipporag, "llm_model", None),
+        enabled=bool(args.qwen_disable_thinking),
+    )
     hipporag.index(docs)
 
     print(f"Running retrieval for {len(queries)} queries...")
@@ -249,15 +337,16 @@ def main() -> None:
             "pool_doc_ids": pool_doc_ids,
         })
 
-    recall = compute_title_recall(gold_docs, retrieved_doc_lists, [5, 20, 100])
+    recall = compute_title_recall(gold_docs, retrieved_doc_lists, [5, 20, 100, 200])
     output = {
         "dataset": str(args.dataset),
         "limit": len(samples),
         "pool_k": pool_k,
-        "source": "hipporag_legacy_fact_graph_export",
+        "source": "hipporag_legacy_graph_export",
         "save_dir": str(args.save_dir),
         "config": {
-            "base_retrieval_mode": "legacy_fact_graph",
+            "causal_engine_version": "legacy",
+            "base_retrieval_mode": "legacy_graph",
             "retrieval_top_k": args.retrieval_top_k,
             "embedding_name": str(args.embedding_name),
         },
