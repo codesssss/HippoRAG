@@ -1,0 +1,149 @@
+{
+  "status": "completed_smoke_with_red_flags",
+  "dataset": "musique",
+  "limit": 100,
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "inputs": {
+    "status": "completed",
+    "dataset": "musique",
+    "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+    "limit": 100,
+    "generated_rows": 100,
+    "cot_rows": 100,
+    "silver_oracle_rows": 100,
+    "llm_base_url": "http://localhost:8041/v1",
+    "llm_model": "qwen3-8b-train",
+    "ircot_prompt_path": "local_ircot_style_frozen_prompt",
+    "errors": [],
+    "outputs": {
+      "generated_obligations_jsonl": "data/dpathrag/arec/generated_obligations_musique_limit100_20260428.jsonl",
+      "cot_queries_jsonl": "data/dpathrag/arec/cot_queries_musique_limit100_20260428.jsonl",
+      "silver_oracle_jsonl": "data/dpathrag/arec/silver_oracle_obligations_musique_limit100_20260428.jsonl"
+    }
+  },
+  "day0_silver_oracle": {
+    "status": "completed",
+    "dataset": "musique",
+    "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+    "oracle_obligations_jsonl": "data/dpathrag/arec/silver_oracle_obligations_musique_limit100_20260428.jsonl",
+    "official_ircot_prompt_path_or_fallback_reason": "local_ircot_style_frozen_prompt",
+    "verifier_model": "cross-encoder/nli-deberta-v3-base",
+    "verifier_backend": "nli",
+    "top_k": 5,
+    "per_query_k": 10,
+    "summary": {
+      "arec_missing_hit_rate": 0.032,
+      "raw_question_missing_hit_rate": 0.008,
+      "cot_missing_hit_rate": 0.022,
+      "final_support_complete": 0.5,
+      "final_support_recall": 0.7675,
+      "rows": 100
+    }
+  },
+  "day1_generated_closure": {
+    "status": "completed",
+    "dataset": "musique",
+    "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+    "generated_obligations_jsonl": "data/dpathrag/arec/generated_obligations_musique_limit100_20260428.jsonl",
+    "oracle_obligations_jsonl": "data/dpathrag/arec/silver_oracle_obligations_musique_limit100_20260428.jsonl",
+    "verifier_model": "cross-encoder/nli-deberta-v3-base",
+    "verifier_backend": "nli",
+    "top_k": 5,
+    "summary": {
+      "closure_score_initial": 0.8342,
+      "oracle_closure_score_initial": 2.1344,
+      "initial_support_complete": 0.29,
+      "initial_support_recall": 0.6458,
+      "active_obligation_count": 2.76,
+      "rows": 100
+    },
+    "by_hop": {
+      "2": {
+        "closure_score_initial": 0.8072,
+        "oracle_closure_score_initial": 2.2019,
+        "initial_support_complete": 0.4583,
+        "initial_support_recall": 0.7292,
+        "active_obligation_count": 2.3542,
+        "rows": 48
+      },
+      "3": {
+        "closure_score_initial": 0.9589,
+        "oracle_closure_score_initial": 2.481,
+        "initial_support_complete": 0.2,
+        "initial_support_recall": 0.6444,
+        "active_obligation_count": 3.0,
+        "rows": 30
+      },
+      "4": {
+        "closure_score_initial": 0.7231,
+        "oracle_closure_score_initial": 1.5145,
+        "initial_support_complete": 0.0455,
+        "initial_support_recall": 0.4659,
+        "active_obligation_count": 3.3182,
+        "rows": 22
+      }
+    }
+  },
+  "day2_generated_residual": {
+    "status": "completed",
+    "dataset": "musique",
+    "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+    "generated_obligations_jsonl": "data/dpathrag/arec/generated_obligations_musique_limit100_20260428.jsonl",
+    "cot_queries_jsonl": "data/dpathrag/arec/cot_queries_musique_limit100_20260428.jsonl",
+    "official_ircot_prompt_path_or_fallback_reason": "local_ircot_style_frozen_prompt",
+    "verifier_model": "cross-encoder/nli-deberta-v3-base",
+    "verifier_backend": "nli",
+    "top_k": 5,
+    "per_query_k": 10,
+    "summary": {
+      "arec_missing_hit_rate": 0.016,
+      "raw_question_missing_hit_rate": 0.008,
+      "cot_missing_hit_rate": 0.022,
+      "final_support_complete": 0.24,
+      "final_support_recall": 0.4892,
+      "initial_support_complete": 0.29,
+      "rows": 100
+    },
+    "by_hop": {
+      "2": {
+        "arec_missing_hit_rate": 0.0063,
+        "raw_question_missing_hit_rate": 0.0042,
+        "cot_missing_hit_rate": 0.0104,
+        "final_support_complete": 0.4167,
+        "final_support_recall": 0.5833,
+        "initial_support_complete": 0.4583,
+        "rows": 48
+      },
+      "3": {
+        "arec_missing_hit_rate": 0.0233,
+        "raw_question_missing_hit_rate": 0.0133,
+        "cot_missing_hit_rate": 0.0333,
+        "final_support_complete": 0.1333,
+        "final_support_recall": 0.4778,
+        "initial_support_complete": 0.2,
+        "rows": 30
+      },
+      "4": {
+        "arec_missing_hit_rate": 0.0273,
+        "raw_question_missing_hit_rate": 0.0091,
+        "cot_missing_hit_rate": 0.0318,
+        "final_support_complete": 0.0,
+        "final_support_recall": 0.2992,
+        "initial_support_complete": 0.0455,
+        "rows": 22
+      }
+    }
+  },
+  "interpretation": {
+    "day0": "silver oracle obligations are positive: AREC missing-hit rate beats raw question and local CoT-style retrieval, and projection improves support completeness.",
+    "day1": "generated obligations are much weaker than silver oracle obligations, especially on 4-hop.",
+    "day2": "generated AREC beats raw-question second retrieval but loses to CoT-style retrieval and hurts final Support-Complete@5.",
+    "gate_decision": "do not promote AREC full implementation yet; improve/validate obligation generation and use official IRCoT prompt before rerun."
+  },
+  "caveats": [
+    "silver_oracle_obligations are generated from gold docs by frozen LLM, not manually annotated oracle obligations",
+    "CoT baseline uses local_ircot_style_frozen_prompt metadata, not verified official IRCoT released prompt/config",
+    "final reader was not rerun after projection; final answer fields remain initial-answer placeholders in this smoke harness",
+    "NLI verifier used cross-encoder/nli-deberta-v3-base from local HuggingFace cache"
+  ]
+}

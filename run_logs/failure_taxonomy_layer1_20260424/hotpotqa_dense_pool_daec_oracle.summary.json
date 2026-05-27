@@ -1,0 +1,21 @@
+{
+  "report": "run_logs/layer1_dense_pool_eval_20260424/hotpotqa_dense_pool_daec_oracle.json",
+  "dataset": "hotpotqa",
+  "num_traces": 1000,
+  "category_counts": {
+    "tie": 959,
+    "win": 35,
+    "loss_other_incomplete": 1,
+    "loss_gold_pushed_out": 2,
+    "loss_reader_interference": 3
+  },
+  "changed_count": 117,
+  "changed_rate": 0.117,
+  "win_count": 35,
+  "loss_count": 6,
+  "tie_count": 959,
+  "mean_delta_f1": 0.022068400000000002,
+  "mean_delta_f1_changed": 0.1886188034188034,
+  "loss_binding_signal_count": 6,
+  "loss_new_non_gold_count": 3
+}

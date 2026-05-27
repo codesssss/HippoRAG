@@ -1,0 +1,32 @@
+{
+  "rows": [
+    {
+      "dataset": "nq",
+      "method_group": "evidenceflow",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 100,
+      "Recall@5": 0.713643,
+      "Recall@20": null,
+      "Recall@100": null,
+      "Recall@200": null,
+      "EM": 0.54,
+      "F1": 0.659,
+      "reader_docs": null,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/evidenceflow_nq_popqa_limit100_32b_no_think_gpt4omini_20260518/reader_qa/evidenceflow/nq_evidenceflow_qwen32b_no_think_gpt4omini_reader_top5_limit100.json"
+    },
+    {
+      "dataset": "popqa",
+      "method_group": "evidenceflow",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 100,
+      "Recall@5": 0.605,
+      "Recall@20": null,
+      "Recall@100": null,
+      "Recall@200": null,
+      "EM": 0.29,
+      "F1": 0.5883,
+      "reader_docs": null,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/evidenceflow_nq_popqa_limit100_32b_no_think_gpt4omini_20260518/reader_qa/evidenceflow/popqa_evidenceflow_qwen32b_no_think_gpt4omini_reader_top5_limit100.json"
+    }
+  ]
+}

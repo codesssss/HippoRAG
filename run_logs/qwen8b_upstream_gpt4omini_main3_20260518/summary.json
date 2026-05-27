@@ -1,0 +1,103 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 1000,
+      "Recall@5": 0.9015,
+      "Recall@20": null,
+      "ExactMatch": 0.633,
+      "F1": 0.7164,
+      "mean_reader_docs": null,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/evidenceflow_etv3/2wikimultihopqa_evidenceflow_etv3_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 1000,
+      "Recall@5": 0.9505,
+      "Recall@20": null,
+      "ExactMatch": 0.618,
+      "F1": 0.7464,
+      "mean_reader_docs": null,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/evidenceflow_etv3/hotpotqa_evidenceflow_etv3_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 1000,
+      "Recall@5": 0.718417,
+      "Recall@20": null,
+      "ExactMatch": 0.361,
+      "F1": 0.47,
+      "mean_reader_docs": null,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/evidenceflow_etv3/musique_evidenceflow_etv3_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "hgrag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.7692,
+      "Recall@20": 0.8403,
+      "ExactMatch": 0.552,
+      "F1": 0.6102,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/hgrag/2wikimultihopqa_hgrag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "hgrag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.945,
+      "Recall@20": 0.981,
+      "ExactMatch": 0.611,
+      "F1": 0.7376,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/hgrag/hotpotqa_hgrag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "hgrag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.6952,
+      "Recall@20": 0.814,
+      "ExactMatch": 0.361,
+      "F1": 0.4757,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/hgrag/musique_hgrag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "neocor_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.7558,
+      "Recall@20": 0.8858,
+      "ExactMatch": 0.486,
+      "F1": 0.5438,
+      "mean_reader_docs": 3.278,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/neocor/2wikimultihopqa_neocor_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "neocor_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.92,
+      "Recall@20": 0.9885,
+      "ExactMatch": 0.585,
+      "F1": 0.7117,
+      "mean_reader_docs": 3.078,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/neocor/hotpotqa_neocor_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "neocor_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.6647,
+      "Recall@20": 0.8528,
+      "ExactMatch": 0.325,
+      "F1": 0.4398,
+      "mean_reader_docs": 3.305,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_20260518/reader_qa/neocor/musique_neocor_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    }
+  ]
+}

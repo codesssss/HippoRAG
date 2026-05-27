@@ -1,0 +1,22 @@
++ set -u
++ ROOT_DIR=/mnt/nvme/code/HippoRAG
++ PYTHON_BIN=/mnt/nvme/code/HippoRAG/.venv-hipporag/bin/python
++ SOURCE_DIR=/mnt/nvme/code/HippoRAG/run_logs/v13b_proprag_pool100_full1000_20260430
++ OUT_DIR=/mnt/nvme/code/HippoRAG/run_logs/v13b_proprag_pool100_full1000_fulloblg_20260430
++ EMBEDDING_BASE_URL=http://localhost:8019/v1/embeddings
++ LIMIT=1000
++ mkdir -p /mnt/nvme/code/HippoRAG/run_logs/v13b_proprag_pool100_full1000_fulloblg_20260430/query_obligation_runtime /mnt/nvme/code/HippoRAG/run_logs/v13b_proprag_pool100_full1000_fulloblg_20260430/qa_runtime
++ tee /mnt/nvme/code/HippoRAG/run_logs/v13b_proprag_pool100_full1000_fulloblg_20260430/launcher.status
+++ date -Is
++ echo '[START] v13b proprag pool100 full1000 full-obligation parallel 2026-04-30T23:53:01+08:00'
+[START] v13b proprag pool100 full1000 full-obligation parallel 2026-04-30T23:53:01+08:00
++ pids=()
++ for dataset in 2wikimultihopqa hotpotqa musique
++ pids+=("$!")
++ for dataset in 2wikimultihopqa hotpotqa musique
++ pids+=("$!")
++ for dataset in 2wikimultihopqa hotpotqa musique
++ pids+=("$!")
++ rc=0
++ for pid in "${pids[@]}"
++ wait 2218774

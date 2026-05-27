@@ -1,0 +1,69 @@
+{
+  "baseline_predictions_jsonl": "",
+  "daec_predictions_jsonl": "",
+  "daec_report_json": "run_logs/daec_noisyor_dense_pool100_musique_fixclean_full1000_20260428.json",
+  "dataset": "musique",
+  "limit": 0,
+  "rows": 1000,
+  "overall": {
+    "baseline_em": 0.298,
+    "baseline_f1": 0.3896,
+    "daec_l1_em": 0.29,
+    "daec_l1_f1": 0.3818,
+    "baseline_support_recall": 0.6888,
+    "baseline_support_complete": 0.386,
+    "daec_l1_support_recall": 0.6854,
+    "daec_l1_support_complete": 0.372,
+    "noise_rate": 0.6632,
+    "reader_wrong_despite_support_complete": 0.172
+  },
+  "failure_categories": {
+    "already_solved_by_daec_l1": 57,
+    "destructive_projection": 27,
+    "mixed_or_unclear": 38,
+    "no_headroom": 233,
+    "reader_bottleneck": 182,
+    "retrieval_or_composition_bottleneck": 463
+  },
+  "by_hop": {
+    "2": {
+      "baseline_em": 0.3571,
+      "baseline_f1": 0.4462,
+      "daec_l1_em": 0.3668,
+      "daec_l1_f1": 0.4635,
+      "baseline_support_recall": 0.7751,
+      "baseline_support_complete": 0.5695,
+      "daec_l1_support_recall": 0.7828,
+      "daec_l1_support_complete": 0.5849,
+      "noise_rate": 0.6954,
+      "reader_wrong_despite_support_complete": 0.2568,
+      "rows": 518
+    },
+    "3": {
+      "baseline_em": 0.2627,
+      "baseline_f1": 0.3618,
+      "daec_l1_em": 0.2437,
+      "daec_l1_f1": 0.3344,
+      "baseline_support_recall": 0.6772,
+      "baseline_support_complete": 0.2658,
+      "daec_l1_support_recall": 0.6524,
+      "daec_l1_support_complete": 0.1994,
+      "noise_rate": 0.6158,
+      "reader_wrong_despite_support_complete": 0.1108,
+      "rows": 316
+    },
+    "4": {
+      "baseline_em": 0.1807,
+      "baseline_f1": 0.2659,
+      "daec_l1_em": 0.1386,
+      "daec_l1_f1": 0.2173,
+      "baseline_support_recall": 0.4418,
+      "baseline_support_complete": 0.0422,
+      "daec_l1_support_recall": 0.4443,
+      "daec_l1_support_complete": 0.0361,
+      "noise_rate": 0.653,
+      "reader_wrong_despite_support_complete": 0.0241,
+      "rows": 166
+    }
+  }
+}

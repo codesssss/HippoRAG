@@ -1,0 +1,1168 @@
+{
+  "objective_epsilon": 0.01,
+  "support_mode": "selected_companion",
+  "policy": "keep base unless objective-tied, base unsupported, and a tied alternative has structural support",
+  "run_dir": "run_logs/daec_binding_grounded_limit100_20260506",
+  "pool_dir": "run_logs/hipporag_pool_exports_full1000_20260503",
+  "by_dataset": {
+    "2Wiki": {
+      "rows": 100,
+      "tied_rows": 22,
+      "tie_rate": 0.22,
+      "base_supported_rows": 82,
+      "base_supported_rate": 0.82,
+      "flips": 2,
+      "flip_rate": 0.02,
+      "support_complete_1_to_0": 0,
+      "support_complete_0_to_1": 0,
+      "avg_support_recall_delta": 0.0
+    },
+    "HotpotQA": {
+      "rows": 100,
+      "tied_rows": 22,
+      "tie_rate": 0.22,
+      "base_supported_rows": 70,
+      "base_supported_rate": 0.7,
+      "flips": 1,
+      "flip_rate": 0.01,
+      "support_complete_1_to_0": 0,
+      "support_complete_0_to_1": 0,
+      "avg_support_recall_delta": 0.0
+    },
+    "MuSiQue": {
+      "rows": 100,
+      "tied_rows": 29,
+      "tie_rate": 0.29,
+      "base_supported_rows": 57,
+      "base_supported_rate": 0.57,
+      "flips": 8,
+      "flip_rate": 0.08,
+      "support_complete_1_to_0": 1,
+      "support_complete_0_to_1": 0,
+      "avg_support_recall_delta": -0.005
+    }
+  },
+  "decision_counts": {
+    "2Wiki": {
+      "keep_not_tied": 78,
+      "keep_base_supported": 16,
+      "keep_no_supported_alt": 4,
+      "flip_alt_supported": 2
+    },
+    "HotpotQA": {
+      "keep_not_tied": 78,
+      "flip_alt_supported": 1,
+      "keep_base_supported": 11,
+      "keep_no_supported_alt": 10
+    },
+    "MuSiQue": {
+      "keep_not_tied": 71,
+      "flip_alt_supported": 8,
+      "keep_no_supported_alt": 15,
+      "keep_base_supported": 6
+    }
+  },
+  "overall": {
+    "rows": 300,
+    "tied_rows": 73,
+    "tie_rate": 0.24333333333333335,
+    "base_supported_rows": 209,
+    "base_supported_rate": 0.6966666666666667,
+    "flips": 11,
+    "flip_rate": 0.03666666666666667,
+    "support_complete_1_to_0": 1,
+    "support_complete_0_to_1": 0,
+    "avg_support_recall_delta": -0.0016666666666666668
+  },
+  "flip_examples": [
+    {
+      "dataset": "2wikimultihopqa",
+      "query_index": 44,
+      "question": "Where was the performer of song B Boy (Song) detained?",
+      "gold_titles": [
+        "B Boy (song)",
+        "Meek Mill"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b1",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "B Boy (song)",
+              "entity_position": 2,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Meek Mill",
+              "entity_position": 3,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 2,
+                  "title": "B Boy (song)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "B Boy (song)",
+        "Al-Mu'ayyad",
+        "Eddie Murray (rugby league)",
+        "Meek Mill",
+        "J-Flexx"
+      ],
+      "verifier_titles": [
+        "Meek Mill",
+        "B Boy (song)",
+        "Al-Mu'ayyad",
+        "Eddie Murray (rugby league)",
+        "J-Flexx"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "query_index": 65,
+      "question": "Where was the place of death of Abdul-Aziz Bin Muhammad's father?",
+      "gold_titles": [
+        "Abdul-Aziz bin Muhammad",
+        "Muhammad bin Saud"
+      ],
+      "base_binding_id": "b1",
+      "verifier_binding_id": "b0",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Muhammad bin Saud",
+              "entity_position": 1,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Abdul-Aziz bin Muhammad"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 3,
+                  "title": "Saud bin Abdul-Aziz bin Muhammad bin Saud"
+                }
+              ]
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Abdullah ibn Muhammad",
+              "entity_position": 2,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Abdullah ibn Muhammad",
+        "Abdul-Aziz bin Muhammad",
+        "Muhammad bin Saud",
+        "Saud bin Abdul-Aziz bin Muhammad bin Saud",
+        "Az-Zubayr ibn Abd al-Muttalib"
+      ],
+      "verifier_titles": [
+        "Muhammad bin Saud",
+        "Abdul-Aziz bin Muhammad",
+        "Saud bin Abdul-Aziz bin Muhammad bin Saud",
+        "Abdullah ibn Muhammad",
+        "Az-Zubayr ibn Abd al-Muttalib"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "hotpotqa",
+      "query_index": 7,
+      "question": "Bethpage State Parkway begins with an interchange at which Long Island-based limited access highway?",
+      "gold_titles": [
+        "Bethpage State Parkway",
+        "Southern State Parkway"
+      ],
+      "base_binding_id": "b4",
+      "verifier_binding_id": "b0",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b2",
+        "b4"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Southern State Parkway",
+              "entity_position": 1,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Bethpage State Parkway"
+                }
+              ]
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Sagtikos State Parkway",
+              "entity_position": 3,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b4": {
+          "binding_id": "b4",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Sunken Meadow State Parkway",
+              "entity_position": 4,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Sunken Meadow State Parkway",
+        "Bethpage State Parkway",
+        "Southern State Parkway",
+        "Heckscher State Parkway",
+        "Sagtikos State Parkway"
+      ],
+      "verifier_titles": [
+        "Southern State Parkway",
+        "Bethpage State Parkway",
+        "Sunken Meadow State Parkway",
+        "Heckscher State Parkway",
+        "Sagtikos State Parkway"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 7,
+      "question": "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+      "gold_titles": [
+        "Vilaiyaadu Mankatha",
+        "Sony Music",
+        "The Right Stuff Records",
+        "Santa Monica, California"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b5",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "The Right Stuff Records",
+              "entity_position": 18,
+              "supported": false,
+              "hits": []
+            },
+            {
+              "requirement_id": "s3",
+              "title": "United States Snooker Association",
+              "entity_position": 91,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "The Right Stuff Records",
+              "entity_position": 18,
+              "supported": false,
+              "hits": []
+            },
+            {
+              "requirement_id": "s3",
+              "title": "New York City",
+              "entity_position": 21,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 99,
+                  "title": "New York City"
+                }
+              ]
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Jive Records",
+              "entity_position": 4,
+              "supported": false,
+              "hits": []
+            },
+            {
+              "requirement_id": "s3",
+              "title": "United States Snooker Association",
+              "entity_position": 91,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Jive Records",
+              "entity_position": 4,
+              "supported": false,
+              "hits": []
+            },
+            {
+              "requirement_id": "s3",
+              "title": "New York City",
+              "entity_position": 21,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 4,
+                  "title": "Jive Records"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 99,
+                  "title": "New York City"
+                }
+              ]
+            }
+          ]
+        },
+        "b4": {
+          "binding_id": "b4",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Sony Music",
+              "entity_position": 7,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Vilaiyaadu Mankatha"
+                }
+              ]
+            },
+            {
+              "requirement_id": "s3",
+              "title": "United States Snooker Association",
+              "entity_position": 91,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b5": {
+          "binding_id": "b5",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Sony Music",
+              "entity_position": 7,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Vilaiyaadu Mankatha"
+                }
+              ]
+            },
+            {
+              "requirement_id": "s3",
+              "title": "New York City",
+              "entity_position": 21,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 99,
+                  "title": "New York City"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "The Right Stuff Records",
+        "United States Snooker Association",
+        "Vilaiyaadu Mankatha",
+        "Miami",
+        "Biltmore Records"
+      ],
+      "verifier_titles": [
+        "Sony Music",
+        "New York City",
+        "Vilaiyaadu Mankatha",
+        "The Right Stuff Records",
+        "United States Snooker Association"
+      ],
+      "base_support_recall": 0.5,
+      "verifier_support_recall": 0.75,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 17,
+      "question": "Who married the actor from Terminator?",
+      "gold_titles": [
+        "Terminator (character)",
+        "Chrétien DuBois"
+      ],
+      "base_binding_id": "b1",
+      "verifier_binding_id": "b0",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1",
+        "b2"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Arnold Schwarzenegger",
+              "entity_position": 4,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 3,
+                  "title": "Terminator (character)"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 8,
+                  "title": "Arnold Schwarzenegger"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 11,
+                  "title": "Arnold Schwarzenegger"
+                }
+              ]
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Edward Furlong",
+              "entity_position": 0,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "John Connor",
+              "entity_position": 2,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Edward Furlong",
+        "Terminator (character)",
+        "Chrétien DuBois",
+        "John Connor",
+        "Arnold Schwarzenegger"
+      ],
+      "verifier_titles": [
+        "Arnold Schwarzenegger",
+        "Terminator (character)",
+        "Arnold Schwarzenegger",
+        "Arnold Schwarzenegger",
+        "Edward Furlong"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 0.5,
+      "base_support_complete": true,
+      "verifier_support_complete": false,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 39,
+      "question": "Who was second pick in the 1999 draft of the league that has a competition where they give out the MLB MVP award after it?",
+      "gold_titles": [
+        "New York Yankees",
+        "World Series",
+        "1999 Major League Baseball draft",
+        "Major League Baseball Most Valuable Player Award"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b1",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1",
+        "b4"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "1999 Major League Baseball draft",
+              "entity_position": 0,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "World Series",
+              "entity_position": 18,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 7,
+                  "title": "World Series Most Valuable Player Award"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 30,
+                  "title": "2017 World Series"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 3,
+                  "title": "Major League Baseball Most Valuable Player Award"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 93,
+                  "title": "World Series"
+                }
+              ]
+            }
+          ]
+        },
+        "b4": {
+          "binding_id": "b4",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Mike Trout",
+              "entity_position": 26,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 69,
+                  "title": "Mike Trout"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Major League Baseball draft",
+        "Major League Baseball Most Valuable Player Award",
+        "1999 Major League Baseball draft",
+        "Major League Baseball All-Star Game Most Valuable Player Award",
+        "Dugout (baseball)"
+      ],
+      "verifier_titles": [
+        "World Series",
+        "World Series Most Valuable Player Award",
+        "2017 World Series",
+        "Major League Baseball Most Valuable Player Award",
+        "World Series"
+      ],
+      "base_support_recall": 0.5,
+      "verifier_support_recall": 0.5,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 44,
+      "question": "When did the person chosen to be president of the confederacy end his fight in the Mexican-American war?",
+      "gold_titles": [
+        "Jefferson Davis",
+        "President of the Confederate States of America"
+      ],
+      "base_binding_id": "b3",
+      "verifier_binding_id": "b0",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Jefferson Davis",
+              "entity_position": 3,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 7,
+                  "title": "Jefferson Davis"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "President of the Confederate States of America"
+                }
+              ]
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "1886 United States House of Representatives elections",
+              "entity_position": 95,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "1886 United States House of Representatives elections",
+        "President of the Confederate States of America",
+        "James Edward Jouett",
+        "Confederate States Army",
+        "Jefferson Davis"
+      ],
+      "verifier_titles": [
+        "Jefferson Davis",
+        "Jefferson Davis",
+        "President of the Confederate States of America",
+        "1886 United States House of Representatives elections",
+        "James Edward Jouett"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 49,
+      "question": "How many ethnic minorities were looked at differently in the city where the headquarters of the only group larger than Långa nätter's record label is located?",
+      "gold_titles": [
+        "Långa nätter",
+        "Sony Music",
+        "The Right Stuff Records",
+        "Santa Monica, California"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b3",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Burning Heart Records",
+              "entity_position": 7,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Roxy Recordings",
+              "entity_position": 14,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Sleaszy Rider Records",
+              "entity_position": 2,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "New York City",
+              "entity_position": 11,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 31,
+                  "title": "New York City"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 51,
+                  "title": "New York City"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 99,
+                  "title": "New York City"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Burning Heart Records",
+        "Långa nätter",
+        "Ole Wehus",
+        "Miami",
+        "Sleaszy Rider Records"
+      ],
+      "verifier_titles": [
+        "New York City",
+        "New York City",
+        "Långa nätter",
+        "New York City",
+        "New York City"
+      ],
+      "base_support_recall": 0.25,
+      "verifier_support_recall": 0.25,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 68,
+      "question": "What was the wettest year of the administrative territorial entity that contains the administrative territorial entity where Drexel Heights is located?",
+      "gold_titles": [
+        "Tucson, Arizona",
+        "Pima County Natural Resources, Parks and Recreation",
+        "Drexel Heights, Arizona"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b2",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b2",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Pima County Natural Resources, Parks and Recreation",
+              "entity_position": 3,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Arizona",
+              "entity_position": 40,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Drexel Heights, Arizona"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 1,
+                  "title": "Tucson, Arizona"
+                }
+              ]
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Shire of Taringa",
+              "entity_position": 7,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Pima County Natural Resources, Parks and Recreation",
+        "ISO 3166-2:AD",
+        "Drexel Heights, Arizona",
+        "Tucson, Arizona",
+        "Tucson, Arizona"
+      ],
+      "verifier_titles": [
+        "Drexel Heights, Arizona",
+        "Tucson, Arizona",
+        "Arizona",
+        "Pima County Natural Resources, Parks and Recreation",
+        "ISO 3166-2:AD"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 94,
+      "question": "Who had the lowest batting average in the league where the team with the most games in the series after which the MLB MVP is awarded played?",
+      "gold_titles": [
+        "New York Yankees",
+        "Batting average",
+        "World Series",
+        "Major League Baseball Most Valuable Player Award"
+      ],
+      "base_binding_id": "b2",
+      "verifier_binding_id": "b1",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b1": {
+          "binding_id": "b1",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s3",
+              "title": "Chicago Cubs",
+              "entity_position": 30,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 35,
+                  "title": "Chicago Cubs"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 54,
+                  "title": "Chicago Cubs"
+                }
+              ]
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s3",
+              "title": "2017 American League Championship Series",
+              "entity_position": 41,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s3",
+              "title": "New York Yankees",
+              "entity_position": 67,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 4,
+                  "title": "World Series"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 70,
+                  "title": "New York Yankees"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "2017 American League Championship Series",
+        "World Series",
+        "Sports league ranking",
+        "Batting average",
+        "Major League Baseball All-Star Game Most Valuable Player Award"
+      ],
+      "verifier_titles": [
+        "Chicago Cubs",
+        "World Series",
+        "Chicago Cubs",
+        "Chicago Cubs",
+        "Sports league ranking"
+      ],
+      "base_support_recall": 0.5,
+      "verifier_support_recall": 0.25,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 99,
+      "question": "When was the region immediately north of the region where the country in which Aluf can be found is located and the Persian Gulf established?",
+      "gold_titles": [
+        "Israel",
+        "Geography of Saudi Arabia",
+        "Saudi Arabia",
+        "Chaim Herzog"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b1",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Alūksne Municipality",
+              "entity_position": 11,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Alūksne",
+              "entity_position": 48,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 11,
+                  "title": "Alūksne Municipality"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Alūksne Municipality",
+        "Alghanim Industries",
+        "Battle of Qurah and Umm al Maradim",
+        "Near East",
+        "Partition of the Ottoman Empire"
+      ],
+      "verifier_titles": [
+        "Alūksne Municipality",
+        "Alghanim Industries",
+        "Battle of Qurah and Umm al Maradim",
+        "Near East",
+        "Partition of the Ottoman Empire"
+      ],
+      "base_support_recall": 0.0,
+      "verifier_support_recall": 0.0,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "report": "run_logs/layer1_dense_pool_eval_20260424/musique_dense_pool_daec_oracle.json",
+  "dataset": "musique",
+  "num_traces": 1000,
+  "category_counts": {
+    "tie": 926,
+    "win": 52,
+    "loss_binding_or_wrong_entity_candidate": 7,
+    "loss_reader_interference": 6,
+    "loss_gold_pushed_out": 3,
+    "loss_other_incomplete": 6
+  },
+  "changed_count": 307,
+  "changed_rate": 0.307,
+  "win_count": 52,
+  "loss_count": 22,
+  "tie_count": 926,
+  "mean_delta_f1": 0.0242349,
+  "mean_delta_f1_changed": 0.07894104234527687,
+  "loss_binding_signal_count": 17,
+  "loss_new_non_gold_count": 14
+}

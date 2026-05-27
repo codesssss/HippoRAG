@@ -1,0 +1,12 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "top_k": 5,
+  "bridge_seed_count": 1,
+  "summary": {
+    "rows": 100,
+    "support_recall": 0.2325,
+    "support_complete": 0.06,
+    "avg_selected_docs": 5.0
+  },
+  "notes": "Controlled fallback baseline; not official BridgeRAG."
+}

@@ -1,0 +1,42 @@
+{
+  "frontier_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "frontier_source": "supplied_dense_pool_frontier_schema_check",
+  "dataset": "musique",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "summary": {
+    "rows": 100,
+    "by_hop": {
+      "2": {
+        "support_recall": 0.3854,
+        "support_complete": 0.125,
+        "noise_rate": 0.8542,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 48
+      },
+      "3": {
+        "support_recall": 0.2722,
+        "support_complete": 0.0,
+        "noise_rate": 0.84,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 30
+      },
+      "4": {
+        "support_recall": 0.2462,
+        "support_complete": 0.0,
+        "noise_rate": 0.8091,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 22
+      }
+    }
+  }
+}

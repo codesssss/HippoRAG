@@ -1,0 +1,17 @@
+[2026-05-05T23:57:12+08:00] HippoRAG-pool bridge expand parity limit100 begin
+[2026-05-05T23:57:12+08:00] Using HippoRAG legacy_fact_graph pool100, Qwen3-8B, causal legacy, structure_rerank_enabled=true, CE_DEVICE=cuda:4
+[2026-05-05T23:57:12+08:00] START eval dataset=2wikimultihopqa variant=bridge_daec limit=100 qa_top_k=5 port=8043
+[2026-05-06T00:00:18+08:00] DONE eval dataset=2wikimultihopqa variant=bridge_daec output=/mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/evals/2wikimultihopqa_bridge_daec_qwen8b_legacy_structure_limit100.json
+[2026-05-06T00:00:18+08:00] START eval dataset=2wikimultihopqa variant=bridge_ce limit=100 qa_top_k=5 port=8043
+[2026-05-06T00:02:34+08:00] DONE eval dataset=2wikimultihopqa variant=bridge_ce output=/mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/evals/2wikimultihopqa_bridge_ce_qwen8b_legacy_structure_limit100.json
+[2026-05-06T00:02:34+08:00] START eval dataset=hotpotqa variant=bridge_daec limit=100 qa_top_k=5 port=8042
+[2026-05-06T00:07:20+08:00] DONE eval dataset=hotpotqa variant=bridge_daec output=/mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/evals/hotpotqa_bridge_daec_qwen8b_legacy_structure_limit100.json
+[2026-05-06T00:07:20+08:00] START eval dataset=hotpotqa variant=bridge_ce limit=100 qa_top_k=5 port=8042
+[2026-05-06T00:11:28+08:00] DONE eval dataset=hotpotqa variant=bridge_ce output=/mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/evals/hotpotqa_bridge_ce_qwen8b_legacy_structure_limit100.json
+[2026-05-06T00:11:28+08:00] START eval dataset=musique variant=bridge_daec limit=100 qa_top_k=5 port=8041
+[2026-05-06T00:16:43+08:00] DONE eval dataset=musique variant=bridge_daec output=/mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/evals/musique_bridge_daec_qwen8b_legacy_structure_limit100.json
+[2026-05-06T00:16:43+08:00] START eval dataset=musique variant=bridge_ce limit=100 qa_top_k=5 port=8041
+[2026-05-06T00:20:46+08:00] DONE eval dataset=musique variant=bridge_ce output=/mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/evals/musique_bridge_ce_qwen8b_legacy_structure_limit100.json
+wrote /mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/hipporag_bridge_expand_parity_limit100_results.csv
+wrote /mnt/nvme/code/HippoRAG/run_logs/hipporag_bridge_expand_parity_limit100_20260505/summary_hipporag_bridge_expand_parity_limit100.md
+[2026-05-06T00:20:46+08:00] HippoRAG-pool bridge expand parity limit100 complete

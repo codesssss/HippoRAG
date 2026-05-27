@@ -1,0 +1,82 @@
+{
+  "datasets": [
+    {
+      "dataset": "2wikimultihopqa",
+      "methods": {
+        "evidence_transition_graphragv3_variable_flow": {
+          "method": "evidence_transition_graphragv3_variable_flow",
+          "metrics": {
+            "ExactMatch": 1.0,
+            "F1": 1.0,
+            "all_gold_at5": 1.0,
+            "answer_string_hit_at5": 1.0,
+            "any_gold_at5": 1.0,
+            "count": 1,
+            "mean_gold_count_at5": 2.0,
+            "r5": 1.0
+          },
+          "per_query": [
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                0,
+                4,
+                6,
+                8,
+                5
+              ],
+              "gold_answers": [
+                "20 March 851"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                4,
+                5
+              ],
+              "predicted_answer": "20 March 851.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 0,
+              "question": "When did Lothair Ii's mother die?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Teutberga",
+                "Lothair II",
+                "Bertha, daughter of Lothair II",
+                "Waldrada of Lotharingia",
+                "Ermengarde of Tours"
+              ]
+            }
+          ],
+          "qa_buckets": {
+            "qa_exact_all_gold_top5": 1
+          }
+        }
+      },
+      "num_queries": 1,
+      "reader": {
+        "llm_base_url": "https://yunwu.ai/v1",
+        "llm_name": "gpt-4o-mini",
+        "qa_top_k": 5
+      },
+      "source": {
+        "doc_key": "retrieved_doc_indices_top5",
+        "metadata_report_path": "/mnt/nvme/code/HippoRAG/run_logs/etv4_clean_mainline_qwen32b_nothink_full1000_20260512/2wikimultihopqa/reports/2wikimultihopqa_minimal_per_query_fresh_v4_fact_witnessed_sto.json",
+        "metadata_variant": "hipporag_v2",
+        "openie_path": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_graphragv3_variable_flow_qwen32b_nv2_full1000_20260511/2wikimultihopqa/index/openie_results_ner_qwen3-32b-judge.json",
+        "retrieval_report_path": "/mnt/nvme/code/HippoRAG/run_logs/evidencelink_phrase_source_only_unified_qwen32b_gpt4omini_full1000_20260519/pcec/phrase_source/evals_reader_fixed/2wikimultihopqa_phrase_source_only_pcec_native_pool_prefix4_residual1_pool100_limit1000.reader_fixed.json",
+        "uses_legacy_transition_qa_runner": false,
+        "uses_sfb_variant": false
+      }
+    }
+  ],
+  "format": "etv3_reader_only_qa",
+  "metadata_variant": "hipporag_v2",
+  "method": "evidence_transition_graphragv3_variable_flow",
+  "qa_doc_key": "retrieved_doc_indices_top5",
+  "uses_legacy_transition_qa_runner": false,
+  "uses_sfb_variant": false
+}

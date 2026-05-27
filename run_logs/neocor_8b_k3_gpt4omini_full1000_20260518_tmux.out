@@ -1,0 +1,5 @@
+[2026-05-18T14:07:59+08:00] BEGIN neocor_8b_k3_gpt4omini_full1000_20260518
+[2026-05-18T14:07:59+08:00] Protocol: NeocorRAG Qwen3-8B no-think beam k=3 saved docs; GPT-4o-mini reader; datasets=2wikimultihopqa hotpotqa musique; max_queries=1000; skip_qa=0
+[2026-05-18T14:07:59+08:00] SKIP existing output=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_inputs/neocor/2wikimultihopqa_neocor_qwen8b_k3_no_think_reader_input.json
+[2026-05-18T14:07:59+08:00] START input=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_inputs/neocor/2wikimultihopqa_neocor_qwen8b_k3_no_think_reader_input.json output=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_qa/neocor/2wikimultihopqa_neocor_qwen8b_k3_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-18T14:07:59+08:00] START NeocorRAG qwen8b beam-k3 GPT-4o-mini reader dataset=2wikimultihopqa

@@ -1,0 +1,17 @@
+{
+  "report": "run_logs/external_pool_dtc_smoke_2wiki1_20260424.json",
+  "dataset": "2wikimultihopqa",
+  "num_traces": 1,
+  "category_counts": {
+    "tie": 1
+  },
+  "changed_count": 0,
+  "changed_rate": 0.0,
+  "win_count": 0,
+  "loss_count": 0,
+  "tie_count": 1,
+  "mean_delta_f1": 0.0,
+  "mean_delta_f1_changed": 0.0,
+  "loss_binding_signal_count": 0,
+  "loss_new_non_gold_count": 0
+}

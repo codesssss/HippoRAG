@@ -1,0 +1,50 @@
+{
+  "status": "completed",
+  "dataset": "musique",
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "generated_obligations_jsonl": "data/dpathrag/arec/generated_obligations_musique_limit100_20260428.jsonl",
+  "cot_queries_jsonl": "data/dpathrag/arec/cot_queries_musique_limit100_20260428.jsonl",
+  "official_ircot_prompt_path_or_fallback_reason": "local_ircot_style_frozen_prompt",
+  "verifier_model": "cross-encoder/nli-deberta-v3-base",
+  "verifier_backend": "nli",
+  "top_k": 5,
+  "per_query_k": 10,
+  "summary": {
+    "arec_missing_hit_rate": 0.016,
+    "raw_question_missing_hit_rate": 0.008,
+    "cot_missing_hit_rate": 0.022,
+    "final_support_complete": 0.24,
+    "final_support_recall": 0.4892,
+    "initial_support_complete": 0.29,
+    "rows": 100
+  },
+  "by_hop": {
+    "2": {
+      "arec_missing_hit_rate": 0.0063,
+      "raw_question_missing_hit_rate": 0.0042,
+      "cot_missing_hit_rate": 0.0104,
+      "final_support_complete": 0.4167,
+      "final_support_recall": 0.5833,
+      "initial_support_complete": 0.4583,
+      "rows": 48
+    },
+    "3": {
+      "arec_missing_hit_rate": 0.0233,
+      "raw_question_missing_hit_rate": 0.0133,
+      "cot_missing_hit_rate": 0.0333,
+      "final_support_complete": 0.1333,
+      "final_support_recall": 0.4778,
+      "initial_support_complete": 0.2,
+      "rows": 30
+    },
+    "4": {
+      "arec_missing_hit_rate": 0.0273,
+      "raw_question_missing_hit_rate": 0.0091,
+      "cot_missing_hit_rate": 0.0318,
+      "final_support_complete": 0.0,
+      "final_support_recall": 0.2992,
+      "initial_support_complete": 0.0455,
+      "rows": 22
+    }
+  }
+}

@@ -1,0 +1,3714 @@
+[2026-04-10 15:03:20] Bridge diagnosis started date_tag=20260410bridge_diag control_date_tag=20260410nqpopqa100dual ce_device=cpu
+[2026-04-10 15:03:20] SKIP existing dataset=nq run=bridge_diag_nq_seed_thr000 report=outputs_step0_general_nq/eval_reports/bridge_diag_nq_seed_thr000_20260410bridge_diag.json
+[2026-04-10 15:03:21] SKIP existing dataset=nq run=bridge_diag_nq_question_thr035 report=outputs_step0_general_nq/eval_reports/bridge_diag_nq_question_thr035_20260410bridge_diag.json
+[2026-04-10 15:03:21] SKIP existing dataset=nq run=bridge_diag_nq_question_thr000 report=outputs_step0_general_nq/eval_reports/bridge_diag_nq_question_thr000_20260410bridge_diag.json
+[2026-04-10 15:03:21] START dataset=popqa run=bridge_diag_popqa_seed_thr000 q_source=seed threshold=0.0 ce_device=cpu llm=http://localhost:8043/v1
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Loaded 8676 records from outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 8676 records already exist.
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:__main__:Reused retrieval from cache outputs_step0_general_popqa/eval_reports/causal_eval_popqa_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.retrieval_cache.json and skipped retrieval stage.
+INFO:__main__:Reused baseline QA from report outputs_step0_general_popqa/eval_reports/causal_eval_popqa_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json and skipped baseline reader pass.
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cpu
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 23442.34it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   5%|▌         | 5/100 [00:01<00:24,  3.86it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  13%|█▎        | 13/100 [00:02<00:16,  5.22it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  19%|█▉        | 19/100 [00:05<00:26,  3.08it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  24%|██▍       | 24/100 [00:06<00:22,  3.44it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  33%|███▎      | 33/100 [00:07<00:13,  4.94it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  35%|███▌      | 35/100 [00:08<00:14,  4.40it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  38%|███▊      | 38/100 [00:12<00:28,  2.17it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  41%|████      | 41/100 [00:13<00:24,  2.41it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  42%|████▏     | 42/100 [00:14<00:28,  2.04it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  44%|████▍     | 44/100 [00:15<00:29,  1.93it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  45%|████▌     | 45/100 [00:16<00:32,  1.70it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  47%|████▋     | 47/100 [00:17<00:32,  1.65it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  61%|██████    | 61/100 [00:20<00:11,  3.52it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  66%|██████▌   | 66/100 [00:21<00:09,  3.55it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  71%|███████   | 71/100 [00:23<00:08,  3.52it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  76%|███████▌  | 76/100 [00:24<00:07,  3.39it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  77%|███████▋  | 77/100 [00:25<00:08,  2.75it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  83%|████████▎ | 83/100 [00:27<00:05,  3.21it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  87%|████████▋ | 87/100 [00:32<00:07,  1.63it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  91%|█████████ | 91/100 [00:33<00:04,  1.99it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  99%|█████████▉| 99/100 [00:35<00:00,  2.73it/s]QA Reading: 100%|██████████| 100/100 [00:35<00:00,  2.82it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 3610.18it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.21, 'F1': 0.4853}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.2100 (delta=+0.0300), F1=0.4853
+{
+  "output_json": "outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_seed_thr000_20260410bridge_diag.json",
+  "overall_recomputed": {
+    "Recall@1": 0.255,
+    "Recall@2": 0.45,
+    "Recall@5": 0.5,
+    "Recall@10": 0.505,
+    "Recall@20": 0.53,
+    "Recall@30": 0.535,
+    "Recall@50": 0.545,
+    "Recall@100": 0.575,
+    "Recall@150": 0.59,
+    "Recall@200": 0.595,
+    "ExactMatch": 0.18,
+    "F1": 0.4810769361173793,
+    "num_queries": 100
+  },
+  "report_metrics": {
+    "primary_run_type": "expand_assemble",
+    "primary_retrieval_metrics": {
+      "Recall@1": 0.45,
+      "Recall@2": 0.49,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@100": 0.575
+    },
+    "primary_qa_metrics": {
+      "ExactMatch": 0.21,
+      "F1": 0.4853
+    },
+    "num_queries": 100,
+    "baseline_retrieval_metrics": {
+      "Recall@1": 0.255,
+      "Recall@2": 0.45,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@30": 0.535,
+      "Recall@50": 0.545,
+      "Recall@100": 0.575,
+      "Recall@150": 0.59,
+      "Recall@200": 0.595
+    },
+    "baseline_qa_metrics": {
+      "ExactMatch": 0.18,
+      "F1": 0.4810769361173793
+    }
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 100
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 100
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 100
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 100
+    },
+    "base_retrieval_dense_fallback_count": 100,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 3,
+    "append_policy": "bridge",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.0,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cpu",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "method_EM": 0.21,
+    "method_F1": 0.4853,
+    "baseline_EM": 0.18,
+    "baseline_F1": 0.4811,
+    "EM_delta": 0.03,
+    "F1_delta": 0.0042,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.45,
+      "Recall@2": 0.49,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@100": 0.575
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 100,
+        "baseline_EM": 0.18,
+        "method_EM": 0.21,
+        "EM_delta": 0.03,
+        "baseline_F1": 0.4811,
+        "method_F1": 0.4853,
+        "F1_delta": 0.0042
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "What is George Rankin's occupation?",
+          "selected_titles": [
+            "George Rankin",
+            "George Rankin -",
+            "George Rankine -",
+            "Rankin (name) - People with the last name",
+            "George Rankine - Family"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 2659,
+              "selected_title": "George Maximilian Bethune -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0643,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 2659,
+                  "title": "George Maximilian Bethune -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0643
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 2660,
+                  "title": "Slave George - Early life and education",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0563
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 405,
+                  "title": "John Holford - Rank",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0481
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 1857,
+                  "title": "Naathan Phan - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0448
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 7421,
+                  "title": "Rolland Golden - Books",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0417
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 2660,
+              "selected_title": "Slave George - Early life and education",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0563,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 2660,
+                  "title": "Slave George - Early life and education",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0563
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 405,
+                  "title": "John Holford - Rank",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0481
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 1857,
+                  "title": "Naathan Phan - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0448
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 7421,
+                  "title": "Rolland Golden - Books",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0417
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 57,
+                  "title": "Alexander Rinnooy Kan -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0404
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 405,
+              "selected_title": "John Holford - Rank",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0481,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 405,
+                  "title": "John Holford - Rank",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0481
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 1857,
+                  "title": "Naathan Phan - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0448
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 7421,
+                  "title": "Rolland Golden - Books",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0417
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 57,
+                  "title": "Alexander Rinnooy Kan -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0404
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 1566,
+                  "title": "Richard Vaughan (ice hockey) - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0388
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is John Mayne's occupation?",
+          "selected_titles": [
+            "John Mayne",
+            "John D. Mayne -",
+            "John D. Mayne - Family",
+            "Edward Mayne - Family",
+            "Kenny Mayne - NBC"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 7190,
+              "selected_title": "Juan Manuel Vázquez (footballer) - Career statistics",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.071,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 7190,
+                  "title": "Juan Manuel Vázquez (footballer) - Career statistics",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.071
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 6801,
+                  "title": "John O'Brien (Louth footballer) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0655
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 1099,
+                  "title": "Mulvaney -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.065
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0622
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 442,
+                  "title": "Maev-Ann Wren -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0602
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 6801,
+              "selected_title": "John O'Brien (Louth footballer) -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0655,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 6801,
+                  "title": "John O'Brien (Louth footballer) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0655
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 1099,
+                  "title": "Mulvaney -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.065
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0622
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 442,
+                  "title": "Maev-Ann Wren -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0602
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 2529,
+                  "title": "John Andrew Martin -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0531
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 1099,
+              "selected_title": "Mulvaney -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.065,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 1099,
+                  "title": "Mulvaney -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.065
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0622
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 442,
+                  "title": "Maev-Ann Wren -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0602
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 2529,
+                  "title": "John Andrew Martin -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0531
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 260,
+                  "title": "Ng (name) - Notable people with the surname Ng (character unknown)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0503
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is Henry Feilden's occupation?",
+          "selected_titles": [
+            "Henry Wemyss Feilden -",
+            "Henry Feilden (Conservative politician)",
+            "Feilden - People",
+            "Feilden baronets - Feilden baronets, of Feniscowles (1846)",
+            "Randle Feilden - Biography"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 6770,
+              "selected_title": "Henry Hunter (architect) - Residences",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0441,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 1,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 6976,
+                  "title": "Henry Bailey (American football)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0551
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 6770,
+                  "title": "Henry Hunter (architect) - Residences",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0441
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 858,
+                  "title": "Henry Olin - Family life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0387
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 5174,
+                  "title": "Martin Hyder -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0349
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 858,
+              "selected_title": "Henry Olin - Family life",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0387,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 1,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 6976,
+                  "title": "Henry Bailey (American football)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0551
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 858,
+                  "title": "Henry Olin - Family life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0387
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 5174,
+                  "title": "Martin Hyder -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0349
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 2525,
+                  "title": "Bobby Henon - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0341
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 13,
+              "selected_doc_id": 642,
+              "selected_title": "William John Seward Webber - Career",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0358,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 1,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 6976,
+                  "title": "Henry Bailey (American football)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0551
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 5174,
+                  "title": "Martin Hyder -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0349
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 2525,
+                  "title": "Bobby Henon - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0341
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 4448,
+                  "title": "John Edgerton - Track and field",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0333
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is Kathy Saltzman's occupation?",
+          "selected_titles": [
+            "Kathy Saltzman",
+            "Kathy Saltzman -",
+            "Salzmann - Saltzman",
+            "Harry Saltzman - Life and career",
+            "W. Mark Saltzman - Research"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 2957,
+              "selected_title": "Shirley Palmer (Kansas politician) - Issue positions",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0384,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 2957,
+                  "title": "Shirley Palmer (Kansas politician) - Issue positions",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0384
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 8174,
+                  "title": "Sola i Karlstad -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.038
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 216,
+                  "title": "Colleen Zenk",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0378
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 7409,
+                  "title": "Franky Zapata - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 2934,
+                  "title": "Sanlam - Sanlam Group Executive",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0324
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 8174,
+              "selected_title": "Sola i Karlstad -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.038,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 8174,
+                  "title": "Sola i Karlstad -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.038
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 216,
+                  "title": "Colleen Zenk",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0378
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 7409,
+                  "title": "Franky Zapata - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 2934,
+                  "title": "Sanlam - Sanlam Group Executive",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0324
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 1381,
+                  "title": "Ann Friedman -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0311
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 216,
+              "selected_title": "Colleen Zenk",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0378,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 216,
+                  "title": "Colleen Zenk",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0378
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 7409,
+                  "title": "Franky Zapata - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 2934,
+                  "title": "Sanlam - Sanlam Group Executive",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0324
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 1381,
+                  "title": "Ann Friedman -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0311
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 5966,
+                  "title": "Zsuzsanna Németh",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0286
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is Eleanor Davis's occupation?",
+          "selected_titles": [
+            "Eleanor Davis",
+            "Eleanor Davies (poet) -",
+            "Eleanor Davies (poet) - Further reading",
+            "Rob Davis (gridiron football) - Early years",
+            "Graphic designer -"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 1589,
+              "selected_title": "Graphic designer -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.039,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 1589,
+                  "title": "Graphic designer -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.039
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 1748,
+                  "title": "Robert Williams (Robert ap Gwilym Ddu) - Notes",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0388
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 3719,
+                  "title": "Charlie Davis (politician) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0359
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0304
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 433,
+                  "title": "Walter Raleigh - Sources",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0296
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 1748,
+              "selected_title": "Robert Williams (Robert ap Gwilym Ddu) - Notes",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0388,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 1748,
+                  "title": "Robert Williams (Robert ap Gwilym Ddu) - Notes",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0388
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 3719,
+                  "title": "Charlie Davis (politician) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0359
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0304
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 433,
+                  "title": "Walter Raleigh - Sources",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0296
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 36,
+                  "title": "Cartoonist",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0288
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 3719,
+              "selected_title": "Charlie Davis (politician) -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0359,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 3719,
+                  "title": "Charlie Davis (politician) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0359
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0304
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 433,
+                  "title": "Walter Raleigh - Sources",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0296
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 36,
+                  "title": "Cartoonist",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0288
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0276
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 3,
+      "append_policy": "bridge",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.0,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cpu",
+      "avg_appended_doc_count": 3.0,
+      "avg_candidate_set_size": 13.0,
+      "append_count_histogram": {
+        "3": 100
+      },
+      "append_stop_reason_counts": {
+        "append_cap_reached": 100
+      }
+    }
+  }
+}
+[2026-04-10 15:08:51] DONE dataset=popqa run=bridge_diag_popqa_seed_thr000 report=outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_seed_thr000_20260410bridge_diag.json
+[2026-04-10 15:08:51] START dataset=popqa run=bridge_diag_popqa_question_thr035 q_source=question threshold=0.35 ce_device=cpu llm=http://localhost:8043/v1
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Loaded 8676 records from outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 8676 records already exist.
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:__main__:Reused retrieval from cache outputs_step0_general_popqa/eval_reports/causal_eval_popqa_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.retrieval_cache.json and skipped retrieval stage.
+INFO:__main__:Reused baseline QA from report outputs_step0_general_popqa/eval_reports/causal_eval_popqa_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json and skipped baseline reader pass.
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cpu
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 29375.99it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]QA Reading: 100%|██████████| 100/100 [00:00<00:00, 4565.18it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 10437.49it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.2, 'F1': 0.4819}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.2000 (delta=+0.0200), F1=0.4819
+{
+  "output_json": "outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_question_thr035_20260410bridge_diag.json",
+  "overall_recomputed": {
+    "Recall@1": 0.255,
+    "Recall@2": 0.45,
+    "Recall@5": 0.5,
+    "Recall@10": 0.505,
+    "Recall@20": 0.53,
+    "Recall@30": 0.535,
+    "Recall@50": 0.545,
+    "Recall@100": 0.575,
+    "Recall@150": 0.59,
+    "Recall@200": 0.595,
+    "ExactMatch": 0.18,
+    "F1": 0.4810769361173793,
+    "num_queries": 100
+  },
+  "report_metrics": {
+    "primary_run_type": "expand_assemble",
+    "primary_retrieval_metrics": {
+      "Recall@1": 0.455,
+      "Recall@2": 0.49,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@100": 0.575
+    },
+    "primary_qa_metrics": {
+      "ExactMatch": 0.2,
+      "F1": 0.4819
+    },
+    "num_queries": 100,
+    "baseline_retrieval_metrics": {
+      "Recall@1": 0.255,
+      "Recall@2": 0.45,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@30": 0.535,
+      "Recall@50": 0.545,
+      "Recall@100": 0.575,
+      "Recall@150": 0.59,
+      "Recall@200": 0.595
+    },
+    "baseline_qa_metrics": {
+      "ExactMatch": 0.18,
+      "F1": 0.4810769361173793
+    }
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 100
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 100
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 100
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 100
+    },
+    "base_retrieval_dense_fallback_count": 100,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 3,
+    "append_policy": "bridge",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.35,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cpu",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "question",
+    "method_EM": 0.2,
+    "method_F1": 0.4819,
+    "baseline_EM": 0.18,
+    "baseline_F1": 0.4811,
+    "EM_delta": 0.02,
+    "F1_delta": 0.0008,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.455,
+      "Recall@2": 0.49,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@100": 0.575
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 100,
+        "baseline_EM": 0.18,
+        "method_EM": 0.2,
+        "EM_delta": 0.02,
+        "baseline_F1": 0.4811,
+        "method_F1": 0.4819,
+        "F1_delta": 0.0009
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "question",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "What is George Rankin's occupation?",
+          "selected_titles": [
+            "George Rankin",
+            "George Rankin -",
+            "George Rankine -",
+            "Rankin (name) - People with the last name",
+            "George Rankine - Family"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is John Mayne's occupation?",
+          "selected_titles": [
+            "John Mayne",
+            "John D. Mayne -",
+            "John D. Mayne - Family",
+            "Edward Mayne - Family",
+            "Kenny Mayne - NBC"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is Henry Feilden's occupation?",
+          "selected_titles": [
+            "Henry Wemyss Feilden -",
+            "Henry Feilden (Conservative politician)",
+            "Feilden - People",
+            "Feilden baronets - Feilden baronets, of Feniscowles (1846)",
+            "Randle Feilden - Biography"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is Kathy Saltzman's occupation?",
+          "selected_titles": [
+            "Kathy Saltzman",
+            "Kathy Saltzman -",
+            "Salzmann - Saltzman",
+            "Harry Saltzman - Life and career",
+            "W. Mark Saltzman - Research"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is Eleanor Davis's occupation?",
+          "selected_titles": [
+            "Eleanor Davis",
+            "Eleanor Davies (poet) -",
+            "Eleanor Davies (poet) - Further reading",
+            "Rob Davis (gridiron football) - Early years",
+            "Eleanor Trehawke Davies - Early life"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "selection_steps": []
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 3,
+      "append_policy": "bridge",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.35,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cpu",
+      "avg_appended_doc_count": 0.0,
+      "avg_candidate_set_size": 10.0,
+      "append_count_histogram": {
+        "0": 100
+      },
+      "append_stop_reason_counts": {
+        "structure_below_threshold": 100
+      }
+    }
+  }
+}
+[2026-04-10 15:12:22] DONE dataset=popqa run=bridge_diag_popqa_question_thr035 report=outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_question_thr035_20260410bridge_diag.json
+[2026-04-10 15:12:22] START dataset=popqa run=bridge_diag_popqa_question_thr000 q_source=question threshold=0.0 ce_device=cpu llm=http://localhost:8043/v1
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Loaded 8676 records from outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 8676 records already exist.
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:__main__:Reused retrieval from cache outputs_step0_general_popqa/eval_reports/causal_eval_popqa_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.retrieval_cache.json and skipped retrieval stage.
+INFO:__main__:Reused baseline QA from report outputs_step0_general_popqa/eval_reports/causal_eval_popqa_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json and skipped baseline reader pass.
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cpu
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 28976.19it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]QA Reading: 100%|██████████| 100/100 [00:00<00:00, 4480.38it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 10526.55it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.21, 'F1': 0.4853}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.2100 (delta=+0.0300), F1=0.4853
+{
+  "output_json": "outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_question_thr000_20260410bridge_diag.json",
+  "overall_recomputed": {
+    "Recall@1": 0.255,
+    "Recall@2": 0.45,
+    "Recall@5": 0.5,
+    "Recall@10": 0.505,
+    "Recall@20": 0.53,
+    "Recall@30": 0.535,
+    "Recall@50": 0.545,
+    "Recall@100": 0.575,
+    "Recall@150": 0.59,
+    "Recall@200": 0.595,
+    "ExactMatch": 0.18,
+    "F1": 0.4810769361173793,
+    "num_queries": 100
+  },
+  "report_metrics": {
+    "primary_run_type": "expand_assemble",
+    "primary_retrieval_metrics": {
+      "Recall@1": 0.45,
+      "Recall@2": 0.49,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@100": 0.575
+    },
+    "primary_qa_metrics": {
+      "ExactMatch": 0.21,
+      "F1": 0.4853
+    },
+    "num_queries": 100,
+    "baseline_retrieval_metrics": {
+      "Recall@1": 0.255,
+      "Recall@2": 0.45,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@30": 0.535,
+      "Recall@50": 0.545,
+      "Recall@100": 0.575,
+      "Recall@150": 0.59,
+      "Recall@200": 0.595
+    },
+    "baseline_qa_metrics": {
+      "ExactMatch": 0.18,
+      "F1": 0.4810769361173793
+    }
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 100
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 100
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 100
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 100
+    },
+    "base_retrieval_dense_fallback_count": 100,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 3,
+    "append_policy": "bridge",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.0,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cpu",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "question",
+    "method_EM": 0.21,
+    "method_F1": 0.4853,
+    "baseline_EM": 0.18,
+    "baseline_F1": 0.4811,
+    "EM_delta": 0.03,
+    "F1_delta": 0.0042,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.45,
+      "Recall@2": 0.49,
+      "Recall@5": 0.5,
+      "Recall@10": 0.505,
+      "Recall@20": 0.53,
+      "Recall@100": 0.575
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 100,
+        "baseline_EM": 0.18,
+        "method_EM": 0.21,
+        "EM_delta": 0.03,
+        "baseline_F1": 0.4811,
+        "method_F1": 0.4853,
+        "F1_delta": 0.0042
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "question",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "What is George Rankin's occupation?",
+          "selected_titles": [
+            "George Rankin",
+            "George Rankin -",
+            "George Rankine -",
+            "Rankin (name) - People with the last name",
+            "George Rankine - Family"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 2659,
+              "selected_title": "George Maximilian Bethune -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0643,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 2659,
+                  "title": "George Maximilian Bethune -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0643
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 2660,
+                  "title": "Slave George - Early life and education",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0563
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 405,
+                  "title": "John Holford - Rank",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0481
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 1857,
+                  "title": "Naathan Phan - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0448
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 7421,
+                  "title": "Rolland Golden - Books",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0417
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 2660,
+              "selected_title": "Slave George - Early life and education",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0563,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 2660,
+                  "title": "Slave George - Early life and education",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0563
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 405,
+                  "title": "John Holford - Rank",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0481
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 1857,
+                  "title": "Naathan Phan - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0448
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 7421,
+                  "title": "Rolland Golden - Books",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0417
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 57,
+                  "title": "Alexander Rinnooy Kan -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0404
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 405,
+              "selected_title": "John Holford - Rank",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0481,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 405,
+                  "title": "John Holford - Rank",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0481
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 1857,
+                  "title": "Naathan Phan - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0448
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 7421,
+                  "title": "Rolland Golden - Books",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0417
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 57,
+                  "title": "Alexander Rinnooy Kan -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0404
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 1566,
+                  "title": "Richard Vaughan (ice hockey) - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0388
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is John Mayne's occupation?",
+          "selected_titles": [
+            "John Mayne",
+            "John D. Mayne -",
+            "John D. Mayne - Family",
+            "Edward Mayne - Family",
+            "Kenny Mayne - NBC"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 7190,
+              "selected_title": "Juan Manuel Vázquez (footballer) - Career statistics",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.071,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 7190,
+                  "title": "Juan Manuel Vázquez (footballer) - Career statistics",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.071
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 6801,
+                  "title": "John O'Brien (Louth footballer) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0655
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 1099,
+                  "title": "Mulvaney -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.065
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0622
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 442,
+                  "title": "Maev-Ann Wren -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0602
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 6801,
+              "selected_title": "John O'Brien (Louth footballer) -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0655,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 6801,
+                  "title": "John O'Brien (Louth footballer) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0655
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 1099,
+                  "title": "Mulvaney -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.065
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0622
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 442,
+                  "title": "Maev-Ann Wren -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0602
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 2529,
+                  "title": "John Andrew Martin -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0531
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 1099,
+              "selected_title": "Mulvaney -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.065,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 1099,
+                  "title": "Mulvaney -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.065
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0622
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 442,
+                  "title": "Maev-Ann Wren -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0602
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 2529,
+                  "title": "John Andrew Martin -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0531
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 260,
+                  "title": "Ng (name) - Notable people with the surname Ng (character unknown)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0503
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is Henry Feilden's occupation?",
+          "selected_titles": [
+            "Henry Wemyss Feilden -",
+            "Henry Feilden (Conservative politician)",
+            "Feilden - People",
+            "Feilden baronets - Feilden baronets, of Feniscowles (1846)",
+            "Randle Feilden - Biography"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 6770,
+              "selected_title": "Henry Hunter (architect) - Residences",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0441,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 1,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 6976,
+                  "title": "Henry Bailey (American football)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0551
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 6770,
+                  "title": "Henry Hunter (architect) - Residences",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0441
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 858,
+                  "title": "Henry Olin - Family life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0387
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 5174,
+                  "title": "Martin Hyder -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0349
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 858,
+              "selected_title": "Henry Olin - Family life",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0387,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 1,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 6976,
+                  "title": "Henry Bailey (American football)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0551
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 858,
+                  "title": "Henry Olin - Family life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0387
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 5174,
+                  "title": "Martin Hyder -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0349
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 2525,
+                  "title": "Bobby Henon - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0341
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 13,
+              "selected_doc_id": 642,
+              "selected_title": "William John Seward Webber - Career",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0358,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 1,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 6976,
+                  "title": "Henry Bailey (American football)",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0551
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 5174,
+                  "title": "Martin Hyder -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0349
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 2525,
+                  "title": "Bobby Henon - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0341
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 4448,
+                  "title": "John Edgerton - Track and field",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0333
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is Kathy Saltzman's occupation?",
+          "selected_titles": [
+            "Kathy Saltzman",
+            "Kathy Saltzman -",
+            "Salzmann - Saltzman",
+            "Harry Saltzman - Life and career",
+            "W. Mark Saltzman - Research"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 2957,
+              "selected_title": "Shirley Palmer (Kansas politician) - Issue positions",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0384,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 2957,
+                  "title": "Shirley Palmer (Kansas politician) - Issue positions",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0384
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 8174,
+                  "title": "Sola i Karlstad -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.038
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 216,
+                  "title": "Colleen Zenk",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0378
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 7409,
+                  "title": "Franky Zapata - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 2934,
+                  "title": "Sanlam - Sanlam Group Executive",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0324
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 8174,
+              "selected_title": "Sola i Karlstad -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.038,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 8174,
+                  "title": "Sola i Karlstad -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.038
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 216,
+                  "title": "Colleen Zenk",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0378
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 7409,
+                  "title": "Franky Zapata - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 2934,
+                  "title": "Sanlam - Sanlam Group Executive",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0324
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 1381,
+                  "title": "Ann Friedman -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0311
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 216,
+              "selected_title": "Colleen Zenk",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0378,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 216,
+                  "title": "Colleen Zenk",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0378
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 7409,
+                  "title": "Franky Zapata - Personal life",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0358
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 2934,
+                  "title": "Sanlam - Sanlam Group Executive",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0324
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 1381,
+                  "title": "Ann Friedman -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0311
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 5966,
+                  "title": "Zsuzsanna Németh",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0286
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "question": "What is Eleanor Davis's occupation?",
+          "selected_titles": [
+            "Eleanor Davis",
+            "Eleanor Davies (poet) -",
+            "Eleanor Davies (poet) - Further reading",
+            "Rob Davis (gridiron football) - Early years",
+            "Graphic designer -"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "bridge",
+              "selected_pool_position": 10,
+              "selected_doc_id": 1589,
+              "selected_title": "Graphic designer -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.039,
+              "candidate_pool_size": 90,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 10,
+                  "doc_id": 1589,
+                  "title": "Graphic designer -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.039
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 11,
+                  "doc_id": 1748,
+                  "title": "Robert Williams (Robert ap Gwilym Ddu) - Notes",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0388
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 12,
+                  "doc_id": 3719,
+                  "title": "Charlie Davis (politician) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0359
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0304
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 14,
+                  "doc_id": 433,
+                  "title": "Walter Raleigh - Sources",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0296
+                }
+              ]
+            },
+            {
+              "step": 2,
+              "selection_policy": "bridge",
+              "selected_pool_position": 11,
+              "selected_doc_id": 1748,
+              "selected_title": "Robert Williams (Robert ap Gwilym Ddu) - Notes",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0388,
+              "candidate_pool_size": 89,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 11,
+                  "doc_id": 1748,
+                  "title": "Robert Williams (Robert ap Gwilym Ddu) - Notes",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0388
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 12,
+                  "doc_id": 3719,
+                  "title": "Charlie Davis (politician) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0359
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0304
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 14,
+                  "doc_id": 433,
+                  "title": "Walter Raleigh - Sources",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0296
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 15,
+                  "doc_id": 36,
+                  "title": "Cartoonist",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0288
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "selection_policy": "bridge",
+              "selected_pool_position": 12,
+              "selected_doc_id": 3719,
+              "selected_title": "Charlie Davis (politician) -",
+              "selected_structure_score": 0.0,
+              "selected_closure_score": 0.0,
+              "selected_novelty_score": 0.0,
+              "selected_combined_score": 0.0359,
+              "candidate_pool_size": 88,
+              "best_structure_score": 0.0,
+              "duplicate_skip_count": 0,
+              "candidate_preview": [
+                {
+                  "preview_rank": 1,
+                  "pool_position": 12,
+                  "doc_id": 3719,
+                  "title": "Charlie Davis (politician) -",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0359
+                },
+                {
+                  "preview_rank": 2,
+                  "pool_position": 13,
+                  "doc_id": 642,
+                  "title": "William John Seward Webber - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0304
+                },
+                {
+                  "preview_rank": 3,
+                  "pool_position": 14,
+                  "doc_id": 433,
+                  "title": "Walter Raleigh - Sources",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0296
+                },
+                {
+                  "preview_rank": 4,
+                  "pool_position": 15,
+                  "doc_id": 36,
+                  "title": "Cartoonist",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0288
+                },
+                {
+                  "preview_rank": 5,
+                  "pool_position": 16,
+                  "doc_id": 444,
+                  "title": "Maev-Ann Wren - Career",
+                  "structure_score": 0.0,
+                  "closure_score": 0.0,
+                  "novelty_score": 0.0,
+                  "combined_score": 0.0276
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 3,
+      "append_policy": "bridge",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.0,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cpu",
+      "avg_appended_doc_count": 3.0,
+      "avg_candidate_set_size": 13.0,
+      "append_count_histogram": {
+        "3": 100
+      },
+      "append_stop_reason_counts": {
+        "append_cap_reached": 100
+      }
+    }
+  }
+}
+[2026-04-10 15:17:00] DONE dataset=popqa run=bridge_diag_popqa_question_thr000 report=outputs_step0_general_popqa/eval_reports/bridge_diag_popqa_question_thr000_20260410bridge_diag.json
+[2026-04-10 15:17:01] Bridge diagnosis finished

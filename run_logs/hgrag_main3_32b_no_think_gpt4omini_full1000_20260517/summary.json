@@ -1,0 +1,37 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "hgrag_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.7665,
+      "Recall@20": 0.834,
+      "ExactMatch": 0.545,
+      "F1": 0.6017,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/hgrag_main3_32b_no_think_gpt4omini_full1000_20260517/reader_qa/hgrag/2wikimultihopqa_hgrag_qwen32b_no_think_gpt4omini_reader.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "hgrag_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.9445,
+      "Recall@20": 0.9785,
+      "ExactMatch": 0.606,
+      "F1": 0.7328,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/hgrag_main3_32b_no_think_gpt4omini_full1000_20260517/reader_qa/hgrag/hotpotqa_hgrag_qwen32b_no_think_gpt4omini_reader.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "hgrag_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.6949,
+      "Recall@20": 0.8156,
+      "ExactMatch": 0.368,
+      "F1": 0.4806,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/hgrag_main3_32b_no_think_gpt4omini_full1000_20260517/reader_qa/hgrag/musique_hgrag_qwen32b_no_think_gpt4omini_reader.json"
+    }
+  ]
+}

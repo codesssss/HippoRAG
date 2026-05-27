@@ -1,0 +1,86 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "dataset": "2wikimultihopqa",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "summary": {
+    "rows": 400,
+    "by_hop_variant": {
+      "2:mixed_source_absorption": {
+        "support_recall": 0.4221,
+        "support_complete": 0.1818,
+        "noise_rate": 0.8312,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "2:multi_channel_noisy_or": {
+        "support_recall": 0.513,
+        "support_complete": 0.2468,
+        "noise_rate": 0.7942,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "2:multi_channel_sum": {
+        "support_recall": 0.513,
+        "support_complete": 0.2468,
+        "noise_rate": 0.7948,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "2:query_level_ppr": {
+        "support_recall": 0.4221,
+        "support_complete": 0.1818,
+        "noise_rate": 0.8312,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "4:mixed_source_absorption": {
+        "support_recall": 0.4348,
+        "support_complete": 0.0,
+        "noise_rate": 0.6522,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      },
+      "4:multi_channel_noisy_or": {
+        "support_recall": 0.4674,
+        "support_complete": 0.0,
+        "noise_rate": 0.6261,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      },
+      "4:multi_channel_sum": {
+        "support_recall": 0.4674,
+        "support_complete": 0.0,
+        "noise_rate": 0.6261,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      },
+      "4:query_level_ppr": {
+        "support_recall": 0.4348,
+        "support_complete": 0.0,
+        "noise_rate": 0.6522,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      }
+    }
+  }
+}

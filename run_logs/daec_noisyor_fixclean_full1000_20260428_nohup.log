@@ -1,0 +1,5 @@
+[2026-04-28T11:30:19+08:00] DAEC noisy-OR full1000 launcher started
+[2026-04-28T11:30:20+08:00] launching daec_noisyor_dense_pool100_2wiki on 8042
+[2026-04-28T11:30:20+08:00] daec_noisyor_dense_pool100_2wiki pid=1951656 log=run_logs/daec_noisyor_dense_pool100_2wiki_fixclean_full1000_20260428.log json=run_logs/daec_noisyor_dense_pool100_2wiki_fixclean_full1000_20260428.json
+[2026-04-28T11:30:30+08:00] launching daec_noisyor_dense_pool100_hotpotqa on 8043
+[2026-04-28T11:30:30+08:00] daec_noisyor_dense_pool100_hotpotqa pid=1953847 log=run_logs/daec_noisyor_dense_pool100_hotpotqa_fixclean_full1000_20260428.log json=run_logs/daec_noisyor_dense_pool100_hotpotqa_fixclean_full1000_20260428.json

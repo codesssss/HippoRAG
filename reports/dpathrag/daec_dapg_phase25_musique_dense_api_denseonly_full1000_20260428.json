@@ -1,0 +1,161 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "daec_report_json": "run_logs/daec_noisyor_dense_pool100_musique_fixclean_full1000_20260428.json",
+  "dataset": "musique",
+  "limit": 1000,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "embedding_backend": "api",
+  "embedding_model": "nvidia/NV-Embed-v2",
+  "embedding_base_url": "http://localhost:8019/v1/embeddings",
+  "phi_transform": "linear_clip",
+  "phi_scales": [
+    1.0
+  ],
+  "variants": [
+    "dense_query_cosine",
+    "query_level_ppr",
+    "dense_demand_union_cosine",
+    "demand_source_union"
+  ],
+  "summary": {
+    "rows": 4000,
+    "by_hop_variant": {
+      "2:scale=1:demand_source_union": {
+        "support_recall": 0.6737,
+        "support_complete": 0.3764,
+        "noise_rate": 0.739,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 518,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:dense_demand_union_cosine": {
+        "support_recall": 0.695,
+        "support_complete": 0.4189,
+        "noise_rate": 0.7305,
+        "objective": 1.8537,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 518,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:dense_query_cosine": {
+        "support_recall": 0.7751,
+        "support_complete": 0.5695,
+        "noise_rate": 0.6985,
+        "objective": 1.6775,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 518,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:query_level_ppr": {
+        "support_recall": 0.7336,
+        "support_complete": 0.4942,
+        "noise_rate": 0.7151,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 518,
+        "phi_scale": 1.0
+      },
+      "3:scale=1:demand_source_union": {
+        "support_recall": 0.6097,
+        "support_complete": 0.1804,
+        "noise_rate": 0.6418,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 316,
+        "phi_scale": 1.0
+      },
+      "3:scale=1:dense_demand_union_cosine": {
+        "support_recall": 0.635,
+        "support_complete": 0.1741,
+        "noise_rate": 0.6266,
+        "objective": 1.9146,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 316,
+        "phi_scale": 1.0
+      },
+      "3:scale=1:dense_query_cosine": {
+        "support_recall": 0.6772,
+        "support_complete": 0.2658,
+        "noise_rate": 0.6019,
+        "objective": 1.5504,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 316,
+        "phi_scale": 1.0
+      },
+      "3:scale=1:query_level_ppr": {
+        "support_recall": 0.6456,
+        "support_complete": 0.2373,
+        "noise_rate": 0.6209,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 316,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:demand_source_union": {
+        "support_recall": 0.4061,
+        "support_complete": 0.0241,
+        "noise_rate": 0.6843,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 166,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:dense_demand_union_cosine": {
+        "support_recall": 0.4332,
+        "support_complete": 0.0301,
+        "noise_rate": 0.6627,
+        "objective": 1.8954,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 166,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:dense_query_cosine": {
+        "support_recall": 0.4418,
+        "support_complete": 0.0422,
+        "noise_rate": 0.6554,
+        "objective": 1.4751,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 166,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:query_level_ppr": {
+        "support_recall": 0.3991,
+        "support_complete": 0.0301,
+        "noise_rate": 0.6892,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 166,
+        "phi_scale": 1.0
+      }
+    },
+    "sum_vs_noisy_or": {}
+  }
+}

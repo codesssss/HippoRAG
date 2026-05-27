@@ -1,0 +1,95 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "dataset": "2wikimultihopqa",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "embedding_backend": "tfidf_dense",
+  "summary": {
+    "rows": 400,
+    "by_hop_variant": {
+      "2:mixed_source_absorption": {
+        "support_recall": 0.6688,
+        "support_complete": 0.4026,
+        "noise_rate": 0.7325,
+        "objective": 0.0012,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "2:multi_channel_noisy_or": {
+        "support_recall": 0.6688,
+        "support_complete": 0.4026,
+        "noise_rate": 0.7307,
+        "objective": 0.0012,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "2:multi_channel_sum": {
+        "support_recall": 0.6688,
+        "support_complete": 0.4026,
+        "noise_rate": 0.7325,
+        "objective": 0.0012,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "2:query_level_ppr": {
+        "support_recall": 0.6688,
+        "support_complete": 0.4026,
+        "noise_rate": 0.7325,
+        "objective": 0.0012,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77
+      },
+      "4:mixed_source_absorption": {
+        "support_recall": 0.5109,
+        "support_complete": 0.0,
+        "noise_rate": 0.5913,
+        "objective": 0.0014,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      },
+      "4:multi_channel_noisy_or": {
+        "support_recall": 0.5109,
+        "support_complete": 0.0,
+        "noise_rate": 0.5913,
+        "objective": 0.0014,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      },
+      "4:multi_channel_sum": {
+        "support_recall": 0.5109,
+        "support_complete": 0.0,
+        "noise_rate": 0.5913,
+        "objective": 0.0014,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      },
+      "4:query_level_ppr": {
+        "support_recall": 0.5109,
+        "support_complete": 0.0,
+        "noise_rate": 0.5913,
+        "objective": 0.0014,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23
+      }
+    }
+  }
+}

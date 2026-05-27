@@ -1,0 +1,6 @@
+[2026-04-14 12:08:29] Queue started on CUDA_VISIBLE_DEVICES=3 CE_DEVICE=cuda:0
+[2026-04-14 12:08:29] SKIP dataset=musique run=width_match_bridge_append_plus_action_swap_noisyor_flat_qatopk5 report=outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_flat_qatopk5_20260414noisyor.json
+[2026-04-14 12:08:31] SKIP dataset=musique run=width_match_bridge_append_plus_action_swap_noisyor_dep_qatopk5 report=outputs_step0_general_musique/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_dep_qatopk5_20260414noisyor.json
+[2026-04-14 12:08:32] SKIP dataset=2wikimultihopqa run=width_match_bridge_append_plus_action_swap_noisyor_flat_qatopk5 report=outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_flat_qatopk5_20260414noisyor.json
+[2026-04-14 12:08:33] SKIP dataset=2wikimultihopqa run=width_match_bridge_append_plus_action_swap_noisyor_dep_qatopk5 report=outputs_step0_general_2wikimultihopqa/eval_reports/width_match_bridge_append_plus_action_swap_noisyor_dep_qatopk5_20260414noisyor.json
+[2026-04-14 12:08:36] Queue finished

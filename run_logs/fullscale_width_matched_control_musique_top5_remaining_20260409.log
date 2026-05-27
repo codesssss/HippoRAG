@@ -1,0 +1,5 @@
+[2026-04-09 22:56:02] Remaining queue started on CUDA_VISIBLE_DEVICES=6
+[2026-04-09 22:56:02] SKIP dataset=musique run=retrieval_cache_top5 cache=outputs_step0_general_musique/eval_reports/causal_eval_musique_full_qwen3-8b_qatopk5_baseline_20260409fullfix.retrieval_cache.json
+[2026-04-09 22:56:07] SKIP dataset=musique run=random3_deep_plus_ce_qatopk5 report=outputs_step0_general_musique/eval_reports/random3_deep_plus_ce_qatopk5_20260409fullfix.json
+[2026-04-09 22:56:11] SKIP dataset=musique run=bridge_append_plus_ce_qatopk5 report=outputs_step0_general_musique/eval_reports/bridge_append_plus_ce_qatopk5_20260409fullfix.json
+[2026-04-09 22:56:19] Remaining queue finished

@@ -1,0 +1,22 @@
+{
+  "report": "run_logs/layer1_proprag_pool_eval_fixed_20260424/musique_proprag_pool_daec_oracle.json",
+  "dataset": "musique",
+  "num_traces": 1000,
+  "category_counts": {
+    "tie": 933,
+    "win": 39,
+    "loss_other_incomplete": 9,
+    "loss_binding_or_wrong_entity_candidate": 9,
+    "loss_gold_pushed_out": 1,
+    "loss_reader_interference": 9
+  },
+  "changed_count": 334,
+  "changed_rate": 0.334,
+  "win_count": 39,
+  "loss_count": 28,
+  "tie_count": 933,
+  "mean_delta_f1": 0.013770200000000003,
+  "mean_delta_f1_changed": 0.041228143712574855,
+  "loss_binding_signal_count": 24,
+  "loss_new_non_gold_count": 13
+}

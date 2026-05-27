@@ -1,0 +1,17 @@
+[2026-05-03T23:21:49+08:00] START export_2wikimultihopqa_dense_setr_k20_doc768
+[2026-05-03T23:21:49+08:00] START export_hotpotqa_dense_setr_k20_doc768
+[2026-05-03T23:21:49+08:00] START export_musique_dense_setr_k20_doc768
+[2026-05-03T23:21:50+08:00] DONE export_2wikimultihopqa_dense_setr_k20_doc768
+[2026-05-03T23:21:50+08:00] START select_2wikimultihopqa_dense_setr_k20_doc768
+[2026-05-03T23:21:50+08:00] DONE export_hotpotqa_dense_setr_k20_doc768
+[2026-05-03T23:21:50+08:00] START select_hotpotqa_dense_setr_k20_doc768
+[2026-05-03T23:21:50+08:00] DONE export_musique_dense_setr_k20_doc768
+[2026-05-03T23:21:50+08:00] START select_musique_dense_setr_k20_doc768
+[2026-05-03T23:25:58+08:00] DONE select_2wikimultihopqa_dense_setr_k20_doc768
+[2026-05-03T23:25:58+08:00] START apply_2wikimultihopqa_dense_setr_k20_doc768
+[2026-05-03T23:25:59+08:00] DONE apply_2wikimultihopqa_dense_setr_k20_doc768
+[2026-05-03T23:25:59+08:00] START eval_setr_k20_doc768
+[2026-05-03T23:26:22+08:00] DONE select_hotpotqa_dense_setr_k20_doc768
+[2026-05-03T23:26:22+08:00] START apply_hotpotqa_dense_setr_k20_doc768
+[2026-05-03T23:26:24+08:00] DONE apply_hotpotqa_dense_setr_k20_doc768
+[2026-05-03T23:26:24+08:00] START eval_setr_k20_doc768

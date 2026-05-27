@@ -1,0 +1,13 @@
+[2026-04-10 13:45:39] Launch started date_tag=20260410nqpopqa100dual limit=100
+[2026-04-10 13:45:39] HEALTHCHECK OK name=local8043 url=http://localhost:8043/v1/models
+[2026-04-10 13:45:40] CHATCHECK OK name=local8043 url=http://localhost:8043/v1/chat/completions model=qwen3-8b-train
+[2026-04-10 13:45:40] HEALTHCHECK OK name=remote8002 url=http://36.133.236.142:8002/v1/models
+[2026-04-10 13:45:40] CHATCHECK OK name=remote8002 url=http://36.133.236.142:8002/v1/chat/completions model=qwen3-8b
+[2026-04-10 13:45:40] HEALTHCHECK OK name=standby8003 url=http://36.133.236.142:8003/v1/models
+[2026-04-10 13:45:40] CHATCHECK OK name=standby8003 url=http://36.133.236.142:8003/v1/chat/completions model=qwen3-8b
+[2026-04-10 13:45:40] EMBEDCHECK OK url=http://localhost:8018/v1/models
+[2026-04-10 13:45:40] INDEX READY dataset=nq path=outputs_step0_general_nq/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+[2026-04-10 13:45:40] INDEX READY dataset=popqa path=outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+[2026-04-10 13:45:40] LANE LAUNCHED name=nq pid=3687840 cuda_visible_devices=6 script=run_logs/width_matched_control_nq_100_20260410.sh
+[2026-04-10 13:45:40] LANE LAUNCHED name=popqa pid=3687844 cuda_visible_devices=5 script=run_logs/width_matched_control_popqa_100_20260410.sh
+[2026-04-10 13:45:40] Launch finished; monitor lane status files under run_logs/

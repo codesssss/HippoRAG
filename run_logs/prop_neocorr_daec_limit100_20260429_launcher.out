@@ -1,0 +1,23 @@
+[START] prop_neocorr_daec_limit100_20260429 2026-04-29T15:13:30+08:00
+[RUNNING] prop_neocorr_daec_limit100_20260429 pids=273156 273157 273158 273160 2026-04-29T15:13:30+08:00
+[START] dataset=2wikimultihopqa variant=neocorrag port=8041 cuda=4 start=2026-04-29T15:13:30+08:00
+[START] dataset=2wikimultihopqa variant=proprag port=8041 start=2026-04-29T15:13:30+08:00
+[START] dataset=hotpotqa variant=proprag port=8042 start=2026-04-29T15:13:30+08:00
+[START] dataset=musique variant=proprag port=8043 start=2026-04-29T15:13:30+08:00
+[FAILED] dataset=2wikimultihopqa variant=neocorrag code=1 end=2026-04-29T15:13:35+08:00 log=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/2wikimultihopqa_neocorrag.log
+[DONE] dataset=2wikimultihopqa variant=proprag end=2026-04-29T15:14:01+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/2wikimultihopqa_proprag.json
+[START] dataset=2wikimultihopqa variant=daec port=8041 start=2026-04-29T15:14:01+08:00
+[DONE] dataset=hotpotqa variant=proprag end=2026-04-29T15:14:28+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/hotpotqa_proprag.json
+[START] dataset=hotpotqa variant=daec port=8042 start=2026-04-29T15:14:28+08:00
+[DONE] dataset=musique variant=proprag end=2026-04-29T15:14:42+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/musique_proprag.json
+[START] dataset=musique variant=daec port=8043 start=2026-04-29T15:14:42+08:00
+[DONE] dataset=2wikimultihopqa variant=daec end=2026-04-29T15:17:14+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/2wikimultihopqa_daec.json
+[START] dataset=2wikimultihopqa variant=daec_l1 port=8041 start=2026-04-29T15:17:14+08:00
+[DONE] dataset=hotpotqa variant=daec end=2026-04-29T15:19:14+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/hotpotqa_daec.json
+[START] dataset=hotpotqa variant=daec_l1 port=8042 start=2026-04-29T15:19:14+08:00
+[DONE] dataset=musique variant=daec end=2026-04-29T15:19:21+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/musique_daec.json
+[START] dataset=musique variant=daec_l1 port=8043 start=2026-04-29T15:19:21+08:00
+[DONE] dataset=2wikimultihopqa variant=daec_l1 end=2026-04-29T15:19:52+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/2wikimultihopqa_daec_l1.json
+[DONE] dataset=hotpotqa variant=daec_l1 end=2026-04-29T15:23:49+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/hotpotqa_daec_l1.json
+[DONE] dataset=musique variant=daec_l1 end=2026-04-29T15:24:59+08:00 output=/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/musique_daec_l1.json
+[FAILED] prop_neocorr_daec_limit100_20260429 rc=1 2026-04-29T15:24:59+08:00

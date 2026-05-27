@@ -1,0 +1,29 @@
+[2026-05-18T14:11:03+08:00] BEGIN neocor_8b_k3_gpt4omini_full1000_20260518
+[2026-05-18T14:11:03+08:00] Protocol: NeocorRAG Qwen3-8B no-think beam k=3 saved docs; GPT-4o-mini reader; datasets=musique; max_queries=1000; skip_qa=0
+[2026-05-18T14:11:03+08:00] START source=/mnt/nvme/code/HippoRAG/run_logs/neocorrag_aligned_k3_full1000_20260430/musique_neocorrag_k3.json output=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_inputs/neocor/musique_neocor_qwen8b_k3_no_think_reader_input.json
+{
+  "output_json": "/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_inputs/neocor/musique_neocor_qwen8b_k3_no_think_reader_input.json",
+  "count": 1000
+}
+[2026-05-18T14:11:04+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_inputs/neocor/musique_neocor_qwen8b_k3_no_think_reader_input.json
+[2026-05-18T14:11:04+08:00] START input=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_inputs/neocor/musique_neocor_qwen8b_k3_no_think_reader_input.json output=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_qa/neocor/musique_neocor_qwen8b_k3_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-18T14:11:04+08:00] START NeocorRAG qwen8b beam-k3 GPT-4o-mini reader dataset=musique
+[2026-05-18T14:37:44+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_qa/neocor/musique_neocor_qwen8b_k3_no_think_gpt4omini_reader_top5_limit1000.json
+{
+  "rows": [
+    {
+      "dataset": "musique",
+      "method": "neocor_qwen8b_k3_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.674,
+      "Recall@20": 0.8482,
+      "ExactMatch": 0.344,
+      "F1": 0.4565,
+      "mean_reader_docs": 3.458,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_qa/neocor/musique_neocor_qwen8b_k3_no_think_gpt4omini_reader_top5_limit1000.json"
+    }
+  ]
+}
+[2026-05-18T14:37:44+08:00] DONE run_tag=neocor_8b_k3_gpt4omini_full1000_20260518
+[2026-05-18T14:37:44+08:00] DONE neocor_8b_k3_gpt4omini_full1000_20260518
+rc=0

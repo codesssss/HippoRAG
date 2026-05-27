@@ -1,0 +1,103 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 2,
+      "Recall@5": 1.0,
+      "Recall@20": null,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": null,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/evidenceflow_etv3/2wikimultihopqa_evidenceflow_etv3_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 2,
+      "Recall@5": 0.75,
+      "Recall@20": null,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": null,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/evidenceflow_etv3/hotpotqa_evidenceflow_etv3_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "evidence_transition_graphragv3_variable_flow",
+      "count": 2,
+      "Recall@5": 0.833333,
+      "Recall@20": null,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": null,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/evidenceflow_etv3/musique_evidenceflow_etv3_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "hgrag_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.7692,
+      "Recall@20": 0.8403,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/hgrag/2wikimultihopqa_hgrag_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "hgrag_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.945,
+      "Recall@20": 0.981,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/hgrag/hotpotqa_hgrag_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "hgrag_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.6952,
+      "Recall@20": 0.814,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/hgrag/musique_hgrag_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "neocor_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.7558,
+      "Recall@20": 0.8858,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.5,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/neocor/2wikimultihopqa_neocor_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "neocor_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.92,
+      "Recall@20": 0.9885,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/neocor/hotpotqa_neocor_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "neocor_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.6647,
+      "Recall@20": 0.8528,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.5,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_main3_smoke_20260518/reader_qa/neocor/musique_neocor_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    }
+  ]
+}

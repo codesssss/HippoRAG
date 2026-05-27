@@ -1,0 +1,9 @@
+policy,missing_gold_titles,queries,baseline_recall_at_5,baseline_recall_at_10,baseline_recall_at_20,policy_recall_at_5,policy_recall_at_10,policy_recall_at_20,new_recall_at_5,new_recall_at_10,new_recall_at_20,mean_source_rank,mean_policy_rank,mean_rank_improvement,positive_score_rate,prompt_parse_ok_rate
+source_order,2,2,0.0,0.5,1.0,0.0,0.5,1.0,0.0,0.0,0.0,12.5,12.5,0.0,0.0,
+question_lexical,2,2,0.0,0.5,1.0,0.0,0.0,0.5,0.0,0.0,0.0,12.5,41.5,-29.0,0.5,
+demand_lexical,2,2,0.0,0.5,1.0,0.0,0.0,0.0,0.0,0.0,0.0,12.5,36.5,-24.0,0.5,
+llm_query_reform,2,2,0.0,0.5,1.0,0.0,0.0,0.0,0.0,0.0,0.0,12.5,45.0,-32.5,0.5,1.0
+llm_demand_reform,2,2,0.0,0.5,1.0,0.0,0.0,0.0,0.0,0.0,0.0,12.5,60.5,-48.0,0.0,1.0
+llm_demand_hyde,2,2,0.0,0.5,1.0,0.0,0.0,0.5,0.0,0.0,0.0,12.5,23.5,-11.0,1.0,1.0
+llm_combined,2,2,0.0,0.5,1.0,0.0,0.0,0.5,0.0,0.0,0.0,12.5,40.5,-28.0,1.0,
+llm_listwise_select,2,2,0.0,0.5,1.0,0.0,0.0,0.5,0.0,0.0,0.0,12.5,23.5,-11.0,0.0,1.0

@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "dataset": "nq",
+      "method": "hgrag_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.5247,
+      "Recall@20": 0.9431,
+      "ExactMatch": 0.51,
+      "F1": 0.6469,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/hgrag_nq_popqa_32b_no_think_gpt4omini_full1000_20260517/reader_qa/hgrag/nq_hgrag_qwen32b_no_think_gpt4omini_reader.json"
+    },
+    {
+      "dataset": "popqa",
+      "method": "hgrag_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.515,
+      "Recall@20": 0.586,
+      "ExactMatch": 0.457,
+      "F1": 0.5839,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/hgrag_nq_popqa_32b_no_think_gpt4omini_full1000_20260517/reader_qa/hgrag/popqa_hgrag_qwen32b_no_think_gpt4omini_reader.json"
+    }
+  ]
+}

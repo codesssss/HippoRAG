@@ -1,0 +1,542 @@
+{
+  "audited_ungrounded_obligation_count_by_dataset": {
+    "2wikimultihopqa": 71,
+    "hotpotqa": 98,
+    "musique": 161
+  },
+  "counting_notes": {
+    "endpoint_shape_counts": "Counts representative cases retained by audit reports, not all failures.",
+    "relation_mismatch_counts": "Counts endpoint-hit fact relations from audit reports, so totals can exceed obligation counts.",
+    "status_counts": "Counts ungrounded retrieval-critical obligations."
+  },
+  "dataset_count": 3,
+  "interpretation": {
+    "candidate_missing_fraction": 0.039394,
+    "endpoint_missing_fraction": 0.293939,
+    "endpoint_relation_mismatch_fraction": 0.606061,
+    "exact_available_fraction": 0.006061,
+    "main_bottleneck": "qwen_openie_schema_alignment",
+    "recommended_next_step": "Define a corpus/query evidence-frame contract and test Qwen OpenIE against it; do not tune selector parameters yet.",
+    "top_schema_gap_kind": "lead_sentence_attribute_not_materialized"
+  },
+  "relation_mismatch_by_query_family": {
+    "event_or_competition_role": 124,
+    "office_or_position_role": 40,
+    "other_relation": 303,
+    "place_or_origin_attribute": 230,
+    "temporal_attribute": 457,
+    "work_metadata_role": 29
+  },
+  "relation_mismatch_family_matrix": {
+    "event_or_competition_role -> event_or_competition_role": 30,
+    "event_or_competition_role -> lead_or_untyped_fact": 9,
+    "event_or_competition_role -> other_relation": 70,
+    "event_or_competition_role -> place_or_origin_attribute": 15,
+    "office_or_position_role -> lead_or_untyped_fact": 8,
+    "office_or_position_role -> office_or_position_role": 18,
+    "office_or_position_role -> place_or_origin_attribute": 14,
+    "other_relation -> lead_or_untyped_fact": 198,
+    "other_relation -> other_relation": 57,
+    "other_relation -> place_or_origin_attribute": 29,
+    "other_relation -> temporal_attribute": 6,
+    "other_relation -> work_metadata_role": 13,
+    "place_or_origin_attribute -> lead_or_untyped_fact": 54,
+    "place_or_origin_attribute -> other_relation": 105,
+    "place_or_origin_attribute -> person_relation_role": 9,
+    "place_or_origin_attribute -> place_or_origin_attribute": 51,
+    "place_or_origin_attribute -> temporal_attribute": 6,
+    "place_or_origin_attribute -> work_metadata_role": 5,
+    "temporal_attribute -> lead_or_untyped_fact": 135,
+    "temporal_attribute -> other_relation": 163,
+    "temporal_attribute -> person_relation_role": 23,
+    "temporal_attribute -> place_or_origin_attribute": 36,
+    "temporal_attribute -> temporal_attribute": 71,
+    "temporal_attribute -> work_metadata_role": 29,
+    "work_metadata_role -> other_relation": 7,
+    "work_metadata_role -> work_metadata_role": 22
+  },
+  "relation_mismatch_pair_top": {
+    "agre -> <empty>": 18,
+    "born_in -> <empty>": 40,
+    "born_in -> cast_includ": 13,
+    "born_in -> compos": 12,
+    "born_in -> criticiz": 13,
+    "born_in -> occurr_dur": 20,
+    "born_in -> occurr_in": 10,
+    "born_in -> predecessor": 14,
+    "born_on -> <empty>": 27,
+    "born_on -> born_on": 10,
+    "born_on -> died_on": 11,
+    "born_on -> direct": 16,
+    "born_on -> released_on": 10,
+    "born_on -> starr": 10,
+    "co_official_language -> spoken_in": 12,
+    "competition -> attend": 29,
+    "competition -> draft": 30,
+    "competition -> includ": 30,
+    "competition -> locat_in": 15,
+    "composer -> cast_includ": 13,
+    "creat -> <empty>": 20,
+    "died_in -> <empty>": 16,
+    "died_in -> made": 10,
+    "died_in -> occurr_dur": 20,
+    "died_in -> occurr_in": 10,
+    "died_on -> <empty>": 43,
+    "died_on -> discuss": 12,
+    "died_on -> influenc": 10,
+    "died_on -> neighbor": 14,
+    "establish_in -> <empty>": 11,
+    "from -> <empty>": 16,
+    "involv -> <empty>": 17,
+    "locat_in -> <empty>": 30,
+    "locat_in -> locat_in": 20,
+    "locat_in -> part": 11,
+    "network -> <empty>": 19,
+    "occurr_in -> occurr_dur": 20,
+    "originat -> <empty>": 17,
+    "radio_division -> <empty>": 19,
+    "tallest_build -> <empty>": 11
+  },
+  "representative_endpoint_examples": {
+    "all_variable_obligation": [
+      {
+        "bound_endpoints": [],
+        "dataset": "2wikimultihopqa",
+        "query_index": 33,
+        "question": "Where was the performer of song Come Dance With Me (Song) born?",
+        "raw_triple": [
+          "?x1",
+          "was born in",
+          "?place"
+        ],
+        "status": "candidate_missing"
+      },
+      {
+        "bound_endpoints": [],
+        "dataset": "2wikimultihopqa",
+        "query_index": 34,
+        "question": "Where does the director of film Talk About A Stranger work at?",
+        "raw_triple": [
+          "?x1",
+          "works at",
+          "?place"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [],
+        "dataset": "2wikimultihopqa",
+        "query_index": 14,
+        "question": "Where was the place of death of Maurice, Prince Of Orange's father?",
+        "raw_triple": [
+          "?x1",
+          "died in",
+          "?place"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [],
+        "dataset": "2wikimultihopqa",
+        "query_index": 15,
+        "question": "Which country Aleksander Koniecpolski (1620–1659)'s father is from?",
+        "raw_triple": [
+          "?x1",
+          "is from",
+          "?country"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [],
+        "dataset": "2wikimultihopqa",
+        "query_index": 20,
+        "question": "Where did Coulson Wallop's father study?",
+        "raw_triple": [
+          "?x1",
+          "studied at",
+          "?place"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [],
+        "dataset": "hotpotqa",
+        "query_index": 39,
+        "question": "Who has written more than 300 papers, Semyon Aranovich Gershgorin or Pavel Alexandrov?",
+        "raw_triple": [
+          "?x2",
+          "count",
+          "?count2"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [],
+        "dataset": "hotpotqa",
+        "query_index": 19,
+        "question": "Where is the ice hockey team based that Zdeno Chára currently serving as captain of?",
+        "raw_triple": [
+          "?team",
+          "based in",
+          "?place"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [],
+        "dataset": "hotpotqa",
+        "query_index": 20,
+        "question": "Sand Mountainis part of the southern tip of a mountain chain in which part of North America ?",
+        "raw_triple": [
+          "?chain",
+          "located in",
+          "?part"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      }
+    ],
+    "descriptive_bound_endpoint": [
+      {
+        "bound_endpoints": [
+          "recently abdicated queen"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 3,
+        "question": "Sparking the Marian civil war, who helped the recently abdicated queen to escape her imprisonment?",
+        "raw_triple": [
+          "?x1",
+          "helped",
+          "recently abdicated queen"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "recently abdicated queen"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 3,
+        "question": "Sparking the Marian civil war, who helped the recently abdicated queen to escape her imprisonment?",
+        "raw_triple": [
+          "recently abdicated queen",
+          "imprisoned by",
+          "?x2"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "The 2000 ICC KnockOut Trophy"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 9,
+        "question": "The 2000 ICC KnockOut Trophy was the debut of a Jamaican cricketer who is a right-handed what?",
+        "raw_triple": [
+          "The 2000 ICC KnockOut Trophy",
+          "debut of",
+          "?x1"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "This Experts Network sports analysts"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 24,
+        "question": "This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?",
+        "raw_triple": [
+          "This Experts Network sports analysts",
+          "played in NFL for",
+          "?x1"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "The Secret of Kells"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 14,
+        "question": "Which 2009 animated film is from Japan, Summer Wars or The Secret of Kells?",
+        "raw_triple": [
+          "The Secret of Kells",
+          "country of origin",
+          "?x2"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [
+          "The Wild Women of Chastity Gulch"
+        ],
+        "dataset": "musique",
+        "query_index": 53,
+        "question": "What is the average salary of a working person with the same nationality as the producer of The Wild Women of Chastity Gulch?",
+        "raw_triple": [
+          "The Wild Women of Chastity Gulch",
+          "producer",
+          "?x1"
+        ],
+        "status": "candidate_missing"
+      },
+      {
+        "bound_endpoints": [
+          "The Bag or the Bat"
+        ],
+        "dataset": "musique",
+        "query_index": 10,
+        "question": "How many episodes are in season 5 of the series with The Bag or the Bat?",
+        "raw_triple": [
+          "The Bag or the Bat",
+          "is a series of",
+          "?series"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "A Lim's country"
+        ],
+        "dataset": "musique",
+        "query_index": 11,
+        "question": "How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+        "raw_triple": [
+          "?x1",
+          "includes",
+          "A Lim's country"
+        ],
+        "status": "gold_endpoint_missing"
+      }
+    ],
+    "long_bound_endpoint": [
+      {
+        "bound_endpoints": [
+          "Pro Football Hall of Fame",
+          "2000"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 24,
+        "question": "This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?",
+        "raw_triple": [
+          "Pro Football Hall of Fame",
+          "induction year",
+          "2000"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "MGM Grand Garden Special Events Center"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 33,
+        "question": "What is the name of the former MGM Grand Garden Special Events Center where the Mayweather-Ortiz fight took place?",
+        "raw_triple": [
+          "?x1",
+          "is a former",
+          "MGM Grand Garden Special Events Center"
+        ],
+        "status": "gold_endpoint_missing"
+      }
+    ],
+    "named_endpoint": [
+      {
+        "bound_endpoints": [
+          "Lisbeth Palme"
+        ],
+        "dataset": "2wikimultihopqa",
+        "query_index": 23,
+        "question": "What is the place of birth of Lisbeth Palme's husband?",
+        "raw_triple": [
+          "Lisbeth Palme",
+          "husband",
+          "?x1"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "Aas Ka Panchhi"
+        ],
+        "dataset": "2wikimultihopqa",
+        "query_index": 1,
+        "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+        "raw_triple": [
+          "Aas Ka Panchhi",
+          "release date",
+          "?date1"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [
+          "Phoolwari"
+        ],
+        "dataset": "2wikimultihopqa",
+        "query_index": 1,
+        "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+        "raw_triple": [
+          "Phoolwari",
+          "release date",
+          "?date2"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [
+          "Raghnall Mac Ruaidhrí"
+        ],
+        "dataset": "2wikimultihopqa",
+        "query_index": 7,
+        "question": "Who is Raghnall Mac Ruaidhrí's paternal grandfather?",
+        "raw_triple": [
+          "Raghnall Mac Ruaidhrí",
+          "paternal grandfather",
+          "?x1"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [
+          "John Middleton Murry"
+        ],
+        "dataset": "2wikimultihopqa",
+        "query_index": 21,
+        "question": "Why did John Middleton Murry's wife die?",
+        "raw_triple": [
+          "John Middleton Murry",
+          "wife",
+          "?x1"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      },
+      {
+        "bound_endpoints": [
+          "Jamaica"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 9,
+        "question": "The 2000 ICC KnockOut Trophy was the debut of a Jamaican cricketer who is a right-handed what?",
+        "raw_triple": [
+          "?x1",
+          "is from",
+          "Jamaica"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "WikiLeaks"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 29,
+        "question": "What WikiLeaks using whistleblower is notable for having a hacking organization with a user base of over 1,800,000?",
+        "raw_triple": [
+          "WikiLeaks",
+          "using whistleblower",
+          "?x1"
+        ],
+        "status": "gold_endpoint_missing"
+      },
+      {
+        "bound_endpoints": [
+          "over 4500"
+        ],
+        "dataset": "hotpotqa",
+        "query_index": 35,
+        "question": "Which aircraft engine powers a General Dynamics aircraft of which over 4500 have been built?",
+        "raw_triple": [
+          "?x1",
+          "quantity built",
+          "over 4500"
+        ],
+        "status": "gold_endpoint_missing"
+      }
+    ],
+    "title_qualified_endpoint": [
+      {
+        "bound_endpoints": [
+          "Aleksander Koniecpolski (1620–1659)"
+        ],
+        "dataset": "2wikimultihopqa",
+        "query_index": 15,
+        "question": "Which country Aleksander Koniecpolski (1620–1659)'s father is from?",
+        "raw_triple": [
+          "Aleksander Koniecpolski (1620–1659)",
+          "father",
+          "?x1"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      }
+    ],
+    "typed_title_endpoint": [
+      {
+        "bound_endpoints": [
+          "film Billy Elliot"
+        ],
+        "dataset": "2wikimultihopqa",
+        "query_index": 22,
+        "question": "Where was the composer of film Billy Elliot born?",
+        "raw_triple": [
+          "film Billy Elliot",
+          "composer",
+          "?x1"
+        ],
+        "status": "gold_endpoint_relation_mismatch"
+      }
+    ]
+  },
+  "representative_endpoint_shape_counts": {
+    "all_variable_obligation": 15,
+    "descriptive_bound_endpoint": 10,
+    "long_bound_endpoint": 2,
+    "named_endpoint": 15,
+    "title_qualified_endpoint": 1,
+    "typed_title_endpoint": 1
+  },
+  "schema_gap_kind_counts": {
+    "cross_family_relation_mismatch": 745,
+    "lead_sentence_attribute_not_materialized": 189,
+    "same_family_relation_mismatch": 249
+  },
+  "status_counts_by_dataset": {
+    "2wikimultihopqa": {
+      "candidate_missing": 1,
+      "gold_endpoint_missing": 2,
+      "gold_endpoint_relation_mismatch": 65,
+      "gold_exact_openie_match_available": 1,
+      "gold_relation_present_without_endpoint_binding": 2
+    },
+    "hotpotqa": {
+      "gold_endpoint_missing": 40,
+      "gold_endpoint_relation_mismatch": 45,
+      "gold_exact_openie_match_available": 1,
+      "gold_relation_present_without_endpoint_binding": 12
+    },
+    "musique": {
+      "candidate_missing": 12,
+      "gold_endpoint_missing": 55,
+      "gold_endpoint_relation_mismatch": 90,
+      "gold_relation_present_without_endpoint_binding": 4
+    }
+  },
+  "status_explanations": {
+    "candidate_missing": "gold docs are not fully present in the candidate universe",
+    "gold_docs_missing": "source report does not carry gold document indices",
+    "gold_endpoint_missing": "gold docs exist, but OpenIE facts do not expose the required endpoint role",
+    "gold_endpoint_relation_mismatch": "gold docs expose the endpoint, but not the required relation frame",
+    "gold_exact_openie_match_available": "gold docs contain an exact role-aligned fact, but selector still did not ground it",
+    "gold_openie_no_facts": "gold docs have no usable OpenIE fact units",
+    "gold_relation_present_without_endpoint_binding": "gold docs expose the relation, but not bound to the required endpoint",
+    "unknown": "unclassified audit status"
+  },
+  "status_totals": {
+    "candidate_missing": 13,
+    "gold_endpoint_missing": 97,
+    "gold_endpoint_relation_mismatch": 200,
+    "gold_exact_openie_match_available": 2,
+    "gold_relation_present_without_endpoint_binding": 18
+  }
+}

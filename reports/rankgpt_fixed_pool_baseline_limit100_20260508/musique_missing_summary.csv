@@ -1,0 +1,6 @@
+dataset,method,missing_gold_titles,queries,hit_at_5,new_at_5
+MuSiQue,dbec_selective,16,11,0.0,0.0
+MuSiQue,rankgpt_rank5_no_think,16,11,0.1875,0.1875
+MuSiQue,rankgpt_select5_no_think,16,11,0.1875,0.1875
+MuSiQue,setr_faithful,16,11,0.0,0.0
+MuSiQue,source_order,16,11,0.0,0.0

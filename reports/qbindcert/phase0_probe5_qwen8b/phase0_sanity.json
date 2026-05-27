@@ -1,0 +1,1673 @@
+{
+  "config": {
+    "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+    "output_dir": "reports/qbindcert/phase0_probe5_qwen8b",
+    "limit": 100,
+    "oracle_limit": 50,
+    "entity_pair_limit": 200,
+    "run_llm": true,
+    "llm_limit": 5,
+    "llm_base_url": "http://localhost:8043/v1",
+    "llm_model": "qwen3-8b-train"
+  },
+  "runtime": {
+    "started_at_unix": 16279443.862161087,
+    "llm_probe": {
+      "available": true,
+      "raw": "<think>\n\n</think>\n\nOK",
+      "stripped": "OK",
+      "error": ""
+    },
+    "llm": {
+      "llm_rows": 5,
+      "elapsed_seconds": 36.689,
+      "seconds_per_query": 7.338,
+      "errors": {}
+    },
+    "elapsed_seconds": 38.004
+  },
+  "tests": [
+    {
+      "name": "typed_proposition_extraction",
+      "status": "FAIL_PROXY",
+      "metrics": {
+        "rows": 5,
+        "parse_ok_rate": 1.0,
+        "predicate_bucket_correct_proxy": 0.8333333333333334,
+        "argument_extraction_correct_proxy": 0.3333333333333333,
+        "source_span_provenance_correct_proxy": 1.0,
+        "no_hallucinated_proposition_proxy": 1.0,
+        "oracle_propositions": 12,
+        "extracted_propositions": 13
+      },
+      "thresholds": {
+        "predicate_bucket_correct_proxy": 0.8,
+        "argument_extraction_correct_proxy": 0.8,
+        "source_span_provenance_correct_proxy": 0.9,
+        "no_hallucinated_proposition_proxy": 0.9
+      },
+      "samples": [
+        {
+          "qid": "83bf3b5a0bd911eba7f7acde48001122",
+          "question": "When did Lothair Ii's mother die?",
+          "answer": "20 March 851",
+          "oracle": [
+            {
+              "prop_id": "83bf3b5a0bd911eba7f7acde48001122::oracle::0",
+              "demand_id": "u1",
+              "source_title": "Lothair II",
+              "predicate_text": "mother",
+              "predicate_bucket": "family_relation",
+              "args": [
+                {
+                  "text": "Lothair II",
+                  "type": "Other"
+                },
+                {
+                  "text": "Ermengarde of Tours",
+                  "type": "Other"
+                }
+              ],
+              "source_span": "Lothair II --mother--> Ermengarde of Tours"
+            },
+            {
+              "prop_id": "83bf3b5a0bd911eba7f7acde48001122::oracle::1",
+              "demand_id": "u2",
+              "source_title": "Ermengarde of Tours",
+              "predicate_text": "date of death",
+              "predicate_bucket": "date_of_death",
+              "args": [
+                {
+                  "text": "Ermengarde of Tours",
+                  "type": "Other"
+                },
+                {
+                  "text": "20 March 851",
+                  "type": "Date"
+                }
+              ],
+              "source_span": "Ermengarde of Tours --date of death--> 20 March 851"
+            }
+          ],
+          "extracted": [
+            {
+              "predicate_bucket": "date_of_death",
+              "predicate_text": "died",
+              "args": [
+                {
+                  "text": "20 March 851",
+                  "type": "Date"
+                }
+              ],
+              "source_title": "Ermengarde of Tours",
+              "source_span": "Ermengarde of Tours (d. 20 March 851)"
+            }
+          ],
+          "parse_ok": true
+        },
+        {
+          "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+          "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+          "answer": "Phoolwari",
+          "oracle": [
+            {
+              "prop_id": "a80d84e7096d11ebbdb0ac1f6bf848b6::oracle::0",
+              "demand_id": "u1",
+              "source_title": "Aas Ka Panchhi",
+              "predicate_text": "publication date",
+              "predicate_bucket": "publication_date",
+              "args": [
+                {
+                  "text": "Aas Ka Panchhi",
+                  "type": "Other"
+                },
+                {
+                  "text": "1961",
+                  "type": "Date"
+                }
+              ],
+              "source_span": "Aas Ka Panchhi --publication date--> 1961"
+            },
+            {
+              "prop_id": "a80d84e7096d11ebbdb0ac1f6bf848b6::oracle::1",
+              "demand_id": "u2",
+              "source_title": "Phoolwari",
+              "predicate_text": "publication date",
+              "predicate_bucket": "publication_date",
+              "args": [
+                {
+                  "text": "Phoolwari",
+                  "type": "Other"
+                },
+                {
+                  "text": "1946",
+                  "type": "Date"
+                }
+              ],
+              "source_span": "Phoolwari --publication date--> 1946"
+            }
+          ],
+          "extracted": [
+            {
+              "predicate_bucket": "publication_date",
+              "predicate_text": "publication_date",
+              "args": [
+                {
+                  "text": "1961",
+                  "type": "Date"
+                }
+              ],
+              "source_title": "Aas Ka Panchhi",
+              "source_span": "Aas Ka Panchhi is a 1961 Hindi movie produced by J. Om Prakash."
+            },
+            {
+              "predicate_bucket": "publication_date",
+              "predicate_text": "publication_date",
+              "args": [
+                {
+                  "text": "1946",
+                  "type": "Date"
+                }
+              ],
+              "source_title": "Phoolwari",
+              "source_span": "Phoolwari( The Bower) is a 1946 Indian Bollywood film."
+            }
+          ],
+          "parse_ok": true
+        },
+        {
+          "qid": "2dc690ba0bdc11eba7f7acde48001122",
+          "question": "What is the place of birth of the performer of song Changed It?",
+          "answer": "Port of Spain",
+          "oracle": [
+            {
+              "prop_id": "2dc690ba0bdc11eba7f7acde48001122::oracle::0",
+              "demand_id": "u1",
+              "source_title": "Changed It",
+              "predicate_text": "performer",
+              "predicate_bucket": "attribute",
+              "args": [
+                {
+                  "text": "Changed It",
+                  "type": "Other"
+                },
+                {
+                  "text": "Nicki Minaj",
+                  "type": "Other"
+                }
+              ],
+              "source_span": "Changed It --performer--> Nicki Minaj"
+            },
+            {
+              "prop_id": "2dc690ba0bdc11eba7f7acde48001122::oracle::1",
+              "demand_id": "u2",
+              "source_title": "Nicki Minaj",
+              "predicate_text": "place of birth",
+              "predicate_bucket": "place_of_birth",
+              "args": [
+                {
+                  "text": "Nicki Minaj",
+                  "type": "Other"
+                },
+                {
+                  "text": "Port of Spain",
+                  "type": "Other"
+                }
+              ],
+              "source_span": "Nicki Minaj --place of birth--> Port of Spain"
+            }
+          ],
+          "extracted": [
+            {
+              "predicate_bucket": "performed_by",
+              "predicate_text": "performed_by",
+              "args": [
+                {
+                  "text": "Nicki Minaj",
+                  "type": "Person"
+                },
+                {
+                  "text": "Lil Wayne",
+                  "type": "Person"
+                }
+              ],
+              "source_title": "Changed It",
+              "source_span": "Changed It is a song by Trinidadian-American rapper and singer Nicki Minaj and American rapper Lil Wayne."
+            },
+            {
+              "predicate_bucket": "place_of_birth",
+              "predicate_text": "place_of_birth",
+              "args": [
+                {
+                  "text": "Port of Spain",
+                  "type": "Place"
+                },
+                {
+                  "text": "Nicki Minaj",
+                  "type": "Person"
+                }
+              ],
+              "source_title": "Changed It",
+              "source_span": "Changed It is a song by Trinidadian-American rapper and singer Nicki Minaj and American rapper Lil Wayne."
+            }
+          ],
+          "parse_ok": true
+        },
+        {
+          "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+          "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+          "answer": "no",
+          "oracle": [
+            {
+              "prop_id": "462bb642099211ebbdb0ac1f6bf848b6::oracle::0",
+              "demand_id": "u1",
+              "source_title": "Marufabad",
+              "predicate_text": "country",
+              "predicate_bucket": "located_in",
+              "args": [
+                {
+                  "text": "Marufabad",
+                  "type": "Other"
+                },
+                {
+                  "text": "Iran",
+                  "type": "Other"
+                }
+              ],
+              "source_span": "Marufabad --country--> Iran"
+            },
+            {
+              "prop_id": "462bb642099211ebbdb0ac1f6bf848b6::oracle::1",
+              "demand_id": "u2",
+              "source_title": "Nasamkhrali",
+              "predicate_text": "country",
+              "predicate_bucket": "located_in",
+              "args": [
+                {
+                  "text": "Nasamkhrali",
+                  "type": "Other"
+                },
+                {
+                  "text": "Georgia",
+                  "type": "Other"
+                }
+              ],
+              "source_span": "Nasamkhrali --country--> Georgia"
+            }
+          ],
+          "extracted": [
+            {
+              "predicate_bucket": "located_in",
+              "predicate_text": "located_in",
+              "args": [
+                {
+                  "text": "Nasamkhrali",
+                  "type": "Place"
+                },
+                {
+                  "text": "Georgia",
+                  "type": "Place"
+                }
+              ],
+              "source_title": "Nasamkhrali",
+              "source_span": "Nasamkhrali( previously known as Nasomkhari until 1955) is a village in the Telavi district of Georgia."
+            },
+            {
+              "predicate_bucket": "located_in",
+              "predicate_text": "located_in",
+              "args": [
+                {
+                  "text": "Marufabad",
+                  "type": "Place"
+                },
+                {
+                  "text": "Iran",
+                  "type": "Place"
+                }
+              ],
+              "source_title": "Marufabad",
+              "source_span": "Marufabad( also Romanized as Ma‘rūfābād) is a village in Kabutarsorkh Rural District, in the Central District of Chadegan County, Isfahan Province, Iran."
+            }
+          ],
+          "parse_ok": true
+        },
+        {
+          "qid": "a1cdb240085811ebbd5bac1f6bf848b6",
+          "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+          "answer": "God'S Gift To Women",
+          "oracle": [
+            {
+              "prop_id": "a1cdb240085811ebbd5bac1f6bf848b6::oracle::0",
+              "demand_id": "u1",
+              "source_title": "God's Gift to Women",
+              "predicate_text": "director",
+              "predicate_bucket": "directed_by",
+              "args": [
+                {
+                  "text": "God's Gift to Women",
+                  "type": "Other"
+                },
+                {
+                  "text": "Michael Curtiz",
+                  "type": "Other"
+                }
+              ],
+              "source_span": "God's Gift to Women --director--> Michael Curtiz"
+            },
+            {
+              "prop_id": "a1cdb240085811ebbd5bac1f6bf848b6::oracle::1",
+              "demand_id": "u2",
+              "source_title": "Aldri annet enn bråk",
+              "predicate_text": "director",
+              "predicate_bucket": "directed_by",
+              "args": [
+                {
+                  "text": "Aldri annet enn bråk",
+                  "type": "Other"
+                },
+                {
+                  "text": "Edith Carlmar",
+                  "type": "Other"
+                }
+              ],
+              "source_span": "Aldri annet enn bråk --director--> Edith Carlmar"
+            },
+            {
+              "prop_id": "a1cdb240085811ebbd5bac1f6bf848b6::oracle::2",
+              "demand_id": "u3",
+              "source_title": "Michael Curtiz",
+              "predicate_text": "date of birth",
+              "predicate_bucket": "date_of_birth",
+              "args": [
+                {
+                  "text": "Michael Curtiz",
+                  "type": "Other"
+                },
+                {
+                  "text": "December 24, 1886",
+                  "type": "Date"
+                }
+              ],
+              "source_span": "Michael Curtiz --date of birth--> December 24, 1886"
+            },
+            {
+              "prop_id": "a1cdb240085811ebbd5bac1f6bf848b6::oracle::3",
+              "demand_id": "u4",
+              "source_title": "Edith Carlmar",
+              "predicate_text": "date of birth",
+              "predicate_bucket": "date_of_birth",
+              "args": [
+                {
+                  "text": "Edith Carlmar",
+                  "type": "Other"
+                },
+                {
+                  "text": "15 November 1911",
+                  "type": "Date"
+                }
+              ],
+              "source_span": "Edith Carlmar --date of birth--> 15 November 1911"
+            }
+          ],
+          "extracted": [
+            {
+              "predicate_bucket": "directed_by",
+              "predicate_text": "directed_by",
+              "args": [
+                {
+                  "text": "God'S Gift To Women",
+                  "type": "Work"
+                },
+                {
+                  "text": "Michael Curtiz",
+                  "type": "Person"
+                }
+              ],
+              "source_title": "God's Gift to Women",
+              "source_span": "God's Gift to Women is a 1931 American pre-Code romantic musical comedy film directed by Michael Curtiz, starring Frank Fay, Laura LaPlante, and Joan Blondell."
+            },
+            {
+              "predicate_bucket": "directed_by",
+              "predicate_text": "directed_by",
+              "args": [
+                {
+                  "text": "Aldri Annet Enn Bråk",
+                  "type": "Work"
+                },
+                {
+                  "text": "Edith Carlmar",
+                  "type": "Person"
+                }
+              ],
+              "source_title": "Aldri annet enn bråk",
+              "source_span": "Aldri annet enn bråk is a 1954 Norwegian comedy- drama film, edited by Edith Carlmar."
+            },
+            {
+              "predicate_bucket": "date_of_birth",
+              "predicate_text": "date_of_birth",
+              "args": [
+                {
+                  "text": "Edith Carlmar",
+                  "type": "Person"
+                },
+                {
+                  "text": "15 November 1911",
+                  "type": "Date"
+                }
+              ],
+              "source_title": "Edith Carlmar",
+              "source_span": "Edith Carlmar (Edith Mary Johanne Mathiesen) (15 November 1911 – 17 May 2003) was an Norwagian actress and Norway's first female film director."
+            },
+            {
+              "predicate_bucket": "date_of_death",
+              "predicate_text": "date_of_death",
+              "args": [
+                {
+                  "text": "Edith Carlmar",
+                  "type": "Person"
+                },
+                {
+                  "text": "17 May 2003",
+                  "type": "Date"
+                }
+              ],
+              "source_title": "Edith Carlmar",
+              "source_span": "Edith Carlmar (Edith Mary Johanne Mathiesen) (15 November 1911 – 17 May 2003) was an Norwagian actress and Norway's first female film director."
+            },
+            {
+              "predicate_bucket": "date_of_birth",
+              "predicate_text": "date_of_birth",
+              "args": [
+                {
+                  "text": "Michael Curtiz",
+                  "type": "Person"
+                },
+                {
+                  "text": "December 24, 1886",
+                  "type": "Date"
+                }
+              ],
+              "source_title": "Michael Curtiz",
+              "source_span": "Michael Curtiz (born Manó Kaminer(1886-1905) Mihály Kertész (1905); December 24, 1886 April 11, 1962) was a Hungarian-born American film director, recognized as one of the most prolific directors in history."
+            },
+            {
+              "predicate_bucket": "date_of_death",
+              "predicate_text": "date_of_death",
+              "args": [
+                {
+                  "text": "Michael Curtiz",
+                  "type": "Person"
+                },
+                {
+                  "text": "April 11, 1962",
+                  "type": "Date"
+                }
+              ],
+              "source_title": "Michael Curtiz",
+              "source_span": "Michael Curtiz (born Manó Kaminer(1886-1905) Mihály Kertész (1905); December 24, 1886 April 11, 1962) was a Hungarian-born American film director, recognized as one of the most prolific directors in history."
+            }
+          ],
+          "parse_ok": true
+        }
+      ]
+    },
+    {
+      "name": "query_program_lattice",
+      "status": "FAIL_PROXY",
+      "metrics": {
+        "rows": 5,
+        "parse_ok_rate": 1.0,
+        "top3_any_program_correct_proxy": 0.6,
+        "top1_program_correct_proxy": 0.6,
+        "answer_variable_correct_proxy": 1.0,
+        "dependency_binding_correct_proxy": 1.0,
+        "question_type_operator_correct_proxy": 1.0,
+        "error_modes": {
+          "operator_or_relation_wrong": 2
+        }
+      },
+      "thresholds": {
+        "top3_any_program_correct_proxy": 0.75,
+        "top1_program_correct_proxy": 0.6,
+        "answer_variable_correct_proxy": 0.75,
+        "dependency_binding_correct_proxy": 0.75,
+        "question_type_operator_correct_proxy": 0.8
+      },
+      "samples": [
+        {
+          "qid": "83bf3b5a0bd911eba7f7acde48001122",
+          "question": "When did Lothair Ii's mother die?",
+          "dataset_type": "compositional",
+          "oracle_program": {
+            "program_id": "oracle",
+            "question_type": "compositional",
+            "answer_type": "Date",
+            "variables": [
+              {
+                "name": "x1",
+                "entity": "Lothair II",
+                "type": "Other"
+              },
+              {
+                "name": "x2",
+                "entity": "Ermengarde of Tours",
+                "type": "Other"
+              },
+              {
+                "name": "y",
+                "entity": "20 March 851",
+                "type": "Date"
+              }
+            ],
+            "demands": [
+              {
+                "id": "u1",
+                "predicate_bucket": "family_relation",
+                "predicate_text": "mother",
+                "args": [
+                  "x1",
+                  "x2"
+                ],
+                "arg_entities": [
+                  "Lothair II",
+                  "Ermengarde of Tours"
+                ]
+              },
+              {
+                "id": "u2",
+                "predicate_bucket": "date_of_death",
+                "predicate_text": "date of death",
+                "args": [
+                  "x2",
+                  "y"
+                ],
+                "arg_entities": [
+                  "Ermengarde of Tours",
+                  "20 March 851"
+                ]
+              }
+            ],
+            "dependencies": [
+              [
+                "u1",
+                "u2",
+                "shared:x2"
+              ]
+            ],
+            "answer_variable": "y"
+          },
+          "programs": [
+            {
+              "program_id": "p1",
+              "question_type": "bridge",
+              "answer_type": "Date",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Person"
+                },
+                {
+                  "name": "x2",
+                  "type": "Person"
+                },
+                {
+                  "name": "y",
+                  "type": "Date"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "family_relation",
+                  "predicate_text": "child_of",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "date_of_death",
+                  "predicate_text": "date_of_death",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d1"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p2",
+              "question_type": "bridge",
+              "answer_type": "Date",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Person"
+                },
+                {
+                  "name": "x2",
+                  "type": "Person"
+                },
+                {
+                  "name": "y",
+                  "type": "Date"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "family_relation",
+                  "predicate_text": "child_of",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "date_of_death",
+                  "predicate_text": "date_of_death",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d1"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p3",
+              "question_type": "bridge",
+              "answer_type": "Date",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Person"
+                },
+                {
+                  "name": "x2",
+                  "type": "Person"
+                },
+                {
+                  "name": "y",
+                  "type": "Date"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "family_relation",
+                  "predicate_text": "child_of",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "date_of_death",
+                  "predicate_text": "date_of_death",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d1"
+                ]
+              ],
+              "answer_variable": "y"
+            }
+          ],
+          "top1_correct_proxy": true,
+          "any_correct_proxy": true
+        },
+        {
+          "qid": "a80d84e7096d11ebbdb0ac1f6bf848b6",
+          "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+          "dataset_type": "comparison",
+          "oracle_program": {
+            "program_id": "oracle",
+            "question_type": "comparison",
+            "answer_type": "Work",
+            "variables": [
+              {
+                "name": "x1",
+                "entity": "Aas Ka Panchhi",
+                "type": "Other"
+              },
+              {
+                "name": "x2",
+                "entity": "1961",
+                "type": "Date"
+              },
+              {
+                "name": "x3",
+                "entity": "1946",
+                "type": "Date"
+              },
+              {
+                "name": "y",
+                "entity": "Phoolwari",
+                "type": "Other"
+              }
+            ],
+            "demands": [
+              {
+                "id": "u1",
+                "predicate_bucket": "publication_date",
+                "predicate_text": "publication date",
+                "args": [
+                  "x1",
+                  "x2"
+                ],
+                "arg_entities": [
+                  "Aas Ka Panchhi",
+                  "1961"
+                ]
+              },
+              {
+                "id": "u2",
+                "predicate_bucket": "publication_date",
+                "predicate_text": "publication date",
+                "args": [
+                  "y",
+                  "x3"
+                ],
+                "arg_entities": [
+                  "Phoolwari",
+                  "1946"
+                ]
+              }
+            ],
+            "dependencies": [],
+            "answer_variable": "y"
+          },
+          "programs": [
+            {
+              "program_id": "p1",
+              "question_type": "comparison",
+              "answer_type": "Number",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "String"
+                },
+                {
+                  "name": "x2",
+                  "type": "String"
+                },
+                {
+                  "name": "y",
+                  "type": "Number"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "publication_date",
+                  "predicate_text": "release_date",
+                  "args": [
+                    "x1",
+                    "x1_date"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "publication_date",
+                  "predicate_text": "release_date",
+                  "args": [
+                    "x2",
+                    "x2_date"
+                  ]
+                },
+                {
+                  "id": "d3",
+                  "predicate_bucket": "comparison",
+                  "predicate_text": "earlier_than",
+                  "args": [
+                    "x1_date",
+                    "x2_date",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d3",
+                  "d2"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p2",
+              "question_type": "inference",
+              "answer_type": "Number",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "String"
+                },
+                {
+                  "name": "x2",
+                  "type": "String"
+                },
+                {
+                  "name": "y",
+                  "type": "Number"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "publication_date",
+                  "predicate_text": "release_date",
+                  "args": [
+                    "x1",
+                    "x1_date"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "publication_date",
+                  "predicate_text": "release_date",
+                  "args": [
+                    "x2",
+                    "x2_date"
+                  ]
+                },
+                {
+                  "id": "d3",
+                  "predicate_bucket": "comparison",
+                  "predicate_text": "earlier_than",
+                  "args": [
+                    "x1_date",
+                    "x2_date",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d3",
+                  "d2"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p3",
+              "question_type": "bridge",
+              "answer_type": "Number",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "String"
+                },
+                {
+                  "name": "x2",
+                  "type": "String"
+                },
+                {
+                  "name": "y",
+                  "type": "Number"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "publication_date",
+                  "predicate_text": "release_date",
+                  "args": [
+                    "x1",
+                    "x1_date"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "publication_date",
+                  "predicate_text": "release_date",
+                  "args": [
+                    "x2",
+                    "x2_date"
+                  ]
+                },
+                {
+                  "id": "d3",
+                  "predicate_bucket": "comparison",
+                  "predicate_text": "earlier_than",
+                  "args": [
+                    "x1_date",
+                    "x2_date",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d3",
+                  "d2"
+                ]
+              ],
+              "answer_variable": "y"
+            }
+          ],
+          "top1_correct_proxy": true,
+          "any_correct_proxy": true
+        },
+        {
+          "qid": "2dc690ba0bdc11eba7f7acde48001122",
+          "question": "What is the place of birth of the performer of song Changed It?",
+          "dataset_type": "compositional",
+          "oracle_program": {
+            "program_id": "oracle",
+            "question_type": "compositional",
+            "answer_type": "Work",
+            "variables": [
+              {
+                "name": "x1",
+                "entity": "Changed It",
+                "type": "Other"
+              },
+              {
+                "name": "x2",
+                "entity": "Nicki Minaj",
+                "type": "Other"
+              },
+              {
+                "name": "y",
+                "entity": "Port of Spain",
+                "type": "Other"
+              }
+            ],
+            "demands": [
+              {
+                "id": "u1",
+                "predicate_bucket": "attribute",
+                "predicate_text": "performer",
+                "args": [
+                  "x1",
+                  "x2"
+                ],
+                "arg_entities": [
+                  "Changed It",
+                  "Nicki Minaj"
+                ]
+              },
+              {
+                "id": "u2",
+                "predicate_bucket": "place_of_birth",
+                "predicate_text": "place of birth",
+                "args": [
+                  "x2",
+                  "y"
+                ],
+                "arg_entities": [
+                  "Nicki Minaj",
+                  "Port of Spain"
+                ]
+              }
+            ],
+            "dependencies": [
+              [
+                "u1",
+                "u2",
+                "shared:x2"
+              ]
+            ],
+            "answer_variable": "y"
+          },
+          "programs": [
+            {
+              "program_id": "p1",
+              "question_type": "bridge",
+              "answer_type": "Place",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Work"
+                },
+                {
+                  "name": "x2",
+                  "type": "Person"
+                },
+                {
+                  "name": "y",
+                  "type": "Place"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "performed_by",
+                  "predicate_text": "performed_by",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "place_of_birth",
+                  "predicate_text": "place_of_birth",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d1"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p2",
+              "question_type": "compositional",
+              "answer_type": "Place",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Work"
+                },
+                {
+                  "name": "x2",
+                  "type": "Person"
+                },
+                {
+                  "name": "y",
+                  "type": "Place"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "performed_by",
+                  "predicate_text": "performed_by",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "place_of_birth",
+                  "predicate_text": "place_of_birth",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d1"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p3",
+              "question_type": "inference",
+              "answer_type": "Place",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Work"
+                },
+                {
+                  "name": "x2",
+                  "type": "Person"
+                },
+                {
+                  "name": "y",
+                  "type": "Place"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "performed_by",
+                  "predicate_text": "performed_by",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "place_of_birth",
+                  "predicate_text": "place_of_birth",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d1"
+                ]
+              ],
+              "answer_variable": "y"
+            }
+          ],
+          "top1_correct_proxy": false,
+          "any_correct_proxy": false
+        },
+        {
+          "qid": "462bb642099211ebbdb0ac1f6bf848b6",
+          "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+          "dataset_type": "comparison",
+          "oracle_program": {
+            "program_id": "oracle",
+            "question_type": "comparison",
+            "answer_type": "Boolean",
+            "variables": [
+              {
+                "name": "x1",
+                "entity": "Marufabad",
+                "type": "Other"
+              },
+              {
+                "name": "x2",
+                "entity": "Iran",
+                "type": "Other"
+              },
+              {
+                "name": "x3",
+                "entity": "Nasamkhrali",
+                "type": "Other"
+              },
+              {
+                "name": "x4",
+                "entity": "Georgia",
+                "type": "Other"
+              },
+              {
+                "name": "y",
+                "entity": "no",
+                "type": "Other"
+              }
+            ],
+            "demands": [
+              {
+                "id": "u1",
+                "predicate_bucket": "located_in",
+                "predicate_text": "country",
+                "args": [
+                  "x1",
+                  "x2"
+                ],
+                "arg_entities": [
+                  "Marufabad",
+                  "Iran"
+                ]
+              },
+              {
+                "id": "u2",
+                "predicate_bucket": "located_in",
+                "predicate_text": "country",
+                "args": [
+                  "x3",
+                  "x4"
+                ],
+                "arg_entities": [
+                  "Nasamkhrali",
+                  "Georgia"
+                ]
+              }
+            ],
+            "dependencies": [],
+            "answer_variable": "y"
+          },
+          "programs": [
+            {
+              "program_id": "1",
+              "question_type": "comparison",
+              "answer_type": "Boolean",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Place"
+                },
+                {
+                  "name": "x2",
+                  "type": "Place"
+                },
+                {
+                  "name": "y",
+                  "type": "Boolean"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "1",
+                  "predicate_bucket": "located_in",
+                  "predicate_text": "located_in",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "2",
+                  "predicate_bucket": "located_in",
+                  "predicate_text": "located_in",
+                  "args": [
+                    "x1",
+                    "y"
+                  ]
+                },
+                {
+                  "id": "3",
+                  "predicate_bucket": "located_in",
+                  "predicate_text": "located_in",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "1",
+                  "2",
+                  "3"
+                ]
+              ],
+              "answer_variable": "y"
+            }
+          ],
+          "top1_correct_proxy": true,
+          "any_correct_proxy": true
+        },
+        {
+          "qid": "a1cdb240085811ebbd5bac1f6bf848b6",
+          "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+          "dataset_type": "bridge_comparison",
+          "oracle_program": {
+            "program_id": "oracle",
+            "question_type": "bridge_comparison",
+            "answer_type": "Work",
+            "variables": [
+              {
+                "name": "x1",
+                "entity": "Michael Curtiz",
+                "type": "Other"
+              },
+              {
+                "name": "x2",
+                "entity": "Aldri annet enn bråk",
+                "type": "Other"
+              },
+              {
+                "name": "x3",
+                "entity": "Edith Carlmar",
+                "type": "Other"
+              },
+              {
+                "name": "x4",
+                "entity": "December 24, 1886",
+                "type": "Date"
+              },
+              {
+                "name": "x5",
+                "entity": "15 November 1911",
+                "type": "Date"
+              },
+              {
+                "name": "y",
+                "entity": "God'S Gift To Women",
+                "type": "Other"
+              }
+            ],
+            "demands": [
+              {
+                "id": "u1",
+                "predicate_bucket": "directed_by",
+                "predicate_text": "director",
+                "args": [
+                  "y",
+                  "x1"
+                ],
+                "arg_entities": [
+                  "God's Gift to Women",
+                  "Michael Curtiz"
+                ]
+              },
+              {
+                "id": "u2",
+                "predicate_bucket": "directed_by",
+                "predicate_text": "director",
+                "args": [
+                  "x2",
+                  "x3"
+                ],
+                "arg_entities": [
+                  "Aldri annet enn bråk",
+                  "Edith Carlmar"
+                ]
+              },
+              {
+                "id": "u3",
+                "predicate_bucket": "date_of_birth",
+                "predicate_text": "date of birth",
+                "args": [
+                  "x1",
+                  "x4"
+                ],
+                "arg_entities": [
+                  "Michael Curtiz",
+                  "December 24, 1886"
+                ]
+              },
+              {
+                "id": "u4",
+                "predicate_bucket": "date_of_birth",
+                "predicate_text": "date of birth",
+                "args": [
+                  "x3",
+                  "x5"
+                ],
+                "arg_entities": [
+                  "Edith Carlmar",
+                  "15 November 1911"
+                ]
+              }
+            ],
+            "dependencies": [
+              [
+                "u1",
+                "u3",
+                "shared:x1"
+              ],
+              [
+                "u2",
+                "u4",
+                "shared:x3"
+              ]
+            ],
+            "answer_variable": "y"
+          },
+          "programs": [
+            {
+              "program_id": "p1",
+              "question_type": "comparison",
+              "answer_type": "Work",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Work"
+                },
+                {
+                  "name": "x2",
+                  "type": "Work"
+                },
+                {
+                  "name": "y",
+                  "type": "Work"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "directed_by",
+                  "predicate_text": "directed_by",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "date_of_birth",
+                  "predicate_text": "date_of_birth",
+                  "args": [
+                    "x2",
+                    "x1"
+                  ]
+                },
+                {
+                  "id": "d3",
+                  "predicate_bucket": "attribute",
+                  "predicate_text": "attribute",
+                  "args": [
+                    "x1",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d3"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p2",
+              "question_type": "comparison",
+              "answer_type": "Work",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Work"
+                },
+                {
+                  "name": "x2",
+                  "type": "Work"
+                },
+                {
+                  "name": "y",
+                  "type": "Work"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "directed_by",
+                  "predicate_text": "directed_by",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "date_of_birth",
+                  "predicate_text": "date_of_birth",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d3",
+                  "predicate_bucket": "attribute",
+                  "predicate_text": "attribute",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d3"
+                ]
+              ],
+              "answer_variable": "y"
+            },
+            {
+              "program_id": "p3",
+              "question_type": "comparison",
+              "answer_type": "Work",
+              "variables": [
+                {
+                  "name": "x1",
+                  "type": "Work"
+                },
+                {
+                  "name": "x2",
+                  "type": "Work"
+                },
+                {
+                  "name": "y",
+                  "type": "Work"
+                }
+              ],
+              "demands": [
+                {
+                  "id": "d1",
+                  "predicate_bucket": "directed_by",
+                  "predicate_text": "directed_by",
+                  "args": [
+                    "x1",
+                    "x2"
+                  ]
+                },
+                {
+                  "id": "d2",
+                  "predicate_bucket": "date_of_birth",
+                  "predicate_text": "date_of_birth",
+                  "args": [
+                    "x2",
+                    "x1"
+                  ]
+                },
+                {
+                  "id": "d3",
+                  "predicate_bucket": "attribute",
+                  "predicate_text": "attribute",
+                  "args": [
+                    "x2",
+                    "y"
+                  ]
+                }
+              ],
+              "dependencies": [
+                [
+                  "d1",
+                  "d2",
+                  "d3"
+                ]
+              ],
+              "answer_variable": "y"
+            }
+          ],
+          "top1_correct_proxy": false,
+          "any_correct_proxy": false
+        }
+      ]
+    },
+    {
+      "name": "entity_normalization",
+      "status": "NEEDS_MANUAL_AUDIT",
+      "metrics": {
+        "pairs": 200,
+        "alias_pairs": 5,
+        "negative_pairs": 195,
+        "same_title_pairs": 0,
+        "alias_merge_correct_proxy": 1.0,
+        "false_merge_rate_proxy": 0.0,
+        "same_title_duplicate_detection_proxy": 1.0
+      },
+      "thresholds": {
+        "alias_merge_correct_proxy": 0.85,
+        "false_merge_rate_proxy_max": 0.1,
+        "same_title_duplicate_detection_proxy": 0.9
+      }
+    },
+    {
+      "name": "oracle_certificate_search",
+      "status": "PASS",
+      "metrics": {
+        "rows": 50,
+        "complete_certificate_found": 1.0,
+        "certificate_answer_agrees_with_gold": 1.0,
+        "no_non_contributing_duplicate_evidence": 1.0
+      },
+      "thresholds": {
+        "complete_certificate_found": 0.7,
+        "certificate_answer_agrees_with_gold": 0.65,
+        "no_non_contributing_duplicate_evidence": 0.9
+      }
+    },
+    {
+      "name": "answer_contrastive_oracle_certificate",
+      "status": "PASS",
+      "metrics": {
+        "rows": 50,
+        "gold_certificate_beats_wrong": 1.0,
+        "wrong_rejected_by_answer_terminal_binding_type": 0.96,
+        "query_program_error_caused_wrong_win": 0.0
+      },
+      "thresholds": {
+        "gold_certificate_beats_wrong": 0.65,
+        "wrong_rejected_by_answer_terminal_binding_type": 0.4,
+        "query_program_error_caused_wrong_win_max": 0.25
+      }
+    }
+  ],
+  "decision": {
+    "decision": "STOP_PHASE0_FAIL",
+    "phase1_justified": false,
+    "statuses": {
+      "typed_proposition_extraction": "FAIL_PROXY",
+      "query_program_lattice": "FAIL_PROXY",
+      "entity_normalization": "NEEDS_MANUAL_AUDIT",
+      "oracle_certificate_search": "PASS",
+      "answer_contrastive_oracle_certificate": "PASS"
+    },
+    "notes": [
+      "Manual-quality gates cannot be promoted from proxy PASS to final PASS by this script.",
+      "Proceed to Phase 1 only if all statuses become PASS after manual audit."
+    ]
+  },
+  "outputs": {
+    "json": "reports/qbindcert/phase0_probe5_qwen8b/phase0_sanity.json",
+    "markdown": "reports/qbindcert/phase0_probe5_qwen8b/phase0_sanity.md",
+    "extraction_samples": "reports/qbindcert/phase0_probe5_qwen8b/phase0_extraction_samples.jsonl",
+    "program_samples": "reports/qbindcert/phase0_probe5_qwen8b/phase0_program_samples.jsonl",
+    "entity_pairs": "reports/qbindcert/phase0_probe5_qwen8b/phase0_entity_pairs.jsonl",
+    "certificate_rows": "reports/qbindcert/phase0_probe5_qwen8b/phase0_certificate_rows.jsonl",
+    "contrastive_rows": "reports/qbindcert/phase0_probe5_qwen8b/phase0_contrastive_rows.jsonl"
+  }
+}

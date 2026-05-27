@@ -1,0 +1,49 @@
++ set -u
++ ROOT_DIR=/mnt/nvme/code/HippoRAG
++ PYTHON_BIN=/mnt/nvme/code/HippoRAG/.venv-hipporag/bin/python
++ OUT_DIR=/mnt/nvme/code/HippoRAG/run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503
++ SAVE_DIR=outputs_step0_general_nvembed
++ EMBEDDING_BASE_URL=http://localhost:8019/v1/embeddings
++ MATCH_MODE=wiki_title
++ LIMIT=1000
++ export HIPPORAG_RERANK_FORCE_NO_THINK=1
++ HIPPORAG_RERANK_FORCE_NO_THINK=1
++ mkdir -p /mnt/nvme/code/HippoRAG/run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503
++ main
+++ date -Is
++ echo '[START] daec_llm_wiki_title_dense_hipporag_full1000 start=2026-05-03T21:35:04+08:00'
+++ date -Is
++ echo '[START] daec_llm_wiki_title_dense_hipporag_full1000 start=2026-05-03T21:35:04+08:00'
++ pids=()
++ local pids
++ local dataset
++ for dataset in 2wikimultihopqa hotpotqa musique
++ pids+=("$!")
++ for dataset in 2wikimultihopqa hotpotqa musique
++ run_dataset_worker 2wikimultihopqa
++ pids+=("$!")
++ local dataset=2wikimultihopqa
++ for dataset in 2wikimultihopqa hotpotqa musique
++ local rc=0
++ local pool
++ for pool in dense hipporag
++ pids+=("$!")
++ run_dataset_worker hotpotqa
++ local rc=0
++ local pid
++ for pid in "${pids[@]}"
++ wait 2779454
++ local dataset=hotpotqa
++ local rc=0
++ local pool
++ for pool in dense hipporag
++ run_dataset_worker musique
++ local dataset=musique
++ local rc=0
++ tee -a /mnt/nvme/code/HippoRAG/run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/launcher.log
++ local pool
++ for pool in dense hipporag
+++ date -Is
++ tee -a /mnt/nvme/code/HippoRAG/run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/launcher.log
++ tee -a /mnt/nvme/code/HippoRAG/run_logs/daec_llm_wiki_title_dense_hipporag_full1000_20260503/launcher.log
+++ date -Is

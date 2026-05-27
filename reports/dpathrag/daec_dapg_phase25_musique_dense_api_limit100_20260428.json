@@ -1,0 +1,167 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "daec_report_json": "run_logs/daec_noisyor_dense_pool100_musique_fixclean_full1000_20260428.json",
+  "dataset": "musique",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "embedding_backend": "api",
+  "embedding_model": "nvidia/NV-Embed-v2",
+  "embedding_base_url": "http://localhost:8019/v1/embeddings",
+  "summary": {
+    "rows": 400,
+    "by_hop_variant": {
+      "2:mixed_source_absorption": {
+        "support_recall": 0.6875,
+        "support_complete": 0.375,
+        "noise_rate": 0.7375,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 48
+      },
+      "2:multi_channel_noisy_or": {
+        "support_recall": 0.6458,
+        "support_complete": 0.3542,
+        "noise_rate": 0.7542,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 48
+      },
+      "2:multi_channel_sum": {
+        "support_recall": 0.6458,
+        "support_complete": 0.3542,
+        "noise_rate": 0.7542,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 48
+      },
+      "2:query_level_ppr": {
+        "support_recall": 0.6771,
+        "support_complete": 0.375,
+        "noise_rate": 0.7417,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 48
+      },
+      "3:mixed_source_absorption": {
+        "support_recall": 0.5778,
+        "support_complete": 0.2,
+        "noise_rate": 0.66,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 30
+      },
+      "3:multi_channel_noisy_or": {
+        "support_recall": 0.5056,
+        "support_complete": 0.1,
+        "noise_rate": 0.7,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 30
+      },
+      "3:multi_channel_sum": {
+        "support_recall": 0.5056,
+        "support_complete": 0.1,
+        "noise_rate": 0.7,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 30
+      },
+      "3:query_level_ppr": {
+        "support_recall": 0.6,
+        "support_complete": 0.2333,
+        "noise_rate": 0.6467,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 30
+      },
+      "4:mixed_source_absorption": {
+        "support_recall": 0.3371,
+        "support_complete": 0.0,
+        "noise_rate": 0.7364,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 22
+      },
+      "4:multi_channel_noisy_or": {
+        "support_recall": 0.3712,
+        "support_complete": 0.0,
+        "noise_rate": 0.7091,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 22
+      },
+      "4:multi_channel_sum": {
+        "support_recall": 0.3712,
+        "support_complete": 0.0,
+        "noise_rate": 0.7091,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 22
+      },
+      "4:query_level_ppr": {
+        "support_recall": 0.428,
+        "support_complete": 0.0,
+        "noise_rate": 0.6636,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 22
+      }
+    },
+    "sum_vs_noisy_or": {
+      "2": {
+        "selection_diff": 0.0,
+        "selection_jaccard": 1.0,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0,
+        "rows": 48
+      },
+      "3": {
+        "selection_diff": 0.0,
+        "selection_jaccard": 1.0,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0,
+        "rows": 30
+      },
+      "4": {
+        "selection_diff": 0.0,
+        "selection_jaccard": 1.0,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0,
+        "rows": 22
+      }
+    }
+  }
+}

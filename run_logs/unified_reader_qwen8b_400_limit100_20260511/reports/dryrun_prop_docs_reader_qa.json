@@ -1,0 +1,73 @@
+{
+  "datasets": [
+    {
+      "dataset": "2wikimultihopqa",
+      "methods": {
+        "proprag": {
+          "method": "proprag",
+          "metrics": {
+            "ExactMatch": null,
+            "F1": null,
+            "count": 2,
+            "mean_reader_docs": 3.0,
+            "r5": 0.935
+          },
+          "per_query": [
+            {
+              "ExactMatch": null,
+              "F1": null,
+              "gold_answers": [
+                "20 March 851"
+              ],
+              "num_reader_docs": 3,
+              "predicted_answer": null,
+              "query_index": 0,
+              "question": "When did Lothair Ii's mother die?",
+              "retrieved_doc_ids_top5": [
+                "chunk-c243f22e876fe15945d3efd1ae2523a2",
+                "chunk-5c14ce77d3053e7909d871a494e1305a",
+                "chunk-dc1aae2ecfa1f4703c2190bf0cb3e105",
+                "chunk-0a62e6c19abb4d9175a31d5937650821",
+                "chunk-5e032533c01e97fae70ce7533ecd45fc"
+              ]
+            },
+            {
+              "ExactMatch": null,
+              "F1": null,
+              "gold_answers": [
+                "Phoolwari"
+              ],
+              "num_reader_docs": 3,
+              "predicted_answer": null,
+              "query_index": 1,
+              "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+              "retrieved_doc_ids_top5": [
+                "chunk-17357b02e2d871fdbd2097104967dcc2",
+                "chunk-8952949b5fac2a2f6934e75b9cc7cc0a",
+                "chunk-25dda9432cf30ec732a4675ecdf56af4",
+                "chunk-02dec1a4bc7c602fcb4d639ff763a4a0",
+                "chunk-03883f131d1b008ed45015437cb2c336"
+              ]
+            }
+          ]
+        }
+      },
+      "num_queries": 2,
+      "reader": {
+        "llm_base_url": "http://localhost:8041/v1",
+        "llm_name": "qwen3-8b-train",
+        "max_new_tokens": 400,
+        "qa_top_k": 5
+      },
+      "source": {
+        "does_not_modify_retrieval": true,
+        "input_path": "/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/2wikimultihopqa_proprag.json",
+        "retrieval_r5_source": "input_file.overall_recomputed.Recall@5",
+        "uses_saved_reader_docs": true
+      }
+    }
+  ],
+  "format": "saved_docs_reader_only_qa",
+  "max_new_tokens": 400,
+  "qa_top_k": 5
+}

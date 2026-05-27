@@ -1,0 +1,1397 @@
+{
+  "report_json": "run_logs/daec_noisyor_dense_pool100_musique_fixclean_full1000_20260428.json",
+  "dataset": "musique",
+  "source_name": "dense_pool100",
+  "summary": {
+    "rows": 1000,
+    "overall": {
+      "baseline_em": 0.298,
+      "selector_em": 0.29,
+      "delta_em": -0.008,
+      "baseline_f1": 0.3896,
+      "selector_f1": 0.3818,
+      "delta_f1": -0.0078,
+      "changed_from_baseline": 0.843,
+      "title_jaccard": 0.6794,
+      "doc_jaccard": 0.6689,
+      "same_title_set": 0.373,
+      "same_doc_set": 0.364,
+      "support_recall_delta": -0.0034,
+      "support_complete_delta": -0.014,
+      "noise_delta": 0.0237,
+      "duplicate_delta": -0.075,
+      "rows": 1000
+    },
+    "answer_transitions": {
+      "both_wrong": 645,
+      "both_correct": 233,
+      "wrong_to_correct": 57,
+      "correct_to_wrong": 65
+    },
+    "f1_buckets": {
+      "f1_unchanged": 803,
+      "f1_regressed": 109,
+      "f1_improved": 88
+    },
+    "by_answer_transition": {
+      "both_correct": {
+        "baseline_em": 1.0,
+        "selector_em": 1.0,
+        "delta_em": 0.0,
+        "baseline_f1": 1.0,
+        "selector_f1": 1.0,
+        "delta_f1": 0.0,
+        "changed_from_baseline": 0.7897,
+        "title_jaccard": 0.7999,
+        "doc_jaccard": 0.7987,
+        "same_title_set": 0.5322,
+        "same_doc_set": 0.5322,
+        "support_recall_delta": 0.0043,
+        "support_complete_delta": 0.0086,
+        "noise_delta": 0.0161,
+        "added_gold_count": 0.0687,
+        "removed_gold_count": 0.0687,
+        "added_non_gold_count": 0.5279,
+        "removed_non_gold_count": 0.4635,
+        "duplicate_delta": -0.0644,
+        "rows": 233
+      },
+      "both_wrong": {
+        "baseline_em": 0.0,
+        "selector_em": 0.0,
+        "delta_em": 0.0,
+        "baseline_f1": 0.133,
+        "selector_f1": 0.1287,
+        "delta_f1": -0.0043,
+        "changed_from_baseline": 0.8326,
+        "title_jaccard": 0.6626,
+        "doc_jaccard": 0.6482,
+        "same_title_set": 0.3612,
+        "same_doc_set": 0.3519,
+        "support_recall_delta": 0.0048,
+        "support_complete_delta": -0.0124,
+        "noise_delta": 0.0157,
+        "added_gold_count": 0.1566,
+        "removed_gold_count": 0.1364,
+        "added_non_gold_count": 0.9752,
+        "removed_non_gold_count": 0.9054,
+        "duplicate_delta": -0.0899,
+        "rows": 645
+      },
+      "correct_to_wrong": {
+        "baseline_em": 1.0,
+        "selector_em": 0.0,
+        "delta_em": -1.0,
+        "baseline_f1": 1.0,
+        "selector_f1": 0.1352,
+        "delta_f1": -0.8648,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.4542,
+        "doc_jaccard": 0.4465,
+        "same_title_set": 0.0923,
+        "same_doc_set": 0.0769,
+        "support_recall_delta": -0.2564,
+        "support_complete_delta": -0.3846,
+        "noise_delta": 0.1887,
+        "added_gold_count": 0.0769,
+        "removed_gold_count": 0.7692,
+        "added_non_gold_count": 1.6308,
+        "removed_non_gold_count": 0.9538,
+        "duplicate_delta": 0.0154,
+        "rows": 65
+      },
+      "wrong_to_correct": {
+        "baseline_em": 0.0,
+        "selector_em": 1.0,
+        "delta_em": 1.0,
+        "baseline_f1": 0.1018,
+        "selector_f1": 1.0,
+        "delta_f1": 0.8982,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6342,
+        "doc_jaccard": 0.6261,
+        "same_title_set": 0.1754,
+        "same_doc_set": 0.1404,
+        "support_recall_delta": 0.1608,
+        "support_complete_delta": 0.2982,
+        "noise_delta": -0.0439,
+        "added_gold_count": 0.4737,
+        "removed_gold_count": 0.1228,
+        "added_non_gold_count": 0.614,
+        "removed_non_gold_count": 0.9123,
+        "duplicate_delta": -0.0526,
+        "rows": 57
+      }
+    },
+    "by_f1_bucket": {
+      "f1_improved": {
+        "baseline_em": 0.0,
+        "selector_em": 0.6477,
+        "delta_em": 0.6477,
+        "baseline_f1": 0.0886,
+        "selector_f1": 0.8392,
+        "delta_f1": 0.7506,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6165,
+        "doc_jaccard": 0.6129,
+        "same_title_set": 0.1705,
+        "same_doc_set": 0.1477,
+        "support_recall_delta": 0.1364,
+        "support_complete_delta": 0.2273,
+        "noise_delta": -0.0356,
+        "added_gold_count": 0.4318,
+        "removed_gold_count": 0.125,
+        "added_non_gold_count": 0.75,
+        "removed_non_gold_count": 0.9545,
+        "duplicate_delta": -0.1023,
+        "rows": 88
+      },
+      "f1_regressed": {
+        "baseline_em": 0.5963,
+        "selector_em": 0.0,
+        "delta_em": -0.5963,
+        "baseline_f1": 0.8096,
+        "selector_f1": 0.1325,
+        "delta_f1": -0.6771,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.4618,
+        "doc_jaccard": 0.4474,
+        "same_title_set": 0.1193,
+        "same_doc_set": 0.1101,
+        "support_recall_delta": -0.2141,
+        "support_complete_delta": -0.3303,
+        "noise_delta": 0.1495,
+        "added_gold_count": 0.1009,
+        "removed_gold_count": 0.6789,
+        "added_non_gold_count": 1.6147,
+        "removed_non_gold_count": 1.0826,
+        "duplicate_delta": 0.0459,
+        "rows": 109
+      },
+      "f1_unchanged": {
+        "baseline_em": 0.2902,
+        "selector_em": 0.2902,
+        "delta_em": 0.0,
+        "baseline_f1": 0.3656,
+        "selector_f1": 0.3656,
+        "delta_f1": 0.0,
+        "changed_from_baseline": 0.8045,
+        "title_jaccard": 0.7158,
+        "doc_jaccard": 0.7051,
+        "same_title_set": 0.4296,
+        "same_doc_set": 0.4222,
+        "support_recall_delta": 0.0099,
+        "support_complete_delta": 0.0025,
+        "noise_delta": 0.0131,
+        "added_gold_count": 0.1245,
+        "removed_gold_count": 0.0946,
+        "added_non_gold_count": 0.8107,
+        "removed_non_gold_count": 0.7522,
+        "duplicate_delta": -0.0884,
+        "rows": 803
+      }
+    },
+    "changed_doc_set": {
+      "baseline_em": 0.2657,
+      "selector_em": 0.2484,
+      "delta_em": -0.0173,
+      "baseline_f1": 0.3453,
+      "selector_f1": 0.3246,
+      "delta_f1": -0.0207,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.4959,
+      "doc_jaccard": 0.4794,
+      "same_title_set": 0.0142,
+      "same_doc_set": 0.0,
+      "support_recall_delta": -0.0054,
+      "support_complete_delta": -0.022,
+      "noise_delta": 0.0372,
+      "duplicate_delta": -0.1179,
+      "rows": 636
+    },
+    "unchanged_doc_set": {
+      "baseline_em": 0.3544,
+      "selector_em": 0.3626,
+      "delta_em": 0.0082,
+      "baseline_f1": 0.467,
+      "selector_f1": 0.4818,
+      "delta_f1": 0.0148,
+      "changed_from_baseline": 0.5687,
+      "title_jaccard": 1.0,
+      "doc_jaccard": 1.0,
+      "same_title_set": 1.0,
+      "same_doc_set": 1.0,
+      "support_recall_delta": 0.0,
+      "support_complete_delta": 0.0,
+      "noise_delta": 0.0,
+      "duplicate_delta": 0.0,
+      "rows": 364
+    },
+    "improved_f1": {
+      "baseline_em": 0.0,
+      "selector_em": 0.6477,
+      "delta_em": 0.6477,
+      "baseline_f1": 0.0886,
+      "selector_f1": 0.8392,
+      "delta_f1": 0.7506,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.6165,
+      "doc_jaccard": 0.6129,
+      "same_title_set": 0.1705,
+      "same_doc_set": 0.1477,
+      "support_recall_delta": 0.1364,
+      "support_complete_delta": 0.2273,
+      "noise_delta": -0.0356,
+      "duplicate_delta": -0.1023,
+      "rows": 88
+    },
+    "regressed_f1": {
+      "baseline_em": 0.5963,
+      "selector_em": 0.0,
+      "delta_em": -0.5963,
+      "baseline_f1": 0.8096,
+      "selector_f1": 0.1325,
+      "delta_f1": -0.6771,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.4618,
+      "doc_jaccard": 0.4474,
+      "same_title_set": 0.1193,
+      "same_doc_set": 0.1101,
+      "support_recall_delta": -0.2141,
+      "support_complete_delta": -0.3303,
+      "noise_delta": 0.1495,
+      "duplicate_delta": 0.0459,
+      "rows": 109
+    }
+  },
+  "examples": {
+    "largest_f1_gains": [
+      {
+        "query_idx": 9,
+        "question": "What is the Till dom ensamma performer's birth date?",
+        "baseline_answer": "Not mentioned.",
+        "selector_answer": "11 September 1962.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Till dom ensamma",
+          "När hela världen ser på",
+          "Långa nätter",
+          "Stig Olin",
+          "Styrbjörn Holm"
+        ],
+        "selector_top_titles": [
+          "Till dom ensamma",
+          "Mauro Scocco",
+          "När hela världen ser på",
+          "Långa nätter",
+          "Stig Olin"
+        ]
+      },
+      {
+        "query_idx": 13,
+        "question": "How many times did plague occur in the place where Crucifixion's creator died?",
+        "baseline_answer": "0.",
+        "selector_answer": "22.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.3333333333333333,
+        "noise_delta": 0.33333333333333337,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death"
+        ],
+        "selector_top_titles": [
+          "Black Death",
+          "Crucifixion of Jesus",
+          "Black Death",
+          "Crucifixion (Titian)",
+          "Black Death"
+        ]
+      },
+      {
+        "query_idx": 22,
+        "question": "Where was the person who wrote about the rioting being a dividing factor in Birmingham educated?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "University of Glasgow.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Priestley Riots",
+          "Richard Cory-Wright",
+          "Ernest Barnes",
+          "Ian Quayle Jones",
+          "Out of the Ashes (book)"
+        ],
+        "selector_top_titles": [
+          "Priestley Riots",
+          "James Watt",
+          "Richard Cory-Wright",
+          "Ernest Barnes",
+          "Ian Quayle Jones"
+        ]
+      },
+      {
+        "query_idx": 27,
+        "question": "In what year was the group who performed Attics To Eden formed?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "2005.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Attics to Eden",
+          "The Beatles",
+          "Jagged Edge",
+          "Eagles (band)",
+          "Queen (band)"
+        ],
+        "selector_top_titles": [
+          "Attics to Eden",
+          "Madina Lake",
+          "The Beatles",
+          "Jagged Edge",
+          "Eagles (band)"
+        ]
+      },
+      {
+        "query_idx": 45,
+        "question": "What city is the star of Sous les pieds des femmes from?",
+        "baseline_answer": "Rome.",
+        "selector_answer": "Tunis.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Sous les pieds des femmes",
+          "Maria Deraismes",
+          "Alexandre de Lesseps",
+          "Île de la Cité",
+          "Women's Games"
+        ],
+        "selector_top_titles": [
+          "Sous les pieds des femmes",
+          "Claudia Cardinale",
+          "Maria Deraismes",
+          "Alexandre de Lesseps",
+          "Île de la Cité"
+        ]
+      },
+      {
+        "query_idx": 70,
+        "question": "What does the river that Darling Mills Creek turns into flow into?",
+        "baseline_answer": "Tasman Sea.",
+        "selector_answer": "Sydney Harbour.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Darling Mills Creek",
+          "Murrah River",
+          "Pambula River",
+          "Doubtful Creek",
+          "Mamaroneck River"
+        ],
+        "selector_top_titles": [
+          "Darling Mills Creek",
+          "Parramatta River",
+          "Murrah River",
+          "Pambula River",
+          "Doubtful Creek"
+        ]
+      },
+      {
+        "query_idx": 98,
+        "question": "How many times did the plague occur in the birth place of Concerto in C Major Op 3 6's composer?",
+        "baseline_answer": "0.",
+        "selector_answer": "22.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.6666666666666667,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death"
+        ],
+        "selector_top_titles": [
+          "Antonio Vivaldi",
+          "Cello Concerto No. 2 (Haydn)",
+          "Black Death",
+          "Black Death",
+          "Black Death"
+        ]
+      },
+      {
+        "query_idx": 102,
+        "question": "What is the population in 2010 of they city popular with tourists?",
+        "baseline_answer": "85,000.",
+        "selector_answer": "8.005 million.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": -0.050000000000000044,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Atlantic City, New Jersey",
+          "Nanjing",
+          "Oklahoma City",
+          "New York City",
+          "Santa Monica, California"
+        ],
+        "selector_top_titles": [
+          "Nanjing",
+          "Nanjing",
+          "Atlantic City, New Jersey",
+          "Oklahoma City",
+          "New York City"
+        ]
+      },
+      {
+        "query_idx": 148,
+        "question": "Along with the Closer performer, what notable pop artist started out his career on adult contemporary radio?",
+        "baseline_answer": "Josh Groban.",
+        "selector_answer": "Michael Bublé.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": 0.0,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Adult contemporary music",
+          "Adult contemporary music",
+          "Adult contemporary music",
+          "Adult contemporary music",
+          "Adult contemporary music"
+        ],
+        "selector_top_titles": [
+          "Closer (Josh Groban album)",
+          "Adult contemporary music",
+          "Adult contemporary music",
+          "Adult contemporary music",
+          "Adult contemporary music"
+        ]
+      },
+      {
+        "query_idx": 220,
+        "question": "There is a state A where Storm of the Century was filmed based on the book by the author who wrote a short story featuring the author of This Is My God. What is the population of state A?",
+        "baseline_answer": "1,369,607.",
+        "selector_answer": "1,335,907.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.19999999999999996,
+        "added_gold_count": 1,
+        "removed_gold_count": 2,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Storm of the Century",
+          "Herman Wouk Is Still Alive",
+          "This Is My God",
+          "The Storm (short story)",
+          "God"
+        ],
+        "selector_top_titles": [
+          "Storm of the Century",
+          "Pennsylvania",
+          "Maine",
+          "Trenton Lee Stewart",
+          "E Township, Maine"
+        ]
+      }
+    ],
+    "largest_f1_losses": [
+      {
+        "query_idx": 16,
+        "question": "When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?",
+        "baseline_answer": "15th century.",
+        "selector_answer": "1906.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.33333333333333337,
+        "noise_delta": 0.19999999999999996,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Martin of Aragon",
+          "Palau Güell",
+          "Perdiguera",
+          "Josep Domènech i Estapà",
+          "Gothic architecture"
+        ],
+        "selector_top_titles": [
+          "Monastery of la Murta",
+          "Monastery of Aguas Vivas",
+          "Perdiguera",
+          "Martin of Aragon",
+          "Valencia"
+        ]
+      },
+      {
+        "query_idx": 19,
+        "question": "Who is the mascot of the university related to Randy Conrads?",
+        "baseline_answer": "Benny Beaver.",
+        "selector_answer": "Not specified.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Randy Conrads",
+          "The Oregon Duck",
+          "Smokey (mascot)",
+          "Benny Beaver",
+          "Sebastian the Ibis"
+        ],
+        "selector_top_titles": [
+          "Robert Wayman",
+          "Randy Conrads",
+          "Northwestern University",
+          "The Oregon Duck",
+          "Smokey (mascot)"
+        ]
+      },
+      {
+        "query_idx": 20,
+        "question": "What does seal stand for in the U.S. military branch that operates destroyers, as well as the USS Edsall?",
+        "baseline_answer": "Sea, Air, and Land.",
+        "selector_answer": "Navy SEALs.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.15000000000000002,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "USS Edsall (DE-129)",
+          "United States Navy SEALs",
+          "United States Navy SEALs",
+          "List of destroyer classes of the United States Navy",
+          "USS Rhodes (DE-384)"
+        ],
+        "selector_top_titles": [
+          "United States Navy SEALs",
+          "United States Army",
+          "USS Edsall (DE-129)",
+          "John F. Thorson",
+          "List of destroyer classes of the United States Navy"
+        ]
+      },
+      {
+        "query_idx": 87,
+        "question": "When was the death penalty abolished in the country near the country where the writer of The Book Thief is a citizen of?",
+        "baseline_answer": "1989.",
+        "selector_answer": "1965.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.25,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "The Book Thief (film)",
+          "Capital punishment in the United States",
+          "Capital punishment in the United Kingdom",
+          "Capital punishment in the United States",
+          "Capital punishment in New Zealand"
+        ],
+        "selector_top_titles": [
+          "The Book Thief (film)",
+          "Liechtenstein",
+          "Capital punishment in the United States",
+          "Capital punishment in the United Kingdom",
+          "Capital punishment in the United States"
+        ]
+      },
+      {
+        "query_idx": 91,
+        "question": "What county has a city that is adjacent to the capital city of Erskine College's state?",
+        "baseline_answer": "Richland County.",
+        "selector_answer": "Lexington.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Erskine College",
+          "Columbia, South Carolina",
+          "Erskine College–Due West Historic District",
+          "College Place, Washington",
+          "Forest Acres, South Carolina"
+        ],
+        "selector_top_titles": [
+          "Mississippi",
+          "Erskine College",
+          "List of capitals in the United States",
+          "Apulia",
+          "Columbia, South Carolina"
+        ]
+      },
+      {
+        "query_idx": 106,
+        "question": "In what state is the district where the man who wanted to reform the religion practiced by Innocenzo Ferrieri preached a sermon on Marian devotion?",
+        "baseline_answer": "Saxony-Anhalt.",
+        "selector_answer": "Unknown.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.35,
+        "added_gold_count": 0,
+        "removed_gold_count": 2,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Mary, mother of Jesus",
+          "Anthony Maria Zaccaria",
+          "Innocenzo Ferrieri",
+          "Marian reforms",
+          "Reformation"
+        ],
+        "selector_top_titles": [
+          "Reformation",
+          "Protestantism",
+          "Protestantism",
+          "Thuringia",
+          "Mariefred Charterhouse"
+        ]
+      },
+      {
+        "query_idx": 116,
+        "question": "Who is the grandmother of Philippe, Duke of Orléans?",
+        "baseline_answer": "Marie de' Medici.",
+        "selector_answer": "Margaret of Austria.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Philippe I, Duke of Orléans",
+          "Louise Élisabeth d'Orléans",
+          "Philip III of Spain",
+          "Mercedes of Orléans",
+          "Louise of Savoy"
+        ],
+        "selector_top_titles": [
+          "Louis Chedid",
+          "Philippe I, Duke of Orléans",
+          "Louise Élisabeth d'Orléans",
+          "Philip III of Spain",
+          "Mercedes of Orléans"
+        ]
+      },
+      {
+        "query_idx": 128,
+        "question": "What year did the company that published Starship Command end?",
+        "baseline_answer": "1986.",
+        "selector_answer": "Unknown.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Starship Command",
+          "Spectrum HoloByte",
+          "Software 2000",
+          "Star Trek: Birth of the Federation",
+          "Acornsoft"
+        ],
+        "selector_top_titles": [
+          "Star Trek: Birth of the Federation",
+          "Star Trek",
+          "Starship Command",
+          "Spectrum HoloByte",
+          "Software 2000"
+        ]
+      },
+      {
+        "query_idx": 144,
+        "question": "What was the percentage that the Dow Jones fell when the US had the highest unemployment rate?",
+        "baseline_answer": "54.7%.",
+        "selector_answer": "22.61%.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Unemployment in the United States",
+          "Tanzania",
+          "Tanzania",
+          "Closing milestones of the Dow Jones Industrial Average",
+          "Portugal"
+        ],
+        "selector_top_titles": [
+          "Unemployment in the United States",
+          "Black Monday (1987)",
+          "Tanzania",
+          "Tanzania",
+          "Closing milestones of the Dow Jones Industrial Average"
+        ]
+      },
+      {
+        "query_idx": 174,
+        "question": "When was the Palau de la Generalitat constructed in the city where Martin of the region of Pedrola died?",
+        "baseline_answer": "15th century.",
+        "selector_answer": "Unknown.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.6666666666666667,
+        "noise_delta": 0.35,
+        "added_gold_count": 0,
+        "removed_gold_count": 2,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Martin of Aragon",
+          "Palau Güell",
+          "Josep Domènech i Estapà",
+          "Pedrola",
+          "Gothic architecture"
+        ],
+        "selector_top_titles": [
+          "Valencia",
+          "Pedrola",
+          "Valencia",
+          "Monastery of Aguas Vivas",
+          "Assut de l'Or Bridge"
+        ]
+      }
+    ],
+    "wrong_to_correct": [
+      {
+        "query_idx": 9,
+        "question": "What is the Till dom ensamma performer's birth date?",
+        "baseline_answer": "Not mentioned.",
+        "selector_answer": "11 September 1962.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Till dom ensamma",
+          "När hela världen ser på",
+          "Långa nätter",
+          "Stig Olin",
+          "Styrbjörn Holm"
+        ],
+        "selector_top_titles": [
+          "Till dom ensamma",
+          "Mauro Scocco",
+          "När hela världen ser på",
+          "Långa nätter",
+          "Stig Olin"
+        ]
+      },
+      {
+        "query_idx": 13,
+        "question": "How many times did plague occur in the place where Crucifixion's creator died?",
+        "baseline_answer": "0.",
+        "selector_answer": "22.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.3333333333333333,
+        "noise_delta": 0.33333333333333337,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death"
+        ],
+        "selector_top_titles": [
+          "Black Death",
+          "Crucifixion of Jesus",
+          "Black Death",
+          "Crucifixion (Titian)",
+          "Black Death"
+        ]
+      },
+      {
+        "query_idx": 22,
+        "question": "Where was the person who wrote about the rioting being a dividing factor in Birmingham educated?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "University of Glasgow.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Priestley Riots",
+          "Richard Cory-Wright",
+          "Ernest Barnes",
+          "Ian Quayle Jones",
+          "Out of the Ashes (book)"
+        ],
+        "selector_top_titles": [
+          "Priestley Riots",
+          "James Watt",
+          "Richard Cory-Wright",
+          "Ernest Barnes",
+          "Ian Quayle Jones"
+        ]
+      },
+      {
+        "query_idx": 27,
+        "question": "In what year was the group who performed Attics To Eden formed?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "2005.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Attics to Eden",
+          "The Beatles",
+          "Jagged Edge",
+          "Eagles (band)",
+          "Queen (band)"
+        ],
+        "selector_top_titles": [
+          "Attics to Eden",
+          "Madina Lake",
+          "The Beatles",
+          "Jagged Edge",
+          "Eagles (band)"
+        ]
+      },
+      {
+        "query_idx": 42,
+        "question": "What was the form of the language Auctor is in, used in the era of the Frankish king who created the Holy Roman Empire, later known as?",
+        "baseline_answer": "Latin.",
+        "selector_answer": "Medieval Latin.",
+        "delta_f1": 0.33330000000000004,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.33333333333333337,
+        "noise_delta": -0.25,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Charlemagne",
+          "Charlemagne",
+          "Holy Roman Empire",
+          "Auctor",
+          "Holy Roman Emperor"
+        ],
+        "selector_top_titles": [
+          "Charlemagne",
+          "Middle Ages",
+          "Charlemagne",
+          "Holy Roman Empire",
+          "Auctor"
+        ]
+      },
+      {
+        "query_idx": 45,
+        "question": "What city is the star of Sous les pieds des femmes from?",
+        "baseline_answer": "Rome.",
+        "selector_answer": "Tunis.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Sous les pieds des femmes",
+          "Maria Deraismes",
+          "Alexandre de Lesseps",
+          "Île de la Cité",
+          "Women's Games"
+        ],
+        "selector_top_titles": [
+          "Sous les pieds des femmes",
+          "Claudia Cardinale",
+          "Maria Deraismes",
+          "Alexandre de Lesseps",
+          "Île de la Cité"
+        ]
+      },
+      {
+        "query_idx": 62,
+        "question": "What was the language Auctor comes from during the era of the man crowned first Holy Roman Emperor later known as?",
+        "baseline_answer": "Latin.",
+        "selector_answer": "Medieval Latin.",
+        "delta_f1": 0.33330000000000004,
+        "delta_em": 1.0,
+        "support_recall_delta": -0.3333333333333333,
+        "noise_delta": 0.16666666666666674,
+        "added_gold_count": 1,
+        "removed_gold_count": 2,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Auctor",
+          "Holy Roman Emperor",
+          "Holy Roman Empire",
+          "Charlemagne",
+          "Charlemagne"
+        ],
+        "selector_top_titles": [
+          "Charlemagne",
+          "Middle Ages",
+          "Charlemagne",
+          "Charlemagne",
+          "Military history of France"
+        ]
+      },
+      {
+        "query_idx": 70,
+        "question": "What does the river that Darling Mills Creek turns into flow into?",
+        "baseline_answer": "Tasman Sea.",
+        "selector_answer": "Sydney Harbour.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Darling Mills Creek",
+          "Murrah River",
+          "Pambula River",
+          "Doubtful Creek",
+          "Mamaroneck River"
+        ],
+        "selector_top_titles": [
+          "Darling Mills Creek",
+          "Parramatta River",
+          "Murrah River",
+          "Pambula River",
+          "Doubtful Creek"
+        ]
+      },
+      {
+        "query_idx": 98,
+        "question": "How many times did the plague occur in the birth place of Concerto in C Major Op 3 6's composer?",
+        "baseline_answer": "0.",
+        "selector_answer": "22.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.6666666666666667,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death",
+          "Black Death"
+        ],
+        "selector_top_titles": [
+          "Antonio Vivaldi",
+          "Cello Concerto No. 2 (Haydn)",
+          "Black Death",
+          "Black Death",
+          "Black Death"
+        ]
+      },
+      {
+        "query_idx": 102,
+        "question": "What is the population in 2010 of they city popular with tourists?",
+        "baseline_answer": "85,000.",
+        "selector_answer": "8.005 million.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": -0.050000000000000044,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Atlantic City, New Jersey",
+          "Nanjing",
+          "Oklahoma City",
+          "New York City",
+          "Santa Monica, California"
+        ],
+        "selector_top_titles": [
+          "Nanjing",
+          "Nanjing",
+          "Atlantic City, New Jersey",
+          "Oklahoma City",
+          "New York City"
+        ]
+      }
+    ],
+    "correct_to_wrong": [
+      {
+        "query_idx": 16,
+        "question": "When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?",
+        "baseline_answer": "15th century.",
+        "selector_answer": "1906.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.33333333333333337,
+        "noise_delta": 0.19999999999999996,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Martin of Aragon",
+          "Palau Güell",
+          "Perdiguera",
+          "Josep Domènech i Estapà",
+          "Gothic architecture"
+        ],
+        "selector_top_titles": [
+          "Monastery of la Murta",
+          "Monastery of Aguas Vivas",
+          "Perdiguera",
+          "Martin of Aragon",
+          "Valencia"
+        ]
+      },
+      {
+        "query_idx": 19,
+        "question": "Who is the mascot of the university related to Randy Conrads?",
+        "baseline_answer": "Benny Beaver.",
+        "selector_answer": "Not specified.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Randy Conrads",
+          "The Oregon Duck",
+          "Smokey (mascot)",
+          "Benny Beaver",
+          "Sebastian the Ibis"
+        ],
+        "selector_top_titles": [
+          "Robert Wayman",
+          "Randy Conrads",
+          "Northwestern University",
+          "The Oregon Duck",
+          "Smokey (mascot)"
+        ]
+      },
+      {
+        "query_idx": 20,
+        "question": "What does seal stand for in the U.S. military branch that operates destroyers, as well as the USS Edsall?",
+        "baseline_answer": "Sea, Air, and Land.",
+        "selector_answer": "Navy SEALs.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.15000000000000002,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "USS Edsall (DE-129)",
+          "United States Navy SEALs",
+          "United States Navy SEALs",
+          "List of destroyer classes of the United States Navy",
+          "USS Rhodes (DE-384)"
+        ],
+        "selector_top_titles": [
+          "United States Navy SEALs",
+          "United States Army",
+          "USS Edsall (DE-129)",
+          "John F. Thorson",
+          "List of destroyer classes of the United States Navy"
+        ]
+      },
+      {
+        "query_idx": 80,
+        "question": "What is the name of the famous bridge in the city where the composer of La Silvia was born?",
+        "baseline_answer": "Rialto Bridge.",
+        "selector_answer": "Bridge of Sighs.",
+        "delta_f1": -0.6,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.3333333333333333,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "La Silvia",
+          "Bridge of Sighs",
+          "Antonio Vivaldi",
+          "La fida ninfa",
+          "Rialto Bridge"
+        ],
+        "selector_top_titles": [
+          "Antonio Vivaldi",
+          "Île de la Cité",
+          "La Silvia",
+          "Bridge of Sighs",
+          "La fida ninfa"
+        ]
+      },
+      {
+        "query_idx": 87,
+        "question": "When was the death penalty abolished in the country near the country where the writer of The Book Thief is a citizen of?",
+        "baseline_answer": "1989.",
+        "selector_answer": "1965.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.25,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "The Book Thief (film)",
+          "Capital punishment in the United States",
+          "Capital punishment in the United Kingdom",
+          "Capital punishment in the United States",
+          "Capital punishment in New Zealand"
+        ],
+        "selector_top_titles": [
+          "The Book Thief (film)",
+          "Liechtenstein",
+          "Capital punishment in the United States",
+          "Capital punishment in the United Kingdom",
+          "Capital punishment in the United States"
+        ]
+      },
+      {
+        "query_idx": 88,
+        "question": "What is the tallest building in the state where KZAR is located?",
+        "baseline_answer": "JPMorgan Chase Tower.",
+        "selector_answer": "William P. Clements Jr. Tower.",
+        "delta_f1": -0.75,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "KZAR",
+          "List of tallest buildings and structures",
+          "List of tallest buildings and structures",
+          "List of tallest buildings and structures",
+          "Empire State Building"
+        ],
+        "selector_top_titles": [
+          "Missouri",
+          "KZAR",
+          "List of tallest buildings and structures",
+          "List of tallest buildings and structures",
+          "List of tallest buildings and structures"
+        ]
+      },
+      {
+        "query_idx": 91,
+        "question": "What county has a city that is adjacent to the capital city of Erskine College's state?",
+        "baseline_answer": "Richland County.",
+        "selector_answer": "Lexington.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Erskine College",
+          "Columbia, South Carolina",
+          "Erskine College–Due West Historic District",
+          "College Place, Washington",
+          "Forest Acres, South Carolina"
+        ],
+        "selector_top_titles": [
+          "Mississippi",
+          "Erskine College",
+          "List of capitals in the United States",
+          "Apulia",
+          "Columbia, South Carolina"
+        ]
+      },
+      {
+        "query_idx": 101,
+        "question": "Between the state university in the state without North Point Mall and where Edwards won the primary and the university in Fort Hill's town which has the more national championships?",
+        "baseline_answer": "University of South Carolina.",
+        "selector_answer": "Clemson University.",
+        "delta_f1": -0.6667000000000001,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 1,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "2004 United States presidential election",
+          "Clemson–South Carolina rivalry",
+          "2004 United States presidential election",
+          "Fort Hill (Clemson, South Carolina)",
+          "John Kerry"
+        ],
+        "selector_top_titles": [
+          "Texas A&M University",
+          "2004 United States presidential election",
+          "Fort Hill (Clemson, South Carolina)",
+          "North Point Mall",
+          "2004 United States presidential election"
+        ]
+      },
+      {
+        "query_idx": 106,
+        "question": "In what state is the district where the man who wanted to reform the religion practiced by Innocenzo Ferrieri preached a sermon on Marian devotion?",
+        "baseline_answer": "Saxony-Anhalt.",
+        "selector_answer": "Unknown.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.35,
+        "added_gold_count": 0,
+        "removed_gold_count": 2,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Mary, mother of Jesus",
+          "Anthony Maria Zaccaria",
+          "Innocenzo Ferrieri",
+          "Marian reforms",
+          "Reformation"
+        ],
+        "selector_top_titles": [
+          "Reformation",
+          "Protestantism",
+          "Protestantism",
+          "Thuringia",
+          "Mariefred Charterhouse"
+        ]
+      },
+      {
+        "query_idx": 116,
+        "question": "Who is the grandmother of Philippe, Duke of Orléans?",
+        "baseline_answer": "Marie de' Medici.",
+        "selector_answer": "Margaret of Austria.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Philippe I, Duke of Orléans",
+          "Louise Élisabeth d'Orléans",
+          "Philip III of Spain",
+          "Mercedes of Orléans",
+          "Louise of Savoy"
+        ],
+        "selector_top_titles": [
+          "Louis Chedid",
+          "Philippe I, Duke of Orléans",
+          "Louise Élisabeth d'Orléans",
+          "Philip III of Spain",
+          "Mercedes of Orléans"
+        ]
+      }
+    ]
+  }
+}

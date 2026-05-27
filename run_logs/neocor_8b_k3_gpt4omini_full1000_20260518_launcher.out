@@ -1,0 +1,2 @@
+[2026-05-18T14:06:37+08:00] BEGIN neocor_8b_k3_gpt4omini_full1000_20260518
+[2026-05-18T14:06:37+08:00] Protocol: NeocorRAG Qwen3-8B no-think beam k=3 saved docs; GPT-4o-mini reader; datasets=2wikimultihopqa hotpotqa musique; max_queries=1000; skip_qa=0

@@ -1,0 +1,64 @@
+[2026-04-22 00:03:56] START 2wikimultihopqa/soft -> outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_pilot100_anchor2_fresh8043.json
+INFO:src.hipporag.HippoRAG:Creating working directory: outputs_step0_general_nvembed_2wikimultihopqa/qwen3-8b_nvidia_NV-Embed-v2
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:03<00:10,  3.66s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:06<00:06,  3.37s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:10<00:03,  3.65s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.34s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:11<00:00,  2.79s/it]
+INFO:src.hipporag.embedding_store:Creating working directory: outputs_step0_general_nvembed_2wikimultihopqa/qwen3-8b_nvidia_NV-Embed-v2/chunk_embeddings
+INFO:src.hipporag.embedding_store:Creating working directory: outputs_step0_general_nvembed_2wikimultihopqa/qwen3-8b_nvidia_NV-Embed-v2/entity_embeddings
+INFO:src.hipporag.embedding_store:Creating working directory: outputs_step0_general_nvembed_2wikimultihopqa/qwen3-8b_nvidia_NV-Embed-v2/fact_embeddings
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 6119 new records, 0 records already exist.
+Batch Encoding:   0%|          | 0/6119 [00:00<?, ?it/s]/home/maozhifang/.cache/huggingface/modules/transformers_modules/nvidia/NV-Embed-v2/3fa59658547db50a1e8e3346cf057fd0c77ed6ef/modeling_nvembed.py:347: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  'input_ids': torch.tensor(batch_dict.get('input_ids').to(batch_dict.get('input_ids')).long()),
+Traceback (most recent call last):
+  File "/mnt/nvme/code/HippoRAG/scripts/eval_causal_qwen3.py", line 8070, in <module>
+    main()
+  File "/mnt/nvme/code/HippoRAG/scripts/eval_causal_qwen3.py", line 7216, in main
+    hipporag.index(docs)
+  File "/mnt/nvme/code/HippoRAG/src/hipporag/HippoRAG.py", line 321, in index
+    self.chunk_embedding_store.insert_strings(docs)
+  File "/mnt/nvme/code/HippoRAG/src/hipporag/embedding_store.py", line 90, in insert_strings
+    missing_embeddings = self.embedding_model.batch_encode(texts_to_encode)
+  File "/mnt/nvme/code/HippoRAG/src/hipporag/embedding_model/NVEmbedV2.py", line 90, in batch_encode
+    results.append(self.embedding_model.encode(**params))
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/maozhifang/.cache/huggingface/modules/transformers_modules/nvidia/NV-Embed-v2/3fa59658547db50a1e8e3346cf057fd0c77ed6ef/modeling_nvembed.py", line 428, in encode
+    return self(**features)["sentence_embeddings"].squeeze(1)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/home/maozhifang/.cache/huggingface/modules/transformers_modules/nvidia/NV-Embed-v2/3fa59658547db50a1e8e3346cf057fd0c77ed6ef/modeling_nvembed.py", line 399, in forward
+    outputs = self.embedding_model(
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/maozhifang/.cache/huggingface/modules/transformers_modules/nvidia/NV-Embed-v2/3fa59658547db50a1e8e3346cf057fd0c77ed6ef/modeling_nvembed.py", line 144, in forward
+    layer_outputs = decoder_layer(
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/transformers/models/mistral/modeling_mistral.py", line 548, in forward
+    hidden_states = self.input_layernorm(hidden_states)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+  File "/mnt/nvme/code/HippoRAG/.venv-hipporag/lib/python3.10/site-packages/transformers/models/mistral/modeling_mistral.py", line 73, in forward
+    hidden_states = hidden_states.to(torch.float32)
+RuntimeError: CUDA error: out of memory
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+Batch Encoding:   0%|          | 0/6119 [00:03<?, ?it/s]

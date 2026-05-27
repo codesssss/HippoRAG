@@ -1,0 +1,15 @@
+{
+  "rows": [
+    {
+      "dataset": "hotpotqa",
+      "method": "raptor_qwen32b_no_think_top5",
+      "count": 5,
+      "Recall@5": 0.8,
+      "Recall@20": 1.0,
+      "ExactMatch": 0.2,
+      "F1": 0.4061,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/raptor_smoke_32b_no_think_gpt4omini_20260517/reader_qa/raptor/hotpotqa_raptor_qwen32b_no_think_gpt4omini_reader.json"
+    }
+  ]
+}

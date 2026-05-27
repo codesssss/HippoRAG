@@ -1,0 +1,18 @@
+rank_weight	dataset	F1_delta	EM_delta
+0.1	2wikimultihopqa	0.024700	0.020000
+0.1	hotpotqa	0.031000	0.020000
+0.1	musique	0.049700	0.050000
+0.2	2wikimultihopqa	0.045600	0.040000
+0.2	hotpotqa	0.031000	0.020000
+0.2	musique	0.039700	0.040000
+0.3	2wikimultihopqa	0.042900	0.040000
+0.3	hotpotqa	0.031000	0.020000
+0.3	musique	0.039700	0.040000
+0.6	2wikimultihopqa	0.044900	0.040000
+0.6	hotpotqa	0.031000	0.020000
+0.6	musique	0.025600	0.030000
+1.0	2wikimultihopqa	0.044700	0.040000
+1.0	hotpotqa	0.031000	0.020000
+1.0	musique	0.033200	0.040000
+
+BEST	0.2

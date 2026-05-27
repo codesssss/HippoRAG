@@ -1,0 +1,16 @@
+[2026-05-20T17:57:01+08:00] BEGIN evidencelink_edge_count_matched_dense_control_full1000_20260520
+[2026-05-20T17:57:01+08:00] Protocol: doc-transition controls, full1000 main3, Qwen32B no-think DBEC/PCEC, retrieval-only, no GPT-4o-mini reader
+[2026-05-20T17:57:01+08:00] Control policies: edge_count_matched_dense_doc_knn
+[2026-05-20T17:57:01+08:00] Graph utility model: qwen3-32b-judge; Qwen URLs: http://localhost:8045/v1
+[2026-05-20T17:57:01+08:00] Pool/readout: pool_k=100 prefix_budget_m=4 reader_budget_k=5; dense_seed_k=20 neighbor_k=20 closure_hops=2
+[2026-05-20T17:57:01+08:00] OK endpoint qwen32b:http://localhost:8045/v1: http://localhost:8045/v1/models
+[2026-05-20T17:57:01+08:00] OK endpoint nv_embed: http://localhost:8019/v1/models
+[2026-05-20T17:57:01+08:00] LAUNCHED worker slot=0 pid=1418434 qwen_url=http://localhost:8045/v1
+[2026-05-20T17:57:01+08:00] START worker slot=0/1 qwen_url=http://localhost:8045/v1
+[2026-05-20T17:57:01+08:00] SKIP export policy=edge_count_matched_dense_doc_knn dataset=2wikimultihopqa
+[2026-05-20T17:57:01+08:00] START DBEC32 policy=edge_count_matched_dense_doc_knn dataset=2wikimultihopqa qwen_url=http://localhost:8045/v1
+[2026-05-20T18:16:58+08:00] DONE DBEC32 policy=edge_count_matched_dense_doc_knn dataset=2wikimultihopqa
+[2026-05-20T18:16:58+08:00] START PCEC policy=edge_count_matched_dense_doc_knn dataset=2wikimultihopqa qwen_url=http://localhost:8045/v1
+[2026-05-20T18:23:48+08:00] DONE PCEC policy=edge_count_matched_dense_doc_knn dataset=2wikimultihopqa
+[2026-05-20T18:23:48+08:00] DONE worker slot=0/1 qwen_url=http://localhost:8045/v1
+[2026-05-20T18:23:48+08:00] DONE evidencelink_edge_count_matched_dense_control_full1000_20260520

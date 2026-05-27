@@ -1,0 +1,37 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "raptor_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.717,
+      "Recall@20": 0.804,
+      "ExactMatch": 0.496,
+      "F1": 0.5438,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/raptor_32b_no_think_gpt4omini_full1000_20260517/reader_qa/raptor/2wikimultihopqa_raptor_qwen32b_no_think_gpt4omini_reader.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "raptor_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.9085,
+      "Recall@20": 0.975,
+      "ExactMatch": 0.59,
+      "F1": 0.7196,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/raptor_32b_no_think_gpt4omini_full1000_20260517/reader_qa/raptor/hotpotqa_raptor_qwen32b_no_think_gpt4omini_reader.json"
+    },
+    {
+      "dataset": "nq_rear",
+      "method": "raptor_qwen32b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.7712,
+      "Recall@20": 0.9901,
+      "ExactMatch": 0.498,
+      "F1": 0.6407,
+      "mean_reader_docs": 5.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/raptor_32b_no_think_gpt4omini_full1000_20260517/reader_qa/raptor/nq_raptor_qwen32b_no_think_gpt4omini_reader.json"
+    }
+  ]
+}

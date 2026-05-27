@@ -1,0 +1,1893 @@
+[2026-04-10 13:57:53] Queue started dataset=nq limit=100 cuda_visible_devices=6
+[2026-04-10 13:57:53] SKIP existing dataset=nq run=baseline_top5 report=outputs_step0_general_nq/eval_reports/causal_eval_nq_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json
+[2026-04-10 13:57:53] START dataset=nq run=width_match_baseline_top10_plus_ce_qatopk5 append_policy=bridge append_max_docs=0 seed=0 ce_device=cuda:0
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Loaded 9633 records from outputs_step0_general_nq/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 9633 records already exist.
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:__main__:Reused retrieval from cache outputs_step0_general_nq/eval_reports/causal_eval_nq_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.retrieval_cache.json and skipped retrieval stage.
+INFO:__main__:Reused baseline QA from report outputs_step0_general_nq/eval_reports/causal_eval_nq_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json and skipped baseline reader pass.
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cuda:0
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 16305.66it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   6%|▌         | 6/100 [00:06<01:42,  1.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   7%|▋         | 7/100 [00:11<02:42,  1.74s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   8%|▊         | 8/100 [00:12<02:29,  1.63s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   9%|▉         | 9/100 [00:13<02:18,  1.52s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  10%|█         | 10/100 [00:15<02:20,  1.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  11%|█         | 11/100 [00:16<02:17,  1.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  12%|█▏        | 12/100 [00:31<07:29,  5.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  13%|█▎        | 13/100 [00:32<06:04,  4.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  14%|█▍        | 14/100 [00:34<04:56,  3.45s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  15%|█▌        | 15/100 [00:36<04:15,  3.01s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  16%|█▌        | 16/100 [00:38<03:38,  2.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  17%|█▋        | 17/100 [01:13<17:01, 12.31s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  18%|█▊        | 18/100 [01:18<13:54, 10.18s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  19%|█▉        | 19/100 [01:19<10:08,  7.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  20%|██        | 20/100 [01:20<07:24,  5.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  21%|██        | 21/100 [01:22<05:40,  4.31s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  22%|██▏       | 22/100 [01:23<04:33,  3.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  23%|██▎       | 23/100 [01:56<15:50, 12.34s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  24%|██▍       | 24/100 [01:58<11:39,  9.20s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  25%|██▌       | 25/100 [02:03<09:50,  7.87s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  26%|██▌       | 26/100 [02:04<07:11,  5.83s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  27%|██▋       | 27/100 [02:06<05:35,  4.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  28%|██▊       | 28/100 [02:13<06:19,  5.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  29%|██▉       | 29/100 [02:14<04:56,  4.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  30%|███       | 30/100 [02:15<03:48,  3.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  31%|███       | 31/100 [02:18<03:32,  3.08s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  32%|███▏      | 32/100 [02:22<03:54,  3.45s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  33%|███▎      | 33/100 [02:25<03:39,  3.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  34%|███▍      | 34/100 [02:28<03:19,  3.03s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  35%|███▌      | 35/100 [02:29<02:41,  2.49s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  36%|███▌      | 36/100 [02:30<02:13,  2.08s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  37%|███▋      | 37/100 [02:32<02:01,  1.92s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  38%|███▊      | 38/100 [02:33<01:56,  1.88s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  39%|███▉      | 39/100 [02:35<01:48,  1.79s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  40%|████      | 40/100 [02:39<02:33,  2.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  41%|████      | 41/100 [02:41<02:22,  2.41s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  42%|████▏     | 42/100 [02:43<02:02,  2.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  43%|████▎     | 43/100 [02:45<01:55,  2.02s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  44%|████▍     | 44/100 [02:46<01:48,  1.94s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  45%|████▌     | 45/100 [02:50<02:22,  2.59s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  46%|████▌     | 46/100 [02:52<01:55,  2.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  47%|████▋     | 47/100 [02:56<02:34,  2.92s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  48%|████▊     | 48/100 [02:58<02:08,  2.47s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  49%|████▉     | 49/100 [03:02<02:30,  2.94s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  50%|█████     | 50/100 [03:36<10:10, 12.22s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  51%|█████     | 51/100 [03:37<07:16,  8.91s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  52%|█████▏    | 52/100 [03:38<05:21,  6.69s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  53%|█████▎    | 53/100 [03:41<04:22,  5.58s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  54%|█████▍    | 54/100 [03:43<03:21,  4.37s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  55%|█████▌    | 55/100 [03:44<02:31,  3.36s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  56%|█████▌    | 56/100 [03:46<02:09,  2.94s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  57%|█████▋    | 57/100 [03:47<01:48,  2.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  58%|█████▊    | 58/100 [03:49<01:37,  2.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  59%|█████▉    | 59/100 [03:51<01:28,  2.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  60%|██████    | 60/100 [03:55<01:46,  2.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  61%|██████    | 61/100 [03:56<01:25,  2.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  62%|██████▏   | 62/100 [03:57<01:15,  1.99s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  63%|██████▎   | 63/100 [04:01<01:25,  2.32s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  64%|██████▍   | 64/100 [04:03<01:28,  2.46s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  65%|██████▌   | 65/100 [04:05<01:17,  2.21s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  66%|██████▌   | 66/100 [04:07<01:09,  2.04s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  67%|██████▋   | 67/100 [04:09<01:06,  2.03s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  68%|██████▊   | 68/100 [04:10<00:56,  1.76s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  69%|██████▉   | 69/100 [04:11<00:52,  1.70s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  70%|███████   | 70/100 [04:13<00:52,  1.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  71%|███████   | 71/100 [04:17<01:10,  2.43s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  72%|███████▏  | 72/100 [04:18<00:57,  2.04s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  73%|███████▎  | 73/100 [04:24<01:25,  3.16s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  74%|███████▍  | 74/100 [04:26<01:09,  2.67s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  75%|███████▌  | 75/100 [04:27<00:55,  2.20s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  76%|███████▌  | 76/100 [04:28<00:47,  1.98s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  77%|███████▋  | 77/100 [04:30<00:43,  1.89s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  78%|███████▊  | 78/100 [04:32<00:40,  1.84s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  79%|███████▉  | 79/100 [04:34<00:40,  1.91s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  80%|████████  | 80/100 [04:36<00:38,  1.92s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  81%|████████  | 81/100 [04:37<00:33,  1.77s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  82%|████████▏ | 82/100 [04:38<00:28,  1.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  83%|████████▎ | 83/100 [04:39<00:25,  1.48s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  84%|████████▍ | 84/100 [04:41<00:23,  1.48s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  85%|████████▌ | 85/100 [04:43<00:22,  1.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  86%|████████▌ | 86/100 [04:45<00:24,  1.77s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  87%|████████▋ | 87/100 [04:47<00:23,  1.77s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  88%|████████▊ | 88/100 [04:48<00:19,  1.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  89%|████████▉ | 89/100 [04:52<00:25,  2.31s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  90%|█████████ | 90/100 [04:53<00:20,  2.02s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  91%|█████████ | 91/100 [04:56<00:19,  2.15s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  92%|█████████▏| 92/100 [04:58<00:16,  2.09s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  93%|█████████▎| 93/100 [04:59<00:12,  1.83s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  94%|█████████▍| 94/100 [05:00<00:10,  1.77s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  95%|█████████▌| 95/100 [05:04<00:11,  2.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  96%|█████████▌| 96/100 [05:05<00:08,  2.01s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  97%|█████████▋| 97/100 [05:06<00:05,  1.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  98%|█████████▊| 98/100 [05:08<00:03,  1.83s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  99%|█████████▉| 99/100 [05:10<00:01,  1.63s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading: 100%|██████████| 100/100 [05:11<00:00,  1.42s/it]QA Reading: 100%|██████████| 100/100 [05:11<00:00,  3.11s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 2531.84it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.53, 'F1': 0.6444}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.5300 (delta=+0.0100), F1=0.6444
+{
+  "output_json": "outputs_step0_general_nq/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa100dual.json",
+  "overall_recomputed": {
+    "Recall@1": 0.2575,
+    "Recall@2": 0.4197,
+    "Recall@5": 0.7105,
+    "Recall@10": 0.9529,
+    "Recall@20": 0.9872,
+    "Recall@30": 0.9887,
+    "Recall@50": 0.998,
+    "Recall@100": 1.0,
+    "Recall@150": 1.0,
+    "Recall@200": 1.0,
+    "ExactMatch": 0.52,
+    "F1": 0.6500354491769059,
+    "num_queries": 100
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 100
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 100
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 100
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 100
+    },
+    "base_retrieval_dense_fallback_count": 100,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 0,
+    "append_policy": "bridge",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.35,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cuda:0",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "method_EM": 0.53,
+    "method_F1": 0.6444,
+    "baseline_EM": 0.52,
+    "baseline_F1": 0.65,
+    "EM_delta": 0.01,
+    "F1_delta": -0.0056,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.3021,
+      "Recall@2": 0.4605,
+      "Recall@5": 0.6882,
+      "Recall@10": 0.9529,
+      "Recall@20": 0.9872,
+      "Recall@100": 1.0
+    },
+    "per_bucket": {
+      "1_doc": {
+        "count": 28,
+        "baseline_EM": 0.4286,
+        "method_EM": 0.4286,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.5456,
+        "method_F1": 0.5194,
+        "F1_delta": -0.0262
+      },
+      "2_doc": {
+        "count": 15,
+        "baseline_EM": 0.4,
+        "method_EM": 0.4667,
+        "EM_delta": 0.0667,
+        "baseline_F1": 0.6225,
+        "method_F1": 0.5978,
+        "F1_delta": -0.0248
+      },
+      "3_doc": {
+        "count": 19,
+        "baseline_EM": 0.6316,
+        "method_EM": 0.5263,
+        "EM_delta": -0.1053,
+        "baseline_F1": 0.7652,
+        "method_F1": 0.7214,
+        "F1_delta": -0.0438
+      },
+      "4_doc": {
+        "count": 8,
+        "baseline_EM": 0.625,
+        "method_EM": 0.75,
+        "EM_delta": 0.125,
+        "baseline_F1": 0.6875,
+        "method_F1": 0.8125,
+        "F1_delta": 0.125
+      },
+      "5_doc": {
+        "count": 7,
+        "baseline_EM": 0.4286,
+        "method_EM": 0.4286,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.5714,
+        "method_F1": 0.5952,
+        "F1_delta": 0.0238
+      },
+      "6_doc": {
+        "count": 9,
+        "baseline_EM": 0.5556,
+        "method_EM": 0.6667,
+        "EM_delta": 0.1111,
+        "baseline_F1": 0.719,
+        "method_F1": 0.7429,
+        "F1_delta": 0.0238
+      },
+      "7_doc": {
+        "count": 3,
+        "baseline_EM": 0.6667,
+        "method_EM": 0.6667,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.6667,
+        "method_F1": 0.6667,
+        "F1_delta": 0.0
+      },
+      "8_doc": {
+        "count": 7,
+        "baseline_EM": 0.7143,
+        "method_EM": 0.7143,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.7144,
+        "method_F1": 0.7143,
+        "F1_delta": -0.0001
+      },
+      "9_doc": {
+        "count": 2,
+        "baseline_EM": 0.0,
+        "method_EM": 0.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.4386,
+        "method_F1": 0.4333,
+        "F1_delta": -0.0053
+      },
+      "10_doc": {
+        "count": 2,
+        "baseline_EM": 1.0,
+        "method_EM": 1.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 1.0,
+        "method_F1": 1.0,
+        "F1_delta": 0.0
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "who has the oldest team in the nba",
+          "selected_titles": [
+            "Philadelphia 76ers",
+            "National Basketball Association",
+            "Boston Celtics",
+            "National Basketball Association",
+            "History of the Boston Celtics"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "an influential religion to enter china along the silk route during the han dynasty was",
+          "selected_titles": [
+            "Religion in China",
+            "Han dynasty",
+            "Religion in China",
+            "Silk Road",
+            "Silk Road"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "who pays medical bills in great britain where does the money come from to pay these bills",
+          "selected_titles": [
+            "Single-payer healthcare",
+            "Universal health care",
+            "National Health Service",
+            "United Kingdom enterprise law",
+            "National Insurance Fund"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "who is the captain of richmond football club",
+          "selected_titles": [
+            "Richmond Football Club",
+            "Richmond Football Club",
+            "Trent Cotchin",
+            "2018 Richmond Football Club season",
+            "2018 Richmond Football Club season"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "how many hoops are used in a game of croquet",
+          "selected_titles": [
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 0,
+      "append_policy": "bridge",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.35,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cuda:0",
+      "avg_appended_doc_count": 0.0,
+      "avg_candidate_set_size": 10.0,
+      "append_count_histogram": {
+        "0": 100
+      },
+      "append_stop_reason_counts": {
+        "append_cap_zero": 100
+      }
+    }
+  }
+}
+[2026-04-10 14:03:36] DONE dataset=nq run=width_match_baseline_top10_plus_ce_qatopk5 report=outputs_step0_general_nq/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa100dual.json
+[2026-04-10 14:03:36] START dataset=nq run=width_match_random3_deep_plus_ce_qatopk5 append_policy=random_deep append_max_docs=3 seed=0 ce_device=cuda:0
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Loaded 9633 records from outputs_step0_general_nq/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 9633 records already exist.
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:__main__:Reused retrieval from cache outputs_step0_general_nq/eval_reports/causal_eval_nq_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.retrieval_cache.json and skipped retrieval stage.
+INFO:__main__:Reused baseline QA from report outputs_step0_general_nq/eval_reports/causal_eval_nq_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json and skipped baseline reader pass.
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cuda:0
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 29429.58it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  11%|█         | 11/100 [00:01<00:13,  6.59it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  36%|███▌      | 36/100 [00:02<00:04, 14.71it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  44%|████▍     | 44/100 [00:04<00:05, 10.02it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  54%|█████▍    | 54/100 [00:06<00:05,  7.87it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  63%|██████▎   | 63/100 [00:40<00:44,  1.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  89%|████████▉ | 89/100 [00:44<00:06,  1.57it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  93%|█████████▎| 93/100 [00:46<00:04,  1.65it/s]QA Reading: 100%|██████████| 100/100 [00:46<00:00,  2.16it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 2436.49it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.52, 'F1': 0.6327}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.5200 (delta=+0.0000), F1=0.6327
+{
+  "output_json": "outputs_step0_general_nq/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260410nqpopqa100dual.json",
+  "overall_recomputed": {
+    "Recall@1": 0.2575,
+    "Recall@2": 0.4197,
+    "Recall@5": 0.7105,
+    "Recall@10": 0.9529,
+    "Recall@20": 0.9872,
+    "Recall@30": 0.9887,
+    "Recall@50": 0.998,
+    "Recall@100": 1.0,
+    "Recall@150": 1.0,
+    "Recall@200": 1.0,
+    "ExactMatch": 0.52,
+    "F1": 0.6500354491769059,
+    "num_queries": 100
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 100
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 100
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 100
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 100
+    },
+    "base_retrieval_dense_fallback_count": 100,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 3,
+    "append_policy": "random_deep",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.35,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cuda:0",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "method_EM": 0.52,
+    "method_F1": 0.6327,
+    "baseline_EM": 0.52,
+    "baseline_F1": 0.65,
+    "EM_delta": 0.0,
+    "F1_delta": -0.0173,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.3021,
+      "Recall@2": 0.4605,
+      "Recall@5": 0.6849,
+      "Recall@10": 0.9396,
+      "Recall@20": 0.9852,
+      "Recall@100": 1.0
+    },
+    "per_bucket": {
+      "1_doc": {
+        "count": 28,
+        "baseline_EM": 0.4286,
+        "method_EM": 0.4286,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.5456,
+        "method_F1": 0.5135,
+        "F1_delta": -0.0322
+      },
+      "2_doc": {
+        "count": 15,
+        "baseline_EM": 0.4,
+        "method_EM": 0.4667,
+        "EM_delta": 0.0667,
+        "baseline_F1": 0.6225,
+        "method_F1": 0.5978,
+        "F1_delta": -0.0248
+      },
+      "3_doc": {
+        "count": 19,
+        "baseline_EM": 0.6316,
+        "method_EM": 0.4737,
+        "EM_delta": -0.1579,
+        "baseline_F1": 0.7652,
+        "method_F1": 0.6687,
+        "F1_delta": -0.0964
+      },
+      "4_doc": {
+        "count": 8,
+        "baseline_EM": 0.625,
+        "method_EM": 0.75,
+        "EM_delta": 0.125,
+        "baseline_F1": 0.6875,
+        "method_F1": 0.8125,
+        "F1_delta": 0.125
+      },
+      "5_doc": {
+        "count": 7,
+        "baseline_EM": 0.4286,
+        "method_EM": 0.4286,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.5714,
+        "method_F1": 0.5952,
+        "F1_delta": 0.0238
+      },
+      "6_doc": {
+        "count": 9,
+        "baseline_EM": 0.5556,
+        "method_EM": 0.6667,
+        "EM_delta": 0.1111,
+        "baseline_F1": 0.719,
+        "method_F1": 0.7429,
+        "F1_delta": 0.0238
+      },
+      "7_doc": {
+        "count": 3,
+        "baseline_EM": 0.6667,
+        "method_EM": 0.6667,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.6667,
+        "method_F1": 0.6667,
+        "F1_delta": 0.0
+      },
+      "8_doc": {
+        "count": 7,
+        "baseline_EM": 0.7143,
+        "method_EM": 0.7143,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.7144,
+        "method_F1": 0.7143,
+        "F1_delta": -0.0001
+      },
+      "9_doc": {
+        "count": 2,
+        "baseline_EM": 0.0,
+        "method_EM": 0.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.4386,
+        "method_F1": 0.4333,
+        "F1_delta": -0.0053
+      },
+      "10_doc": {
+        "count": 2,
+        "baseline_EM": 1.0,
+        "method_EM": 1.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 1.0,
+        "method_F1": 1.0,
+        "F1_delta": 0.0
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "who has the oldest team in the nba",
+          "selected_titles": [
+            "Philadelphia 76ers",
+            "National Basketball Association",
+            "Boston Celtics",
+            "National Basketball Association",
+            "History of the Boston Celtics"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 37,
+              "selected_doc_id": 5261,
+              "selected_title": "2016–17 Golden State Warriors season"
+            },
+            {
+              "step": 2,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 30,
+              "selected_doc_id": 7595,
+              "selected_title": "NBA draft"
+            },
+            {
+              "step": 3,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 23,
+              "selected_doc_id": 6699,
+              "selected_title": "2015–16 Golden State Warriors season"
+            }
+          ]
+        },
+        {
+          "question": "an influential religion to enter china along the silk route during the han dynasty was",
+          "selected_titles": [
+            "Religion in China",
+            "Han dynasty",
+            "Religion in China",
+            "Silk Road",
+            "Silk Road"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 37,
+              "selected_doc_id": 1140,
+              "selected_title": "History of the world"
+            },
+            {
+              "step": 2,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 30,
+              "selected_doc_id": 9174,
+              "selected_title": "Abacus"
+            },
+            {
+              "step": 3,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 23,
+              "selected_doc_id": 9168,
+              "selected_title": "Islam in Iran"
+            }
+          ]
+        },
+        {
+          "question": "who pays medical bills in great britain where does the money come from to pay these bills",
+          "selected_titles": [
+            "Single-payer healthcare",
+            "Universal health care",
+            "National Health Service",
+            "United Kingdom enterprise law",
+            "National Insurance Fund"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 37,
+              "selected_doc_id": 6808,
+              "selected_title": "Politics of the United Kingdom"
+            },
+            {
+              "step": 2,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 30,
+              "selected_doc_id": 5944,
+              "selected_title": "Help to Buy"
+            },
+            {
+              "step": 3,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 23,
+              "selected_doc_id": 5943,
+              "selected_title": "Right to Buy"
+            }
+          ]
+        },
+        {
+          "question": "who is the captain of richmond football club",
+          "selected_titles": [
+            "Richmond Football Club",
+            "Richmond Football Club",
+            "Trent Cotchin",
+            "2018 Richmond Football Club season",
+            "2018 Richmond Football Club season"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 37,
+              "selected_doc_id": 2707,
+              "selected_title": "Alex Greenwood"
+            },
+            {
+              "step": 2,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 30,
+              "selected_doc_id": 6576,
+              "selected_title": "Australia II"
+            },
+            {
+              "step": 3,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 23,
+              "selected_doc_id": 2836,
+              "selected_title": "Fremantle"
+            }
+          ]
+        },
+        {
+          "question": "how many hoops are used in a game of croquet",
+          "selected_titles": [
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": [
+            {
+              "step": 1,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 37,
+              "selected_doc_id": 1403,
+              "selected_title": "World's biggest cricket bat"
+            },
+            {
+              "step": 2,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 30,
+              "selected_doc_id": 5293,
+              "selected_title": "The record of the nine"
+            },
+            {
+              "step": 3,
+              "selection_policy": "random_deep",
+              "selected_pool_position": 23,
+              "selected_doc_id": 7884,
+              "selected_title": "American football plays"
+            }
+          ]
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 3,
+      "append_policy": "random_deep",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.35,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cuda:0",
+      "avg_appended_doc_count": 2.83,
+      "avg_candidate_set_size": 12.83,
+      "append_count_histogram": {
+        "0": 2,
+        "1": 1,
+        "2": 9,
+        "3": 88
+      },
+      "append_stop_reason_counts": {
+        "append_cap_reached": 88,
+        "duplicate_title_only": 12
+      }
+    }
+  }
+}
+[2026-04-10 14:04:55] DONE dataset=nq run=width_match_random3_deep_plus_ce_qatopk5 report=outputs_step0_general_nq/eval_reports/width_match_random3_deep_plus_ce_qatopk5_20260410nqpopqa100dual.json
+[2026-04-10 14:04:55] START dataset=nq run=width_match_bridge_append_plus_ce_qatopk5 append_policy=bridge append_max_docs=3 seed=0 ce_device=cuda:0
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Loaded 9633 records from outputs_step0_general_nq/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 9633 records already exist.
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:__main__:Reused retrieval from cache outputs_step0_general_nq/eval_reports/causal_eval_nq_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.retrieval_cache.json and skipped retrieval stage.
+INFO:__main__:Reused baseline QA from report outputs_step0_general_nq/eval_reports/causal_eval_nq_100_qwen3-8b_qatopk5_baseline_20260410nqpopqa100dual.json and skipped baseline reader pass.
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cuda:0
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 14936.45it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]QA Reading: 100%|██████████| 100/100 [00:00<00:00, 2449.21it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 3061.27it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.53, 'F1': 0.6444}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.5300 (delta=+0.0100), F1=0.6444
+{
+  "output_json": "outputs_step0_general_nq/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260410nqpopqa100dual.json",
+  "overall_recomputed": {
+    "Recall@1": 0.2575,
+    "Recall@2": 0.4197,
+    "Recall@5": 0.7105,
+    "Recall@10": 0.9529,
+    "Recall@20": 0.9872,
+    "Recall@30": 0.9887,
+    "Recall@50": 0.998,
+    "Recall@100": 1.0,
+    "Recall@150": 1.0,
+    "Recall@200": 1.0,
+    "ExactMatch": 0.52,
+    "F1": 0.6500354491769059,
+    "num_queries": 100
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 100
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 100
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 100
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 100
+    },
+    "base_retrieval_dense_fallback_count": 100,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 3,
+    "append_policy": "bridge",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.35,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cuda:0",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "method_EM": 0.53,
+    "method_F1": 0.6444,
+    "baseline_EM": 0.52,
+    "baseline_F1": 0.65,
+    "EM_delta": 0.01,
+    "F1_delta": -0.0056,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.3021,
+      "Recall@2": 0.4605,
+      "Recall@5": 0.6882,
+      "Recall@10": 0.9529,
+      "Recall@20": 0.9872,
+      "Recall@100": 1.0
+    },
+    "per_bucket": {
+      "1_doc": {
+        "count": 28,
+        "baseline_EM": 0.4286,
+        "method_EM": 0.4286,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.5456,
+        "method_F1": 0.5194,
+        "F1_delta": -0.0262
+      },
+      "2_doc": {
+        "count": 15,
+        "baseline_EM": 0.4,
+        "method_EM": 0.4667,
+        "EM_delta": 0.0667,
+        "baseline_F1": 0.6225,
+        "method_F1": 0.5978,
+        "F1_delta": -0.0248
+      },
+      "3_doc": {
+        "count": 19,
+        "baseline_EM": 0.6316,
+        "method_EM": 0.5263,
+        "EM_delta": -0.1053,
+        "baseline_F1": 0.7652,
+        "method_F1": 0.7214,
+        "F1_delta": -0.0438
+      },
+      "4_doc": {
+        "count": 8,
+        "baseline_EM": 0.625,
+        "method_EM": 0.75,
+        "EM_delta": 0.125,
+        "baseline_F1": 0.6875,
+        "method_F1": 0.8125,
+        "F1_delta": 0.125
+      },
+      "5_doc": {
+        "count": 7,
+        "baseline_EM": 0.4286,
+        "method_EM": 0.4286,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.5714,
+        "method_F1": 0.5952,
+        "F1_delta": 0.0238
+      },
+      "6_doc": {
+        "count": 9,
+        "baseline_EM": 0.5556,
+        "method_EM": 0.6667,
+        "EM_delta": 0.1111,
+        "baseline_F1": 0.719,
+        "method_F1": 0.7429,
+        "F1_delta": 0.0238
+      },
+      "7_doc": {
+        "count": 3,
+        "baseline_EM": 0.6667,
+        "method_EM": 0.6667,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.6667,
+        "method_F1": 0.6667,
+        "F1_delta": 0.0
+      },
+      "8_doc": {
+        "count": 7,
+        "baseline_EM": 0.7143,
+        "method_EM": 0.7143,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.7144,
+        "method_F1": 0.7143,
+        "F1_delta": -0.0001
+      },
+      "9_doc": {
+        "count": 2,
+        "baseline_EM": 0.0,
+        "method_EM": 0.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.4386,
+        "method_F1": 0.4333,
+        "F1_delta": -0.0053
+      },
+      "10_doc": {
+        "count": 2,
+        "baseline_EM": 1.0,
+        "method_EM": 1.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 1.0,
+        "method_F1": 1.0,
+        "F1_delta": 0.0
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "who has the oldest team in the nba",
+          "selected_titles": [
+            "Philadelphia 76ers",
+            "National Basketball Association",
+            "Boston Celtics",
+            "National Basketball Association",
+            "History of the Boston Celtics"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "an influential religion to enter china along the silk route during the han dynasty was",
+          "selected_titles": [
+            "Religion in China",
+            "Han dynasty",
+            "Religion in China",
+            "Silk Road",
+            "Silk Road"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "who pays medical bills in great britain where does the money come from to pay these bills",
+          "selected_titles": [
+            "Single-payer healthcare",
+            "Universal health care",
+            "National Health Service",
+            "United Kingdom enterprise law",
+            "National Insurance Fund"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "who is the captain of richmond football club",
+          "selected_titles": [
+            "Richmond Football Club",
+            "Richmond Football Club",
+            "Trent Cotchin",
+            "2018 Richmond Football Club season",
+            "2018 Richmond Football Club season"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "how many hoops are used in a game of croquet",
+          "selected_titles": [
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 3,
+      "append_policy": "bridge",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.35,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cuda:0",
+      "avg_appended_doc_count": 0.0,
+      "avg_candidate_set_size": 10.0,
+      "append_count_histogram": {
+        "0": 100
+      },
+      "append_stop_reason_counts": {
+        "structure_below_threshold": 100
+      }
+    }
+  }
+}
+[2026-04-10 14:05:33] DONE dataset=nq run=width_match_bridge_append_plus_ce_qatopk5 report=outputs_step0_general_nq/eval_reports/width_match_bridge_append_plus_ce_qatopk5_20260410nqpopqa100dual.json
+[2026-04-10 14:05:34] Queue finished dataset=nq

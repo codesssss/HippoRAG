@@ -1,0 +1,517 @@
+[2026-04-22 09:31:47] still running
+[2026-04-22 09:31:43] START 2wikimultihopqa/limit20 -> outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+[2026-04-22 09:36:47] still running
+[2026-04-22 09:31:43] START 2wikimultihopqa/limit20 -> outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:   5%|▌         | 1/20 [00:09<03:09,  9.98s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  10%|█         | 2/20 [00:19<02:59,  9.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  15%|█▌        | 3/20 [00:29<02:46,  9.79s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  20%|██        | 4/20 [00:39<02:34,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 5/20 [00:48<02:25,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 6/20 [00:58<02:16,  9.74s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:08<02:05,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:17<01:55,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:27<01:45,  9.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:36<01:35,  9.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:45<01:23,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [01:53<01:11,  8.97s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:03<01:05,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:14<00:58,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:23<00:48,  9.70s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:33<00:38,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:43<00:28,  9.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [02:51<00:18,  9.22s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:00<00:09,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:10<00:00,  9.41s/it]Retrieving: 100%|██████████| 20/20 [03:10<00:00,  9.52s/it]
+[2026-04-22 09:41:47] still running
+[2026-04-22 09:31:43] START 2wikimultihopqa/limit20 -> outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:   5%|▌         | 1/20 [00:09<03:09,  9.98s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  10%|█         | 2/20 [00:19<02:59,  9.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  15%|█▌        | 3/20 [00:29<02:46,  9.79s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  20%|██        | 4/20 [00:39<02:34,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 5/20 [00:48<02:25,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 6/20 [00:58<02:16,  9.74s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:08<02:05,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:17<01:55,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:27<01:45,  9.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:36<01:35,  9.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:45<01:23,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [01:53<01:11,  8.97s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:03<01:05,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:14<00:58,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:23<00:48,  9.70s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:33<00:38,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:43<00:28,  9.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [02:51<00:18,  9.22s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:00<00:09,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:10<00:00,  9.41s/it]Retrieving: 100%|██████████| 20/20 [03:10<00:00,  9.52s/it]
+  "output_json": "outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+  "setwise_selector_qa": {
+[2026-04-22 09:38:01] DONE 2wikimultihopqa/limit20
+[2026-04-22 09:38:01] START hotpotqa/limit20 -> outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:   5%|▌         | 1/20 [00:14<04:37, 14.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  10%|█         | 2/20 [00:24<03:38, 12.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  15%|█▌        | 3/20 [00:34<03:04, 10.83s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  20%|██        | 4/20 [00:44<02:52, 10.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 5/20 [00:55<02:39, 10.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 6/20 [01:05<02:27, 10.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:16<02:16, 10.53s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:23<01:55,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:31<01:40,  9.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:42<01:35,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:52<01:27,  9.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [02:01<01:16,  9.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:12<01:09,  9.95s/it]
+[2026-04-22 09:46:47] still running
+Retrieving:  50%|█████     | 10/20 [01:36<01:35,  9.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:45<01:23,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [01:53<01:11,  8.97s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:03<01:05,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:14<00:58,  9.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:23<00:48,  9.70s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:33<00:38,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:43<00:28,  9.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [02:51<00:18,  9.22s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:00<00:09,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:10<00:00,  9.41s/it]Retrieving: 100%|██████████| 20/20 [03:10<00:00,  9.52s/it]
+  "output_json": "outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+  "setwise_selector_qa": {
+[2026-04-22 09:38:01] DONE 2wikimultihopqa/limit20
+[2026-04-22 09:38:01] START hotpotqa/limit20 -> outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:   5%|▌         | 1/20 [00:14<04:37, 14.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  10%|█         | 2/20 [00:24<03:38, 12.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  15%|█▌        | 3/20 [00:34<03:04, 10.83s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  20%|██        | 4/20 [00:44<02:52, 10.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 5/20 [00:55<02:39, 10.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 6/20 [01:05<02:27, 10.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:16<02:16, 10.53s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:23<01:55,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:31<01:40,  9.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:42<01:35,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:52<01:27,  9.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [02:01<01:16,  9.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:12<01:09,  9.95s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:23<01:00, 10.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:32<00:49,  9.85s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:42<00:39,  9.82s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:53<00:30, 10.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [03:03<00:20, 10.21s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:13<00:10, 10.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:23<00:00, 10.20s/it]Retrieving: 100%|██████████| 20/20 [03:23<00:00, 10.20s/it]
+  "output_json": "outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+  "setwise_selector_qa": {
+[2026-04-22 09:46:02] DONE hotpotqa/limit20
+[2026-04-22 09:46:02] START musique/limit20 -> outputs_step0_general_nvembed_musique/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+[2026-04-22 09:51:47] still running
+Retrieving:  30%|███       | 6/20 [01:05<02:27, 10.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:16<02:16, 10.53s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:23<01:55,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:31<01:40,  9.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:42<01:35,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:52<01:27,  9.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [02:01<01:16,  9.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:12<01:09,  9.95s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:23<01:00, 10.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:32<00:49,  9.85s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:42<00:39,  9.82s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:53<00:30, 10.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [03:03<00:20, 10.21s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:13<00:10, 10.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:23<00:00, 10.20s/it]Retrieving: 100%|██████████| 20/20 [03:23<00:00, 10.20s/it]
+  "output_json": "outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+  "setwise_selector_qa": {
+[2026-04-22 09:46:02] DONE hotpotqa/limit20
+[2026-04-22 09:46:02] START musique/limit20 -> outputs_step0_general_nvembed_musique/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:   5%|▌         | 1/20 [00:11<03:43, 11.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  10%|█         | 2/20 [00:22<03:21, 11.21s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  15%|█▌        | 3/20 [00:32<03:03, 10.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  20%|██        | 4/20 [00:43<02:49, 10.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 5/20 [00:53<02:39, 10.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 6/20 [01:04<02:27, 10.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:15<02:17, 10.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:25<02:07, 10.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:36<01:56, 10.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:46<01:46, 10.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:57<01:35, 10.58s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [02:08<01:27, 10.89s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:19<01:16, 10.86s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:30<01:04, 10.76s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:40<00:53, 10.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:48<00:38,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:58<00:29,  9.90s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [03:09<00:20, 10.07s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:19<00:10, 10.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:29<00:00, 10.27s/it]Retrieving: 100%|██████████| 20/20 [03:29<00:00, 10.50s/it]
+[2026-04-22 09:56:47] still running
+Retrieving:  30%|███       | 6/20 [01:05<02:27, 10.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:16<02:16, 10.53s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:23<01:55,  9.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:31<01:40,  9.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:42<01:35,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:52<01:27,  9.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [02:01<01:16,  9.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:12<01:09,  9.95s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:23<01:00, 10.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:32<00:49,  9.85s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:42<00:39,  9.82s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:53<00:30, 10.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [03:03<00:20, 10.21s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:13<00:10, 10.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:23<00:00, 10.20s/it]Retrieving: 100%|██████████| 20/20 [03:23<00:00, 10.20s/it]
+  "output_json": "outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+  "setwise_selector_qa": {
+[2026-04-22 09:46:02] DONE hotpotqa/limit20
+[2026-04-22 09:46:02] START musique/limit20 -> outputs_step0_general_nvembed_musique/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:   5%|▌         | 1/20 [00:11<03:43, 11.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  10%|█         | 2/20 [00:22<03:21, 11.21s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  15%|█▌        | 3/20 [00:32<03:03, 10.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  20%|██        | 4/20 [00:43<02:49, 10.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 5/20 [00:53<02:39, 10.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 6/20 [01:04<02:27, 10.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 7/20 [01:15<02:17, 10.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 8/20 [01:25<02:07, 10.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 9/20 [01:36<01:56, 10.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 10/20 [01:46<01:46, 10.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 11/20 [01:57<01:35, 10.58s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 12/20 [02:08<01:27, 10.89s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 13/20 [02:19<01:16, 10.86s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 14/20 [02:30<01:04, 10.76s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 15/20 [02:40<00:53, 10.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 16/20 [02:48<00:38,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 17/20 [02:58<00:29,  9.90s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 18/20 [03:09<00:20, 10.07s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:19<00:10, 10.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:29<00:00, 10.27s/it]Retrieving: 100%|██████████| 20/20 [03:29<00:00, 10.50s/it]
+[2026-04-22 10:01:47] still running
+Retrieving:  90%|█████████ | 18/20 [03:09<00:20, 10.07s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 19/20 [03:19<00:10, 10.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 20/20 [03:29<00:00, 10.27s/it]Retrieving: 100%|██████████| 20/20 [03:29<00:00, 10.50s/it]
+  "output_json": "outputs_step0_general_nvembed_musique/eval_reports/dtc_embed_nvembed_soft_instrfix_limit20_anchor2_fresh8043.json",
+  "setwise_selector_qa": {
+[2026-04-22 09:57:54] DONE musique/limit20
+[2026-04-22 09:57:54] START 2wikimultihopqa/limit100 -> outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit100_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/100 [00:00<?, ?it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When did Lothair Ii's mother die?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:   1%|          | 1/100 [00:00<01:37,  1.01it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film was released first, Aas Ka Panchhi or Phoolwari?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:   2%|▏         | 2/100 [00:01<01:32,  1.06it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the performer of song Changed It?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   3%|▎         | 3/100 [00:02<01:30,  1.08it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are Marufabad and Nasamkhrali both located in the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   4%|▍         | 4/100 [00:03<01:29,  1.08it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   5%|▌         | 5/100 [00:04<01:27,  1.08it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film whose director was born first, El Tonto or The Heart Of Doreon?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+Retrieving:   6%|▌         | 6/100 [00:05<01:26,  1.09it/s]Retrieving:   7%|▋         | 7/100 [00:06<01:24,  1.10it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Raghnall Mac Ruaidhrí's paternal grandfather?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   8%|▊         | 8/100 [00:07<01:23,  1.10it/s]Retrieving:   9%|▉         | 9/100 [00:08<01:21,  1.11it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the director of film Blood Street?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  10%|█         | 10/100 [00:09<01:20,  1.11it/s]Retrieving:  11%|█         | 11/100 [00:10<01:20,  1.11it/s]Retrieving:  12%|█▏        | 12/100 [00:10<01:19,  1.10it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the performer of song When The Stars Go Blue?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  13%|█▎        | 13/100 [00:11<01:19,  1.10it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the performer of song Me And Bobby Mcgee?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  14%|█▍        | 14/100 [00:12<01:17,  1.10it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the place of death of Maurice, Prince Of Orange's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  15%|█▌        | 15/100 [00:13<01:16,  1.11it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which country Aleksander Koniecpolski (1620–1659)'s father is from?": Error parsing raw response as candidate selection: Unable to parse structured payload: invalid character '—' (U+2014) (<unknown>, line 4).
+Retrieving:  16%|█▌        | 16/100 [00:14<01:14,  1.13it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the date of death of the director of film Madame La Presidente?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  17%|█▋        | 17/100 [00:15<01:13,  1.13it/s]Retrieving:  18%|█▊        | 18/100 [00:16<01:11,  1.15it/s]Retrieving:  19%|█▉        | 19/100 [00:17<01:11,  1.13it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the director of film The Private Life Of Cinema born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  20%|██        | 20/100 [00:18<01:10,  1.13it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  21%|██        | 21/100 [00:28<04:47,  3.63s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  22%|██▏       | 22/100 [00:37<07:01,  5.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  23%|██▎       | 23/100 [00:47<08:35,  6.70s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  24%|██▍       | 24/100 [00:57<09:41,  7.65s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 25/100 [01:06<10:17,  8.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  26%|██▌       | 26/100 [01:16<10:46,  8.73s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  27%|██▋       | 27/100 [01:26<10:54,  8.97s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  28%|██▊       | 28/100 [01:35<10:53,  9.08s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  29%|██▉       | 29/100 [01:45<10:56,  9.24s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 30/100 [01:55<11:00,  9.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  31%|███       | 31/100 [02:04<10:56,  9.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  32%|███▏      | 32/100 [02:14<10:55,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  33%|███▎      | 33/100 [02:24<10:50,  9.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  34%|███▍      | 34/100 [02:34<10:42,  9.73s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 35/100 [02:44<10:42,  9.88s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  36%|███▌      | 36/100 [02:53<10:14,  9.59s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  37%|███▋      | 37/100 [03:03<10:09,  9.67s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  38%|███▊      | 38/100 [03:13<10:07,  9.80s/it]
+[2026-04-22 10:06:47] still running
+Retrieving:  31%|███       | 31/100 [02:04<10:56,  9.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  32%|███▏      | 32/100 [02:14<10:55,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  33%|███▎      | 33/100 [02:24<10:50,  9.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  34%|███▍      | 34/100 [02:34<10:42,  9.73s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 35/100 [02:44<10:42,  9.88s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  36%|███▌      | 36/100 [02:53<10:14,  9.59s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  37%|███▋      | 37/100 [03:03<10:09,  9.67s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  38%|███▊      | 38/100 [03:13<10:07,  9.80s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  39%|███▉      | 39/100 [03:21<09:28,  9.32s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  40%|████      | 40/100 [03:31<09:27,  9.46s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  41%|████      | 41/100 [03:49<11:42, 11.90s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  42%|████▏     | 42/100 [03:58<10:48, 11.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  43%|████▎     | 43/100 [04:08<10:08, 10.68s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  44%|████▍     | 44/100 [04:17<09:44, 10.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  45%|████▌     | 45/100 [04:26<08:57,  9.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  46%|████▌     | 46/100 [04:36<08:49,  9.80s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  47%|████▋     | 47/100 [04:45<08:34,  9.70s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  48%|████▊     | 48/100 [04:55<08:22,  9.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  49%|████▉     | 49/100 [05:04<08:06,  9.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  50%|█████     | 50/100 [05:13<07:54,  9.48s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  51%|█████     | 51/100 [05:23<07:42,  9.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  52%|█████▏    | 52/100 [05:32<07:35,  9.49s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  53%|█████▎    | 53/100 [05:42<07:26,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  54%|█████▍    | 54/100 [05:51<07:18,  9.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  55%|█████▌    | 55/100 [06:01<07:11,  9.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  56%|█████▌    | 56/100 [06:08<06:23,  8.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  57%|█████▋    | 57/100 [06:15<06:01,  8.41s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  58%|█████▊    | 58/100 [06:25<06:06,  8.73s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  59%|█████▉    | 59/100 [06:34<06:08,  8.99s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  60%|██████    | 60/100 [06:44<06:05,  9.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  61%|██████    | 61/100 [06:53<06:01,  9.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  62%|██████▏   | 62/100 [07:03<05:56,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  63%|██████▎   | 63/100 [07:06<04:37,  7.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  64%|██████▍   | 64/100 [07:16<04:51,  8.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 65/100 [07:25<04:59,  8.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  66%|██████▌   | 66/100 [07:31<04:16,  7.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  67%|██████▋   | 67/100 [07:41<04:33,  8.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  68%|██████▊   | 68/100 [07:50<04:38,  8.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  69%|██████▉   | 69/100 [08:00<04:40,  9.06s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 70/100 [08:10<04:38,  9.29s/it]
+[2026-04-22 10:11:47] still running
+Retrieving:  61%|██████    | 61/100 [06:53<06:01,  9.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  62%|██████▏   | 62/100 [07:03<05:56,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  63%|██████▎   | 63/100 [07:06<04:37,  7.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  64%|██████▍   | 64/100 [07:16<04:51,  8.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 65/100 [07:25<04:59,  8.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  66%|██████▌   | 66/100 [07:31<04:16,  7.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  67%|██████▋   | 67/100 [07:41<04:33,  8.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  68%|██████▊   | 68/100 [07:50<04:38,  8.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  69%|██████▉   | 69/100 [08:00<04:40,  9.06s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 70/100 [08:10<04:38,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  71%|███████   | 71/100 [08:20<04:33,  9.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  72%|███████▏  | 72/100 [08:28<04:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  73%|███████▎  | 73/100 [08:37<04:09,  9.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  74%|███████▍  | 74/100 [08:47<04:01,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 75/100 [08:57<03:55,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  76%|███████▌  | 76/100 [09:06<03:44,  9.37s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  77%|███████▋  | 77/100 [09:16<03:38,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  78%|███████▊  | 78/100 [09:25<03:30,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  79%|███████▉  | 79/100 [09:35<03:21,  9.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 80/100 [09:43<03:03,  9.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  81%|████████  | 81/100 [09:53<02:58,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  82%|████████▏ | 82/100 [10:02<02:44,  9.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  83%|████████▎ | 83/100 [10:11<02:37,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  84%|████████▍ | 84/100 [10:21<02:28,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 85/100 [10:30<02:19,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  86%|████████▌ | 86/100 [10:40<02:14,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  87%|████████▋ | 87/100 [10:44<01:41,  7.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  88%|████████▊ | 88/100 [10:53<01:40,  8.35s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  89%|████████▉ | 89/100 [11:00<01:24,  7.72s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 90/100 [11:09<01:23,  8.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  91%|█████████ | 91/100 [11:19<01:17,  8.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  92%|█████████▏| 92/100 [11:29<01:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  93%|█████████▎| 93/100 [11:38<01:03,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  94%|█████████▍| 94/100 [11:46<00:52,  8.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 95/100 [11:55<00:44,  9.00s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  96%|█████████▌| 96/100 [12:05<00:36,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  97%|█████████▋| 97/100 [12:14<00:27,  9.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  98%|█████████▊| 98/100 [12:24<00:18,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  99%|█████████▉| 99/100 [12:34<00:09,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 100/100 [12:43<00:00,  9.56s/it]Retrieving: 100%|██████████| 100/100 [12:43<00:00,  7.64s/it]
+[2026-04-22 10:16:47] still running
+Retrieving:  61%|██████    | 61/100 [06:53<06:01,  9.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  62%|██████▏   | 62/100 [07:03<05:56,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  63%|██████▎   | 63/100 [07:06<04:37,  7.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  64%|██████▍   | 64/100 [07:16<04:51,  8.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 65/100 [07:25<04:59,  8.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  66%|██████▌   | 66/100 [07:31<04:16,  7.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  67%|██████▋   | 67/100 [07:41<04:33,  8.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  68%|██████▊   | 68/100 [07:50<04:38,  8.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  69%|██████▉   | 69/100 [08:00<04:40,  9.06s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 70/100 [08:10<04:38,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  71%|███████   | 71/100 [08:20<04:33,  9.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  72%|███████▏  | 72/100 [08:28<04:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  73%|███████▎  | 73/100 [08:37<04:09,  9.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  74%|███████▍  | 74/100 [08:47<04:01,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 75/100 [08:57<03:55,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  76%|███████▌  | 76/100 [09:06<03:44,  9.37s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  77%|███████▋  | 77/100 [09:16<03:38,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  78%|███████▊  | 78/100 [09:25<03:30,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  79%|███████▉  | 79/100 [09:35<03:21,  9.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 80/100 [09:43<03:03,  9.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  81%|████████  | 81/100 [09:53<02:58,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  82%|████████▏ | 82/100 [10:02<02:44,  9.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  83%|████████▎ | 83/100 [10:11<02:37,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  84%|████████▍ | 84/100 [10:21<02:28,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 85/100 [10:30<02:19,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  86%|████████▌ | 86/100 [10:40<02:14,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  87%|████████▋ | 87/100 [10:44<01:41,  7.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  88%|████████▊ | 88/100 [10:53<01:40,  8.35s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  89%|████████▉ | 89/100 [11:00<01:24,  7.72s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 90/100 [11:09<01:23,  8.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  91%|█████████ | 91/100 [11:19<01:17,  8.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  92%|█████████▏| 92/100 [11:29<01:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  93%|█████████▎| 93/100 [11:38<01:03,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  94%|█████████▍| 94/100 [11:46<00:52,  8.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 95/100 [11:55<00:44,  9.00s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  96%|█████████▌| 96/100 [12:05<00:36,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  97%|█████████▋| 97/100 [12:14<00:27,  9.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  98%|█████████▊| 98/100 [12:24<00:18,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  99%|█████████▉| 99/100 [12:34<00:09,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 100/100 [12:43<00:00,  9.56s/it]Retrieving: 100%|██████████| 100/100 [12:43<00:00,  7.64s/it]
+[2026-04-22 10:21:47] still running
+Retrieving:  61%|██████    | 61/100 [06:53<06:01,  9.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  62%|██████▏   | 62/100 [07:03<05:56,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  63%|██████▎   | 63/100 [07:06<04:37,  7.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  64%|██████▍   | 64/100 [07:16<04:51,  8.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 65/100 [07:25<04:59,  8.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  66%|██████▌   | 66/100 [07:31<04:16,  7.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  67%|██████▋   | 67/100 [07:41<04:33,  8.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  68%|██████▊   | 68/100 [07:50<04:38,  8.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  69%|██████▉   | 69/100 [08:00<04:40,  9.06s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 70/100 [08:10<04:38,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  71%|███████   | 71/100 [08:20<04:33,  9.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  72%|███████▏  | 72/100 [08:28<04:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  73%|███████▎  | 73/100 [08:37<04:09,  9.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  74%|███████▍  | 74/100 [08:47<04:01,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 75/100 [08:57<03:55,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  76%|███████▌  | 76/100 [09:06<03:44,  9.37s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  77%|███████▋  | 77/100 [09:16<03:38,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  78%|███████▊  | 78/100 [09:25<03:30,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  79%|███████▉  | 79/100 [09:35<03:21,  9.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 80/100 [09:43<03:03,  9.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  81%|████████  | 81/100 [09:53<02:58,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  82%|████████▏ | 82/100 [10:02<02:44,  9.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  83%|████████▎ | 83/100 [10:11<02:37,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  84%|████████▍ | 84/100 [10:21<02:28,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 85/100 [10:30<02:19,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  86%|████████▌ | 86/100 [10:40<02:14,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  87%|████████▋ | 87/100 [10:44<01:41,  7.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  88%|████████▊ | 88/100 [10:53<01:40,  8.35s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  89%|████████▉ | 89/100 [11:00<01:24,  7.72s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 90/100 [11:09<01:23,  8.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  91%|█████████ | 91/100 [11:19<01:17,  8.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  92%|█████████▏| 92/100 [11:29<01:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  93%|█████████▎| 93/100 [11:38<01:03,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  94%|█████████▍| 94/100 [11:46<00:52,  8.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 95/100 [11:55<00:44,  9.00s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  96%|█████████▌| 96/100 [12:05<00:36,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  97%|█████████▋| 97/100 [12:14<00:27,  9.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  98%|█████████▊| 98/100 [12:24<00:18,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  99%|█████████▉| 99/100 [12:34<00:09,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 100/100 [12:43<00:00,  9.56s/it]Retrieving: 100%|██████████| 100/100 [12:43<00:00,  7.64s/it]
+[2026-04-22 10:26:47] still running
+Retrieving:  61%|██████    | 61/100 [06:53<06:01,  9.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  62%|██████▏   | 62/100 [07:03<05:56,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  63%|██████▎   | 63/100 [07:06<04:37,  7.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  64%|██████▍   | 64/100 [07:16<04:51,  8.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 65/100 [07:25<04:59,  8.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  66%|██████▌   | 66/100 [07:31<04:16,  7.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  67%|██████▋   | 67/100 [07:41<04:33,  8.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  68%|██████▊   | 68/100 [07:50<04:38,  8.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  69%|██████▉   | 69/100 [08:00<04:40,  9.06s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 70/100 [08:10<04:38,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  71%|███████   | 71/100 [08:20<04:33,  9.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  72%|███████▏  | 72/100 [08:28<04:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  73%|███████▎  | 73/100 [08:37<04:09,  9.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  74%|███████▍  | 74/100 [08:47<04:01,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 75/100 [08:57<03:55,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  76%|███████▌  | 76/100 [09:06<03:44,  9.37s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  77%|███████▋  | 77/100 [09:16<03:38,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  78%|███████▊  | 78/100 [09:25<03:30,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  79%|███████▉  | 79/100 [09:35<03:21,  9.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 80/100 [09:43<03:03,  9.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  81%|████████  | 81/100 [09:53<02:58,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  82%|████████▏ | 82/100 [10:02<02:44,  9.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  83%|████████▎ | 83/100 [10:11<02:37,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  84%|████████▍ | 84/100 [10:21<02:28,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 85/100 [10:30<02:19,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  86%|████████▌ | 86/100 [10:40<02:14,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  87%|████████▋ | 87/100 [10:44<01:41,  7.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  88%|████████▊ | 88/100 [10:53<01:40,  8.35s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  89%|████████▉ | 89/100 [11:00<01:24,  7.72s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 90/100 [11:09<01:23,  8.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  91%|█████████ | 91/100 [11:19<01:17,  8.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  92%|█████████▏| 92/100 [11:29<01:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  93%|█████████▎| 93/100 [11:38<01:03,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  94%|█████████▍| 94/100 [11:46<00:52,  8.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 95/100 [11:55<00:44,  9.00s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  96%|█████████▌| 96/100 [12:05<00:36,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  97%|█████████▋| 97/100 [12:14<00:27,  9.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  98%|█████████▊| 98/100 [12:24<00:18,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  99%|█████████▉| 99/100 [12:34<00:09,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 100/100 [12:43<00:00,  9.56s/it]Retrieving: 100%|██████████| 100/100 [12:43<00:00,  7.64s/it]
+[2026-04-22 10:31:47] still running
+Retrieving:  61%|██████    | 61/100 [06:53<06:01,  9.27s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  62%|██████▏   | 62/100 [07:03<05:56,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  63%|██████▎   | 63/100 [07:06<04:37,  7.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  64%|██████▍   | 64/100 [07:16<04:51,  8.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  65%|██████▌   | 65/100 [07:25<04:59,  8.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  66%|██████▌   | 66/100 [07:31<04:16,  7.54s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  67%|██████▋   | 67/100 [07:41<04:33,  8.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  68%|██████▊   | 68/100 [07:50<04:38,  8.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  69%|██████▉   | 69/100 [08:00<04:40,  9.06s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  70%|███████   | 70/100 [08:10<04:38,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  71%|███████   | 71/100 [08:20<04:33,  9.44s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  72%|███████▏  | 72/100 [08:28<04:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  73%|███████▎  | 73/100 [08:37<04:09,  9.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  74%|███████▍  | 74/100 [08:47<04:01,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  75%|███████▌  | 75/100 [08:57<03:55,  9.40s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  76%|███████▌  | 76/100 [09:06<03:44,  9.37s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  77%|███████▋  | 77/100 [09:16<03:38,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  78%|███████▊  | 78/100 [09:25<03:30,  9.55s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  79%|███████▉  | 79/100 [09:35<03:21,  9.60s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  80%|████████  | 80/100 [09:43<03:03,  9.17s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  81%|████████  | 81/100 [09:53<02:58,  9.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  82%|████████▏ | 82/100 [10:02<02:44,  9.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  83%|████████▎ | 83/100 [10:11<02:37,  9.26s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  84%|████████▍ | 84/100 [10:21<02:28,  9.28s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  85%|████████▌ | 85/100 [10:30<02:19,  9.29s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  86%|████████▌ | 86/100 [10:40<02:14,  9.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  87%|████████▋ | 87/100 [10:44<01:41,  7.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  88%|████████▊ | 88/100 [10:53<01:40,  8.35s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  89%|████████▉ | 89/100 [11:00<01:24,  7.72s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 90/100 [11:09<01:23,  8.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  91%|█████████ | 91/100 [11:19<01:17,  8.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  92%|█████████▏| 92/100 [11:29<01:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  93%|█████████▎| 93/100 [11:38<01:03,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  94%|█████████▍| 94/100 [11:46<00:52,  8.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 95/100 [11:55<00:44,  9.00s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  96%|█████████▌| 96/100 [12:05<00:36,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  97%|█████████▋| 97/100 [12:14<00:27,  9.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  98%|█████████▊| 98/100 [12:24<00:18,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  99%|█████████▉| 99/100 [12:34<00:09,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 100/100 [12:43<00:00,  9.56s/it]Retrieving: 100%|██████████| 100/100 [12:43<00:00,  7.64s/it]
+[2026-04-22 10:36:47] still running
+Retrieving:  87%|████████▋ | 87/100 [10:44<01:41,  7.78s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  88%|████████▊ | 88/100 [10:53<01:40,  8.35s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  89%|████████▉ | 89/100 [11:00<01:24,  7.72s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  90%|█████████ | 90/100 [11:09<01:23,  8.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  91%|█████████ | 91/100 [11:19<01:17,  8.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  92%|█████████▏| 92/100 [11:29<01:11,  8.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  93%|█████████▎| 93/100 [11:38<01:03,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  94%|█████████▍| 94/100 [11:46<00:52,  8.75s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  95%|█████████▌| 95/100 [11:55<00:44,  9.00s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  96%|█████████▌| 96/100 [12:05<00:36,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  97%|█████████▋| 97/100 [12:14<00:27,  9.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  98%|█████████▊| 98/100 [12:24<00:18,  9.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  99%|█████████▉| 99/100 [12:34<00:09,  9.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving: 100%|██████████| 100/100 [12:43<00:00,  9.56s/it]Retrieving: 100%|██████████| 100/100 [12:43<00:00,  7.64s/it]
+  "output_json": "outputs_step0_general_nvembed_2wikimultihopqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit100_anchor2_fresh8043.json",
+  "setwise_selector_qa": {
+[2026-04-22 10:32:59] DONE 2wikimultihopqa/limit100
+[2026-04-22 10:32:59] START hotpotqa/limit100 -> outputs_step0_general_nvembed_hotpotqa/eval_reports/dtc_embed_nvembed_soft_instrfix_limit100_anchor2_fresh8043.json
+Retrieving:   0%|          | 0/100 [00:00<?, ?it/s]Retrieving:   1%|          | 1/100 [00:01<02:42,  1.65s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The fictional private detective that appears in "The Adventure of the Seven Clocks" what written by whom?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   2%|▏         | 2/100 [00:03<02:41,  1.65s/it]Retrieving:   3%|▎         | 3/100 [00:04<02:40,  1.66s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Sparking the Marian civil war, who helped the recently abdicated queen to escape her imprisonment?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   4%|▍         | 4/100 [00:06<02:38,  1.65s/it]Retrieving:   5%|▌         | 5/100 [00:08<02:36,  1.65s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What screenplay was worked on by both Edward Carfagno and Miklos Rozsa?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 16) (<unknown>, line 16).
+Retrieving:   6%|▌         | 6/100 [00:09<02:28,  1.58s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which Walt Disney film was produced first, The Apple Dumpling Gang or Something Wicked This Way Comes?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   7%|▋         | 7/100 [00:11<02:21,  1.53s/it]Retrieving:   8%|▊         | 8/100 [00:12<02:17,  1.49s/it]Retrieving:   9%|▉         | 9/100 [00:13<02:14,  1.47s/it]Retrieving:  10%|█         | 10/100 [00:15<02:12,  1.47s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Bytham Castle is a castle in the civil parish of how many houses?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  11%|█         | 11/100 [00:16<02:10,  1.46s/it]Retrieving:  12%|█▏        | 12/100 [00:18<02:07,  1.45s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How do the Peter Laufer books Forbidden Creatures and No Animals Were Harmed differ in their focus on animals?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  13%|█▎        | 13/100 [00:19<02:05,  1.44s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is a winner of the 2013 6 Hours of Silverstone a co-commentator for?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  14%|█▍        | 14/100 [00:21<02:03,  1.43s/it]Retrieving:  15%|█▌        | 15/100 [00:22<02:01,  1.42s/it]Retrieving:  16%|█▌        | 16/100 [00:23<01:59,  1.42s/it]Retrieving:  17%|█▋        | 17/100 [00:25<02:02,  1.48s/it]Retrieving:  18%|█▊        | 18/100 [00:27<02:04,  1.52s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'One Raffles Place is one of the tallest skyscrapers in the city of Singapore and tallest in the wolrd outside North America until it was succeeded by a Building': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  19%|█▉        | 19/100 [00:28<02:04,  1.53s/it]Retrieving:  20%|██        | 20/100 [00:30<02:00,  1.51s/it]Retrieving:  21%|██        | 21/100 [00:31<01:58,  1.49s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  22%|██▏       | 22/100 [00:42<05:26,  4.19s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  23%|██▎       | 23/100 [00:52<07:42,  6.01s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  24%|██▍       | 24/100 [00:59<07:53,  6.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  25%|██▌       | 25/100 [01:09<09:15,  7.41s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  26%|██▌       | 26/100 [01:18<09:38,  7.82s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  27%|██▋       | 27/100 [01:28<10:26,  8.58s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  28%|██▊       | 28/100 [01:38<10:56,  9.12s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  29%|██▉       | 29/100 [01:47<10:34,  8.94s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  30%|███       | 30/100 [01:55<10:04,  8.63s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  31%|███       | 31/100 [02:03<09:39,  8.39s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  32%|███▏      | 32/100 [02:13<10:11,  8.99s/it]Retrieving:  33%|███▎      | 33/100 [02:15<07:37,  6.82s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  34%|███▍      | 34/100 [02:21<07:29,  6.80s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  35%|███▌      | 35/100 [02:31<08:23,  7.74s/it]

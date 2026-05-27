@@ -1,0 +1,44 @@
+{
+  "status": "completed",
+  "dataset": "musique",
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "generated_obligations_jsonl": "data/dpathrag/arec/generated_obligations_musique_limit100_20260428.jsonl",
+  "oracle_obligations_jsonl": "data/dpathrag/arec/silver_oracle_obligations_musique_limit100_20260428.jsonl",
+  "verifier_model": "cross-encoder/nli-deberta-v3-base",
+  "verifier_backend": "nli",
+  "top_k": 5,
+  "summary": {
+    "closure_score_initial": 0.8342,
+    "oracle_closure_score_initial": 2.1344,
+    "initial_support_complete": 0.29,
+    "initial_support_recall": 0.6458,
+    "active_obligation_count": 2.76,
+    "rows": 100
+  },
+  "by_hop": {
+    "2": {
+      "closure_score_initial": 0.8072,
+      "oracle_closure_score_initial": 2.2019,
+      "initial_support_complete": 0.4583,
+      "initial_support_recall": 0.7292,
+      "active_obligation_count": 2.3542,
+      "rows": 48
+    },
+    "3": {
+      "closure_score_initial": 0.9589,
+      "oracle_closure_score_initial": 2.481,
+      "initial_support_complete": 0.2,
+      "initial_support_recall": 0.6444,
+      "active_obligation_count": 3.0,
+      "rows": 30
+    },
+    "4": {
+      "closure_score_initial": 0.7231,
+      "oracle_closure_score_initial": 1.5145,
+      "initial_support_complete": 0.0455,
+      "initial_support_recall": 0.4659,
+      "active_obligation_count": 3.3182,
+      "rows": 22
+    }
+  }
+}

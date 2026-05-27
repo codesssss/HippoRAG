@@ -1,0 +1,464 @@
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 56422 nodes, 1457156 edges
+INFO:src.hipporag.embedding_store:Loaded 6119 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 50303 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 67159 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 6119 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_2wikimultihopqa/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 50303 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 67159 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]2284it [00:00, 22827.78it/s]4567it [00:00, 20742.19it/s]6119it [00:00, 20278.64it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]6119it [00:00, 2954748.58it/s]
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval.
+INFO:src.hipporag.HippoRAG:Loading keys.
+INFO:src.hipporag.HippoRAG:Loading embeddings.
+INFO:src.hipporag.HippoRAG:Encoding 10 queries for query_to_fact.
+INFO:src.hipporag.HippoRAG:Encoding 10 queries for query_to_passage.
+Retrieving:   0%|          | 0/10 [00:00<?, ?it/s]Retrieving:  10%|█         | 1/10 [00:00<00:07,  1.24it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film was released first, Aas Ka Panchhi or Phoolwari?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  20%|██        | 2/10 [00:01<00:06,  1.26it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the performer of song Changed It?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  30%|███       | 3/10 [00:02<00:05,  1.25it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are Marufabad and Nasamkhrali both located in the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  40%|████      | 4/10 [00:03<00:05,  1.18it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  50%|█████     | 5/10 [00:04<00:04,  1.17it/s]Retrieving:  60%|██████    | 6/10 [00:05<00:03,  1.17it/s]Retrieving:  70%|███████   | 7/10 [00:05<00:02,  1.16it/s]Retrieving:  80%|████████  | 8/10 [00:06<00:01,  1.16it/s]Retrieving:  90%|█████████ | 9/10 [00:07<00:00,  1.16it/s]Retrieving: 100%|██████████| 10/10 [00:08<00:00,  1.17it/s]Retrieving: 100%|██████████| 10/10 [00:08<00:00,  1.18it/s]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 13.48s
+INFO:src.hipporag.HippoRAG:Total Recognition Memory Time 6.12s
+INFO:src.hipporag.HippoRAG:Total PPR Time 1.47s
+INFO:src.hipporag.HippoRAG:Total Misc Time 5.89s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.425, 'Recall@2': 0.7, 'Recall@5': 0.85, 'Recall@10': 0.85, 'Recall@20': 0.85, 'Recall@30': 0.85, 'Recall@50': 0.85, 'Recall@100': 0.85, 'Recall@150': 0.85, 'Recall@200': 0.875}
+Collecting QA prompts:   0%|          | 0/10 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 10/10 [00:00<00:00, 26132.74it/s]
+QA Reading:   0%|          | 0/10 [00:00<?, ?it/s]QA Reading: 100%|██████████| 10/10 [00:00<00:00, 3258.22it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 10it [00:00, 1543.78it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.6, 'F1': 0.7045}
+INFO:httpx:HTTP Request: POST https://api-vip.codex-for.me/v1/responses "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api-vip.codex-for.me/v1/responses "HTTP/1.1 200 OK"
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film was released first, Aas Ka Panchhi or Phoolwari?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the performer of song Changed It?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are Marufabad and Nasamkhrali both located in the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:httpx:HTTP Request: POST https://api-vip.codex-for.me/v1/responses "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api-vip.codex-for.me/v1/responses "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api-vip.codex-for.me/v1/responses "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST https://api-vip.codex-for.me/v1/responses "HTTP/1.1 200 OK"
+INFO:__main__:Applied bridge_beam selector over pool@100 for 10 queries (avg mapped pool docs=100.00, avg seed entities=5.40)
+Collecting QA prompts:   0%|          | 0/10 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 10/10 [00:00<00:00, 14334.60it/s]
+QA Reading:   0%|          | 0/10 [00:00<?, ?it/s]QA Reading: 100%|██████████| 10/10 [00:00<00:00, 2074.03it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 10it [00:00, 559.42it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.6, 'F1': 0.6545}
+INFO:__main__:Setwise selector bridge_beam[set_closure]@100: EM=0.6000 (delta=+0.0000), F1=0.6545
+{
+  "output_json": "outputs_step0_general_2wikimultihopqa/eval_reports/setwise_bridge_beam_set_closure_gpt54judge_rawfix_smoke10.json",
+  "overall_recomputed": {
+    "Recall@1": 0.425,
+    "Recall@2": 0.7,
+    "Recall@5": 0.85,
+    "Recall@10": 0.85,
+    "Recall@20": 0.85,
+    "Recall@30": 0.85,
+    "Recall@50": 0.85,
+    "Recall@100": 0.85,
+    "Recall@150": 0.85,
+    "Recall@200": 0.875,
+    "ExactMatch": 0.6,
+    "F1": 0.7045454545454545,
+    "num_queries": 10
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "setwise_selector_qa": {
+    "selector": "bridge_beam",
+    "score_mode": "set_closure",
+    "pool_k": 100,
+    "anchor_count": 2,
+    "reserve_top_m": 3,
+    "max_bridge_slots": 0,
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "gate_mode": "none",
+    "gate_min_structure_score": 0.15,
+    "gate_min_combined_margin": 0.0,
+    "beam_width": 4,
+    "beam_expand_per_state": 4,
+    "late_rerank_enabled": true,
+    "late_rerank_candidate_count": 4,
+    "late_rerank_include_baseline": true,
+    "late_rerank_doc_char_limit": 280,
+    "late_rerank_judge_backend": "responses",
+    "late_rerank_judge_model": "gpt-5.4",
+    "late_rerank_judge_base_url": "https://api-vip.codex-for.me/v1",
+    "late_rerank_judge_reasoning_effort": "low",
+    "state_score_weights": {
+      "path_connectivity": 0.3,
+      "reachable_doc_ratio": 0.2,
+      "query_reachability": 0.15,
+      "support_mean": 0.05,
+      "support_min": 0.05,
+      "closure_mean": 0.1,
+      "suffix_base_mean": 0.05,
+      "query_coverage": 0.1,
+      "frontier_ratio": 0.05,
+      "redundancy_penalty": 0.1
+    },
+    "setwise_model_path": null,
+    "selector_EM": 0.6,
+    "selector_F1": 0.6545,
+    "baseline_EM": 0.6,
+    "baseline_F1": 0.7045,
+    "EM_delta": 0.0,
+    "F1_delta": -0.05,
+    "selector_retrieval_metrics": {
+      "Recall@1": 0.425,
+      "Recall@2": 0.7,
+      "Recall@5": 0.825,
+      "Recall@10": 0.85,
+      "Recall@20": 0.85
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 7,
+        "baseline_EM": 0.5714,
+        "selector_EM": 0.7143,
+        "EM_delta": 0.1429,
+        "baseline_F1": 0.7208,
+        "selector_F1": 0.7922,
+        "F1_delta": 0.0714
+      },
+      "4_doc": {
+        "count": 3,
+        "baseline_EM": 0.6667,
+        "selector_EM": 0.3333,
+        "EM_delta": -0.3333,
+        "baseline_F1": 0.6667,
+        "selector_F1": 0.3333,
+        "F1_delta": -0.3333
+      }
+    },
+    "selector_summary": {
+      "selector": "bridge_beam",
+      "score_mode": "set_closure",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 5.4,
+      "avg_selected_structured_doc_count": 5.0,
+      "reserve_top_m": 3,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "late_rerank_enabled": true,
+      "late_rerank_apply_count": 3,
+      "late_rerank_override_count": 0,
+      "late_rerank_parse_failure_count": 3,
+      "late_rerank_error_count": 0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "examples_preview": [
+        {
+          "question": "When did Lothair Ii's mother die?",
+          "selected_titles": [
+            "Lothair II",
+            "Waldrada of Lotharingia",
+            "Teutberga",
+            "Lambert, Margrave of Tuscany",
+            "Ermengarde of Tours"
+          ],
+          "seed_entities_preview": [
+            "bertha",
+            "emperor lothair i",
+            "ermengarde of tours",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "waldrada of lotharingia"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 4,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 8,
+              "base_score": 0.569,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.569
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 0,
+              "base_score": 0.5283,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.5283
+            },
+            {
+              "step": 4,
+              "mode": "beam",
+              "pool_position": 5,
+              "doc_id": 2,
+              "base_score": 0.3358,
+              "structure_score": 0.0,
+              "novelty_score": 0.9286,
+              "closure_score": 0.0,
+              "selection_score": 0.0,
+              "combined_score": 0.2232,
+              "state_score": 0.7571101523401467
+            }
+          ]
+        },
+        {
+          "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+          "selected_titles": [
+            "Aas Ka Panchhi",
+            "Aansoo Ban Gaye Phool",
+            "Phoolwari",
+            "Abhishek Saxena",
+            "Phalitamsha"
+          ],
+          "seed_entities_preview": [
+            "1961 hindi movie",
+            "aas ka panchhi",
+            "j om prakash",
+            "mohan kumar",
+            "rajinder singh bedi"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 17,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 2177,
+              "base_score": 0.0946,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.0946
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 19,
+              "base_score": 0.0667,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.0667
+            }
+          ]
+        },
+        {
+          "question": "What is the place of birth of the performer of song Changed It?",
+          "selected_titles": [
+            "Changed It",
+            "Nicki Minaj",
+            "Did It On'em",
+            "You Changed Me",
+            "2 Chainz"
+          ],
+          "seed_entities_preview": [
+            "cash money records",
+            "changed it",
+            "lil wayne",
+            "nicki minaj",
+            "young money entertainment"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 22,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 24,
+              "base_score": 0.1405,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.1405
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 5425,
+              "base_score": 0.0797,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.0797
+            }
+          ]
+        },
+        {
+          "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+          "selected_titles": [
+            "Nasamkhrali",
+            "Marufabad",
+            "Qaleh-ye Zaras",
+            "Qaleh-ye Sahar",
+            "Qaleh-ye Nashin Shahi"
+          ],
+          "seed_entities_preview": [
+            "iran",
+            "kabutarsorkh rural district",
+            "marufabad",
+            "nasamkhrali",
+            "nasomkhari",
+            "qaleh ye zaras",
+            "telavi district"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 39,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 31,
+              "base_score": 0.7093,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.7093
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 2321,
+              "base_score": 0.2484,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.2484
+            }
+          ]
+        },
+        {
+          "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+          "selected_titles": [
+            "God's Gift to Women",
+            "Aldri annet enn bråk",
+            "Altid ballade",
+            "Victor Sjöström",
+            "Brink of Life"
+          ],
+          "seed_entities_preview": [
+            "aldri annet enn br k",
+            "film",
+            "gabriel axel",
+            "god s gift to women",
+            "laura laplante",
+            "michael curtiz"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 46,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 41,
+              "base_score": 0.8552,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.8552
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 40,
+              "base_score": 0.5044,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.5044
+            },
+            {
+              "step": 4,
+              "mode": "beam",
+              "pool_position": 35,
+              "doc_id": 1646,
+              "base_score": 0.0398,
+              "structure_score": 0.0,
+              "novelty_score": 1.0,
+              "closure_score": 0.16,
+              "selection_score": 0.064,
+              "combined_score": 0.1983,
+              "state_score": 0.6617115838857768
+            },
+            {
+              "step": 5,
+              "mode": "beam",
+              "pool_position": 4,
+              "doc_id": 4046,
+              "base_score": 0.1506,
+              "structure_score": 1.0,
+              "novelty_score": 0.9167,
+              "closure_score": 0.5957,
+              "selection_score": 0.8383,
+              "combined_score": 0.6781,
+              "state_score": 0.7652836363779916
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

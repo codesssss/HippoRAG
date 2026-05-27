@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "dataset": "musique",
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "limit": 100,
+  "generated_rows": 100,
+  "cot_rows": 100,
+  "silver_oracle_rows": 100,
+  "llm_base_url": "http://localhost:8041/v1",
+  "llm_model": "qwen3-8b-train",
+  "ircot_prompt_path": "local_ircot_style_frozen_prompt",
+  "errors": [],
+  "outputs": {
+    "generated_obligations_jsonl": "data/dpathrag/arec/generated_obligations_musique_limit100_20260428.jsonl",
+    "cot_queries_jsonl": "data/dpathrag/arec/cot_queries_musique_limit100_20260428.jsonl",
+    "silver_oracle_jsonl": "data/dpathrag/arec/silver_oracle_obligations_musique_limit100_20260428.jsonl"
+  }
+}

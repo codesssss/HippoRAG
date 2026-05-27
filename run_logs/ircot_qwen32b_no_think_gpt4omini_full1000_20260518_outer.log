@@ -1,0 +1,32 @@
+[2026-05-18T21:04:44+08:00] START run_tag=ircot_qwen32b_no_think_gpt4omini_full1000_20260518 datasets=2wikimultihopqa hotpotqa musique
+[2026-05-18T21:04:44+08:00] BEGIN ircot_qwen32b_no_think_gpt4omini_full1000_20260518
+[2026-05-18T21:04:44+08:00] Protocol: IRCoT follow-up retrieval with qwen3-32b-judge /no_think, reader=gpt-4o-mini, top=5
+[2026-05-18T21:04:44+08:00] OK endpoint qwen32_a: http://localhost:8045/v1
+[2026-05-18T21:04:44+08:00] OK endpoint qwen32_b: http://localhost:8046/v1
+[2026-05-18T21:04:44+08:00] WARN embedding endpoint did not answer /models: http://localhost:8019/v1/embeddings
+[2026-05-18T21:04:44+08:00] START lane=lane_a qwen=http://localhost:8045/v1 output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/2wikimultihopqa_ircot_qwen32b_no_think_reader_input_limit1000.json
+[2026-05-18T21:04:44+08:00] START lane=lane_b qwen=http://localhost:8046/v1 output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/hotpotqa_ircot_qwen32b_no_think_reader_input_limit1000.json
+[2026-05-18T21:04:44+08:00] START IRCoT retrieval dataset=2wikimultihopqa lane=lane_a qwen=http://localhost:8045/v1
+[2026-05-18T21:04:44+08:00] START IRCoT retrieval dataset=hotpotqa lane=lane_b qwen=http://localhost:8046/v1
+[2026-05-18T22:41:26+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/2wikimultihopqa_ircot_qwen32b_no_think_reader_input_limit1000.json
+[2026-05-18T22:41:26+08:00] DONE IRCoT retrieval dataset=2wikimultihopqa
+[2026-05-18T23:00:14+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/hotpotqa_ircot_qwen32b_no_think_reader_input_limit1000.json
+[2026-05-18T23:00:14+08:00] DONE IRCoT retrieval dataset=hotpotqa
+[2026-05-18T23:00:14+08:00] START lane=lane_a qwen=http://localhost:8045/v1 output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/musique_ircot_qwen32b_no_think_reader_input_limit1000.json
+[2026-05-18T23:00:14+08:00] START IRCoT retrieval dataset=musique lane=lane_a qwen=http://localhost:8045/v1
+[2026-05-19T00:59:31+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/musique_ircot_qwen32b_no_think_reader_input_limit1000.json
+[2026-05-19T00:59:31+08:00] DONE IRCoT retrieval dataset=musique
+[2026-05-19T00:59:31+08:00] START input=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/2wikimultihopqa_ircot_qwen32b_no_think_reader_input_limit1000.json output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_qa/ircot/2wikimultihopqa_ircot_qwen32b_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-19T00:59:31+08:00] START input=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/hotpotqa_ircot_qwen32b_no_think_reader_input_limit1000.json output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_qa/ircot/hotpotqa_ircot_qwen32b_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-19T00:59:31+08:00] START input=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_inputs/ircot/musique_ircot_qwen32b_no_think_reader_input_limit1000.json output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_qa/ircot/musique_ircot_qwen32b_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-19T00:59:31+08:00] START IRCoT GPT-4o-mini reader dataset=2wikimultihopqa
+[2026-05-19T00:59:31+08:00] START IRCoT GPT-4o-mini reader dataset=hotpotqa
+[2026-05-19T00:59:31+08:00] START IRCoT GPT-4o-mini reader dataset=musique
+[2026-05-19T01:25:56+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_qa/ircot/hotpotqa_ircot_qwen32b_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-19T01:25:56+08:00] DONE IRCoT GPT-4o-mini reader dataset=hotpotqa
+[2026-05-19T01:27:11+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_qa/ircot/musique_ircot_qwen32b_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-19T01:27:11+08:00] DONE IRCoT GPT-4o-mini reader dataset=musique
+[2026-05-19T01:28:10+08:00] DONE output=/mnt/nvme/code/HippoRAG/run_logs/ircot_qwen32b_no_think_gpt4omini_full1000_20260518/reader_qa/ircot/2wikimultihopqa_ircot_qwen32b_no_think_gpt4omini_reader_top5_limit1000.json
+[2026-05-19T01:28:10+08:00] DONE IRCoT GPT-4o-mini reader dataset=2wikimultihopqa
+[2026-05-19T01:28:10+08:00] DONE run_tag=ircot_qwen32b_no_think_gpt4omini_full1000_20260518
+[2026-05-19T01:28:10+08:00] DONE ircot_qwen32b_no_think_gpt4omini_full1000_20260518

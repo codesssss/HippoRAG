@@ -1,0 +1,2004 @@
+===== 2026-04-21T15:20:50+08:00 START 2wikimultihopqa pilot100 =====
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 56422 nodes, 1457156 edges
+INFO:src.hipporag.embedding_store:Loaded 6119 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 50303 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 67159 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 6119 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_2wikimultihopqa/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 50303 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 67159 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]2210it [00:00, 22079.02it/s]4418it [00:00, 19701.68it/s]6119it [00:00, 10016.48it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]6119it [00:00, 2937837.25it/s]
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval.
+INFO:src.hipporag.HippoRAG:Loading keys.
+INFO:src.hipporag.HippoRAG:Loading embeddings.
+INFO:src.hipporag.HippoRAG:Encoding 100 queries for query_to_fact.
+Batch Encoding:   0%|          | 0/4 [00:00<?, ?it/s]Batch Encoding:  25%|██▌       | 1/4 [00:00<00:00,  4.35it/s]Batch Encoding:  50%|█████     | 2/4 [00:00<00:00,  4.24it/s]Batch Encoding:  75%|███████▌  | 3/4 [00:00<00:00,  4.15it/s]Batch Encoding: 100%|██████████| 4/4 [00:00<00:00,  5.03it/s]
+INFO:src.hipporag.HippoRAG:Encoding 100 queries for query_to_passage.
+Batch Encoding:   0%|          | 0/4 [00:00<?, ?it/s]Batch Encoding:  25%|██▌       | 1/4 [00:00<00:00,  4.17it/s]Batch Encoding:  50%|█████     | 2/4 [00:00<00:00,  4.32it/s]Batch Encoding:  75%|███████▌  | 3/4 [00:00<00:00,  4.29it/s]Batch Encoding: 100%|██████████| 4/4 [00:00<00:00,  5.10it/s]
+Retrieving:   0%|          | 0/100 [00:00<?, ?it/s]Retrieving:   1%|          | 1/100 [00:01<01:40,  1.02s/it]Retrieving:   2%|▏         | 2/100 [00:01<01:36,  1.01it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the performer of song Changed It?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   3%|▎         | 3/100 [00:02<01:34,  1.02it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are Marufabad and Nasamkhrali both located in the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   4%|▍         | 4/100 [00:03<01:34,  1.02it/s]Retrieving:   5%|▌         | 5/100 [00:04<01:30,  1.05it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film whose director was born first, El Tonto or The Heart Of Doreon?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:   6%|▌         | 6/100 [00:05<01:28,  1.06it/s]Retrieving:   7%|▋         | 7/100 [00:06<01:26,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Raghnall Mac Ruaidhrí's paternal grandfather?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:   8%|▊         | 8/100 [00:07<01:25,  1.08it/s]Retrieving:   9%|▉         | 9/100 [00:08<01:24,  1.07it/s]Retrieving:  10%|█         | 10/100 [00:09<01:21,  1.11it/s]Retrieving:  11%|█         | 11/100 [00:10<01:19,  1.12it/s]Retrieving:  12%|█▏        | 12/100 [00:11<01:16,  1.15it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the performer of song When The Stars Go Blue?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  13%|█▎        | 13/100 [00:12<01:17,  1.12it/s]Retrieving:  14%|█▍        | 14/100 [00:12<01:18,  1.09it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the place of death of Maurice, Prince Of Orange's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  15%|█▌        | 15/100 [00:13<01:18,  1.09it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which country Aleksander Koniecpolski (1620–1659)'s father is from?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  16%|█▌        | 16/100 [00:14<01:19,  1.05it/s]Retrieving:  17%|█▋        | 17/100 [00:15<01:17,  1.06it/s]Retrieving:  18%|█▊        | 18/100 [00:16<01:16,  1.08it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  19%|█▉        | 19/100 [00:17<01:14,  1.08it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the director of film The Private Life Of Cinema born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  20%|██        | 20/100 [00:18<01:14,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where did Coulson Wallop's father study?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  21%|██        | 21/100 [00:19<01:14,  1.06it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Why did John Middleton Murry's wife die?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  22%|██▏       | 22/100 [00:20<01:12,  1.08it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the composer of film Billy Elliot born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 5) (<unknown>, line 5).
+Retrieving:  23%|██▎       | 23/100 [00:21<01:09,  1.10it/s]Retrieving:  24%|██▍       | 24/100 [00:22<01:11,  1.07it/s]Retrieving:  25%|██▌       | 25/100 [00:23<01:07,  1.10it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the father-in-law of Sisowath Kossamak?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  26%|██▌       | 26/100 [00:23<01:05,  1.14it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Mugain's mother-in-law?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:  27%|██▋       | 27/100 [00:24<01:02,  1.16it/s]Retrieving:  28%|██▊       | 28/100 [00:25<01:01,  1.17it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the director of film The Return Of Swamp Thing?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  29%|██▉       | 29/100 [00:26<00:59,  1.19it/s]Retrieving:  30%|███       | 30/100 [00:27<00:58,  1.20it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which film has the director who was born later, Playing It Wild or I'Ll Be Going Now?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  31%|███       | 31/100 [00:28<00:57,  1.20it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "What nationality is Beatrice I, Countess Of Burgundy's husband?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+Retrieving:  32%|███▏      | 32/100 [00:28<00:56,  1.20it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born later, Christ Walking On The Water or 45 Fathers?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  33%|███▎      | 33/100 [00:29<00:55,  1.20it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the performer of song Come Dance With Me (Song) born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  34%|███▍      | 34/100 [00:30<00:54,  1.21it/s]Retrieving:  35%|███▌      | 35/100 [00:31<00:53,  1.21it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was born later, Gideon Johnson Pillow or Holm Jølsen?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax (<unknown>, line 1).
+Retrieving:  36%|███▌      | 36/100 [00:32<00:52,  1.21it/s]Retrieving:  37%|███▋      | 37/100 [00:33<00:52,  1.20it/s]Retrieving:  38%|███▊      | 38/100 [00:33<00:51,  1.20it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where did Sylvia Burka's husband die?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+Retrieving:  39%|███▉      | 39/100 [00:34<00:50,  1.20it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who lived longer, Ludwig Elsbett or Pamela Ann Rymer?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  40%|████      | 40/100 [00:35<00:51,  1.15it/s]Retrieving:  41%|████      | 41/100 [00:36<00:52,  1.12it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who was born later, Henry Goes Arizona or The Blue Collar Worker And The Hairdresser In A Whirl Of Sex And Politics?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  42%|████▏     | 42/100 [00:37<00:53,  1.09it/s]Retrieving:  43%|████▎     | 43/100 [00:38<00:52,  1.09it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who was born first, Tombstone Rashomon or Waiting For The Clouds?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  44%|████▍     | 44/100 [00:39<00:52,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the performer of song B Boy (Song) detained?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  45%|████▌     | 45/100 [00:40<00:52,  1.06it/s]Retrieving:  46%|████▌     | 46/100 [00:41<00:50,  1.07it/s]Retrieving:  47%|████▋     | 47/100 [00:42<00:47,  1.11it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who lived longer, Sir Thomas Wheate, 1St Baronet or Albert Édouard Le Brethon De Caligny?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  48%|████▊     | 48/100 [00:43<00:45,  1.14it/s]Retrieving:  49%|████▉     | 49/100 [00:43<00:43,  1.17it/s]Retrieving:  50%|█████     | 50/100 [00:44<00:42,  1.18it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Were both Pietro Salini and Domenico Ravenna, born in the same place?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  51%|█████     | 51/100 [00:45<00:41,  1.19it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the father-in-law of John Ernest, Duke Of Saxe-Eisenach?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  52%|█████▏    | 52/100 [00:46<00:39,  1.21it/s]Retrieving:  53%|█████▎    | 53/100 [00:47<00:38,  1.22it/s]Retrieving:  54%|█████▍    | 54/100 [00:48<00:39,  1.18it/s]Retrieving:  55%|█████▌    | 55/100 [00:48<00:39,  1.15it/s]Retrieving:  56%|█████▌    | 56/100 [00:49<00:38,  1.14it/s]Retrieving:  57%|█████▋    | 57/100 [00:50<00:38,  1.11it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born later, Arrête Ton Cinéma or Agni (2004 Film)?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  58%|█████▊    | 58/100 [00:51<00:37,  1.11it/s]Retrieving:  59%|█████▉    | 59/100 [00:52<00:36,  1.13it/s]Retrieving:  60%|██████    | 60/100 [00:53<00:34,  1.16it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the director of film An Event?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  61%|██████    | 61/100 [00:54<00:32,  1.18it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the director of film Good People (Film)?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  62%|██████▏   | 62/100 [00:54<00:32,  1.18it/s]Retrieving:  63%|██████▎   | 63/100 [00:55<00:31,  1.18it/s]Retrieving:  64%|██████▍   | 64/100 [00:56<00:30,  1.17it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the husband of Joanna Elisabeth Of Holstein-Gottorp born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  65%|██████▌   | 65/100 [00:57<00:31,  1.12it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the place of death of Abdul-Aziz Bin Muhammad's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  66%|██████▌   | 66/100 [00:58<00:31,  1.09it/s]Retrieving:  67%|██████▋   | 67/100 [00:59<00:33,  1.02s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  68%|██████▊   | 68/100 [01:08<01:47,  3.36s/it]Retrieving:  69%|██████▉   | 69/100 [01:09<01:21,  2.63s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which museum was established first, Museum Of Croatian Archaeological Monuments or Bayernhof Music Museum?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  70%|███████   | 70/100 [01:10<01:03,  2.13s/it]Retrieving:  71%|███████   | 71/100 [01:11<00:51,  1.77s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where did the director of film Dancing In The Rain (Film) die?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  72%|███████▏  | 72/100 [01:12<00:42,  1.51s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where did Saw Thanda's husband die?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+Retrieving:  73%|███████▎  | 73/100 [01:13<00:36,  1.33s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Did the movies Inside The Room and Crude Set Drama, originate from the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  74%|███████▍  | 74/100 [01:14<00:31,  1.21s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who was born earlier, The Marriage Of Princess Demidoff or The Pocket-Knife?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  75%|███████▌  | 75/100 [01:15<00:28,  1.12s/it]Retrieving:  76%|███████▌  | 76/100 [01:16<00:25,  1.06s/it]Retrieving:  77%|███████▋  | 77/100 [01:17<00:23,  1.01s/it]Retrieving:  78%|███████▊  | 78/100 [01:17<00:21,  1.05it/s]Retrieving:  79%|███████▉  | 79/100 [01:18<00:19,  1.09it/s]Retrieving:  80%|████████  | 80/100 [01:19<00:17,  1.12it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the mother of the director of film Atomised (Film)?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  81%|████████  | 81/100 [01:20<00:16,  1.14it/s]Retrieving:  82%|████████▏ | 82/100 [01:21<00:17,  1.02it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "What is the date of birth of Henry I Of Ziębice's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  83%|████████▎ | 83/100 [01:22<00:16,  1.03it/s]Retrieving:  84%|████████▍ | 84/100 [01:23<00:15,  1.04it/s]Retrieving:  85%|████████▌ | 85/100 [01:24<00:14,  1.04it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the composer of song Back In The U.S.A. born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  86%|████████▌ | 86/100 [01:25<00:13,  1.04it/s]Retrieving:  87%|████████▋ | 87/100 [01:26<00:12,  1.05it/s]Retrieving:  88%|████████▊ | 88/100 [01:27<00:11,  1.09it/s]Retrieving:  89%|████████▉ | 89/100 [01:28<00:09,  1.12it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Sibyl Hathaway's child-in-law?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  90%|█████████ | 90/100 [01:28<00:08,  1.14it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born first, Sins Of Madeleine or Captain Apache?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  91%|█████████ | 91/100 [01:29<00:07,  1.16it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Godomar Ii's stepmother?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  92%|█████████▏| 92/100 [01:30<00:06,  1.17it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the director of film The Outlaw Express born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+Retrieving:  93%|█████████▎| 93/100 [01:31<00:05,  1.18it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who died later, 45 Calibre Echo or Bons Baisers De Hong Kong?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  94%|█████████▍| 94/100 [01:32<00:05,  1.19it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "What nationality is Lamprocles's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+Retrieving:  95%|█████████▌| 95/100 [01:33<00:04,  1.19it/s]Retrieving:  96%|█████████▌| 96/100 [01:33<00:03,  1.20it/s]Retrieving:  97%|█████████▋| 97/100 [01:34<00:02,  1.21it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which film has the director born first, Mord Em'Ly or Ek Hi Bhool (1940 Film)?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  98%|█████████▊| 98/100 [01:35<00:01,  1.21it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born earlier, The Korean Wedding Chest or True To The Navy?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  99%|█████████▉| 99/100 [01:36<00:00,  1.23it/s]Retrieving: 100%|██████████| 100/100 [01:37<00:00,  1.20it/s]Retrieving: 100%|██████████| 100/100 [01:37<00:00,  1.03it/s]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 104.82s
+INFO:src.hipporag.HippoRAG:Total Recognition Memory Time 72.15s
+INFO:src.hipporag.HippoRAG:Total PPR Time 15.50s
+INFO:src.hipporag.HippoRAG:Total Misc Time 17.17s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.3875, 'Recall@2': 0.6425, 'Recall@5': 0.78, 'Recall@10': 0.8325, 'Recall@20': 0.8675, 'Recall@30': 0.875, 'Recall@50': 0.8825, 'Recall@100': 0.8975, 'Recall@150': 0.905, 'Recall@200': 0.9175}
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 15514.92it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]QA Reading: 100%|██████████| 100/100 [00:00<00:00, 2445.03it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 1044.85it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.35, 'F1': 0.3951}
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the performer of song Changed It?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are Marufabad and Nasamkhrali both located in the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film whose director was born first, El Tonto or The Heart Of Doreon?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Raghnall Mac Ruaidhrí's paternal grandfather?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the performer of song When The Stars Go Blue?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the place of death of Maurice, Prince Of Orange's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which country Aleksander Koniecpolski (1620–1659)'s father is from?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the director of film The Private Life Of Cinema born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where did Coulson Wallop's father study?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Why did John Middleton Murry's wife die?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the composer of film Billy Elliot born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 5) (<unknown>, line 5).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the father-in-law of Sisowath Kossamak?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Mugain's mother-in-law?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the director of film The Return Of Swamp Thing?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which film has the director who was born later, Playing It Wild or I'Ll Be Going Now?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "What nationality is Beatrice I, Countess Of Burgundy's husband?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born later, Christ Walking On The Water or 45 Fathers?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the performer of song Come Dance With Me (Song) born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was born later, Gideon Johnson Pillow or Holm Jølsen?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where did Sylvia Burka's husband die?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who lived longer, Ludwig Elsbett or Pamela Ann Rymer?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who was born later, Henry Goes Arizona or The Blue Collar Worker And The Hairdresser In A Whirl Of Sex And Politics?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who was born first, Tombstone Rashomon or Waiting For The Clouds?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the performer of song B Boy (Song) detained?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who lived longer, Sir Thomas Wheate, 1St Baronet or Albert Édouard Le Brethon De Caligny?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Were both Pietro Salini and Domenico Ravenna, born in the same place?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the father-in-law of John Ernest, Duke Of Saxe-Eisenach?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born later, Arrête Ton Cinéma or Agni (2004 Film)?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the director of film An Event?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the director of film Good People (Film)?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the husband of Joanna Elisabeth Of Holstein-Gottorp born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the place of death of Abdul-Aziz Bin Muhammad's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which museum was established first, Museum Of Croatian Archaeological Monuments or Bayernhof Music Museum?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where did the director of film Dancing In The Rain (Film) die?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where did Saw Thanda's husband die?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Did the movies Inside The Room and Crude Set Drama, originate from the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who was born earlier, The Marriage Of Princess Demidoff or The Pocket-Knife?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the mother of the director of film Atomised (Film)?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "What is the date of birth of Henry I Of Ziębice's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the composer of song Back In The U.S.A. born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Sibyl Hathaway's child-in-law?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born first, Sins Of Madeleine or Captain Apache?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Godomar Ii's stepmother?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the director of film The Outlaw Express born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who died later, 45 Calibre Echo or Bons Baisers De Hong Kong?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "What nationality is Lamprocles's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which film has the director born first, Mord Em'Ly or Ek Hi Bhool (1940 Film)?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director born earlier, The Korean Wedding Chest or True To The Navy?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:__main__:Applied bridge_beam selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=4.99)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 10418.04it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  15%|█▌        | 15/100 [00:51<04:50,  3.41s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  32%|███▏      | 32/100 [00:53<01:33,  1.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  34%|███▍      | 34/100 [00:56<01:31,  1.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  36%|███▌      | 36/100 [00:58<01:25,  1.33s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  52%|█████▏    | 52/100 [01:00<00:32,  1.50it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  60%|██████    | 60/100 [01:10<00:32,  1.23it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  61%|██████    | 61/100 [01:12<00:34,  1.13it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  68%|██████▊   | 68/100 [01:13<00:20,  1.52it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  88%|████████▊ | 88/100 [02:09<00:22,  1.88s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  90%|█████████ | 90/100 [02:31<00:25,  2.57s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  97%|█████████▋| 97/100 [02:49<00:07,  2.56s/it]QA Reading: 100%|██████████| 100/100 [02:49<00:00,  1.69s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 99it [00:00, 946.89it/s]Extraction Answers from LLM Response: 100it [00:00, 952.40it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.4, 'F1': 0.4501}
+INFO:__main__:Setwise selector bridge_beam[bridge]@100: EM=0.4000 (delta=+0.0500), F1=0.4501
+{
+  "output_json": "outputs_step0_general_2wikimultihopqa/eval_reports/bridge_beam_sameprotocol_closureonly_pilot100_fresh8043.json",
+  "overall_recomputed": {
+    "Recall@1": 0.3875,
+    "Recall@2": 0.6425,
+    "Recall@5": 0.78,
+    "Recall@10": 0.8325,
+    "Recall@20": 0.8675,
+    "Recall@30": 0.875,
+    "Recall@50": 0.8825,
+    "Recall@100": 0.8975,
+    "Recall@150": 0.905,
+    "Recall@200": 0.9175,
+    "ExactMatch": 0.35,
+    "F1": 0.3951140285869711,
+    "num_queries": 100
+  },
+  "causal_slice": {
+    "Recall@1": 0.5,
+    "Recall@2": 1.0,
+    "Recall@5": 1.0,
+    "Recall@10": 1.0,
+    "Recall@20": 1.0,
+    "Recall@30": 1.0,
+    "Recall@50": 1.0,
+    "Recall@100": 1.0,
+    "Recall@150": 1.0,
+    "Recall@200": 1.0,
+    "ExactMatch": 1.0,
+    "F1": 1.0,
+    "num_queries": 1
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "setwise_selector_qa": {
+    "selector": "bridge_beam",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "anchor_count": 2,
+    "reserve_top_m": 4,
+    "max_bridge_slots": 1,
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "gate_mode": "suffix_bridge",
+    "gate_min_structure_score": 0.15,
+    "gate_min_combined_margin": 0.0,
+    "gate_min_closure_score": 0.0,
+    "gate_min_novelty_score": 0.0,
+    "gate_min_frontier_gain": 0.0,
+    "gate_min_path_coherence": 0.0,
+    "gate_max_avg_local_structure": 0.95,
+    "gate_min_suffix_base_mean": 0.15,
+    "reader_order_probe_mode": "none",
+    "beam_width": 4,
+    "beam_expand_per_state": 4,
+    "beam_projected_shortlist_factor": 1,
+    "late_rerank_enabled": false,
+    "late_rerank_candidate_count": 4,
+    "late_rerank_include_baseline": true,
+    "late_rerank_doc_char_limit": 280,
+    "late_rerank_policy": "always",
+    "late_rerank_max_state_score_gap": 0.0,
+    "late_rerank_judge_backend": "inherit",
+    "late_rerank_judge_model": "qwen3-8b-train",
+    "late_rerank_judge_base_url": "http://localhost:8043/v1",
+    "late_rerank_judge_reasoning_effort": null,
+    "state_score_weights": {
+      "path_connectivity": 0.3,
+      "reachable_doc_ratio": 0.2,
+      "query_reachability": 0.15,
+      "support_mean": 0.05,
+      "support_min": 0.05,
+      "closure_mean": 0.1,
+      "suffix_base_mean": 0.05,
+      "query_coverage": 0.1,
+      "frontier_ratio": 0.05,
+      "redundancy_penalty": 0.1
+    },
+    "setwise_model_path": null,
+    "setwise_requirement_cache_path": null,
+    "setwise_requirement_mode": "oracle",
+    "setwise_requirement_model_path": null,
+    "setwise_requirement_reserve_policy": "fixed",
+    "setwise_requirement_annotation_pool_k": 50,
+    "setwise_requirement_smooth_tau": 0.15,
+    "setwise_requirement_counterfactual_tau": 0.1,
+    "setwise_requirement_live_annotation_pool_k": 0,
+    "setwise_requirement_live_annotation_score_mode": "heuristic",
+    "setwise_requirement_live_atomic_model_path": null,
+    "setwise_requirement_live_source_expand_factor": 0,
+    "setwise_requirement_exposure_watch_titles": [
+      "Riverside Plaza",
+      "Minneapolis",
+      "Mississippi River",
+      "The Right Stuff Records",
+      "Sony Music"
+    ],
+    "setwise_requirement_probe_force_source_titles": [],
+    "setwise_requirement_probe_force_shortlist_titles": [],
+    "setwise_requirement_probe_force_final_titles": [],
+    "setwise_requirement_probe_force_pool_gold_into_final": false,
+    "setwise_requirement_probe_source_sort_mode": "combined",
+    "setwise_requirement_probe_source_support_gain_weight": 0.0,
+    "setwise_requirement_probe_shortlist_sort_mode": "margin_first",
+    "setwise_requirement_probe_bridge_bonus_mode": "off",
+    "setwise_requirement_probe_bridge_bonus_weight": 0.0,
+    "selector_EM": 0.4,
+    "selector_F1": 0.4501,
+    "baseline_EM": 0.35,
+    "baseline_F1": 0.3951,
+    "EM_delta": 0.05,
+    "F1_delta": 0.055,
+    "selector_retrieval_metrics": {
+      "Recall@1": 0.3875,
+      "Recall@2": 0.6425,
+      "Recall@5": 0.8125,
+      "Recall@10": 0.8475,
+      "Recall@20": 0.8825
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 77,
+        "baseline_EM": 0.4156,
+        "selector_EM": 0.4805,
+        "EM_delta": 0.0649,
+        "baseline_F1": 0.4569,
+        "selector_F1": 0.5283,
+        "F1_delta": 0.0714
+      },
+      "4_doc": {
+        "count": 23,
+        "baseline_EM": 0.1304,
+        "selector_EM": 0.1304,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.1883,
+        "selector_F1": 0.1883,
+        "F1_delta": 0.0
+      }
+    },
+    "selector_summary": {
+      "selector": "bridge_beam",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 4.99,
+      "avg_selected_structured_doc_count": 4.97,
+      "reserve_top_m": 4,
+      "max_bridge_slots": 1,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "suffix_bridge",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 20,
+      "gate_skip_count": 80,
+      "gate_reason_counts": {
+        "offrank_bridge_signal_detected": 20,
+        "offrank_structure_below_threshold": 80
+      },
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "When did Lothair Ii's mother die?",
+          "selected_titles": [
+            "Lothair II",
+            "Waldrada of Lotharingia",
+            "Teutberga",
+            "Ermengarde of Tours",
+            "Bertha, daughter of Lothair II"
+          ],
+          "seed_entities_preview": [
+            "bertha",
+            "emperor lothair i",
+            "ermengarde of tours",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "waldrada of lotharingia"
+          ],
+          "question_entities_preview": [
+            "adelaide ii",
+            "emperor lothair i",
+            "lothair",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "mother s will",
+            "theobald ii",
+            "unknown mother"
+          ],
+          "grounded_question_entities_preview": [
+            "emperor lothair i",
+            "lothair",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "unknown mother"
+          ],
+          "proposal_query_entities_preview": [
+            "bertha",
+            "emperor lothair i",
+            "ermengarde of tours",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "waldrada of lotharingia"
+          ],
+          "query_entities_preview": [
+            "bertha",
+            "emperor lothair i",
+            "ermengarde of tours",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "waldrada of lotharingia"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+          "selected_titles": [
+            "Aas Ka Panchhi",
+            "Aansoo Ban Gaye Phool",
+            "Phoolwari",
+            "Abhishek Saxena",
+            "Phalitamsha"
+          ],
+          "seed_entities_preview": [
+            "1961 hindi movie",
+            "aas ka panchhi",
+            "mohan kumar",
+            "rajinder singh bedi"
+          ],
+          "question_entities_preview": [
+            "aas ka panchhi",
+            "bollywood film",
+            "film",
+            "film director",
+            "first indian film with sound",
+            "japanese film",
+            "malayalam film",
+            "phoolwari"
+          ],
+          "grounded_question_entities_preview": [
+            "aas ka panchhi",
+            "film",
+            "japanese film",
+            "phoolwari"
+          ],
+          "proposal_query_entities_preview": [
+            "1961 hindi movie",
+            "aas ka panchhi",
+            "mohan kumar",
+            "rajinder singh bedi"
+          ],
+          "query_entities_preview": [
+            "1961 hindi movie",
+            "aas ka panchhi",
+            "mohan kumar",
+            "rajinder singh bedi"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is the place of birth of the performer of song Changed It?",
+          "selected_titles": [
+            "Changed It",
+            "Nicki Minaj",
+            "Did It On'em",
+            "You Changed Me",
+            "2 Chainz"
+          ],
+          "seed_entities_preview": [
+            "cash money records",
+            "changed it",
+            "lil wayne",
+            "nicki minaj",
+            "young money entertainment"
+          ],
+          "question_entities_preview": [
+            "change",
+            "changed it",
+            "country of birth",
+            "domicile of birth",
+            "performer",
+            "place of birth",
+            "song",
+            "the o c"
+          ],
+          "grounded_question_entities_preview": [
+            "change",
+            "changed it",
+            "the o c"
+          ],
+          "proposal_query_entities_preview": [
+            "cash money records",
+            "changed it",
+            "lil wayne",
+            "nicki minaj",
+            "young money entertainment"
+          ],
+          "query_entities_preview": [
+            "cash money records",
+            "changed it",
+            "lil wayne",
+            "nicki minaj",
+            "young money entertainment"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+          "selected_titles": [
+            "Nasamkhrali",
+            "Marufabad",
+            "Qaleh-ye Zaras",
+            "Qaleh-ye Sahar",
+            "Qaleh-ye Nashin Shahi"
+          ],
+          "seed_entities_preview": [
+            "iran",
+            "kabutarsorkh rural district",
+            "marufabad",
+            "nasamkhrali",
+            "nasomkhari",
+            "qaleh ye zaras",
+            "telavi district"
+          ],
+          "question_entities_preview": [
+            "alexander the great",
+            "country",
+            "country of birth",
+            "hasan the bald",
+            "islamic state of iraq and the levant",
+            "marufabad",
+            "nasamkhrali",
+            "the sufi order in the west"
+          ],
+          "grounded_question_entities_preview": [
+            "marufabad",
+            "nasamkhrali"
+          ],
+          "proposal_query_entities_preview": [
+            "iran",
+            "kabutarsorkh rural district",
+            "marufabad",
+            "nasamkhrali",
+            "nasomkhari",
+            "qaleh ye zaras",
+            "telavi district"
+          ],
+          "query_entities_preview": [
+            "iran",
+            "kabutarsorkh rural district",
+            "marufabad",
+            "nasamkhrali",
+            "nasomkhari",
+            "qaleh ye zaras",
+            "telavi district"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+          "selected_titles": [
+            "God's Gift to Women",
+            "Aldri annet enn bråk",
+            "Altid ballade",
+            "Edith Carlmar",
+            "Brink of Life"
+          ],
+          "seed_entities_preview": [
+            "aldri annet enn br k",
+            "film",
+            "gabriel axel",
+            "god s gift to women",
+            "laura laplante",
+            "michael curtiz"
+          ],
+          "question_entities_preview": [
+            "aldri annet enn br k",
+            "director",
+            "english title of aldri annet enn br k",
+            "film",
+            "film director",
+            "god s gift to women",
+            "remake of aldri annet enn br k",
+            "women"
+          ],
+          "grounded_question_entities_preview": [
+            "aldri annet enn br k",
+            "director",
+            "english title of aldri annet enn br k",
+            "film",
+            "film director",
+            "god s gift to women",
+            "remake of aldri annet enn br k"
+          ],
+          "proposal_query_entities_preview": [
+            "aldri annet enn br k",
+            "film",
+            "gabriel axel",
+            "god s gift to women",
+            "laura laplante",
+            "michael curtiz"
+          ],
+          "query_entities_preview": [
+            "aldri annet enn br k",
+            "film",
+            "gabriel axel",
+            "god s gift to women",
+            "laura laplante",
+            "michael curtiz"
+          ],
+          "selection_steps": []
+        }
+      ]
+    }
+  }
+}
+===== 2026-04-21T15:27:02+08:00 END 2wikimultihopqa; output=outputs_step0_general_2wikimultihopqa/eval_reports/bridge_beam_sameprotocol_closureonly_pilot100_fresh8043.json =====
+===== 2026-04-21T15:27:02+08:00 START hotpotqa pilot100 =====
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 105259 nodes, 2031487 edges
+INFO:src.hipporag.embedding_store:Loaded 9811 records from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 95448 records from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 130305 records from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 9811 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_hotpotqa/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 95448 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 130305 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]1754it [00:00, 17530.32it/s]3508it [00:00, 16463.36it/s]5159it [00:00, 16061.21it/s]6768it [00:00, 15382.92it/s]8310it [00:00, 14489.97it/s]9766it [00:00, 14119.27it/s]9811it [00:00, 14872.57it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]9811it [00:00, 2980179.36it/s]
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval.
+INFO:src.hipporag.HippoRAG:Loading keys.
+INFO:src.hipporag.HippoRAG:Loading embeddings.
+INFO:src.hipporag.HippoRAG:Encoding 100 queries for query_to_fact.
+Batch Encoding:   0%|          | 0/4 [00:00<?, ?it/s]Batch Encoding:  25%|██▌       | 1/4 [00:00<00:00,  4.13it/s]Batch Encoding:  50%|█████     | 2/4 [00:00<00:00,  4.16it/s]Batch Encoding:  75%|███████▌  | 3/4 [00:00<00:00,  4.25it/s]Batch Encoding: 100%|██████████| 4/4 [00:00<00:00,  5.03it/s]
+INFO:src.hipporag.HippoRAG:Encoding 100 queries for query_to_passage.
+Batch Encoding:   0%|          | 0/4 [00:00<?, ?it/s]Batch Encoding:  25%|██▌       | 1/4 [00:00<00:00,  4.15it/s]Batch Encoding:  50%|█████     | 2/4 [00:00<00:00,  4.07it/s]Batch Encoding:  75%|███████▌  | 3/4 [00:00<00:00,  4.16it/s]Batch Encoding: 100%|██████████| 4/4 [00:00<00:00,  5.02it/s]
+Retrieving:   0%|          | 0/100 [00:00<?, ?it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'what is one of the stars of  The Newcomers known for': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+Retrieving:   1%|          | 1/100 [00:01<02:53,  1.75s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The fictional private detective that appears in "The Adventure of the Seven Clocks" what written by whom?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   2%|▏         | 2/100 [00:03<02:49,  1.73s/it]Retrieving:   3%|▎         | 3/100 [00:05<02:52,  1.77s/it]Retrieving:   4%|▍         | 4/100 [00:06<02:46,  1.74s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In which county is the town in which Raymond Robertsen was born ?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   5%|▌         | 5/100 [00:08<02:43,  1.72s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What screenplay was worked on by both Edward Carfagno and Miklos Rozsa?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:   6%|▌         | 6/100 [00:10<02:42,  1.73s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which Walt Disney film was produced first, The Apple Dumpling Gang or Something Wicked This Way Comes?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   7%|▋         | 7/100 [00:12<02:37,  1.70s/it]Retrieving:   8%|▊         | 8/100 [00:13<02:30,  1.63s/it]Retrieving:   9%|▉         | 9/100 [00:15<02:24,  1.59s/it]Retrieving:  10%|█         | 10/100 [00:16<02:20,  1.56s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Bytham Castle is a castle in the civil parish of how many houses?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  11%|█         | 11/100 [00:18<02:16,  1.54s/it]Retrieving:  12%|█▏        | 12/100 [00:19<02:14,  1.52s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How do the Peter Laufer books Forbidden Creatures and No Animals Were Harmed differ in their focus on animals?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  13%|█▎        | 13/100 [00:21<02:11,  1.51s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is a winner of the 2013 6 Hours of Silverstone a co-commentator for?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax. Perhaps you forgot a comma? (<unknown>, line 1).
+Retrieving:  14%|█▍        | 14/100 [00:22<02:09,  1.51s/it]Retrieving:  15%|█▌        | 15/100 [00:24<02:14,  1.58s/it]Retrieving:  16%|█▌        | 16/100 [00:25<02:16,  1.62s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what year was the Golden State NBA player, who was part of the Cavaliers-Warriors rivalry, named NBA Finals Most Valuable Player?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  17%|█▋        | 17/100 [00:27<02:15,  1.64s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the actor who wrote the memoir Without you: A memoir of love, loss, and the Musical Rent and also stared as Mark Cohen in the Broadway produ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  18%|█▊        | 18/100 [00:29<02:18,  1.68s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'One Raffles Place is one of the tallest skyscrapers in the city of Singapore and tallest in the wolrd outside North America until it was succeeded by a Building': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  19%|█▉        | 19/100 [00:31<02:17,  1.70s/it]Retrieving:  20%|██        | 20/100 [00:32<02:18,  1.73s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Sand Mountainis part of the southern tip of a mountain chain in which part of North America ?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  21%|██        | 21/100 [00:34<02:19,  1.77s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'At what intersection was the former home of the wooden roller coaster now located at Six Flags Great America in Gurnee, Illinois located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  22%|██▏       | 22/100 [00:36<02:12,  1.70s/it]Retrieving:  23%|██▎       | 23/100 [00:37<02:06,  1.64s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The View from the Bottom is the fifth studio album by an American rock band best known for what hit song?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+Retrieving:  24%|██▍       | 24/100 [00:39<02:02,  1.61s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  25%|██▌       | 25/100 [00:40<01:58,  1.58s/it]Retrieving:  26%|██▌       | 26/100 [00:42<01:54,  1.54s/it]Retrieving:  27%|██▋       | 27/100 [00:43<01:50,  1.52s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which historical drama filmed in the Winter Palace of the Russian State Hermitage Museum stars Sergey Dreyden?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  28%|██▊       | 28/100 [00:45<01:49,  1.51s/it]Retrieving:  29%|██▉       | 29/100 [00:47<02:04,  1.75s/it]Retrieving:  30%|███       | 30/100 [00:50<02:16,  1.95s/it]Retrieving:  31%|███       | 31/100 [00:51<02:09,  1.88s/it]Retrieving:  32%|███▏      | 32/100 [00:53<02:05,  1.84s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What subsidiary of the largest airline of the Republic of China (Taiwan) has a main hub at Taichung Airport?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  33%|███▎      | 33/100 [00:55<02:00,  1.80s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the former MGM Grand Garden Special Events Center where the Mayweather-Ortiz fight took place?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  34%|███▍      | 34/100 [00:56<01:54,  1.74s/it]Retrieving:  35%|███▌      | 35/100 [00:58<01:46,  1.64s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which aircraft engine powers a General Dynamics aircraft of which over 4500 have been built?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  36%|███▌      | 36/100 [00:59<01:40,  1.57s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which British racing driver has raced for 7 different teams and won the European Grand Prix in 1999?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  37%|███▋      | 37/100 [01:01<01:35,  1.52s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what city can a person find both the Nusretiye Clock Tower and the Eski Imaret Mosque be found?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  38%|███▊      | 38/100 [01:02<01:32,  1.49s/it]Retrieving:  39%|███▉      | 39/100 [01:03<01:30,  1.49s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who has written more than 300 papers, Semyon Aranovich Gershgorin or Pavel Alexandrov?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  40%|████      | 40/100 [01:05<01:33,  1.56s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which software application was originally made for the company that acquired RadioShack in 1963?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  41%|████      | 41/100 [01:07<01:33,  1.59s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who wrote Bring Me Sunshine and where did they write it?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  42%|████▏     | 42/100 [01:08<01:33,  1.60s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What American professional Hawaiian surfer born 18 October 1992 won the Rip Curl Pro Portugal?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  43%|████▎     | 43/100 [01:10<01:28,  1.55s/it]Retrieving:  44%|████▍     | 44/100 [01:11<01:25,  1.52s/it]Retrieving:  45%|████▌     | 45/100 [01:13<01:22,  1.50s/it]Retrieving:  46%|████▌     | 46/100 [01:14<01:20,  1.49s/it]Retrieving:  47%|████▋     | 47/100 [01:16<01:18,  1.47s/it]Retrieving:  48%|████▊     | 48/100 [01:17<01:15,  1.46s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Ellie Parker is a 2005 American drama-comedy film whose title character is played by an English actress who made her screen debut in what Australian drama film?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  49%|████▉     | 49/100 [01:18<01:13,  1.44s/it]Retrieving:  50%|█████     | 50/100 [01:20<01:11,  1.44s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Faith Goldy got fired after an interview she gave on what production site edited by Andrew Anglin?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+Retrieving:  51%|█████     | 51/100 [01:21<01:10,  1.44s/it]Retrieving:  52%|█████▏    | 52/100 [01:23<01:08,  1.43s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where is the headquarters for the service broadcaster the show Tenko is on?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  53%|█████▎    | 53/100 [01:24<01:07,  1.43s/it]Retrieving:  54%|█████▍    | 54/100 [01:26<01:05,  1.43s/it]Retrieving:  55%|█████▌    | 55/100 [01:27<01:04,  1.44s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "The fourth episode The Simpsons' seventh season has what kind of theme?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  56%|█████▌    | 56/100 [01:29<01:03,  1.44s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'La Machine a ecirire was written by what French writer, designer, playright, artist, and filmmaker, who is known for his novel, "Les Enfants Terribles"?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  57%|█████▋    | 57/100 [01:30<01:02,  1.45s/it]Retrieving:  58%|█████▊    | 58/100 [01:32<01:02,  1.49s/it]Retrieving:  59%|█████▉    | 59/100 [01:33<01:00,  1.48s/it]Retrieving:  60%|██████    | 60/100 [01:34<00:58,  1.47s/it]Retrieving:  61%|██████    | 61/100 [01:36<00:57,  1.46s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the birthdate of this Norwegian professional footballer who plays as an attacking midfielder and who broke the record for the youngest player that has e': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  62%|██████▏   | 62/100 [01:38<00:57,  1.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  63%|██████▎   | 63/100 [01:46<02:15,  3.66s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Devil's Food is a singles compilation by an American rock and roll band that has also been known to play country shows under what?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  64%|██████▍   | 64/100 [01:48<01:51,  3.10s/it]Retrieving:  65%|██████▌   | 65/100 [01:50<01:34,  2.69s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What 1944 Bollywood film was the mother of Bollywood actor Govinda in?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid decimal literal (<unknown>, line 2).
+Retrieving:  66%|██████▌   | 66/100 [01:51<01:21,  2.39s/it]Retrieving:  67%|██████▋   | 67/100 [01:53<01:11,  2.18s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Haier has North American rights to which appliance company headquartered in Louisville, Kentucky?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  68%|██████▊   | 68/100 [01:55<01:04,  2.01s/it]Retrieving:  69%|██████▉   | 69/100 [01:56<00:57,  1.86s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who directed a 2006 film where Ron Perkins character plays the manager of a hotel?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  70%|███████   | 70/100 [01:58<00:52,  1.75s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What movie did Chris Duesterdiek work on that was directed by Seth Rogen and Evan Goldberg?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  71%|███████   | 71/100 [01:59<00:48,  1.66s/it]Retrieving:  72%|███████▏  | 72/100 [02:01<00:44,  1.59s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the county seat of the county in which Keokuk Falls, Oklahoma is loated?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  73%|███████▎  | 73/100 [02:02<00:42,  1.57s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What former president of ABC television is a high ranking officer in the same company as Christine Mccarthy?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  74%|███████▍  | 74/100 [02:04<00:40,  1.54s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the second World Junior Ice Hockey Championship in which Miroslav Přerost coached the men's national junior ice hockey team hosted?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  75%|███████▌  | 75/100 [02:05<00:38,  1.54s/it]Retrieving:  76%|███████▌  | 76/100 [02:07<00:36,  1.54s/it]Retrieving:  77%|███████▋  | 77/100 [02:08<00:35,  1.53s/it]Retrieving:  78%|███████▊  | 78/100 [02:10<00:33,  1.53s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What city did the musician whose debut album shares its title with the 1959 Alfred Hitchcock hail from?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:  79%|███████▉  | 79/100 [02:11<00:31,  1.52s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The 53rd National Hockey League All-Star Game took place at the indoor arena that was completed in what year?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  80%|████████  | 80/100 [02:13<00:30,  1.52s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which of Damon Stoudamire's cousins once played college basketball for the University of Kentucky?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  81%|████████  | 81/100 [02:14<00:28,  1.51s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The player who defeated Johnny Majors for the Heisman Trophy in 1956 was born in what year?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  82%|████████▏ | 82/100 [02:16<00:27,  1.51s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In which election did Norm Coleman won to become the last republican elected as of 2017?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  83%|████████▎ | 83/100 [02:17<00:25,  1.52s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is the mother of Mary, Crown Princess of Denmark's husband?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:  84%|████████▍ | 84/100 [02:19<00:25,  1.57s/it]Retrieving:  85%|████████▌ | 85/100 [02:21<00:24,  1.62s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What year did Fifty Shades of Grey release?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  86%|████████▌ | 86/100 [02:22<00:22,  1.64s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The ghetto that George Kadish documented held how many people at its peak?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax (<unknown>, line 1).
+Retrieving:  87%|████████▋ | 87/100 [02:24<00:20,  1.61s/it]Retrieving:  88%|████████▊ | 88/100 [02:25<00:18,  1.57s/it]Retrieving:  89%|████████▉ | 89/100 [02:27<00:17,  1.55s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What where both Hawker Hurricane and No. 1455 Flight apart of?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+Retrieving:  90%|█████████ | 90/100 [02:28<00:15,  1.53s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Kadeem Jack is a player in a league that started with how many teams?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  91%|█████████ | 91/100 [02:30<00:13,  1.51s/it]Retrieving:  92%|█████████▏| 92/100 [02:31<00:11,  1.49s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Of four Harry S. Truman Supreme Court candidates, who was the 53rd United States Secretary of the Treasury and the 13th Chief Justice of the United States?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid decimal literal (<unknown>, line 2).
+INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  93%|█████████▎| 93/100 [02:41<00:28,  4.00s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what month was the relief first officer of the flight that crashed on its way to Cairo with a stop in New York Born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  94%|█████████▍| 94/100 [02:43<00:19,  3.29s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are The Datsuns and The Black Crowes both rock bands?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  95%|█████████▌| 95/100 [02:44<00:13,  2.73s/it]Retrieving:  96%|█████████▌| 96/100 [02:46<00:09,  2.33s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Rimo I and Passu Sar are both part of which mountain range?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  97%|█████████▋| 97/100 [02:47<00:06,  2.05s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the country which has border with the village where an Austrian forest caretaker, naturalist, pseudoscientistref>Ronald Engert: "Die Forellenturbine al': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  98%|█████████▊| 98/100 [02:48<00:03,  1.86s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which team did Joe Buck's father broadcast for?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  99%|█████████▉| 99/100 [02:50<00:01,  1.72s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the city located near the historical region known as Margianḗ in Greek?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving: 100%|██████████| 100/100 [02:51<00:00,  1.64s/it]Retrieving: 100%|██████████| 100/100 [02:51<00:00,  1.72s/it]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 183.68s
+INFO:src.hipporag.HippoRAG:Total Recognition Memory Time 134.14s
+INFO:src.hipporag.HippoRAG:Total PPR Time 22.24s
+INFO:src.hipporag.HippoRAG:Total Misc Time 27.31s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.38, 'Recall@2': 0.645, 'Recall@5': 0.915, 'Recall@10': 0.96, 'Recall@20': 0.965, 'Recall@30': 0.98, 'Recall@50': 0.985, 'Recall@100': 1.0, 'Recall@150': 1.0, 'Recall@200': 1.0}
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 31545.61it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]QA Reading: 100%|██████████| 100/100 [00:00<00:00, 4094.28it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 6488.01it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.58, 'F1': 0.6978}
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'what is one of the stars of  The Newcomers known for': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The fictional private detective that appears in "The Adventure of the Seven Clocks" what written by whom?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In which county is the town in which Raymond Robertsen was born ?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What screenplay was worked on by both Edward Carfagno and Miklos Rozsa?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which Walt Disney film was produced first, The Apple Dumpling Gang or Something Wicked This Way Comes?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Bytham Castle is a castle in the civil parish of how many houses?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How do the Peter Laufer books Forbidden Creatures and No Animals Were Harmed differ in their focus on animals?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is a winner of the 2013 6 Hours of Silverstone a co-commentator for?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax. Perhaps you forgot a comma? (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what year was the Golden State NBA player, who was part of the Cavaliers-Warriors rivalry, named NBA Finals Most Valuable Player?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the actor who wrote the memoir Without you: A memoir of love, loss, and the Musical Rent and also stared as Mark Cohen in the Broadway produ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'One Raffles Place is one of the tallest skyscrapers in the city of Singapore and tallest in the wolrd outside North America until it was succeeded by a Building': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Sand Mountainis part of the southern tip of a mountain chain in which part of North America ?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'At what intersection was the former home of the wooden roller coaster now located at Six Flags Great America in Gurnee, Illinois located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The View from the Bottom is the fifth studio album by an American rock band best known for what hit song?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which historical drama filmed in the Winter Palace of the Russian State Hermitage Museum stars Sergey Dreyden?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What subsidiary of the largest airline of the Republic of China (Taiwan) has a main hub at Taichung Airport?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the former MGM Grand Garden Special Events Center where the Mayweather-Ortiz fight took place?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which aircraft engine powers a General Dynamics aircraft of which over 4500 have been built?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which British racing driver has raced for 7 different teams and won the European Grand Prix in 1999?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what city can a person find both the Nusretiye Clock Tower and the Eski Imaret Mosque be found?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who has written more than 300 papers, Semyon Aranovich Gershgorin or Pavel Alexandrov?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which software application was originally made for the company that acquired RadioShack in 1963?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who wrote Bring Me Sunshine and where did they write it?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What American professional Hawaiian surfer born 18 October 1992 won the Rip Curl Pro Portugal?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Ellie Parker is a 2005 American drama-comedy film whose title character is played by an English actress who made her screen debut in what Australian drama film?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Faith Goldy got fired after an interview she gave on what production site edited by Andrew Anglin?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where is the headquarters for the service broadcaster the show Tenko is on?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "The fourth episode The Simpsons' seventh season has what kind of theme?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'La Machine a ecirire was written by what French writer, designer, playright, artist, and filmmaker, who is known for his novel, "Les Enfants Terribles"?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the birthdate of this Norwegian professional footballer who plays as an attacking midfielder and who broke the record for the youngest player that has e': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Devil's Food is a singles compilation by an American rock and roll band that has also been known to play country shows under what?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What 1944 Bollywood film was the mother of Bollywood actor Govinda in?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid decimal literal (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Haier has North American rights to which appliance company headquartered in Louisville, Kentucky?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who directed a 2006 film where Ron Perkins character plays the manager of a hotel?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What movie did Chris Duesterdiek work on that was directed by Seth Rogen and Evan Goldberg?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the county seat of the county in which Keokuk Falls, Oklahoma is loated?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What former president of ABC television is a high ranking officer in the same company as Christine Mccarthy?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the second World Junior Ice Hockey Championship in which Miroslav Přerost coached the men's national junior ice hockey team hosted?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What city did the musician whose debut album shares its title with the 1959 Alfred Hitchcock hail from?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The 53rd National Hockey League All-Star Game took place at the indoor arena that was completed in what year?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which of Damon Stoudamire's cousins once played college basketball for the University of Kentucky?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The player who defeated Johnny Majors for the Heisman Trophy in 1956 was born in what year?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In which election did Norm Coleman won to become the last republican elected as of 2017?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is the mother of Mary, Crown Princess of Denmark's husband?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What year did Fifty Shades of Grey release?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The ghetto that George Kadish documented held how many people at its peak?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What where both Hawker Hurricane and No. 1455 Flight apart of?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 3) (<unknown>, line 3).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Kadeem Jack is a player in a league that started with how many teams?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Of four Harry S. Truman Supreme Court candidates, who was the 53rd United States Secretary of the Treasury and the 13th Chief Justice of the United States?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid decimal literal (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what month was the relief first officer of the flight that crashed on its way to Cairo with a stop in New York Born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are The Datsuns and The Black Crowes both rock bands?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Rimo I and Passu Sar are both part of which mountain range?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the country which has border with the village where an Austrian forest caretaker, naturalist, pseudoscientistref>Ronald Engert: "Die Forellenturbine al': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which team did Joe Buck's father broadcast for?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the city located near the historical region known as Margianḗ in Greek?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:__main__:Applied bridge_beam selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=4.93)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 17513.48it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  20%|██        | 20/100 [00:01<00:06, 13.22it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  25%|██▌       | 25/100 [00:04<00:14,  5.04it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  27%|██▋       | 27/100 [00:05<00:20,  3.51it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  43%|████▎     | 43/100 [00:20<00:38,  1.48it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  52%|█████▏    | 52/100 [00:23<00:25,  1.86it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  59%|█████▉    | 59/100 [00:33<00:32,  1.27it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  74%|███████▍  | 74/100 [00:36<00:13,  1.94it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  76%|███████▌  | 76/100 [00:38<00:13,  1.78it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  87%|████████▋ | 87/100 [00:40<00:05,  2.35it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  93%|█████████▎| 93/100 [00:42<00:02,  2.53it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  95%|█████████▌| 95/100 [00:44<00:02,  2.31it/s]QA Reading: 100%|██████████| 100/100 [00:44<00:00,  2.27it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 2939.72it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.57, 'F1': 0.6862}
+INFO:__main__:Setwise selector bridge_beam[bridge]@100: EM=0.5700 (delta=-0.0100), F1=0.6862
+{
+  "output_json": "outputs_step0_general_hotpotqa/eval_reports/bridge_beam_sameprotocol_closureonly_pilot100_fresh8043.json",
+  "overall_recomputed": {
+    "Recall@1": 0.38,
+    "Recall@2": 0.645,
+    "Recall@5": 0.915,
+    "Recall@10": 0.96,
+    "Recall@20": 0.965,
+    "Recall@30": 0.98,
+    "Recall@50": 0.985,
+    "Recall@100": 1.0,
+    "Recall@150": 1.0,
+    "Recall@200": 1.0,
+    "ExactMatch": 0.58,
+    "F1": 0.6978360294676084,
+    "num_queries": 100
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "setwise_selector_qa": {
+    "selector": "bridge_beam",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "anchor_count": 2,
+    "reserve_top_m": 4,
+    "max_bridge_slots": 1,
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "gate_mode": "suffix_bridge",
+    "gate_min_structure_score": 0.15,
+    "gate_min_combined_margin": 0.0,
+    "gate_min_closure_score": 0.0,
+    "gate_min_novelty_score": 0.0,
+    "gate_min_frontier_gain": 0.0,
+    "gate_min_path_coherence": 0.0,
+    "gate_max_avg_local_structure": 0.95,
+    "gate_min_suffix_base_mean": 0.15,
+    "reader_order_probe_mode": "none",
+    "beam_width": 4,
+    "beam_expand_per_state": 4,
+    "beam_projected_shortlist_factor": 1,
+    "late_rerank_enabled": false,
+    "late_rerank_candidate_count": 4,
+    "late_rerank_include_baseline": true,
+    "late_rerank_doc_char_limit": 280,
+    "late_rerank_policy": "always",
+    "late_rerank_max_state_score_gap": 0.0,
+    "late_rerank_judge_backend": "inherit",
+    "late_rerank_judge_model": "qwen3-8b-train",
+    "late_rerank_judge_base_url": "http://localhost:8043/v1",
+    "late_rerank_judge_reasoning_effort": null,
+    "state_score_weights": {
+      "path_connectivity": 0.3,
+      "reachable_doc_ratio": 0.2,
+      "query_reachability": 0.15,
+      "support_mean": 0.05,
+      "support_min": 0.05,
+      "closure_mean": 0.1,
+      "suffix_base_mean": 0.05,
+      "query_coverage": 0.1,
+      "frontier_ratio": 0.05,
+      "redundancy_penalty": 0.1
+    },
+    "setwise_model_path": null,
+    "setwise_requirement_cache_path": null,
+    "setwise_requirement_mode": "oracle",
+    "setwise_requirement_model_path": null,
+    "setwise_requirement_reserve_policy": "fixed",
+    "setwise_requirement_annotation_pool_k": 50,
+    "setwise_requirement_smooth_tau": 0.15,
+    "setwise_requirement_counterfactual_tau": 0.1,
+    "setwise_requirement_live_annotation_pool_k": 0,
+    "setwise_requirement_live_annotation_score_mode": "heuristic",
+    "setwise_requirement_live_atomic_model_path": null,
+    "setwise_requirement_live_source_expand_factor": 0,
+    "setwise_requirement_exposure_watch_titles": [
+      "Riverside Plaza",
+      "Minneapolis",
+      "Mississippi River",
+      "The Right Stuff Records",
+      "Sony Music"
+    ],
+    "setwise_requirement_probe_force_source_titles": [],
+    "setwise_requirement_probe_force_shortlist_titles": [],
+    "setwise_requirement_probe_force_final_titles": [],
+    "setwise_requirement_probe_force_pool_gold_into_final": false,
+    "setwise_requirement_probe_source_sort_mode": "combined",
+    "setwise_requirement_probe_source_support_gain_weight": 0.0,
+    "setwise_requirement_probe_shortlist_sort_mode": "margin_first",
+    "setwise_requirement_probe_bridge_bonus_mode": "off",
+    "setwise_requirement_probe_bridge_bonus_weight": 0.0,
+    "selector_EM": 0.57,
+    "selector_F1": 0.6862,
+    "baseline_EM": 0.58,
+    "baseline_F1": 0.6978,
+    "EM_delta": -0.01,
+    "F1_delta": -0.0116,
+    "selector_retrieval_metrics": {
+      "Recall@1": 0.38,
+      "Recall@2": 0.645,
+      "Recall@5": 0.915,
+      "Recall@10": 0.965,
+      "Recall@20": 0.97
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 100,
+        "baseline_EM": 0.58,
+        "selector_EM": 0.57,
+        "EM_delta": -0.01,
+        "baseline_F1": 0.6978,
+        "selector_F1": 0.6862,
+        "F1_delta": -0.0117
+      }
+    },
+    "selector_summary": {
+      "selector": "bridge_beam",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 4.93,
+      "avg_selected_structured_doc_count": 5.0,
+      "reserve_top_m": 4,
+      "max_bridge_slots": 1,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "suffix_bridge",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 17,
+      "gate_skip_count": 83,
+      "gate_reason_counts": {
+        "baseline_suffix_already_has_equal_or_better_bridge": 2,
+        "offrank_bridge_signal_detected": 17,
+        "offrank_structure_below_threshold": 81
+      },
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "what is one of the stars of  The Newcomers known for",
+          "selected_titles": [
+            "The Newcomers (film)",
+            "Vaniusha The Newcomer",
+            "The Newcomer in The Cabbage",
+            "Vaniusha and The Giant",
+            "Vaniusha and The Space Pirate"
+          ],
+          "seed_entities_preview": [
+            "chris evans",
+            "christopher mccoy",
+            "kate bosworth",
+            "paul dano",
+            "the newcomers"
+          ],
+          "question_entities_preview": [
+            "an american girl mckenna shoots for the stars",
+            "cultural identity of the malayali",
+            "emigration for the sake of seeking a better profession",
+            "han sun hwa as one of the nine rising it stars",
+            "multiple seasons of the sopranos",
+            "newcomers",
+            "the newcomers",
+            "war of the worlds"
+          ],
+          "grounded_question_entities_preview": [
+            "an american girl mckenna shoots for the stars",
+            "cultural identity of the malayali",
+            "emigration for the sake of seeking a better profession",
+            "the newcomers"
+          ],
+          "proposal_query_entities_preview": [
+            "chris evans",
+            "christopher mccoy",
+            "kate bosworth",
+            "paul dano",
+            "the newcomers"
+          ],
+          "query_entities_preview": [
+            "chris evans",
+            "christopher mccoy",
+            "kate bosworth",
+            "paul dano",
+            "the newcomers"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "The fictional private detective that appears in \"The Adventure of the Seven Clocks\" what written by whom?",
+          "selected_titles": [
+            "The Adventure of the Seven Clocks",
+            "Sherlock Holmes",
+            "He Who Whispers",
+            "The Crooked Hinge",
+            "Mr. Holmes"
+          ],
+          "seed_entities_preview": [
+            "adrian conan doyle",
+            "john dickson carr",
+            "sherlock holmes story",
+            "the adventure of the seven clocks",
+            "the exploits of sherlock holmes"
+          ],
+          "question_entities_preview": [
+            "fiction",
+            "fictional private detective",
+            "private detective",
+            "seven",
+            "tales of the fictional private detective nick carter",
+            "the adventure company",
+            "the adventure of the seven clocks",
+            "the private sector"
+          ],
+          "grounded_question_entities_preview": [
+            "fictional private detective",
+            "tales of the fictional private detective nick carter",
+            "the adventure company",
+            "the adventure of the seven clocks"
+          ],
+          "proposal_query_entities_preview": [
+            "adrian conan doyle",
+            "john dickson carr",
+            "sherlock holmes story",
+            "the adventure of the seven clocks",
+            "the exploits of sherlock holmes"
+          ],
+          "query_entities_preview": [
+            "adrian conan doyle",
+            "john dickson carr",
+            "sherlock holmes story",
+            "the adventure of the seven clocks",
+            "the exploits of sherlock holmes"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "The Distribution of Industry act was passed by a man who was prime minister when? ",
+          "selected_titles": [
+            "Industry Act 1975",
+            "Distribution of Industry Act 1950",
+            "Clement Attlee",
+            "Honours (Prevention of Abuses) Act 1925",
+            "James Callaghan"
+          ],
+          "seed_entities_preview": [
+            "1950",
+            "clement attlee",
+            "distribution of industry act 1950",
+            "labour government",
+            "united kingdom"
+          ],
+          "question_entities_preview": [
+            "act",
+            "department of the prime minister",
+            "distribution",
+            "distribution of industry act 1950",
+            "industry",
+            "prime minister",
+            "prime minister of mauritius",
+            "prime minister of pakistan"
+          ],
+          "grounded_question_entities_preview": [
+            "act",
+            "department of the prime minister",
+            "distribution of industry act 1950",
+            "prime minister",
+            "prime minister of mauritius",
+            "prime minister of pakistan"
+          ],
+          "proposal_query_entities_preview": [
+            "1950",
+            "clement attlee",
+            "distribution of industry act 1950",
+            "labour government",
+            "united kingdom"
+          ],
+          "query_entities_preview": [
+            "1950",
+            "clement attlee",
+            "distribution of industry act 1950",
+            "labour government",
+            "united kingdom"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "Sparking the Marian civil war, who helped the recently abdicated queen to escape her imprisonment?",
+          "selected_titles": [
+            "Marian civil war",
+            "Battle of Langside",
+            "Loch Leven Castle",
+            "Battle of Carberry Hill",
+            "Background of the Spanish Civil War"
+          ],
+          "seed_entities_preview": [
+            "loch leven castle",
+            "marian civil war",
+            "mary queen of scots"
+          ],
+          "question_entities_preview": [
+            "civil war political pamphleteer",
+            "king",
+            "marian civil war",
+            "queen",
+            "queen anne s war",
+            "scottish civil war",
+            "spanish civil war",
+            "the winter queen"
+          ],
+          "grounded_question_entities_preview": [
+            "king",
+            "marian civil war",
+            "queen",
+            "spanish civil war",
+            "the winter queen"
+          ],
+          "proposal_query_entities_preview": [
+            "loch leven castle",
+            "marian civil war",
+            "mary queen of scots"
+          ],
+          "query_entities_preview": [
+            "loch leven castle",
+            "marian civil war",
+            "mary queen of scots"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "In which county is the town in which Raymond Robertsen was born ?",
+          "selected_titles": [
+            "Raymond, Alberta",
+            "Raymond Robertsen",
+            "Hammerfest",
+            "Raymond, Maine",
+            "P.P. Raymond House"
+          ],
+          "seed_entities_preview": [
+            "12 september 1974",
+            "hammerfest",
+            "norwegian politician",
+            "raymond center",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "question_entities_preview": [
+            "agricultural growth in goodhue county",
+            "raymond",
+            "raymond robertsen",
+            "the town",
+            "town",
+            "town of raymond",
+            "western edge of the county",
+            "when the town was officially established"
+          ],
+          "grounded_question_entities_preview": [
+            "raymond",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "proposal_query_entities_preview": [
+            "12 september 1974",
+            "hammerfest",
+            "norwegian politician",
+            "raymond center",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "query_entities_preview": [
+            "12 september 1974",
+            "hammerfest",
+            "norwegian politician",
+            "raymond center",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "selection_steps": []
+        }
+      ]
+    }
+  }
+}
+===== 2026-04-21T15:33:38+08:00 END hotpotqa; output=outputs_step0_general_hotpotqa/eval_reports/bridge_beam_sameprotocol_closureonly_pilot100_fresh8043.json =====
+===== 2026-04-21T15:33:38+08:00 START musique pilot100 =====
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 111597 nodes, 2262000 edges
+INFO:src.hipporag.embedding_store:Loaded 11656 records from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 99941 records from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 135279 records from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 11656 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_musique/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 99941 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 135279 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]2554it [00:00, 25535.70it/s]5108it [00:00, 23365.17it/s]7457it [00:00, 22401.40it/s]9705it [00:00, 21325.95it/s]11656it [00:00, 21570.34it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]11656it [00:00, 4048092.03it/s]
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval.
+INFO:src.hipporag.HippoRAG:Loading keys.
+INFO:src.hipporag.HippoRAG:Loading embeddings.
+INFO:src.hipporag.HippoRAG:Encoding 100 queries for query_to_fact.
+Batch Encoding:   0%|          | 0/4 [00:00<?, ?it/s]Batch Encoding:  25%|██▌       | 1/4 [00:00<00:00,  3.98it/s]Batch Encoding:  50%|█████     | 2/4 [00:00<00:00,  4.02it/s]Batch Encoding:  75%|███████▌  | 3/4 [00:00<00:00,  4.11it/s]Batch Encoding: 100%|██████████| 4/4 [00:00<00:00,  4.94it/s]
+INFO:src.hipporag.HippoRAG:Encoding 100 queries for query_to_passage.
+Batch Encoding:   0%|          | 0/4 [00:00<?, ?it/s]Batch Encoding:  25%|██▌       | 1/4 [00:00<00:00,  4.37it/s]Batch Encoding:  50%|█████     | 2/4 [00:00<00:00,  4.31it/s]Batch Encoding:  75%|███████▌  | 3/4 [00:00<00:00,  4.36it/s]Batch Encoding: 100%|██████████| 4/4 [00:00<00:00,  5.17it/s]
+Retrieving:   0%|          | 0/100 [00:00<?, ?it/s]Retrieving:   1%|          | 1/100 [00:02<03:18,  2.01s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:   2%|▏         | 2/100 [00:03<03:14,  1.99s/it]Retrieving:   3%|▎         | 3/100 [00:05<03:07,  1.94s/it]Retrieving:   4%|▍         | 4/100 [00:07<02:59,  1.87s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:   5%|▌         | 5/100 [00:17<07:38,  4.82s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the region immediately north of the region where Israel is located and the location of the Battle of Qurah and Umm al Maradim created?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 17) (<unknown>, line 17).
+Retrieving:   6%|▌         | 6/100 [00:19<05:59,  3.82s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:   7%|▋         | 7/100 [00:21<04:55,  3.18s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:   8%|▊         | 8/100 [00:23<04:13,  2.75s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the start of the battle of the birthplace of the performer of III?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:   9%|▉         | 9/100 [00:25<03:44,  2.46s/it]Retrieving:  10%|█         | 10/100 [00:27<03:26,  2.30s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How many episodes are in season 5 of the series with The Bag or the Bat?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+Retrieving:  11%|█         | 11/100 [00:28<03:13,  2.17s/it]Retrieving:  12%|█▏        | 12/100 [00:30<03:04,  2.10s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the birthplace of the person after whom São José dos Campos was named?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  13%|█▎        | 13/100 [00:32<02:59,  2.06s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How many times did plague occur in the place where Crucifixion's creator died?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+Retrieving:  14%|█▍        | 14/100 [00:34<02:52,  2.01s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What year did the Governor of the city where the basilica named after the same saint as the one that Mantua Cathedral is dedicated to die?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  15%|█▌        | 15/100 [00:36<02:48,  1.99s/it]Retrieving:  16%|█▌        | 16/100 [00:38<02:45,  1.97s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  17%|█▋        | 17/100 [00:40<02:39,  1.93s/it]Retrieving:  18%|█▊        | 18/100 [00:42<02:35,  1.89s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was in charge of the place where Castricum is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  19%|█▉        | 19/100 [00:44<02:32,  1.89s/it]Retrieving:  20%|██        | 20/100 [00:45<02:29,  1.87s/it]Retrieving:  21%|██        | 21/100 [00:47<02:26,  1.85s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is the child of Chiang Hsiao-wen's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  22%|██▏       | 22/100 [00:49<02:21,  1.81s/it]Retrieving:  23%|██▎       | 23/100 [00:50<02:14,  1.74s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Whose sister played Susie in miracle on 34th street?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  24%|██▍       | 24/100 [01:01<05:26,  4.30s/it]Retrieving:  25%|██▌       | 25/100 [01:03<04:28,  3.59s/it]Retrieving:  26%|██▌       | 26/100 [01:05<03:58,  3.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How many times did the plague occur in the city where the painter of The Bacchanal of the Andrians died?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  27%|██▋       | 27/100 [01:16<06:36,  5.43s/it]Retrieving:  28%|██▊       | 28/100 [01:18<05:16,  4.39s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflic': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  29%|██▉       | 29/100 [01:19<04:18,  3.63s/it]Retrieving:  30%|███       | 30/100 [01:21<03:37,  3.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the city where Greenwood Laboratory School is located become capitol of the state where the screenwriter of The Poor Boob was born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+Retrieving:  31%|███       | 31/100 [01:32<06:02,  5.25s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is played by the director of The Good Shepherd in The Godfather?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  32%|███▏      | 32/100 [01:33<04:47,  4.23s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How long are the council terms of the city that shares a county with Helvetia?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  33%|███▎      | 33/100 [01:35<03:54,  3.51s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the region immediately north of the region that prevailed with the disgrace of Near East and the terrain feature on which shamal is located created?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid character '–' (U+2013) (<unknown>, line 6).
+Retrieving:  34%|███▍      | 34/100 [01:37<03:18,  3.00s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How did did the people fare during the reign of the abolisher of sati partha in India?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+Retrieving:  35%|███▌      | 35/100 [01:39<02:52,  2.66s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the position of the 1st governor general of India?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  36%|███▌      | 36/100 [01:41<02:36,  2.45s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the president who suffered a major defeat when the body which approves members of the American cabinet refused to ratify the Versailles trea': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  37%|███▋      | 37/100 [01:44<02:42,  2.58s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What does dell call the feature letting the interface replacing FireWire in later iterations of the iPod drives to remain powered when the computer is off?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:  38%|███▊      | 38/100 [01:46<02:31,  2.44s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who wrote Turn Me On by the singer of Come Away with Me?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  39%|███▉      | 39/100 [01:48<02:17,  2.26s/it]Retrieving:  40%|████      | 40/100 [01:50<02:06,  2.11s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring indepe": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  41%|████      | 41/100 [01:51<01:58,  2.02s/it]Retrieving:  42%|████▏     | 42/100 [01:53<01:53,  1.95s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the form of the language Auctor is in, used in the era of the Frankish king who created the Holy Roman Empire, later known as?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  43%|████▎     | 43/100 [01:55<01:44,  1.84s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  44%|████▍     | 44/100 [01:56<01:39,  1.78s/it]Retrieving:  45%|████▌     | 45/100 [01:58<01:34,  1.71s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What city is the star of Sous les pieds des femmes from?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  46%|████▌     | 46/100 [01:59<01:30,  1.68s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'what is meaning of the word that is a majority religion of the area that became India when the country origin of Mizraab was created in Arabic dictionary?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  47%|████▋     | 47/100 [02:01<01:27,  1.65s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who stars in the video "One Last Time" by the performer of Baby I?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  48%|████▊     | 48/100 [02:03<01:25,  1.65s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the majority party in the House of Representatives gain control of the body which approves members of the Cabinet?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  49%|████▉     | 49/100 [02:04<01:23,  1.64s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How many ethnic minorities were looked at differently in the city where the headquarters of the only group larger than Långa nätter's record label is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  50%|█████     | 50/100 [02:06<01:20,  1.62s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the country the top-ranking Warsaw Pact operatives came from, despite it being headquartered in the country where A Generation is set, agree to a unifi': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  51%|█████     | 51/100 [02:07<01:18,  1.60s/it]Retrieving:  52%|█████▏    | 52/100 [02:09<01:16,  1.59s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who did the person who married their half sister in the bible marry after the death of sarah?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  53%|█████▎    | 53/100 [02:11<01:14,  1.58s/it]Retrieving:  54%|█████▍    | 54/100 [02:12<01:12,  1.58s/it]Retrieving:  55%|█████▌    | 55/100 [02:14<01:11,  1.59s/it]Retrieving:  56%|█████▌    | 56/100 [02:16<01:17,  1.76s/it]Retrieving:  57%|█████▋    | 57/100 [02:18<01:17,  1.79s/it]Retrieving:  58%|█████▊    | 58/100 [02:20<01:17,  1.85s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was the spouse of a leading speaker against slavery and publisher of an antislavery newspaper?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  59%|█████▉    | 59/100 [02:22<01:15,  1.84s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where is the district that the person who wanted to reform and address John Kodwo Amissah's religion preached a sermon on Marian devotion before his death locat": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  60%|██████    | 60/100 [02:23<01:12,  1.81s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the capital of the county where Fort Deposit is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  61%|██████    | 61/100 [02:25<01:10,  1.80s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+Retrieving:  62%|██████▏   | 62/100 [02:27<01:08,  1.81s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the language Auctor comes from during the era of the man crowned first Holy Roman Emperor later known as?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  63%|██████▎   | 63/100 [02:29<01:05,  1.76s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the 1979-80 European Cup winner win the FA Cup?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  64%|██████▍   | 64/100 [02:30<01:00,  1.69s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was a prominent figure at the radio division of the network that created the version of The Biggest Loser set in the country where Seria is?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  65%|██████▌   | 65/100 [02:32<00:57,  1.65s/it]Retrieving:  66%|██████▌   | 66/100 [02:33<00:55,  1.63s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the language from which the last name Sylvester originated during the era of the person crowned emperor of the west in 800 CE later known as?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  67%|██████▋   | 67/100 [02:35<00:53,  1.63s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the head of the agency that created MYSTIC?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  68%|██████▊   | 68/100 [02:36<00:51,  1.62s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the wettest year of the administrative territorial entity that contains the administrative territorial entity where Drexel Heights is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  69%|██████▉   | 69/100 [02:38<00:50,  1.63s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who won the Indy Car Race in the largest populated city of the state where the performer of Mingus Plays Piano is from?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  70%|███████   | 70/100 [02:40<00:49,  1.66s/it]Retrieving:  71%|███████   | 71/100 [02:42<00:49,  1.69s/it]Retrieving:  72%|███████▏  | 72/100 [02:43<00:48,  1.73s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which county shares a border with the county where the most populous city in the state where Washington State Prison can be found is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  73%|███████▎  | 73/100 [02:45<00:46,  1.71s/it]Retrieving:  74%|███████▍  | 74/100 [02:47<00:43,  1.66s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the direction of flow of the body of water by the city where Write This Down was formed?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  75%|███████▌  | 75/100 [02:48<00:40,  1.63s/it]Retrieving:  76%|███████▌  | 76/100 [02:50<00:38,  1.60s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is the father of Empress Wang's husband?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+Retrieving:  77%|███████▋  | 77/100 [02:51<00:37,  1.61s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the country with a co-official language used in the film titled after the city that is the final resting place of Tito first attend the Olympics games?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  78%|███████▊  | 78/100 [02:53<00:35,  1.61s/it]Retrieving:  79%|███████▉  | 79/100 [02:55<00:33,  1.59s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When was the last time Darren Carter's team beat the 1894-95 FA Cup winner?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  80%|████████  | 80/100 [02:56<00:31,  1.57s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the famous bridge in the city where the composer of La Silvia was born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  81%|████████  | 81/100 [02:58<00:29,  1.57s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the spouse of the actor that plays Jarvis in the Avengers Age of Ultron?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  82%|████████▏ | 82/100 [02:59<00:28,  1.56s/it]Retrieving:  83%|████████▎ | 83/100 [03:01<00:26,  1.57s/it]Retrieving:  84%|████████▍ | 84/100 [03:02<00:25,  1.57s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the president under whom prohibition occurred?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  85%|████████▌ | 85/100 [03:04<00:23,  1.56s/it]Retrieving:  86%|████████▌ | 86/100 [03:05<00:21,  1.56s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who played the girlfriend of who plays marty mcfly's daughter in back to the future 2?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  87%|████████▋ | 87/100 [03:07<00:20,  1.55s/it]Retrieving:  88%|████████▊ | 88/100 [03:09<00:18,  1.55s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the tallest building in the state where KZAR is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  89%|████████▉ | 89/100 [03:10<00:17,  1.55s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the maximum load drawn by the 1.0 and 2.0 versions of the device that replaced FireWire in later iPods?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  90%|█████████ | 90/100 [03:12<00:15,  1.55s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where is the headquarters of Radio Television of this country that has a co-official language that is the same as the language of Olivera Markovic?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:  91%|█████████ | 91/100 [03:13<00:14,  1.56s/it]Retrieving:  92%|█████████▏| 92/100 [03:15<00:12,  1.55s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the majority party in the House of Representatives gain control of the body which determines rules of the US House and US Senate?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  93%|█████████▎| 93/100 [03:16<00:10,  1.54s/it]Retrieving:  94%|█████████▍| 94/100 [03:18<00:09,  1.54s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who had the lowest batting average in the league where the team with the most games in the series after which the MLB MVP is awarded played?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  95%|█████████▌| 95/100 [03:19<00:07,  1.54s/it]Retrieving:  96%|█████████▌| 96/100 [03:21<00:06,  1.55s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is an example of a railroad line in the country first to invade Manchuria?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  97%|█████████▋| 97/100 [03:22<00:04,  1.54s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the Victim of Romance performer?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  98%|█████████▊| 98/100 [03:24<00:03,  1.55s/it]Retrieving:  99%|█████████▉| 99/100 [03:26<00:01,  1.56s/it]Retrieving: 100%|██████████| 100/100 [03:27<00:00,  1.55s/it]Retrieving: 100%|██████████| 100/100 [03:27<00:00,  2.08s/it]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 223.11s
+INFO:src.hipporag.HippoRAG:Total Recognition Memory Time 163.96s
+INFO:src.hipporag.HippoRAG:Total PPR Time 24.90s
+INFO:src.hipporag.HippoRAG:Total Misc Time 34.25s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.2733, 'Recall@2': 0.3792, 'Recall@5': 0.615, 'Recall@10': 0.725, 'Recall@20': 0.7858, 'Recall@30': 0.8092, 'Recall@50': 0.8333, 'Recall@100': 0.8875, 'Recall@150': 0.9108, 'Recall@200': 0.9233}
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 27749.28it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]QA Reading: 100%|██████████| 100/100 [00:00<00:00, 3528.42it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 4896.63it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.26, 'F1': 0.3349}
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the region immediately north of the region where Israel is located and the location of the Battle of Qurah and Umm al Maradim created?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 17) (<unknown>, line 17).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the start of the battle of the birthplace of the performer of III?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How many episodes are in season 5 of the series with The Bag or the Bat?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the birthplace of the person after whom São José dos Campos was named?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How many times did plague occur in the place where Crucifixion's creator died?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What year did the Governor of the city where the basilica named after the same saint as the one that Mantua Cathedral is dedicated to die?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was in charge of the place where Castricum is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is the child of Chiang Hsiao-wen's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Whose sister played Susie in miracle on 34th street?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How many times did the plague occur in the city where the painter of The Bacchanal of the Andrians died?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflic': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the city where Greenwood Laboratory School is located become capitol of the state where the screenwriter of The Poor Boob was born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is played by the director of The Good Shepherd in The Godfather?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How long are the council terms of the city that shares a county with Helvetia?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the region immediately north of the region that prevailed with the disgrace of Near East and the terrain feature on which shamal is located created?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid character '–' (U+2013) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How did did the people fare during the reign of the abolisher of sati partha in India?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the position of the 1st governor general of India?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the president who suffered a major defeat when the body which approves members of the American cabinet refused to ratify the Versailles trea': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What does dell call the feature letting the interface replacing FireWire in later iterations of the iPod drives to remain powered when the computer is off?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who wrote Turn Me On by the singer of Come Away with Me?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring indepe": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the form of the language Auctor is in, used in the era of the Frankish king who created the Holy Roman Empire, later known as?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What city is the star of Sous les pieds des femmes from?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'what is meaning of the word that is a majority religion of the area that became India when the country origin of Mizraab was created in Arabic dictionary?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who stars in the video "One Last Time" by the performer of Baby I?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the majority party in the House of Representatives gain control of the body which approves members of the Cabinet?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How many ethnic minorities were looked at differently in the city where the headquarters of the only group larger than Långa nätter's record label is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the country the top-ranking Warsaw Pact operatives came from, despite it being headquartered in the country where A Generation is set, agree to a unifi': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who did the person who married their half sister in the bible marry after the death of sarah?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was the spouse of a leading speaker against slavery and publisher of an antislavery newspaper?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where is the district that the person who wanted to reform and address John Kodwo Amissah's religion preached a sermon on Marian devotion before his death locat": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the capital of the county where Fort Deposit is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the language Auctor comes from during the era of the man crowned first Holy Roman Emperor later known as?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the 1979-80 European Cup winner win the FA Cup?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was a prominent figure at the radio division of the network that created the version of The Biggest Loser set in the country where Seria is?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the language from which the last name Sylvester originated during the era of the person crowned emperor of the west in 800 CE later known as?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the head of the agency that created MYSTIC?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What was the wettest year of the administrative territorial entity that contains the administrative territorial entity where Drexel Heights is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who won the Indy Car Race in the largest populated city of the state where the performer of Mingus Plays Piano is from?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which county shares a border with the county where the most populous city in the state where Washington State Prison can be found is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the direction of flow of the body of water by the city where Write This Down was formed?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is the father of Empress Wang's husband?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 8) (<unknown>, line 8).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the country with a co-official language used in the film titled after the city that is the final resting place of Tito first attend the Olympics games?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When was the last time Darren Carter's team beat the 1894-95 FA Cup winner?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the famous bridge in the city where the composer of La Silvia was born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the spouse of the actor that plays Jarvis in the Avengers Age of Ultron?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the president under whom prohibition occurred?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who played the girlfriend of who plays marty mcfly's daughter in back to the future 2?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the tallest building in the state where KZAR is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the maximum load drawn by the 1.0 and 2.0 versions of the device that replaced FireWire in later iPods?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where is the headquarters of Radio Television of this country that has a co-official language that is the same as the language of Olivera Markovic?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When did the majority party in the House of Representatives gain control of the body which determines rules of the US House and US Senate?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who had the lowest batting average in the league where the team with the most games in the series after which the MLB MVP is awarded played?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is an example of a railroad line in the country first to invade Manchuria?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is the child of the Victim of Romance performer?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:__main__:Applied bridge_beam selector over pool@100 for 100 queries (avg mapped pool docs=100.00, avg seed entities=5.32)
+Collecting QA prompts:   0%|          | 0/100 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 100/100 [00:00<00:00, 23273.24it/s]
+QA Reading:   0%|          | 0/100 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   1%|          | 1/100 [00:08<13:58,  8.47s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   2%|▏         | 2/100 [00:13<10:38,  6.52s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   6%|▌         | 6/100 [00:26<06:17,  4.02s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:   8%|▊         | 8/100 [00:36<06:37,  4.32s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  12%|█▏        | 12/100 [00:40<03:49,  2.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  17%|█▋        | 17/100 [00:46<02:42,  1.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  27%|██▋       | 27/100 [00:57<01:47,  1.47s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  29%|██▉       | 29/100 [01:03<02:01,  1.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  31%|███       | 31/100 [02:00<07:04,  6.15s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  32%|███▏      | 32/100 [02:07<07:03,  6.23s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  34%|███▍      | 34/100 [02:22<07:16,  6.61s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  35%|███▌      | 35/100 [02:31<07:32,  6.96s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  36%|███▌      | 36/100 [02:33<06:32,  6.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  38%|███▊      | 38/100 [02:36<04:40,  4.53s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  40%|████      | 40/100 [02:38<03:29,  3.49s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  41%|████      | 41/100 [03:30<12:16, 12.49s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  43%|████▎     | 43/100 [03:34<08:23,  8.83s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  44%|████▍     | 44/100 [04:26<16:15, 17.43s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  45%|████▌     | 45/100 [04:29<13:03, 14.24s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  46%|████▌     | 46/100 [04:39<11:52, 13.20s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  47%|████▋     | 47/100 [04:50<11:10, 12.66s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  49%|████▉     | 49/100 [04:59<07:41,  9.05s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  50%|█████     | 50/100 [05:11<08:08,  9.76s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  51%|█████     | 51/100 [05:20<07:51,  9.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  56%|█████▌    | 56/100 [05:32<03:42,  5.07s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  60%|██████    | 60/100 [05:41<02:33,  3.83s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  62%|██████▏   | 62/100 [05:46<02:15,  3.57s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  63%|██████▎   | 63/100 [05:51<02:16,  3.70s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  64%|██████▍   | 64/100 [05:53<02:06,  3.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  67%|██████▋   | 67/100 [05:58<01:30,  2.74s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  76%|███████▌  | 76/100 [06:01<00:28,  1.18s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  77%|███████▋  | 77/100 [06:04<00:29,  1.30s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  78%|███████▊  | 78/100 [06:13<00:48,  2.21s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  79%|███████▉  | 79/100 [06:16<00:49,  2.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  80%|████████  | 80/100 [06:31<01:31,  4.56s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  84%|████████▍ | 84/100 [06:41<00:56,  3.50s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  85%|████████▌ | 85/100 [06:47<00:58,  3.90s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  87%|████████▋ | 87/100 [07:02<01:03,  4.88s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  91%|█████████ | 91/100 [07:14<00:36,  4.06s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  93%|█████████▎| 93/100 [07:23<00:28,  4.14s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  95%|█████████▌| 95/100 [07:43<00:28,  5.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  99%|█████████▉| 99/100 [08:33<00:08,  8.62s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading: 100%|██████████| 100/100 [08:41<00:00,  8.50s/it]QA Reading: 100%|██████████| 100/100 [08:41<00:00,  5.21s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 100it [00:00, 1384.00it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.25, 'F1': 0.3334}
+INFO:__main__:Setwise selector bridge_beam[bridge]@100: EM=0.2500 (delta=-0.0100), F1=0.3334
+{
+  "output_json": "outputs_step0_general_musique/eval_reports/bridge_beam_sameprotocol_closureonly_pilot100_fresh8043.json",
+  "overall_recomputed": {
+    "Recall@1": 0.2733,
+    "Recall@2": 0.3792,
+    "Recall@5": 0.615,
+    "Recall@10": 0.725,
+    "Recall@20": 0.7858,
+    "Recall@30": 0.8092,
+    "Recall@50": 0.8333,
+    "Recall@100": 0.8875,
+    "Recall@150": 0.9108,
+    "Recall@200": 0.9233,
+    "ExactMatch": 0.26,
+    "F1": 0.334890756302521,
+    "num_queries": 100
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "setwise_selector_qa": {
+    "selector": "bridge_beam",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "anchor_count": 2,
+    "reserve_top_m": 4,
+    "max_bridge_slots": 1,
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "gate_mode": "suffix_bridge",
+    "gate_min_structure_score": 0.15,
+    "gate_min_combined_margin": 0.0,
+    "gate_min_closure_score": 0.0,
+    "gate_min_novelty_score": 0.0,
+    "gate_min_frontier_gain": 0.0,
+    "gate_min_path_coherence": 0.0,
+    "gate_max_avg_local_structure": 0.95,
+    "gate_min_suffix_base_mean": 0.15,
+    "reader_order_probe_mode": "none",
+    "beam_width": 4,
+    "beam_expand_per_state": 4,
+    "beam_projected_shortlist_factor": 1,
+    "late_rerank_enabled": false,
+    "late_rerank_candidate_count": 4,
+    "late_rerank_include_baseline": true,
+    "late_rerank_doc_char_limit": 280,
+    "late_rerank_policy": "always",
+    "late_rerank_max_state_score_gap": 0.0,
+    "late_rerank_judge_backend": "inherit",
+    "late_rerank_judge_model": "qwen3-8b-train",
+    "late_rerank_judge_base_url": "http://localhost:8043/v1",
+    "late_rerank_judge_reasoning_effort": null,
+    "state_score_weights": {
+      "path_connectivity": 0.3,
+      "reachable_doc_ratio": 0.2,
+      "query_reachability": 0.15,
+      "support_mean": 0.05,
+      "support_min": 0.05,
+      "closure_mean": 0.1,
+      "suffix_base_mean": 0.05,
+      "query_coverage": 0.1,
+      "frontier_ratio": 0.05,
+      "redundancy_penalty": 0.1
+    },
+    "setwise_model_path": null,
+    "setwise_requirement_cache_path": null,
+    "setwise_requirement_mode": "oracle",
+    "setwise_requirement_model_path": null,
+    "setwise_requirement_reserve_policy": "fixed",
+    "setwise_requirement_annotation_pool_k": 50,
+    "setwise_requirement_smooth_tau": 0.15,
+    "setwise_requirement_counterfactual_tau": 0.1,
+    "setwise_requirement_live_annotation_pool_k": 0,
+    "setwise_requirement_live_annotation_score_mode": "heuristic",
+    "setwise_requirement_live_atomic_model_path": null,
+    "setwise_requirement_live_source_expand_factor": 0,
+    "setwise_requirement_exposure_watch_titles": [
+      "Riverside Plaza",
+      "Minneapolis",
+      "Mississippi River",
+      "The Right Stuff Records",
+      "Sony Music"
+    ],
+    "setwise_requirement_probe_force_source_titles": [],
+    "setwise_requirement_probe_force_shortlist_titles": [],
+    "setwise_requirement_probe_force_final_titles": [],
+    "setwise_requirement_probe_force_pool_gold_into_final": false,
+    "setwise_requirement_probe_source_sort_mode": "combined",
+    "setwise_requirement_probe_source_support_gain_weight": 0.0,
+    "setwise_requirement_probe_shortlist_sort_mode": "margin_first",
+    "setwise_requirement_probe_bridge_bonus_mode": "off",
+    "setwise_requirement_probe_bridge_bonus_weight": 0.0,
+    "selector_EM": 0.25,
+    "selector_F1": 0.3334,
+    "baseline_EM": 0.26,
+    "baseline_F1": 0.3349,
+    "EM_delta": -0.01,
+    "F1_delta": -0.0015,
+    "selector_retrieval_metrics": {
+      "Recall@1": 0.2733,
+      "Recall@2": 0.3792,
+      "Recall@5": 0.5842,
+      "Recall@10": 0.715,
+      "Recall@20": 0.7908
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 48,
+        "baseline_EM": 0.3333,
+        "selector_EM": 0.3125,
+        "EM_delta": -0.0208,
+        "baseline_F1": 0.4262,
+        "selector_F1": 0.4063,
+        "F1_delta": -0.0198
+      },
+      "3_doc": {
+        "count": 30,
+        "baseline_EM": 0.2333,
+        "selector_EM": 0.2333,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.3044,
+        "selector_F1": 0.3311,
+        "F1_delta": 0.0267
+      },
+      "4_doc": {
+        "count": 22,
+        "baseline_EM": 0.1364,
+        "selector_EM": 0.1364,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.1773,
+        "selector_F1": 0.1773,
+        "F1_delta": 0.0
+      }
+    },
+    "selector_summary": {
+      "selector": "bridge_beam",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 5.32,
+      "avg_selected_structured_doc_count": 4.99,
+      "reserve_top_m": 4,
+      "max_bridge_slots": 1,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "suffix_bridge",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 52,
+      "gate_skip_count": 48,
+      "gate_reason_counts": {
+        "baseline_suffix_already_has_equal_or_better_bridge": 2,
+        "offrank_bridge_signal_detected": 52,
+        "offrank_combined_margin_too_small": 2,
+        "offrank_structure_below_threshold": 44
+      },
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "When was the person who Messi's goals in Copa del Rey compared to get signed by Barcelona?",
+          "selected_titles": [
+            "Lionel Messi",
+            "FC Barcelona",
+            "FC Barcelona",
+            "Lionel Messi",
+            "Manchester City F.C."
+          ],
+          "seed_entities_preview": [
+            "arda turan",
+            "boca juniors",
+            "copa catalunya",
+            "diego maradona",
+            "fc barcelona",
+            "lionel messi"
+          ],
+          "question_entities_preview": [
+            "6 goals",
+            "barcelona",
+            "barcelona b",
+            "copa del rey",
+            "f c barcelona",
+            "goal",
+            "messi",
+            "messi s goal"
+          ],
+          "grounded_question_entities_preview": [
+            "barcelona",
+            "barcelona b",
+            "copa del rey",
+            "messi",
+            "messi s goal"
+          ],
+          "proposal_query_entities_preview": [
+            "arda turan",
+            "boca juniors",
+            "copa catalunya",
+            "diego maradona",
+            "fc barcelona",
+            "lionel messi"
+          ],
+          "query_entities_preview": [
+            "arda turan",
+            "boca juniors",
+            "copa catalunya",
+            "diego maradona",
+            "fc barcelona",
+            "lionel messi"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 0,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 2,
+              "base_score": 0.9183,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.9183
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 4049,
+              "base_score": 0.646,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.646
+            },
+            {
+              "step": 4,
+              "mode": "reserve",
+              "pool_position": 3,
+              "doc_id": 11,
+              "base_score": 0.6012,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.6012
+            },
+            {
+              "step": 5,
+              "mode": "beam",
+              "pool_position": 44,
+              "doc_id": 1392,
+              "base_score": 0.1045,
+              "structure_score": 0.9829,
+              "novelty_score": 0.9091,
+              "closure_score": 0.6683,
+              "selection_score": 0.9829,
+              "combined_score": 0.7522,
+              "proposal_rank": 1,
+              "state_score": 0.8710875495333666
+            }
+          ]
+        },
+        {
+          "question": "What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities commonwealth, the top-ranking Warsaw Pact operatives originated?",
+          "selected_titles": [
+            "Warsaw Pact",
+            "Warsaw Pact",
+            "Molotov–Ribbentrop Pact",
+            "Warsaw Pact",
+            "Pacific War"
+          ],
+          "seed_entities_preview": [
+            "central and eastern europe",
+            "june",
+            "molotov ribbentrop pact",
+            "warsaw pact"
+          ],
+          "question_entities_preview": [
+            "begin",
+            "britain",
+            "commonwealth",
+            "country",
+            "france",
+            "warsaw",
+            "warsaw pact",
+            "warsaw pact country"
+          ],
+          "grounded_question_entities_preview": [
+            "britain",
+            "france",
+            "warsaw pact"
+          ],
+          "proposal_query_entities_preview": [
+            "central and eastern europe",
+            "june",
+            "molotov ribbentrop pact",
+            "warsaw pact"
+          ],
+          "query_entities_preview": [
+            "central and eastern europe",
+            "june",
+            "molotov ribbentrop pact",
+            "warsaw pact"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 32,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 35,
+              "base_score": 0.4187,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.4187
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 29,
+              "base_score": 0.1335,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.1335
+            },
+            {
+              "step": 4,
+              "mode": "reserve",
+              "pool_position": 3,
+              "doc_id": 4970,
+              "base_score": 0.1188,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.1188
+            },
+            {
+              "step": 5,
+              "mode": "beam",
+              "pool_position": 84,
+              "doc_id": 5796,
+              "base_score": 0.004,
+              "structure_score": 0.9807,
+              "novelty_score": 0.9667,
+              "closure_score": 0.7162,
+              "selection_score": 0.9807,
+              "combined_score": 0.7344,
+              "proposal_rank": 1,
+              "state_score": 0.8714094481935399
+            }
+          ]
+        },
+        {
+          "question": "What county is Erik Hort's birthplace a part of?",
+          "selected_titles": [
+            "Erik Hort",
+            "Erik Jensen (American football)",
+            "Horton Park (Saint Paul, Minnesota)",
+            "Långe Erik",
+            "Hickory Grove, Wisconsin"
+          ],
+          "seed_entities_preview": [
+            "american",
+            "erik hort"
+          ],
+          "question_entities_preview": [
+            "aroostook county",
+            "clearfield county",
+            "county highway g",
+            "erik hort",
+            "hillsborough county",
+            "historic county of quebec",
+            "jefferson county",
+            "washington county"
+          ],
+          "grounded_question_entities_preview": [
+            "aroostook county",
+            "erik hort",
+            "historic county of quebec"
+          ],
+          "proposal_query_entities_preview": [
+            "american",
+            "erik hort"
+          ],
+          "query_entities_preview": [
+            "american",
+            "erik hort"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What year did the publisher of Labyrinth end?",
+          "selected_titles": [
+            "Warlocked",
+            "The Devil's Labyrinth",
+            "Labyrinth (1984 video game)",
+            "The Sense of an Ending",
+            "The Lord of the Rings"
+          ],
+          "seed_entities_preview": [
+            "1984",
+            "acornsoft",
+            "ballantine books",
+            "labyrinth",
+            "the devil s labyrinth"
+          ],
+          "question_entities_preview": [
+            "artist of the year",
+            "end of the line",
+            "labyrinth",
+            "labyrinth of suffering",
+            "lack of publisher",
+            "the devil s labyrinth",
+            "the end of it all",
+            "the year of intelligent tigers"
+          ],
+          "grounded_question_entities_preview": [
+            "labyrinth",
+            "labyrinth of suffering",
+            "lack of publisher",
+            "the devil s labyrinth",
+            "the end of it all"
+          ],
+          "proposal_query_entities_preview": [
+            "1984",
+            "acornsoft",
+            "ballantine books",
+            "labyrinth",
+            "the devil s labyrinth"
+          ],
+          "query_entities_preview": [
+            "1984",
+            "acornsoft",
+            "ballantine books",
+            "labyrinth",
+            "the devil s labyrinth"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "anchor",
+              "pool_position": 0,
+              "doc_id": 4828,
+              "base_score": 1.0,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 1.0
+            },
+            {
+              "step": 2,
+              "mode": "anchor",
+              "pool_position": 1,
+              "doc_id": 79,
+              "base_score": 0.6659,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.6659
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "pool_position": 2,
+              "doc_id": 67,
+              "base_score": 0.4513,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.4513
+            },
+            {
+              "step": 4,
+              "mode": "reserve",
+              "pool_position": 3,
+              "doc_id": 70,
+              "base_score": 0.125,
+              "structure_score": 0.0,
+              "novelty_score": 0.0,
+              "combined_score": 0.125
+            },
+            {
+              "step": 5,
+              "mode": "beam",
+              "pool_position": 55,
+              "doc_id": 7705,
+              "base_score": 0.0173,
+              "structure_score": 1.0,
+              "novelty_score": 0.95,
+              "closure_score": 0.6729,
+              "selection_score": 1.0,
+              "combined_score": 0.7468,
+              "proposal_rank": 1,
+              "state_score": 0.9035123216657374
+            }
+          ]
+        },
+        {
+          "question": "When was Lady Godiva's birthplace abolished?",
+          "selected_titles": [
+            "Spalding Priory",
+            "Cuthred of Kent",
+            "Board of Longitude",
+            "Lady Godiva Rides Again",
+            "Lordship of Frisia"
+          ],
+          "seed_entities_preview": [
+            "1559",
+            "act of parliament",
+            "archbishopric of lichfield",
+            "board of longitude",
+            "council of clovesho",
+            "godiva",
+            "spalding priory",
+            "westminster abbey"
+          ],
+          "question_entities_preview": [
+            "flora shaw lady lugard",
+            "frances crewe lady crewe",
+            "gladstone s bill was defeated",
+            "godiva",
+            "lady anne de grey",
+            "lady flora hastings",
+            "lady godiva rides again",
+            "second lady of the mercians"
+          ],
+          "grounded_question_entities_preview": [
+            "godiva",
+            "lady godiva rides again",
+            "second lady of the mercians"
+          ],
+          "proposal_query_entities_preview": [
+            "1559",
+            "act of parliament",
+            "archbishopric of lichfield",
+            "board of longitude",
+            "council of clovesho",
+            "godiva",
+            "spalding priory",
+            "westminster abbey"
+          ],
+          "query_entities_preview": [
+            "1559",
+            "act of parliament",
+            "archbishopric of lichfield",
+            "board of longitude",
+            "council of clovesho",
+            "godiva",
+            "spalding priory",
+            "westminster abbey"
+          ],
+          "selection_steps": []
+        }
+      ]
+    }
+  }
+}
+===== 2026-04-21T15:49:15+08:00 END musique; output=outputs_step0_general_musique/eval_reports/bridge_beam_sameprotocol_closureonly_pilot100_fresh8043.json =====
+===== 2026-04-21T15:49:15+08:00 ALL PILOT100 DONE =====

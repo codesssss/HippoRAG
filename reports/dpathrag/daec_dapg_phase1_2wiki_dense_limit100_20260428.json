@@ -1,0 +1,104 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "dataset": "2wikimultihopqa",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "summary": {
+    "rows": 500,
+    "by_hop_variant": {
+      "2:daec_l1": {
+        "support_recall": 0.2273,
+        "support_complete": 0.0649,
+        "noise_rate": 0.9091,
+        "objective": 0.7526,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 77
+      },
+      "2:local_absorption": {
+        "support_recall": 0.4286,
+        "support_complete": 0.1948,
+        "noise_rate": 0.8286,
+        "objective": 0.0052,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 77
+      },
+      "2:local_absorption_kappa": {
+        "support_recall": 0.5,
+        "support_complete": 0.2338,
+        "noise_rate": 0.7955,
+        "objective": 0.0008,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 77
+      },
+      "2:local_absorption_prior": {
+        "support_recall": 0.5,
+        "support_complete": 0.2338,
+        "noise_rate": 0.7955,
+        "objective": 0.0008,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 77
+      },
+      "2:local_occupancy": {
+        "support_recall": 0.0714,
+        "support_complete": 0.0,
+        "noise_rate": 0.8571,
+        "objective": 1.0,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 77
+      },
+      "4:daec_l1": {
+        "support_recall": 0.2283,
+        "support_complete": 0.0,
+        "noise_rate": 0.8174,
+        "objective": 0.7605,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 23
+      },
+      "4:local_absorption": {
+        "support_recall": 0.4674,
+        "support_complete": 0.0,
+        "noise_rate": 0.6261,
+        "objective": 0.0025,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 23
+      },
+      "4:local_absorption_kappa": {
+        "support_recall": 0.4891,
+        "support_complete": 0.0,
+        "noise_rate": 0.6087,
+        "objective": 0.0006,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 23
+      },
+      "4:local_absorption_prior": {
+        "support_recall": 0.4891,
+        "support_complete": 0.0,
+        "noise_rate": 0.6087,
+        "objective": 0.0006,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 23
+      },
+      "4:local_occupancy": {
+        "support_recall": 0.0761,
+        "support_complete": 0.0,
+        "noise_rate": 0.6957,
+        "objective": 1.0,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 23
+      }
+    }
+  }
+}

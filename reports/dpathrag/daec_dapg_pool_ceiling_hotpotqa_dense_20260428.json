@@ -1,0 +1,30 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/hotpotqa_dense_pool100.json",
+  "dataset": "hotpotqa_dense",
+  "record_count": 1000,
+  "k_values": [
+    5,
+    20,
+    100
+  ],
+  "summary": {
+    "rows": 3000,
+    "by_hop_k": {
+      "2:k5": {
+        "support_recall": 0.9305,
+        "support_complete": 0.864,
+        "rows": 1000
+      },
+      "2:k20": {
+        "support_recall": 0.983,
+        "support_complete": 0.968,
+        "rows": 1000
+      },
+      "2:k100": {
+        "support_recall": 0.9925,
+        "support_complete": 0.985,
+        "rows": 1000
+      }
+    }
+  }
+}

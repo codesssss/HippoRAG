@@ -1,0 +1,176 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "daec_report_json": "run_logs/daec_noisyor_dense_pool100_2wiki_fixclean_full1000_20260428.json",
+  "dataset": "2wikimultihopqa",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "embedding_backend": "api",
+  "embedding_model": "nvidia/NV-Embed-v2",
+  "embedding_base_url": "http://localhost:8019/v1/embeddings",
+  "phi_transform": "linear_clip",
+  "phi_scales": [
+    1.0
+  ],
+  "summary": {
+    "rows": 600,
+    "by_hop_variant": {
+      "2:scale=1:channel_cross_talk": {
+        "support_recall": 0.6818,
+        "support_complete": 0.3636,
+        "noise_rate": 0.7273,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:demand_source_union": {
+        "support_recall": 0.6883,
+        "support_complete": 0.3896,
+        "noise_rate": 0.7247,
+        "objective": 0.0005,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:mixed_source_absorption": {
+        "support_recall": 0.6039,
+        "support_complete": 0.2987,
+        "noise_rate": 0.7584,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:multi_channel_noisy_or": {
+        "support_recall": 0.487,
+        "support_complete": 0.2338,
+        "noise_rate": 0.8052,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:multi_channel_sum": {
+        "support_recall": 0.487,
+        "support_complete": 0.2338,
+        "noise_rate": 0.8052,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:query_level_ppr": {
+        "support_recall": 0.7208,
+        "support_complete": 0.4416,
+        "noise_rate": 0.7117,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:channel_cross_talk": {
+        "support_recall": 0.5109,
+        "support_complete": 0.0,
+        "noise_rate": 0.5913,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:demand_source_union": {
+        "support_recall": 0.5217,
+        "support_complete": 0.0,
+        "noise_rate": 0.5826,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:mixed_source_absorption": {
+        "support_recall": 0.4891,
+        "support_complete": 0.0,
+        "noise_rate": 0.6087,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:multi_channel_noisy_or": {
+        "support_recall": 0.4783,
+        "support_complete": 0.0,
+        "noise_rate": 0.6174,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:multi_channel_sum": {
+        "support_recall": 0.4783,
+        "support_complete": 0.0,
+        "noise_rate": 0.6174,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:query_level_ppr": {
+        "support_recall": 0.5326,
+        "support_complete": 0.0,
+        "noise_rate": 0.5739,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      }
+    },
+    "sum_vs_noisy_or": {
+      "2:scale=1": {
+        "selection_diff": 0.0,
+        "selection_jaccard": 1.0,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "4:scale=1": {
+        "selection_diff": 0.0,
+        "selection_jaccard": 1.0,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      }
+    }
+  }
+}

@@ -1,0 +1,943 @@
+{
+  "objective_epsilon": 1e-09,
+  "policy": "keep base unless objective-tied, base unsupported, and a tied alternative has structural support",
+  "run_dir": "run_logs/daec_binding_grounded_limit100_20260506",
+  "pool_dir": "run_logs/hipporag_pool_exports_full1000_20260503",
+  "by_dataset": {
+    "2Wiki": {
+      "rows": 100,
+      "tied_rows": 21,
+      "tie_rate": 0.21,
+      "base_supported_rows": 87,
+      "base_supported_rate": 0.87,
+      "flips": 3,
+      "flip_rate": 0.03,
+      "support_complete_1_to_0": 1,
+      "support_complete_0_to_1": 1,
+      "avg_support_recall_delta": 0.0
+    },
+    "HotpotQA": {
+      "rows": 100,
+      "tied_rows": 21,
+      "tie_rate": 0.21,
+      "base_supported_rows": 72,
+      "base_supported_rate": 0.72,
+      "flips": 2,
+      "flip_rate": 0.02,
+      "support_complete_1_to_0": 0,
+      "support_complete_0_to_1": 0,
+      "avg_support_recall_delta": 0.0
+    },
+    "MuSiQue": {
+      "rows": 100,
+      "tied_rows": 24,
+      "tie_rate": 0.24,
+      "base_supported_rows": 61,
+      "base_supported_rate": 0.61,
+      "flips": 4,
+      "flip_rate": 0.04,
+      "support_complete_1_to_0": 0,
+      "support_complete_0_to_1": 0,
+      "avg_support_recall_delta": 0.0
+    }
+  },
+  "decision_counts": {
+    "2Wiki": {
+      "keep_not_tied": 79,
+      "keep_base_supported": 17,
+      "keep_no_supported_alt": 1,
+      "flip_alt_supported": 3
+    },
+    "HotpotQA": {
+      "keep_not_tied": 79,
+      "keep_base_supported": 11,
+      "keep_no_supported_alt": 8,
+      "flip_alt_supported": 2
+    },
+    "MuSiQue": {
+      "keep_not_tied": 76,
+      "flip_alt_supported": 4,
+      "keep_no_supported_alt": 15,
+      "keep_base_supported": 5
+    }
+  },
+  "overall": {
+    "rows": 300,
+    "tied_rows": 66,
+    "tie_rate": 0.22,
+    "base_supported_rows": 220,
+    "base_supported_rate": 0.7333333333333333,
+    "flips": 9,
+    "flip_rate": 0.03,
+    "support_complete_1_to_0": 1,
+    "support_complete_0_to_1": 1,
+    "avg_support_recall_delta": 0.0
+  },
+  "flip_examples": [
+    {
+      "dataset": "2wikimultihopqa",
+      "query_index": 14,
+      "question": "Where was the place of death of Maurice, Prince Of Orange's father?",
+      "gold_titles": [
+        "Maurice, Prince of Orange",
+        "William the Silent"
+      ],
+      "base_binding_id": "b1",
+      "verifier_binding_id": "b2",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b1",
+        "b2"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Maurice, Prince of Orange",
+              "entity_position": 0,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "William I, Count of Nassau-Dillenburg",
+              "entity_position": 5,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 4,
+                  "title": "William the Silent"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Maurice, Prince of Orange",
+        "William of Nassau (1620–1679)",
+        "Louis of Nassau, Lord of De Lek and Beverweerd",
+        "William of Nassau (1601–1627)",
+        "William the Silent"
+      ],
+      "verifier_titles": [
+        "William I, Count of Nassau-Dillenburg",
+        "Maurice, Prince of Orange",
+        "William of Nassau (1620–1679)",
+        "Louis of Nassau, Lord of De Lek and Beverweerd",
+        "William of Nassau (1601–1627)"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 0.5,
+      "base_support_complete": true,
+      "verifier_support_complete": false,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "query_index": 44,
+      "question": "Where was the performer of song B Boy (Song) detained?",
+      "gold_titles": [
+        "B Boy (song)",
+        "Meek Mill"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b1",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "B Boy (song)",
+              "entity_position": 2,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Meek Mill",
+              "entity_position": 3,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 2,
+                  "title": "B Boy (song)"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 2,
+                  "title": "B Boy (song)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "B Boy (song)",
+        "Al-Mu'ayyad",
+        "Eddie Murray (rugby league)",
+        "Meek Mill",
+        "J-Flexx"
+      ],
+      "verifier_titles": [
+        "Meek Mill",
+        "B Boy (song)",
+        "Al-Mu'ayyad",
+        "Eddie Murray (rugby league)",
+        "J-Flexx"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "query_index": 56,
+      "question": "Which country the composer of film Thunder On The Hill is from?",
+      "gold_titles": [
+        "Hans J. Salter",
+        "Thunder on the Hill"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b2",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Walter Ulfig",
+              "entity_position": 1,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Bert Grund",
+              "entity_position": 2,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Hans J. Salter",
+              "entity_position": 7,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 0,
+                  "title": "Thunder on the Hill"
+                }
+              ]
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Abe Meyer",
+              "entity_position": 3,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Walter Ulfig",
+        "Thunder on the Hill",
+        "Bert Grund",
+        "Abe Meyer",
+        "Henri Verdun"
+      ],
+      "verifier_titles": [
+        "Hans J. Salter",
+        "Walter Ulfig",
+        "Thunder on the Hill",
+        "Bert Grund",
+        "Abe Meyer"
+      ],
+      "base_support_recall": 0.5,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": false,
+      "verifier_support_complete": true,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "hotpotqa",
+      "query_index": 71,
+      "question": "The producer of \"Live By NIght\" began his film career playing what role in \"Critters 3\"?",
+      "gold_titles": [
+        "Benny Ciaramello",
+        "Leonardo DiCaprio"
+      ],
+      "base_binding_id": "b1",
+      "verifier_binding_id": "b3",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b1",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Dana Brunetti",
+              "entity_position": 19,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Trigger Street Productions",
+              "entity_position": 99,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 19,
+                  "title": "Dana Brunetti"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Dana Brunetti",
+        "Benny Ciaramello",
+        "Aimee Brooks",
+        "Critters 3",
+        "Leonardo DiCaprio filmography"
+      ],
+      "verifier_titles": [
+        "Trigger Street Productions",
+        "Benny Ciaramello",
+        "Dana Brunetti",
+        "Aimee Brooks",
+        "Critters 3"
+      ],
+      "base_support_recall": 0.5,
+      "verifier_support_recall": 0.5,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "hotpotqa",
+      "query_index": 99,
+      "question": "What is the name of the city located near the historical region known as Margianḗ in Greek?",
+      "gold_titles": [
+        "Merv",
+        "Margiana"
+      ],
+      "base_binding_id": "b1",
+      "verifier_binding_id": "b3",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b1",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Margiana",
+              "entity_position": 1,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Helmand River",
+              "entity_position": 91,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 4,
+                  "title": "Drangiana"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Margiana",
+        "Merv",
+        "Attica",
+        "Syracuse, Sicily",
+        "Drangiana"
+      ],
+      "verifier_titles": [
+        "Helmand River",
+        "Margiana",
+        "Merv",
+        "Attica",
+        "Syracuse, Sicily"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 7,
+      "question": "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+      "gold_titles": [
+        "Vilaiyaadu Mankatha",
+        "Sony Music",
+        "The Right Stuff Records",
+        "Santa Monica, California"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b3",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "The Right Stuff Records",
+              "entity_position": 18,
+              "supported": false,
+              "hits": []
+            },
+            {
+              "requirement_id": "s3",
+              "title": "United States Snooker Association",
+              "entity_position": 91,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "The Right Stuff Records",
+              "entity_position": 18,
+              "supported": false,
+              "hits": []
+            },
+            {
+              "requirement_id": "s3",
+              "title": "New York City",
+              "entity_position": 21,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 13,
+                  "title": "Headquarters of the United Nations"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 99,
+                  "title": "New York City"
+                }
+              ]
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Jive Records",
+              "entity_position": 4,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 25,
+                  "title": "American Idol"
+                }
+              ]
+            },
+            {
+              "requirement_id": "s3",
+              "title": "United States Snooker Association",
+              "entity_position": 91,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Jive Records",
+              "entity_position": 4,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 25,
+                  "title": "American Idol"
+                }
+              ]
+            },
+            {
+              "requirement_id": "s3",
+              "title": "New York City",
+              "entity_position": 21,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 13,
+                  "title": "Headquarters of the United Nations"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 4,
+                  "title": "Jive Records"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 99,
+                  "title": "New York City"
+                }
+              ]
+            }
+          ]
+        },
+        "b4": {
+          "binding_id": "b4",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Sony Music",
+              "entity_position": 7,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 25,
+                  "title": "American Idol"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Vilaiyaadu Mankatha"
+                }
+              ]
+            },
+            {
+              "requirement_id": "s3",
+              "title": "United States Snooker Association",
+              "entity_position": 91,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b5": {
+          "binding_id": "b5",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Sony Music",
+              "entity_position": 7,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 25,
+                  "title": "American Idol"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Vilaiyaadu Mankatha"
+                }
+              ]
+            },
+            {
+              "requirement_id": "s3",
+              "title": "New York City",
+              "entity_position": 21,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 13,
+                  "title": "Headquarters of the United Nations"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 99,
+                  "title": "New York City"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "The Right Stuff Records",
+        "United States Snooker Association",
+        "Vilaiyaadu Mankatha",
+        "Miami",
+        "Biltmore Records"
+      ],
+      "verifier_titles": [
+        "Jive Records",
+        "New York City",
+        "Vilaiyaadu Mankatha",
+        "The Right Stuff Records",
+        "United States Snooker Association"
+      ],
+      "base_support_recall": 0.5,
+      "verifier_support_recall": 0.5,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 17,
+      "question": "Who married the actor from Terminator?",
+      "gold_titles": [
+        "Terminator (character)",
+        "Chrétien DuBois"
+      ],
+      "base_binding_id": "b1",
+      "verifier_binding_id": "b2",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b1",
+        "b2"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b1": {
+          "binding_id": "b1",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Edward Furlong",
+              "entity_position": 0,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "John Connor",
+              "entity_position": 2,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 0,
+                  "title": "Edward Furlong"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Edward Furlong",
+        "Terminator (character)",
+        "Chrétien DuBois",
+        "John Connor",
+        "Arnold Schwarzenegger"
+      ],
+      "verifier_titles": [
+        "John Connor",
+        "Terminator (character)",
+        "Edward Furlong",
+        "Chrétien DuBois",
+        "Arnold Schwarzenegger"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 68,
+      "question": "What was the wettest year of the administrative territorial entity that contains the administrative territorial entity where Drexel Heights is located?",
+      "gold_titles": [
+        "Tucson, Arizona",
+        "Pima County Natural Resources, Parks and Recreation",
+        "Drexel Heights, Arizona"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b2",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b2",
+        "b3"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Pima County Natural Resources, Parks and Recreation",
+              "entity_position": 3,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b2": {
+          "binding_id": "b2",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Arizona",
+              "entity_position": 40,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "cross_extraction_mention",
+                  "position": 0,
+                  "title": "Drexel Heights, Arizona"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 0,
+                  "title": "Drexel Heights, Arizona"
+                },
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 1,
+                  "title": "Tucson, Arizona"
+                }
+              ]
+            }
+          ]
+        },
+        "b3": {
+          "binding_id": "b3",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Shire of Taringa",
+              "entity_position": 7,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Pima County Natural Resources, Parks and Recreation",
+        "ISO 3166-2:AD",
+        "Drexel Heights, Arizona",
+        "Tucson, Arizona",
+        "Tucson, Arizona"
+      ],
+      "verifier_titles": [
+        "Drexel Heights, Arizona",
+        "Tucson, Arizona",
+        "Arizona",
+        "Pima County Natural Resources, Parks and Recreation",
+        "ISO 3166-2:AD"
+      ],
+      "base_support_recall": 1.0,
+      "verifier_support_recall": 1.0,
+      "base_support_complete": true,
+      "verifier_support_complete": true,
+      "base_em": 1.0,
+      "base_f1": 1.0
+    },
+    {
+      "dataset": "musique",
+      "query_index": 99,
+      "question": "When was the region immediately north of the region where the country in which Aluf can be found is located and the Persian Gulf established?",
+      "gold_titles": [
+        "Israel",
+        "Geography of Saudi Arabia",
+        "Saudi Arabia",
+        "Chaim Herzog"
+      ],
+      "base_binding_id": "b0",
+      "verifier_binding_id": "b1",
+      "decision": "flip_alt_supported",
+      "tied_binding_ids": [
+        "b0",
+        "b1"
+      ],
+      "base_supported": false,
+      "support_by_binding": {
+        "b0": {
+          "binding_id": "b0",
+          "supported": false,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Alūksne Municipality",
+              "entity_position": 11,
+              "supported": false,
+              "hits": []
+            }
+          ]
+        },
+        "b1": {
+          "binding_id": "b1",
+          "supported": true,
+          "assignments": [
+            {
+              "requirement_id": "s2",
+              "title": "Alūksne",
+              "entity_position": 48,
+              "supported": true,
+              "hits": [
+                {
+                  "mode": "selected_companion_mention",
+                  "position": 11,
+                  "title": "Alūksne Municipality"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "base_titles": [
+        "Alūksne Municipality",
+        "Alghanim Industries",
+        "Battle of Qurah and Umm al Maradim",
+        "Near East",
+        "Partition of the Ottoman Empire"
+      ],
+      "verifier_titles": [
+        "Alūksne Municipality",
+        "Alghanim Industries",
+        "Battle of Qurah and Umm al Maradim",
+        "Near East",
+        "Partition of the Ottoman Empire"
+      ],
+      "base_support_recall": 0.0,
+      "verifier_support_recall": 0.0,
+      "base_support_complete": false,
+      "verifier_support_complete": false,
+      "base_em": 0.0,
+      "base_f1": 0.0
+    }
+  ]
+}

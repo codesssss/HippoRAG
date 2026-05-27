@@ -1,0 +1,22 @@
+{
+  "report": "run_logs/layer1_dense_pool_eval_20260424/2wikimultihopqa_dense_pool_daec_oracle.json",
+  "dataset": "2wikimultihopqa",
+  "num_traces": 1000,
+  "category_counts": {
+    "tie": 915,
+    "win": 79,
+    "loss_binding_or_wrong_entity_candidate": 1,
+    "loss_reader_interference": 3,
+    "loss_gold_pushed_out": 1,
+    "loss_other_incomplete": 1
+  },
+  "changed_count": 226,
+  "changed_rate": 0.226,
+  "win_count": 79,
+  "loss_count": 6,
+  "tie_count": 915,
+  "mean_delta_f1": 0.0643691,
+  "mean_delta_f1_changed": 0.2848190265486726,
+  "loss_binding_signal_count": 6,
+  "loss_new_non_gold_count": 2
+}

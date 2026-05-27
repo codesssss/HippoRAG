@@ -1,0 +1,43 @@
+[audit] starting dataset=2wikimultihopqa
+[audit] 2wikimultihopqa: query 1/100
+[audit] 2wikimultihopqa: query 10/100
+[audit] 2wikimultihopqa: query 20/100
+[audit] 2wikimultihopqa: query 30/100
+[audit] 2wikimultihopqa: query 40/100
+[audit] 2wikimultihopqa: query 50/100
+[audit] 2wikimultihopqa: query 60/100
+[audit] 2wikimultihopqa: query 70/100
+[audit] 2wikimultihopqa: query 80/100
+[audit] 2wikimultihopqa: query 90/100
+[audit] 2wikimultihopqa: query 100/100
+[audit] finished dataset=2wikimultihopqa
+[audit] starting dataset=hotpotqa
+[audit] hotpotqa: query 1/100
+[audit] hotpotqa: query 10/100
+[audit] hotpotqa: query 20/100
+[audit] hotpotqa: query 30/100
+[audit] hotpotqa: query 40/100
+[audit] hotpotqa: query 50/100
+[audit] hotpotqa: query 60/100
+[audit] hotpotqa: query 70/100
+[audit] hotpotqa: query 80/100
+[audit] hotpotqa: query 90/100
+[audit] hotpotqa: query 100/100
+[audit] finished dataset=hotpotqa
+[audit] starting dataset=musique
+[audit] musique: query 1/100
+[audit] musique: query 10/100
+[audit] musique: query 20/100
+[audit] musique: query 30/100
+[audit] musique: query 40/100
+[audit] musique: query 50/100
+[audit] musique: query 60/100
+[audit] musique: query 70/100
+[audit] musique: query 80/100
+[audit] musique: query 90/100
+[audit] musique: query 100/100
+[audit] finished dataset=musique
+{
+  "output_json": "run_logs/agsto_clean_audit_limit100_20260505/audit.json",
+  "output_md": "run_logs/agsto_clean_audit_limit100_20260505/summary.md"
+}

@@ -1,0 +1,459 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "daec_report_json": "run_logs/daec_noisyor_dense_pool100_2wiki_fixclean_full1000_20260428.json",
+  "dataset": "2wikimultihopqa",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "embedding_backend": "api",
+  "embedding_model": "nvidia/NV-Embed-v2",
+  "embedding_base_url": "http://localhost:8019/v1/embeddings",
+  "phi_transform": "exp",
+  "phi_scales": [
+    1.0,
+    1000.0,
+    10000.0,
+    50000.0
+  ],
+  "summary": {
+    "rows": 1600,
+    "by_hop_variant": {
+      "2:scale=1:mixed_source_absorption": {
+        "support_recall": 0.6364,
+        "support_complete": 0.3247,
+        "noise_rate": 0.7455,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:multi_channel_noisy_or": {
+        "support_recall": 0.4481,
+        "support_complete": 0.1818,
+        "noise_rate": 0.8208,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:multi_channel_sum": {
+        "support_recall": 0.4481,
+        "support_complete": 0.1818,
+        "noise_rate": 0.8208,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:query_level_ppr": {
+        "support_recall": 0.7208,
+        "support_complete": 0.4416,
+        "noise_rate": 0.7117,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1000:mixed_source_absorption": {
+        "support_recall": 0.6364,
+        "support_complete": 0.3247,
+        "noise_rate": 0.7455,
+        "objective": 0.3821,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1000.0
+      },
+      "2:scale=1000:multi_channel_noisy_or": {
+        "support_recall": 0.4416,
+        "support_complete": 0.1948,
+        "noise_rate": 0.8234,
+        "objective": 0.2698,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1000.0
+      },
+      "2:scale=1000:multi_channel_sum": {
+        "support_recall": 0.4351,
+        "support_complete": 0.1818,
+        "noise_rate": 0.826,
+        "objective": 0.3085,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1000.0
+      },
+      "2:scale=1000:query_level_ppr": {
+        "support_recall": 0.7208,
+        "support_complete": 0.4416,
+        "noise_rate": 0.7117,
+        "objective": 0.3768,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 1000.0
+      },
+      "2:scale=10000:mixed_source_absorption": {
+        "support_recall": 0.6364,
+        "support_complete": 0.3247,
+        "noise_rate": 0.7455,
+        "objective": 2.672,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 10000.0
+      },
+      "2:scale=10000:multi_channel_noisy_or": {
+        "support_recall": 0.3377,
+        "support_complete": 0.1169,
+        "noise_rate": 0.8649,
+        "objective": 0.9373,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 10000.0
+      },
+      "2:scale=10000:multi_channel_sum": {
+        "support_recall": 0.2922,
+        "support_complete": 0.1039,
+        "noise_rate": 0.8831,
+        "objective": 2.2191,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 10000.0
+      },
+      "2:scale=10000:query_level_ppr": {
+        "support_recall": 0.7208,
+        "support_complete": 0.4416,
+        "noise_rate": 0.7117,
+        "objective": 2.6341,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 10000.0
+      },
+      "2:scale=50000:mixed_source_absorption": {
+        "support_recall": 0.6364,
+        "support_complete": 0.3247,
+        "noise_rate": 0.7455,
+        "objective": 4.8325,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 50000.0
+      },
+      "2:scale=50000:multi_channel_noisy_or": {
+        "support_recall": 0.1883,
+        "support_complete": 0.0649,
+        "noise_rate": 0.924,
+        "objective": 1.0,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 50000.0
+      },
+      "2:scale=50000:multi_channel_sum": {
+        "support_recall": 0.0909,
+        "support_complete": 0.026,
+        "noise_rate": 0.9636,
+        "objective": 4.6059,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 50000.0
+      },
+      "2:scale=50000:query_level_ppr": {
+        "support_recall": 0.7208,
+        "support_complete": 0.4416,
+        "noise_rate": 0.7117,
+        "objective": 4.8049,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 77,
+        "phi_scale": 50000.0
+      },
+      "4:scale=1:mixed_source_absorption": {
+        "support_recall": 0.5,
+        "support_complete": 0.0,
+        "noise_rate": 0.6,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:multi_channel_noisy_or": {
+        "support_recall": 0.4457,
+        "support_complete": 0.0,
+        "noise_rate": 0.6435,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:multi_channel_sum": {
+        "support_recall": 0.4457,
+        "support_complete": 0.0,
+        "noise_rate": 0.6435,
+        "objective": 0.0002,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:query_level_ppr": {
+        "support_recall": 0.5217,
+        "support_complete": 0.0,
+        "noise_rate": 0.5826,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1000:mixed_source_absorption": {
+        "support_recall": 0.5,
+        "support_complete": 0.0,
+        "noise_rate": 0.6,
+        "objective": 0.3526,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1000.0
+      },
+      "4:scale=1000:multi_channel_noisy_or": {
+        "support_recall": 0.4457,
+        "support_complete": 0.0,
+        "noise_rate": 0.6435,
+        "objective": 0.2148,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1000.0
+      },
+      "4:scale=1000:multi_channel_sum": {
+        "support_recall": 0.4457,
+        "support_complete": 0.0,
+        "noise_rate": 0.6435,
+        "objective": 0.2349,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1000.0
+      },
+      "4:scale=1000:query_level_ppr": {
+        "support_recall": 0.5217,
+        "support_complete": 0.0,
+        "noise_rate": 0.5826,
+        "objective": 0.3038,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 1000.0
+      },
+      "4:scale=10000:mixed_source_absorption": {
+        "support_recall": 0.5,
+        "support_complete": 0.0,
+        "noise_rate": 0.6,
+        "objective": 2.4772,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 10000.0
+      },
+      "4:scale=10000:multi_channel_noisy_or": {
+        "support_recall": 0.4022,
+        "support_complete": 0.0,
+        "noise_rate": 0.6783,
+        "objective": 0.9044,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 10000.0
+      },
+      "4:scale=10000:multi_channel_sum": {
+        "support_recall": 0.337,
+        "support_complete": 0.0,
+        "noise_rate": 0.7304,
+        "objective": 1.8046,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 10000.0
+      },
+      "4:scale=10000:query_level_ppr": {
+        "support_recall": 0.5217,
+        "support_complete": 0.0,
+        "noise_rate": 0.5826,
+        "objective": 2.2686,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 10000.0
+      },
+      "4:scale=50000:mixed_source_absorption": {
+        "support_recall": 0.5,
+        "support_complete": 0.0,
+        "noise_rate": 0.6,
+        "objective": 4.7453,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 50000.0
+      },
+      "4:scale=50000:multi_channel_noisy_or": {
+        "support_recall": 0.1087,
+        "support_complete": 0.0,
+        "noise_rate": 0.913,
+        "objective": 1.0,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 50000.0
+      },
+      "4:scale=50000:multi_channel_sum": {
+        "support_recall": 0.0109,
+        "support_complete": 0.0,
+        "noise_rate": 0.9913,
+        "objective": 4.354,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 50000.0
+      },
+      "4:scale=50000:query_level_ppr": {
+        "support_recall": 0.5217,
+        "support_complete": 0.0,
+        "noise_rate": 0.5826,
+        "objective": 4.6766,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 23,
+        "phi_scale": 50000.0
+      }
+    },
+    "sum_vs_noisy_or": {
+      "2:scale=1": {
+        "selection_diff": 0.0,
+        "selection_jaccard": 1.0,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0,
+        "rows": 77,
+        "phi_scale": 1.0
+      },
+      "2:scale=1000": {
+        "selection_diff": 0.2468,
+        "selection_jaccard": 0.9116,
+        "noisy_minus_sum_recall": 0.0065,
+        "noisy_minus_sum_complete": 0.013,
+        "noisy_minus_sum_noise": -0.0026,
+        "noisy_minus_sum_objective": -0.0386,
+        "rows": 77,
+        "phi_scale": 1000.0
+      },
+      "2:scale=10000": {
+        "selection_diff": 0.6234,
+        "selection_jaccard": 0.7286,
+        "noisy_minus_sum_recall": 0.0455,
+        "noisy_minus_sum_complete": 0.013,
+        "noisy_minus_sum_noise": -0.0182,
+        "noisy_minus_sum_objective": -1.2818,
+        "rows": 77,
+        "phi_scale": 10000.0
+      },
+      "2:scale=50000": {
+        "selection_diff": 0.7922,
+        "selection_jaccard": 0.6851,
+        "noisy_minus_sum_recall": 0.0974,
+        "noisy_minus_sum_complete": 0.039,
+        "noisy_minus_sum_noise": -0.0396,
+        "noisy_minus_sum_objective": -3.6059,
+        "rows": 77,
+        "phi_scale": 50000.0
+      },
+      "4:scale=1": {
+        "selection_diff": 0.0,
+        "selection_jaccard": 1.0,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0,
+        "rows": 23,
+        "phi_scale": 1.0
+      },
+      "4:scale=1000": {
+        "selection_diff": 0.0435,
+        "selection_jaccard": 0.9855,
+        "noisy_minus_sum_recall": 0.0,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": 0.0,
+        "noisy_minus_sum_objective": -0.0201,
+        "rows": 23,
+        "phi_scale": 1000.0
+      },
+      "4:scale=10000": {
+        "selection_diff": 0.6087,
+        "selection_jaccard": 0.766,
+        "noisy_minus_sum_recall": 0.0652,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": -0.0522,
+        "noisy_minus_sum_objective": -0.9002,
+        "rows": 23,
+        "phi_scale": 10000.0
+      },
+      "4:scale=50000": {
+        "selection_diff": 0.7391,
+        "selection_jaccard": 0.6708,
+        "noisy_minus_sum_recall": 0.0978,
+        "noisy_minus_sum_complete": 0.0,
+        "noisy_minus_sum_noise": -0.0783,
+        "noisy_minus_sum_objective": -3.354,
+        "rows": 23,
+        "phi_scale": 50000.0
+      }
+    }
+  }
+}

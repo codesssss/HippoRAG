@@ -1,0 +1,37 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "neocor_qwen8b_k3_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.7835,
+      "Recall@20": 0.8928,
+      "ExactMatch": 0.514,
+      "F1": 0.574,
+      "mean_reader_docs": 3.318,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_qa/neocor/2wikimultihopqa_neocor_qwen8b_k3_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "neocor_qwen8b_k3_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.935,
+      "Recall@20": 0.9895,
+      "ExactMatch": 0.591,
+      "F1": 0.7244,
+      "mean_reader_docs": 3.389,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_qa/neocor/hotpotqa_neocor_qwen8b_k3_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "neocor_qwen8b_k3_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.674,
+      "Recall@20": 0.8482,
+      "ExactMatch": 0.344,
+      "F1": 0.4565,
+      "mean_reader_docs": 3.458,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/neocor_8b_k3_gpt4omini_full1000_20260518/reader_qa/neocor/musique_neocor_qwen8b_k3_no_think_gpt4omini_reader_top5_limit1000.json"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "report": "run_logs/layer1_proprag_pool_eval_fixed_20260424/2wikimultihopqa_proprag_pool_daec_oracle.json",
+  "dataset": "2wikimultihopqa",
+  "num_traces": 1000,
+  "category_counts": {
+    "tie": 945,
+    "win": 47,
+    "loss_other_incomplete": 3,
+    "loss_reader_interference": 3,
+    "loss_gold_pushed_out": 1,
+    "loss_binding_or_wrong_entity_candidate": 1
+  },
+  "changed_count": 191,
+  "changed_rate": 0.191,
+  "win_count": 47,
+  "loss_count": 8,
+  "tie_count": 945,
+  "mean_delta_f1": 0.03525749999999999,
+  "mean_delta_f1_changed": 0.1845942408376963,
+  "loss_binding_signal_count": 7,
+  "loss_new_non_gold_count": 2
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "dataset": "hotpotqa",
+    "status": "missing"
+  },
+  {
+    "dataset": "2wikimultihopqa",
+    "status": "missing"
+  },
+  {
+    "dataset": "musique",
+    "status": "missing"
+  },
+  {
+    "dataset": "nq_rear",
+    "status": "missing"
+  },
+  {
+    "dataset": "popqa",
+    "status": "retrieval_done",
+    "r5": 1.0,
+    "all5": 1.0,
+    "em": null,
+    "f1": null,
+    "offline_chat_tokens": 18868,
+    "online_chat_tokens": 856,
+    "offline_chat_calls": 5,
+    "online_chat_calls": 2
+  }
+]

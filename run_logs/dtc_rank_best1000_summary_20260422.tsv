@@ -1,0 +1,4 @@
+dataset	baseEM	selEM	dEM	baseF1	selF1	dF1	file
+2wikimultihopqa	0.475000	0.484000	+0.009000	0.540400	0.552400	+0.012000	dtc_embed_nvembed_rankw0p2_limit1000_anchor2_8043.json
+hotpotqa	0.573000	0.589000	+0.016000	0.704000	0.722800	+0.018800	dtc_embed_nvembed_rankw0p2_limit1000_anchor2_8043.json
+musique	0.307000	0.337000	+0.030000	0.405400	0.436000	+0.030600	dtc_embed_nvembed_rankw0p2_limit1000_anchor2_8043.json

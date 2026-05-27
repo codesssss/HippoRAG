@@ -1,0 +1,7 @@
+# Evidence Transition GraphRAG v4 Fact-Witnessed STO Summary
+
+| dataset | rows | R@5 | EM | F1 | candidate source | fresh OpenIE | fresh embeddings |
+| --- | ---: | ---: | ---: | ---: | --- | --- | --- |
+| 2wikimultihopqa | 100 | 0.9400 |  |  | fresh_dense_seeded_sto_query_local_sto_graph | /mnt/nvme/code/HippoRAG/run_logs/etv4_ablation_no_multi_anchor_precision_gpt4omini_3x100_20260511/2wikimultihopqa/index/openie_results_ner_gpt-4o-mini.json | run_logs/etv4_ablation_no_multi_anchor_precision_gpt4omini_3x100_20260511/2wikimultihopqa/index/gpt-4o-mini_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet |
+| musique | 100 | 0.7325 |  |  | fresh_dense_seeded_sto_query_local_sto_graph | /mnt/nvme/code/HippoRAG/run_logs/etv4_ablation_no_multi_anchor_precision_gpt4omini_3x100_20260511/musique/index/openie_results_ner_gpt-4o-mini.json | run_logs/etv4_ablation_no_multi_anchor_precision_gpt4omini_3x100_20260511/musique/index/gpt-4o-mini_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet |
+| hotpotqa | 100 | 0.9550 |  |  | fresh_dense_seeded_sto_query_local_sto_graph | /mnt/nvme/code/HippoRAG/run_logs/etv4_ablation_no_multi_anchor_precision_gpt4omini_3x100_20260511/hotpotqa/index/openie_results_ner_gpt-4o-mini.json | run_logs/etv4_ablation_no_multi_anchor_precision_gpt4omini_3x100_20260511/hotpotqa/index/gpt-4o-mini_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet |

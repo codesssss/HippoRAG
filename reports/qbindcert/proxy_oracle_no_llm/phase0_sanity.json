@@ -1,0 +1,144 @@
+{
+  "config": {
+    "cache_jsonl": "data/dpathrag/cache/2wiki_proprag_pool100_smoke.jsonl",
+    "output_dir": "reports/qbindcert/proxy_oracle_no_llm",
+    "limit": 100,
+    "oracle_limit": 50,
+    "entity_pair_limit": 200,
+    "run_llm": false,
+    "llm_limit": 20,
+    "llm_base_url": "http://localhost:8043/v1",
+    "llm_model": "qwen3-8b-train"
+  },
+  "runtime": {
+    "started_at_unix": 16279349.736619672,
+    "llm_probe": {
+      "available": false,
+      "raw": "<think>\n\n</think>\n\n",
+      "error": ""
+    },
+    "llm": {
+      "llm_rows": 0,
+      "elapsed_seconds": 0.0,
+      "errors": {}
+    },
+    "elapsed_seconds": 2.395
+  },
+  "tests": [
+    {
+      "name": "typed_proposition_extraction",
+      "status": "NOT_RUN",
+      "metrics": {
+        "rows": 0,
+        "parse_ok_rate": 0.0,
+        "predicate_bucket_correct_proxy": 0.0,
+        "argument_extraction_correct_proxy": 0.0,
+        "source_span_provenance_correct_proxy": 0.0,
+        "no_hallucinated_proposition_proxy": 0.0,
+        "oracle_propositions": 0,
+        "extracted_propositions": 0
+      },
+      "thresholds": {
+        "predicate_bucket_correct_proxy": 0.8,
+        "argument_extraction_correct_proxy": 0.8,
+        "source_span_provenance_correct_proxy": 0.9,
+        "no_hallucinated_proposition_proxy": 0.9
+      },
+      "samples": []
+    },
+    {
+      "name": "query_program_lattice",
+      "status": "NOT_RUN",
+      "metrics": {
+        "rows": 0,
+        "parse_ok_rate": 0.0,
+        "top3_any_program_correct_proxy": 0.0,
+        "top1_program_correct_proxy": 0.0,
+        "answer_variable_correct_proxy": 0.0,
+        "dependency_binding_correct_proxy": 0.0,
+        "question_type_operator_correct_proxy": 0.0,
+        "error_modes": {}
+      },
+      "thresholds": {
+        "top3_any_program_correct_proxy": 0.75,
+        "top1_program_correct_proxy": 0.6,
+        "answer_variable_correct_proxy": 0.75,
+        "dependency_binding_correct_proxy": 0.75,
+        "question_type_operator_correct_proxy": 0.8
+      },
+      "samples": []
+    },
+    {
+      "name": "entity_normalization",
+      "status": "NEEDS_MANUAL_AUDIT",
+      "metrics": {
+        "pairs": 200,
+        "alias_pairs": 5,
+        "negative_pairs": 195,
+        "same_title_pairs": 0,
+        "alias_merge_correct_proxy": 1.0,
+        "false_merge_rate_proxy": 0.0,
+        "same_title_duplicate_detection_proxy": 1.0
+      },
+      "thresholds": {
+        "alias_merge_correct_proxy": 0.85,
+        "false_merge_rate_proxy_max": 0.1,
+        "same_title_duplicate_detection_proxy": 0.9
+      }
+    },
+    {
+      "name": "oracle_certificate_search",
+      "status": "PASS",
+      "metrics": {
+        "rows": 50,
+        "complete_certificate_found": 1.0,
+        "certificate_answer_agrees_with_gold": 1.0,
+        "no_non_contributing_duplicate_evidence": 1.0
+      },
+      "thresholds": {
+        "complete_certificate_found": 0.7,
+        "certificate_answer_agrees_with_gold": 0.65,
+        "no_non_contributing_duplicate_evidence": 0.9
+      }
+    },
+    {
+      "name": "answer_contrastive_oracle_certificate",
+      "status": "PASS",
+      "metrics": {
+        "rows": 50,
+        "gold_certificate_beats_wrong": 1.0,
+        "wrong_rejected_by_answer_terminal_binding_type": 0.96,
+        "query_program_error_caused_wrong_win": 0.0
+      },
+      "thresholds": {
+        "gold_certificate_beats_wrong": 0.65,
+        "wrong_rejected_by_answer_terminal_binding_type": 0.4,
+        "query_program_error_caused_wrong_win_max": 0.25
+      }
+    }
+  ],
+  "decision": {
+    "decision": "PHASE0_NOT_CLEARED",
+    "phase1_justified": false,
+    "statuses": {
+      "typed_proposition_extraction": "NOT_RUN",
+      "query_program_lattice": "NOT_RUN",
+      "entity_normalization": "NEEDS_MANUAL_AUDIT",
+      "oracle_certificate_search": "PASS",
+      "answer_contrastive_oracle_certificate": "PASS"
+    },
+    "notes": [
+      "Manual-quality gates cannot be promoted from proxy PASS to final PASS by this script.",
+      "Proceed to Phase 1 only if all statuses become PASS after manual audit."
+    ]
+  },
+  "outputs": {
+    "json": "reports/qbindcert/proxy_oracle_no_llm/phase0_sanity.json",
+    "markdown": "reports/qbindcert/proxy_oracle_no_llm/phase0_sanity.md",
+    "extraction_samples": "reports/qbindcert/proxy_oracle_no_llm/phase0_extraction_samples.jsonl",
+    "program_samples": "reports/qbindcert/proxy_oracle_no_llm/phase0_program_samples.jsonl",
+    "entity_pairs": "reports/qbindcert/proxy_oracle_no_llm/phase0_entity_pairs.jsonl",
+    "certificate_rows": "reports/qbindcert/proxy_oracle_no_llm/phase0_certificate_rows.jsonl",
+    "contrastive_rows": "reports/qbindcert/proxy_oracle_no_llm/phase0_contrastive_rows.jsonl"
+  }
+}

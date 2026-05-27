@@ -1,0 +1,1972 @@
+{
+  "datasets": [
+    {
+      "dataset": "musique",
+      "methods": {
+        "proprag": {
+          "method": "proprag",
+          "metrics": {
+            "ExactMatch": 0.38,
+            "F1": 0.4374,
+            "count": 100,
+            "mean_reader_docs": 5.0,
+            "r5": 0.6775
+          },
+          "per_query": [
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "June 1982"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1982.",
+              "query_index": 0,
+              "question": "When was the person who Messi's goals in Copa del Rey compared to get signed by Barcelona?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-34b4763cffb110a8f304510900b4f691",
+                "chunk-dbf2de5fff58c7c0a70356ddc6bfa01a",
+                "chunk-4931bf1447f7c7c70f85286b10271963",
+                "chunk-426163d687d1c9bc407142d4adfc24bb",
+                "chunk-0f19b42d483dc05cd5a62ea7dffa0864"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "mid-June"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "June.",
+              "query_index": 1,
+              "question": "What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities commonwealth, the top-ranking Warsaw Pact operatives originated?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ba365113ade273b2d5588b81b9f36766",
+                "chunk-e8cc85b226bacede5c1f07c159a4722a",
+                "chunk-6664b5ca880c69b6dce7bbd0390b9a55",
+                "chunk-26c0c419ded4b0f9ff3a87c677d089d6",
+                "chunk-aecb7486c5404dfff8d213ec3f69109c"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Rockland County, New York",
+                "Rockland County"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Hertfordshire.",
+              "query_index": 2,
+              "question": "What county is Erik Hort's birthplace a part of?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ab458015decd1b5cd666b03fade71205",
+                "chunk-da958c9152c4c6fe07138f7bed631b54",
+                "chunk-1bef26d26a6035022c1c36c799b79775",
+                "chunk-ec00446f5abc56aa107ceaa10aaa72b2",
+                "chunk-57285b32cd78e662d2149db45927a32b"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1986"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1986.",
+              "query_index": 3,
+              "question": "What year did the publisher of Labyrinth end?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e3f1b8ff5108281ddfe6cc669fbd7ae1",
+                "chunk-588ca568ff7b1d4dee98c7e7d6b10d77",
+                "chunk-e4e953e267b4a534db9443b95c88efd3",
+                "chunk-986e9d4fc7aaea26a3d1eebce2db18bf",
+                "chunk-84bd121cd641718becfc5352e8f90243"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "918"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Cannot be determined.",
+              "query_index": 4,
+              "question": "When was Lady Godiva's birthplace abolished?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-94661ee658fe0b947629fad4d8d22c0f",
+                "chunk-d7989476f9fb9496805878bbf0b94e3f",
+                "chunk-7db61855573b73618e89107fa352b427",
+                "chunk-1c91ee6a0a179299d5e12dde1cfabc2d",
+                "chunk-a66976cd2d0a20fda7a6b19004b2bd42"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1930"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1943.",
+              "query_index": 5,
+              "question": "When was the region immediately north of the region where Israel is located and the location of the Battle of Qurah and Umm al Maradim created?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9f4f5674f304b20804a75f76887a0060",
+                "chunk-fe55c7e4361e565c39ca2c09e1cb3a16",
+                "chunk-814122a9a5294f22e06209746bf3ab0d",
+                "chunk-4cdeecb4685ac7aa24b170b94d5ee8a5",
+                "chunk-21b2e8472be8689fff0ee597e846ae77"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "the Mississippi River Delta",
+                "Mississippi River Delta"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Gulf of Mexico.",
+              "query_index": 6,
+              "question": "Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-934d565d7971a99fdbff92dcf0f0c838",
+                "chunk-70696d9db1d18c6ce00fbfcf589af4f1",
+                "chunk-92bcbc23ae173227214a2bc6e391d3f4",
+                "chunk-dec7eafa7b405d1c16bde7b036d5f474",
+                "chunk-508d8f0124e2ad9935dd1f398eee8b1c"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "August 3, 1769"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1792.",
+              "query_index": 7,
+              "question": "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7f5d8b50f367d0eec191d111a09aee8c",
+                "chunk-df1438c2a131b19c7a3794d8f14f6147",
+                "chunk-fdb1aad619b6dd90ff8d069321d5bfee",
+                "chunk-05df294990f82ec9d877e09ebbea9931",
+                "chunk-23a8abf083ce4b5e93939bf8796a0502"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "December 14, 1814"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1939.",
+              "query_index": 8,
+              "question": "When was the start of the battle of the birthplace of the performer of III?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c2a299a17a0e90a258a9de26a00449f5",
+                "chunk-89d7eaf4b6235de664cef28ee0d05c28",
+                "chunk-546e5a7ed0badd1649c89c2ac4626cd1",
+                "chunk-64525040a95d581e19b117d9a1d9d8c7",
+                "chunk-353aec7b571a6b2d0b8bb0dbcffaa25c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "11 September 1962"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "11 September 1962.",
+              "query_index": 9,
+              "question": "What is the Till dom ensamma performer's birth date?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-52d570c76e3c5a021323b5a3887d5b09",
+                "chunk-7dd88dfe2e741290be66625aadac57dd",
+                "chunk-25088ca4cf16b2393547ee3bd15bb18f",
+                "chunk-cc65a80945aab514952fe5477e30c58a",
+                "chunk-37aaa996f13559a50b73ed795056ac85"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "12"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "12.",
+              "query_index": 10,
+              "question": "How many episodes are in season 5 of the series with The Bag or the Bat?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-61cf7ce63d54c08f1e07f3ae99ecb4c2",
+                "chunk-04dbc93367764e24171fdcb318083814",
+                "chunk-52b47c240caebc91434636afbe7f29e0",
+                "chunk-a135853b3ccfc63a1ccb5f73ec485187",
+                "chunk-8b5cb7967755000794467dc9f0474cae"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "The dynasty regrouped and defeated the Portuguese"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not mentioned.",
+              "query_index": 11,
+              "question": "How were the people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the country between Thailand and A Lim's country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5b2864a8e270e701da2f6e01ddacd511",
+                "chunk-66feb1de439ac0f84fc4595224a3c68a",
+                "chunk-f6919612d3bdee873cf25680ad370f56",
+                "chunk-b5362d5ddc4936b613a732f858a02339",
+                "chunk-b7703d222f0b5ef8fbd789c3a3bd8a22"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Nazareth"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Saint Joseph.",
+              "query_index": 12,
+              "question": "What is the birthplace of the person after whom S\u00e3o Jos\u00e9 dos Campos was named?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-bfb8500bd78cc5b90a09f554023a10de",
+                "chunk-d911d4a3bbc273727419bb5f80f33583",
+                "chunk-9733cae5c65314f5af675f3cce9fe67a",
+                "chunk-a160f4b74c1a37ad38fd3469ab378d47",
+                "chunk-e7866510018b9f1b0a2edd82e791dc58"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "22"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "22.",
+              "query_index": 13,
+              "question": "How many times did plague occur in the place where Crucifixion's creator died?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-371315bd53c79360fd02676e65d14fe7",
+                "chunk-fe656417908667dd45740b241975efb6",
+                "chunk-b1940124e938677f82d678532faec011",
+                "chunk-a469bbe29b9bed85e55331175b0c9f75",
+                "chunk-8bd896729d2eb4ebb30d34a692e916be"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1952"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1963.",
+              "query_index": 14,
+              "question": "What year did the Governor of the city where the basilica named after the same saint as the one that Mantua Cathedral is dedicated to die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-0b248d07d50155592ad6780594803cb8",
+                "chunk-ba07bf5646ca1b7d2a93ddd9fd492b2d",
+                "chunk-548ab262425ea86d667b1268dacc12fe",
+                "chunk-91253c6e09bade46b2e2cc6bf08c549f",
+                "chunk-caa26daa19809db96cec550c1c0e9995"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Time Warner Cable",
+                "Time Warner"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Windjammer Communications.",
+              "query_index": 15,
+              "question": "What company succeeded the owner of Empire Sports Network?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7c3ddcd7bf2df82527639358d1282b0b",
+                "chunk-869bdad74097c266c9b9eb9e75dd9d76",
+                "chunk-ce36c7ee76892299b0345a65f13d21eb",
+                "chunk-62b04ed7b50d1efa59d96f00d1dc1e52",
+                "chunk-ba4533acc68198e5599b977990feab13"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "15th century",
+                "built in the 15th century"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "15th century.",
+              "query_index": 16,
+              "question": "When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fa6f0a6fa65183e2915775e2463782af",
+                "chunk-d3cbb44aeb76b6d68880735a7386e068",
+                "chunk-9aa2608d2789447ad4f269887e76f978",
+                "chunk-bc04ccbaec78f28a95411c047fd8febc",
+                "chunk-af10cc1bcaf41e7010672fc729b8bec7"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Maria Shriver"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Maria Shriver.",
+              "query_index": 17,
+              "question": "Who married the actor from Terminator?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7605a789ea53e0a438ca72f250fcc00d",
+                "chunk-768beee77a217d9317e4e642671e7c6e",
+                "chunk-43069f722faf48dcbc3f7c57c81d1ea2",
+                "chunk-cf1f11ebd2a8742ec670d041b198fde5",
+                "chunk-7c225ed95b94cd164facc9bab678a68f"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Johan Remkes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Johan Remkes.",
+              "query_index": 18,
+              "question": "Who was in charge of the place where Castricum is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5025fe36ef009bc24acb408a4115673a",
+                "chunk-304598a5e446837e76e1b44484cbfe04",
+                "chunk-f5c1a1353104b4f24037216947b85b9d",
+                "chunk-0f3556a85a3e76de41af58e4b1856b8d",
+                "chunk-293e5d55737272e20701536ac42f0431"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Benny Beaver"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Benny Beaver.",
+              "query_index": 19,
+              "question": "Who is the mascot of the university related to Randy Conrads?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4140964a0670fd47406c74d790b06742",
+                "chunk-321ff782686d5f6201026abe3ec4e85c",
+                "chunk-8fe4414d59cb9ac5793875027104abd1",
+                "chunk-7f58063a897abe02c23b3e716e25a653",
+                "chunk-8ee2326ca1eb32bab2d3f6f06dd31b33"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Sea, Air, and Land"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sea, Air, and Land.",
+              "query_index": 20,
+              "question": "What does seal stand for in the U.S. military branch that operates destroyers, as well as the USS Edsall?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-bc9b2663ec12df9c0c71972ef75759cf",
+                "chunk-6590c5df3355caa697a4f1cd8a969fa2",
+                "chunk-cc316ac0a07425924badd4da2dbcf18c",
+                "chunk-383c0a249f66d8df65dcf55a44494641",
+                "chunk-a4495cf406ba678b59cd957ba5832e39"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "Alex Chiang",
+                "Chiang Hsiao-wu"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Chiang Hsiao-chang, Chiang Hsiao-wu, and others.",
+              "query_index": 21,
+              "question": "Who is the child of Chiang Hsiao-wen's father?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-0a0b485a2bbc12c3ef2293579c914199",
+                "chunk-349079c682184cf382ea87b9c4420587",
+                "chunk-164705aeb04abcf4870ef841174f03f1",
+                "chunk-f672e31b39fc7cff7c7c0e172f594c8c",
+                "chunk-e8508b6bc0ccce40a0aa36b4b6162686"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "University of Glasgow"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 22,
+              "question": "Where was the person who wrote about the rioting being a dividing factor in Birmingham educated?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ba26da1fd01e5251561d594b5ed5a5fe",
+                "chunk-414eefb13f2a8eb48d6039cc4a9ca400",
+                "chunk-617ee47768156cd97f69f94f86126e9a",
+                "chunk-b401cf3e5c4a85e7f107cf8fd3cfdb43",
+                "chunk-fb8f6b50e8bc13e98ba631dd71bf6b94"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Lana Wood"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Nancy Wilson.",
+              "query_index": 23,
+              "question": "Whose sister played Susie in miracle on 34th street?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5c8ce4b48ce0021bcc7d3fd100ba1e19",
+                "chunk-744502e065e4f10c968b18147a494f57",
+                "chunk-5506f55fc33127197c4faeedf94926b1",
+                "chunk-890bfab14b25422e2ed76e73db7895a8",
+                "chunk-f2f7b1053451adbcf5b52cd3fffa5cf8"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "Sebastian Cabot"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "John Cabot.",
+              "query_index": 24,
+              "question": "Who is the child of the Italian navigator who explored the eastern coast of the continent C\u00e9sar Gaytan was born in for the English?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-de0095250822a43e7b1d200e6488e2fa",
+                "chunk-73f1e13c4dfad2b43fdd45a8c64e7a36",
+                "chunk-fbb7b827f379595e5902a92ce6553892",
+                "chunk-5b09bf06a053cd4bf859780474c79f55",
+                "chunk-0c8ad7c48717fc04ccfa3ab53dc731c4"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Joan Erikson"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not mentioned.",
+              "query_index": 25,
+              "question": "Who is the spouse of Young Man Luther's author?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-499533b82c02aea7b5cf1b5d5305d4d9",
+                "chunk-a7b3b9f5e0eb5dbe0f22aeaaee7d72f1",
+                "chunk-df80a8ab2ea4538e336ce9faf50c015e",
+                "chunk-50c97a37045563e50aeb3f88d7c37db3",
+                "chunk-a55ad0c9b8cc5d9a6fd1d7ed9b7f376c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "22"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "22.",
+              "query_index": 26,
+              "question": "How many times did the plague occur in the city where the painter of The Bacchanal of the Andrians died?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-deaad6b79ec082e555390e4c451143a2",
+                "chunk-371315bd53c79360fd02676e65d14fe7",
+                "chunk-5d339c1e472c3fce4a9914c371fbec53",
+                "chunk-a3df33fb9180dd46dd15743ad6914f70",
+                "chunk-bed7e8e110b52cd7267c2fe2927097ea"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "2005"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "2005.",
+              "query_index": 27,
+              "question": "In what year was the group who performed Attics To Eden formed?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fc071e714cd8f8749b101a7084328f8e",
+                "chunk-4708b257b5e91bfcecde93297e6654d1",
+                "chunk-947e2343664d9b1db2fdb0e7ee2c469f",
+                "chunk-74f30b4be40547898c7315ef47f865d9",
+                "chunk-08f561f83f51eec7d2323dcd4fd81029"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Politburo",
+                "the Politburo"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 28,
+              "question": "Where did the arguer that the country Directive 10/2 called for actions against had become an imperialist power declare he would intervene in the Korean conflict?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2ba1ac0a5071a1e9e8aadf4c76106ce2",
+                "chunk-945118df3e5d032e7c7c1da2acd68b4f",
+                "chunk-57ff8b3d558b6f426ef321de1dc5d6c7",
+                "chunk-cb6a1ba991e7f597cbe04bd1eec7cee3",
+                "chunk-75ee3840b8d9483abfff9089c2fc9ad2"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1912"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1912.",
+              "query_index": 29,
+              "question": "When did military instruction start at the place where Larry Alcala was educated?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-709e1ea53115977bad60e54679108f22",
+                "chunk-c447ef69527042fabaf3caadb7b7226c",
+                "chunk-c549678cae68ba2c933f9cab8762440f",
+                "chunk-76f5ece6df5d1157d7271cd0c47928d2",
+                "chunk-a4495cf406ba678b59cd957ba5832e39"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1839"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1826.",
+              "query_index": 30,
+              "question": "When did the city where Greenwood Laboratory School is located become capitol of the state where the screenwriter of The Poor Boob was born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f8aa772bdb6f54552936423bdc0cea85",
+                "chunk-c6b544a918d0f9ced5d6725ab3deaac5",
+                "chunk-89a1a54bbf6b18ad44e8e79ecf589634",
+                "chunk-e3ca76ed4809337ec44904ae73830695",
+                "chunk-34d490efdab149604c5e201fa01c03e9"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Vito Andolini",
+                "Vito Andolini Corleone",
+                "Vito Corleone"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Vito Corleone.",
+              "query_index": 31,
+              "question": "Who is played by the director of The Good Shepherd in The Godfather?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b75b165985cb18091f1cabeb0c07044b",
+                "chunk-33fa53fe180fe0e93e8f9cf7fc8332aa",
+                "chunk-c89f42091e7f0ee601b7c78b56a49a9f",
+                "chunk-324714cd5f563755aff09e54cb8ebfae",
+                "chunk-c36fb3dfd334981280c1b2d23ea77f79"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "four-year"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Four years.",
+              "query_index": 32,
+              "question": "How long are the council terms of the city that shares a county with Helvetia?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-8e616c803f02a0c604fe59c1d340249f",
+                "chunk-9681bce3801bb2e1bbe8034805cbf1bc",
+                "chunk-bbb0bd74fe19624f0bc39d3150975d38",
+                "chunk-c1f26e68183886a887cc8e2f03ff4a62",
+                "chunk-2ecaeaf163e2bb9c1d6a9227467d0d41"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1930"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The region immediately north of the Near East is the Middle East, and the terrain feature where shamal is located is the Persian Gulf. The Near East was replaced by the Middle East, and the Persian Gulf is part of the region. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is where the Persian Gulf is located. The Middle East's traditional definition includes the Arabian Peninsula, which is",
+              "query_index": 33,
+              "question": "When was the region immediately north of the region that prevailed with the disgrace of Near East and the terrain feature on which shamal is located created?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-12c9be1e565b3a6447e5b7369e7d6e68",
+                "chunk-10bf86f26a0dbf228656863bf6b8603a",
+                "chunk-21b2e8472be8689fff0ee597e846ae77",
+                "chunk-1d373a7179245d087a407a07a2f2d983",
+                "chunk-c99a09b62de60e5fffa45a2d95cc5a32"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "a long period of prosperity for the British people"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 34,
+              "question": "How did did the people fare during the reign of the abolisher of sati partha in India?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f23ec3dd2b9d195c971d94634f2def87",
+                "chunk-b2dace53cd0b22c894780063582713ad",
+                "chunk-7a1dc0697af3977700bf54c800892450",
+                "chunk-e4f7efa86de47756089d310a6408c6f7",
+                "chunk-d6f4a3d3b716a17194a8310c6fb375d4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Viceroy of India",
+                "Governor-General of India"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Governor-General of India.",
+              "query_index": 35,
+              "question": "What is the position of the 1st governor general of India?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-aa4e9370a256b59efc33c562df834b46",
+                "chunk-df5af6879a656538d788d534cb989c20",
+                "chunk-6138b0f8126d11db91b7e613bae6c30b",
+                "chunk-5d95d1725b3e109ad8458e2dcabf506d",
+                "chunk-f99d8c379dcf474718e0b5adc44d1fe3"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Jessie Woodrow Wilson",
+                "Jessie Woodrow Wilson Sayre"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Chester Alan Arthur II.",
+              "query_index": 36,
+              "question": "Who is the child of the president who suffered a major defeat when the body which approves members of the American cabinet refused to ratify the Versailles treaty?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7c315aa85ee38d3a903db2e679a99c8a",
+                "chunk-c0b61da49a5344618c689b823bb3e7cf",
+                "chunk-a923c7c448a7f96692b337503d5142e8",
+                "chunk-4f39c035b3e48fea25c1a7e04597dc14",
+                "chunk-cd4b20c75d7fa09e6fb17742e6fdad8c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "PowerShare"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "PowerShare.",
+              "query_index": 37,
+              "question": "What does dell call the feature letting the interface replacing FireWire in later iterations of the iPod drives to remain powered when the computer is off?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9e53201af0781dcebaed2d949488daf1",
+                "chunk-28fd483adb5bba9789a36ee2c34721f6",
+                "chunk-11ee1fd7b8b8f178b8162aaddd0dca79",
+                "chunk-d87c6e9fb666214b88b154cd20c500b5",
+                "chunk-5ea3f153ff96c45e34596c562e7d32fc"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "John D. Loudermilk"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "John D. Loudermilk.",
+              "query_index": 38,
+              "question": "Who wrote Turn Me On by the singer of Come Away with Me?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1d430f83f6ad9e3b440e03518174ea50",
+                "chunk-164d048777d2260fdd7c3a64918741f0",
+                "chunk-b2322259bc0d432c40df98105364baac",
+                "chunk-b3cc3ad1dfb5d3ca87221c74cd0af3d3",
+                "chunk-2dda1b4ffa13714eeedd47b3de3b7df1"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Josh Beckett"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Kyle Lohse.",
+              "query_index": 39,
+              "question": "Who was second pick in the 1999 draft of the league that has a competition where they give out the MLB MVP award after it?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-521f7a7225fcbced9a5f12d5636aee07",
+                "chunk-85a82db9982664998c91662f2095f8c5",
+                "chunk-5463d3d5011caca5ef085f3c70fede3c",
+                "chunk-aeda3cf460aa1e2ea7ba37fd12eb69b4",
+                "chunk-bc1be20500db6ceeddd03c35485db40e"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Francisco Guterres"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Francisco Guterres.",
+              "query_index": 40,
+              "question": "The Commission of Truth and Friendship established governments for Bustami's birth country and a second country that had who as president after declaring independence?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f4c66ec5a52a34ad25436f894c4821e8",
+                "chunk-6c3d91c6391e127f24063bb3a136749f",
+                "chunk-e37bc23364dc45833ccf3f8f3ddd1498",
+                "chunk-16f8667a5a995618a19c7022c1a1b73d",
+                "chunk-66feb1de439ac0f84fc4595224a3c68a"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Atlantic Ocean",
+                "Atlantic",
+                "central Atlantic Ocean"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "off the coast of Northwest Africa.",
+              "query_index": 41,
+              "question": "Where is the country with ISO code ISO 3166-2:CV located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-07d9ef2973a4ff3c75506c8c873fd658",
+                "chunk-71273c48042b6d7bb771140523b74df4",
+                "chunk-2646222c97da8d8814e6370a08689314",
+                "chunk-fcfbebfbde672adb696dabdb2012c8f7",
+                "chunk-3b1d3a6c86d07a3dcd55c896c17e35c9"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Medieval Latin"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Latin.",
+              "query_index": 42,
+              "question": "What was the form of the language Auctor is in, used in the era of the Frankish king who created the Holy Roman Empire, later known as?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-3795f2e908fbe2a001408fa800ac9971",
+                "chunk-ebdbbb8490362a14b67d4923ce1a3eb0",
+                "chunk-ace8a2705e1259fe894d8e5cd44a6438",
+                "chunk-ac72ee03bd87783f4527bb2b7486e02e",
+                "chunk-08437715227573bafeb2f16103013cea"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "the 2010 election"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1865.",
+              "query_index": 43,
+              "question": "When did the political party that favored harsh punishment of southern states after the Civil War, gain control of the House?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b2acb44fbc1f85ed0d337852a261cbce",
+                "chunk-9810880feb95bbf3f15f989770f10941",
+                "chunk-6068e1a4d180ef823ddf9d549406151c",
+                "chunk-decc57e4343d47230f8dd6d7cb11043e",
+                "chunk-709d44ca1b1e13878d968cad39475dab"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1848"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1848.",
+              "query_index": 44,
+              "question": "When did the person chosen to be president of the confederacy end his fight in the Mexican-American war?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ddd27cc1f173cb9b2be774850c31c729",
+                "chunk-f044023104bf3fedff755fc2925420f8",
+                "chunk-19e6edf29ddd870e928925a9d6ae8292",
+                "chunk-524c271408aded9d5a673edfc8d6e69c",
+                "chunk-7a7324fc3fe52e918406995138f934a9"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Tunis",
+                "La Goulette"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Tunis.",
+              "query_index": 45,
+              "question": "What city is the star of Sous les pieds des femmes from?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-deb178bf2252ced04320c26a54e0eb67",
+                "chunk-eae130b744b32ef4a2748bdc273c023f",
+                "chunk-0bf05ce4531d9790dd92fd6b53574d4d",
+                "chunk-46462f119b63a4c2bdee17f22f3b8b96",
+                "chunk-a1d985a958b34d119a5b524c8bdb50e7"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "IN",
+                "India",
+                "the country of India",
+                "IND",
+                "Republic of India",
+                "in"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Hindu.",
+              "query_index": 46,
+              "question": "what is meaning of the word that is a majority religion of the area that became India when the country origin of Mizraab was created in Arabic dictionary?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d93f737472c13881d052d269a7b8e58b",
+                "chunk-0465ad1cae225c1b7a29bbe1e2f080c1",
+                "chunk-737fb9a47804eca7f06c9804eb04e5ed",
+                "chunk-ac01b556eaca67165eefc2a30c60e671",
+                "chunk-b0f714b9788c816a6a1abc28c799c1cf"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5714,
+              "gold_answers": [
+                "Matt Bennett"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Matt Bennett and Elizabeth Gillies.",
+              "query_index": 47,
+              "question": "Who stars in the video \"One Last Time\" by the performer of Baby I?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-270d85f5dbbde27cfe74b68c392bc581",
+                "chunk-940492798e3138b838564c1c7534e893",
+                "chunk-023bf11dfefeadcccc41d41b3f39c837",
+                "chunk-d88f5d5dc842ee6ca1959b310baf2027",
+                "chunk-5a4a89fbe6ed69b809d24c0c9973e9ac"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "January 2015"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "2002.",
+              "query_index": 48,
+              "question": "When did the majority party in the House of Representatives gain control of the body which approves members of the Cabinet?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6068e1a4d180ef823ddf9d549406151c",
+                "chunk-78dd3f9d918844488bcfa6a57cdee306",
+                "chunk-9810880feb95bbf3f15f989770f10941",
+                "chunk-bc8ec23d59ba1e7fca3c642901f2b96a",
+                "chunk-709d44ca1b1e13878d968cad39475dab"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "two"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 49,
+              "question": "How many ethnic minorities were looked at differently in the city where the headquarters of the only group larger than L\u00e5nga n\u00e4tter's record label is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-33e9294d148d2227fa35b1fcd843f255",
+                "chunk-780d0c16999ece5ff53f3fc9819e4e40",
+                "chunk-fdb1aad619b6dd90ff8d069321d5bfee",
+                "chunk-b57d1c3029bd5b29cf94c7b9a38f028f",
+                "chunk-4b715c7dd2dd0e9d0b4e20d59785ea23"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "May 1990",
+                "1990"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1990.",
+              "query_index": 50,
+              "question": "When did the country the top-ranking Warsaw Pact operatives came from, despite it being headquartered in the country where A Generation is set, agree to a unified Germany inside NATO?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a92a0360698e2203dca4d781dcf79613",
+                "chunk-dc373d37a50091570d5ff8a616fb402e",
+                "chunk-9143eb6398d8dc3b0bd4d26ee9a98c22",
+                "chunk-6f1e32e1ef87d2e5ab2d6408b78e88de",
+                "chunk-6664b5ca880c69b6dce7bbd0390b9a55"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Mario Andretti"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 51,
+              "question": "Who won the Indy Car Race in the largest populated city of the state where the performer of Mingus Three is from?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9063625af7e8bb5a4a43dbd6aa221abb",
+                "chunk-3c0cbd1d94d38b0f940141ba0a5f590a",
+                "chunk-e2d38409a4271a39cb3679b99f3d9606",
+                "chunk-78134c6460fdbbbec357c8a7ba6e2e5e",
+                "chunk-4eef73e3551a5957cdf3a771dedbabc0"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Keturah"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Keturah.",
+              "query_index": 52,
+              "question": "Who did the person who married their half sister in the bible marry after the death of sarah?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-14979ee1dd1847fbb10d43814e063c77",
+                "chunk-ca9c498dc0ddd83782fd17750ea75859",
+                "chunk-6f6c70d8ead671c4ccd37008731fff08",
+                "chunk-cb8dbbe64a873309a5b5bbae2c12fc26",
+                "chunk-549bebfdfc611aabbf9fb505e8e8c104"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "$59,039"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not enough information.",
+              "query_index": 53,
+              "question": "What is the average salary of a working person with the same nationality as the producer of The Wild Women of Chastity Gulch?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6c2a239d83991ff51a9fe7c5a747e3c3",
+                "chunk-32a4f78777a2da359fce824b617aba1b",
+                "chunk-d9319ac6218441711dce171c56dd0000",
+                "chunk-eff88d21e503db6804c65136213ebdaf",
+                "chunk-55ffd392883bb03f016762e7fb4ce7c6"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "three different relationships he had in the past"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 54,
+              "question": "Who was Beyonce's husband talking about in the the song Cry?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-27ce68faa7139791425af2b165437fbd",
+                "chunk-af96a94a1201984ca6e00eab89fd4589",
+                "chunk-7da71ed1b782fc45f5c3b89b3f187092",
+                "chunk-c6580d7bf2597cc05339b96b10b6036b",
+                "chunk-a1d28011cfc04e27f1c33da50ff2a07e"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1932"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 55,
+              "question": "When was the region immediately north of the region where Israel is located and the site of the most growth in desalination for agricultural use established?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a7dacd571216083848f8c3be6a581954",
+                "chunk-814122a9a5294f22e06209746bf3ab0d",
+                "chunk-4cdeecb4685ac7aa24b170b94d5ee8a5",
+                "chunk-d12a21986a0e4d35f247227b7809d2c4",
+                "chunk-21b2e8472be8689fff0ee597e846ae77"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Mario Andretti"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 56,
+              "question": "An Indy car race was held in the capital of the state where the performer of Mingus Plays Piano was born. Who won the race?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d7b1d17e7fbb32604d0b0657e61b1c64",
+                "chunk-4aea23d30e1d636f356291a6858fa6f9",
+                "chunk-3c0cbd1d94d38b0f940141ba0a5f590a",
+                "chunk-78134c6460fdbbbec357c8a7ba6e2e5e",
+                "chunk-4eef73e3551a5957cdf3a771dedbabc0"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Ponte di Rialto",
+                "Rialto Bridge"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Rialto Bridge.",
+              "query_index": 57,
+              "question": "What is the name of the famous bridge in the birth city of the composer of Scanderbeg?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5e04c791a52ddf4855c51da506cbd46d",
+                "chunk-7192252f60eaa8d04fa48cea0793a433",
+                "chunk-7a9b664e88f5c962075e7f9a15d59420",
+                "chunk-8324e148c2cb1daaf8eccbccf16eeb97",
+                "chunk-b9364865b362f94e8f97341b5cffe77b"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Helen Pitts Douglass"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Helen Pitts Douglass.",
+              "query_index": 58,
+              "question": "Who was the spouse of a leading speaker against slavery and publisher of an antislavery newspaper?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5878c784c5ae0a19c9740f95ef9e64aa",
+                "chunk-44303fdcaacd9a51756ec45e7f529c96",
+                "chunk-82b1dd05e085412ea5d3410e7dae0459",
+                "chunk-068a41538f918f53e97a551f13ec1a28",
+                "chunk-ca113328474c81791a6914964bb6c26c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Saxony-Anhalt"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Saxony-Anhalt.",
+              "query_index": 59,
+              "question": "Where is the district that the person who wanted to reform and address John Kodwo Amissah's religion preached a sermon on Marian devotion before his death located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7072adf8089049a4b188a7964921a5a8",
+                "chunk-d6ec11eba2f0c44378eba30ba5a93e78",
+                "chunk-6f2f3c6b6369e0fd215277620876d3d2",
+                "chunk-7f95a9b80be5cff97b8d4bcbcf04c1d6",
+                "chunk-7f77ee679078084e78ced5cbe59c3c09"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Hayneville",
+                "Hayneville, Alabama"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Hayneville.",
+              "query_index": 60,
+              "question": "What is the capital of the county where Fort Deposit is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-49d6bfc9d79d4cbc21f0e7945da062ff",
+                "chunk-34431c3df7bf89e9b572d34d7a521e8d",
+                "chunk-b75cdb69063149df088b83b115f2fa17",
+                "chunk-f6cf693fd6c6aa95c9e9e7abdeab0c4a",
+                "chunk-169cc4d4bb74dbd015cca92a5fab674e"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.3333,
+              "gold_answers": [
+                "about 400 years"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Over 1,000 years.",
+              "query_index": 61,
+              "question": "How long had Pfrang Association's headquarters location been the capitol city of the area where Guangling District is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a3398fa77dbdfc21b2bf2ac6060c6cc2",
+                "chunk-61d9ade8c76551de28537ebc16b020ac",
+                "chunk-c968fa65d93620273f996bd71cd6665c",
+                "chunk-7294231372e1ad8eeb40570c888f8d2e",
+                "chunk-4874a740719576325a1b26bf869d2f39"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Medieval Latin"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Latin.",
+              "query_index": 62,
+              "question": "What was the language Auctor comes from during the era of the man crowned first Holy Roman Emperor later known as?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ebdbbb8490362a14b67d4923ce1a3eb0",
+                "chunk-3795f2e908fbe2a001408fa800ac9971",
+                "chunk-08437715227573bafeb2f16103013cea",
+                "chunk-ac72ee03bd87783f4527bb2b7486e02e",
+                "chunk-e0725b6c5054fb44646c081c979d5126"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1898 and 1959"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1898 and 1959.",
+              "query_index": 63,
+              "question": "When did the 1979-80 European Cup winner win the FA Cup?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a08cee827ff875e90bc01f9768941ec8",
+                "chunk-120b14a7b9a58c16bc7decb3d4e38d96",
+                "chunk-6dede0bd2b6e6de634f500418a45157b",
+                "chunk-b71ffe115d53e289f439807991903d35",
+                "chunk-df13d25cc29ed3c7d9fdc527ef439b88"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Walter Sabo"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 64,
+              "question": "Who was a prominent figure at the radio division of the network that created the version of The Biggest Loser set in the country where Seria is?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ef74670a7443d1e4066e1527ed5979c6",
+                "chunk-19f254692fd84fbe5f07441b18eb3a01",
+                "chunk-2e87302b12880bc46fedec5e90016be3",
+                "chunk-5294c36099106cc371fc8792889453b7",
+                "chunk-6bdab53451b8e4c742ca29a53c0e0d46"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "260,897"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "260,897.",
+              "query_index": 65,
+              "question": "What was the 2018 population of the Italian city that's underwater?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-733a09a5edb4d7b948b2d856ae5faf2c",
+                "chunk-5e9c0b27e9fd4c9c360a284d830e1123",
+                "chunk-077e37550cf88ef67a79b8297b39b846",
+                "chunk-55cafd59d5777aafa9a400df687f682f",
+                "chunk-73bb33cf3da11a32e290f935a44a5019"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Medieval Latin"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not mentioned.",
+              "query_index": 66,
+              "question": "What was the language from which the last name Sylvester originated during the era of the person crowned emperor of the west in 800 CE later known as?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f1c30a0d677be8a8f33f014fa57e7250",
+                "chunk-e0725b6c5054fb44646c081c979d5126",
+                "chunk-15eae541a88ad31dde7c84110028a4cb",
+                "chunk-ac72ee03bd87783f4527bb2b7486e02e",
+                "chunk-fd72a2ce271cfeb7d54fbe63aac733ce"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "ADM Michael S. Rogers",
+                "Michael S. Rogers"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Director of the National Security Agency.",
+              "query_index": 67,
+              "question": "Who is the head of the agency that created MYSTIC?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-8c0180e52f221df3498a160ec509d834",
+                "chunk-8fb912133bc46cfd44d66c7a152402e0",
+                "chunk-2ac1298893f04518d6c3c9af75983785",
+                "chunk-2ba1ac0a5071a1e9e8aadf4c76106ce2",
+                "chunk-e4ddfe19f7a282de1c58dbdd731bc9cc"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1905"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1905.",
+              "query_index": 68,
+              "question": "What was the wettest year of the administrative territorial entity that contains the administrative territorial entity where Drexel Heights is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b11459be77765a13ce30596bf8f6c79d",
+                "chunk-2d4a42c5eae6bab211f30432e74bcf0b",
+                "chunk-f1cf8a47c64d0e00f4545e2e51e8bbe4",
+                "chunk-2ecaeaf163e2bb9c1d6a9227467d0d41",
+                "chunk-e38a6d3341beb2b96edd90c4cde313ad"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Mario Andretti"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 69,
+              "question": "Who won the Indy Car Race in the largest populated city of the state where the performer of Mingus Plays Piano is from?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d7b1d17e7fbb32604d0b0657e61b1c64",
+                "chunk-3c0cbd1d94d38b0f940141ba0a5f590a",
+                "chunk-4eef73e3551a5957cdf3a771dedbabc0",
+                "chunk-e2d38409a4271a39cb3679b99f3d9606",
+                "chunk-78134c6460fdbbbec357c8a7ba6e2e5e"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Sydney Harbour",
+                "Port Jackson"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Tasman Sea.",
+              "query_index": 70,
+              "question": "What does the river that Darling Mills Creek turns into flow into?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b1da4c539a7313c6c9d4e6096c9b8d7b",
+                "chunk-ac89ce464a0ecb5268b56e76f867b23a",
+                "chunk-de7a15c19df98bae8defbf2f5bedc840",
+                "chunk-216474a8d5d66835689e8d48591728ec",
+                "chunk-7740d2e807869b06cc99c15d60e880bf"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Minas Gerais"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "State of Minas Gerais.",
+              "query_index": 71,
+              "question": "What administrative territorial entity does Darley Ramon Torres's place of birth located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-92fd5adf9cb84d5870edfa0ebdd0cbb8",
+                "chunk-0a44d9fb19e9a9319adf0cb3aa8e7396",
+                "chunk-630589e3e288b4cf9519732ea7a7d515",
+                "chunk-2f34c30bca2a927ccf9c10eb84e14153",
+                "chunk-ed32a38bfa0245c512c749d55e791267"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Presque Isle County"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Fulton.",
+              "query_index": 72,
+              "question": "Which county shares a border with the county where the most populous city in the state where Washington State Prison can be found is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-baf742f09c880756fe97214b1a3320c9",
+                "chunk-cc2678996be46f762cae9db2b9f52bf2",
+                "chunk-59c1c88c8e483df7da83ddb82c1cdad8",
+                "chunk-9a2a9af11da0a1043876c1f9666a5e63",
+                "chunk-229d08d975f7e902196a37c94c261fbb"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "\"Southern Capital\"",
+                "Nanking",
+                "Nanjing",
+                "Nankin"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Southern Capital.",
+              "query_index": 73,
+              "question": "What is the meaning of the name of the city where the Yongle emperor greeted the person to whom the edict was addressed?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c968fa65d93620273f996bd71cd6665c",
+                "chunk-45f2eb623d94cc7b761d05f8acaa348e",
+                "chunk-35ef215463d88a7022209540e0dcde82",
+                "chunk-eaa2b6b56e1ffe82a3ed031d6f3ea1b1",
+                "chunk-e85cfee017c0b4ae6173ee21f01963d1"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "rises in northern Minnesota and meanders slowly southwards",
+                "Minnesota"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "South.",
+              "query_index": 74,
+              "question": "What is the direction of flow of the body of water by the city where Write This Down was formed?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e3c728e95e80ce1a233da074c999db9d",
+                "chunk-6898b7d2ebe121f91e53e6e3ad063fcf",
+                "chunk-33c1c4cd7540f72c766c2236b0452836",
+                "chunk-d57ad550d151a73f296b4cf8643c2807",
+                "chunk-686c73b009b7b84f0fc95e1dad166f15"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "The dynasty regrouped and defeated the Portuguese"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not mentioned.",
+              "query_index": 75,
+              "question": "How were people from whom new coins were a proclamation of independence by the Somali Muslim Ajuran Empire expelled from the natural boundary between Thailand and A Don's country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5b2864a8e270e701da2f6e01ddacd511",
+                "chunk-66feb1de439ac0f84fc4595224a3c68a",
+                "chunk-f6919612d3bdee873cf25680ad370f56",
+                "chunk-21a8bfa8618f9e6b0558163dd96f378c",
+                "chunk-b7703d222f0b5ef8fbd789c3a3bd8a22"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Yang Xingmi"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yang Xingmi.",
+              "query_index": 76,
+              "question": "Who is the father of Empress Wang's husband?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-be56ea9d66ea317e13614878bd93fc4a",
+                "chunk-e7fb6818ff423f4acf827267e6b1d8f6",
+                "chunk-057ad7c3d72eb092d86021e427e26039",
+                "chunk-eb12aa246630d613a82f078eb76faf01",
+                "chunk-b1d743dce499c74b1151517705a29aba"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "2016"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1992.",
+              "query_index": 77,
+              "question": "When did the country with a co-official language used in the film titled after the city that is the final resting place of Tito first attend the Olympics games?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ad00aca48b83e4f83722f18d80e00252",
+                "chunk-f168677e930f726243f105d933c0e512",
+                "chunk-ec4eae82a8b8ef9288fe94ec78479af3",
+                "chunk-6afda231b94cb3fc569e98053df31744",
+                "chunk-8c6875d8f9b5622317ad84b32acd2da6"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Adrian Edmondson"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Andrew Adamson.",
+              "query_index": 78,
+              "question": "Who is the spouse of the actress who played the fairy god mother in Shrek 2?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-8c71f3a4d4394a5046224ba3e5389a07",
+                "chunk-e2c7781e49cec7304008d7f6e1bbcf6c",
+                "chunk-b822280322f25bbde3d1fb49493d44cf",
+                "chunk-28eaa8aeb7ad83d20bb13abdf68e5a80",
+                "chunk-dbc9850955ccf28f1a23f9c995cac826"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1 December 2010"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 79,
+              "question": "When was the last time Darren Carter's team beat the 1894-95 FA Cup winner?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5c5f6b0ce63689c4bac69805cd104631",
+                "chunk-120b14a7b9a58c16bc7decb3d4e38d96",
+                "chunk-9563f5edde3d40fa831bf4a617942d53",
+                "chunk-b6adc29474b3a6407e33fde255705405",
+                "chunk-df13d25cc29ed3c7d9fdc527ef439b88"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Ponte di Rialto",
+                "Rialto Bridge"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Rialto Bridge.",
+              "query_index": 80,
+              "question": "What is the name of the famous bridge in the city where the composer of La Silvia was born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2aebca05d7817f4b3f4693f0bc55637d",
+                "chunk-e48aa766d3c59d35c8b6282ed9309eda",
+                "chunk-73bb33cf3da11a32e290f935a44a5019",
+                "chunk-7192252f60eaa8d04fa48cea0793a433",
+                "chunk-78ea1c103cf3ec96c314eca562e641ab"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "Jennifer Connelly"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Jennifer Aniston.",
+              "query_index": 81,
+              "question": "Who is the spouse of the actor that plays Jarvis in the Avengers Age of Ultron?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d3711c17041816e2c0abad78b580144e",
+                "chunk-b9c05aded151506e3040e097a41f1f6e",
+                "chunk-b88d9641eb364e1e77318426fc32190b",
+                "chunk-ff39159fd74644e61312d1ad800cb6b0",
+                "chunk-fdd98cc2f73d4b593f8d0eccd0e1444d"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Fort Lee"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Fort Lee, New Jersey.",
+              "query_index": 82,
+              "question": "What is the location of formation of the film company distributing The Boss?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-43ec0489f52bc194cf1eb5a025a65325",
+                "chunk-de7806e1ce9cf68ec78a91a9e85414c2",
+                "chunk-120845844fb35f5129fcc6b525e6890b",
+                "chunk-4e91934cb320ebf0361acdb974b0e115",
+                "chunk-e940c9fb39ec791fba5b16c47e51adab"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "four-year"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 83,
+              "question": "How long are the city council terms in the second largest city in the state where Yuma is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f74af124e91148b60bcac8456c8c5a9a",
+                "chunk-7e96f3e106ec39387231fd8ec7fbfd3f",
+                "chunk-2ecaeaf163e2bb9c1d6a9227467d0d41",
+                "chunk-0c9fb96189f0d7b8b2c963f526e6f9c6",
+                "chunk-4eef73e3551a5957cdf3a771dedbabc0"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Jessie Woodrow Wilson",
+                "Jessie Woodrow Wilson Sayre"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Chester Alan Arthur II.",
+              "query_index": 84,
+              "question": "Who is the child of the president under whom prohibition occurred?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7c315aa85ee38d3a903db2e679a99c8a",
+                "chunk-163dd41f4f3843c188b13d41e3194022",
+                "chunk-daf32ec3669ba7625227b6ec40672e5c",
+                "chunk-c9fda928129137e5b8d592ac5b1791bc",
+                "chunk-52dd17f32cb432f2aa81948ab8a19589"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Hubbard County",
+                "Hubbard County, Minnesota"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Hubbard County.",
+              "query_index": 85,
+              "question": "What administrative territorial entity contains the place where KPRM is licensed to broadcast to?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5c2657658381ee0cd42ebc4505165a60",
+                "chunk-9d20c56c894f7b4ad310fbb76cd40b27",
+                "chunk-58743956a5008e68430a6fd9649f5118",
+                "chunk-1647f72d910bd8e910e62f28637a462b",
+                "chunk-56488182d172567ebeef1cb90c7bc8b4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Claudia Wells"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Claudia Wells.",
+              "query_index": 86,
+              "question": "Who played the girlfriend of who plays marty mcfly's daughter in back to the future 2?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-cf6bae3832242da40ece26af3227919e",
+                "chunk-c0a51420b5755bb45603d3a61d07659a",
+                "chunk-d32e5d5397b83c73d220c8bb221c8ded",
+                "chunk-dfedd4c2563c80c8314b01d9562b8dfa",
+                "chunk-0e1bf367b43678f6b54566772605d6b5"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1989"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1989.",
+              "query_index": 87,
+              "question": "When was the death penalty abolished in the country near the country where the writer of The Book Thief is a citizen of?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-add518e2b82184f3a18076d5b48b3814",
+                "chunk-be7596d1bc7c949239e3d36354aba7f5",
+                "chunk-6aa04fba841fed4724071e9ce997f734",
+                "chunk-710ee9bf353b2b40bc022c448d6be7a6",
+                "chunk-911e462b1ced87f9664c43189b990a72"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Texas Commerce Tower",
+                "JPMorgan Chase Tower"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "William P. Clements Jr. Federal Building.",
+              "query_index": 88,
+              "question": "What is the tallest building in the state where KZAR is located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f6b03835e2526c37477f5788fa3d50a2",
+                "chunk-538f4d9ced13c66f352d680638364bfa",
+                "chunk-401195250b5b26126ab6e1f861180f9c",
+                "chunk-681ef2ac83105c57818487e7e671ebfd",
+                "chunk-23156f4c2170aabb1eb7b433556b6ed0"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "five unit loads"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "500 mA.",
+              "query_index": 89,
+              "question": "What is the maximum load drawn by the 1.0 and 2.0 versions of the device that replaced FireWire in later iPods?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e46a1203dbcbc2aa7d6fb7bb0abe3dea",
+                "chunk-d87c6e9fb666214b88b154cd20c500b5",
+                "chunk-86d8213e71fd84927f5ddc992abe2fa6",
+                "chunk-6c414f8cb5b0bcbeed4dbfbb39123255",
+                "chunk-c1190d01aa22ceccf453d2ee150fded6"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Pristina"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sarajevo.",
+              "query_index": 90,
+              "question": "Where is the headquarters of Radio Television of this country that has a co-official language that is the same as the language of Olivera Markovic?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-795d895ac7d411b23b66f8897c2f3b43",
+                "chunk-91f1728e3992a613a929a2d9e485e950",
+                "chunk-474155b58d7f0afe2d016cc411e03a94",
+                "chunk-e9bd0510861cabce4b3ce8a700fad9b2",
+                "chunk-ad00aca48b83e4f83722f18d80e00252"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Richland County, South Carolina",
+                "Richland County"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Hennepin.",
+              "query_index": 91,
+              "question": "What county has a city that is adjacent to the capital city of Erskine College's state?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-324d76b19eb9398fb416be148981abaa",
+                "chunk-c7f7eb316c201fd88c40c19a10bc7f30",
+                "chunk-e3ca76ed4809337ec44904ae73830695",
+                "chunk-d6b4f22f3612a1e8bd75e186ecc5aee6",
+                "chunk-6898b7d2ebe121f91e53e6e3ad063fcf"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "January 2015"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 92,
+              "question": "When did the majority party in the House of Representatives gain control of the body which determines rules of the US House and US Senate?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6068e1a4d180ef823ddf9d549406151c",
+                "chunk-78dd3f9d918844488bcfa6a57cdee306",
+                "chunk-257eaa4704d5a19b017211a1f16f5067",
+                "chunk-5e89382f69b49eaaf172ad273276e2c8",
+                "chunk-f46c140a9f34fa7d6dfedf678e1b2532"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1981"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1983.",
+              "query_index": 93,
+              "question": "When did Nissan, the Acura Legend maker and the Scion Fuse manufacturer open US assembly plants?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6598bb3bc1d93f577f8058e81c406bb3",
+                "chunk-69181f112a25ba5e9c1c5e6494fda801",
+                "chunk-3c7b06926c407ee6980d0740123749bf",
+                "chunk-3cbae44d0343f79d9cbe77520f241274",
+                "chunk-047e7b8a194c0bc8ce2b2f47da9fda41"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Bill Bergen"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not enough information.",
+              "query_index": 94,
+              "question": "Who had the lowest batting average in the league where the team with the most games in the series after which the MLB MVP is awarded played?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-de709c9e816754834cef9e3ec76b27f8",
+                "chunk-aeda3cf460aa1e2ea7ba37fd12eb69b4",
+                "chunk-bc1be20500db6ceeddd03c35485db40e",
+                "chunk-50f718c5e53665a4e29feae1ba43417f",
+                "chunk-49a9f6b3a5222eb05fb258d2a2e28f0e"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Brooklyn Public Library"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Brooklyn Public Library.",
+              "query_index": 95,
+              "question": "What is the public library system called in the place where the Cosbys live in New York?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-52f15364100f5e7580db8a7e437bbc9e",
+                "chunk-2df1071e7799b61c2b115b2ca8062865",
+                "chunk-8bd30f0a110e21ea95031c0e7cb3f140",
+                "chunk-cdf932e6a4ec27459a0fb6f1da821daa",
+                "chunk-33ca74b15db8365f600186bec32c0063"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Yamanote Line",
+                "Yamanote Line loop"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Japan.",
+              "query_index": 96,
+              "question": "What is an example of a railroad line in the country first to invade Manchuria?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-89af40d889a46a96c8b6db78136060fb",
+                "chunk-5d89863e70374b947fcbe46626c0dd20",
+                "chunk-9972cbb58c8cacdb1e7fbd21e5d7697a",
+                "chunk-91ffaceec999c9310737b3d2e3c5a358",
+                "chunk-0be58443f38eb8327ef06f60eab8eb87"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Chynna Phillips"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Chynna Phillips.",
+              "query_index": 97,
+              "question": "Who is the child of the Victim of Romance performer?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d631c826e71f80d2678917d5e8e0dcee",
+                "chunk-253ddb169f4696ea503f710e389a4d4a",
+                "chunk-4fb40e60bf9a43cc2e9f3bd41af6f1e1",
+                "chunk-15dae5e92f7138bbd7a6e9e571cef1ea",
+                "chunk-e22e2f007b16badbfe1ae2572496dd7e"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "22"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "22.",
+              "query_index": 98,
+              "question": "How many times did the plague occur in the birth place of Concerto in C Major Op 3 6's composer?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-8ddd312db6da995ffd640345e25ba53a",
+                "chunk-7192252f60eaa8d04fa48cea0793a433",
+                "chunk-371315bd53c79360fd02676e65d14fe7",
+                "chunk-a469bbe29b9bed85e55331175b0c9f75",
+                "chunk-733a09a5edb4d7b948b2d856ae5faf2c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1932"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1932.",
+              "query_index": 99,
+              "question": "When was the region immediately north of the region where the country in which Aluf can be found is located and the Persian Gulf established?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-030827db5492ac006623e6bd584da08d",
+                "chunk-23e0a462c751d2ff5a5ffab86cd0530a",
+                "chunk-3fcc65a02006ebf198fc9efcabfe3a09",
+                "chunk-bbc25b32428998a26773e1466d020ccf",
+                "chunk-71dd9abed18ed7521c8a1e0b3858501b"
+              ]
+            }
+          ]
+        }
+      },
+      "num_queries": 100,
+      "reader": {
+        "llm_base_url": "http://localhost:8043/v1",
+        "llm_name": "qwen3-8b-train",
+        "max_new_tokens": 400,
+        "qa_top_k": 5
+      },
+      "source": {
+        "doc_source": "external_pool_topk_docs",
+        "does_not_modify_retrieval": true,
+        "input_path": "/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/musique_proprag.json",
+        "retrieval_r5_source": "input_file.overall_recomputed.Recall@5",
+        "uses_exported_pool_topk_docs": true,
+        "uses_saved_reader_docs": false
+      }
+    }
+  ],
+  "format": "saved_docs_reader_only_qa",
+  "max_new_tokens": 400,
+  "qa_top_k": 5
+}

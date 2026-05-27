@@ -1,0 +1,2859 @@
+===== 2026-04-21T21:02:57+08:00 START 2wikimultihopqa dtc_embed binding bestcover smoke20 anchor2 =====
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 56422 nodes, 1457156 edges
+INFO:src.hipporag.embedding_store:Loaded 6119 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 50303 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 67159 records from outputs_step0_general_2wikimultihopqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 6119 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_2wikimultihopqa/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 50303 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 67159 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]2195it [00:00, 21947.56it/s]4390it [00:00, 19479.03it/s]6119it [00:00, 10890.69it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]6119it [00:00, 2938509.98it/s]
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval.
+INFO:src.hipporag.HippoRAG:Loading keys.
+INFO:src.hipporag.HippoRAG:Loading embeddings.
+INFO:src.hipporag.HippoRAG:Encoding 20 queries for query_to_fact.
+INFO:src.hipporag.HippoRAG:Encoding 20 queries for query_to_passage.
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]Retrieving:   5%|▌         | 1/20 [00:00<00:16,  1.17it/s]Retrieving:  10%|█         | 2/20 [00:01<00:16,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the performer of song Changed It?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  15%|█▌        | 3/20 [00:02<00:15,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are Marufabad and Nasamkhrali both located in the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  20%|██        | 4/20 [00:03<00:15,  1.06it/s]Retrieving:  25%|██▌       | 5/20 [00:04<00:13,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film whose director was born first, El Tonto or The Heart Of Doreon?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:  30%|███       | 6/20 [00:05<00:12,  1.08it/s]Retrieving:  35%|███▌      | 7/20 [00:06<00:11,  1.09it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Raghnall Mac Ruaidhrí's paternal grandfather?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  40%|████      | 8/20 [00:07<00:11,  1.08it/s]Retrieving:  45%|████▌     | 9/20 [00:08<00:10,  1.08it/s]Retrieving:  50%|█████     | 10/20 [00:09<00:09,  1.08it/s]Retrieving:  55%|█████▌    | 11/20 [00:10<00:08,  1.08it/s]Retrieving:  60%|██████    | 12/20 [00:11<00:07,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the performer of song When The Stars Go Blue?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  65%|██████▌   | 13/20 [00:12<00:06,  1.08it/s]Retrieving:  70%|███████   | 14/20 [00:12<00:05,  1.07it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the place of death of Maurice, Prince Of Orange's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  75%|███████▌  | 15/20 [00:13<00:04,  1.09it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which country Aleksander Koniecpolski (1620–1659)'s father is from?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  80%|████████  | 16/20 [00:14<00:03,  1.11it/s]Retrieving:  85%|████████▌ | 17/20 [00:15<00:02,  1.12it/s]Retrieving:  90%|█████████ | 18/20 [00:16<00:01,  1.14it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  95%|█████████▌| 19/20 [00:17<00:00,  1.15it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the director of film The Private Life Of Cinema born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving: 100%|██████████| 20/20 [00:18<00:00,  1.13it/s]Retrieving: 100%|██████████| 20/20 [00:18<00:00,  1.10it/s]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 23.97s
+INFO:src.hipporag.HippoRAG:Total Recognition Memory Time 13.18s
+INFO:src.hipporag.HippoRAG:Total PPR Time 3.19s
+INFO:src.hipporag.HippoRAG:Total Misc Time 7.60s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.4, 'Recall@2': 0.625, 'Recall@5': 0.8375, 'Recall@10': 0.8875, 'Recall@20': 0.8875, 'Recall@30': 0.8875, 'Recall@50': 0.8875, 'Recall@100': 0.8875, 'Recall@150': 0.8875, 'Recall@200': 0.925}
+Collecting QA prompts:   0%|          | 0/20 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 20/20 [00:00<00:00, 15282.58it/s]
+QA Reading:   0%|          | 0/20 [00:00<?, ?it/s]QA Reading: 100%|██████████| 20/20 [00:00<00:00, 2234.70it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 20it [00:00, 4489.73it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.5, 'F1': 0.5523}
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the place of birth of the performer of song Changed It?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Are Marufabad and Nasamkhrali both located in the same country?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 4 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film whose director was born first, El Tonto or The Heart Of Doreon?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+INFO:src.hipporag.HippoRAG:Encoding 4 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Who is Raghnall Mac Ruaidhrí's paternal grandfather?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What nationality is the performer of song When The Stars Go Blue?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Where was the place of death of Maurice, Prince Of Orange's father?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "Which country Aleksander Koniecpolski (1620–1659)'s father is from?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 4 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where was the director of film The Private Life Of Cinema born?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:__main__:Applied dtc_embed selector over pool@100 for 20 queries (avg mapped pool docs=100.00, avg seed entities=5.05)
+Collecting QA prompts:   0%|          | 0/20 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 20/20 [00:00<00:00, 15445.79it/s]
+QA Reading:   0%|          | 0/20 [00:00<?, ?it/s]QA Reading: 100%|██████████| 20/20 [00:00<00:00, 2250.22it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 20it [00:00, 4694.50it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.65, 'F1': 0.6773}
+INFO:__main__:Setwise selector dtc_embed[bridge]@100: EM=0.6500 (delta=+0.1500), F1=0.6773
+{
+  "output_json": "outputs_step0_general_2wikimultihopqa/eval_reports/dtc_embed_binding_bestcover_smoke20_anchor2_fresh8043.json",
+  "overall_recomputed": {
+    "Recall@1": 0.4,
+    "Recall@2": 0.625,
+    "Recall@5": 0.8375,
+    "Recall@10": 0.8875,
+    "Recall@20": 0.8875,
+    "Recall@30": 0.8875,
+    "Recall@50": 0.8875,
+    "Recall@100": 0.8875,
+    "Recall@150": 0.8875,
+    "Recall@200": 0.925,
+    "ExactMatch": 0.5,
+    "F1": 0.5523009121656247,
+    "num_queries": 20
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "setwise_selector_qa": {
+    "selector": "dtc_embed",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "anchor_count": 2,
+    "reserve_top_m": 2,
+    "max_bridge_slots": 0,
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "gate_mode": "none",
+    "gate_min_structure_score": 0.15,
+    "gate_min_combined_margin": 0.0,
+    "gate_min_closure_score": 0.0,
+    "gate_min_novelty_score": 0.0,
+    "gate_min_frontier_gain": 0.0,
+    "gate_min_path_coherence": 0.0,
+    "gate_max_avg_local_structure": 0.95,
+    "gate_min_suffix_base_mean": 0.15,
+    "reader_order_probe_mode": "none",
+    "beam_width": 4,
+    "beam_expand_per_state": 4,
+    "beam_projected_shortlist_factor": 1,
+    "late_rerank_enabled": false,
+    "late_rerank_candidate_count": 4,
+    "late_rerank_include_baseline": true,
+    "late_rerank_doc_char_limit": 280,
+    "late_rerank_policy": "always",
+    "late_rerank_max_state_score_gap": 0.0,
+    "late_rerank_judge_backend": "inherit",
+    "late_rerank_judge_model": "qwen3-8b-train",
+    "late_rerank_judge_base_url": "http://localhost:8043/v1",
+    "late_rerank_judge_reasoning_effort": null,
+    "state_score_weights": {
+      "path_connectivity": 0.3,
+      "reachable_doc_ratio": 0.2,
+      "query_reachability": 0.15,
+      "support_mean": 0.05,
+      "support_min": 0.05,
+      "closure_mean": 0.1,
+      "suffix_base_mean": 0.05,
+      "query_coverage": 0.1,
+      "frontier_ratio": 0.05,
+      "redundancy_penalty": 0.1
+    },
+    "setwise_model_path": null,
+    "setwise_requirement_cache_path": null,
+    "setwise_requirement_mode": "oracle",
+    "setwise_requirement_model_path": null,
+    "setwise_requirement_reserve_policy": "fixed",
+    "setwise_requirement_annotation_pool_k": 50,
+    "setwise_requirement_smooth_tau": 0.15,
+    "setwise_requirement_counterfactual_tau": 0.1,
+    "setwise_requirement_live_annotation_pool_k": 0,
+    "setwise_requirement_live_annotation_score_mode": "heuristic",
+    "setwise_requirement_live_atomic_model_path": null,
+    "setwise_requirement_live_source_expand_factor": 0,
+    "setwise_requirement_exposure_watch_titles": [
+      "Riverside Plaza",
+      "Minneapolis",
+      "Mississippi River",
+      "The Right Stuff Records",
+      "Sony Music"
+    ],
+    "setwise_requirement_probe_force_source_titles": [],
+    "setwise_requirement_probe_force_shortlist_titles": [],
+    "setwise_requirement_probe_force_final_titles": [],
+    "setwise_requirement_probe_force_pool_gold_into_final": false,
+    "setwise_requirement_probe_source_sort_mode": "combined",
+    "setwise_requirement_probe_source_support_gain_weight": 0.0,
+    "setwise_requirement_probe_shortlist_sort_mode": "margin_first",
+    "setwise_requirement_probe_bridge_bonus_mode": "off",
+    "setwise_requirement_probe_bridge_bonus_weight": 0.0,
+    "selector_EM": 0.65,
+    "selector_F1": 0.6773,
+    "baseline_EM": 0.5,
+    "baseline_F1": 0.5523,
+    "EM_delta": 0.15,
+    "F1_delta": 0.125,
+    "selector_retrieval_metrics": {
+      "Recall@1": 0.4,
+      "Recall@2": 0.625,
+      "Recall@5": 0.8875,
+      "Recall@10": 0.8875,
+      "Recall@20": 0.8875
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 15,
+        "baseline_EM": 0.5333,
+        "selector_EM": 0.6667,
+        "EM_delta": 0.1333,
+        "baseline_F1": 0.603,
+        "selector_F1": 0.7031,
+        "F1_delta": 0.1
+      },
+      "4_doc": {
+        "count": 5,
+        "baseline_EM": 0.4,
+        "selector_EM": 0.6,
+        "EM_delta": 0.2,
+        "baseline_F1": 0.4001,
+        "selector_F1": 0.6,
+        "F1_delta": 0.1999
+      }
+    },
+    "selector_summary": {
+      "selector": "dtc_embed",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 5.05,
+      "avg_selected_structured_doc_count": 4.95,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "When did Lothair Ii's mother die?",
+          "selected_titles": [
+            "Lothair II",
+            "Waldrada of Lotharingia",
+            "Ermengarde of Tours",
+            "Teutberga",
+            "Bertha, daughter of Lothair II"
+          ],
+          "seed_entities_preview": [
+            "bertha",
+            "emperor lothair i",
+            "ermengarde of tours",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "waldrada of lotharingia"
+          ],
+          "question_entities_preview": [
+            "adelaide ii",
+            "emperor lothair i",
+            "lothair",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "mother s will",
+            "theobald ii",
+            "unknown mother"
+          ],
+          "grounded_question_entities_preview": [
+            "emperor lothair i",
+            "lothair",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "unknown mother"
+          ],
+          "proposal_query_entities_preview": [
+            "bertha",
+            "emperor lothair i",
+            "ermengarde of tours",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "waldrada of lotharingia"
+          ],
+          "query_entities_preview": [
+            "bertha",
+            "emperor lothair i",
+            "ermengarde of tours",
+            "lothair ii",
+            "lothair ii of lotharingia",
+            "waldrada of lotharingia"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Lothair II",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Lothair II",
+              "coverage_score": 0.5935,
+              "previous_coverage_score": 0.0,
+              "binding_title": "Ermengarde of Tours"
+            },
+            {
+              "step": 3,
+              "mode": "dtc_cover",
+              "pool_position": 3,
+              "title": "Ermengarde of Tours",
+              "coverage_gain": 0.4065,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.5243,
+              "redundancy": 0.6836,
+              "total_gain": 0.3643,
+              "requirement_scores": [
+                {
+                  "unit_id": "s1",
+                  "score": 0.5545,
+                  "previous": 1.0,
+                  "delta": 0.0,
+                  "binding_title": ""
+                },
+                {
+                  "unit_id": "s2",
+                  "score": 1.0,
+                  "previous": 0.5935,
+                  "delta": 0.4065,
+                  "binding_title": "Ermengarde of Tours"
+                }
+              ]
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 3,
+              "title": "Ermengarde of Tours",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.5935,
+              "binding_title": "Ermengarde of Tours"
+            },
+            {
+              "step": 5,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "Teutberga",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 6,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "Bertha, daughter of Lothair II",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+          "selected_titles": [
+            "Aas Ka Panchhi",
+            "Aansoo Ban Gaye Phool",
+            "Phoolwari",
+            "Abhishek Saxena",
+            "Phalitamsha"
+          ],
+          "seed_entities_preview": [
+            "1961 hindi movie",
+            "aas ka panchhi",
+            "mohan kumar",
+            "rajinder singh bedi"
+          ],
+          "question_entities_preview": [
+            "aas ka panchhi",
+            "bollywood film",
+            "film",
+            "film director",
+            "first indian film with sound",
+            "japanese film",
+            "malayalam film",
+            "phoolwari"
+          ],
+          "grounded_question_entities_preview": [
+            "aas ka panchhi",
+            "film",
+            "japanese film",
+            "phoolwari"
+          ],
+          "proposal_query_entities_preview": [
+            "1961 hindi movie",
+            "aas ka panchhi",
+            "mohan kumar",
+            "rajinder singh bedi"
+          ],
+          "query_entities_preview": [
+            "1961 hindi movie",
+            "aas ka panchhi",
+            "mohan kumar",
+            "rajinder singh bedi"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Aas Ka Panchhi",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 1,
+              "title": "Aansoo Ban Gaye Phool",
+              "coverage_score": 0.577,
+              "previous_coverage_score": 0.2684,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s3",
+              "cover_update": false,
+              "pool_position": 1,
+              "title": "Aansoo Ban Gaye Phool",
+              "coverage_score": 0.6719,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "pool_position": 2,
+              "title": "Phoolwari",
+              "coverage_gain": 0.423,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.0664,
+              "redundancy": 0.5875,
+              "total_gain": 0.3675,
+              "requirement_scores": [
+                {
+                  "unit_id": "s2",
+                  "score": 1.0,
+                  "previous": 0.577,
+                  "delta": 0.423,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Phoolwari",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.577,
+              "binding_title": ""
+            },
+            {
+              "step": 6,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s3",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Phoolwari",
+              "coverage_score": 0.8759,
+              "previous_coverage_score": 0.6719,
+              "binding_title": ""
+            },
+            {
+              "step": 7,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Abhishek Saxena",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 8,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "Phalitamsha",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "What is the place of birth of the performer of song Changed It?",
+          "selected_titles": [
+            "Changed It",
+            "Nicki Minaj",
+            "Did It On'em",
+            "You Changed Me",
+            "2 Chainz"
+          ],
+          "seed_entities_preview": [
+            "cash money records",
+            "changed it",
+            "lil wayne",
+            "nicki minaj",
+            "young money entertainment"
+          ],
+          "question_entities_preview": [
+            "change",
+            "changed it",
+            "country of birth",
+            "domicile of birth",
+            "performer",
+            "place of birth",
+            "song",
+            "the o c"
+          ],
+          "grounded_question_entities_preview": [
+            "change",
+            "changed it",
+            "the o c"
+          ],
+          "proposal_query_entities_preview": [
+            "cash money records",
+            "changed it",
+            "lil wayne",
+            "nicki minaj",
+            "young money entertainment"
+          ],
+          "query_entities_preview": [
+            "cash money records",
+            "changed it",
+            "lil wayne",
+            "nicki minaj",
+            "young money entertainment"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Changed It",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Changed It",
+              "coverage_score": 0.6231,
+              "previous_coverage_score": 0.0,
+              "binding_title": "Nicki Minaj"
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "Nicki Minaj",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.6231,
+              "binding_title": "Nicki Minaj"
+            },
+            {
+              "step": 4,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "Did It On'em",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 5,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "You Changed Me",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 6,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "2 Chainz",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+          "selected_titles": [
+            "Nasamkhrali",
+            "Marufabad",
+            "Radisele",
+            "Qaleh-ye Zaras",
+            "Qaleh-ye Sahar"
+          ],
+          "seed_entities_preview": [
+            "iran",
+            "kabutarsorkh rural district",
+            "marufabad",
+            "nasamkhrali",
+            "nasomkhari",
+            "qaleh ye zaras",
+            "telavi district"
+          ],
+          "question_entities_preview": [
+            "alexander the great",
+            "country",
+            "country of birth",
+            "hasan the bald",
+            "islamic state of iraq and the levant",
+            "marufabad",
+            "nasamkhrali",
+            "the sufi order in the west"
+          ],
+          "grounded_question_entities_preview": [
+            "marufabad",
+            "nasamkhrali"
+          ],
+          "proposal_query_entities_preview": [
+            "iran",
+            "kabutarsorkh rural district",
+            "marufabad",
+            "nasamkhrali",
+            "nasomkhari",
+            "qaleh ye zaras",
+            "telavi district"
+          ],
+          "query_entities_preview": [
+            "iran",
+            "kabutarsorkh rural district",
+            "marufabad",
+            "nasamkhrali",
+            "nasomkhari",
+            "qaleh ye zaras",
+            "telavi district"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Nasamkhrali",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 1,
+              "title": "Marufabad",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.2435,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "dtc_cover",
+              "pool_position": 7,
+              "title": "Radisele",
+              "coverage_gain": 0.2825,
+              "new_requirement_count": 1,
+              "new_requirement_ids": [
+                "s3"
+              ],
+              "base_score": 0.0481,
+              "redundancy": 0.3144,
+              "total_gain": 0.5034,
+              "requirement_scores": [
+                {
+                  "unit_id": "s3",
+                  "score": 0.5814,
+                  "previous": 0.2989,
+                  "delta": 0.2825,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s3",
+              "cover_update": false,
+              "pool_position": 7,
+              "title": "Radisele",
+              "coverage_score": 0.5814,
+              "previous_coverage_score": 0.2989,
+              "binding_title": ""
+            },
+            {
+              "step": 5,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "Qaleh-ye Zaras",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 6,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Qaleh-ye Sahar",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Bråk?",
+          "selected_titles": [
+            "God's Gift to Women",
+            "Aldri annet enn bråk",
+            "Altid ballade",
+            "Edith Carlmar",
+            "Brink of Life"
+          ],
+          "seed_entities_preview": [
+            "aldri annet enn br k",
+            "film",
+            "gabriel axel",
+            "god s gift to women",
+            "laura laplante",
+            "michael curtiz"
+          ],
+          "question_entities_preview": [
+            "aldri annet enn br k",
+            "director",
+            "english title of aldri annet enn br k",
+            "film",
+            "film director",
+            "god s gift to women",
+            "remake of aldri annet enn br k",
+            "women"
+          ],
+          "grounded_question_entities_preview": [
+            "aldri annet enn br k",
+            "director",
+            "english title of aldri annet enn br k",
+            "film",
+            "film director",
+            "god s gift to women",
+            "remake of aldri annet enn br k"
+          ],
+          "proposal_query_entities_preview": [
+            "aldri annet enn br k",
+            "film",
+            "gabriel axel",
+            "god s gift to women",
+            "laura laplante",
+            "michael curtiz"
+          ],
+          "query_entities_preview": [
+            "aldri annet enn br k",
+            "film",
+            "gabriel axel",
+            "god s gift to women",
+            "laura laplante",
+            "michael curtiz"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "God's Gift to Women",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s3",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "God's Gift to Women",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 1,
+              "title": "Aldri annet enn bråk",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "reserve",
+              "covered_requirement_id": "s4",
+              "cover_update": false,
+              "pool_position": 1,
+              "title": "Aldri annet enn bråk",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": "Altid ballade"
+            },
+            {
+              "step": 5,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "Altid ballade",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 6,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Edith Carlmar",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 7,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "Brink of Life",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        }
+      ],
+      "dtc_max_steps": 4,
+      "dtc_match_threshold": 0.35,
+      "dtc_redundancy_weight": 0.1,
+      "dtc_base_weight": 0.05,
+      "dtc_anchor_bonus_weight": 0.1,
+      "dtc_dependency_bonus_weight": 0.1,
+      "dtc_max_completion_tokens": 512,
+      "dtc_enable_dependency_binding": true,
+      "dtc_binding_max_candidates": 4,
+      "dtc_binding_entity_hit_required": true,
+      "dtc_parse_success_count": 20,
+      "dtc_fallback_count": 0,
+      "avg_dtc_requirement_count": 2.75,
+      "avg_dtc_covered_requirement_rate": 0.9875,
+      "avg_dtc_embedding_available_requirement_count": 2.75
+    }
+  }
+}
+===== 2026-04-21T21:04:09+08:00 END 2wikimultihopqa dtc_embed binding bestcover smoke20 anchor2 =====
+===== 2026-04-21T21:04:09+08:00 START hotpotqa dtc_embed binding bestcover smoke20 anchor2 =====
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 105259 nodes, 2031487 edges
+INFO:src.hipporag.embedding_store:Loaded 9811 records from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 95448 records from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 130305 records from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 9811 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_hotpotqa/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 95448 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 130305 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]1746it [00:00, 17454.90it/s]3492it [00:00, 16213.75it/s]5120it [00:00, 15653.09it/s]6689it [00:00, 15211.77it/s]8213it [00:00, 14333.91it/s]9653it [00:00, 14015.74it/s]9811it [00:00, 14684.71it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]9811it [00:00, 2952806.87it/s]
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval.
+INFO:src.hipporag.HippoRAG:Loading keys.
+INFO:src.hipporag.HippoRAG:Loading embeddings.
+INFO:src.hipporag.HippoRAG:Encoding 20 queries for query_to_fact.
+INFO:src.hipporag.HippoRAG:Encoding 20 queries for query_to_passage.
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'what is one of the stars of  The Newcomers known for': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+Retrieving:   5%|▌         | 1/20 [00:01<00:31,  1.64s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The fictional private detective that appears in "The Adventure of the Seven Clocks" what written by whom?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  10%|█         | 2/20 [00:03<00:30,  1.70s/it]Retrieving:  15%|█▌        | 3/20 [00:05<00:29,  1.72s/it]Retrieving:  20%|██        | 4/20 [00:06<00:27,  1.71s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In which county is the town in which Raymond Robertsen was born ?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  25%|██▌       | 5/20 [00:08<00:25,  1.71s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What screenplay was worked on by both Edward Carfagno and Miklos Rozsa?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  30%|███       | 6/20 [00:10<00:24,  1.74s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which Walt Disney film was produced first, The Apple Dumpling Gang or Something Wicked This Way Comes?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  35%|███▌      | 7/20 [00:12<00:23,  1.77s/it]Retrieving:  40%|████      | 8/20 [00:13<00:21,  1.77s/it]Retrieving:  45%|████▌     | 9/20 [00:15<00:19,  1.79s/it]Retrieving:  50%|█████     | 10/20 [00:17<00:17,  1.78s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Bytham Castle is a castle in the civil parish of how many houses?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+Retrieving:  55%|█████▌    | 11/20 [00:19<00:16,  1.78s/it]Retrieving:  60%|██████    | 12/20 [00:21<00:14,  1.77s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How do the Peter Laufer books Forbidden Creatures and No Animals Were Harmed differ in their focus on animals?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  65%|██████▌   | 13/20 [00:22<00:12,  1.77s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is a winner of the 2013 6 Hours of Silverstone a co-commentator for?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax. Perhaps you forgot a comma? (<unknown>, line 1).
+Retrieving:  70%|███████   | 14/20 [00:24<00:10,  1.76s/it]Retrieving:  75%|███████▌  | 15/20 [00:26<00:08,  1.74s/it]Retrieving:  80%|████████  | 16/20 [00:28<00:07,  1.75s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what year was the Golden State NBA player, who was part of the Cavaliers-Warriors rivalry, named NBA Finals Most Valuable Player?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  85%|████████▌ | 17/20 [00:29<00:05,  1.76s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the actor who wrote the memoir Without you: A memoir of love, loss, and the Musical Rent and also stared as Mark Cohen in the Broadway produ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  90%|█████████ | 18/20 [00:31<00:03,  1.76s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'One Raffles Place is one of the tallest skyscrapers in the city of Singapore and tallest in the wolrd outside North America until it was succeeded by a Building': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  95%|█████████▌| 19/20 [00:33<00:01,  1.76s/it]Retrieving: 100%|██████████| 20/20 [00:35<00:00,  1.75s/it]Retrieving: 100%|██████████| 20/20 [00:35<00:00,  1.75s/it]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 46.02s
+INFO:src.hipporag.HippoRAG:Total Recognition Memory Time 26.05s
+INFO:src.hipporag.HippoRAG:Total PPR Time 5.62s
+INFO:src.hipporag.HippoRAG:Total Misc Time 14.35s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.375, 'Recall@2': 0.625, 'Recall@5': 0.9, 'Recall@10': 0.95, 'Recall@20': 0.95, 'Recall@30': 0.975, 'Recall@50': 0.975, 'Recall@100': 1.0, 'Recall@150': 1.0, 'Recall@200': 1.0}
+Collecting QA prompts:   0%|          | 0/20 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 20/20 [00:00<00:00, 17791.32it/s]
+QA Reading:   0%|          | 0/20 [00:00<?, ?it/s]QA Reading: 100%|██████████| 20/20 [00:00<00:00, 2327.00it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 20it [00:00, 3425.32it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.55, 'F1': 0.6626}
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'what is one of the stars of  The Newcomers known for': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'The fictional private detective that appears in "The Adventure of the Seven Clocks" what written by whom?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In which county is the town in which Raymond Robertsen was born ?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What screenplay was worked on by both Edward Carfagno and Miklos Rozsa?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Which Walt Disney film was produced first, The Apple Dumpling Gang or Something Wicked This Way Comes?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Bytham Castle is a castle in the civil parish of how many houses?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 1) (<unknown>, line 1).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How do the Peter Laufer books Forbidden Creatures and No Animals Were Harmed differ in their focus on animals?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who is a winner of the 2013 6 Hours of Silverstone a co-commentator for?': Error parsing raw response as candidate selection: Unable to parse structured payload: invalid syntax. Perhaps you forgot a comma? (<unknown>, line 1).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'In what year was the Golden State NBA player, who was part of the Cavaliers-Warriors rivalry, named NBA Finals Most Valuable Player?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the name of the actor who wrote the memoir Without you: A memoir of love, loss, and the Musical Rent and also stared as Mark Cohen in the Broadway produ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'One Raffles Place is one of the tallest skyscrapers in the city of Singapore and tallest in the wolrd outside North America until it was succeeded by a Building': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:__main__:Applied dtc_embed selector over pool@100 for 20 queries (avg mapped pool docs=100.00, avg seed entities=5.00)
+Collecting QA prompts:   0%|          | 0/20 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 20/20 [00:00<00:00, 16222.41it/s]
+QA Reading:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading: 100%|██████████| 20/20 [00:02<00:00,  7.51it/s]QA Reading: 100%|██████████| 20/20 [00:02<00:00,  7.51it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 20it [00:00, 4541.01it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.65, 'F1': 0.7182}
+INFO:__main__:Setwise selector dtc_embed[bridge]@100: EM=0.6500 (delta=+0.1000), F1=0.7182
+{
+  "output_json": "outputs_step0_general_hotpotqa/eval_reports/dtc_embed_binding_bestcover_smoke20_anchor2_fresh8043.json",
+  "overall_recomputed": {
+    "Recall@1": 0.375,
+    "Recall@2": 0.625,
+    "Recall@5": 0.9,
+    "Recall@10": 0.95,
+    "Recall@20": 0.95,
+    "Recall@30": 0.975,
+    "Recall@50": 0.975,
+    "Recall@100": 1.0,
+    "Recall@150": 1.0,
+    "Recall@200": 1.0,
+    "ExactMatch": 0.55,
+    "F1": 0.6626262626262626,
+    "num_queries": 20
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "setwise_selector_qa": {
+    "selector": "dtc_embed",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "anchor_count": 2,
+    "reserve_top_m": 2,
+    "max_bridge_slots": 0,
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "gate_mode": "none",
+    "gate_min_structure_score": 0.15,
+    "gate_min_combined_margin": 0.0,
+    "gate_min_closure_score": 0.0,
+    "gate_min_novelty_score": 0.0,
+    "gate_min_frontier_gain": 0.0,
+    "gate_min_path_coherence": 0.0,
+    "gate_max_avg_local_structure": 0.95,
+    "gate_min_suffix_base_mean": 0.15,
+    "reader_order_probe_mode": "none",
+    "beam_width": 4,
+    "beam_expand_per_state": 4,
+    "beam_projected_shortlist_factor": 1,
+    "late_rerank_enabled": false,
+    "late_rerank_candidate_count": 4,
+    "late_rerank_include_baseline": true,
+    "late_rerank_doc_char_limit": 280,
+    "late_rerank_policy": "always",
+    "late_rerank_max_state_score_gap": 0.0,
+    "late_rerank_judge_backend": "inherit",
+    "late_rerank_judge_model": "qwen3-8b-train",
+    "late_rerank_judge_base_url": "http://localhost:8043/v1",
+    "late_rerank_judge_reasoning_effort": null,
+    "state_score_weights": {
+      "path_connectivity": 0.3,
+      "reachable_doc_ratio": 0.2,
+      "query_reachability": 0.15,
+      "support_mean": 0.05,
+      "support_min": 0.05,
+      "closure_mean": 0.1,
+      "suffix_base_mean": 0.05,
+      "query_coverage": 0.1,
+      "frontier_ratio": 0.05,
+      "redundancy_penalty": 0.1
+    },
+    "setwise_model_path": null,
+    "setwise_requirement_cache_path": null,
+    "setwise_requirement_mode": "oracle",
+    "setwise_requirement_model_path": null,
+    "setwise_requirement_reserve_policy": "fixed",
+    "setwise_requirement_annotation_pool_k": 50,
+    "setwise_requirement_smooth_tau": 0.15,
+    "setwise_requirement_counterfactual_tau": 0.1,
+    "setwise_requirement_live_annotation_pool_k": 0,
+    "setwise_requirement_live_annotation_score_mode": "heuristic",
+    "setwise_requirement_live_atomic_model_path": null,
+    "setwise_requirement_live_source_expand_factor": 0,
+    "setwise_requirement_exposure_watch_titles": [
+      "Riverside Plaza",
+      "Minneapolis",
+      "Mississippi River",
+      "The Right Stuff Records",
+      "Sony Music"
+    ],
+    "setwise_requirement_probe_force_source_titles": [],
+    "setwise_requirement_probe_force_shortlist_titles": [],
+    "setwise_requirement_probe_force_final_titles": [],
+    "setwise_requirement_probe_force_pool_gold_into_final": false,
+    "setwise_requirement_probe_source_sort_mode": "combined",
+    "setwise_requirement_probe_source_support_gain_weight": 0.0,
+    "setwise_requirement_probe_shortlist_sort_mode": "margin_first",
+    "setwise_requirement_probe_bridge_bonus_mode": "off",
+    "setwise_requirement_probe_bridge_bonus_weight": 0.0,
+    "selector_EM": 0.65,
+    "selector_F1": 0.7182,
+    "baseline_EM": 0.55,
+    "baseline_F1": 0.6626,
+    "EM_delta": 0.1,
+    "F1_delta": 0.0556,
+    "selector_retrieval_metrics": {
+      "Recall@1": 0.375,
+      "Recall@2": 0.625,
+      "Recall@5": 0.925,
+      "Recall@10": 0.975,
+      "Recall@20": 0.975
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 20,
+        "baseline_EM": 0.55,
+        "selector_EM": 0.65,
+        "EM_delta": 0.1,
+        "baseline_F1": 0.6626,
+        "selector_F1": 0.7182,
+        "F1_delta": 0.0556
+      }
+    },
+    "selector_summary": {
+      "selector": "dtc_embed",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 5.0,
+      "avg_selected_structured_doc_count": 5.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "what is one of the stars of  The Newcomers known for",
+          "selected_titles": [
+            "The Newcomers (film)",
+            "Vaniusha The Newcomer",
+            "Chris Evans (actor)",
+            "The Newcomer in The Cabbage",
+            "Vaniusha and The Giant"
+          ],
+          "seed_entities_preview": [
+            "chris evans",
+            "christopher mccoy",
+            "kate bosworth",
+            "paul dano",
+            "the newcomers"
+          ],
+          "question_entities_preview": [
+            "an american girl mckenna shoots for the stars",
+            "cultural identity of the malayali",
+            "emigration for the sake of seeking a better profession",
+            "han sun hwa as one of the nine rising it stars",
+            "multiple seasons of the sopranos",
+            "newcomers",
+            "the newcomers",
+            "war of the worlds"
+          ],
+          "grounded_question_entities_preview": [
+            "an american girl mckenna shoots for the stars",
+            "cultural identity of the malayali",
+            "emigration for the sake of seeking a better profession",
+            "the newcomers"
+          ],
+          "proposal_query_entities_preview": [
+            "chris evans",
+            "christopher mccoy",
+            "kate bosworth",
+            "paul dano",
+            "the newcomers"
+          ],
+          "query_entities_preview": [
+            "chris evans",
+            "christopher mccoy",
+            "kate bosworth",
+            "paul dano",
+            "the newcomers"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "The Newcomers (film)",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "dtc_cover",
+              "pool_position": 53,
+              "title": "Chris Evans (actor)",
+              "coverage_gain": 0.504,
+              "new_requirement_count": 1,
+              "new_requirement_ids": [
+                "s2"
+              ],
+              "base_score": 0.0109,
+              "redundancy": 0.3456,
+              "total_gain": 0.7199,
+              "requirement_scores": [
+                {
+                  "unit_id": "s2",
+                  "score": 0.6703,
+                  "previous": 0.1664,
+                  "delta": 0.504,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 3,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 53,
+              "title": "Chris Evans (actor)",
+              "coverage_score": 0.6703,
+              "previous_coverage_score": 0.1664,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "The Newcomer in The Cabbage",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 5,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Vaniusha and The Giant",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "The fictional private detective that appears in \"The Adventure of the Seven Clocks\" what written by whom?",
+          "selected_titles": [
+            "The Adventure of the Seven Clocks",
+            "Sherlock Holmes",
+            "He Who Whispers",
+            "The Crooked Hinge",
+            "Mr. Holmes"
+          ],
+          "seed_entities_preview": [
+            "adrian conan doyle",
+            "john dickson carr",
+            "sherlock holmes story",
+            "the adventure of the seven clocks",
+            "the exploits of sherlock holmes"
+          ],
+          "question_entities_preview": [
+            "fiction",
+            "fictional private detective",
+            "private detective",
+            "seven",
+            "tales of the fictional private detective nick carter",
+            "the adventure company",
+            "the adventure of the seven clocks",
+            "the private sector"
+          ],
+          "grounded_question_entities_preview": [
+            "fictional private detective",
+            "tales of the fictional private detective nick carter",
+            "the adventure company",
+            "the adventure of the seven clocks"
+          ],
+          "proposal_query_entities_preview": [
+            "adrian conan doyle",
+            "john dickson carr",
+            "sherlock holmes story",
+            "the adventure of the seven clocks",
+            "the exploits of sherlock holmes"
+          ],
+          "query_entities_preview": [
+            "adrian conan doyle",
+            "john dickson carr",
+            "sherlock holmes story",
+            "the adventure of the seven clocks",
+            "the exploits of sherlock holmes"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "The Adventure of the Seven Clocks",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "The Adventure of the Seven Clocks",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": "Sherlock Holmes"
+            },
+            {
+              "step": 3,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "He Who Whispers",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 4,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "The Crooked Hinge",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 5,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "Mr. Holmes",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "The Distribution of Industry act was passed by a man who was prime minister when? ",
+          "selected_titles": [
+            "Industry Act 1975",
+            "Distribution of Industry Act 1950",
+            "Clement Attlee",
+            "Honours (Prevention of Abuses) Act 1925",
+            "James Callaghan"
+          ],
+          "seed_entities_preview": [
+            "1950",
+            "clement attlee",
+            "distribution of industry act 1950",
+            "labour government",
+            "united kingdom"
+          ],
+          "question_entities_preview": [
+            "act",
+            "department of the prime minister",
+            "distribution",
+            "distribution of industry act 1950",
+            "industry",
+            "prime minister",
+            "prime minister of mauritius",
+            "prime minister of pakistan"
+          ],
+          "grounded_question_entities_preview": [
+            "act",
+            "department of the prime minister",
+            "distribution of industry act 1950",
+            "prime minister",
+            "prime minister of mauritius",
+            "prime minister of pakistan"
+          ],
+          "proposal_query_entities_preview": [
+            "1950",
+            "clement attlee",
+            "distribution of industry act 1950",
+            "labour government",
+            "united kingdom"
+          ],
+          "query_entities_preview": [
+            "1950",
+            "clement attlee",
+            "distribution of industry act 1950",
+            "labour government",
+            "united kingdom"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Industry Act 1975",
+              "coverage_score": 0.7283,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Industry Act 1975",
+              "coverage_score": 0.8219,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "Distribution of Industry Act 1950",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.7283,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "Distribution of Industry Act 1950",
+              "coverage_score": 0.9647,
+              "previous_coverage_score": 0.8219,
+              "binding_title": "Clement Attlee"
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "pool_position": 2,
+              "title": "Clement Attlee",
+              "coverage_gain": 0.0353,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.1763,
+              "redundancy": 0.3638,
+              "total_gain": 0.0078,
+              "requirement_scores": [
+                {
+                  "unit_id": "s2",
+                  "score": 1.0,
+                  "previous": 0.9647,
+                  "delta": 0.0353,
+                  "binding_title": "Clement Attlee"
+                }
+              ]
+            },
+            {
+              "step": 6,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Clement Attlee",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.9647,
+              "binding_title": "Clement Attlee"
+            },
+            {
+              "step": 7,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Honours (Prevention of Abuses) Act 1925",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 8,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "James Callaghan",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "Sparking the Marian civil war, who helped the recently abdicated queen to escape her imprisonment?",
+          "selected_titles": [
+            "Marian civil war",
+            "Battle of Langside",
+            "Loch Leven Castle",
+            "Battle of Carberry Hill",
+            "Background of the Spanish Civil War"
+          ],
+          "seed_entities_preview": [
+            "loch leven castle",
+            "marian civil war",
+            "mary queen of scots"
+          ],
+          "question_entities_preview": [
+            "civil war political pamphleteer",
+            "king",
+            "marian civil war",
+            "queen",
+            "queen anne s war",
+            "scottish civil war",
+            "spanish civil war",
+            "the winter queen"
+          ],
+          "grounded_question_entities_preview": [
+            "king",
+            "marian civil war",
+            "queen",
+            "spanish civil war",
+            "the winter queen"
+          ],
+          "proposal_query_entities_preview": [
+            "loch leven castle",
+            "marian civil war",
+            "mary queen of scots"
+          ],
+          "query_entities_preview": [
+            "loch leven castle",
+            "marian civil war",
+            "mary queen of scots"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Marian civil war",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Marian civil war",
+              "coverage_score": 0.7442,
+              "previous_coverage_score": 0.0,
+              "binding_title": "Loch Leven Castle"
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "Battle of Langside",
+              "coverage_score": 0.7497,
+              "previous_coverage_score": 0.7442,
+              "binding_title": "Loch Leven Castle"
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "pool_position": 2,
+              "title": "Loch Leven Castle",
+              "coverage_gain": 0.2503,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.5803,
+              "redundancy": 0.6638,
+              "total_gain": 0.213,
+              "requirement_scores": [
+                {
+                  "unit_id": "s2",
+                  "score": 1.0,
+                  "previous": 0.7497,
+                  "delta": 0.2503,
+                  "binding_title": "Loch Leven Castle"
+                }
+              ]
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Loch Leven Castle",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.7497,
+              "binding_title": "Loch Leven Castle"
+            },
+            {
+              "step": 6,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Battle of Carberry Hill",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 7,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "Background of the Spanish Civil War",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "In which county is the town in which Raymond Robertsen was born ?",
+          "selected_titles": [
+            "Raymond, Alberta",
+            "Raymond Robertsen",
+            "Hammerfest",
+            "Raymond, Maine",
+            "P.P. Raymond House"
+          ],
+          "seed_entities_preview": [
+            "12 september 1974",
+            "hammerfest",
+            "norwegian politician",
+            "raymond center",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "question_entities_preview": [
+            "agricultural growth in goodhue county",
+            "raymond",
+            "raymond robertsen",
+            "the town",
+            "town",
+            "town of raymond",
+            "western edge of the county",
+            "when the town was officially established"
+          ],
+          "grounded_question_entities_preview": [
+            "raymond",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "proposal_query_entities_preview": [
+            "12 september 1974",
+            "hammerfest",
+            "norwegian politician",
+            "raymond center",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "query_entities_preview": [
+            "12 september 1974",
+            "hammerfest",
+            "norwegian politician",
+            "raymond center",
+            "raymond robertsen",
+            "town of raymond"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Raymond, Alberta",
+              "coverage_score": 0.5073,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Raymond, Alberta",
+              "coverage_score": 0.8853,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "Raymond Robertsen",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.5073,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "pool_position": 2,
+              "title": "Hammerfest",
+              "coverage_gain": 0.1147,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.171,
+              "redundancy": 0.3681,
+              "total_gain": 0.0864,
+              "requirement_scores": [
+                {
+                  "unit_id": "s2",
+                  "score": 1.0,
+                  "previous": 0.8853,
+                  "delta": 0.1147,
+                  "binding_title": "Hammerfest"
+                }
+              ]
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Hammerfest",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.8853,
+              "binding_title": "Hammerfest"
+            },
+            {
+              "step": 6,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Raymond, Maine",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 7,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "P.P. Raymond House",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        }
+      ],
+      "dtc_max_steps": 4,
+      "dtc_match_threshold": 0.35,
+      "dtc_redundancy_weight": 0.1,
+      "dtc_base_weight": 0.05,
+      "dtc_anchor_bonus_weight": 0.1,
+      "dtc_dependency_bonus_weight": 0.1,
+      "dtc_max_completion_tokens": 512,
+      "dtc_enable_dependency_binding": true,
+      "dtc_binding_max_candidates": 4,
+      "dtc_binding_entity_hit_required": true,
+      "dtc_parse_success_count": 20,
+      "dtc_fallback_count": 0,
+      "avg_dtc_requirement_count": 2.3,
+      "avg_dtc_covered_requirement_rate": 1.0,
+      "avg_dtc_embedding_available_requirement_count": 2.3
+    }
+  }
+}
+===== 2026-04-21T21:06:17+08:00 END hotpotqa dtc_embed binding bestcover smoke20 anchor2 =====
+===== 2026-04-21T21:06:17+08:00 START musique dtc_embed binding bestcover smoke20 anchor2 =====
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 111597 nodes, 2262000 edges
+INFO:src.hipporag.embedding_store:Loaded 11656 records from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.embedding_store:Loaded 99941 records from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings/vdb_entity.parquet
+INFO:src.hipporag.embedding_store:Loaded 135279 records from outputs_step0_general_musique/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings/vdb_fact.parquet
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Performing OpenIE
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 11656 records already exist.
+INFO:src.hipporag.HippoRAG:OpenIE results saved to outputs_step0_general_musique/openie_results_ner_qwen3-8b.json
+INFO:src.hipporag.HippoRAG:Encoding Entities
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 99941 records already exist.
+INFO:src.hipporag.HippoRAG:Encoding Facts
+INFO:src.hipporag.embedding_store:Inserting 0 new records, 135279 records already exist.
+INFO:src.hipporag.HippoRAG:Constructing Graph
+INFO:src.hipporag.HippoRAG:Adding OpenIE triples to graph.
+0it [00:00, ?it/s]1924it [00:00, 19232.36it/s]3848it [00:00, 17856.19it/s]5641it [00:00, 17236.55it/s]7369it [00:00, 16546.40it/s]9028it [00:00, 15768.50it/s]10610it [00:00, 15196.86it/s]11656it [00:00, 15889.38it/s]
+INFO:src.hipporag.HippoRAG:Connecting passage nodes to phrase nodes.
+0it [00:00, ?it/s]11656it [00:00, 2460433.19it/s]
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval.
+INFO:src.hipporag.HippoRAG:Loading keys.
+INFO:src.hipporag.HippoRAG:Loading embeddings.
+INFO:src.hipporag.HippoRAG:Encoding 20 queries for query_to_fact.
+INFO:src.hipporag.HippoRAG:Encoding 20 queries for query_to_passage.
+Retrieving:   0%|          | 0/20 [00:00<?, ?it/s]Retrieving:   5%|▌         | 1/20 [00:02<00:40,  2.11s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  10%|█         | 2/20 [00:03<00:35,  1.95s/it]Retrieving:  15%|█▌        | 3/20 [00:05<00:31,  1.88s/it]Retrieving:  20%|██        | 4/20 [00:07<00:29,  1.85s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When was Lady Godiva's birthplace abolished?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  25%|██▌       | 5/20 [00:09<00:27,  1.82s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the region immediately north of the region where Israel is located and the location of the Battle of Qurah and Umm al Maradim created?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 17) (<unknown>, line 17).
+Retrieving:  30%|███       | 6/20 [00:10<00:24,  1.76s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  35%|███▌      | 7/20 [00:12<00:22,  1.70s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+Retrieving:  40%|████      | 8/20 [00:14<00:20,  1.67s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the start of the battle of the birthplace of the performer of III?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+Retrieving:  45%|████▌     | 9/20 [00:15<00:18,  1.67s/it]Retrieving:  50%|█████     | 10/20 [00:17<00:16,  1.66s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How many episodes are in season 5 of the series with The Bag or the Bat?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+Retrieving:  55%|█████▌    | 11/20 [00:19<00:15,  1.73s/it]Retrieving:  60%|██████    | 12/20 [00:21<00:14,  1.79s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the birthplace of the person after whom São José dos Campos was named?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  65%|██████▌   | 13/20 [00:23<00:12,  1.82s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How many times did plague occur in the place where Crucifixion's creator died?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+Retrieving:  70%|███████   | 14/20 [00:25<00:10,  1.83s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What year did the Governor of the city where the basilica named after the same saint as the one that Mantua Cathedral is dedicated to die?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  75%|███████▌  | 15/20 [00:26<00:09,  1.84s/it]Retrieving:  80%|████████  | 16/20 [00:28<00:07,  1.78s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  85%|████████▌ | 17/20 [00:30<00:05,  1.74s/it]Retrieving:  90%|█████████ | 18/20 [00:31<00:03,  1.72s/it]WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was in charge of the place where Castricum is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+Retrieving:  95%|█████████▌| 19/20 [00:33<00:01,  1.70s/it]Retrieving: 100%|██████████| 20/20 [00:35<00:00,  1.70s/it]Retrieving: 100%|██████████| 20/20 [00:35<00:00,  1.76s/it]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 48.44s
+INFO:src.hipporag.HippoRAG:Total Recognition Memory Time 26.28s
+INFO:src.hipporag.HippoRAG:Total PPR Time 5.30s
+INFO:src.hipporag.HippoRAG:Total Misc Time 16.86s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.2292, 'Recall@2': 0.3042, 'Recall@5': 0.5417, 'Recall@10': 0.6083, 'Recall@20': 0.6917, 'Recall@30': 0.7167, 'Recall@50': 0.7958, 'Recall@100': 0.8375, 'Recall@150': 0.8792, 'Recall@200': 0.9042}
+Collecting QA prompts:   0%|          | 0/20 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 20/20 [00:00<00:00, 29694.19it/s]
+QA Reading:   0%|          | 0/20 [00:00<?, ?it/s]QA Reading: 100%|██████████| 20/20 [00:00<00:00, 3416.81it/s]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 20it [00:00, 10302.88it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.3, 'F1': 0.3309}
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities ': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+INFO:src.hipporag.HippoRAG:Encoding 4 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When was Lady Godiva's birthplace abolished?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the region immediately north of the region where Israel is located and the location of the Battle of Qurah and Umm al Maradim created?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 17) (<unknown>, line 17).
+INFO:src.hipporag.HippoRAG:Encoding 4 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Where does the body of water by the city where the Southeast Library designer died empty into the Gulf of Mexico?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 4 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "When did the explorer reach the city where the headquarters of the only group larger than Vilaiyaadu Mankatha's record label is located?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 6) (<unknown>, line 6).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the start of the battle of the birthplace of the performer of III?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 4) (<unknown>, line 4).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'How many episodes are in season 5 of the series with The Bag or the Bat?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 12) (<unknown>, line 12).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What is the birthplace of the person after whom São José dos Campos was named?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query "How many times did plague occur in the place where Crucifixion's creator died?": Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 10) (<unknown>, line 10).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'What year did the Governor of the city where the basilica named after the same saint as the one that Mantua Cathedral is dedicated to die?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 3 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'When was the Palau de la Generalitat constructed in the city where Martin from the region where Perdiguera is located died?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 4 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+WARNING:src.hipporag.rerank:Rerank parse failed on attempt 1 for query 'Who was in charge of the place where Castricum is located?': Error parsing raw response as candidate selection: Unable to parse structured payload: unterminated string literal (detected at line 2) (<unknown>, line 2).
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 1 queries for query_to_passage.
+INFO:src.hipporag.HippoRAG:Encoding 2 queries for query_to_passage.
+INFO:__main__:Applied dtc_embed selector over pool@100 for 20 queries (avg mapped pool docs=100.00, avg seed entities=5.50)
+Collecting QA prompts:   0%|          | 0/20 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 20/20 [00:00<00:00, 23810.98it/s]
+QA Reading:   0%|          | 0/20 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  20%|██        | 4/20 [00:02<00:09,  1.62it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  30%|███       | 6/20 [00:55<02:39, 11.38s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  40%|████      | 8/20 [01:46<03:20, 16.67s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  85%|████████▌ | 17/20 [01:54<00:16,  5.53s/it]QA Reading: 100%|██████████| 20/20 [01:54<00:00,  5.72s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 20it [00:00, 841.67it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.35, 'F1': 0.3893}
+INFO:__main__:Setwise selector dtc_embed[bridge]@100: EM=0.3500 (delta=+0.0500), F1=0.3893
+{
+  "output_json": "outputs_step0_general_musique/eval_reports/dtc_embed_binding_bestcover_smoke20_anchor2_fresh8043.json",
+  "overall_recomputed": {
+    "Recall@1": 0.2292,
+    "Recall@2": 0.3042,
+    "Recall@5": 0.5417,
+    "Recall@10": 0.6083,
+    "Recall@20": 0.6917,
+    "Recall@30": 0.7167,
+    "Recall@50": 0.7958,
+    "Recall@100": 0.8375,
+    "Recall@150": 0.8792,
+    "Recall@200": 0.9042,
+    "ExactMatch": 0.3,
+    "F1": 0.33088235294117646,
+    "num_queries": 20
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {},
+  "setwise_selector_qa": {
+    "selector": "dtc_embed",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "anchor_count": 2,
+    "reserve_top_m": 2,
+    "max_bridge_slots": 0,
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "gate_mode": "none",
+    "gate_min_structure_score": 0.15,
+    "gate_min_combined_margin": 0.0,
+    "gate_min_closure_score": 0.0,
+    "gate_min_novelty_score": 0.0,
+    "gate_min_frontier_gain": 0.0,
+    "gate_min_path_coherence": 0.0,
+    "gate_max_avg_local_structure": 0.95,
+    "gate_min_suffix_base_mean": 0.15,
+    "reader_order_probe_mode": "none",
+    "beam_width": 4,
+    "beam_expand_per_state": 4,
+    "beam_projected_shortlist_factor": 1,
+    "late_rerank_enabled": false,
+    "late_rerank_candidate_count": 4,
+    "late_rerank_include_baseline": true,
+    "late_rerank_doc_char_limit": 280,
+    "late_rerank_policy": "always",
+    "late_rerank_max_state_score_gap": 0.0,
+    "late_rerank_judge_backend": "inherit",
+    "late_rerank_judge_model": "qwen3-8b-train",
+    "late_rerank_judge_base_url": "http://localhost:8043/v1",
+    "late_rerank_judge_reasoning_effort": null,
+    "state_score_weights": {
+      "path_connectivity": 0.3,
+      "reachable_doc_ratio": 0.2,
+      "query_reachability": 0.15,
+      "support_mean": 0.05,
+      "support_min": 0.05,
+      "closure_mean": 0.1,
+      "suffix_base_mean": 0.05,
+      "query_coverage": 0.1,
+      "frontier_ratio": 0.05,
+      "redundancy_penalty": 0.1
+    },
+    "setwise_model_path": null,
+    "setwise_requirement_cache_path": null,
+    "setwise_requirement_mode": "oracle",
+    "setwise_requirement_model_path": null,
+    "setwise_requirement_reserve_policy": "fixed",
+    "setwise_requirement_annotation_pool_k": 50,
+    "setwise_requirement_smooth_tau": 0.15,
+    "setwise_requirement_counterfactual_tau": 0.1,
+    "setwise_requirement_live_annotation_pool_k": 0,
+    "setwise_requirement_live_annotation_score_mode": "heuristic",
+    "setwise_requirement_live_atomic_model_path": null,
+    "setwise_requirement_live_source_expand_factor": 0,
+    "setwise_requirement_exposure_watch_titles": [
+      "Riverside Plaza",
+      "Minneapolis",
+      "Mississippi River",
+      "The Right Stuff Records",
+      "Sony Music"
+    ],
+    "setwise_requirement_probe_force_source_titles": [],
+    "setwise_requirement_probe_force_shortlist_titles": [],
+    "setwise_requirement_probe_force_final_titles": [],
+    "setwise_requirement_probe_force_pool_gold_into_final": false,
+    "setwise_requirement_probe_source_sort_mode": "combined",
+    "setwise_requirement_probe_source_support_gain_weight": 0.0,
+    "setwise_requirement_probe_shortlist_sort_mode": "margin_first",
+    "setwise_requirement_probe_bridge_bonus_mode": "off",
+    "setwise_requirement_probe_bridge_bonus_weight": 0.0,
+    "selector_EM": 0.35,
+    "selector_F1": 0.3893,
+    "baseline_EM": 0.3,
+    "baseline_F1": 0.3309,
+    "EM_delta": 0.05,
+    "F1_delta": 0.0584,
+    "selector_retrieval_metrics": {
+      "Recall@1": 0.2292,
+      "Recall@2": 0.3042,
+      "Recall@5": 0.6458,
+      "Recall@10": 0.6875,
+      "Recall@20": 0.7167
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 11,
+        "baseline_EM": 0.3636,
+        "selector_EM": 0.4545,
+        "EM_delta": 0.0909,
+        "baseline_F1": 0.4091,
+        "selector_F1": 0.526,
+        "F1_delta": 0.1169
+      },
+      "3_doc": {
+        "count": 5,
+        "baseline_EM": 0.4,
+        "selector_EM": 0.4,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.4,
+        "selector_F1": 0.4,
+        "F1_delta": 0.0
+      },
+      "4_doc": {
+        "count": 4,
+        "baseline_EM": 0.0,
+        "selector_EM": 0.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.0294,
+        "selector_F1": 0.0,
+        "F1_delta": -0.0294
+      }
+    },
+    "selector_summary": {
+      "selector": "dtc_embed",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 5.5,
+      "avg_selected_structured_doc_count": 4.95,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "When was the person who Messi's goals in Copa del Rey compared to get signed by Barcelona?",
+          "selected_titles": [
+            "Lionel Messi",
+            "FC Barcelona",
+            "List of international goals scored by Lionel Messi",
+            "FC Barcelona",
+            "Lionel Messi"
+          ],
+          "seed_entities_preview": [
+            "arda turan",
+            "boca juniors",
+            "copa catalunya",
+            "diego maradona",
+            "fc barcelona",
+            "lionel messi"
+          ],
+          "question_entities_preview": [
+            "6 goals",
+            "barcelona",
+            "barcelona b",
+            "copa del rey",
+            "f c barcelona",
+            "goal",
+            "messi",
+            "messi s goal"
+          ],
+          "grounded_question_entities_preview": [
+            "barcelona",
+            "barcelona b",
+            "copa del rey",
+            "messi",
+            "messi s goal"
+          ],
+          "proposal_query_entities_preview": [
+            "arda turan",
+            "boca juniors",
+            "copa catalunya",
+            "diego maradona",
+            "fc barcelona",
+            "lionel messi"
+          ],
+          "query_entities_preview": [
+            "arda turan",
+            "boca juniors",
+            "copa catalunya",
+            "diego maradona",
+            "fc barcelona",
+            "lionel messi"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Lionel Messi",
+              "coverage_score": 0.8539,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Lionel Messi",
+              "coverage_score": 0.9865,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "FC Barcelona",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.9865,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "pool_position": 10,
+              "title": "List of international goals scored by Lionel Messi",
+              "coverage_gain": 0.1461,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.3973,
+              "redundancy": 0.5715,
+              "total_gain": 0.1089,
+              "requirement_scores": [
+                {
+                  "unit_id": "s1",
+                  "score": 1.0,
+                  "previous": 0.8539,
+                  "delta": 0.1461,
+                  "binding_title": ""
+                },
+                {
+                  "unit_id": "s2",
+                  "score": 0.3976,
+                  "previous": 1.0,
+                  "delta": 0.0,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s1",
+              "cover_update": true,
+              "pool_position": 10,
+              "title": "List of international goals scored by Lionel Messi",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.8539,
+              "binding_title": ""
+            },
+            {
+              "step": 6,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "FC Barcelona",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 7,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Lionel Messi",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "What month did the Tripartite discussions begin between Britain, France, and the country where, despite being headquartered in the nation called the nobilities commonwealth, the top-ranking Warsaw Pact operatives originated?",
+          "selected_titles": [
+            "Warsaw Pact",
+            "Warsaw Pact",
+            "Molotov–Ribbentrop Pact",
+            "NATO",
+            "Warsaw Pact"
+          ],
+          "seed_entities_preview": [
+            "central and eastern europe",
+            "june",
+            "molotov ribbentrop pact",
+            "warsaw pact"
+          ],
+          "question_entities_preview": [
+            "begin",
+            "britain",
+            "commonwealth",
+            "country",
+            "france",
+            "warsaw",
+            "warsaw pact",
+            "warsaw pact country"
+          ],
+          "grounded_question_entities_preview": [
+            "britain",
+            "france",
+            "warsaw pact"
+          ],
+          "proposal_query_entities_preview": [
+            "central and eastern europe",
+            "june",
+            "molotov ribbentrop pact",
+            "warsaw pact"
+          ],
+          "query_entities_preview": [
+            "central and eastern europe",
+            "june",
+            "molotov ribbentrop pact",
+            "warsaw pact"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Warsaw Pact",
+              "coverage_score": 0.8228,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s4",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Warsaw Pact",
+              "coverage_score": 0.3679,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 1,
+              "title": "Warsaw Pact",
+              "coverage_score": 0.8352,
+              "previous_coverage_score": 0.3493,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "Warsaw Pact",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.8228,
+              "binding_title": ""
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "pool_position": 2,
+              "title": "Molotov–Ribbentrop Pact",
+              "coverage_gain": 1.3342,
+              "new_requirement_count": 1,
+              "new_requirement_ids": [
+                "s3"
+              ],
+              "base_score": 0.1333,
+              "redundancy": 0.3565,
+              "total_gain": 1.5552,
+              "requirement_scores": [
+                {
+                  "unit_id": "s1",
+                  "score": 0.4169,
+                  "previous": 0.8352,
+                  "delta": 0.0,
+                  "binding_title": ""
+                },
+                {
+                  "unit_id": "s2",
+                  "score": 0.4111,
+                  "previous": 1.0,
+                  "delta": 0.0,
+                  "binding_title": ""
+                },
+                {
+                  "unit_id": "s3",
+                  "score": 1.0,
+                  "previous": 0.2979,
+                  "delta": 0.7021,
+                  "binding_title": ""
+                },
+                {
+                  "unit_id": "s4",
+                  "score": 1.0,
+                  "previous": 0.3679,
+                  "delta": 0.6321,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 6,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s3",
+              "cover_update": false,
+              "pool_position": 2,
+              "title": "Molotov–Ribbentrop Pact",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.2979,
+              "binding_title": ""
+            },
+            {
+              "step": 7,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s4",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Molotov–Ribbentrop Pact",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.3679,
+              "binding_title": ""
+            },
+            {
+              "step": 8,
+              "mode": "dtc_cover",
+              "pool_position": 36,
+              "title": "NATO",
+              "coverage_gain": 0.1648,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.0287,
+              "redundancy": 0.5357,
+              "total_gain": 0.1127,
+              "requirement_scores": [
+                {
+                  "unit_id": "s1",
+                  "score": 1.0,
+                  "previous": 0.8352,
+                  "delta": 0.1648,
+                  "binding_title": ""
+                },
+                {
+                  "unit_id": "s2",
+                  "score": 0.4374,
+                  "previous": 1.0,
+                  "delta": 0.0,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 9,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s1",
+              "cover_update": true,
+              "pool_position": 36,
+              "title": "NATO",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.8352,
+              "binding_title": ""
+            },
+            {
+              "step": 10,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Warsaw Pact",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "What county is Erik Hort's birthplace a part of?",
+          "selected_titles": [
+            "Erik Hort",
+            "Erik Jensen (American football)",
+            "Horton Park (Saint Paul, Minnesota)",
+            "Långe Erik",
+            "Hickory Grove, Wisconsin"
+          ],
+          "seed_entities_preview": [
+            "american",
+            "erik hort"
+          ],
+          "question_entities_preview": [
+            "aroostook county",
+            "clearfield county",
+            "county highway g",
+            "erik hort",
+            "hillsborough county",
+            "historic county of quebec",
+            "jefferson county",
+            "washington county"
+          ],
+          "grounded_question_entities_preview": [
+            "aroostook county",
+            "erik hort",
+            "historic county of quebec"
+          ],
+          "proposal_query_entities_preview": [
+            "american",
+            "erik hort"
+          ],
+          "query_entities_preview": [
+            "american",
+            "erik hort"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Erik Hort",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Erik Hort",
+              "coverage_score": 0.5146,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "Horton Park (Saint Paul, Minnesota)",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 4,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "Långe Erik",
+              "reason": "no_positive_requirement_gain"
+            },
+            {
+              "step": 5,
+              "mode": "baseline_fill",
+              "pool_position": 4,
+              "title": "Hickory Grove, Wisconsin",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "What year did the publisher of Labyrinth end?",
+          "selected_titles": [
+            "Warlocked",
+            "The Devil's Labyrinth",
+            "Labyrinth (1984 video game)",
+            "Acornsoft",
+            "The Sense of an Ending"
+          ],
+          "seed_entities_preview": [
+            "1984",
+            "acornsoft",
+            "ballantine books",
+            "labyrinth",
+            "the devil s labyrinth"
+          ],
+          "question_entities_preview": [
+            "artist of the year",
+            "end of the line",
+            "labyrinth",
+            "labyrinth of suffering",
+            "lack of publisher",
+            "the devil s labyrinth",
+            "the end of it all",
+            "the year of intelligent tigers"
+          ],
+          "grounded_question_entities_preview": [
+            "labyrinth",
+            "labyrinth of suffering",
+            "lack of publisher",
+            "the devil s labyrinth",
+            "the end of it all"
+          ],
+          "proposal_query_entities_preview": [
+            "1984",
+            "acornsoft",
+            "ballantine books",
+            "labyrinth",
+            "the devil s labyrinth"
+          ],
+          "query_entities_preview": [
+            "1984",
+            "acornsoft",
+            "ballantine books",
+            "labyrinth",
+            "the devil s labyrinth"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Warlocked",
+              "coverage_score": 0.3884,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Warlocked",
+              "coverage_score": 0.4563,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "The Devil's Labyrinth",
+              "coverage_score": 0.8835,
+              "previous_coverage_score": 0.3884,
+              "binding_title": ""
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "pool_position": 2,
+              "title": "Labyrinth (1984 video game)",
+              "coverage_gain": 0.1165,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.4513,
+              "redundancy": 0.4534,
+              "total_gain": 0.0938,
+              "requirement_scores": [
+                {
+                  "unit_id": "s1",
+                  "score": 1.0,
+                  "previous": 0.8835,
+                  "delta": 0.1165,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s1",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Labyrinth (1984 video game)",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.8835,
+              "binding_title": ""
+            },
+            {
+              "step": 6,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 2,
+              "title": "Labyrinth (1984 video game)",
+              "coverage_score": 0.5966,
+              "previous_coverage_score": 0.4563,
+              "binding_title": "Acornsoft"
+            },
+            {
+              "step": 7,
+              "mode": "dtc_cover",
+              "pool_position": 4,
+              "title": "Acornsoft",
+              "coverage_gain": 0.4034,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.0941,
+              "redundancy": 0.4436,
+              "total_gain": 0.3638,
+              "requirement_scores": [
+                {
+                  "unit_id": "s2",
+                  "score": 1.0,
+                  "previous": 0.5966,
+                  "delta": 0.4034,
+                  "binding_title": "Acornsoft"
+                }
+              ]
+            },
+            {
+              "step": 8,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 4,
+              "title": "Acornsoft",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.5966,
+              "binding_title": "Acornsoft"
+            },
+            {
+              "step": 9,
+              "mode": "baseline_fill",
+              "pool_position": 3,
+              "title": "The Sense of an Ending",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        },
+        {
+          "question": "When was Lady Godiva's birthplace abolished?",
+          "selected_titles": [
+            "Spalding Priory",
+            "Cuthred of Kent",
+            "Mercia",
+            "Lady Godiva Rides Again",
+            "Board of Longitude"
+          ],
+          "seed_entities_preview": [
+            "1559",
+            "act of parliament",
+            "archbishopric of lichfield",
+            "board of longitude",
+            "council of clovesho",
+            "godiva",
+            "spalding priory",
+            "westminster abbey"
+          ],
+          "question_entities_preview": [
+            "flora shaw lady lugard",
+            "frances crewe lady crewe",
+            "gladstone s bill was defeated",
+            "godiva",
+            "lady anne de grey",
+            "lady flora hastings",
+            "lady godiva rides again",
+            "second lady of the mercians"
+          ],
+          "grounded_question_entities_preview": [
+            "godiva",
+            "lady godiva rides again",
+            "second lady of the mercians"
+          ],
+          "proposal_query_entities_preview": [
+            "1559",
+            "act of parliament",
+            "archbishopric of lichfield",
+            "board of longitude",
+            "council of clovesho",
+            "godiva",
+            "spalding priory",
+            "westminster abbey"
+          ],
+          "query_entities_preview": [
+            "1559",
+            "act of parliament",
+            "archbishopric of lichfield",
+            "board of longitude",
+            "council of clovesho",
+            "godiva",
+            "spalding priory",
+            "westminster abbey"
+          ],
+          "selection_steps": [
+            {
+              "step": 1,
+              "mode": "reserve",
+              "covered_requirement_id": "s1",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Spalding Priory",
+              "coverage_score": 0.8738,
+              "previous_coverage_score": 0.0,
+              "binding_title": ""
+            },
+            {
+              "step": 2,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": false,
+              "pool_position": 0,
+              "title": "Spalding Priory",
+              "coverage_score": 0.5896,
+              "previous_coverage_score": 0.0,
+              "binding_title": "Mercia"
+            },
+            {
+              "step": 3,
+              "mode": "reserve",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 1,
+              "title": "Cuthred of Kent",
+              "coverage_score": 0.8073,
+              "previous_coverage_score": 0.5896,
+              "binding_title": "Mercia"
+            },
+            {
+              "step": 4,
+              "mode": "dtc_cover",
+              "pool_position": 5,
+              "title": "Mercia",
+              "coverage_gain": 0.1927,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.0518,
+              "redundancy": 0.4501,
+              "total_gain": 0.1503,
+              "requirement_scores": [
+                {
+                  "unit_id": "s1",
+                  "score": 0.6036,
+                  "previous": 0.8738,
+                  "delta": 0.0,
+                  "binding_title": ""
+                },
+                {
+                  "unit_id": "s2",
+                  "score": 1.0,
+                  "previous": 0.8073,
+                  "delta": 0.1927,
+                  "binding_title": "Mercia"
+                }
+              ]
+            },
+            {
+              "step": 5,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s2",
+              "cover_update": true,
+              "pool_position": 5,
+              "title": "Mercia",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.8073,
+              "binding_title": "Mercia"
+            },
+            {
+              "step": 6,
+              "mode": "dtc_cover",
+              "pool_position": 3,
+              "title": "Lady Godiva Rides Again",
+              "coverage_gain": 0.1262,
+              "new_requirement_count": 0,
+              "new_requirement_ids": [],
+              "base_score": 0.0675,
+              "redundancy": 0.3437,
+              "total_gain": 0.0952,
+              "requirement_scores": [
+                {
+                  "unit_id": "s1",
+                  "score": 1.0,
+                  "previous": 0.8738,
+                  "delta": 0.1262,
+                  "binding_title": ""
+                }
+              ]
+            },
+            {
+              "step": 7,
+              "mode": "dtc_cover",
+              "covered_requirement_id": "s1",
+              "cover_update": true,
+              "pool_position": 3,
+              "title": "Lady Godiva Rides Again",
+              "coverage_score": 1.0,
+              "previous_coverage_score": 0.8738,
+              "binding_title": ""
+            },
+            {
+              "step": 8,
+              "mode": "baseline_fill",
+              "pool_position": 2,
+              "title": "Board of Longitude",
+              "reason": "no_positive_requirement_gain"
+            }
+          ]
+        }
+      ],
+      "dtc_max_steps": 4,
+      "dtc_match_threshold": 0.35,
+      "dtc_redundancy_weight": 0.1,
+      "dtc_base_weight": 0.05,
+      "dtc_anchor_bonus_weight": 0.1,
+      "dtc_dependency_bonus_weight": 0.1,
+      "dtc_max_completion_tokens": 512,
+      "dtc_enable_dependency_binding": true,
+      "dtc_binding_max_candidates": 4,
+      "dtc_binding_entity_hit_required": true,
+      "dtc_parse_success_count": 20,
+      "dtc_fallback_count": 0,
+      "avg_dtc_requirement_count": 2.7,
+      "avg_dtc_covered_requirement_rate": 1.0,
+      "avg_dtc_embedding_available_requirement_count": 2.7
+    }
+  }
+}
+===== 2026-04-21T21:10:37+08:00 END musique dtc_embed binding bestcover smoke20 anchor2 =====

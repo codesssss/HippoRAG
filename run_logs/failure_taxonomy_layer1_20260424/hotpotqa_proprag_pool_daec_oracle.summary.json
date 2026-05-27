@@ -1,0 +1,19 @@
+{
+  "report": "run_logs/layer1_proprag_pool_eval_fixed_20260424/hotpotqa_proprag_pool_daec_oracle.json",
+  "dataset": "hotpotqa",
+  "num_traces": 1000,
+  "category_counts": {
+    "tie": 980,
+    "win": 17,
+    "loss_reader_interference": 3
+  },
+  "changed_count": 130,
+  "changed_rate": 0.13,
+  "win_count": 17,
+  "loss_count": 3,
+  "tie_count": 980,
+  "mean_delta_f1": 0.012066700000000001,
+  "mean_delta_f1_changed": 0.09282076923076923,
+  "loss_binding_signal_count": 3,
+  "loss_new_non_gold_count": 0
+}

@@ -1,0 +1,1939 @@
+{
+  "datasets": [
+    {
+      "dataset": "hotpotqa",
+      "methods": {
+        "hipporag_v2": {
+          "method": "hipporag_v2",
+          "metrics": {
+            "ExactMatch": 0.58,
+            "F1": 0.6837,
+            "count": 100,
+            "mean_reader_docs": 5.0,
+            "r5": 0.925
+          },
+          "per_query": [
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "superhero roles as the Marvel Comics"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "12 Years a Slave.",
+              "query_index": 0,
+              "question": "what is one of the stars of  The Newcomers known for",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2a284703dedf59f1e4c9daf62b60ab44",
+                "chunk-306829fd24f7ea4936530755e9795e2d",
+                "chunk-6a37263e4954839216803f515c38ff39",
+                "chunk-ca38063d442c4aa7077c7640b28c2222",
+                "chunk-7456e3bbe70013f9b27bf72982cb65bd"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Sir Arthur Conan Doyle"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sir Arthur Conan Doyle.",
+              "query_index": 1,
+              "question": "The fictional private detective that appears in \"The Adventure of the Seven Clocks\" what written by whom?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d033d4ba5818b96240206a3581f3588c",
+                "chunk-128273b1f690c4c84ce39911ffbcf754",
+                "chunk-5a1f6cf38048a9a1713787626a128d62",
+                "chunk-140d1ab0728c0623abaf97eaa7c80d91",
+                "chunk-89f6d9065fade4e8dba0896be999f754"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1945 to 1951"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1945 to 1951.",
+              "query_index": 2,
+              "question": "The Distribution of Industry act was passed by a man who was prime minister when?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-92bb2c2360b51c67b5a9e53c2db35080",
+                "chunk-9d298dd5c20e7345e3c3d4e28b8b77da",
+                "chunk-3e112e9ffe51fec27dd3e9be6b058b1c",
+                "chunk-b3c2bff27eefe695c7a85375a9a73e4c",
+                "chunk-7b14134793c165a0679db1721409a82c"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "the Queen's gaoler"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Adam Gordon of Auchindoun.",
+              "query_index": 3,
+              "question": "Sparking the Marian civil war, who helped the recently abdicated queen to escape her imprisonment?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6ab084a9575715deb36a36c482b3c929",
+                "chunk-4b1046a24d1054ca0a87555759ed2a9f",
+                "chunk-ea99b07341e3421ae310d6fb194ef291",
+                "chunk-b961ebd8f8050682b088c0211683bb43",
+                "chunk-4fcedf51e725eb4a481752a7f98f2d11"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Finnmark county,"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Finnmark.",
+              "query_index": 4,
+              "question": "In which county is the town in which Raymond Robertsen was born ?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-aa401c478f72e639453f46d4c510edeb",
+                "chunk-f29036ed5c729a355008b97b83055daa",
+                "chunk-3126f69812c51a872ea3ab0538231fdf",
+                "chunk-39f4a299433fe1f0538a287f5f09c4a1",
+                "chunk-959b7cf224657d77357533f6eaa28434"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Julius Caesar"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "None.",
+              "query_index": 5,
+              "question": "What screenplay was worked on by both Edward Carfagno and Miklos Rozsa?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b8413929d759eb497bcabcfc3becf44d",
+                "chunk-e6d8409db0af8299e51c7d0667b134bf",
+                "chunk-94f7d93edaad21a1b7b022912967a00f",
+                "chunk-cce94cade54bdbae9964ae515669a709",
+                "chunk-382992098f0bae120198fa114985e297"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Apple Dumpling Gang"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Apple Dumpling Gang.",
+              "query_index": 6,
+              "question": "Which Walt Disney film was produced first, The Apple Dumpling Gang or Something Wicked This Way Comes?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-45c73f89d6b647ef7a3aa35fa32f6c02",
+                "chunk-718f09aec4c0679d629bf12fcdc640a2",
+                "chunk-0e82623a631d505ebf6d61d215208080",
+                "chunk-a8c4316b445f772c7108869d60d7c261",
+                "chunk-eabec089bd31b13979121e781782d09c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Southern State Parkway"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Southern State Parkway.",
+              "query_index": 7,
+              "question": "Bethpage State Parkway begins with an interchange at which Long Island-based limited access highway?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-21ac9fcfffb06eccdb86c396c44d0fdd",
+                "chunk-c5f32a2e60c292387f252016d1d400a5",
+                "chunk-ef67f9f5c33bb8d2853e71b4b9261cf7",
+                "chunk-1c311469a0b5756f1d42084179ec2452",
+                "chunk-f99c61b7214867845ea10a6fd7870767"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 8,
+              "question": "Are Colocasia and Coronilla both flowering plants?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-590bc575450182eff812f41925413015",
+                "chunk-288ee4aceb7676b54402f6bb0bb8792f",
+                "chunk-966b066874eb0ea693e9a0e259680ddb",
+                "chunk-5dbd372d08dd411f42d22d61d487d7ab",
+                "chunk-b075c92db4b09194c205d87301aed41f"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "middle order batsman"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "batsman.",
+              "query_index": 9,
+              "question": "The 2000 ICC KnockOut Trophy was the debut of a Jamaican cricketer who is a right-handed what?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4c03604d246f9079d8d72ea54c4154ba",
+                "chunk-c98126fe80a9cbc85875b7886bc95855",
+                "chunk-2159132f943251a61cb0bff142f79f21",
+                "chunk-c9cafa4465a0983a23b5744135e66933",
+                "chunk-534c3ff44e0edce2f8cbda9cff8d9be4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "300"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "300.",
+              "query_index": 10,
+              "question": "Bytham Castle is a castle in the civil parish of how many houses?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b3231bf909cdc145db94fa147fdce4da",
+                "chunk-3a10ed6de08af334525b773ba1f43e4d",
+                "chunk-b1a004d5c0d121d40850444f1399e594",
+                "chunk-a0434aa1ca1d808f27cf51008c7f0ffe",
+                "chunk-3e7232de46410f4977d6c8b9fe30af47"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "The Cathedral of the Blessed Virgin Mary, Truro"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Truro Cathedral.",
+              "query_index": 11,
+              "question": "Which is located in Cornwall, Southwell Minster or Truro Cathedral?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-bfe6da905efbbbb97e8720ad65bc66de",
+                "chunk-2609f7bbeb918bf6983d44eb0d61cf71",
+                "chunk-883c323686a1e594a7f7129267c09ded",
+                "chunk-cf50150005dffbaf5d40c5648c7c196a",
+                "chunk-283ac2ec8471ce44a47c7e399dc7729e"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "his own opinions changed"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "One focuses on smuggling and exotic pets, the other on entertainment vs. abuse.",
+              "query_index": 12,
+              "question": "How do the Peter Laufer books Forbidden Creatures and No Animals Were Harmed differ in their focus on animals?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ca224402d7df52cdce319d365a868106",
+                "chunk-2d410d87d8d41ec55e7354ea5073d96e",
+                "chunk-aee3688a6164c76d85a09cfa71bf6873",
+                "chunk-7fbf40b7a4aef4f5ebb66d0c1d4c3d12",
+                "chunk-3e0472eff9680c98747d38b62ef39ba5"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "BBC Formula One"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "BBC Formula One.",
+              "query_index": 13,
+              "question": "Who is a winner of the 2013 6 Hours of Silverstone a co-commentator for?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e609833599c79a6db66be2f85a9807fb",
+                "chunk-1ebec7208ccd8b2ef23f0de3385d090a",
+                "chunk-57caf6deda664c9ca0ffef61186b3d83",
+                "chunk-26890607e1788b909b77afe51ec23845",
+                "chunk-7c6b6c9831a00b495ca8e69313dc6530"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Summer Wars"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Summer Wars.",
+              "query_index": 14,
+              "question": "Which 2009 animated film is from Japan, Summer Wars or The Secret of Kells?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1450d801b067dd97505250de165ab281",
+                "chunk-f14d53356f4a3908d129ffb63b8400b4",
+                "chunk-c432bc010d486cc0d1224caaeeec1845",
+                "chunk-7a0e068f63f247090f9e721c07d0544f",
+                "chunk-51b6c6c21e65af7e9192befd8338a48a"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 15,
+              "question": "Are Steve Perry and Leslie West both singers?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-50f279dd0692551f2c1ebe40a55d5f59",
+                "chunk-51a95faebe89d0dc8c8c9be483466320",
+                "chunk-1e06d5ead1d3d58663826287c8d8d561",
+                "chunk-5777a853b58e425f276ca54a2a49bcd2",
+                "chunk-306548a27cd2882af02f96a309e3b189"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "2015"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "2015.",
+              "query_index": 16,
+              "question": "In what year was the Golden State NBA player, who was part of the Cavaliers-Warriors rivalry, named NBA Finals Most Valuable Player?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-425595b5fb882a28772ea2fba8a23635",
+                "chunk-4db79427e4b290fe82cccde39e540855",
+                "chunk-27abf536d7ae7e05b508686d6751491f",
+                "chunk-389010921e309924c03f40df7ac748e4",
+                "chunk-b135c3c174c4fb1fcb93d38634696cd4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Anthony Rapp"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Anthony Rapp.",
+              "query_index": 17,
+              "question": "What is the name of the actor who wrote the memoir Without you: A memoir of love, loss, and the Musical Rent and also stared as Mark Cohen in the Broadway production of \"Rent\"?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c63be6c0dbcc91eb2e50914c1761aab9",
+                "chunk-59626924413f4b1bb517168994ad00cc",
+                "chunk-48e52aa0d96e8cbfdb6984d8a6f7313f",
+                "chunk-01a81e537b528c2ce5cf5e425b6baa63",
+                "chunk-a4181df127f78999eccdeb506d59c523"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Hong Kong"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Bank of China Tower.",
+              "query_index": 18,
+              "question": "One Raffles Place is one of the tallest skyscrapers in the city of Singapore and tallest in the wolrd outside North America until it was succeeded by a Building in city?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-97be1fbabf357a12306ab12dfa143e11",
+                "chunk-3c7a15eb89a3bc1d7cb2fd1d2ba348e6",
+                "chunk-b330b78c1c15e43e7ad50e6187d3619a",
+                "chunk-54b323d6481d29b235e4e46b309dd9ca",
+                "chunk-c08ea1993358ae186d664d7501d5d77a"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Boston, Massachusetts"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Boston, Massachusetts.",
+              "query_index": 19,
+              "question": "Where is the ice hockey team based that Zdeno Ch\u00e1ra currently serving as captain of?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f104838fe502b6e8b29809ba6503937d",
+                "chunk-bdae0a8734e640e2bc5678e3d2364f2d",
+                "chunk-52353d1c9e8fe21674d0b6abd0759080",
+                "chunk-dbe84663a423c1ae13d587980bd04ba7",
+                "chunk-c32fecc38df22d500439e88c3ae58e45"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "eastern North America"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "eastern North America.",
+              "query_index": 20,
+              "question": "Sand Mountainis part of the southern tip of a mountain chain in which part of North America ?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-592a10ddc65585553307004478b0581a",
+                "chunk-a98c8453d9562ff24479eb5dc238094d",
+                "chunk-3ecfd6a8a286e1866dcd6b2181ed9328",
+                "chunk-4dab86867e72d85589ded470dcbb84ef",
+                "chunk-fb6b2ece1266672802dd6879f1a9a3e6"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "North Avenue and First Avenue"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "North Avenue and First Avenue.",
+              "query_index": 21,
+              "question": "At what intersection was the former home of the wooden roller coaster now located at Six Flags Great America in Gurnee, Illinois located?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fd930057050d9ded548fc49720689144",
+                "chunk-ebf749de7c40e34cf6bf59026e27ab43",
+                "chunk-093b86e76c6244687b5ffd272a64f059",
+                "chunk-4bdf2199a477328a9873e4fdaa26557e",
+                "chunk-56a98226d97411b2f93fee9145d9be82"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.4,
+              "gold_answers": [
+                "Rickie Lee Skaggs"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Ricky Skaggs.",
+              "query_index": 22,
+              "question": "\"Heartbreak Hurricane\" was recorded by which country artist, that also goes by the name Ricky Skaggs?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fbd9df1d5faeccb9f5e143694d22a969",
+                "chunk-eb26afc96710d1faf914952bf32b9a5c",
+                "chunk-cd66d2c7686e3c4ceb1258a09f5f8380",
+                "chunk-e5bf64cadb8d7c3324e326c03e0f479f",
+                "chunk-4460692df2a15140e95968bbfb545219"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "My Own Worst Enemy"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "My Own Worst Enemy.",
+              "query_index": 23,
+              "question": "The View from the Bottom is the fifth studio album by an American rock band best known for what hit song?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1573d38f66be30894346b9a863f46ee9",
+                "chunk-534985f790640536cc90ffa0f12a5c89",
+                "chunk-341b759b49fd81f8a0a397afb509e5a0",
+                "chunk-ee1bec554d020e68b8a02cd70c64af10",
+                "chunk-a57b1feaddb7f521e143a33c35b23e18"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "13 seasons"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "13.",
+              "query_index": 24,
+              "question": "This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7048e7945cbea652cb48235fe8efee81",
+                "chunk-e04abdde2d5840b70c3e97d4b709525c",
+                "chunk-9c520064061550927310ef64c4bc2905",
+                "chunk-33df510226c2af3f1cd6c3590fb499d2",
+                "chunk-485628e3f44980315ef902d520ceb7e4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "California Polytechnic State University"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "California Polytechnic State University.",
+              "query_index": 25,
+              "question": "In between  Polytechnic University of the Philippines and California Polytechnic State University which was founded as a vocational high school?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5728ff8fa0eb14b8040ea913aa622724",
+                "chunk-f3433d9979e6f5a0365bc9e72a5df942",
+                "chunk-c7f6996cb988efa5651ee0c6f69d95cb",
+                "chunk-21d2962d1be5a4e994e8b3edb87eb25c",
+                "chunk-6a6b329d6849e6fd6ae5016df2c58055"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 26,
+              "question": "Are Giuseppe Verdi and Ambroise Thomas both Opera composers ?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4ca8bdaff2a328357d426e2280c172c5",
+                "chunk-688b40b9fd9c9a0a919f0a7ecd4a56bf",
+                "chunk-2d57b4e4c49b7ffb78d5b5c60ac37eed",
+                "chunk-5c88f920be2f825aa24b46a52153fac7",
+                "chunk-d1967192a9267a1a170f5473377e6e4c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Russian Ark"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Russian Ark.",
+              "query_index": 27,
+              "question": "Which historical drama filmed in the Winter Palace of the Russian State Hermitage Museum stars Sergey Dreyden?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-003c3a112fadafe12d249da9580f67d9",
+                "chunk-e0957368b0f51479554a2368523e189a",
+                "chunk-2f75d78e1b93ea5eaa2a1c4b0ef70053",
+                "chunk-ffb65d40c4729aa6050dfdfa99ad48a2",
+                "chunk-1a62627a9f7f27682fb7b6980d61b55b"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Bruce Chatwin"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Bruce Chatwin.",
+              "query_index": 28,
+              "question": "Who was born first, Karen Joy Fowler or Bruce Chatwin?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-0a45c2c5344586c2a1587990df5ee4e7",
+                "chunk-aee6b23e86754472a9f4cb49eb5ce664",
+                "chunk-9375f1c6c61be66f507d7ae4d5a52ede",
+                "chunk-25ffa92d40c15ef7f37a6e4705d03138",
+                "chunk-fff3f452b71dcb8c5ca2ee5b57f5744f"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Jeremy Hammond"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Jeremy Hammond.",
+              "query_index": 29,
+              "question": "What WikiLeaks using whistleblower is notable for having a hacking organization with a user base of over 1,800,000?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e8a976667dc1e5436bd5ac51bc46d08e",
+                "chunk-d9e4ac866468a3d33704bb5aae02677f",
+                "chunk-40d761b038954a6c3787bec84f4106e1",
+                "chunk-40f6f843a506a2da41d9a51bfea12477",
+                "chunk-41484ee5d49ba92d2ee9aef11a9ca6f1"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Egremont"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Egremont.",
+              "query_index": 30,
+              "question": "Egremont Castle is located in what market town, civil parish, and two electoral wards in the Borough of Copeland in Cumbria, England?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6f1a9a485abe2960b890cc4a6211b24a",
+                "chunk-3e7232de46410f4977d6c8b9fe30af47",
+                "chunk-ea57274138921e47126d6330787087a5",
+                "chunk-f71e5f1720d771a6bfa5eec66dc0807d",
+                "chunk-6a0357a0c3cc430b5c40bca76ee4670f"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5263,
+              "gold_answers": [
+                "La jolie fille de Perth \"(The Fair Maid of Perth)\" is an opera in four acts"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "La jolie fille de Perth.",
+              "query_index": 31,
+              "question": "Which opera has more acts, La jolie fille de Perth or Mitridate, re di Ponto?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-8d79b2bf3fe00523d3515cc7be78eb3a",
+                "chunk-aa5a3c8ad30f43155984190d0a9438f2",
+                "chunk-c2e66e14a8e622e74c22f8cc47de2c8c",
+                "chunk-c43e0c91249b44aa9d88a5c623a38284",
+                "chunk-30186ba2f6321460d8646772cca8666b"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Mandarin Airlines"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Mandarin Airlines.",
+              "query_index": 32,
+              "question": "What subsidiary of the largest airline of the Republic of China (Taiwan) has a main hub at Taichung Airport?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b6e3863a4181bfbe31d28b5000583fd5",
+                "chunk-5a35accfd785f6d6a283e2d50f86b704",
+                "chunk-3ace362093e234baf9e893f49066df5b",
+                "chunk-d8ea64fd71dff33cfaae133110807770",
+                "chunk-120015a4d797d9672b4d1e6bab1e596e"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "MGM Grand Garden Arena"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "MGM Grand Garden Arena.",
+              "query_index": 33,
+              "question": "What is the name of the former MGM Grand Garden Special Events Center where the Mayweather-Ortiz fight took place?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5e24bc91d4f801210bef0d1f46d981dc",
+                "chunk-fd0a59fa87b922cd81e5bef176f0011a",
+                "chunk-11b80c8e83ed0b408be181af0d343a96",
+                "chunk-feec5f83c623533ea088a284367f0d2d",
+                "chunk-0876cd94a2b99a64244eabcfcc357902"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Justin Spitzer"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Justin Spitzer.",
+              "query_index": 34,
+              "question": "Who created the NBC sitcom that Johnny Pemberton appears in as the character Bo Thompson?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-56de52dbb5efe6f54f9df76c0ab891ce",
+                "chunk-785b68c8da362e5674c13f5586c65151",
+                "chunk-8aaac403a021cf18892db3c411e7052c",
+                "chunk-bce127be58989d84fcff111ac1c094c8",
+                "chunk-36750be58f2984c92f40204f1a1260df"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Pratt & Whitney F100"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Pratt & Whitney F100.",
+              "query_index": 35,
+              "question": "Which aircraft engine powers a General Dynamics aircraft of which over 4500 have been built?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2996fde03080b6e372350196486aa9ea",
+                "chunk-c6153abf2f8895f6b73b929c49116461",
+                "chunk-6cc5208341dea1f07d88c48868e1f8c0",
+                "chunk-8149245a042fd4223ae7fba9f7517ee6",
+                "chunk-8268c29eab0ce68e07936bd4500a5014"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Johnny Herbert"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Johnny Herbert.",
+              "query_index": 36,
+              "question": "Which British racing driver has raced for 7 different teams and won the European Grand Prix in 1999?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-bc999e1d513838fbb6bdd6f7a73924bb",
+                "chunk-9a5d3d7df2fa935994a661cf2be956bb",
+                "chunk-9af3cb9bd5704ea9b5a56abf1b20bca4",
+                "chunk-ddc3ffd3193eedb109c172a2e99ace66",
+                "chunk-19c6c84d2c98138b26a5b3e6a9546ae5"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Istanbul, Turkey"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Istanbul.",
+              "query_index": 37,
+              "question": "In what city can a person find both the Nusretiye Clock Tower and the Eski Imaret Mosque be found?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-70f44eee10a183660ee6d5c9afee016e",
+                "chunk-a2c15ff9e86a11af79275ce4af224048",
+                "chunk-f51e938060837cbfc3a933116988215c",
+                "chunk-a46c52abf877a1db7d7a0a07ae61ee4e",
+                "chunk-974596db85c360b9e440e907a8d7bc45"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "George Harrison"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "George Harrison.",
+              "query_index": 38,
+              "question": "Which English musician is known for both the songs \"See Yourself\" and \"Withing You Without You\"?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-01162876d774cc9c9ce980ddcaf6cd81",
+                "chunk-fb009edec031f4475f90f05c09325d01",
+                "chunk-cecff81ba4ade099a68604319850dde9",
+                "chunk-bda7cc38bac125f4e723f77160cdfc0a",
+                "chunk-0b6b6f7c42e90a95f1265dc44a596a3e"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.8,
+              "gold_answers": [
+                "Pavel Sergeyevich Alexandrov"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Pavel Alexandrov.",
+              "query_index": 39,
+              "question": "Who has written more than 300 papers, Semyon Aranovich Gershgorin or Pavel Alexandrov?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a908bf09f6a6664c72d04a743499bdec",
+                "chunk-be528e54afde20534a2f07da952e9e3f",
+                "chunk-3c3b9e7da39f92f849e07611a746a3dd",
+                "chunk-1f49061c47625930ffa6e3bd1251c743",
+                "chunk-3c0fb7ebeda3fbe0d1f6a493df4215ca"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "DeskMate"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "DeskMate.",
+              "query_index": 40,
+              "question": "Which software application was originally made for the company that acquired RadioShack in 1963?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a11488d46fb89d7ab2a3db20f595d811",
+                "chunk-f0006a5d62c6fbd7ae81fb813abb82c2",
+                "chunk-032aa884efb4bf278f3e33b6e4660896",
+                "chunk-a39ba8e97793edf2cf577c8b9e12d132",
+                "chunk-c31a1765be09026a965693424bd5dd54"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Bring Me Sunshine (1994) was originally a three-part retrospective in tribute to Eric Morecambe"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sylvia Dee.",
+              "query_index": 41,
+              "question": "Who wrote Bring Me Sunshine and where did they write it?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-35f724f818a166375bf09c5c1a7631d4",
+                "chunk-4e9201732b6cb5974a64388b4ed83e64",
+                "chunk-596bcac472c264f6847eee59bcfae841",
+                "chunk-176a255613fd930d4fea6682ea72bb21",
+                "chunk-a43cb7ad51806be8ea7c4075220856be"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "John John Florence"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "John John Florence.",
+              "query_index": 42,
+              "question": "What American professional Hawaiian surfer born 18 October 1992 won the Rip Curl Pro Portugal?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ac9e6e489f2235a8b93dbf6cd0db750a",
+                "chunk-faeadb75bce2556d6cd735b6a4ca4c12",
+                "chunk-5d46b3c8558557402839826024aa1d96",
+                "chunk-683a4dad66fd07cd66c4faf6abd157c6",
+                "chunk-c83180dfaa2e0d51834bb8813ece3ee4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1981"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1981.",
+              "query_index": 43,
+              "question": "Bill Nelson flew as a Payload Specialist on a Space Shuttle launched for the first time in what year?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c056ef255c0bf98aa0e410abfbe300a0",
+                "chunk-4c38501517690ebc3f0b6be0d3acf3e3",
+                "chunk-d5c4dbd6b6b2e841a853f2fd9d7287a6",
+                "chunk-201e29c045f9e447cd0712f496c32175",
+                "chunk-c52f8f39b1c2c14ca6d42c94df641d39"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Glee"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Glee.",
+              "query_index": 44,
+              "question": "The actress and singer Heather Morris is best known for her role in which series, becoming a regular character in the second season?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9e4b27ae0498d95a642fc5d6c4ce3eeb",
+                "chunk-1d2dad8f59a4194544b6b85911b7e5b1",
+                "chunk-d2b9c610bb1fdb7f1122fc02c377ad79",
+                "chunk-9e291de7d4e4816e717d9123103fe43a",
+                "chunk-73a3e27627432ee5a60880bbe3afc57e"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "ten"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "10.",
+              "query_index": 45,
+              "question": "What age was Georgia Middleman when she started singing in the seventh-most populated city in the United States?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9d88d3f13344b455794b17956ade2f6e",
+                "chunk-51c9e97836fc6f9d3694acc65032b946",
+                "chunk-0bb362e9766b3fd3e9615b22b2c88874",
+                "chunk-e26d0dc4921837946b68411632dac2a6",
+                "chunk-36266455925b066a39e043e6fee138be"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Gracie Mansion"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Gracie Mansion.",
+              "query_index": 46,
+              "question": "Stockely Webster has paintings hanging in what home (that serves as the residence for the Mayor of New York)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-86c60b8357794eef1256447730628947",
+                "chunk-5a842688168f6b26b5b3b89772897ed0",
+                "chunk-d4b31cf153205bd06e62176bb3fd9f0b",
+                "chunk-06ee887acfee39247747d7948d150345",
+                "chunk-2e497af8827ab0baadfefa3f9fc9d3f6"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.8,
+              "gold_answers": [
+                "Antonio Lucio Vivaldi"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Antonio Vivaldi.",
+              "query_index": 47,
+              "question": "What composer with an Italian libretto was born 4 March 1678?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-42146e6cfab80e592a279cf34e6318a0",
+                "chunk-72f545a0c8195a7bf5e43ae69f92fd28",
+                "chunk-9789fb490ea9eccc73dabb9cf7bdee37",
+                "chunk-688b40b9fd9c9a0a919f0a7ecd4a56bf",
+                "chunk-e01b49d0c7fcc6280f49a01bede2345e"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "For Love Alone"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "For Love Alone.",
+              "query_index": 48,
+              "question": "Ellie Parker is a 2005 American drama-comedy film whose title character is played by an English actress who made her screen debut in what Australian drama film?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-70798af199add051074f42ca7c6fcf4b",
+                "chunk-6e5ab8f140023034a31e0169e8daffba",
+                "chunk-846f0fa6dfb8e918948b177645e5950c",
+                "chunk-893423120a7f604ea18defeda98cb065",
+                "chunk-342b5287305a7b9ec995e4c902716abb"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Compliance"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Compliance.",
+              "query_index": 49,
+              "question": "A scam involving a male calling small town fast-food restaurants and pretending to be a police officer to have them strip search employees was turned into a movie of what name?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7815261b0d2dc1710ee1986d01a01951",
+                "chunk-972327de2722907d6c3eb8bbea7c13f3",
+                "chunk-8f67f5a63fa603b426c5c9fb40e04097",
+                "chunk-099c005d7f1a18e6f99d5a9bd3bf0b29",
+                "chunk-84cf9b6d6b4c628d5c3eb1f175aebd38"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Daily Stormer"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Daily Stormer.",
+              "query_index": 50,
+              "question": "Faith Goldy got fired after an interview she gave on what production site edited by Andrew Anglin?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2e8a704f18bbc322ef452e7621ecfeb1",
+                "chunk-85f8583a19fccbdaea960b3f1d77f2a8",
+                "chunk-ec81b3e2d85c52ea9b2ca2f6fe08e0d2",
+                "chunk-136d6403057ee81f36b8a1f88a14a658",
+                "chunk-3c70cd9dd027ae9fcbbb4709376b56bc"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "PPG Paints Arena"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "PPG Paints Arena.",
+              "query_index": 51,
+              "question": "What is the current home arena of the NHL team Chris Summers plays for?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-961dbf2a316c6e37288fbc997645189d",
+                "chunk-5edeb8e0a5ebe59ba7cca846fa05a7d6",
+                "chunk-295d61add9bf6277af50e2cf42363186",
+                "chunk-48124f2590eb827e26b4742eb7b7b80f",
+                "chunk-71f656bc106c0eaf70f62db87cb89075"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.4,
+              "gold_answers": [
+                "Broadcasting House in London"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "London.",
+              "query_index": 52,
+              "question": "Where is the headquarters for the service broadcaster the show Tenko is on?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-14332e624178e2a63a0950da2d969396",
+                "chunk-406252498d84dceaa3bb553104c98d89",
+                "chunk-7e6ca96c0a8875aad109bc19a3d59378",
+                "chunk-9100beebf200bd5cf5a97336b7ad5047",
+                "chunk-b11681a18c9493fb6f8b638fee49324a"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Sofia the First"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sofia the First.",
+              "query_index": 53,
+              "question": "Meghan Strange is an American actress and voice actress, known for her role as Robin on what American animated television series produced for Disney Channel?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b85d632ed2d7349b48ce92af4fb2e7d9",
+                "chunk-26b437df994f1e34f0df0512cd6f892f",
+                "chunk-ffb0982094fe3b6feefcd535842b26d8",
+                "chunk-ef923e2a915b7ef22f829f7aaad8e912",
+                "chunk-0c9b568842982e6f9d03adc19e1b47b3"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "filmmaker."
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Director.",
+              "query_index": 54,
+              "question": "Sam Mendes and Ruby Yang share what profession?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-23111af25628ab435f66dd19bee30baa",
+                "chunk-a16c4e48f8f8c64416413cbdecfcfe3b",
+                "chunk-4d42f763a1d70af0331c985b02ad1228",
+                "chunk-040720b1649fd885b289985fb76a54de",
+                "chunk-d75ca1f8439c6caef0e9e2ef5ac74d30"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "spiritual"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Soul.",
+              "query_index": 55,
+              "question": "The fourth episode The Simpsons' seventh season has what kind of theme?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4024925376eb38bcc805b8df35b1ddfb",
+                "chunk-0c8a0ae7be12fcafc7350e2bc1b06067",
+                "chunk-f66057828299a929ccf9cb910a4855b3",
+                "chunk-398249d2a45afb9b5d02fa6e4ce73acb",
+                "chunk-3d5d15c931c458a435d0e0162d9d911b"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5714,
+              "gold_answers": [
+                "Jean Maurice Eug\u00e8ne Cl\u00e9ment Cocteau"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Jean Cocteau.",
+              "query_index": 56,
+              "question": "La Machine a ecirire was written by what French writer, designer, playright, artist, and filmmaker, who is known for his novel, \"Les Enfants Terribles\"?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-14300a7f2d72247c6561cc12bdfa78f8",
+                "chunk-aa9b20ceebc3ae3227ded4aab7460c55",
+                "chunk-6889e11fbc5319c3fa0f6de2afbc7e0b",
+                "chunk-1a93b3754976b6e91ff27bc40be47f4f",
+                "chunk-111c33c1c0ccc1d7508f2e93e6ba4d79"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "alcoholic drinks"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "alcoholic drinks.",
+              "query_index": 57,
+              "question": "Gleannt\u00e1in Ghlas' Ghaoth Dobhair is a song that can be heard in pubs licensed to serve what?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-327423aa7f1608bcd20b2a58819e3bad",
+                "chunk-94f65a7eb4ab025ca1dd06a7698d19ba",
+                "chunk-374713226859bcec81b1fe171a469757",
+                "chunk-2b2bbf4277fd600abdf3c37a5addc291",
+                "chunk-4ecbdaefdad91e3357abdce3800baee4"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "1943"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 58,
+              "question": "In what year was the composer of \"Anthem\" born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-19c2417c9ec09129d66ab8eab822342e",
+                "chunk-4341dfb415f41b8f89f26826ee754c64",
+                "chunk-1d08b6843267281514393c3ac3615d26",
+                "chunk-8fe10d0aa7f7e3cf6ec3357c3d52d26b",
+                "chunk-c9166a7565250f15b70f69e57cb4e00b"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "director"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Film director.",
+              "query_index": 59,
+              "question": "What profession do Raj Kapoor and Mike Cahill share?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f7dfc13d73a6ab8abf677acf2fe7d0ba",
+                "chunk-d4600cfb08d18509be73e17b8254140d",
+                "chunk-ecf6c93b5edb79dee4a4ca281d3e4e8e",
+                "chunk-ba25eeb4009f07586dc40ec5c878793e",
+                "chunk-0f5c2a02172c5608e59a996e191d9992"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.2857,
+              "gold_answers": [
+                "other individuals, teams, or entire organizations"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "individuals.",
+              "query_index": 60,
+              "question": "Wexner Graduate Fellowships are given to students who show an ability of an individual to \"lead\" or guide who?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-76d824296ed8701a904754b0efb57230",
+                "chunk-ba8177091f2f85e1073f01f849fa445d",
+                "chunk-e1240f2a19615652df3c5278f0fe9f96",
+                "chunk-aebd9e3cd54bf8d7879f99a0d7997a38",
+                "chunk-1392669f7ea2a49cce964ecfdaf58d3e"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "17 December 1998"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "17 December 1998.",
+              "query_index": 61,
+              "question": "What is the birthdate of this Norwegian professional footballer who plays as an attacking midfielder and who broke the record for the youngest player that has ever played in the Norwegian top league?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-06c36ce4445f6a8db8934312fb403439",
+                "chunk-dfef55b5b495ef9a97cc65a92d1b9909",
+                "chunk-f3aeff405d5a0b97f307b57ef04099b5",
+                "chunk-aa745d7ab6364a052b77cf285107b6c6",
+                "chunk-b16ec0875224c726cdf8812ceeb46efe"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "drawings"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "drawings.",
+              "query_index": 62,
+              "question": "Works by Hanna Leena Kristiina Varis are part of a collection in a museum that houses approximately 65,000 what?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-efbb1b72215ec6b9c1b97e5932697935",
+                "chunk-74dcaa7d7512e41c019903c1165618ab",
+                "chunk-635ca8fa5f0bdd394bb303fc1d7b4356",
+                "chunk-d0ac031bdae44f9d6d514c616d825df3",
+                "chunk-3d7933eb359d307b41dae875ef77d6ad"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "various names"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "the Supersuckers.",
+              "query_index": 63,
+              "question": "Devil's Food is a singles compilation by an American rock and roll band that has also been known to play country shows under what?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4fb0a0e907614a58f74c5e50895e0f40",
+                "chunk-4164edeb7e438e7198f5db71455d583e",
+                "chunk-1d83342b3f510d2e224a437afe69aa35",
+                "chunk-64577d12b7961747b84a57507082073e",
+                "chunk-b7d05dc9f7f8ebe042c2b4a14d8a0f64"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Sound of Music"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Sound of Music.",
+              "query_index": 64,
+              "question": "What musical was inspired by the films that included Ruth Leuwerik's best known role?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f62f67a1499fb1ba3702ffc4880b7f41",
+                "chunk-6b40c8fdddeb57161f23d93c75c74779",
+                "chunk-a43cb7ad51806be8ea7c4075220856be",
+                "chunk-2acbc973d265b3ca35ae41989ff44dd7",
+                "chunk-b422f8e274ec98d0679e170c860858f3"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "Geet or The Song"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Geet.",
+              "query_index": 65,
+              "question": "What 1944 Bollywood film was the mother of Bollywood actor Govinda in?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-aaba41245a41f722894c5a5a18060145",
+                "chunk-e5ab6f62a96ac04eaf864b4b6a8ba989",
+                "chunk-8f874f5ed448a0d8599ffa8da867a073",
+                "chunk-fb5c1aa4306959178428f8f523cafeda",
+                "chunk-f8924e0ec8f921ddaeb6eaa1c2568a33"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "94"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "6.",
+              "query_index": 66,
+              "question": "How many episodes were in the original run of the HBO show that Kristin Davis played the character Charlotte York Goldenblatt?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-709923378d2aee732d62ca1051ec624b",
+                "chunk-a53cddd090e351b399295c1ba47f8157",
+                "chunk-0d5e81e27b8267a5a588cb559cd8a1b0",
+                "chunk-69d0053af6ab450d21ded7906fc9dd5b",
+                "chunk-71d67819fca40a0fdeedcc23ac4e6001"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "GE Appliances"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Hotpoint.",
+              "query_index": 67,
+              "question": "Haier has North American rights to which appliance company headquartered in Louisville, Kentucky?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e3b2fad926ea971655e0db03d508a775",
+                "chunk-7c867fd4dca2985bdd61d3a054c279e1",
+                "chunk-8491d75a6210c2ae3a023352c60974a2",
+                "chunk-f760e8f6a15a3d69c3e4d96e9b1469dc",
+                "chunk-5c2b5e7f3aa2a87ddd16fc6cf2fd1519"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "16 March 1987"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1985.",
+              "query_index": 68,
+              "question": "When was the track from which a sample was featured in \"Take Me to the Clouds Above\" released?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-059c1ac0f8fbf964bcbd9607c1013e63",
+                "chunk-b3a0d2c2dff585749d2148110fb02a3d",
+                "chunk-09d51cede8bb72c0020b0ecd663e9745",
+                "chunk-693055b003b463ef18f43b5d078ace73",
+                "chunk-a7ef579878a85ad5cb768c8bc47c96bd"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Christopher Nolan"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Christopher Nolan.",
+              "query_index": 69,
+              "question": "Who directed a 2006 film where Ron Perkins character plays the manager of a hotel?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2238e5b976eb40465e3fdcedddffe36e",
+                "chunk-2d745f8054146c5bf3da669043809d24",
+                "chunk-716823344cb11565d4fe9773b55c3271",
+                "chunk-4535e2e33e8ea1ba34d43e69a1a6e974",
+                "chunk-2da9244b3025315db17a03005a81f04b"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Interview"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Interview.",
+              "query_index": 70,
+              "question": "What movie did Chris Duesterdiek work on that was directed by Seth Rogen and Evan Goldberg?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-11ffc6dc2258810134e86ca51f25d1ab",
+                "chunk-f4ddcba152aa841036b22d93aa73384e",
+                "chunk-8a57b26b77e52d13b6aa853c5b8ea2d6",
+                "chunk-e11fa317bbad4b34712aa6aa26772045",
+                "chunk-59e68537d7e7d9031d684b5b8652dce6"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Josh"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Josh.",
+              "query_index": 71,
+              "question": "The producer of \"Live By NIght\" began his film career playing what role in \"Critters 3\"?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-cdc9d7636eed23e7e8d39c0ab38c42e1",
+                "chunk-c93ba0b57307cae02ca22ac112117900",
+                "chunk-68fea8f532a6a64adde53b205337de28",
+                "chunk-3023b6fcc5530dc99be4f292637b3c13",
+                "chunk-54c5fb7bc982efe1dfecfd44e9fc8316"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Shawnee"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Shawnee.",
+              "query_index": 72,
+              "question": "What is the county seat of the county in which Keokuk Falls, Oklahoma is loated?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-639c3ab7b976de93089d62b3161f33d2",
+                "chunk-0edc90020260c218db48ad760860e0e0",
+                "chunk-9dd876ffffd550504a3c90d5a11dc3c0",
+                "chunk-ba2edf66a3e2933de1ad21e5da2c1009",
+                "chunk-73b0e1dd71e5a21d4d911bfd484980dc"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Robert A. Iger"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Gary Marsh.",
+              "query_index": 73,
+              "question": "What former president of ABC television is a high ranking officer in the same company as Christine Mccarthy?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e378faba32557d0c58110c039bf5145e",
+                "chunk-4c1774b393c726a39cb36b03987e6c30",
+                "chunk-d6562f8ee726257deff7234850587e72",
+                "chunk-77e0e5a785db91f7b2ef82c5e0bfef78",
+                "chunk-0b29f9e2dd856c57e9b186dc9181dcdb"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Ufa, Russia"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Helsinki.",
+              "query_index": 74,
+              "question": "Where was the second World Junior Ice Hockey Championship in which Miroslav P\u0159erost coached the men's national junior ice hockey team hosted?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-de6758a13510657ae50e57b4b3693aed",
+                "chunk-5fdb6496ecb84c46f608c12dd11974fb",
+                "chunk-5f4fb24f3cd74edea3fad3fa326de6d0",
+                "chunk-1a515bf5ac5b25bb5078f1193dd05879",
+                "chunk-b3cc155b1a09cef3b2415baba7ce8073"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Bodyjar"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Bodyjar.",
+              "query_index": 75,
+              "question": "Between two bands Audioslave and Bodyjar, which group formed earlier?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-bd2a9469ad8efc26421a8a965dadee13",
+                "chunk-4107bccf573d1758e67725d256b70aae",
+                "chunk-6a6797baa7a939493b7e02b9984f5a69",
+                "chunk-3c7d2e3f4000729024ebbb454eea7874",
+                "chunk-d5ee20497feebe192f907a919c0bbfa8"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Berklee College of Music"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Berklee College of Music.",
+              "query_index": 76,
+              "question": "What music school did the singer of The Search for Everything: Wave One attend?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-e27b5995af2dbb821ae12c302cc400e5",
+                "chunk-85d70a7d55b529ae4f7340763f3d40a8",
+                "chunk-b2a1076aeb7a4cbc489123e8728c44c5",
+                "chunk-b5e99ed2c3ff2d07aad1e3c363eb1161",
+                "chunk-17780a1c2bcfee01ac8bed4c33663dee"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "International Watch Co."
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "International Watch Company.",
+              "query_index": 77,
+              "question": "G\u00e9rald Genta, a Swiss jewelllery designer, worked with what luxury Swiss watch manufacturer which was founded by American Watch,aker Florentine Ariosts Jones?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-68faf3b8115d8f9b28c523d92bcfbfaf",
+                "chunk-c0567248610072cb594d8e889d6e518d",
+                "chunk-86bed840803fa17ab9ce72829a89ec5c",
+                "chunk-3b7497e84c965890360281655af284d3",
+                "chunk-b081822507decabb2d7362a2f890a2a3"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Chicago, IL"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 78,
+              "question": "What city did the musician whose debut album shares its title with the 1959 Alfred Hitchcock hail from?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7eaa2f18d2632740d6514eadf4fd93fe",
+                "chunk-a657afcff88d74a0f40aa3aafadb842f",
+                "chunk-efa3612d3046191a97ad51df1c9585f9",
+                "chunk-7066ed5f8f84b5a9943b5a1d4b2481c1",
+                "chunk-e4ce6035e627b960f63995bf4d137bf3"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1998"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1998.",
+              "query_index": 79,
+              "question": "The 53rd National Hockey League All-Star Game took place at the indoor arena that was completed in what year?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-599846b8de5017e8e1333d9ffdd7cf2b",
+                "chunk-3a64a87147b55daa151c9dd59f2f86bc",
+                "chunk-3ce4e873421f5506837c920d707220f6",
+                "chunk-284418290e16baca14a1c0f382aa28ad",
+                "chunk-8aeff2d5acbf749ab230c9a5d35ca46d"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Terrence Jones"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Terrence Jones.",
+              "query_index": 80,
+              "question": "Which of Damon Stoudamire's cousins once played college basketball for the University of Kentucky?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-27110d2f4661e91f7d680fbfc35b0d1b",
+                "chunk-186c5718bfc1e74a991de7e6538faecb",
+                "chunk-0bfccc8a832367e6f407ecd95cf84e37",
+                "chunk-1a34da94c452a30a18cfc2e5bd82bff7",
+                "chunk-86b52131e848c2725ba9e2ae83805e9f"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "1935"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "1935.",
+              "query_index": 81,
+              "question": "The player who defeated Johnny Majors for the Heisman Trophy in 1956 was born in what year?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-327fc995be8b563766f74069c084c1e9",
+                "chunk-bd02d0dcf8683d3fa63f4c9e157775ed",
+                "chunk-be73d3b7ad863ccc525c7a8ae497fbbf",
+                "chunk-21a8e5134b3ad0c7e7eaa78c0d87517c",
+                "chunk-fc96938d4d1018cd1fb35de33f6555bf"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.25,
+              "gold_answers": [
+                "2002"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "2002 United States Senate election in Minnesota.",
+              "query_index": 82,
+              "question": "In which election did Norm Coleman won to become the last republican elected as of 2017?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-3e78db2f27a2a2988286cd1b075c715f",
+                "chunk-8b0deb436c513c562efa7151c90192c7",
+                "chunk-f6177ef69709f12a93f42aaa4712267e",
+                "chunk-5f21baddaaeca3f20edf14742c99c699",
+                "chunk-a57dd38ef0d9b8d35f700e9fb00a4b1b"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Queen Margrethe II"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Queen Margrethe II.",
+              "query_index": 83,
+              "question": "Who is the mother of Mary, Crown Princess of Denmark's husband?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-41c5d32ac0acc12e0ea1d34ca97fd6e3",
+                "chunk-c3a3bc77fa7d685964447a5a51594039",
+                "chunk-e7ba6ea2d374e74eab08eb7e9a8f33dd",
+                "chunk-a801cfd9087bfde0955986acb30c01b9",
+                "chunk-c38e9d00a712e2bc37f8effa8dff7b8c"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Krakatau"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Universal's Volcano Bay.",
+              "query_index": 84,
+              "question": "What park replaced American's first waterpark designed by the creator of seaworld?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2abe31c1803d9b23c488874a653df775",
+                "chunk-4e7232648658b1aeb609d81e560e4892",
+                "chunk-e126e96bf844f138b8a911a777697ed1",
+                "chunk-d6c9e1189e7202706fff0ba582ae2905",
+                "chunk-d9ae92f2ced82aa42bee86da5ed1daa2"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "2011"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "2011.",
+              "query_index": 85,
+              "question": "What year did Fifty Shades of Grey release?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4b03926cda33cde2a4a946272712429e",
+                "chunk-ea945da417d1c1672f2fa4cfb176c36d",
+                "chunk-2f6407f742d84ca77f41d97710c28528",
+                "chunk-f090ec16b0e16c2ea459e7d309c4fd85",
+                "chunk-afa31c6a2ab943f592a98b038064c14a"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "29,000"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "29,000.",
+              "query_index": 86,
+              "question": "The ghetto that George Kadish documented held how many people at its peak?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-efdd88cc3ecfe1525761265273526d3f",
+                "chunk-8e4e8f7619461ef4927ae2c185f814ab",
+                "chunk-0fccee79745251564fcdd8ee036400d0",
+                "chunk-c99a9592a9823eade447d6e7eb3b89a7",
+                "chunk-abbbef4eb63dd1782d5208ef7d250112"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "the villanelle poetic form"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "villanelle.",
+              "query_index": 87,
+              "question": "In which poetic form is Mad Girl's Love Song written and appears in the novel The Bell Jar by Sylvia Plath?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-71884bdfd408b99ce9c58cfb51728152",
+                "chunk-760290a13f19597c0035a0cbeae4d665",
+                "chunk-5af3913e24fbee37c3d908c7077ab63c",
+                "chunk-449a1f72f1ab19345d7d9ddf28fc828c",
+                "chunk-69e7dc7cd0e4caaea9c9fd86e9d48e4e"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Walt Disney Productions"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "None.",
+              "query_index": 88,
+              "question": "Which production company was involved with both of the movies A Kid in King Arthur's Court and The Great Locomotive Chase?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-34de2c4b9dc7d508244a6862da1cb785",
+                "chunk-9da9eef1e672b24401783965f41cd99d",
+                "chunk-00933fed711fe667a0dc1821c99bf03b",
+                "chunk-306b2783ffe0fc5bad1d23a837608eda",
+                "chunk-6546975268521a41e976569f00112f8c"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Royal Air Force"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "RAF.",
+              "query_index": 89,
+              "question": "What where both Hawker Hurricane and No. 1455 Flight apart of?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-dc6fe840b500614d054341707bfa99b7",
+                "chunk-8f58c4bcce1dc5952c6b6cda03051ecc",
+                "chunk-14f8ff2f1c11ddc9db8a1e1a3c362584",
+                "chunk-868f7cc685b0d3b047c3554d4bd6caf5",
+                "chunk-305da7b7087a8a194f56fed07c40fed1"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "eight"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "8.",
+              "query_index": 90,
+              "question": "Kadeem Jack is a player in a league that started with how many teams?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d903623ccab5ddf5d50da044e100fdf0",
+                "chunk-9c2a2f95357460a586d5a2d5a1254370",
+                "chunk-0cfeb4d1e751e783b985f7d598783578",
+                "chunk-fed052491f8c73ac873942c764031be5",
+                "chunk-389010921e309924c03f40df7ac748e4"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Jamnagar"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "India.",
+              "query_index": 91,
+              "question": "What country is the member of Gujarat Legislative Assembly and parliament representing?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-de07b4d35a4f221a4e58d75b36bc3cac",
+                "chunk-d07fd50e9810c0a045a17e273f076b3e",
+                "chunk-c05bfdf636e5bc2a21c89806028b7eb9",
+                "chunk-a425d2e0fee9c02c0adfe8a6bd36767e",
+                "chunk-866cf9e6af66feb4c4cfc8366bdaa410"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Fred M. Vinson"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Fred M. Vinson.",
+              "query_index": 92,
+              "question": "Of four Harry S. Truman Supreme Court candidates, who was the 53rd United States Secretary of the Treasury and the 13th Chief Justice of the United States?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2c04c41cd8834fe288d622fa858e263b",
+                "chunk-291ff63c32c5f7015613cafca6aa0822",
+                "chunk-1bbbd23f8c8d09279c1f98f341159e61",
+                "chunk-4160799579691297caf64d97443dd1e6",
+                "chunk-8184a7d8e9f0e942679e3a6588c537e6"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "February"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "February.",
+              "query_index": 93,
+              "question": "In what month was the relief first officer of the flight that crashed on its way to Cairo with a stop in New York Born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-05ab58b3a615d3fb071ec62334d82a4e",
+                "chunk-fb0c0d48b398a5fd76726e58ec302567",
+                "chunk-43abf64f1e287e7dc320acdbcbc5cfde",
+                "chunk-3e84650f9f987137d8ffeea5800230b0",
+                "chunk-f0b84d397eb589a17a95b27675a687ba"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 94,
+              "question": "Are The Datsuns and The Black Crowes both rock bands?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c1c2b89da598cba0660a4982222203dd",
+                "chunk-c3dcc93f2a005ae93a67b248189b6549",
+                "chunk-8e27169683fffe70e09e63811898bd11",
+                "chunk-3420e9d602ee06ef71503751d67a0edb",
+                "chunk-1cb8a1dd6d2be6663e796710769d9a51"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "James Harrison"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Jim Harrison.",
+              "query_index": 95,
+              "question": "Legends of the Fall was based on a novella by what poetry and fiction writer?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4cd461b93a56e47fc745afda950a2dcb",
+                "chunk-33fb5a4a34b30bfb3dc73b09a2ee29f6",
+                "chunk-cd5d16fbc917b63f21a8ae84e9fcae44",
+                "chunk-ca38063d442c4aa7077c7640b28c2222",
+                "chunk-3f0527d4c7a87ec03d9dbbde193d82a1"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "Karakoram mountain range"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Karakoram.",
+              "query_index": 96,
+              "question": "Rimo I and Passu Sar are both part of which mountain range?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fcc6beb619657cc0a56047e652665370",
+                "chunk-a063615de8632df59c3d1a4902725c48",
+                "chunk-dbde29851b3f4e1a29764669f00e2717",
+                "chunk-71ac03e7f14a74991544e23b33d2c8fa",
+                "chunk-29bfee8f2a448ce0800aa66930754e7d"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Czech Republic"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Czech Republic.",
+              "query_index": 97,
+              "question": "What was the country which has border with the village where an Austrian forest caretaker, naturalist, pseudoscientistref>Ronald Engert: \"Die Forellenturbine als Prinzip der kostenlosen Energiegewinnung born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7c33e8c86c6ea24fe97a65c60e870534",
+                "chunk-8fb6b8f1bde3f47ee58a2e7dc1f93e2b",
+                "chunk-45135413dce3a0d7672e022c46c25ba2",
+                "chunk-7dfa9c7812e2e070b82fa2629927318a",
+                "chunk-4c263ea0171259e98a81ca0aa8e39057"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "St. Louis Cardinals"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "St. Louis Cardinals.",
+              "query_index": 98,
+              "question": "Which team did Joe Buck's father broadcast for?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fcfd5c4af1638ae7fe7142f5c82cd24d",
+                "chunk-71493659eb089d10c1f3a9ee8993c7e1",
+                "chunk-84c50f72aec5eb931ae02340d79e5aa4",
+                "chunk-82bfee5ac160ba47692bcf0c84efa83f",
+                "chunk-2281d728b8a5d51ad2ff23c25e637120"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Mary"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Merv.",
+              "query_index": 99,
+              "question": "What is the name of the city located near the historical region known as Margian\u1e17 in Greek?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-23d28525fd0f91a7728a82a4d767130a",
+                "chunk-bf3ee99eeea8f383022c5e59abdc6ca1",
+                "chunk-3c4ddd36d808d2c0ca206045021c247e",
+                "chunk-de96bde74b892fb9176db45c294b274d",
+                "chunk-d2595b0ab2917ddc3a49fc9af655f613"
+              ]
+            }
+          ]
+        }
+      },
+      "num_queries": 100,
+      "reader": {
+        "llm_base_url": "http://localhost:8042/v1",
+        "llm_name": "qwen3-8b-train",
+        "max_new_tokens": 400,
+        "qa_top_k": 5
+      },
+      "source": {
+        "doc_source": "external_pool_topk_docs",
+        "does_not_modify_retrieval": true,
+        "input_path": "/mnt/nvme/code/HippoRAG/run_logs/daec_binding_grounded_limit100_20260506/evals/hotpotqa_base_qwen8b_hipporag_pool100_limit100.json",
+        "retrieval_r5_source": "input_file.overall_recomputed.Recall@5",
+        "uses_exported_pool_topk_docs": true,
+        "uses_saved_reader_docs": false
+      }
+    }
+  ],
+  "format": "saved_docs_reader_only_qa",
+  "max_new_tokens": 400,
+  "qa_top_k": 5
+}

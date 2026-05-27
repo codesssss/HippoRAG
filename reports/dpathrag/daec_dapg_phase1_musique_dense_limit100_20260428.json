@@ -1,0 +1,149 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "dataset": "musique",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "summary": {
+    "rows": 500,
+    "by_hop_variant": {
+      "2:daec_l1": {
+        "support_recall": 0.25,
+        "support_complete": 0.0625,
+        "noise_rate": 0.9083,
+        "objective": 0.7549,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 48
+      },
+      "2:local_absorption": {
+        "support_recall": 0.3542,
+        "support_complete": 0.0625,
+        "noise_rate": 0.8667,
+        "objective": 0.0022,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 48
+      },
+      "2:local_absorption_kappa": {
+        "support_recall": 0.375,
+        "support_complete": 0.1042,
+        "noise_rate": 0.8583,
+        "objective": 0.0005,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 48
+      },
+      "2:local_absorption_prior": {
+        "support_recall": 0.375,
+        "support_complete": 0.1042,
+        "noise_rate": 0.8583,
+        "objective": 0.0005,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 48
+      },
+      "2:local_occupancy": {
+        "support_recall": 0.1042,
+        "support_complete": 0.0208,
+        "noise_rate": 0.8125,
+        "objective": 1.0,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 48
+      },
+      "3:daec_l1": {
+        "support_recall": 0.1611,
+        "support_complete": 0.0,
+        "noise_rate": 0.9067,
+        "objective": 0.7469,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 30
+      },
+      "3:local_absorption": {
+        "support_recall": 0.3167,
+        "support_complete": 0.0333,
+        "noise_rate": 0.8133,
+        "objective": 0.002,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 30
+      },
+      "3:local_absorption_kappa": {
+        "support_recall": 0.3167,
+        "support_complete": 0.0333,
+        "noise_rate": 0.8133,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 30
+      },
+      "3:local_absorption_prior": {
+        "support_recall": 0.3167,
+        "support_complete": 0.0333,
+        "noise_rate": 0.8133,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 30
+      },
+      "3:local_occupancy": {
+        "support_recall": 0.0944,
+        "support_complete": 0.0,
+        "noise_rate": 0.7333,
+        "objective": 1.0,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 30
+      },
+      "4:daec_l1": {
+        "support_recall": 0.1023,
+        "support_complete": 0.0,
+        "noise_rate": 0.9182,
+        "objective": 0.803,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 22
+      },
+      "4:local_absorption": {
+        "support_recall": 0.197,
+        "support_complete": 0.0,
+        "noise_rate": 0.8455,
+        "objective": 0.0019,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 22
+      },
+      "4:local_absorption_kappa": {
+        "support_recall": 0.197,
+        "support_complete": 0.0,
+        "noise_rate": 0.8455,
+        "objective": 0.0005,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 22
+      },
+      "4:local_absorption_prior": {
+        "support_recall": 0.197,
+        "support_complete": 0.0,
+        "noise_rate": 0.8455,
+        "objective": 0.0005,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 22
+      },
+      "4:local_occupancy": {
+        "support_recall": 0.0227,
+        "support_complete": 0.0,
+        "noise_rate": 0.9091,
+        "objective": 1.0,
+        "em": 0.0,
+        "f1": 0.0,
+        "rows": 22
+      }
+    }
+  }
+}

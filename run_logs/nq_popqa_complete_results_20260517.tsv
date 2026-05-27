@@ -1,0 +1,17 @@
+Dataset	Method	Status	Count	R@5	R@20	R@100	EM	F1	Avg F1 NQ+PopQA	Notes
+NQ	GPT-4o-mini no context	DONE	1000				29.20	37.81	19.32	no retrieval
+PopQA	GPT-4o-mini no context	DONE	1000				0.70	0.83	19.32	no retrieval
+NQ	BM25	DONE	1000	71.24	93.67	97.74	46.10	59.47	57.79	GPT-4o-mini reader
+PopQA	BM25	DONE	1000	39.45	49.95	50.75	45.40	56.11	57.79	GPT-4o-mini reader
+NQ	Dense NV-Embed-v2	DONE	1000	77.16	99.07	99.88	49.40	63.29	61.86	dense entry baseline
+PopQA	Dense NV-Embed-v2	DONE	1000	49.20	56.35	68.00	47.90	60.42	61.86	dense entry baseline
+NQ	HippoRAG	DONE	1000	79.84	99.17	99.93	50.30	63.36	61.85	Qwen3-32B no_think + GPT-4o-mini
+PopQA	HippoRAG	DONE	1000	49.60	58.30	70.20	47.70	60.33	61.85	Qwen3-32B no_think + GPT-4o-mini
+NQ	PropRAG	DONE	1000	81.05	99.26	99.88	50.10	63.73	62.64	Qwen3-32B no_think + GPT-4o-mini
+PopQA	PropRAG	DONE	1000	56.45	70.70	80.40	49.40	61.55	62.64	Qwen3-32B no_think + GPT-4o-mini
+NQ	HGRAG	DONE	1000	52.47	94.31		51.00	64.69	61.54	Qwen3-32B no_think + GPT-4o-mini
+PopQA	HGRAG	DONE	1000	51.50	58.60		45.70	58.39	61.54	Qwen3-32B no_think + GPT-4o-mini
+NQ	EvidenceFlow	DONE	1000	71.63			51.90	65.04		final reader done
+PopQA	EvidenceFlow	PENDING	1000							DBEC running; base ET retrieval R@5=65.05, All@5=30.40
+NQ	NeocorRAG	RUNNING	1000							still in reretrieval, no final JSON
+PopQA	NeocorRAG	WAITING	1000							blocked behind slow NQ NeocorRAG

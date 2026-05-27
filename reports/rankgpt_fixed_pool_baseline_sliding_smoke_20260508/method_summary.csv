@@ -1,0 +1,13 @@
+dataset,method,queries,support_recall_at_5,support_complete_at_5,parse_ok_rate,prompt_no_think_rate,mean_selected_count
+2Wiki,dbec_selective,2,1.0,1.0,,,
+2Wiki,rankgpt_sliding20_step10_no_think,2,1.0,1.0,1.0,1.0,5.0
+2Wiki,setr_faithful,2,1.0,1.0,,,
+2Wiki,source_order,2,1.0,1.0,,,
+HotpotQA,dbec_selective,2,1.0,1.0,,,
+HotpotQA,rankgpt_sliding20_step10_no_think,2,1.0,1.0,1.0,1.0,5.0
+HotpotQA,setr_faithful,2,1.0,1.0,,,
+HotpotQA,source_order,2,1.0,1.0,,,
+MuSiQue,dbec_selective,2,1.0,1.0,,,
+MuSiQue,rankgpt_sliding20_step10_no_think,2,0.8333333333333333,0.5,1.0,1.0,5.0
+MuSiQue,setr_faithful,2,0.8333333333333333,0.5,,,
+MuSiQue,source_order,2,0.8333333333333333,0.5,,,

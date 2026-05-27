@@ -1,0 +1,45 @@
+{
+  "pool_json": "run_logs/proprag_pool_exports_full1000_20260424/2wikimultihopqa_pool100.json",
+  "dataset": "2wiki_proprag",
+  "record_count": 1000,
+  "k_values": [
+    5,
+    20,
+    100
+  ],
+  "summary": {
+    "rows": 3000,
+    "by_hop_k": {
+      "2:k5": {
+        "support_recall": 0.9052,
+        "support_complete": 0.8144,
+        "rows": 765
+      },
+      "2:k20": {
+        "support_recall": 0.9647,
+        "support_complete": 0.9307,
+        "rows": 765
+      },
+      "2:k100": {
+        "support_recall": 0.9876,
+        "support_complete": 0.9752,
+        "rows": 765
+      },
+      "4:k5": {
+        "support_recall": 0.8947,
+        "support_complete": 0.634,
+        "rows": 235
+      },
+      "4:k20": {
+        "support_recall": 0.9479,
+        "support_complete": 0.8,
+        "rows": 235
+      },
+      "4:k100": {
+        "support_recall": 0.9862,
+        "support_complete": 0.9447,
+        "rows": 235
+      }
+    }
+  }
+}

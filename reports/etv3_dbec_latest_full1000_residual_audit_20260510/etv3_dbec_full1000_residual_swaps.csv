@@ -1,0 +1,1506 @@
+dataset,query_idx,step,out_position,out_title,in_position,in_title,objective_gain,retriever_rank_loss,adjusted_gain
+2wikimultihopqa,3,1,1,Ismail I,11,Abdul-Vahed Niyazov,0.060463,0.552764,0.060463
+2wikimultihopqa,5,1,1,Charlie Day,6,John Francis Dillon (director),0.25,0.527638,0.25
+2wikimultihopqa,5,2,3,Heart (1987 film),31,Fernando Cortés,0.224133,0.643216,0.224133
+2wikimultihopqa,6,1,1,Eric XIV of Sweden,27,Jeff Barlow,0.021799,0.633166,0.021799
+2wikimultihopqa,7,1,2,Dáire Drechlethan,36,John Templeton (botanist),0.333333,0.673367,0.333333
+2wikimultihopqa,8,1,3,The Umbrella Coup,21,Frank Launder,0.25,0.592965,0.25
+2wikimultihopqa,18,1,3,The Past of Mary Holmes,65,Clarence Brown,0.25,0.81407,0.25
+2wikimultihopqa,30,1,3,Victor Sjöström,21,William Duncan (actor),0.18272,0.592965,0.18272
+2wikimultihopqa,31,1,2,"Otto I, Count of Burgundy",20,"Frederick I, Holy Roman Emperor",0.5,0.592965,0.5
+2wikimultihopqa,34,1,1,Anthony Mann,56,David Bradley (director),0.5,0.778894,0.5
+2wikimultihopqa,35,1,2,Ola Isene,42,Edward Francis Burney,0.004759,0.703518,0.004759
+2wikimultihopqa,37,1,3,Werner Herzog,21,Georges Lautner,0.14912,0.592965,0.14912
+2wikimultihopqa,39,1,1,Margaret of Masovia,92,Health and intelligence,0.037685,0.959799,0.037685
+2wikimultihopqa,41,1,3,Henry King (director),21,Lina Wertmüller,0.149921,0.592965,0.149921
+2wikimultihopqa,42,1,2,Harold D. Schuster,17,Charles Arthur Tabberer,0.008343,0.577889,0.008343
+2wikimultihopqa,43,1,1,Alex Cox,11,Juzo Itami,0.25,0.552764,0.25
+2wikimultihopqa,46,1,1,Low Deep T,87,Place of birth,0.016148,0.934673,0.016148
+2wikimultihopqa,51,1,2,"John George II, Duke of Saxe-Eisenach",13,Duke Alexander of Württemberg (1804–1885),0.017333,0.557789,0.017333
+2wikimultihopqa,54,1,1,Antonio Rinaldi (cinematographer),53,"Derek Moore-Brabazon, 2nd Baron Brabazon of Tara",3.9e-05,0.763819,3.9e-05
+2wikimultihopqa,57,1,3,Bertrand Tavernier,16,Laurent Tirard,0.25,0.567839,0.25
+2wikimultihopqa,58,1,1,Elvis Presley,7,"Karl, Prince of Leiningen",0.000594,0.532663,0.000594
+2wikimultihopqa,59,1,1,Joseph Ferdinand of Bavaria,9,Infanta María de la Paz of Spain,0.5,0.542714,0.5
+2wikimultihopqa,66,1,3,"Love, Honor, and Oh Baby!",29,Charles Lamont,0.248009,0.633166,0.248009
+2wikimultihopqa,68,1,1,Friday the 13th (1916 film),64,Invasion of the Neptune Men,0.031466,0.819095,0.031466
+2wikimultihopqa,72,1,1,Salin Mibaya,78,Place of birth,0.049056,0.889447,0.049056
+2wikimultihopqa,73,1,4,The I Inside,5,The Room,0.074535,0.507538,0.074535
+2wikimultihopqa,73,2,1,The Room (film),6,In the Room,2e-06,0.527638,2e-06
+2wikimultihopqa,74,1,1,Frederic Zelnik,13,Marco Ferreri,0.25,0.562814,0.25
+2wikimultihopqa,74,2,3,The Marriage of Krechinsky,14,Konrad Wolf,0.25,0.557789,0.25
+2wikimultihopqa,75,1,3,Return to Return to Nuke 'Em High AKA Volume 2,20,Po-Chih Leong,0.25,0.58794,0.25
+2wikimultihopqa,76,1,2,Pirates of the Coast,17,A House of Sand,0.017259,0.577889,0.017259
+2wikimultihopqa,77,1,3,Dead Man's Eyes,21,Melville W. Brown,0.236027,0.592965,0.236027
+2wikimultihopqa,79,1,2,Aarno Sulkanen,8,Nina Cook Silitch,0.005578,0.532663,0.005578
+2wikimultihopqa,81,1,2,Alberto Falcón,29,William Rose Benét,0.004326,0.638191,0.004326
+2wikimultihopqa,82,1,1,"Albert, Count of Chiny",8,Nicholas the Small,0.5,0.537688,0.5
+2wikimultihopqa,86,1,2,Tifanie Christun,32,William Rose Benét,0.005198,0.653266,0.005198
+2wikimultihopqa,87,1,1,Andrea Bianchi,21,Aleksander Ford,0.17386,0.603015,0.17386
+2wikimultihopqa,88,1,2,Carolina Sanchez,13,Abdul-Vahed Niyazov,0.003484,0.557789,0.003484
+2wikimultihopqa,93,1,3,Stanley Kwan,26,Yvan Chiffre,0.25,0.61809,0.25
+2wikimultihopqa,94,1,1,Alexander the Great,21,Socrates,0.5,0.603015,0.5
+2wikimultihopqa,95,1,1,DJ Clue,5,Nomi Ruiz,0.5,0.522613,0.5
+2wikimultihopqa,96,1,1,Gus Meins,16,Chloé Robichaud,0.25,0.577889,0.25
+2wikimultihopqa,96,2,3,Johnny on the Run,24,Walter Hugo Khouri,0.19534,0.60804,0.19534
+2wikimultihopqa,97,1,2,Ek Hi Bhool,74,George Pearson (filmmaker),0.25,0.864322,0.25
+2wikimultihopqa,98,1,3,The Wedding Chest,10,Henry King (director),0.25,0.537688,0.25
+2wikimultihopqa,100,1,1,Anna of Brunswick-Grubenhagen-Einbeck,9,"Albert III, Duke of Bavaria",0.333333,0.542714,0.333333
+2wikimultihopqa,100,2,2,Margaret Paleologa,17,"Maximilian II Emanuel, Elector of Bavaria",0.333333,0.577889,0.333333
+2wikimultihopqa,101,1,3,Daleks' Invasion Earth 2150 A.D.,7,Gordon Flemyng,0.25,0.522613,0.25
+2wikimultihopqa,102,1,2,Such a Little Pirate,6,The Pirate (1984 film),0.005527,0.522613,0.005527
+2wikimultihopqa,103,1,1,Harold D. Schuster,63,Reunion (1936 film),0.010688,0.81407,0.010688
+2wikimultihopqa,108,1,2,Shahadat Chowdhury,22,Wang Shusen,0.000714,0.603015,0.000714
+2wikimultihopqa,111,1,1,Ray Nazarro,5,Henry Hathaway,0.25,0.522613,0.25
+2wikimultihopqa,111,2,3,Bury Me Not on the Lone Prairie (film),60,Ray Taylor (director),0.246801,0.788945,0.246801
+2wikimultihopqa,112,1,1,Bertrand Tavernier,56,Claude Weisz,0.25,0.778894,0.25
+2wikimultihopqa,113,1,1,Machu Kunturi,54,Boy or Girl?,0.034838,0.768844,0.034838
+2wikimultihopqa,116,1,2,Mark Pellington,6,Do You Believe?,0.002609,0.522613,0.002609
+2wikimultihopqa,118,1,3,Sam Wood,12,Roland Joffé,0.233523,0.547739,0.233523
+2wikimultihopqa,121,1,1,Dinu Cocea,20,Richard Sale (director),0.25,0.59799,0.25
+2wikimultihopqa,121,2,3,My Wife's Enemy,59,Elisabeta Bostan,0.25,0.78392,0.25
+2wikimultihopqa,123,1,1,Thomas Morse,8,Amedeo Escobar,0.5,0.537688,0.5
+2wikimultihopqa,126,1,2,Dáire Drechlethan,38,John Templeton (botanist),0.333333,0.683417,0.333333
+2wikimultihopqa,127,1,1,Ralph L. Thomas,58,El Festín de Satanás,0.008039,0.788945,0.008039
+2wikimultihopqa,128,1,1,Marie Émilie de Joly de Choin,36,"John George II, Duke of Saxe-Eisenach",0.333333,0.678392,0.333333
+2wikimultihopqa,129,1,1,Ramón Hernández (beach volleyball),60,Hélène Grenier,0.049398,0.798995,0.049398
+2wikimultihopqa,130,1,3,Brother Rat and a Baby,85,Henry King (director),0.25,0.914573,0.25
+2wikimultihopqa,131,1,2,Mafalda von Hessen,9,Archduchess Elisabeth Amalie of Austria,0.333333,0.537688,0.333333
+2wikimultihopqa,133,1,2,Robert G. Vignola,9,John Veltri,0.01195,0.537688,0.01195
+2wikimultihopqa,134,1,1,Vasili Pichul,90,Edward Sedgwick,0.246177,0.949749,0.246177
+2wikimultihopqa,137,1,2,Thiruvannamalai (film),9,Lloyd (film),0.026013,0.537688,0.026013
+2wikimultihopqa,138,1,1,Solomon II of Imereti,99,Theodred II (Bishop of Elmham),0.051595,0.994975,0.051595
+2wikimultihopqa,140,1,3,La Boum 2,11,Claude Pinoteau,0.25,0.542714,0.25
+2wikimultihopqa,142,1,1,Romanoff and Juliet (1961 film),6,Christopher Robinson,0.007241,0.527638,0.007241
+2wikimultihopqa,143,1,3,Goopy Bagha Phire Elo,10,Satyajit Ray,0.224796,0.537688,0.224796
+2wikimultihopqa,147,1,2,Cecile of Baux,17,"Isabella of France, Queen of Navarre",0.333333,0.577889,0.333333
+2wikimultihopqa,149,1,2,Forbidden Ground (2013 film),81,Pál Gábor,0.161528,0.899497,0.161528
+2wikimultihopqa,151,1,1,Dancing in the Rain (film),11,Sky Magazine,0.003721,0.552764,0.003721
+2wikimultihopqa,154,1,2,The Power (1984 film),50,A Matter of Life and Death,0.018333,0.743719,0.018333
+2wikimultihopqa,157,1,2,"Anna Amalia, Abbess of Quedlinburg",9,"Christian August, Prince of Anhalt-Zerbst",0.333333,0.537688,0.333333
+2wikimultihopqa,160,1,2,Miloš Zličić,11,Peter Gravesen,0.003746,0.547739,0.003746
+2wikimultihopqa,163,1,2,Al-Mu'ayyad,12,Harun al-Rashid,0.5,0.552764,0.5
+2wikimultihopqa,165,1,1,Henry King (director),26,Clement Virgo,0.240806,0.628141,0.240806
+2wikimultihopqa,167,1,1,"Sigramnus, Count of Hesbaye",7,Lothair II,0.333333,0.532663,0.333333
+2wikimultihopqa,167,2,2,"Ingerman, Count of Hesbaye",14,Louis the Pious,0.333333,0.562814,0.333333
+2wikimultihopqa,168,1,1,Google,17,One and Five,0.005328,0.582915,0.005328
+2wikimultihopqa,169,1,3,Eagle Feather,21,Edward Sloman,0.224489,0.592965,0.224489
+2wikimultihopqa,170,1,3,The Wanted 18,21,Gérard Oury,0.25,0.592965,0.25
+2wikimultihopqa,171,1,1,Anthony Mann,16,Gérard Oury,0.25,0.577889,0.25
+2wikimultihopqa,171,2,3,Georges Méliès,63,Kevin S. Tenney,0.25,0.80402,0.25
+2wikimultihopqa,173,1,1,Sigrid Sture,89,Arthur Beauchamp,0.000675,0.944724,0.000675
+2wikimultihopqa,174,1,3,Three for Happiness,21,Jean Negulesco,0.25,0.592965,0.25
+2wikimultihopqa,176,1,2,The First Day of Freedom,12,A House of Sand,0.004984,0.552764,0.004984
+2wikimultihopqa,178,1,1,"Claude Bowes-Lyon, 13th Earl of Strathmore and Kinghorne",5,"Thomas Lyon-Bowes, 11th Earl of Strathmore and Kinghorne",0.464526,0.522613,0.464526
+2wikimultihopqa,179,1,2,The Complaint of an Empress,7,God of War (film),0.018993,0.527638,0.018993
+2wikimultihopqa,180,1,1,Marco Ferreri,13,Laurent Tirard,0.5,0.562814,0.5
+2wikimultihopqa,182,1,1,Oei Hui-lan,9,Charles Arthur Tabberer,0.013929,0.542714,0.013929
+2wikimultihopqa,186,1,1,Edsel Ford,6,Henry Ford,0.5,0.527638,0.5
+2wikimultihopqa,187,1,2,Atang de la Rama,14,Frankenstein Conquers the World,0.002349,0.562814,0.002349
+2wikimultihopqa,188,1,1,True to the Navy,7,George Sherman,0.25,0.532663,0.25
+2wikimultihopqa,188,2,3,Mabel Cheung,14,Lawrence Huntington,0.246794,0.557789,0.246794
+2wikimultihopqa,190,1,2,Puka Qallpa,39,Xue Song (badminton),0.012556,0.688442,0.012556
+2wikimultihopqa,192,1,1,Donnie Elbert,9,Let Me Out,0.001051,0.542714,0.001051
+2wikimultihopqa,193,1,1,Oei Tiong Ham,8,Steve Miller,0.022697,0.537688,0.022697
+2wikimultihopqa,195,1,1,A Better Tomorrow II,16,Raj Kanwar,0.25,0.577889,0.25
+2wikimultihopqa,197,1,2,Gerald Patterson,10,Steve Cooreman,0.006248,0.542714,0.006248
+2wikimultihopqa,198,1,1,Herbert Selpin,16,Konrad Wolf,0.25,0.577889,0.25
+2wikimultihopqa,199,1,3,Jack Arnold (director),61,Harold D. Schuster,0.161263,0.79397,0.161263
+2wikimultihopqa,204,1,1,Die Mutter,12,Keith Moon,0.5,0.557789,0.5
+2wikimultihopqa,205,1,3,Jim Wynorski,21,Jules White,0.25,0.592965,0.25
+2wikimultihopqa,206,1,2,Helen Taylor (writer),27,Héctor Barrantes,0.333333,0.628141,0.333333
+2wikimultihopqa,210,1,1,Vincenzo Lapuma,83,Boy or Girl?,0.006116,0.914573,0.006116
+2wikimultihopqa,210,2,2,Lorenzo Sabbatini,9,Maria da Graça Carvalho,6.2e-05,0.537688,6.2e-05
+2wikimultihopqa,213,1,3,Archduke Maximilian of Austria-Este,9,Maria Theresa of Austria-Este (1849–1919),0.335159,0.532663,0.335159
+2wikimultihopqa,213,2,1,Maria Ludovika of Austria-Este,6,Archduchess Elisabeth Amalie of Austria,0.000672,0.527638,0.000672
+2wikimultihopqa,215,1,1,P. Bhaskaran,21,Mabel Cheung,0.220787,0.603015,0.220787
+2wikimultihopqa,216,1,2,Four Girls from Hong Kong,30,Invasion of the Neptune Men,0.000428,0.643216,0.000428
+2wikimultihopqa,217,1,1,Karl Maka,9,Enzo G. Castellari,0.25,0.542714,0.25
+2wikimultihopqa,217,2,3,My Name Is Nobody,21,Ann Hui,0.212095,0.592965,0.212095
+2wikimultihopqa,218,1,1,Frédéric Mitterrand,5,Louie Psihoyos,0.25,0.522613,0.25
+2wikimultihopqa,222,1,3,Safe Haven (film),48,Lasse Hallström,0.25,0.728643,0.25
+2wikimultihopqa,224,1,2,Princess Alia bint Hussein,16,"Princess Elisabeth, Duchess of Brabant",0.000272,0.572864,0.000272
+2wikimultihopqa,228,1,3,José Luis Cuerda,23,Manuel Romero,0.183078,0.603015,0.183078
+2wikimultihopqa,230,1,1,Ven a bailar conmigo,89,Boy or Girl?,0.00085,0.944724,0.00085
+2wikimultihopqa,231,1,2,John Augustus Fuller,14,Charles Arthur Tabberer,0.005257,0.562814,0.005257
+2wikimultihopqa,232,1,1,Return of the Jedi,10,One and Five,0.068891,0.547739,0.068891
+2wikimultihopqa,234,1,1,Sabika bint Ibrahim Al Khalifa,5,Isa bin Salman Al Khalifa,0.333333,0.522613,0.333333
+2wikimultihopqa,234,2,2,Abdullah bin Hamad bin Isa Al Khalifa,17,Kaya Alp,0.333333,0.577889,0.333333
+2wikimultihopqa,239,1,1,Behind Locked Doors (1991 film),10,Matthias Drawe,0.5,0.547739,0.5
+2wikimultihopqa,240,1,1,Robert Vere Buxton,9,Dugès,0.067327,0.542714,0.067327
+2wikimultihopqa,242,1,3,Wisit Sasanatieng,20,Thomas Jahn,0.242717,0.58794,0.242717
+2wikimultihopqa,244,1,4,Peter Glenville,27,Philip Ford (film director),0.25,0.61809,0.25
+2wikimultihopqa,247,1,2,Dasari Narayana Rao,13,I. V. Sasi,0.000852,0.557789,0.000852
+2wikimultihopqa,249,1,3,Hitler – Dead or Alive,51,John Farrow,0.17159,0.743719,0.17159
+2wikimultihopqa,250,1,1,Mel Stuart,12,Nanni Loy,0.25,0.557789,0.25
+2wikimultihopqa,250,2,3,Her First Romance,46,Wilfred Lucas,0.210221,0.718593,0.210221
+2wikimultihopqa,252,1,1,Francis Buxton,5,Abdul-Vahed Niyazov,0.078631,0.522613,0.078631
+2wikimultihopqa,253,1,1,Oei Tiong Ham,6,Mary Jane Warnes,0.001069,0.527638,0.001069
+2wikimultihopqa,254,1,1,Henri Decoin,10,Gérard Oury,0.25,0.547739,0.25
+2wikimultihopqa,254,2,3,Norman Taurog,15,TK McKamy,0.25,0.562814,0.25
+2wikimultihopqa,262,1,3,Lina Wertmüller,11,Po-Chih Leong,0.25,0.542714,0.25
+2wikimultihopqa,263,1,1,Ayumi Hamasaki,12,Charles Arthur Tabberer,0.000599,0.557789,0.000599
+2wikimultihopqa,264,1,2,Bruce McCandless,15,B. Joseph Pine II,0.020836,0.567839,0.020836
+2wikimultihopqa,266,1,3,Doris Wishman,14,Jules White,0.25,0.557789,0.25
+2wikimultihopqa,267,1,1,Sidonius Apollinaris,20,Stan Rice,0.01052,0.59799,0.01052
+2wikimultihopqa,269,1,2,Mine Safety and Health News,19,Abdul-Vahed Niyazov,0.077994,0.58794,0.077994
+2wikimultihopqa,270,1,1,Priscilla Pointer,15,I Am... Gabriel,0.028517,0.572864,0.028517
+2wikimultihopqa,272,1,3,Liz Garbus,8,Ian Barry (director),0.25,0.527638,0.25
+2wikimultihopqa,274,1,1,Wolfgang Schleif,5,Richard Pottier,0.25,0.522613,0.25
+2wikimultihopqa,274,2,3,Las Aventuras de Pikín,15,Juan Bustillo Oro,0.230288,0.562814,0.230288
+2wikimultihopqa,275,1,2,"Claude Bowes-Lyon, 13th Earl of Strathmore and Kinghorne",9,Lars Eliasson,0.046775,0.537688,0.046775
+2wikimultihopqa,276,1,1,Battle in Seattle,5,Four Minute Mile,0.000891,0.522613,0.000891
+2wikimultihopqa,279,1,1,Jerry Warren,63,Maurice Elvey,0.25,0.81407,0.25
+2wikimultihopqa,279,2,3,Gurinder Chadha,21,Annabel Jankel,0.235776,0.592965,0.235776
+2wikimultihopqa,280,1,1,"Christian August of Holstein-Gottorp, Prince of Eutin",18,Mario Bava,0.003032,0.58794,0.003032
+2wikimultihopqa,281,1,3,Martin Frič,13,Aki Kaurismäki,0.251931,0.552764,0.251931
+2wikimultihopqa,281,2,2,Miloš Forman,20,Mr. Ace,0.005082,0.592965,0.005082
+2wikimultihopqa,285,1,1,Paul Hamilton (politician),12,Amaury de Montfort (died 1241),0.023758,0.557789,0.023758
+2wikimultihopqa,290,1,1,Michael Curtiz,89,Battle in Outer Space,0.032304,0.944724,0.032304
+2wikimultihopqa,293,1,1,Peter Greenaway,19,Claire's Knee,0.000174,0.592965,0.000174
+2wikimultihopqa,294,1,1,"Franz, Duke of Hohenberg",13,Princess Elisabeth of Anhalt,0.333333,0.562814,0.333333
+2wikimultihopqa,294,2,2,"Georg, Duke of Hohenberg",15,Archduke Franz Karl of Austria,0.317602,0.567839,0.317602
+2wikimultihopqa,297,1,1,Pharoahe Monch,10,Place of birth,0.006834,0.547739,0.006834
+2wikimultihopqa,298,1,3,The Greater Glory,20,Harry Beaumont,0.25,0.58794,0.25
+2wikimultihopqa,300,1,1,Abdullah ibn Muhammad,15,Wojciech Has,8.4e-05,0.572864,8.4e-05
+2wikimultihopqa,302,1,1,"John III, Duke of Cleves",35,"Margaret of Bavaria, Electress Palatine",0.333333,0.673367,0.333333
+2wikimultihopqa,303,1,3,William A. Wellman,21,Phillips Smalley,0.227984,0.592965,0.227984
+2wikimultihopqa,305,1,1,Merle Bettenhausen,10,Charles Arthur Tabberer,0.039499,0.547739,0.039499
+2wikimultihopqa,306,1,1,Peter Greenaway,72,Place of birth,0.031753,0.859296,0.031753
+2wikimultihopqa,309,1,1,Archduchess Maria Carolina of Austria (1740–1741),16,Princess Maria Immaculata of Bourbon-Two Sicilies (1844–1899),0.5,0.577889,0.5
+2wikimultihopqa,310,1,2,The Pleasure,7,One and Five,0.001285,0.527638,0.001285
+2wikimultihopqa,312,1,2,The Courier of Lyon,10,Gérard Oury,0.25,0.542714,0.25
+2wikimultihopqa,313,1,1,Seymour Friedman,21,Monta Bell,0.25,0.603015,0.25
+2wikimultihopqa,313,2,3,A Doctor's Diary,63,Charles Vidor,0.202076,0.80402,0.202076
+2wikimultihopqa,315,1,2,Gauthier Destenay,81,Place of birth,0.151026,0.899497,0.151026
+2wikimultihopqa,321,1,1,Roy Rowland (film director),7,Howard W. Koch,0.5,0.532663,0.5
+2wikimultihopqa,322,1,3,One Sunday Afternoon,38,Raoul Walsh,0.205704,0.678392,0.205704
+2wikimultihopqa,324,1,1,Martin Frič,21,Philip Saville,0.25,0.603015,0.25
+2wikimultihopqa,324,2,3,Helmut Käutner,41,Michael Curtiz,0.245549,0.693467,0.245549
+2wikimultihopqa,327,1,1,Greg A. Hill (artist),62,John Scott-Oldfield,0.00687,0.809045,0.00687
+2wikimultihopqa,329,1,1,Chris Brown,10,Never Have to Be Alone,0.028886,0.547739,0.028886
+2wikimultihopqa,330,1,1,Rhosgoch,62,Tree Without Leaves,0.054095,0.809045,0.054095
+2wikimultihopqa,331,1,1,"Walter Montagu Douglas Scott, 8th Duke of Buccleuch",5,"Yolande of Dreux, Duchess of Burgundy",0.333333,0.522613,0.333333
+2wikimultihopqa,331,2,2,"Mary of Burgundy, Duchess of Cleves",65,Wilhelm I of Limburg,0.333333,0.819095,0.333333
+2wikimultihopqa,332,1,2,The Private Life of Cinema,10,A House of Sand,0.006823,0.542714,0.006823
+2wikimultihopqa,333,1,1,Ramiro Sánchez,6,El Cid,0.5,0.527638,0.5
+2wikimultihopqa,345,1,1,Victor Janson,17,Konjiki no Gash Bell!! Movie 2: Attack of the Mecha-Vulcan,0.017504,0.582915,0.017504
+2wikimultihopqa,347,1,2,William Keighley,35,Eduard von Borsody,0.25,0.668342,0.25
+2wikimultihopqa,350,1,1,Peter Ustinov,12,Alberto Lattuada,0.5,0.557789,0.5
+2wikimultihopqa,356,1,3,Eddie Romero,46,Wilfred Lucas,0.25,0.718593,0.25
+2wikimultihopqa,358,1,1,Philip Saville,37,Ray Taylor (director),0.25,0.683417,0.25
+2wikimultihopqa,358,2,3,Clarence Brown,21,Joseph Henabery,0.208951,0.592965,0.208951
+2wikimultihopqa,361,1,3,Monta Bell,89,Clarence Brown,0.000384,0.934673,0.000384
+2wikimultihopqa,362,1,2,Infanta María de la Paz of Spain,8,Princess Maria Antonia of Parma,0.000225,0.532663,0.000225
+2wikimultihopqa,363,1,2,Pepo (film),52,Luis Manuel Díaz,0.011594,0.753769,0.011594
+2wikimultihopqa,364,1,2,Princess Charlotte of Württemberg,12,Archduchess Elisabeth Amalie of Austria,0.333333,0.552764,0.333333
+2wikimultihopqa,367,1,1,Adolf of Limburg,11,Dietrich III of Limburg-Styrum,0.333333,0.552764,0.333333
+2wikimultihopqa,373,1,3,Dr. Goldfoot and the Bikini Machine,76,Norman Taurog,0.227217,0.869347,0.227217
+2wikimultihopqa,374,1,1,Fridrikh Ermler,6,Rumbi Katedza,0.5,0.527638,0.5
+2wikimultihopqa,375,1,1,Louis Matheson,16,The Bees,0.013778,0.577889,0.013778
+2wikimultihopqa,376,1,1,K. Raghavendra Rao,65,Hieronymus Payer,0.000156,0.824121,0.000156
+2wikimultihopqa,378,1,1,Danny Barker,53,Archduchess Maria Theresa of Austria (1762–1770),0.018441,0.763819,0.018441
+2wikimultihopqa,379,1,3,Henry Hathaway,27,Gordon Douglas (director),0.23556,0.623116,0.23556
+2wikimultihopqa,382,1,2,Pat Boone,92,Little Fire,0.009039,0.954774,0.009039
+2wikimultihopqa,383,1,2,Kim Rossi Stuart,6,John Ross,0.006298,0.522613,0.006298
+2wikimultihopqa,385,1,2,"Rotrou IV, Count of Perche",22,"Hugh de Lacy, Lord of Meath",0.5,0.603015,0.5
+2wikimultihopqa,386,1,2,Johann Sebastian Bach,17,Lars Eliasson,0.333333,0.577889,0.333333
+2wikimultihopqa,389,1,3,Knockout Kid,6,Jai Al-Attas,0.25,0.517588,0.25
+2wikimultihopqa,392,1,3,Raoul Walsh,21,John G. Adolfi,0.193429,0.592965,0.193429
+2wikimultihopqa,393,1,3,Tree Without Leaves,17,Sepideh Farsi,0.25,0.572864,0.25
+2wikimultihopqa,394,1,1,Maigret and the Man on the Boulevard,54,José Luis Garci,0.000879,0.768844,0.000879
+2wikimultihopqa,395,1,2,The Gentle Sex,6,Zulu Love Letter,0.021121,0.522613,0.021121
+2wikimultihopqa,401,1,1,Archibald Hamilton Rowan,7,Paul Hamilton (politician),0.5,0.532663,0.5
+2wikimultihopqa,403,1,2,By the Grace of God (disambiguation),18,Tree Without Leaves,0.052509,0.582915,0.052509
+2wikimultihopqa,404,1,1,King Charles the Martyr,7,"Sir Thomas Southwell, 1st Baronet",0.003967,0.532663,0.003967
+2wikimultihopqa,406,1,1,Halit Refiğ,8,Ertem Eğilmez,0.25,0.537688,0.25
+2wikimultihopqa,407,1,1,"Elizabeth Somerset, Baroness Herbert",10,Lord Edmund Howard,0.000212,0.547739,0.000212
+2wikimultihopqa,408,1,1,It's Never Been Like That,39,"Blood, Sweat & Tears (Blood, Sweat & Tears album)",0.000552,0.693467,0.000552
+2wikimultihopqa,410,1,1,Fabio De Luigi,9,Kim Rossi Stuart,0.0027,0.542714,0.0027
+2wikimultihopqa,411,1,3,Fritz Lang,23,Mauro Bolognini,0.25,0.603015,0.25
+2wikimultihopqa,412,1,3,Eyes of Texas (film),21,Charles Giblyn,0.214061,0.592965,0.214061
+2wikimultihopqa,413,1,1,Bayin Htwe,83,Michael Mavroudis,0.013631,0.914573,0.013631
+2wikimultihopqa,416,1,1,"Henry, Prince of Nassau-Dillenburg",6,Countess Anna of Nassau,0.5,0.527638,0.5
+2wikimultihopqa,418,1,2,"Henry Somerset, 2nd Earl of Worcester",5,Lars Eliasson,0.333333,0.517588,0.333333
+2wikimultihopqa,419,1,2,Behind the Rainbow,18,I Am... Gabriel,0.005373,0.582915,0.005373
+2wikimultihopqa,420,1,3,K. Raghavendra Rao,13,Adurthi Subba Rao,0.236058,0.552764,0.236058
+2wikimultihopqa,423,1,3,Jean-Paul Salomé,21,Steno (director),0.25,0.592965,0.25
+2wikimultihopqa,424,1,2,Sunnyside Christian High School,99,Place of birth,0.012281,0.98995,0.012281
+2wikimultihopqa,427,1,3,Harry Beaumont,6,Bertrand Tavernier,0.000152,0.517588,0.000152
+2wikimultihopqa,428,1,1,Bert Jansch,99,Little Fire,0.035437,0.994975,0.035437
+2wikimultihopqa,429,1,1,Mario Bonnard,5,Jules White,0.25,0.522613,0.25
+2wikimultihopqa,429,2,3,My Three Merry Widows,27,Julio Saraceni,0.240739,0.623116,0.240739
+2wikimultihopqa,430,1,1,Lady Rose McLaren,37,Place of birth,0.028769,0.683417,0.028769
+2wikimultihopqa,432,1,2,"Eleanor Beauchamp, Duchess of Somerset",29,Khalid Abdel Nasser,0.001106,0.638191,0.001106
+2wikimultihopqa,434,1,2,Goldilocks and the Three Bears (Faerie Tale Theatre),69,Frankenstein Conquers the World,0.004241,0.839196,0.004241
+2wikimultihopqa,435,1,1,Robert Emmett Tansey,5,George Sherman,0.25,0.522613,0.25
+2wikimultihopqa,435,2,3,Curry and Pepper,21,Sergio Martino,0.184307,0.592965,0.184307
+2wikimultihopqa,436,1,1,Doug Liman,13,Michael Lehmann,0.25,0.562814,0.25
+2wikimultihopqa,437,1,3,Arthur Hiller,21,Charles J. Hunt,0.25,0.592965,0.25
+2wikimultihopqa,439,1,2,M. Nurul Islam,14,Aleksandar Loma,0.012219,0.562814,0.012219
+2wikimultihopqa,446,1,2,Grand Duchess Maria Vladimirovna of Russia,17,Archduchess Elisabeth Amalie of Austria,0.333333,0.577889,0.333333
+2wikimultihopqa,450,1,2,"Georg, Duke of Hohenberg",67,"Maximilian II Emanuel, Elector of Bavaria",0.333333,0.829146,0.333333
+2wikimultihopqa,451,1,2,Pattom A. Thanu Pillai,9,B. Joseph Pine II,0.056822,0.537688,0.056822
+2wikimultihopqa,454,1,1,Fort Nelson Airport,14,Shkodër Airfield,0.041605,0.567839,0.041605
+2wikimultihopqa,455,1,2,"Elizabeth Howard, Countess of Effingham",5,Hannah Arnold,0.333333,0.517588,0.333333
+2wikimultihopqa,456,1,2,"Charles, Count of Valois",9,Charlemagne,0.333333,0.537688,0.333333
+2wikimultihopqa,458,1,3,Puttanna Kanagal,60,G. Aravindan,0.25,0.788945,0.25
+2wikimultihopqa,459,1,1,Waspman,17,Alfons Zitterbacke,0.005145,0.582915,0.005145
+2wikimultihopqa,460,1,1,Iván Noel,6,Amedeo Escobar,0.5,0.527638,0.5
+2wikimultihopqa,463,1,1,Place of origin,21,Place of birth,0.027097,0.603015,0.027097
+2wikimultihopqa,464,1,1,Ken Burns,22,Jean-Pierre-Xavier Bidauld,0.001268,0.60804,0.001268
+2wikimultihopqa,465,1,2,Sirivantha,13,A House of Sand,0.018105,0.557789,0.018105
+2wikimultihopqa,466,1,2,Marie Jeanne Baptiste of Savoy-Nemours,71,Gytha Thorkelsdóttir,0.333333,0.849246,0.333333
+2wikimultihopqa,468,1,2,Roman Polanski,18,Christopher Robinson,0.019193,0.582915,0.019193
+2wikimultihopqa,469,1,3,The Naked Truth (1914 film),8,Helmut Weiss,0.25,0.527638,0.25
+2wikimultihopqa,470,1,1,"Maria Teresa, Grand Duchess of Luxembourg",6,Tamatoa V,0.5,0.527638,0.5
+2wikimultihopqa,473,1,3,Blake Edwards,5,Steno (director),0.25,0.512563,0.25
+2wikimultihopqa,477,1,1,"Charles, Count of Valois",71,"Richeza of Poland, Queen of Hungary",0.003678,0.854271,0.003678
+2wikimultihopqa,478,1,3,Strangers of the Evening,31,Fred Niblo,0.237938,0.643216,0.237938
+2wikimultihopqa,479,1,3,Jean Negulesco,8,Po-Chih Leong,0.25,0.527638,0.25
+2wikimultihopqa,480,1,2,Kekuʻiapoiwa II,42,"Emich, 5th Prince of Leiningen",0.009128,0.703518,0.009128
+2wikimultihopqa,485,1,1,The Picture of Dorian Gray (1945 film),21,William Duncan (actor),0.188031,0.603015,0.188031
+2wikimultihopqa,487,1,1,Get Carter,7,A House of Sand,0.023377,0.532663,0.023377
+2wikimultihopqa,488,1,1,George Mattos,9,Doug Wendt,0.007922,0.542714,0.007922
+2wikimultihopqa,489,1,1,Wrong Turn 5: Bloodlines,14,A Night at the Movies,0.134911,0.567839,0.134911
+2wikimultihopqa,496,1,2,Los Últimos Cristeros,13,Claire's Knee,0.005563,0.557789,0.005563
+2wikimultihopqa,498,1,1,Chuck Berry,21,Carl Schultz,0.5,0.603015,0.5
+2wikimultihopqa,499,1,3,The Naked Truth (1914 film),21,Gregory La Cava,0.214244,0.592965,0.214244
+2wikimultihopqa,502,1,3,Zero Tolerance (2015 film),21,Harmon Jones,0.25,0.592965,0.25
+2wikimultihopqa,505,1,3,Lewis Milestone,21,Tim Burstall,0.171501,0.592965,0.171501
+2wikimultihopqa,506,1,2,Man without a Passport,8,Tree Without Leaves,0.022108,0.532663,0.022108
+2wikimultihopqa,508,1,3,Safe (2012 film),6,Boaz Yakin,0.25,0.517588,0.25
+2wikimultihopqa,509,1,3,Wisit Sasanatieng,21,Sidney Olcott,0.25,0.592965,0.25
+2wikimultihopqa,512,1,2,John Murray (Irish broadcaster),6,Kim Rossi Stuart,0.007136,0.522613,0.007136
+2wikimultihopqa,513,1,1,Kamal El Sheikh,8,Zhao Liang (director),0.25,0.537688,0.25
+2wikimultihopqa,513,2,3,Toto and the King of Rome,24,Fernando Cerchio,0.228413,0.60804,0.228413
+2wikimultihopqa,514,1,3,Thomas Jahn,7,Srijit Mukherji,0.18568,0.522613,0.18568
+2wikimultihopqa,517,1,2,Puka Puka (Lima),5,Inka P'iqi,0.333333,0.517588,0.333333
+2wikimultihopqa,520,1,3,Bulldog Drummond Escapes,24,Victor Saville,0.25,0.60804,0.25
+2wikimultihopqa,523,1,1,"Charles I, Count of Ligny",8,"Louis of Luxembourg, Count of Saint-Pol",0.5,0.537688,0.5
+2wikimultihopqa,529,1,3,André Cayatte,21,Oskar Roehler,0.25,0.592965,0.25
+2wikimultihopqa,530,1,1,Pasquale Festa Campanile,17,TK McKamy,0.25,0.582915,0.25
+2wikimultihopqa,530,2,3,The Capture of Bigfoot,6,Herschell Gordon Lewis,0.21865,0.517588,0.21865
+2wikimultihopqa,531,1,1,All Over Me (Chocolate Starfish song),87,One More Time,0.001796,0.934673,0.001796
+2wikimultihopqa,534,1,3,Peter Glenville,5,Ken Annakin,0.25,0.512563,0.25
+2wikimultihopqa,536,1,2,Tombstone Rashomon,14,Abdul-Vahed Niyazov,0.015148,0.562814,0.015148
+2wikimultihopqa,538,1,1,Mario Bonnard,8,Bryan Forbes,0.25,0.537688,0.25
+2wikimultihopqa,538,2,3,Michael Powell,14,Konrad Wolf,0.25,0.557789,0.25
+2wikimultihopqa,541,1,2,How Sweet It Is (2013 film),43,Jerry Paris,0.25,0.708543,0.25
+2wikimultihopqa,542,1,1,Lawson Harris,37,Ken G. Hall,0.249931,0.683417,0.249931
+2wikimultihopqa,542,2,3,A Maori Maid's Love,20,Joe Swanberg,0.208626,0.58794,0.208626
+2wikimultihopqa,544,1,1,Alex de Renzy,11,Laurent Tirard,0.25,0.552764,0.25
+2wikimultihopqa,545,1,3,Norman Taurog,20,José Luis Garci,0.243644,0.58794,0.243644
+2wikimultihopqa,547,1,2,Félix de Chazournes,28,"Philippe II, Duke of Orléans",0.002683,0.633166,0.002683
+2wikimultihopqa,552,1,3,Doris Wishman,21,Gene Fowler Jr.,0.25,0.592965,0.25
+2wikimultihopqa,555,1,2,Christine of Mecklenburg-Güstrow,16,Maria Thins,0.018417,0.572864,0.018417
+2wikimultihopqa,556,1,1,Chuck Berry,12,John Anderson (musician),0.5,0.557789,0.5
+2wikimultihopqa,560,1,1,Nakkhatra Mangala,93,Place of birth,0.033594,0.964824,0.033594
+2wikimultihopqa,563,1,3,Chantal Akerman,22,Paul Martin (director),0.204639,0.59799,0.204639
+2wikimultihopqa,564,1,3,Laughing at Life,51,Wallace Fox,0.243677,0.743719,0.243677
+2wikimultihopqa,566,1,3,K. Raghavendra Rao,20,Ajay Devgn,0.166304,0.58794,0.166304
+2wikimultihopqa,567,1,1,Robert Vere Buxton,5,Henry Caldwell Cook,0.056917,0.522613,0.056917
+2wikimultihopqa,568,1,2,"Reginald III, Duke of Guelders",5,"Gerard III, Count of Guelders",0.333333,0.517588,0.333333
+2wikimultihopqa,570,1,2,Carl von Wendt,12,Lars Eliasson,0.008011,0.552764,0.008011
+2wikimultihopqa,573,1,3,The Toast of New Orleans,27,Fred Niblo,0.25,0.623116,0.25
+2wikimultihopqa,575,1,2,Princess Feodora of Saxe-Meiningen,12,Prince Harald of Denmark,0.5,0.552764,0.5
+2wikimultihopqa,578,1,1,Vlatko Vuković,6,Yasuichi Oshima,1.3e-05,0.527638,1.3e-05
+2wikimultihopqa,579,1,1,Place of origin,34,Sarah Connor (singer),0.5,0.668342,0.5
+2wikimultihopqa,580,1,1,Sobotište,20,Abdul-Vahed Niyazov,0.155415,0.59799,0.155415
+2wikimultihopqa,581,1,1,Henry King (director),6,Edward L. Cahn,0.000435,0.527638,0.000435
+2wikimultihopqa,582,1,1,Pupi Avati,6,The Hiding Place,0.086878,0.527638,0.086878
+2wikimultihopqa,583,1,2,Universidad Autónoma de Guadalajara,12,LeRoy D. Brown,9e-06,0.552764,9e-06
+2wikimultihopqa,584,1,3,Trifling Women,14,Gordon Douglas (director),0.25,0.557789,0.25
+2wikimultihopqa,585,1,1,Richard Quine,12,John Cromwell (director),0.25,0.557789,0.25
+2wikimultihopqa,585,2,3,Rhythm in the Clouds,68,Bruce M. Mitchell,0.240661,0.829146,0.240661
+2wikimultihopqa,586,1,1,"Sir William Brereton, 1st Baronet",9,"Sir Thomas Beaumont, 1st Baronet",0.007205,0.542714,0.007205
+2wikimultihopqa,590,1,3,Devil in the Flesh (1986 film),21,Norman Taurog,0.216662,0.592965,0.216662
+2wikimultihopqa,591,1,2,Blanche of Brittany,10,Hubba bint Hulail,0.333333,0.542714,0.333333
+2wikimultihopqa,592,1,3,William Keighley,9,Ray Taylor (director),0.25,0.532663,0.25
+2wikimultihopqa,594,1,2,Adolph II of the Marck,34,"Margaret of Cleves, Duchess of Bavaria-Munich",0.333333,0.663317,0.333333
+2wikimultihopqa,595,1,2,Balthasar of Żagań,15,Marek Sobieski,0.003393,0.567839,0.003393
+2wikimultihopqa,597,1,1,"Frederick William, Prince of Solms-Braunfels",13,"Karl, Prince of Leiningen",0.050344,0.562814,0.050344
+2wikimultihopqa,600,1,1,The Lone Ranger (1956 film),11,The Four Minute Mile,0.047608,0.552764,0.047608
+2wikimultihopqa,601,1,1,João César Monteiro,15,Kim Rossi Stuart,0.00252,0.572864,0.00252
+2wikimultihopqa,602,1,1,Place of origin,40,Brigitte Horney,0.5,0.698492,0.5
+2wikimultihopqa,604,1,1,Roland West,17,Rex Ingram (director),0.25,0.582915,0.25
+2wikimultihopqa,606,1,2,The Almighty Dollar (1916 film),53,De Voortrekkers,0.000773,0.758794,0.000773
+2wikimultihopqa,607,1,1,Henry I of Cyprus,8,Balian of Ibelin,0.5,0.537688,0.5
+2wikimultihopqa,608,1,2,John Yule Mackay,14,John Ross,0.010362,0.562814,0.010362
+2wikimultihopqa,611,1,3,Tough to Handle,21,Umberto Lenzi,0.183128,0.592965,0.183128
+2wikimultihopqa,613,1,1,Monster a Go-Go,16,List of Uruguayan films,0.062686,0.577889,0.062686
+2wikimultihopqa,616,1,3,The Devil in Miss Jones,14,Sam Wood,0.236678,0.557789,0.236678
+2wikimultihopqa,618,1,3,McDull: Me & My Mum,18,Rod Hardy,0.25,0.577889,0.25
+2wikimultihopqa,624,1,1,Michael Powell,11,Wallace Fox,0.25,0.552764,0.25
+2wikimultihopqa,624,2,3,Clarence Brown,24,Richard Eichberg,0.245554,0.60804,0.245554
+2wikimultihopqa,625,1,3,Norman Taurog,10,Konrad Wolf,0.25,0.537688,0.25
+2wikimultihopqa,626,1,1,Fernando Cortés,64,Hélène Grenier,0.010503,0.819095,0.010503
+2wikimultihopqa,627,1,1,Ingmar Bergman,22,Sergio Gobbi,0.5,0.60804,0.5
+2wikimultihopqa,629,1,1,Ramiro II of Aragon,27,"Sancho Ramírez, Count of Ribagorza",0.342758,0.633166,0.342758
+2wikimultihopqa,629,2,2,Ebles I of Roucy,24,Sancho Ramírez,0.104553,0.613065,0.104553
+2wikimultihopqa,630,1,3,Angna Enters,17,Roy Rowland (film director),0.204973,0.572864,0.204973
+2wikimultihopqa,633,1,3,Women Who Dare,16,Lewis Milestone,0.242607,0.567839,0.242607
+2wikimultihopqa,634,1,1,Alicia Keys,14,Corey Snide,0.002203,0.567839,0.002203
+2wikimultihopqa,636,1,1,James Goldstone,23,Place of birth,0.037594,0.613065,0.037594
+2wikimultihopqa,638,1,2,Kaya Alp,16,Anacyndaraxes,0.333333,0.572864,0.333333
+2wikimultihopqa,639,1,3,William A. Wellman,18,R. G. Springsteen,0.25,0.577889,0.25
+2wikimultihopqa,642,1,1,Roger Miller,36,1992 Copa Libertadores,0.039595,0.678392,0.039595
+2wikimultihopqa,644,1,1,Andy Summers,12,Sea of Love,0.001556,0.557789,0.001556
+2wikimultihopqa,648,1,1,Charles Frank,16,Claude Weisz,0.5,0.577889,0.5
+2wikimultihopqa,653,1,1,Get Carter,21,Francis J. Grandon,0.25,0.603015,0.25
+2wikimultihopqa,653,2,3,Victor Sjöström,45,Tony Williams (drummer),0.25,0.713568,0.25
+2wikimultihopqa,655,1,2,Alison Gold,11,TK McKamy,0.000263,0.547739,0.000263
+2wikimultihopqa,657,1,3,Reaching for the Moon (1930 film),6,Rex Ingram (director),0.22253,0.517588,0.22253
+2wikimultihopqa,658,1,3,Vinod Vijayan,82,G. Marthandan,0.25,0.899497,0.25
+2wikimultihopqa,662,1,1,Ramiro II of Aragon,7,Ermesinda of Bigorre,0.333333,0.532663,0.333333
+2wikimultihopqa,665,1,2,Alexina Duchamp,15,Abdul-Vahed Niyazov,0.077549,0.567839,0.077549
+2wikimultihopqa,667,1,2,Léonie Gilmour,7,Allan Gilmour,0.28069,0.527638,0.28069
+2wikimultihopqa,667,2,3,Karl Gilg,6,Allan Gilmour Sr.,0.041724,0.517588,0.041724
+2wikimultihopqa,669,1,3,Dino Risi,26,Max Neufeld,0.199672,0.61809,0.199672
+2wikimultihopqa,675,1,2,'Adud al-Dawla,6,Rukn al-Dawla,0.333333,0.522613,0.333333
+2wikimultihopqa,675,2,3,Ziyar ibn Shahrakuya,18,Kaya Alp,0.333333,0.577889,0.333333
+2wikimultihopqa,676,1,3,Peter Glenville,11,George Sherman,0.25,0.542714,0.25
+2wikimultihopqa,677,1,4,Prince Feodor Alexandrovich of Russia,20,Beaulieu-sur-Loire,0.040326,0.582915,0.040326
+2wikimultihopqa,677,2,1,Aleksandr Bibikov,7,Lars Eliasson,0.000863,0.532663,0.000863
+2wikimultihopqa,678,1,3,André Cayatte,21,Pedro Lazaga,0.180722,0.592965,0.180722
+2wikimultihopqa,681,1,2,Michaela von Habsburg,10,Peter Gravesen,0.024421,0.542714,0.024421
+2wikimultihopqa,684,1,1,"Simon de Montfort, 5th Earl of Leicester",5,Alix de Montmorency,0.5,0.522613,0.5
+2wikimultihopqa,686,1,1,"Apeejay School, Mahavir Marg",19,Saint John's,0.016409,0.592965,0.016409
+2wikimultihopqa,687,1,3,Jazz Boat,13,Jules White,0.247247,0.552764,0.247247
+2wikimultihopqa,688,1,1,John Krish,12,John Cromwell (director),0.25,0.557789,0.25
+2wikimultihopqa,688,2,3,Nagesh Kukunoor,31,Santosh Sivan,0.25,0.643216,0.25
+2wikimultihopqa,689,1,3,Gurinder Chadha,21,Christian E. Christiansen,0.210468,0.592965,0.210468
+2wikimultihopqa,692,1,2,Pledge of Allegiance (South Korea),12,Motherland (disambiguation),0.011286,0.552764,0.011286
+2wikimultihopqa,694,1,2,Jim Wynorski,77,The Picture of Dorian Gray (1915 film),0.000395,0.879397,0.000395
+2wikimultihopqa,695,1,1,Ildikó Enyedi,19,Rakka (film),0.002345,0.592965,0.002345
+2wikimultihopqa,696,1,1,Janis Joplin,10,Where Are You,0.002961,0.547739,0.002961
+2wikimultihopqa,698,1,3,Bertrand Tavernier,26,Irving Brecher,0.25,0.61809,0.25
+2wikimultihopqa,699,1,2,Jan IV of Oświęcim,62,"Christian August, Prince of Anhalt-Zerbst",0.333333,0.80402,0.333333
+2wikimultihopqa,702,1,2,"George Mackenzie, 1st Earl of Cromartie",11,Peter W. May,0.004198,0.547739,0.004198
+2wikimultihopqa,703,1,2,Lubnowy,16,New Hope,0.016856,0.572864,0.016856
+2wikimultihopqa,704,1,2,Return to Nuke 'Em High Volume 1,5,Hassan Zee,0.25,0.517588,0.25
+2wikimultihopqa,705,1,1,Ventura Pons,14,Mariano Laurenti,0.244326,0.567839,0.244326
+2wikimultihopqa,705,2,3,Raffaello Matarazzo,23,Bigas Luna,0.232979,0.603015,0.232979
+2wikimultihopqa,707,1,3,Les Misérables (1925 film),21,Jason Michael Brescia,0.180818,0.592965,0.180818
+2wikimultihopqa,708,1,1,Robert G. Vignola,15,Jytte Rex,0.25,0.572864,0.25
+2wikimultihopqa,708,2,3,Lina Wertmüller,22,Rob Margolies,0.226063,0.59799,0.226063
+2wikimultihopqa,709,1,2,The Man on the Balcony (film),13,Romance Out of the Blue,0.001779,0.557789,0.001779
+2wikimultihopqa,710,1,1,"Mervyn Tuchet, 2nd Earl of Castlehaven",10,Lars Eliasson,0.36979,0.547739,0.36979
+2wikimultihopqa,712,1,3,Lesley Selander,21,Sam Newfield,0.25,0.592965,0.25
+2wikimultihopqa,714,1,2,Sirivantha,13,Qissa (film),0.005285,0.557789,0.005285
+2wikimultihopqa,715,1,3,Tough to Kill,21,D. Ross Lederman,0.158276,0.592965,0.158276
+2wikimultihopqa,716,1,3,Blake Edwards,9,Gordon Douglas (director),0.25,0.532663,0.25
+2wikimultihopqa,717,1,1,Janis Joplin,12,Steve Miller,0.017347,0.557789,0.017347
+2wikimultihopqa,723,1,1,Chris Hughes (musician),9,Charles Arthur Tabberer,0.034865,0.542714,0.034865
+2wikimultihopqa,724,1,3,Bertrand Tavernier,21,François Leterrier,0.25,0.592965,0.25
+2wikimultihopqa,726,1,3,Bertrand Tavernier,45,H. C. Potter,0.25,0.713568,0.25
+2wikimultihopqa,728,1,1,Conaing Bececlach,10,Lugaid Íardonn,0.333333,0.547739,0.333333
+2wikimultihopqa,728,2,2,Eochu Fíadmuine,18,Obata Toramori,0.333333,0.582915,0.333333
+2wikimultihopqa,732,1,1,Charles Vidor,9,Henry Hathaway,0.25,0.542714,0.25
+2wikimultihopqa,732,2,3,The Crime Doctor's Diary,13,Édouard Molinaro,0.25,0.552764,0.25
+2wikimultihopqa,733,1,2,George Sherman,16,Konrad Wolf,0.001571,0.572864,0.001571
+2wikimultihopqa,735,1,3,Werner Herzog,18,Peter Greenaway,0.22347,0.577889,0.22347
+2wikimultihopqa,736,1,1,Susie van der Meer,15,The Hero,0.006666,0.572864,0.006666
+2wikimultihopqa,737,1,1,"John I, Duke of Cleves",47,Lorenzo Sabbatini,0.052985,0.733668,0.052985
+2wikimultihopqa,739,1,2,Silvi Jan,13,Peter Gravesen,0.011455,0.557789,0.011455
+2wikimultihopqa,742,1,1,Maurice de Canonge,9,Arne Toonen,0.25,0.542714,0.25
+2wikimultihopqa,742,2,3,Georges Méliès,14,Claude Weisz,0.25,0.557789,0.25
+2wikimultihopqa,743,1,1,"Ernst I, Prince of Hohenlohe-Langenburg",11,"Prince Jacques, Duke of Orléans",0.333333,0.552764,0.333333
+2wikimultihopqa,743,2,2,"Charles II, Duke of Parma",98,John Templeton (botanist),0.333333,0.984925,0.333333
+2wikimultihopqa,744,1,1,Paul Hamilton (politician),10,Bertrand Tavernier,0.007412,0.547739,0.007412
+2wikimultihopqa,746,1,3,Future Force (film),5,David A. Prior,0.219671,0.512563,0.219671
+2wikimultihopqa,750,1,1,Domitilla the Elder,13,Titus Flavius Clemens (consul),0.430785,0.562814,0.430785
+2wikimultihopqa,753,1,2,Scott Burns (record producer),8,Edward Francis Burney,0.001756,0.532663,0.001756
+2wikimultihopqa,755,1,1,D. Ross Lederman,56,Myn M. Hoffman,0.25,0.778894,0.25
+2wikimultihopqa,755,2,3,The Face in the Fog,21,Alan Crosland,0.187512,0.592965,0.187512
+2wikimultihopqa,756,1,3,Vaibhavi Merchant,8,Subhash Ghai,0.25,0.527638,0.25
+2wikimultihopqa,757,1,3,Roland Joffé,63,Michael Curtiz,0.25,0.80402,0.25
+2wikimultihopqa,759,1,1,Bryan Man,12,Obata Toramori,0.022118,0.557789,0.022118
+2wikimultihopqa,761,1,1,Keeper of the Bees (1947 film),8,Behind the Rainbow,0.027928,0.537688,0.027928
+2wikimultihopqa,763,1,1,Ralph L. Thomas,20,"Prince Charles Louis, Duke of Chartres",0.008407,0.59799,0.008407
+2wikimultihopqa,764,1,1,Leo D. Maloney,20,Belle (album),0.006895,0.59799,0.006895
+2wikimultihopqa,766,1,1,Henry I of Ziębice,23,"Christian August, Prince of Anhalt-Zerbst",0.333333,0.613065,0.333333
+2wikimultihopqa,770,1,1,Bermudo Núñez,21,"Eleanor of Castile, Queen of Navarre",0.666667,0.603015,0.666667
+2wikimultihopqa,774,1,3,Charles Vidor,18,Konrad Wolf,0.25,0.577889,0.25
+2wikimultihopqa,775,1,1,Clara Tabody,15,Fred Raymond,0.5,0.572864,0.5
+2wikimultihopqa,777,1,3,Ken Annakin,21,Phillip J. Roth,0.207449,0.592965,0.207449
+2wikimultihopqa,778,1,2,Neil Hennessy,9,Peter Gravesen,0.078387,0.537688,0.078387
+2wikimultihopqa,779,1,1,Eric XIV of Sweden,17,Chris Kraus (director),0.5,0.582915,0.5
+2wikimultihopqa,780,1,1,Charles W. Socarides,7,Charles Arthur Tabberer,0.044726,0.532663,0.044726
+2wikimultihopqa,781,1,3,Borys Lankosz,20,Jesse Hibbs,0.249473,0.58794,0.249473
+2wikimultihopqa,782,1,2,OSS 117: Lost in Rio,18,Daddy or Mommy,0.000606,0.582915,0.000606
+2wikimultihopqa,783,1,3,Johnny on the Spot,21,Harry L. Franklin,0.25,0.592965,0.25
+2wikimultihopqa,786,1,1,Bảo Đại,87,Battle in Outer Space,0.02497,0.934673,0.02497
+2wikimultihopqa,788,1,1,Charles Barton (director),12,Gérard Oury,0.25,0.557789,0.25
+2wikimultihopqa,789,1,2,Massacre Time,17,Time of Your Life,0.061961,0.577889,0.061961
+2wikimultihopqa,792,1,3,Allison Anders,20,Piero Schivazappa,0.25,0.58794,0.25
+2wikimultihopqa,794,1,2,Aditya Chopra,10,Peter Gravesen,0.006431,0.542714,0.006431
+2wikimultihopqa,796,1,1,Chantal Akerman,6,Aki Kaurismäki,0.25,0.527638,0.25
+2wikimultihopqa,797,1,1,Gone Fishin' (song),12,Pat Boone,0.5,0.557789,0.5
+2wikimultihopqa,801,1,3,Werner Herzog,49,Melora Walters,0.189037,0.733668,0.189037
+2wikimultihopqa,803,1,3,Bertrand Tavernier,17,Claude Autant-Lara,0.187593,0.572864,0.187593
+2wikimultihopqa,804,1,3,J. Lee Thompson,21,Ken Hughes,0.221791,0.592965,0.221791
+2wikimultihopqa,805,1,2,ʻElisiva Fusipala Taukiʻonetuku,8,George Mason II,0.333333,0.532663,0.333333
+2wikimultihopqa,807,1,3,Beast of Blood (film),6,Eddie Romero,0.249877,0.517588,0.249877
+2wikimultihopqa,809,1,1,24 Hours in the Life of a Woman (1968 film),14,City of Angels,0.047396,0.567839,0.047396
+2wikimultihopqa,812,1,1,Jay-Z,30,Ruslana,0.5,0.648241,0.5
+2wikimultihopqa,814,1,3,Michael Lehmann,21,Marcos Siega,0.25,0.592965,0.25
+2wikimultihopqa,822,1,3,Juan Verdaguer,21,Mario Soffici,0.239578,0.592965,0.239578
+2wikimultihopqa,825,1,1,Cuckoo Moray,17,Qissa (film),0.003871,0.582915,0.003871
+2wikimultihopqa,829,1,1,Gérard Oury,82,Laurent Tirard,0.247298,0.909548,0.247298
+2wikimultihopqa,830,1,2,Bashar Al-Sayegh,8,Nasser al-Qudwa,0.007277,0.532663,0.007277
+2wikimultihopqa,831,1,3,K. Raghavendra Rao,20,George Archainbaud,0.25,0.58794,0.25
+2wikimultihopqa,833,1,3,Mario Bava,47,Risto Jarva,0.200201,0.723618,0.200201
+2wikimultihopqa,834,1,3,A Tale of Springtime,21,Éric Rohmer,0.192416,0.592965,0.192416
+2wikimultihopqa,835,1,2,Li Rubai,11,Lars Eliasson,0.001293,0.547739,0.001293
+2wikimultihopqa,836,1,3,Jules White,12,Edward L. Cahn,0.25,0.547739,0.25
+2wikimultihopqa,837,1,1,Francis Buxton,91,"William Montagu Douglas Scott, 6th Duke of Buccleuch",0.475973,0.954774,0.475973
+2wikimultihopqa,838,1,2,Son of the Renegade,22,Manuel Romero,0.21159,0.603015,0.21159
+2wikimultihopqa,839,1,1,Robert Vadra,10,Lars Eliasson,0.349642,0.547739,0.349642
+2wikimultihopqa,840,1,2,The Pirate (1984 film),39,Alfons Zitterbacke,0.011412,0.688442,0.011412
+2wikimultihopqa,842,1,1,Hum Dil De Chuke Sanam,8,Jean-Marie Poiré,0.25,0.537688,0.25
+2wikimultihopqa,852,1,2,Reynaldo Aguinaldo,5,Louis-Armand Chardin,0.000255,0.517588,0.000255
+2wikimultihopqa,855,1,2,Jim Robinson (racing driver),6,Lars Eliasson,0.000485,0.522613,0.000485
+2wikimultihopqa,857,1,1,Return to the Hiding Place,9,Reserve,0.001033,0.542714,0.001033
+2wikimultihopqa,858,1,2,Maciste the Policeman,19,The Wonderful World of Captain Kuhio,0.010001,0.58794,0.010001
+2wikimultihopqa,864,1,1,"Prince Edward, Duke of Kent",14,Prince Wilhelm of Prussia (1783–1851),0.5,0.567839,0.5
+2wikimultihopqa,865,1,1,Christine Pascal,5,Peter Greenaway,0.25,0.522613,0.25
+2wikimultihopqa,865,2,3,Tsui Hark,23,Scott Shaw,0.25,0.603015,0.25
+2wikimultihopqa,868,1,2,My Dear Angel,18,Qissa (film),0.004683,0.582915,0.004683
+2wikimultihopqa,869,1,3,Sergio Leone,21,Sidney Poitier,0.18894,0.592965,0.18894
+2wikimultihopqa,871,1,3,Dino Risi,26,Sergio Nasca,0.25,0.61809,0.25
+2wikimultihopqa,876,1,1,Peter Del Monte,11,Duilio Coletti,0.25,0.552764,0.25
+2wikimultihopqa,877,1,1,Enriqueta Pinto,16,Manuel Antonio,0.005344,0.577889,0.005344
+2wikimultihopqa,882,1,3,Philo Vance's Secret Mission,62,Riccardo Freda,0.187298,0.798995,0.187298
+2wikimultihopqa,884,1,1,Gauthier Destenay,75,John Veltri,0.08395,0.874372,0.08395
+2wikimultihopqa,885,1,3,Will You Marry Me? (film),20,Enrique Carreras,0.151041,0.58794,0.151041
+2wikimultihopqa,886,1,1,Olof Palme,89,Alfred Hitchcock,0.000255,0.944724,0.000255
+2wikimultihopqa,887,1,3,Harold Becker,89,Pasquale Festa Campanile,0.25,0.934673,0.25
+2wikimultihopqa,889,1,3,Miloš Forman,21,Frank Launder,0.176947,0.592965,0.176947
+2wikimultihopqa,891,1,4,Michael Powell,19,Tom Clegg (director),0.250022,0.577889,0.250022
+2wikimultihopqa,891,2,3,Peter Glenville,8,(Romance) in the Digital Age,9.5e-05,0.527638,9.5e-05
+2wikimultihopqa,894,1,1,Emperor Taizong of Song,14,Emperor Gaozong of Tang,0.666667,0.567839,0.666667
+2wikimultihopqa,896,1,3,David Gordon Green,21,Josh Stolberg,0.144596,0.592965,0.144596
+2wikimultihopqa,901,1,3,Herschell Gordon Lewis,6,R. G. Springsteen,0.25,0.517588,0.25
+2wikimultihopqa,902,1,3,John Llewellyn Moxey,21,Laurence Trimble,0.146588,0.592965,0.146588
+2wikimultihopqa,903,1,1,Steno (director),17,Claude Weisz,0.25,0.582915,0.25
+2wikimultihopqa,903,2,3,Éric Rohmer,13,The Boss of It All,0.242511,0.552764,0.242511
+2wikimultihopqa,907,1,2,Jauru River (Mato Grosso do Sul),83,Yojimbo,0.026425,0.909548,0.026425
+2wikimultihopqa,908,1,3,The Wife Takes a Flyer,22,Jack Arnold (director),0.181636,0.59799,0.181636
+2wikimultihopqa,909,1,1,Gülbahar Hatun (wife of Mehmed II),38,Justin (historian),0.010119,0.688442,0.010119
+2wikimultihopqa,910,1,3,Anthony Mann,21,Stuart Heisler,0.25,0.592965,0.25
+2wikimultihopqa,911,1,1,...Baby One More Time (album),74,Baby One More Time,0.04998,0.869347,0.04998
+2wikimultihopqa,913,1,2,Ottaviano dei Conti di Segni,42,"Louis I, Count of Nevers",0.007293,0.703518,0.007293
+2wikimultihopqa,919,1,3,Out West with the Peppers,23,John Cromwell (director),0.25,0.603015,0.25
+2wikimultihopqa,920,1,1,Paul Hamilton (politician),12,Emilio Bigi,0.026844,0.557789,0.026844
+2wikimultihopqa,924,1,1,Abd al-Muttalib,12,Obata Toramori,0.357093,0.557789,0.357093
+2wikimultihopqa,926,1,3,Death of Carlo Giuliani,20,Boy or Girl?,0.001046,0.58794,0.001046
+2wikimultihopqa,928,1,1,Behind Locked Doors,13,Lloyd (film),0.010209,0.562814,0.010209
+2wikimultihopqa,929,1,3,Lesley Selander,23,Sam Newfield,0.180497,0.603015,0.180497
+2wikimultihopqa,933,1,1,Nuit de chien,6,Conan the Conqueror (disambiguation),0.012538,0.527638,0.012538
+2wikimultihopqa,934,1,3,Desmond Tester,20,Mary Mazzio,0.25,0.58794,0.25
+2wikimultihopqa,935,1,1,Natalie Bible',11,Peter Greenaway,0.25,0.552764,0.25
+2wikimultihopqa,935,2,3,Gurinder Chadha,23,Dorothy Fadiman,0.18342,0.603015,0.18342
+2wikimultihopqa,937,1,1,Otto Kanturek,16,Karan Johar,0.25,0.577889,0.25
+2wikimultihopqa,937,2,3,A Lover's Romance,26,Sunil Dutt,0.218753,0.61809,0.218753
+2wikimultihopqa,938,1,2,Rosa,10,Quattro rose rosse,0.000265,0.542714,0.000265
+2wikimultihopqa,940,1,2,Jean-Charles Corbet,8,Jacques Décombe,0.001992,0.532663,0.001992
+2wikimultihopqa,941,1,1,Marcia Neugebauer,59,Place of birth,0.08268,0.79397,0.08268
+2wikimultihopqa,942,1,3,Frank Lloyd,35,Jules White,0.227724,0.663317,0.227724
+2wikimultihopqa,943,1,1,Ruslana,8,Bruno Bizarro,0.057803,0.537688,0.057803
+2wikimultihopqa,944,1,1,Maha Nawrahta,17,Abdul-Vahed Niyazov,0.088537,0.582915,0.088537
+2wikimultihopqa,945,1,1,Jordan I of Capua,6,George Mason II,0.336497,0.527638,0.336497
+2wikimultihopqa,945,2,2,Gaitelgrima of Salerno,50,Crown Prince of Jordan,0.000394,0.743719,0.000394
+2wikimultihopqa,947,1,3,Heart (1987 film),43,Tom Clegg (director),0.25,0.703518,0.25
+2wikimultihopqa,949,1,2,Bolesław IV of Legnica,6,Bolesław III the Generous,0.5,0.522613,0.5
+2wikimultihopqa,950,1,1,Hirak Rajar Deshe,14,Abdul-Vahed Niyazov,0.168536,0.567839,0.168536
+2wikimultihopqa,951,1,1,"James Tuchet, 3rd Earl of Castlehaven",5,"Henry Tuchet, 10th Baron Audley",0.5,0.522613,0.5
+2wikimultihopqa,952,1,1,Selo sanatoriya Glukhovskogo,10,Abdul-Vahed Niyazov,0.087872,0.547739,0.087872
+2wikimultihopqa,956,1,3,Jim Wynorski,53,Esmail Koushan,0.25,0.753769,0.25
+2wikimultihopqa,957,1,1,Juan Carlos I of Spain,14,Archduke Leopold Salvator of Austria,0.5,0.567839,0.5
+2wikimultihopqa,960,1,1,Grand Duchess Xenia Alexandrovna of Russia,21,Archduke Franz Karl of Austria,0.333333,0.603015,0.333333
+2wikimultihopqa,961,1,3,Alfred Hitchcock,24,Robert Thornby,0.249178,0.60804,0.249178
+2wikimultihopqa,962,1,3,Michael Powell,28,Scott R. Dunlap,0.20037,0.628141,0.20037
+2wikimultihopqa,965,1,1,Fernando Di Leo,16,Enzo G. Castellari,0.243595,0.577889,0.243595
+2wikimultihopqa,966,1,1,Homage at Siesta Time,76,Yojimbo,0.006658,0.879397,0.006658
+2wikimultihopqa,968,1,3,God of War (film),68,Gordon Chan,0.245135,0.829146,0.245135
+2wikimultihopqa,969,1,2,Three Live Ghosts (1929 film),83,Belle (album),0.020136,0.909548,0.020136
+2wikimultihopqa,976,1,1,Eduardo Frei Montalva,56,William Rose Benét,0.004009,0.778894,0.004009
+2wikimultihopqa,979,1,3,Hrishikesh Mukherjee,46,Hans Schweikart,0.231627,0.718593,0.231627
+2wikimultihopqa,981,1,1,Waspman,6,Monta Bell,0.5,0.527638,0.5
+2wikimultihopqa,984,1,1,Badi-al Zaman Mirza Safavi,25,Ismail I,0.5,0.623116,0.5
+2wikimultihopqa,987,1,2,The Silent Stranger,7,Stranger in Town,0.0021,0.527638,0.0021
+2wikimultihopqa,988,1,1,"Charles Somerset, 1st Earl of Worcester",62,Thomas Bramhall,0.013122,0.809045,0.013122
+2wikimultihopqa,989,1,2,Kriminal (film),88,Alfons Zitterbacke,0.010278,0.934673,0.010278
+2wikimultihopqa,992,1,3,Fritz Lang,6,Konrad Wolf,0.25,0.517588,0.25
+2wikimultihopqa,993,1,1,"Matilda II, Countess of Nevers",20,Guy II of Dampierre,0.333333,0.59799,0.333333
+2wikimultihopqa,993,2,3,Agnes of Dampierre,38,"Arnulf III, Count of Boulogne",0.333333,0.678392,0.333333
+2wikimultihopqa,994,1,2,Thomas P. Hughes,8,"Bernhard V, Prince of Anhalt-Bernburg",0.333333,0.532663,0.333333
+2wikimultihopqa,995,1,1,Angélique de Saint-Jean Arnauld d'Andilly,10,Steve Cooreman,0.021354,0.547739,0.021354
+2wikimultihopqa,996,1,1,Sam Cooke,71,Invasion of the Neptune Men,0.013938,0.854271,0.013938
+2wikimultihopqa,997,1,2,Peter Greenaway,24,Roger Richebé,0.25,0.613065,0.25
+hotpotqa,0,1,1,Halina Reijn,21,12 Years a Slave (score),0.001833,0.603015,0.001833
+hotpotqa,5,1,2,Emeric Pressburger,13,Alien (soundtrack),0.000292,0.557789,0.000292
+hotpotqa,6,1,3,The Apple Dumpling Gang Rides Again,6,List of Walt Disney Pictures films,0.004472,0.517588,0.004472
+hotpotqa,18,1,1,Republic Plaza (Singapore),18,Bank of China Tower (Hong Kong),0.5,0.58794,0.5
+hotpotqa,21,1,1,Cinderella (sports),22,Coney Island Cyclone,0.5,0.60804,0.5
+hotpotqa,22,1,2,Highway 40 Blues,54,Aaron Tippin,0.25,0.763819,0.25
+hotpotqa,25,1,2,Julian A. McPhee,7,Chicago Vocational High School,0.333333,0.527638,0.333333
+hotpotqa,36,1,2,Jenson Button,6,Colin Crabbe Racing,0.5,0.522613,0.5
+hotpotqa,44,1,1,Santana Lopez,12,Glee (TV series),0.586028,0.557789,0.586028
+hotpotqa,45,1,2,Aaliyah,39,List of San Antonio Spurs seasons,0.074675,0.688442,0.074675
+hotpotqa,45,2,3,Laura Turner (singer),36,List of San Antonio Spurs head coaches,0.029935,0.668342,0.029935
+hotpotqa,47,1,1,Dorilla in Tempe,5,Jacques Hardel,0.000557,0.522613,0.000557
+hotpotqa,47,2,3,"Mitridate, re di Ponto",6,Felix Mendelssohn,3.7e-05,0.517588,3.7e-05
+hotpotqa,58,1,1,Tim Rice,6,Vangelis,0.5,0.527638,0.5
+hotpotqa,59,1,2,Karan Kapoor,8,Shree 420,0.333333,0.532663,0.333333
+hotpotqa,64,1,1,Maria von Trapp,10,Chicago (2002 film),2.6e-05,0.547739,2.6e-05
+hotpotqa,69,1,2,Aquamarine (film),50,Influence of Stanley Kubrick,0.01503,0.743719,0.01503
+hotpotqa,71,1,1,Leonardo DiCaprio,8,Dana Brunetti,0.5,0.537688,0.5
+hotpotqa,74,1,1,France men's national junior ice hockey team,5,Dean Blais,0.25,0.522613,0.25
+hotpotqa,75,1,2,Tool (band),47,Wire (band),0.000211,0.728643,0.000211
+hotpotqa,78,1,1,George Tomasini,10,Silver (Starflyer 59 album),0.25,0.547739,0.25
+hotpotqa,88,1,1,Restrung,9,Rogers Locomotive and Machine Works,0.333333,0.542714,0.333333
+hotpotqa,88,2,2,The Great Locomotive Chase,92,List of Walt Disney Pictures films,0.333333,0.954774,0.333333
+hotpotqa,89,1,1,Battle of Britain Memorial Flight,45,Bhakti Ballabh Tirtha,0.006686,0.723618,0.006686
+hotpotqa,96,1,1,Yutmaru Sar,5,Distaghil Sar,0.333333,0.522613,0.333333
+hotpotqa,101,1,1,James Foley (director),16,Bruce Brown,0.00057,0.577889,0.00057
+hotpotqa,112,1,2,Nuestra Belleza México 1998,9,Wladimiro Politano,0.00571,0.537688,0.00571
+hotpotqa,115,1,1,History of Northwest Territories capital cities,46,Gold (Donna Summer album),0.488585,0.728643,0.488585
+hotpotqa,121,1,2,My Boy Jack (film),11,Christian Bale filmography,0.001073,0.547739,0.001073
+hotpotqa,122,1,2,"John, King of Denmark",18,Philip V of Spain,0.005745,0.582915,0.005745
+hotpotqa,128,1,2,Nathanael West,5,Lunar Park,0.25,0.517588,0.25
+hotpotqa,129,1,2,Freebooters F.C.,19,Croke Park,0.5,0.58794,0.5
+hotpotqa,133,1,1,West Tyson County Park,6,"Times Beach, Missouri",0.50941,0.527638,0.50941
+hotpotqa,143,1,2,Becker–Edberg rivalry,8,2016 Moselle Open – Doubles,0.333333,0.532663,0.333333
+hotpotqa,145,1,1,Red-baiting,5,List of fictional actors,0.005029,0.522613,0.005029
+hotpotqa,150,1,3,Edward Winslow,6,Plymouth Colony,0.039267,0.517588,0.039267
+hotpotqa,153,1,1,Tom Hanks,5,Christopher Robin,0.333457,0.522613,0.333457
+hotpotqa,160,1,3,Lee on the Beats,19,T.I. discography,0.197337,0.582915,0.197337
+hotpotqa,160,2,1,Plies (rapper),18,6 Tre G,3.7e-05,0.58794,3.7e-05
+hotpotqa,168,1,2,Puddle of Mudd,55,Too Much Stereo,0.007279,0.768844,0.007279
+hotpotqa,169,1,3,Jim Kerr discography,11,Joan Jett,0.002031,0.542714,0.002031
+hotpotqa,174,1,1,Maya Angelou,11,Francis Ford Coppola,0.002275,0.552764,0.002275
+hotpotqa,177,1,1,Turhan Hatice Sultan,7,Suleiman the Magnificent,0.406057,0.532663,0.406057
+hotpotqa,178,1,1,Everard Baths,6,Hotel Pennsylvania,0.5,0.527638,0.5
+hotpotqa,179,1,2,Riblja Čorba,6,Dalton Gang,0.303553,0.522613,0.303553
+hotpotqa,180,1,1,"Norfolk County, Massachusetts Colony",21,"Marlborough, New Hampshire",0.5,0.603015,0.5
+hotpotqa,185,1,1,Snowplow Game,16,2010 Green Bay Packers season,0.5,0.577889,0.5
+hotpotqa,200,1,1,Lemania,13,Swiss made,0.002516,0.562814,0.002516
+hotpotqa,202,1,2,The Rebel (book),30,Nobel Prize in Literature,0.333333,0.643216,0.333333
+hotpotqa,209,1,4,Bodybuilders (On the Inside),96,Australian Associated Press,0.467083,0.964824,0.467083
+hotpotqa,209,2,1,Anabolic steroid,11,Scandinavian Airlines,0.000227,0.552764,0.000227
+hotpotqa,210,1,1,Westgate Las Vegas Resort &amp; Casino,11,The Forbury Hotel,0.001695,0.552764,0.001695
+hotpotqa,213,1,4,"Raymond, Maine",12,Keene High School,0.333311,0.542714,0.333311
+hotpotqa,213,2,1,"Mexico, Maine",53,"Marlborough, New Hampshire",0.275606,0.763819,0.275606
+hotpotqa,217,1,3,Hall &amp; Oates,5,Live from Daryl's House,0.29334,0.512563,0.29334
+hotpotqa,218,1,1,Wayman Tisdale,24,Tom Jernstedt,0.5,0.61809,0.5
+hotpotqa,236,1,1,Stephen Nicholas (actor),18,Blackpool F.C.,0.333333,0.58794,0.333333
+hotpotqa,248,1,1,Secondary education,12,Genndy Tartakovsky,0.333333,0.557789,0.333333
+hotpotqa,260,1,2,Ken May,9,Chief executive officer,0.017353,0.537688,0.017353
+hotpotqa,261,1,2,2004–05 Utah Jazz season,7,Kevin Durant,0.25,0.527638,0.25
+hotpotqa,263,1,2,S. D. Perry,11,Michèle Roberts,0.333333,0.547739,0.333333
+hotpotqa,272,1,3,Berenberg family,15,Albert Heijn,0.000156,0.562814,0.000156
+hotpotqa,277,1,1,The Orb discography,21,3rd Bass,0.5,0.603015,0.5
+hotpotqa,289,1,2,Vickers Viscount,5,Kuznetsov NK-12,0.25,0.517588,0.25
+hotpotqa,298,1,1,Patrick Bateman,5,Colin Blakely,0.333333,0.522613,0.333333
+hotpotqa,301,1,1,Sphagnum,7,Hydrogen-bridged cations,0.346534,0.532663,0.346534
+hotpotqa,303,1,2,Jay Park,12,Manu Manzo,0.005138,0.552764,0.005138
+hotpotqa,306,1,2,2011 Colgate Raiders football team,19,Colgate University,0.5,0.58794,0.5
+hotpotqa,313,1,2,Get Cape. Wear Cape. Fly (EP),15,Outside (magazine),0.104902,0.567839,0.104902
+hotpotqa,316,1,3,Chicago (2002 film),14,Sleepless in Seattle,0.25,0.557789,0.25
+hotpotqa,317,1,1,Anything Goes (soundtrack),6,Hal Linden,0.5,0.527638,0.5
+hotpotqa,318,1,1,Frozen Fever,19,Disney Renaissance,0.003842,0.592965,0.003842
+hotpotqa,335,1,2,Singapore Sling (tax avoidance),8,Cocktail,0.008921,0.532663,0.008921
+hotpotqa,338,1,3,Theodore Roosevelt,5,Theodore Roosevelt Cyclopedia,0.002016,0.512563,0.002016
+hotpotqa,340,1,1,Follow the Yellow Brick Road,25,List of Walt Disney Pictures films,0.010591,0.623116,0.010591
+hotpotqa,342,1,1,Estonian Hound,7,Mir Jafar Dasni,0.333333,0.532663,0.333333
+hotpotqa,347,1,1,Michelle Trachtenberg,5,The Dead Rabbitts,0.5,0.522613,0.5
+hotpotqa,353,1,1,The Legend of the Condor Heroes (2017 TV series),83,Semyon Aranovich,0.333333,0.914573,0.333333
+hotpotqa,354,1,1,Sense and Sensibility (2008 miniseries),24,Karen Joy Fowler,0.333333,0.61809,0.333333
+hotpotqa,371,1,1,Physicians Mutual,10,Valentino SpA,0.260649,0.547739,0.260649
+hotpotqa,374,1,2,Mean Girls,19,The Truth About Love (film),0.00159,0.58794,0.00159
+hotpotqa,382,1,1,"Salem, New Hampshire",14,Burnley,0.001259,0.567839,0.001259
+hotpotqa,397,1,1,Shea Stadium,5,Polo Grounds,0.5,0.522613,0.5
+hotpotqa,400,1,1,Armie Hammer,17,Jarvis Williams (American football),0.000315,0.582915,0.000315
+hotpotqa,405,1,2,International Diamond Cut Conference,48,Theodore Roosevelt,0.012547,0.733668,0.012547
+hotpotqa,414,1,1,Krrish (franchise),11,Rajesh Roshan,0.5,0.552764,0.5
+hotpotqa,416,1,2,John Fogerty (engineer),12,Sergey Dreyden,0.25,0.552764,0.25
+hotpotqa,416,2,3,John Frederick Fogerty,20,Rockin' All Over the World,0.25,0.58794,0.25
+hotpotqa,420,1,2,Viktor Schauberger,7,Henry Meyer,0.001666,0.527638,0.001666
+hotpotqa,423,1,1,Academy Awards pre-show,9,Lanphier Park,0.5,0.542714,0.5
+hotpotqa,431,1,1,Battle of Bataan,8,Ulysses S. Grant,0.5,0.537688,0.5
+hotpotqa,469,1,1,2011 Indy Grand Prix of Sonoma,12,2017 FIA Formula One World Championship,0.006561,0.557789,0.006561
+hotpotqa,470,1,3,Sacred Hunger,64,2014–15 Kitchee SC season,0.025918,0.809045,0.025918
+hotpotqa,473,1,1,Given to the Rising,17,Emo,0.003773,0.582915,0.003773
+hotpotqa,476,1,1,Reed Lessing,60,Riverlake,0.012028,0.798995,0.012028
+hotpotqa,480,1,1,South East Queensland Stars,14,San Antonio Spurs,0.001789,0.567839,0.001789
+hotpotqa,481,1,2,Lil Rounds,26,Our Song (Taylor Swift song),0.333333,0.623116,0.333333
+hotpotqa,482,1,1,Booz Allen Hamilton,11,Dun &amp; Bradstreet,0.00278,0.552764,0.00278
+hotpotqa,487,1,2,Camille (1915 film),26,Crime and Punishment (1935 French film),0.032647,0.623116,0.032647
+hotpotqa,489,1,2,Agatha Christie Memorial,66,Anthony Burgess: A Life,0.000397,0.824121,0.000397
+hotpotqa,499,1,4,Frankie Darro,9,Hercules (1997 film),0.50146,0.527638,0.50146
+hotpotqa,499,2,1,Anika Noni Rose,6,Disney Renaissance,0.000677,0.527638,0.000677
+hotpotqa,500,1,2,Paul O'Neill (baseball),20,"Central Avenue (Albany, New York)",0.326611,0.592965,0.326611
+hotpotqa,510,1,2,"Longjiang, Foshan",9,Qizu Pagoda,0.333333,0.537688,0.333333
+hotpotqa,513,1,1,Ley Sinde,5,The Liberty,0.306143,0.522613,0.306143
+hotpotqa,517,1,3,Boston Strong,19,Jeanne Tripplehorn,0.333333,0.582915,0.333333
+hotpotqa,518,1,2,Presidency of George H. W. Bush,8,George Bush Intercontinental Airport,0.5,0.532663,0.5
+hotpotqa,522,1,1,Bart Sells His Soul,5,Homer's Odyssey (The Simpsons),0.499832,0.522613,0.499832
+hotpotqa,536,1,1,Nobel Prize in Literature,7,John Galsworthy,0.5,0.532663,0.5
+hotpotqa,541,1,2,Shkëlzen Gashi,18,Toronto Maple Leafs,0.418277,0.582915,0.418277
+hotpotqa,548,1,3,Vie Luxe International,12,Neiman Marcus,0.25,0.547739,0.25
+hotpotqa,553,1,1,Mark Ciardi,11,List of Walt Disney Pictures films,0.002184,0.552764,0.002184
+hotpotqa,557,1,1,Cedric the Entertainer,20,Hot in Cleveland (season 1),0.5,0.59799,0.5
+hotpotqa,566,1,3,If Tomorrow Never Comes,5,Lonestar discography,0.07033,0.512563,0.07033
+hotpotqa,566,2,1,Love and Theft (duo),18,Rascal Flatts discography,3e-06,0.58794,3e-06
+hotpotqa,569,1,1,Daddy (dog),91,Black Elk Speaks,0.289178,0.954774,0.289178
+hotpotqa,572,1,1,View Askewniverse,54,List of The Muppets productions,0.25,0.768844,0.25
+hotpotqa,574,1,3,2006 Asian Games,35,Winter Olympic Games,2.5e-05,0.663317,2.5e-05
+hotpotqa,575,1,2,Dan Rather,15,David L. Boren,0.333333,0.567839,0.333333
+hotpotqa,577,1,1,Club HSM: Make It Happen,13,Vanessa Hudgens,0.5,0.562814,0.5
+hotpotqa,582,1,2,Metropolitan Life North Building,41,Roxy Hotel (New York City),0.333333,0.698492,0.333333
+hotpotqa,597,1,1,King and the Clown,8,Shin Sang-ok,0.5,0.537688,0.5
+hotpotqa,598,1,1,Egger (company),9,Statenvlag,0.00011,0.542714,0.00011
+hotpotqa,604,1,3,Electoral history of George McGovern,10,"Democratic Party presidential primaries, 2012",0.333333,0.537688,0.333333
+hotpotqa,605,1,1,World Rugby Sevens Series,22,Singha,0.5,0.60804,0.5
+hotpotqa,608,1,2,Diane Ladd,50,Academy Award for Best Supporting Actor,0.000366,0.743719,0.000366
+hotpotqa,610,1,1,Miami Marlins,11,List of pre-World Series baseball champions,0.007892,0.552764,0.007892
+hotpotqa,612,1,1,Kevin Ogle,15,Everett Piper,0.000543,0.572864,0.000543
+hotpotqa,614,1,1,Blitz Kids,9,Confession (band),0.313088,0.542714,0.313088
+hotpotqa,617,1,1,24-7 Spyz,14,Tuskegee (album),0.247861,0.567839,0.247861
+hotpotqa,617,2,2,Castle on the Hill (song),33,I Hate Myself (for Loving You),0.001642,0.658291,0.001642
+hotpotqa,618,1,2,Maxim Mazumdar,8,Oscar Wilde,0.5,0.532663,0.5
+hotpotqa,619,1,3,Best of Puddle of Mudd,5,P.O.D.,0.487629,0.512563,0.487629
+hotpotqa,619,2,4,Yeah Yeah Yeahs,52,The Awakening (P.O.D. album),0.00903,0.743719,0.00903
+hotpotqa,624,1,1,U.S. Route 80,42,Red River system,0.5,0.708543,0.5
+hotpotqa,630,1,1,Dedicated to Chaos,5,The Beach Boys,0.000736,0.522613,0.000736
+hotpotqa,633,1,1,Vancouver,6,Jackass: The Movie,0.5,0.527638,0.5
+hotpotqa,637,1,1,Aubrey Otis Hampton,12,Double bubble (radiology),3.8e-05,0.557789,3.8e-05
+hotpotqa,642,1,1,McAlyster,9,Vince Gill,0.500007,0.542714,0.500007
+hotpotqa,650,1,1,Strange Synergy,20,Card game,0.01973,0.59799,0.01973
+hotpotqa,654,1,1,Stacy's Mom,25,What About Us (Livin Out Loud album),0.333333,0.623116,0.333333
+hotpotqa,657,1,2,Elektra Luxx,11,Mary Harron,0.333333,0.547739,0.333333
+hotpotqa,663,1,3,2017 Open 13 – Doubles,10,2017 ASB Classic – Men's Doubles,0.333333,0.537688,0.333333
+hotpotqa,679,1,1,"Grand Bazaar, Isfahan",96,1996 AFC Asian Cup squads,7.2e-05,0.979899,7.2e-05
+hotpotqa,683,1,2,2017 Texas Tech Red Raiders baseball team,17,2014 Baylor Bears baseball team,0.25,0.577889,0.25
+hotpotqa,689,1,1,Rhodesia,5,Capital of Wales,0.020015,0.522613,0.020015
+hotpotqa,693,1,2,Swiss mountain dog,26,German Spitz (Klein),6.4e-05,0.623116,6.4e-05
+hotpotqa,695,1,1,Personal Enemy,6,Richard Nixon Supreme Court candidates,0.5,0.527638,0.5
+hotpotqa,697,1,1,United Pursuit,54,Religion in The Simpsons,0.347022,0.768844,0.347022
+hotpotqa,701,1,4,Lovin' Lately,14,Lush (band),0.023966,0.552764,0.023966
+hotpotqa,701,2,1,John Rich,6,Big &amp; Rich's Super Galactic Fan Pak 2,0.00014,0.527638,0.00014
+hotpotqa,702,1,3,Jimmy Barnes,22,Tsunami (Manic Street Preachers song),0.333333,0.59799,0.333333
+hotpotqa,703,1,2,Escape (Nine Lashes album),5,World We View,0.492306,0.517588,0.492306
+hotpotqa,704,1,1,Zea (plant),5,Dahlia imperialis,0.715145,0.522613,0.715145
+hotpotqa,704,2,3,Duranta,13,Dahlia,0.026454,0.552764,0.026454
+hotpotqa,708,1,2,2003 NBA draft,20,San Francisco 49ers,0.5,0.592965,0.5
+hotpotqa,716,1,1,Chrysler M platform,11,Mazda6,0.00028,0.552764,0.00028
+hotpotqa,718,1,1,Gary Sinise,26,You Can't Kill Stephen King,0.497766,0.628141,0.497766
+hotpotqa,721,1,1,Oklahoma Air National Guard,10,Quadrophenia (film),0.568934,0.547739,0.568934
+hotpotqa,723,1,1,Park Hyung-sik,6,Inspiring Generation,0.333333,0.527638,0.333333
+hotpotqa,735,1,1,Late Registration,9,Cathal Coughlan (singer),0.666667,0.542714,0.666667
+hotpotqa,741,1,2,Division of Lang,6,Division of Canobolas,3.3e-05,0.522613,3.3e-05
+hotpotqa,749,1,1,The Late Late Tribute Shows,53,Masahiro Nakai,0.007197,0.763819,0.007197
+hotpotqa,749,2,3,The Late Late Show with Craig Ferguson,6,The Late Late Show (Irish TV series),0.000837,0.517588,0.000837
+hotpotqa,751,1,2,Neon City,13,Eisenstein (film),0.5,0.557789,0.5
+hotpotqa,753,1,2,Cowie Castle,17,Eilean Donan,1.2e-05,0.577889,1.2e-05
+hotpotqa,762,1,1,Virtual war,6,Ozone Journal,0.25,0.527638,0.25
+hotpotqa,764,1,1,Chris Doyle (artist),12,Liberty Place,0.004294,0.557789,0.004294
+hotpotqa,773,1,1,What the Water Gave Me (song),11,Liberty Leading the People,0.333333,0.552764,0.333333
+hotpotqa,774,1,1,John Street (Toronto),6,An Inconvenient Truth,0.017841,0.527638,0.017841
+hotpotqa,776,1,1,Liz Rose,6,Fearless (Taylor Swift song),0.5,0.527638,0.5
+hotpotqa,778,1,1,List of Olympic venues in figure skating,16,"Youngstown, Ohio",0.00462,0.577889,0.00462
+hotpotqa,782,1,1,Peter Balakian,31,Maya Angelou,0.5,0.653266,0.5
+hotpotqa,784,1,1,"Bayport, New York",6,Blue Point (LIRR station),0.5,0.527638,0.5
+hotpotqa,786,1,2,Anton Schwarzkopf,5,Pretzel Amusement Ride Company,0.27121,0.517588,0.27121
+hotpotqa,793,1,3,Anna Howard Shaw Day,5,Tea Leaves (Mad Men),0.333333,0.512563,0.333333
+hotpotqa,796,1,1,Riverside Church,20,Amy (2015 film),0.001106,0.59799,0.001106
+hotpotqa,800,1,4,Born Under Punches (The Heat Goes On),62,Creedence Clearwater Revival: Box Set,0.500005,0.79397,0.500005
+hotpotqa,803,1,1,Fly540,7,Tandy Corporation,0.006674,0.532663,0.006674
+hotpotqa,809,1,2,Everett Piper,5,Jim Rogers (Oklahoma politician),0.292328,0.517588,0.292328
+hotpotqa,810,1,1,Blancpain GT Series Sprint Cup,9,FIA GT1 World Championship,0.5,0.542714,0.5
+hotpotqa,811,1,2,Solomon Elimimian,13,John Metras,0.040254,0.557789,0.040254
+hotpotqa,814,1,1,South Park,6,Tsst,0.446301,0.527638,0.446301
+hotpotqa,816,1,1,Missing Pieces (Talk Talk album),6,Volume 1 (Future Boy album),0.5,0.527638,0.5
+hotpotqa,823,1,1,The Mall Wood Green,16,Forum The Shopping Mall,5.5e-05,0.577889,5.5e-05
+hotpotqa,831,1,1,Babe Ruth,5,Mike Hessman,0.5,0.522613,0.5
+hotpotqa,844,1,2,"Choteau, Montana",10,Marv Skie–Lincoln County Airport,0.325495,0.542714,0.325495
+hotpotqa,845,1,1,C. E. Gatchalian,19,"Syracuse, Sicily",0.042463,0.592965,0.042463
+hotpotqa,851,1,1,Victoria (ship),5,"South Yarra, Victoria",0.501561,0.522613,0.501561
+hotpotqa,855,1,1,Ian Holm,55,Udayananu Tharam,0.25,0.773869,0.25
+hotpotqa,857,1,1,Abraham Whistler,6,Bill Haydon,0.014671,0.527638,0.014671
+hotpotqa,860,1,1,A123 Systems,7,Tongil Industries Company,0.002527,0.532663,0.002527
+hotpotqa,864,1,2,SAS Braathens,9,History of British Airways,0.333333,0.537688,0.333333
+hotpotqa,875,1,2,Larry Tee,11,Banana (TV series),0.040145,0.547739,0.040145
+hotpotqa,880,1,1,2004 SANFL Grand Final,9,West Adelaide Football Club,0.5,0.542714,0.5
+hotpotqa,887,1,1,Blue (Double album),51,"United States Senate election in Oklahoma, 2004",0.333333,0.753769,0.333333
+hotpotqa,891,1,1,2006 Stanley Cup Finals,9,Toronto Maple Leafs,0.5,0.542714,0.5
+hotpotqa,911,1,3,Violence (role-playing game),16,Ross Watson (game designer),0.31237,0.567839,0.31237
+hotpotqa,912,1,2,The Grudge 2,15,Kevin Spacey,0.00474,0.567839,0.00474
+hotpotqa,915,1,1,Central America,9,Cucurbita palmeri,0.333333,0.542714,0.333333
+hotpotqa,919,1,1,Peter Helliar,5,Yianni Agisilaou,0.024803,0.522613,0.024803
+hotpotqa,922,1,1,"Portsea, Victoria",22,Victoria (ship),0.347791,0.60804,0.347791
+hotpotqa,926,1,1,2012 St. Louis Rams season,9,Heisman Trophy,0.005533,0.542714,0.005533
+hotpotqa,928,1,1,Robert McConnell (loyalist),6,Scotch Collie,0.033018,0.527638,0.033018
+hotpotqa,931,1,1,Ben Cook (actor),12,Jared Daperis,0.022599,0.557789,0.022599
+hotpotqa,932,1,2,Eccles Interchange,91,Russia–United Kingdom relations,0.333333,0.949749,0.333333
+hotpotqa,944,1,1,Autumn Crocus (film),13,Adam Cooper (dancer),0.292571,0.562814,0.292571
+hotpotqa,944,2,4,True Legend,18,Stephen Mear,0.269097,0.572864,0.269097
+hotpotqa,946,1,2,Possessed (roller coaster),6,Viper (Six Flags Great America),0.323191,0.522613,0.323191
+hotpotqa,951,1,2,Mos Def &amp; Talib Kweli Are Black Star,12,Avril Lavigne,0.5,0.552764,0.5
+hotpotqa,953,1,2,Belgian Shepherd,5,Herding Group,4.2e-05,0.517588,4.2e-05
+hotpotqa,955,1,3,June Jones,5,2012 New Orleans Saints season,0.25,0.512563,0.25
+hotpotqa,958,1,2,Roosevelt Roads Naval Station,6,STOLport,0.003524,0.522613,0.003524
+hotpotqa,959,1,2,Outside (magazine),7,PC Magazine,0.001139,0.527638,0.001139
+hotpotqa,960,1,1,Vib Gyor,11,The Darkness (band),0.33618,0.552764,0.33618
+hotpotqa,960,2,2,The White EP (Vib Gyor EP),12,Lush (band),0.333333,0.552764,0.333333
+hotpotqa,967,1,1,Midnight Oil,5,Now Summer 2007 (Australian series),8e-06,0.522613,8e-06
+hotpotqa,969,1,3,Alexander Radvilovich,10,Vadim Zakharov (artist),0.000395,0.537688,0.000395
+hotpotqa,971,1,3,Langston Hughes Medal,6,Jim Harrison,0.000345,0.517588,0.000345
+hotpotqa,979,1,1,Elijah Wood,23,Crocodile Dundee in Los Angeles,0.333333,0.613065,0.333333
+hotpotqa,979,2,2,Peter Jackson,60,Heavenly Creatures,0.333333,0.79397,0.333333
+hotpotqa,982,1,1,Battle of Bataan,54,New World (Lauri Ylönen album),0.333333,0.768844,0.333333
+hotpotqa,986,1,1,Stieber Twins,15,Egyptian Collection of the Hermitage Museum,0.5,0.572864,0.5
+hotpotqa,990,1,1,Monkey Gland,5,Ian Gillan &amp; Tony Iommi: WhoCares,0.087068,0.522613,0.087068
+hotpotqa,992,1,1,H. Stuart Menzies,5,Ōsako Naoharu,0.035305,0.522613,0.035305
+hotpotqa,999,1,2,Hummingbird (Local Natives album),55,Verelo,0.001197,0.768844,0.001197
+musique,0,1,2,Lionel Messi,9,List of international goals scored by Lionel Messi,0.000201,0.537688,0.000201
+musique,1,1,4,Warsaw Pact,30,Dissolution of the Soviet Union,0.183473,0.633166,0.183473
+musique,1,2,3,Molotov–Ribbentrop Pact,28,Dissolution of the Soviet Union,0.046334,0.628141,0.046334
+musique,6,1,1,Riverside Plaza,10,The Hague City Hall,0.25,0.547739,0.25
+musique,7,1,2,Kathmandu,8,Prysmian Group,0.333333,0.532663,0.333333
+musique,8,1,1,Battle of Korytsa,20,III (Stanton Moore album),0.385064,0.59799,0.385064
+musique,8,2,2,Battle of Oldendorf,7,Battle of Bunker Hill,0.333333,0.527638,0.333333
+musique,11,1,2,Somalis,99,Myanmar,0.238455,0.98995,0.238455
+musique,13,1,1,Crucifixion of Jesus,10,Crucifixion (Titian),0.000307,0.547739,0.000307
+musique,14,1,2,Foligno Cathedral,15,St. Peter's Basilica,0.196683,0.567839,0.196683
+musique,14,2,3,Governor of Vatican City,35,Canonization of Pope John XXIII and Pope John Paul II,0.005379,0.663317,0.005379
+musique,15,1,1,The Path (TV series),14,Arena Football League,0.01004,0.567839,0.01004
+musique,16,1,1,Josep Domènech i Estapà,22,Spain,0.25,0.60804,0.25
+musique,19,1,1,Seattle,23,Memorial Union (Oregon State University),0.5,0.613065,0.5
+musique,22,1,1,Richard Cory-Wright,11,Ian Quayle Jones,0.017373,0.552764,0.017373
+musique,23,1,2,Miracle on 34th Street,8,Cordelia Frost,0.054163,0.532663,0.054163
+musique,23,2,3,Miracle on 34th Street,10,List of show business families,0.001787,0.537688,0.001787
+musique,25,1,1,Elisabeth Luther,9,Sarah Stewart (author),0.004629,0.542714,0.004629
+musique,26,1,1,Balbi Holy Conversation,6,Christian Ackermann,0.333333,0.527638,0.333333
+musique,30,1,2,The Poor Boob,10,Margaret Mayo (playwright),0.25,0.542714,0.25
+musique,30,2,3,Jehan Gordon-Booth,77,Paris,0.25,0.874372,0.25
+musique,32,1,1,"Biff, the Michigan Wolverine",28,"Pima County Natural Resources, Parks and Recreation",0.5,0.638191,0.5
+musique,34,1,1,Nawabs of Bengal and Murshidabad,35,Queen Victoria,0.167044,0.673367,0.167044
+musique,34,2,2,"Bengal Sati Regulation, 1829",65,Queen Victoria,0.002085,0.819095,0.002085
+musique,40,1,1,Indonesian language,25,East Timor,0.333333,0.623116,0.333333
+musique,42,1,1,Greek alphabet,6,Charlemagne,0.00325,0.527638,0.00325
+musique,43,1,1,44th United States Congress,6,2002 United States House of Representatives elections,1e-06,0.527638,1e-06
+musique,46,1,3,Culture of India,6,Religion in Israel,0.002597,0.517588,0.002597
+musique,46,2,1,History of India,12,Partition of India,0.00327,0.557789,0.00327
+musique,49,1,1,American Idol,5,Burning Heart Records,0.5,0.522613,0.5
+musique,50,1,1,Warsaw,20,Dissolution of the Soviet Union,0.451485,0.59799,0.451485
+musique,50,2,3,Warsaw Pact,45,Dissolution of the Soviet Union,0.037899,0.713568,0.037899
+musique,51,1,2,Indiana,32,United States,0.400312,0.653266,0.400312
+musique,51,2,3,"Saint Paul, Minnesota",57,Seat belt use rates in the United States,0.051362,0.773869,0.051362
+musique,55,1,1,Montana,75,Kingdom of Israel (united monarchy),0.005599,0.874372,0.005599
+musique,55,2,2,Israel,38,Judea (Roman province),0.000366,0.683417,0.000366
+musique,56,1,2,Indiana,10,"Saint Paul, Minnesota",0.25,0.542714,0.25
+musique,56,2,3,Logan Gomez,27,Oh Yeah (Charles Mingus album),0.013136,0.623116,0.013136
+musique,57,1,2,Bridge of Sighs,39,Venice,0.319976,0.688442,0.319976
+musique,57,2,3,Rialto Bridge,38,Venice,0.011375,0.678392,0.011375
+musique,60,1,1,Tennessee,5,Kaunas County,0.007378,0.522613,0.007378
+musique,61,1,1,Nanjing,7,Nanjing,0.002091,0.532663,0.002091
+musique,62,1,1,Greek alphabet,5,Charlemagne,0.006613,0.522613,0.006613
+musique,62,2,2,Holy Roman Emperor,7,Charlemagne,4.4e-05,0.527638,4.4e-05
+musique,64,1,1,Costa Ricans,11,DXAQ-AM,0.067786,0.552764,0.067786
+musique,66,1,1,Middle Ages,6,Charlemagne,0.000946,0.527638,0.000946
+musique,67,1,1,Central Intelligence Agency,5,Karen Tandy,0.000134,0.522613,0.000134
+musique,68,1,1,"Helvetia, Arizona",58,Geography of the United States,0.046072,0.788945,0.046072
+musique,69,1,1,A Modern Jazz Symposium of Music and Poetry,36,United States,0.25,0.678392,0.25
+musique,69,2,2,Indiana,10,Oklahoma City,0.207516,0.542714,0.207516
+musique,71,1,1,Anzoátegui,11,Kiri Territory,0.004592,0.552764,0.004592
+musique,72,1,1,"Warren, Vermont",7,Detroit,0.25477,0.532663,0.25477
+musique,72,2,4,"Blaine, Washington",10,"Mecklenburg County, North Carolina",0.250059,0.532663,0.250059
+musique,77,1,2,Yugoslavia at the Olympics,11,Belgrade (film),0.247313,0.547739,0.247313
+musique,77,2,3,Albania at the Olympics,14,Togo,0.205231,0.557789,0.205231
+musique,78,1,2,List of Shrek characters,8,List of show business families,0.021766,0.532663,0.021766
+musique,80,1,2,Bridge of Sighs,89,Detroit,0.333333,0.939698,0.333333
+musique,83,1,3,Yuma County Library District,16,"Mayor of Jersey City, New Jersey",0.333333,0.567839,0.333333
+musique,83,2,1,List of counties in Arizona,7,Arizona,0.099526,0.532663,0.099526
+musique,84,1,1,Child labor laws in the United States,6,Jessie Woodrow Wilson Sayre,0.5,0.527638,0.5
+musique,85,1,1,KANU (FM),16,Oklahoma City,0.072403,0.577889,0.072403
+musique,86,1,1,Back to the Future Part II,16,Elisabeth Shue,0.5,0.577889,0.5
+musique,87,1,3,Capital punishment in the United Kingdom,20,Germany,0.25,0.58794,0.25
+musique,90,1,2,Olivera Katarina,43,Czech Republic,0.49527,0.708543,0.49527
+musique,91,1,1,United States,10,"Saint Paul, Minnesota",0.5,0.547739,0.5
+musique,93,1,1,1973 oil crisis,7,Toyota,0.008803,0.532663,0.008803
+musique,94,1,1,2016 NBA Summer League,20,Sports league ranking,0.027472,0.59799,0.027472
+musique,94,2,2,Batting average,5,World Series,7e-05,0.517588,7e-05
+musique,96,1,1,Korean War,5,Pacific War,0.001504,0.522613,0.001504
+musique,96,2,2,Suin Line,15,Greece,0.000129,0.567839,0.000129
+musique,98,1,2,Black Death,18,Cello Concerto No. 2 (Haydn),0.000477,0.582915,0.000477
+musique,99,1,1,Arabian Peninsula,10,Alūksne Municipality,0.335734,0.547739,0.335734
+musique,101,1,1,Cuba Plantation,79,"Silver Lake (Madison, New Hampshire)",0.25768,0.894472,0.25768
+musique,101,2,3,2004 United States presidential election,9,Pennsylvania State University,0.244074,0.532663,0.244074
+musique,102,1,1,"Atlantic City, New Jersey",29,Nanjing,0.01726,0.643216,0.01726
+musique,104,1,1,Allies of World War II,6,Warsaw Pact,0.00095,0.527638,0.00095
+musique,104,2,2,Warsaw Pact,12,Warsaw Pact,0.000142,0.552764,0.000142
+musique,105,1,1,Dissolution of the Soviet Union,10,Leader of Opposition (Uganda),0.000692,0.547739,0.000692
+musique,106,1,1,Szlachta,14,"Neunkirchen District, Austria",0.182751,0.567839,0.182751
+musique,108,1,1,The Devil Went Down to Georgia,89,"Forest Acres, South Carolina",0.5,0.944724,0.5
+musique,109,1,2,GSAT-7,10,Communications satellite,0.000407,0.542714,0.000407
+musique,110,1,1,Charles Mingus,10,"Saint Paul, Minnesota",0.333333,0.547739,0.333333
+musique,111,1,1,American Civil War,41,Pennsylvania,0.421333,0.703518,0.421333
+musique,112,1,1,Vat Yotkeo,50,Xe Kaman River,0.245939,0.748744,0.245939
+musique,112,2,3,Geography of Myanmar,86,Mexico,0.192689,0.919598,0.192689
+musique,113,1,1,Honda Civic,11,Acura Legend,0.5,0.552764,0.5
+musique,114,1,1,Szlachta,12,Habsburg–Persian alliance,0.002601,0.557789,0.002601
+musique,116,1,2,Mercedes of Orléans,72,Huguenots,6.4e-05,0.854271,6.4e-05
+musique,118,1,1,"Savannah, Georgia",6,Virginia,0.307172,0.527638,0.307172
+musique,119,1,1,Danko Jones,71,New York City,0.333333,0.854271,0.333333
+musique,119,2,2,Pythian Castle Lodge,95,Hawk Nelson,0.322876,0.969849,0.322876
+musique,120,1,1,2016 NBA Summer League,76,2009–10 Oklahoma City Thunder season,0.5,0.879397,0.5
+musique,121,1,1,Culture,66,Katsuaki Watanabe,0.011109,0.829146,0.011109
+musique,123,1,1,Texas A&M University,8,"Ministry of Education, Science and Technology (Nepal)",0.5,0.537688,0.5
+musique,125,1,1,Nigeria,14,Chief Justice of the United States,0.004748,0.567839,0.004748
+musique,127,1,2,United States declaration of war on Germany (1917),29,115th United States Congress,0.044624,0.638191,0.044624
+musique,129,1,3,Richard Feynman,20,"Los Alamos, California",0.1985,0.58794,0.1985
+musique,132,1,1,Qing dynasty,15,"Quincy, Florida",0.007825,0.572864,0.007825
+musique,133,1,3,Slavs,61,Estonia,0.194172,0.79397,0.194172
+musique,133,2,4,Anti-aircraft warfare,23,Estonia,0.079422,0.59799,0.079422
+musique,135,1,1,Association football,87,ISO 3166-2:CH,0.018892,0.934673,0.018892
+musique,136,1,1,Switzerland,18,Guam,0.000546,0.58794,0.000546
+musique,140,1,1,Majority leader,9,Party leaders of the United States House of Representatives,8.3e-05,0.542714,8.3e-05
+musique,143,1,3,Hellenistic period,36,Roman Republic,0.122766,0.668342,0.122766
+musique,144,1,1,New York City,7,Black Monday (1987),0.001359,0.532663,0.001359
+musique,145,1,1,Dell,5,List of U.S. states and territories by elevation,0.172554,0.522613,0.172554
+musique,146,1,1,The Right Stuff Records,26,EmArcy Records,0.5,0.628141,0.5
+musique,147,1,1,Han dynasty,31,Tang dynasty,0.5,0.653266,0.5
+musique,150,1,3,John Kerry,34,Chile,0.3087,0.658291,0.3087
+musique,150,2,4,Cold War,8,Society of Communist Czechoslovakia,0.280123,0.522613,0.280123
+musique,151,1,1,All Right,19,The Right Stuff Records,0.001458,0.592965,0.001458
+musique,152,1,1,Israel,14,Gulf War,0.033827,0.567839,0.033827
+musique,153,1,1,American Idol,21,BNA Records,0.333333,0.603015,0.333333
+musique,157,1,1,Kentucky Tavern,32,"Milan, New Orleans",0.333333,0.658291,0.333333
+musique,158,1,2,114th United States Congress,6,Standing Rules of the United States Senate,0.007119,0.522613,0.007119
+musique,159,1,1,Imperialism,85,Imperialism,0.000727,0.924623,0.000727
+musique,163,1,1,Tom Brady,21,List of National Football League annual sacks leaders,0.467473,0.603015,0.467473
+musique,164,1,2,Arabian Peninsula,52,Israel,0.247297,0.753769,0.247297
+musique,164,2,3,Partition of the Ottoman Empire,57,Israel,0.063095,0.773869,0.063095
+musique,165,1,1,Decade of Hits (George Canyon album),22,Mauro Scocco,0.097363,0.60804,0.097363
+musique,166,1,2,Umberto Mozzoni,24,Pope John XXIII,0.081075,0.613065,0.081075
+musique,166,2,3,Ambroise-Marie Carré,23,Pope John XXIII,0.012676,0.603015,0.012676
+musique,169,1,2,Paulsdale,17,Natalie Horler,0.017746,0.577889,0.017746
+musique,170,1,2,Black Death,36,Venice,0.310137,0.673367,0.310137
+musique,170,2,3,Black Death,37,Venice,0.017753,0.673367,0.017753
+musique,171,1,2,Neil Patrick Harris,9,Josh Radnor,0.430133,0.537688,0.430133
+musique,171,2,3,Barney Stinson,8,Josh Radnor,0.059748,0.527638,0.059748
+musique,175,1,1,New York City,37,New York City,0.078544,0.683417,0.078544
+musique,175,2,2,Indiana,89,Oklahoma,0.062643,0.939698,0.062643
+musique,179,1,1,British Empire,8,"Saint Paul, Minnesota",0.25,0.537688,0.25
+musique,179,2,3,"Columbia, South Carolina",11,"Charleston, South Carolina",0.03798,0.542714,0.03798
+musique,181,1,1,God,14,Architecture,0.000862,0.567839,0.000862
+musique,182,1,1,"Pima County Natural Resources, Parks and Recreation",7,Oklahoma City,0.250074,0.532663,0.250074
+musique,182,2,2,Mississippi,9,"Mecklenburg County, North Carolina",0.24999,0.537688,0.24999
+musique,183,1,1,Near East,14,Shiraz,0.032009,0.567839,0.032009
+musique,184,1,1,Johann Grabbe,9,Frédéric Chopin,0.333333,0.542714,0.333333
+musique,186,1,1,Nanjing,17,Nanjing,2e-06,0.582915,2e-06
+musique,187,1,1,Mexico City,18,Robert Wayman,0.000107,0.58794,0.000107
+musique,188,1,1,Hangrai,6,Culture of India,0.001131,0.527638,0.001131
+musique,189,1,1,Mzingwane River,11,Hargrave River (Nunavut),0.002212,0.552764,0.002212
+musique,193,1,1,American Idol,12,Blue Skies (Diana DeGarmo album),0.5,0.557789,0.5
+musique,198,1,1,Napoleon,86,Soviet Union in World War II,0.193977,0.929648,0.193977
+musique,198,2,2,Molotov–Ribbentrop Pact,59,Soviet Union,0.022765,0.788945,0.022765
+musique,199,1,1,2004–05 UEFA Champions League,19,2015–16 Leicester City F.C. season,0.5,0.592965,0.5
+musique,200,1,1,Catalan language,6,Catalan language,0.006259,0.527638,0.006259
+musique,202,1,1,Sarvepalli Radhakrishnan,7,Raghunath Dhondo Karve,1.2e-05,0.532663,1.2e-05
+musique,204,1,1,2016 NBA Summer League,49,Chicago Cubs,0.02547,0.743719,0.02547
+musique,204,2,2,Home run,5,World Series,0.000103,0.517588,0.000103
+musique,205,1,1,1979–80 European Cup,5,Nottingham Forest F.C.,0.5,0.522613,0.5
+musique,210,1,1,Lexus RX,16,Genesis Motor,0.333333,0.577889,0.333333
+musique,210,2,2,1973 oil crisis,36,Toyota Racing Development,0.333333,0.673367,0.333333
+musique,211,1,1,American Civil War,6,Jefferson Davis,0.482203,0.527638,0.482203
+musique,211,2,3,Confederate States Army,8,Jefferson Davis,0.016361,0.527638,0.016361
+musique,212,1,1,Avicenna,8,Heidelberg University,0.333333,0.537688,0.333333
+musique,215,1,1,Powder keg of Europe,14,Myanmar,0.259311,0.567839,0.259311
+musique,215,2,2,Somalis,93,Myanmar,0.0826,0.959799,0.0826
+musique,216,1,2,Tanzania,7,Cristiano Ronaldo,0.5,0.527638,0.5
+musique,217,1,2,Black Death,22,Venice,0.309714,0.603015,0.309714
+musique,217,2,3,Black Death,23,Venice,0.018498,0.603015,0.018498
+musique,219,1,2,Indiana,19,Arizona,0.5,0.58794,0.5
+musique,220,1,1,Maine,12,Mississippi,0.25,0.557789,0.25
+musique,221,1,1,Nina Sky,10,Tony! Toni! Toné!,0.5,0.547739,0.5
+musique,222,1,1,Cleveland Bulldogs,73,National Hockey League,0.5,0.864322,0.5
+musique,223,1,2,Nanjing,9,Athanasius of Alexandria,0.339848,0.537688,0.339848
+musique,223,2,1,Sino-Tibetan relations during the Ming dynasty,54,Sino-Tibetan relations during the Ming dynasty,0.000347,0.768844,0.000347
+musique,224,1,1,Denmark,45,ISO 3166-2:CH,0.032311,0.723618,0.032311
+musique,226,1,1,The Bourne Deception,19,Guy Williams (actor),0.026384,0.592965,0.026384
+musique,230,1,2,Castle of Dreams,13,Shirley Abicair,0.346168,0.557789,0.346168
+musique,230,2,1,Gavin Bradley,17,Natalie Horler,0.002943,0.582915,0.002943
+musique,232,1,1,Nigeria,12,Stig Olin,0.091164,0.557789,0.091164
+musique,234,1,2,Korean War,9,Korean War,0.015199,0.537688,0.015199
+musique,237,1,1,Thailand,5,Albeni Falls Dam,0.25,0.522613,0.25
+musique,237,2,2,"Natural Dam, Arkansas",62,Lewis and Clark Bridge (Columbia River),0.25,0.80402,0.25
+musique,239,1,1,Herodes Atticus,19,Pierre Goldman,0.021595,0.592965,0.021595
+musique,244,1,1,Roman Republic,15,Plautus,0.001135,0.572864,0.001135
+musique,245,1,1,San Diego,10,Oklahoma City,0.2502,0.547739,0.2502
+musique,245,2,3,Chihuahua (state),14,Oklahoma,4e-06,0.557789,4e-06
+musique,247,1,1,1946 United States House of Representatives elections,7,Majority leader,0.003267,0.532663,0.003267
+musique,248,1,4,2018 Indianapolis 500,6,Detroit,0.248859,0.512563,0.248859
+musique,248,2,1,A Modern Jazz Symposium of Music and Poetry,94,1967 Detroit riot,0.068793,0.969849,0.068793
+musique,249,1,1,Dourkhan,7,Chief Justice of Ghana,1.7e-05,0.532663,1.7e-05
+musique,250,1,1,Germany,26,Literature of East Germany,0.253757,0.628141,0.253757
+musique,252,1,2,Billy Joel,79,Minneapolis,0.333333,0.889447,0.333333
+musique,253,1,2,"Mycenae, New York",24,London,0.086089,0.613065,0.086089
+musique,253,2,3,Maze Hill,21,London,0.002125,0.592965,0.002125
+musique,254,1,1,Cartoon Wars Part I,73,National Insurance number,0.087708,0.864322,0.087708
+musique,256,1,2,Pakxan,18,Geography of Myanmar,0.176702,0.582915,0.176702
+musique,256,2,4,Thailand,58,Myanmar,0.054965,0.773869,0.054965
+musique,258,1,2,History of the west coast of North America,9,John Cabot,0.250345,0.537688,0.250345
+musique,259,1,2,United States Navy SEALs,17,United States Air Force Judge Advocate General's Corps,0.333333,0.577889,0.333333
+musique,260,1,1,Mickey Mouse,5,Mickey Mouse,0.00322,0.522613,0.00322
+musique,261,1,1,Bejaratana,7,Thailand,0.181021,0.532663,0.181021
+musique,261,2,3,The Beach (film),10,Thailand,0.047673,0.537688,0.047673
+musique,262,1,1,Party leaders of the United States House of Representatives,15,Nobel Prize in Literature,0.000889,0.572864,0.000889
+musique,263,1,2,Billiken,8,Aerotech Consumer Aerospace,0.5,0.532663,0.5
+musique,265,1,1,Professional wrestling,77,Real Madrid CF,0.5,0.884422,0.5
+musique,268,1,3,Oklahoma City,7,Papa Roach,0.237115,0.522613,0.237115
+musique,268,2,4,Chris Stillwell,25,San Diego,0.028923,0.60804,0.028923
+musique,269,1,2,Art theft and looting during World War II,83,Declaration of war by the United States,0.25,0.909548,0.25
+musique,270,1,1,United Kingdom,47,The White Suit,0.000662,0.733668,0.000662
+musique,272,1,1,Huguenots,13,Battle of Dunkirk,0.376725,0.562814,0.376725
+musique,273,1,1,Celebrity Big Brother (American TV series),5,New York Giants Radio Network,0.333333,0.522613,0.333333
+musique,274,1,1,Hindus,7,British Raj,0.376464,0.532663,0.376464
+musique,274,2,3,Partition of India,14,British Raj,0.082702,0.557789,0.082702
+musique,276,1,1,2016 NBA Summer League,14,New York Yankees,0.333333,0.567839,0.333333
+musique,280,1,1,Delhi,9,British Raj,0.5,0.542714,0.5
+musique,281,1,1,Modern history,21,Myanmar,0.296514,0.603015,0.296514
+musique,281,2,3,Somalis,27,Myanmar,0.092638,0.623116,0.092638
+musique,282,1,1,2004 United States presidential election,25,"Charleston, South Carolina",0.353843,0.623116,0.353843
+musique,282,2,2,Huguenots,21,"Charleston, South Carolina",0.090303,0.59799,0.090303
+musique,283,1,2,Alcohol law,5,Maine,0.02361,0.517588,0.02361
+musique,283,2,3,Legal drinking age,12,"E Township, Maine",0.004017,0.547739,0.004017
+musique,284,1,4,Rhine,95,Docks of Hamburg,0.008451,0.959799,0.008451
+musique,286,1,1,Figure in a landscape,5,Kim Deitch,0.002095,0.522613,0.002095
+musique,288,1,1,NBA Sportsmanship Award,18,Kevin Durant,0.5,0.58794,0.5
+musique,289,1,1,Oklahoma,16,Sweetwater Mansion,0.005765,0.577889,0.005765
+musique,291,1,1,Dazed and Confused (film),24,List of awards and nominations received by Matt Damon,0.5,0.61809,0.5
+musique,294,1,1,Classical music,11,A Good Day to Die Hard,0.277659,0.552764,0.277659
+musique,298,1,1,Middle Ages,5,Charlemagne,0.45483,0.522613,0.45483
+musique,298,2,2,Holy Roman Emperor,8,Charlemagne,0.041148,0.532663,0.041148
+musique,299,1,1,Dourkhan,15,Religion in Israel,0.003784,0.572864,0.003784
+musique,301,1,3,Protestantism,16,Religion in the United States,0.001342,0.567839,0.001342
+musique,303,1,1,Chaya Mushka Schneersohn,13,Friedrich Hayek,0.000175,0.562814,0.000175
+musique,304,1,1,Breakfast at Tiffany's (film),15,Stig Olin,0.006981,0.572864,0.006981
+musique,305,1,1,United States,5,Florida,0.161243,0.522613,0.161243
+musique,305,2,3,"Grant Park, Atlanta",21,"Jacksonville, Florida",0.054118,0.592965,0.054118
+musique,307,1,1,Sam Small,6,Mido (footballer),0.000119,0.527638,0.000119
+musique,308,1,1,British Empire,18,Political party,0.000687,0.58794,0.000687
+musique,309,1,1,United States,5,"Mecklenburg County, North Carolina",0.333333,0.522613,0.333333
+musique,311,1,1,"Koerner, Ray & Glover",53,"Saint Paul, Minnesota",0.333333,0.763819,0.333333
+musique,314,1,1,Pope John XXIII,6,Antonio Vivaldi,0.333333,0.527638,0.333333
+musique,314,2,3,Pope John XXIII,21,Vladimir Lenin,0.333333,0.592965,0.333333
+musique,315,1,1,Deepwater Horizon (film),5,Guy Williams (actor),0.5,0.522613,0.5
+musique,316,1,1,La Liga,5,FC Barcelona,5e-06,0.522613,5e-06
+musique,318,1,1,2016 NBA Summer League,5,World Series,0.333333,0.522613,0.333333
+musique,318,2,2,List of Major League Baseball longest winning streaks,6,Los Angeles Dodgers,0.333333,0.522613,0.333333
+musique,319,1,4,The Mother (How I Met Your Mother),13,Marshall Eriksen,0.499997,0.547739,0.499997
+musique,319,2,1,The Mother (How I Met Your Mother),7,How I Met Your Mother,2.8e-05,0.532663,2.8e-05
+musique,320,1,1,History of Canada,6,Territorial evolution of North America since 1763,0.5,0.527638,0.5
+musique,322,1,1,Belgrade (film),9,Catalan language,0.008806,0.542714,0.008806
+musique,323,1,1,Hunting,7,Toyota Racing Development,0.072567,0.532663,0.072567
+musique,323,2,3,Scion Fuse,8,Norfolk Assembly,0.003207,0.527638,0.003207
+musique,325,1,1,New York City,18,Cork (city),0.026677,0.58794,0.026677
+musique,326,1,1,James Remar,5,Stig Olin,0.005883,0.522613,0.005883
+musique,327,1,2,Wild Women,10,Idries Shah,0.333333,0.542714,0.333333
+musique,332,1,1,Association football,29,United Nations Population Fund,0.018525,0.643216,0.018525
+musique,334,1,1,Riverside Plaza,74,San Francisco,0.061796,0.869347,0.061796
+musique,336,1,4,The World's Billionaires,43,Oklahoma,0.330518,0.698492,0.330518
+musique,336,2,3,California Gold Rush,51,Oklahoma City,0.034341,0.743719,0.034341
+musique,337,1,1,Mexico City,8,Lina Medina,0.021139,0.537688,0.021139
+musique,338,1,4,Sino-Tibetan relations during the Ming dynasty,5,Nanjing,0.331221,0.507538,0.331221
+musique,338,2,1,Sino-Tibetan relations during the Ming dynasty,8,Athanasius of Alexandria,0.008858,0.537688,0.008858
+musique,341,1,2,Major League Baseball All-Star Game Most Valuable Player Award,44,2017 American League Wild Card Game,0.334671,0.713568,0.334671
+musique,341,2,1,Cleveland Bulldogs,68,Chicago Cubs,0.004613,0.839196,0.004613
+musique,344,1,3,Household income in the United States,9,Alaska,0.338782,0.532663,0.338782
+musique,344,2,1,Super Bowl,41,Jews,0.0308,0.703518,0.0308
+musique,345,1,1,Turhan Tezol,9,Kathmandu,0.019661,0.542714,0.019661
+musique,348,1,1,"Punjab, Pakistan",15,Umm Ubays,0.009523,0.572864,0.009523
+musique,348,2,2,Umayyad Caliphate,6,Ali,5e-05,0.522613,5e-05
+musique,352,1,1,Economic history of Greece and the Greek world,6,Classical music,0.031649,0.527638,0.031649
+musique,353,1,1,Balbi Holy Conversation,7,Roncalli High School (Indiana),0.001992,0.532663,0.001992
+musique,354,1,2,An American Girl: Grace Stirs Up Success,23,Sam Elliott,0.333333,0.60804,0.333333
+musique,355,1,1,"Live from Austin, TX (Eric Johnson album)",9,Oklahoma,0.009103,0.542714,0.009103
+musique,355,2,3,History of Georgia (U.S. state),7,List of capitals in the United States,0.000843,0.522613,0.000843
+musique,356,1,1,Snapper Foster,6,Forever Young (Rod Stewart song),0.5,0.527638,0.5
+musique,357,1,1,The Fox and the Hound,30,Julian Lennon,0.425989,0.648241,0.425989
+musique,358,1,1,WKHK,53,New York City,0.227819,0.763819,0.227819
+musique,361,1,1,South Central Coast,21,Berets of the United States Army,0.206312,0.603015,0.206312
+musique,362,1,1,Thailand,7,Ban Pakpo,0.331397,0.532663,0.331397
+musique,362,2,2,Thailand,10,Portugal,0.224234,0.542714,0.224234
+musique,363,1,1,Israel,9,Xorazm Region,0.25,0.542714,0.25
+musique,364,1,1,Carlos Huerta,19,Green Bay Packers,0.001958,0.592965,0.001958
+musique,365,1,1,WXBQ-FM,53,Virginia,0.057935,0.763819,0.057935
+musique,365,2,3,WKHK,37,These Days (The Virginia Sessions),0.005585,0.673367,0.005585
+musique,366,1,1,2 Chainz discography,61,My Heart (Lorrie Morgan album),0.334038,0.80402,0.334038
+musique,366,2,2,Candy Coburn,19,List of show business families,0.002846,0.58794,0.002846
+musique,368,1,1,A Hole in the Head,18,The Fault in Our Stars (film),0.334298,0.58794,0.334298
+musique,370,1,1,Kentucky Tavern,70,Battle of New Orleans,0.333333,0.849246,0.333333
+musique,370,2,2,Black people,12,Schlage,0.311862,0.552764,0.311862
+musique,371,1,2,Hey Jude,6,Anna (Go to Him),0.0003,0.522613,0.0003
+musique,371,2,1,Freedom (Paul McCartney song),16,Julian Lennon,0.000121,0.577889,0.000121
+musique,372,1,1,Powder keg of Europe,22,Geography of Myanmar,0.182652,0.60804,0.182652
+musique,372,2,3,Somalis,12,Myanmar,0.038838,0.547739,0.038838
+musique,374,1,2,United States in the Korean War,21,Thailand,0.078763,0.59799,0.078763
+musique,375,1,1,Steven Spielberg,6,Myanmar,0.5,0.527638,0.5
+musique,383,1,2,Ah Via Musicom,14,MCA Records,0.024987,0.562814,0.024987
+musique,384,1,2,Neil Patrick Harris,7,Josh Radnor,0.398507,0.527638,0.398507
+musique,384,2,3,Barney Stinson,6,Josh Radnor,0.08027,0.517588,0.08027
+musique,388,1,1,United States,14,"Saint Paul, Minnesota",0.25,0.567839,0.25
+musique,388,2,3,"Yuma, Colorado",18,Oklahoma City,0.25,0.577889,0.25
+musique,390,1,2,Josip Broz Tito,24,Society of Communist Czechoslovakia,0.327081,0.613065,0.327081
+musique,390,2,3,Warsaw Pact,37,United States Army,0.102598,0.673367,0.102598
+musique,392,1,2,Hyderabad,7,Escher Wyss & Cie.,0.000427,0.527638,0.000427
+musique,393,1,2,Mississippi,68,Maine,0.333333,0.834171,0.333333
+musique,394,1,1,Great Britain,7,Volcano,0.143434,0.532663,0.143434
+musique,395,1,1,Vat Yotkeo,81,Myanmar,0.283535,0.904523,0.283535
+musique,395,2,2,Pacific War,62,Myanmar,0.036184,0.80402,0.036184
+musique,396,1,1,Anti-aircraft warfare,20,United States Army,0.002243,0.59799,0.002243
+musique,397,1,1,1982 European Cup Final,5,Everton F.C.,0.5,0.522613,0.5
+musique,400,1,4,Ivo Werner,13,Anti-aircraft warfare,0.005452,0.547739,0.005452
+musique,400,2,1,Anti-aircraft warfare,12,Anti-aircraft warfare,0.000293,0.557789,0.000293
+musique,402,1,1,The Wiz (film),6,Nine Days that Changed the World,0.004247,0.527638,0.004247
+musique,403,1,1,Catholic Church in Lesotho,8,Jive Records,0.25,0.537688,0.25
+musique,403,2,4,Roxy Recordings,9,Kathmandu,0.227481,0.527638,0.227481
+musique,404,1,1,Mexican Cession,84,San Francisco,0.061438,0.919598,0.061438
+musique,405,1,1,Party leaders of the United States House of Representatives,6,Majority leader,7e-06,0.527638,7e-06
+musique,407,1,1,Plymouth Notch Cemetery,6,Barack Obama,0.00572,0.527638,0.00572
+musique,412,1,1,Louis Chedid,7,Matthieu Chedid,0.5,0.532663,0.5
+musique,413,1,2,1973 oil crisis,5,Toyota,0.004395,0.517588,0.004395
+musique,414,1,1,Ecce Ancilla Domini,64,Venice,0.333333,0.819095,0.333333
+musique,416,1,1,Money in the Bank ladder match,5,2008 United States presidential election,0.077016,0.522613,0.077016
+musique,417,1,1,Bible,7,Friedrich Hayek,1.8e-05,0.532663,1.8e-05
+musique,418,1,1,Modern history,10,Antonio Vivaldi,0.333333,0.547739,0.333333
+musique,418,2,2,Black Death,21,Vladimir Lenin,0.333333,0.59799,0.333333
+musique,421,1,2,Eswatini,22,Basotho National Party,0.333333,0.603015,0.333333
+musique,422,1,1,"Charleston, South Carolina",8,History of Columbia University,0.047375,0.537688,0.047375
+musique,425,1,1,Spain in the Eurovision Song Contest 1991,19,Jag ångrar ingenting (song),0.001177,0.592965,0.001177
+musique,426,1,2,Långa nätter,5,New York City,0.398628,0.517588,0.398628
+musique,426,2,4,Seattle,53,Headquarters of the United Nations,0.027388,0.748744,0.027388
+musique,428,1,1,Turn Me On (Mark Dinning song),33,"Live from Austin, TX (Norah Jones DVD)",0.496898,0.663317,0.496898
+musique,429,1,1,Russian Far East,5,Imperialism,0.087062,0.522613,0.087062
+musique,435,1,1,Let There Be Love (1953 Joni James album),26,Days of Our Lives (James Otto album),0.333333,0.628141,0.333333
+musique,436,1,1,Kim Jong-un,6,World Bank,0.012231,0.527638,0.012231
+musique,437,1,1,"I Love Life, Thank You",6,O.S.T.R.,0.459125,0.527638,0.459125
+musique,438,1,1,Dissolution of the Soviet Union,40,Ukraine,0.271277,0.698492,0.271277
+musique,438,2,2,Steven Spielberg,17,Josip Broz Tito,0.008761,0.577889,0.008761
+musique,439,1,1,Enoch Arden law,5,Stig Olin,0.011552,0.522613,0.011552
+musique,440,1,2,Bridge of Sighs,15,Giovanni de Macque,0.333333,0.567839,0.333333
+musique,441,1,1,Back of My Mind,19,The Right Stuff Records,8.6e-05,0.592965,8.6e-05
+musique,442,1,1,WIRR,8,Baranya County,0.154421,0.537688,0.154421
+musique,445,1,1,Roxy Recordings,29,American Idol,0.001438,0.643216,0.001438
+musique,446,1,1,Parched,54,Princess Fiona,0.001592,0.768844,0.001592
+musique,447,1,1,Dwight D. Eisenhower,20,Treaty of Versailles,0.001194,0.59799,0.001194
+musique,453,1,1,Joseph Strickland,90,States of Germany,0.004211,0.949749,0.004211
+musique,457,1,1,INS Tir (A86),7,Communications satellite,0.000173,0.532663,0.000173
+musique,461,1,3,Karl Popper,21,United Kingdom,0.256886,0.592965,0.256886
+musique,461,2,1,Karl Popper,99,Germany,0.130657,0.994975,0.130657
+musique,467,1,2,Huguenots,52,Switzerland,0.5,0.753769,0.5
+musique,470,1,1,Nanjing,9,Nanjing,0.03537,0.542714,0.03537
+musique,471,1,1,Days of Our Lives (James Otto album),10,MCA Records,0.002624,0.547739,0.002624
+musique,472,1,1,2016 NBA Summer League,73,Chicago Cubs,0.00326,0.864322,0.00326
+musique,472,2,2,Major League Baseball schedule,6,World Series,0.000451,0.522613,0.000451
+musique,475,1,1,Party leaders of the United States Senate,6,United States House of Representatives,0.000724,0.527638,0.000724
+musique,476,1,1,World War II,21,Soviet Union,0.122711,0.603015,0.122711
+musique,479,1,1,Bahram Mirza,13,Louis Chedid,0.006463,0.562814,0.006463
+musique,481,1,1,Dustin Pedroia,16,Magic (Smash Mouth album),0.5,0.577889,0.5
+musique,482,1,1,Molotov–Ribbentrop Pact,25,Declarations of war during World War II,0.001667,0.623116,0.001667
+musique,483,1,1,List of National Basketball Association annual scoring leaders,15,Kevin Durant,0.5,0.572864,0.5
+musique,485,1,1,1973 oil crisis,20,Toyota Racing Development,0.25,0.59799,0.25
+musique,487,1,1,Berets of the United States Army,5,Bird migration,0.037271,0.522613,0.037271
+musique,488,1,1,On Golden Pond (2001 film),49,Shrek (franchise),0.25,0.743719,0.25
+musique,490,1,4,Daylight saving time in the United States,37,European Union law,0.207552,0.668342,0.207552
+musique,490,2,2,Daylight saving time,56,Germany,0.045506,0.773869,0.045506
+musique,492,1,1,2016 NBA Summer League,39,2009–10 Oklahoma City Thunder season,0.333333,0.693467,0.333333
+musique,492,2,2,List of Major League Baseball career hits leaders,54,List of National Basketball Association annual scoring leaders,0.333333,0.763819,0.333333
+musique,494,1,1,Adult contemporary music,22,The Dance (Dave Koz album),0.422946,0.60804,0.422946
+musique,496,1,1,Ina Coolbrith,21,Joseph Smith,0.073037,0.603015,0.073037
+musique,498,1,1,Dwight D. Eisenhower,34,NATO,0.5,0.668342,0.5
+musique,500,1,1,Hurricane Charley,13,Matthieu Chedid,0.608287,0.562814,0.608287
+musique,500,2,2,Effects of Hurricane Katrina in New Orleans,5,Toussaint (album),0.057426,0.517588,0.057426
+musique,501,1,1,List of Charlie and the Chocolate Factory characters,8,Peter Ostrum,0.5,0.537688,0.5
+musique,502,1,1,Terry Dexter (album),19,MCA Records,0.011138,0.592965,0.011138
+musique,503,1,1,"Phoenix, Arizona",7,Gmina Pabianice,0.003873,0.532663,0.003873
+musique,506,1,2,The Biggest Loser Brunei: Lose It All,61,Armenia,0.244051,0.798995,0.244051
+musique,506,2,3,The Biggest Loser (season 16),59,Armenia,0.06534,0.78392,0.06534
+musique,509,1,4,"Codos, Aragon",67,Spain,0.250059,0.819095,0.250059
+musique,509,2,1,Catalan language,7,Palau Güell,0.004913,0.532663,0.004913
+musique,513,1,1,Chinese characters,12,Genesis Motor,0.341889,0.557789,0.341889
+musique,515,1,2,Korean War,20,Olga Kuragina,0.036112,0.592965,0.036112
+musique,517,1,3,Warsaw Pact,15,Dissolution of the Soviet Union,0.352578,0.562814,0.352578
+musique,517,2,1,Warsaw Pact,27,Dissolution of the Soviet Union,0.093817,0.633166,0.093817
+musique,518,1,1,Adult contemporary music,21,Hawk Nelson,0.106149,0.603015,0.106149
+musique,519,1,2,Đức Huệ District,12,Charles Mingus,0.004575,0.552764,0.004575
+musique,520,1,4,Ashley McKenzie,9,Baranya County,0.011842,0.527638,0.011842
+musique,520,2,1,Suga Mama,58,"Jersey City, New Jersey",0.000588,0.788945,0.000588
+musique,523,1,1,British Empire,7,Partition of India,1.6e-05,0.532663,1.6e-05
+musique,526,1,1,Zhejiang,15,Military history of Indonesia,0.00763,0.572864,0.00763
+musique,527,1,1,Riverside Plaza,18,New York City,0.003765,0.58794,0.003765
+musique,529,1,1,Upper Orange Water Management Area,8,Congo River,0.001376,0.537688,0.001376
+musique,534,1,1,"Campbell, California",10,"Pinellas County, Florida",0.010244,0.547739,0.010244
+musique,537,1,1,Beyoncé,49,Arturo Tappin,0.015646,0.743719,0.015646
+musique,538,1,1,The Muppets Celebrate Jim Henson,7,New York Giants Radio Network,0.414709,0.532663,0.414709
+musique,538,2,3,Celebrity Big Brother (American TV series),5,New York City,0.023524,0.512563,0.023524
+musique,539,1,1,Indian Rebellion of 1857,6,Casa Natal del General Santander,0.333333,0.527638,0.333333
+musique,539,2,3,Charles James Napier,9,Billie Barry,0.333333,0.532663,0.333333
+musique,540,1,1,Phonograph record,11,Queen Victoria,0.050263,0.552764,0.050263
+musique,540,2,3,White Queen (Through the Looking-Glass),36,Queen Victoria,0.015995,0.668342,0.015995
+musique,541,1,1,Dell,19,Cellius,0.5,0.592965,0.5
+musique,542,1,2,Brown and Roach Incorporated,62,New York City,0.333333,0.80402,0.333333
+musique,543,1,2,2014 United States Senate elections,6,Standing Rules of the United States Senate,2.3e-05,0.522613,2.3e-05
+musique,545,1,2,Hung Pham,15,An Phú District,0.25,0.567839,0.25
+musique,546,1,1,World War II,5,List of destroyer classes of the Royal Navy,0.000199,0.522613,0.000199
+musique,550,1,4,Korean War,61,Soviet Union in World War II,0.236857,0.788945,0.236857
+musique,550,2,1,Korean War,6,Estonia,0.018793,0.527638,0.018793
+musique,552,1,1,Sports in the United States,7,Tennessee,0.004784,0.532663,0.004784
+musique,552,2,3,E. Thomas Wood,63,Green Party of Tennessee,0.000108,0.80402,0.000108
+musique,553,1,4,"Mecklenburg County, North Carolina",7,Detroit,0.333536,0.517588,0.333536
+musique,553,2,2,Tennessee,11,Pennsylvania,3.6e-05,0.547739,3.6e-05
+musique,554,1,4,Detroit,5,Mississippi,0.000173,0.507538,0.000173
+musique,556,1,1,Crystal Kay,25,Let There Be Love (1993 Joni James album),0.5,0.623116,0.5
+musique,558,1,1,Royal Dutch Shell,12,April (1998 film),0.006031,0.557789,0.006031
+musique,560,1,1,Black people,10,Queen Victoria,5.1e-05,0.547739,5.1e-05
+musique,561,1,1,Austria,26,James Cottriall,0.152306,0.628141,0.152306
+musique,562,1,1,Minneapolis,5,Adams–Onís Treaty,3e-06,0.522613,3e-06
+musique,564,1,1,British Empire,17,New Zealand,0.070898,0.582915,0.070898
+musique,564,2,2,The Lord of the Rings (film series),21,New Zealand,0.016937,0.59799,0.016937
+musique,566,1,1,Szlachta,31,Warsaw Pact,0.411233,0.653266,0.411233
+musique,566,2,2,Kingdom of Bohemia,80,Warsaw,0.06209,0.894472,0.06209
+musique,568,1,1,United States,21,Danko Jones,0.333333,0.603015,0.333333
+musique,568,2,2,"The Collection (1993 Blood, Sweat & Tears album)",32,"New Haven, Connecticut",0.017931,0.653266,0.017931
+musique,569,1,1,"Richmond, Virginia",8,Southern California,0.000103,0.537688,0.000103
+musique,570,1,2,Hung Pham,68,Bueng Kan Province,0.000116,0.834171,0.000116
+musique,575,1,1,"Koerner, Ray & Glover",97,Mississippi River,0.311657,0.984925,0.311657
+musique,575,2,2,Adams–Onís Treaty,92,Minneapolis,0.018432,0.954774,0.018432
+musique,577,1,1,Canonization of Pope John XXIII and Pope John Paul II,10,"Flora Shaw, Lady Lugard",0.333333,0.547739,0.333333
+musique,580,1,3,Czech Republic,46,Member states of NATO,0.217793,0.718593,0.217793
+musique,580,2,1,Warsaw Pact,94,NATO,0.030839,0.969849,0.030839
+musique,583,1,2,Near East,7,Kingdom of Judah,0.25,0.527638,0.25
+musique,584,1,1,1982 European Cup Final,6,Everton F.C.,0.333333,0.527638,0.333333
+musique,589,1,1,The Beauty of Hindsight,7,Apple Records,0.333333,0.532663,0.333333
+musique,593,1,2,Armor for Sleep,43,New York City,0.333333,0.708543,0.333333
+musique,598,1,2,Sylvester,22,Charlemagne,0.063846,0.603015,0.063846
+musique,598,2,3,Louis the Stammerer,23,Charlemagne,0.010569,0.603015,0.010569
+musique,600,1,1,Society of Communist Czechoslovakia,15,Guinea-Bissau,0.082091,0.572864,0.082091
+musique,601,1,4,Ina Coolbrith,10,Alexandre de Lesseps,0.006991,0.532663,0.006991
+musique,601,2,1,Eugene Paul Nassar,20,Raymond Carver bibliography,0.00034,0.59799,0.00034
+musique,602,1,1,You Were on My Mind,18,Maiysha,0.333333,0.58794,0.333333
+musique,602,2,2,Baranya County,27,The Definitive Collection (Eric Carmen album),0.333333,0.628141,0.333333
+musique,605,1,1,North Carolina,6,"Columbia, South Carolina",0.453503,0.527638,0.453503
+musique,605,2,2,Baranya County,12,"Saint Paul, Minnesota",0.25,0.552764,0.25
+musique,606,1,1,Ann Hampton Callaway,15,Elisheba,0.003281,0.572864,0.003281
+musique,608,1,1,Seattle,17,Cape Knowles,0.013285,0.582915,0.013285
+musique,608,2,2,History of Georgia (U.S. state),8,Kentucky State Capitol,0.000243,0.532663,0.000243
+musique,609,1,1,Somalis,7,Juno Award,0.333333,0.532663,0.333333
+musique,610,1,1,Montana,29,"Lake County, Oregon",0.333333,0.643216,0.333333
+musique,612,1,1,KGLK,35,Miami,0.259604,0.673367,0.259604
+musique,616,1,1,Adult contemporary music,25,Closer (Josh Groban album),0.492256,0.623116,0.492256
+musique,617,1,1,"Wichita, Kansas",7,"Saint Paul, Minnesota",0.25,0.532663,0.25
+musique,617,2,3,2017–18 NCAA Division I men's basketball season,8,"Columbia, South Carolina",0.25,0.527638,0.25
+musique,618,1,2,"Rudolph (town), Wisconsin",5,North Pole,0.5,0.517588,0.5
+musique,619,1,1,Way Down in the Hole,65,MCA Records,0.5,0.824121,0.5
+musique,620,1,1,Ben Shuldiner,81,Channel Islands,0.25,0.904523,0.25
+musique,621,1,1,History of condoms,33,Los Angeles Dodgers,0.500091,0.663317,0.500091
+musique,621,2,2,Major League Baseball All-Star Game Most Valuable Player Award,5,World Series,5.1e-05,0.517588,5.1e-05
+musique,622,1,3,Israel,6,Kingdom of Israel (united monarchy),0.001508,0.517588,0.001508
+musique,623,1,3,2016 Atlantic hurricane season,17,Gulf of Mexico,0.240383,0.572864,0.240383
+musique,623,2,2,Atlantic hurricane,6,Virginia,0.141584,0.522613,0.141584
+musique,625,1,2,"Natural Dam, Arkansas",15,United States men's national soccer team,0.297709,0.567839,0.297709
+musique,625,2,1,Thailand,6,1986 FIFA World Cup,0.023976,0.527638,0.023976
+musique,626,1,2,Sino-Tibetan relations during the Ming dynasty,11,Athanasius of Alexandria,0.340766,0.547739,0.340766
+musique,627,1,2,Basilica del Santo Niño,12,Esztergom Basilica,0.333333,0.552764,0.333333
+musique,628,1,1,Living Out Loud,25,Roger Allen LaPorte,0.000674,0.623116,0.000674
+musique,629,1,3,Foligno Cathedral,20,St. Peter's Basilica,0.206135,0.58794,0.206135
+musique,630,1,1,Free State of Brunswick,14,Literature of East Germany,0.333333,0.567839,0.333333
+musique,635,1,1,IPod,5,Governor of Vatican City,0.25,0.522613,0.25
+musique,638,1,2,Capital punishment in the United States,7,Alma mater,0.000993,0.527638,0.000993
+musique,639,1,1,Protestantism,11,Dutch Reformed Church,0.5,0.552764,0.5
+musique,644,1,1,A River Runs Through It (film),6,Louis Chedid,0.14524,0.527638,0.14524
+musique,646,1,4,Yalu River,84,United States in the Korean War,0.261833,0.904523,0.261833
+musique,646,2,1,A Kiom,7,1986 FIFA World Cup,0.058598,0.532663,0.058598
+musique,647,1,1,Umayyad Caliphate,15,United States,0.5,0.572864,0.5
+musique,648,1,1,Cry Me a River (Justin Timberlake song),14,Thinking About You (Norah Jones song),0.250274,0.567839,0.250274
+musique,648,2,2,Beyoncé,18,Beyoncé,0.000167,0.582915,0.000167
+musique,649,1,1,Major League Baseball All-Star Game Most Valuable Player Award,9,Major League Baseball Most Valuable Player Award,0.0042,0.542714,0.0042
+musique,651,1,1,"Tucson, Arizona",23,"Pima County Natural Resources, Parks and Recreation",0.5,0.613065,0.5
+musique,653,1,2,Philadelphia,21,Darlings (Kevin Drew album),0.032459,0.59799,0.032459
+musique,656,1,2,Groovy Situation,27,Days of Our Lives (James Otto album),0.336408,0.628141,0.336408
+musique,656,2,1,Sunset Man,13,MCA Records,0.009785,0.562814,0.009785
+musique,657,1,1,Logan Shaw,6,National Hockey League,0.455185,0.527638,0.455185
+musique,657,2,2,2018–19 NHL season,5,North Carolina,0.001445,0.517588,0.001445
+musique,659,1,2,Arabian Peninsula,18,Middle East,0.333333,0.582915,0.333333
+musique,660,1,1,A Modern Jazz Symposium of Music and Poetry,10,Oklahoma City,0.00358,0.547739,0.00358
+musique,661,1,1,Lady Li (Wang Jipeng),21,Wang Lin (badminton),0.5,0.603015,0.5
+musique,662,1,4,Nanjing,5,Nanjing,0.003552,0.507538,0.003552
+musique,662,2,3,Nanjing,6,Nanjing,0.000307,0.517588,0.000307
+musique,663,1,2,Dissolution of the Soviet Union,9,Soviet Union,0.000117,0.537688,0.000117
+musique,664,1,1,The First Time Ever I Saw Your Face,5,Light It Up (Luke Bryan song),0.333333,0.522613,0.333333
+musique,665,1,1,Manchester City F.C.,27,Liverpool F.C.–Manchester United F.C. rivalry,0.431771,0.633166,0.431771
+musique,665,2,2,Premier League records and statistics,23,Liverpool F.C.,0.054447,0.60804,0.054447
+musique,668,1,1,"Mill City, Butte County, California",33,San Francisco,0.25,0.663317,0.25
+musique,670,1,1,Battle of Palembang,10,Battle of Waterloo,0.000214,0.547739,0.000214
+musique,672,1,1,Deepwater Horizon (film),11,Monuriki,0.000517,0.552764,0.000517
+musique,673,1,1,Vincent Corleone,5,Tom Hagen,2.8e-05,0.522613,2.8e-05
+musique,674,1,2,Hung Pham,19,John von Neumann,0.001009,0.58794,0.001009
+musique,675,1,1,"Sophie, Countess of Wessex",10,Mercedes of Orléans,0.000132,0.547739,0.000132
+musique,677,1,2,Gloria Braggiotti Etting,13,Some Enchanted Evening,0.333333,0.557789,0.333333
+musique,679,1,3,Albania at the Olympics,5,Olympic Games ceremony,0.346403,0.512563,0.346403
+musique,679,2,1,Yugoslavia at the Olympics,20,Southern Europe,0.005587,0.59799,0.005587
+musique,680,1,1,Provinces and territories of Canada,84,San Francisco,0.333333,0.919598,0.333333
+musique,681,1,2,Ernst Angel,13,Border Security Force,0.25,0.557789,0.25
+musique,683,1,1,"Biff, the Michigan Wolverine",44,"Pima County Natural Resources, Parks and Recreation",0.5,0.718593,0.5
+musique,684,1,1,Infinity on High,8,Heaven (Beyoncé song),0.128819,0.537688,0.128819
+musique,684,2,2,Kanye West,11,Beyoncé,0.054298,0.547739,0.054298
+musique,685,1,1,United States House of Representatives,14,Arthur Fowler,0.499498,0.567839,0.499498
+musique,685,2,2,1993 Russian constitutional crisis,11,Dissolution of the Soviet Union,0.003346,0.547739,0.003346
+musique,687,1,2,The Right Stuff Records,16,Michael Ray (singer),0.333333,0.572864,0.333333
+musique,693,1,2,Josep Domènech i Estapà,24,Spain,0.269284,0.613065,0.269284
+musique,693,2,3,Palau Güell,23,Spain,0.051559,0.603015,0.051559
+musique,695,1,1,Government of India,57,Presbyterianism,0.250679,0.78392,0.250679
+musique,695,2,3,Culture of India,14,Religion in Israel,0.003223,0.557789,0.003223
+musique,696,1,2,Near East,7,Shiraz,0.013854,0.527638,0.013854
+musique,698,1,3,Capital punishment in the United States,19,"North Ravenswood, West Virginia",0.333399,0.582915,0.333399
+musique,698,2,1,Pennsylvania,85,Supreme court,3.8e-05,0.924623,3.8e-05
+musique,699,1,1,John Kerry,72,Economy of Saint Lucia,0.25,0.859296,0.25
+musique,699,2,3,FC Barcelona,35,Spain,0.16084,0.663317,0.16084
+musique,700,1,2,Willy Wonka & the Chocolate Factory,8,List of Charlie and the Chocolate Factory characters,0.035877,0.532663,0.035877
+musique,701,1,1,Canada,11,American Idol,0.008919,0.552764,0.008919
+musique,702,1,4,"Mexico Beach, Florida",24,Miami,0.332451,0.603015,0.332451
+musique,702,2,2,The Blitz,9,Battle of the Atlantic,0.003208,0.537688,0.003208
+musique,703,1,4,Sino-Tibetan relations during the Ming dynasty,25,Nanjing,0.087374,0.60804,0.087374
+musique,703,2,3,Sino-Tibetan relations during the Ming dynasty,9,Nanjing,0.006525,0.532663,0.006525
+musique,704,1,1,Near East,11,Samarqand District,0.01323,0.552764,0.01323
+musique,705,1,2,Indus Valley Civilisation,13,United Nations Security Council Resolution 862,0.333333,0.557789,0.333333
+musique,708,1,1,Scion (automobile),54,BMW,0.000538,0.768844,0.000538
+musique,709,1,4,Near East,11,Operation Praying Mantis,0.00989,0.537688,0.00989
+musique,709,2,3,USS Jarvis (DD-799),6,Gulf War,4.4e-05,0.517588,4.4e-05
+musique,712,1,2,Korean War,12,Armenians,0.483022,0.552764,0.483022
+musique,712,2,3,Imperialism,17,Armenians,0.016978,0.572864,0.016978
+musique,713,1,1,1982 European Cup Final,5,Everton F.C.,0.25,0.522613,0.25
+musique,714,1,2,Indiana,89,Oklahoma,0.478485,0.939698,0.478485
+musique,714,2,3,Logan Gomez,99,Oklahoma City,0.021515,0.984925,0.021515
+musique,715,1,1,Huguenots,47,Switzerland,0.5,0.733668,0.5
+musique,717,1,4,History of science,10,Avicenna,0.003312,0.532663,0.003312
+musique,717,2,1,Avicenna,11,Avicenna,0.000141,0.552764,0.000141
+musique,718,1,1,Ted Key,32,Albert Einstein,0.5,0.658291,0.5
+musique,719,1,1,American Idol,10,BNA Records,0.25,0.547739,0.25
+musique,719,2,2,Jive Records,17,Prysmian Group,0.25,0.577889,0.25
+musique,720,1,4,110th United States Congress,27,Scottish Parliament,0.414211,0.61809,0.414211
+musique,720,2,3,114th United States Congress,7,Cabinet of the United States,0.023437,0.522613,0.023437
+musique,721,1,2,Middle Ages,9,Utrecht,0.000324,0.537688,0.000324
+musique,722,1,1,Szlachta,25,Sámuel Mikoviny,0.004429,0.623116,0.004429
+musique,723,1,2,"Saint Paul, Minnesota",11,Oklahoma,0.006422,0.547739,0.006422
+musique,724,1,2,Hellenistic period,10,Parthian Empire,0.5,0.542714,0.5
+musique,725,1,3,Buckingham Palace,9,Buckingham Palace,0.023051,0.532663,0.023051
+musique,725,2,2,Buckingham Palace,13,Buckingham Palace,0.011611,0.557789,0.011611
+musique,726,1,1,1982 European Cup Final,10,Everton F.C.,0.308275,0.547739,0.308275
+musique,726,2,3,FA Cup,68,History of Everton F.C.,0.019505,0.829146,0.019505
+musique,727,1,2,Islam in India,80,Presbyterianism,0.3152,0.894472,0.3152
+musique,727,2,3,Culture of India,15,Religion in Israel,0.002812,0.562814,0.002812
+musique,728,1,3,Celebrity Big Brother (American TV series),6,New York Giants Radio Network,0.508513,0.517588,0.508513
+musique,728,2,1,Highway to Heaven,5,New York City,0.006309,0.522613,0.006309
+musique,729,1,1,1973 oil crisis,15,Genesis Motor,0.333333,0.572864,0.333333
+musique,729,2,2,Lexus RX,17,Toyota Racing Development,0.218697,0.577889,0.218697
+musique,730,1,1,Houston Astros,53,Cleveland Indians,0.441726,0.763819,0.441726
+musique,732,1,1,Israel,13,Gulf of Mexico,0.009948,0.562814,0.009948
+musique,733,1,4,Ohio River,24,"Murraysville, West Virginia",0.333311,0.603015,0.333311
+musique,733,2,2,Allegheny River,11,New York City,0.00073,0.547739,0.00073
+musique,735,1,1,New Windsor Historic District,11,Baranya County,0.000474,0.552764,0.000474
+musique,739,1,1,Anselm Tupper,15,Tony Mulder,0.000626,0.572864,0.000626
+musique,742,1,1,East Jersey,26,"Charleston, South Carolina",0.5,0.628141,0.5
+musique,743,1,1,2016 NBA Summer League,68,New York Yankees,0.455604,0.839196,0.455604
+musique,743,2,2,NBA Most Valuable Player Award,18,Kareem Abdul-Jabbar,0.250426,0.582915,0.250426
+musique,745,1,2,Bridge of Sighs,21,Cello Concerto No. 2 (Haydn),0.003295,0.59799,0.003295
+musique,746,1,2,Ohio River,60,"Saint Paul, Minnesota",0.333333,0.79397,0.333333
+musique,747,1,1,Armistice Day,10,Queen Victoria,0.379143,0.547739,0.379143
+musique,747,2,3,Buckingham Palace,17,Queen Victoria,0.089737,0.572864,0.089737
+musique,748,1,1,San Diego,21,...To Be Loved,0.096067,0.603015,0.096067
+musique,748,2,3,Arizona,7,Mississippi,0.00038,0.522613,0.00038
+musique,749,1,1,Powder keg of Europe,5,Myanmar,0.2513,0.522613,0.2513
+musique,749,2,3,Somalis,8,Vat Yotkeo,0.000582,0.527638,0.000582
+musique,753,1,1,Super Bowl,15,Kim Deitch,0.07839,0.572864,0.07839
+musique,756,1,1,"John, King of England",8,Kiri Territory,0.00451,0.537688,0.00451
+musique,757,1,3,History of the Ming dynasty,11,Athanasius of Alexandria,0.00845,0.542714,0.00845
+musique,758,1,1,Toyota Matrix,5,Toyopet Master,0.000778,0.522613,0.000778
+musique,758,2,3,1973 oil crisis,12,Norfolk Assembly,0.001466,0.547739,0.001466
+musique,759,1,1,Mexico,11,John Cabot,0.258357,0.552764,0.258357
+musique,759,2,2,History of the west coast of North America,72,Opening of the North Atlantic Ocean,0.248184,0.854271,0.248184
+musique,760,1,1,2010 United States House of Representatives elections,11,Majority leader,0.004085,0.552764,0.004085
+musique,761,1,1,Israel,6,Jordan,0.25,0.527638,0.25
+musique,762,1,1,Steven Spielberg,6,List of awards and honours received by Audrey Hepburn,0.5,0.527638,0.5
+musique,763,1,1,Barack Obama,5,John Darsee,0.028201,0.522613,0.028201
+musique,764,1,1,KVCK (AM),19,"Crescent City, California",0.005776,0.592965,0.005776
+musique,771,1,1,"Jackson Township, Randolph County, Indiana",21,"Springfield, Illinois",0.270038,0.603015,0.270038
+musique,771,2,3,WRBJ-FM,11,Kentucky State Capitol,0.020002,0.542714,0.020002
+musique,772,1,1,San Diego,9,Oklahoma City,0.021356,0.542714,0.021356
+musique,773,1,1,Senica District,9,Oskar Maria Graf,0.00053,0.542714,0.00053
+musique,774,1,3,2026 FIFA World Cup,21,Thailand,0.077005,0.592965,0.077005
+musique,777,1,1,Maine,6,Mike Medavoy,0.5,0.527638,0.5
+musique,780,1,4,Joseph Severn,11,Paul Kane,0.237883,0.537688,0.237883
+musique,780,2,1,Tiffany Blue,14,Baynard's Castle,0.004716,0.567839,0.004716
+musique,783,1,1,Thelma & Louise,5,Alyson Hannigan,0.002807,0.522613,0.002807
+musique,784,1,1,Monarchy of the United Kingdom,6,Demographics of Pakistan,0.032721,0.527638,0.032721
+musique,785,1,1,1973 oil crisis,9,Acura EL,0.476289,0.542714,0.476289
+musique,785,2,3,Scion (automobile),13,Toyota Matrix,0.175606,0.552764,0.175606
+musique,787,1,2,Montana,64,Democratic Party of Oregon,0.5,0.81407,0.5
+musique,791,1,1,Giuseppe Demachi,10,Szlachta,0.071622,0.547739,0.071622
+musique,792,1,1,Adult contemporary music,21,The Dance (Dave Koz album),0.453319,0.603015,0.453319
+musique,793,1,2,Yaxing Coach,28,Nanjing,0.014482,0.633166,0.014482
+musique,793,2,1,Nanjing,20,Nanjing,0.001503,0.59799,0.001503
+musique,795,1,3,Ambroise-Marie Carré,6,Canonization of Pope John XXIII and Pope John Paul II,7.4e-05,0.517588,7.4e-05
+musique,796,1,1,Lake Ontario,7,CBC Television,0.000552,0.532663,0.000552
+musique,796,2,2,CBC Television,5,CBC Television,6.3e-05,0.517588,6.3e-05
+musique,799,1,2,Roman Republic,9,Neoptolemus,0.5,0.537688,0.5
+musique,802,1,1,Valley Girls,68,San Francisco,0.504029,0.839196,0.504029
+musique,802,2,2,"Campbell, California",14,José Ortega Spottorno,0.008926,0.562814,0.008926
+musique,804,1,1,Christian,10,Stig Olin,0.180592,0.547739,0.180592
+musique,806,1,1,Flooding of the Nile,72,Christian,0.041214,0.859296,0.041214
+musique,808,1,1,French colonization of the Americas,21,Robert Abel (animator),0.333333,0.603015,0.333333
+musique,809,1,1,AAM-N-5 Meteor,19,Bee Gees,0.015188,0.592965,0.015188
+musique,810,1,1,Classical music,54,United States,0.309794,0.768844,0.309794
+musique,810,2,2,Kaunas County,44,Nineteenth Amendment to the United States Constitution,0.006308,0.713568,0.006308
+musique,811,1,1,United Kingdom,11,Alyson Hannigan,0.000157,0.552764,0.000157
+musique,812,1,2,Free State of Mecklenburg-Schwerin,22,German Revolution of 1918–19,0.052671,0.603015,0.052671
+musique,815,1,3,The Biggest Loser (season 16),12,DXAQ-AM,0.015544,0.547739,0.015544
+musique,815,2,2,Labu dan Labi,16,CILB-FM,0.000257,0.572864,0.000257
+musique,818,1,2,Lionel Bart,25,John Everett Millais,0.5,0.61809,0.5
+musique,820,1,1,Nintendo Entertainment System,70,South Korea,0.333333,0.849246,0.333333
+musique,821,1,1,Gulf of Mexico,5,Mississippi River,0.5,0.522613,0.5
+musique,822,1,2,Justice League (film),7,Dazed and Confused (film),0.020997,0.527638,0.020997
+musique,824,1,2,Julie (TV series),8,Julia Roberts,0.431117,0.532663,0.431117
+musique,825,1,1,The Real Housewives of New York City,5,Florida,0.163556,0.522613,0.163556
+musique,825,2,4,The Real L Word,94,"Vero Beach, Florida",0.032611,0.954774,0.032611
+musique,827,1,2,Slavery in the British and French Caribbean,33,Saint Helena,0.101744,0.658291,0.101744
+musique,827,2,3,First Reading of the Emancipation Proclamation of President Lincoln,29,Saint Helena,0.044083,0.633166,0.044083
+musique,828,1,2,Sino-Tibetan relations during the Ming dynasty,11,Athanasius of Alexandria,0.013139,0.547739,0.013139
+musique,832,1,1,The Lego Batman Movie,12,Jerry O'Connell,0.012434,0.557789,0.012434
+musique,833,1,1,Hamburg,35,North Sea,0.33883,0.673367,0.33883
+musique,835,1,1,Society of Communist Czechoslovakia,8,Ashkenazi Jews,0.02488,0.537688,0.02488
+musique,836,1,1,Dugout (baseball),18,Jacques Audiard,0.005802,0.58794,0.005802
+musique,837,1,1,Lion,17,Krimulda Castle,0.011816,0.582915,0.011816
+musique,838,1,1,South Asia,15,Income in the United Kingdom,0.5,0.572864,0.5
+musique,839,1,1,Nintendo Entertainment System,8,NFL (video game),0.5,0.537688,0.5
+musique,840,1,1,God,10,Pam Belluck,0.001006,0.547739,0.001006
+musique,843,1,1,The Bright Mississippi,9,Monument to the Unknown Hero,0.002635,0.542714,0.002635
+musique,844,1,2,Martin of Aragon,22,Spain,0.022256,0.603015,0.022256
+musique,844,2,4,Gothic architecture,87,Philip III of Spain,0.001084,0.919598,0.001084
+musique,846,1,1,Josep Domènech i Estapà,22,Spain,0.17173,0.60804,0.17173
+musique,846,2,4,Gothic architecture,21,Spain,0.052145,0.58794,0.052145
+musique,851,1,1,Slavs,9,Holy Roman Emperor,0.5,0.542714,0.5
+musique,852,1,1,Florida,53,Miami,0.333028,0.763819,0.333028
+musique,852,2,2,Battle of Palembang,5,The Blitz,0.001561,0.517588,0.001561
+musique,854,1,2,Beyoncé,64,The Dark Tower (2017 film),0.333333,0.81407,0.333333
+musique,855,1,1,New York Yankees,46,Jorge Posada,0.333333,0.728643,0.333333
+musique,856,1,1,History of condoms,27,Los Angeles Dodgers,0.503235,0.633166,0.503235
+musique,856,2,2,Home run,11,NBA Most Valuable Player Award,0.003247,0.547739,0.003247
+musique,857,1,1,2017 Wimbledon Championships – Men's Singles,11,Bee Gees,0.108585,0.552764,0.108585
+musique,859,1,1,I Can Only Imagine (film),10,Stig Olin,0.001051,0.547739,0.001051
+musique,863,1,2,Hung Pham,40,Bueng Kan Province,8.8e-05,0.693467,8.8e-05
+musique,865,1,1,Nigeria,8,Chief Justice of the United States,0.018843,0.537688,0.018843
+musique,867,1,1,Middle Ages,5,Charlemagne,0.032515,0.522613,0.032515
+musique,868,1,2,Spain,9,Germany,0.271094,0.537688,0.271094
+musique,868,2,3,List of transcontinental countries,22,Germany,0.046582,0.59799,0.046582
+musique,870,1,1,Meg Griffin,9,Peter Griffin,0.5,0.542714,0.5
+musique,871,1,1,Hubert Latham,7,Dead Horse Bay,0.25,0.532663,0.25
+musique,871,2,2,"Irish Channel, New Orleans",16,Hamburg,0.25,0.572864,0.25
+musique,872,1,1,2016 NCAA Division I Women's Basketball Tournament,8,Memorial Union (Oregon State University),0.5,0.537688,0.5
+musique,873,1,2,Jive Records,53,New York City,0.333333,0.758794,0.333333
+musique,874,1,1,2016 NBA Summer League,19,New York Yankees,0.25,0.592965,0.25
+musique,878,1,1,Missouri,7,Margaret Mayo (playwright),0.25,0.532663,0.25
+musique,878,2,2,The Poor Boob,64,Rhys Adrian,0.228824,0.81407,0.228824
+musique,881,1,1,Dallas Cowboys,30,Super Bowl,0.479865,0.648241,0.479865
+musique,881,2,2,Publishers Clearing House,22,Super Bowl,0.018543,0.603015,0.018543
+musique,884,1,1,Thailand,9,Myanmar,0.193414,0.542714,0.193414
+musique,884,2,2,Somalis,22,Geography of Myanmar,0.037968,0.603015,0.037968
+musique,885,1,1,Alfred North Whitehead,20,Anton Zeilinger,0.007145,0.59799,0.007145
+musique,886,1,2,Middle Ages,16,Klejwy PGR,0.0109,0.572864,0.0109
+musique,890,1,2,Voyager 2,5,Voyager 2,0.075211,0.517588,0.075211
+musique,891,1,1,Switzerland,5,List of United States public university campuses by enrollment,0.001396,0.522613,0.001396
+musique,892,1,1,United States,5,Toyota,0.5,0.522613,0.5
+musique,893,1,2,Military history of the United States during World War II,64,Great Britain,0.315844,0.81407,0.315844
+musique,896,1,1,A Kiom,14,Thailand,0.356186,0.567839,0.356186
+musique,896,2,2,Myanmar,13,1986 FIFA World Cup,0.0731,0.557789,0.0731
+musique,898,1,1,Scott Cooley,5,Paul Kane,0.240911,0.522613,0.240911
+musique,901,1,1,Ohio River,14,Minneapolis,0.333333,0.567839,0.333333
+musique,901,2,2,Allegheny River,46,Mississippi River,0.267673,0.723618,0.267673
+musique,904,1,1,Kate Kellaway,12,Kim Deitch,1.2e-05,0.557789,1.2e-05
+musique,906,1,2,Bridge of Sighs,89,Detroit,0.333333,0.939698,0.333333
+musique,907,1,1,Dazed and Confused (film),23,List of awards and nominations received by Matt Damon,0.5,0.613065,0.5
+musique,908,1,1,2016 NBA Summer League,32,New York Yankees,0.25,0.658291,0.25
+musique,910,1,4,Molotov–Ribbentrop Pact,18,Soviet Union in World War II,0.223471,0.572864,0.223471
+musique,910,2,1,Molotov–Ribbentrop Pact,11,Russian Revolution,0.081993,0.552764,0.081993
+musique,911,1,2,Sino-Tibetan relations during the Ming dynasty,19,Athanasius of Alexandria,0.259419,0.58794,0.259419
+musique,911,2,3,Sino-Tibetan relations during the Ming dynasty,12,Nanjing,0.002269,0.547739,0.002269
+musique,912,1,3,Justice League (film),17,Gal Gadot,0.333333,0.572864,0.333333
+musique,914,1,1,Jaluit Airport,17,Marshall Islands,0.154655,0.582915,0.154655
+musique,915,1,1,Macintosh,30,USB,0.079874,0.648241,0.079874
+musique,915,2,2,IPod,44,USB,0.015991,0.713568,0.015991
+musique,916,1,2,Adult contemporary music,29,Closer (Josh Groban album),0.666667,0.638191,0.666667
+musique,917,1,1,Great Purge,12,Soviet Union in World War II,0.348176,0.557789,0.348176
+musique,917,2,2,Molotov–Ribbentrop Pact,60,Soviet Union,0.052369,0.79397,0.052369
+musique,918,1,1,Fishing Creek Confederacy,41,United States,0.296541,0.703518,0.296541
+musique,918,2,2,"Portland, Oregon",68,Canada–United States border,0.107323,0.834171,0.107323
+musique,921,1,1,United States,5,Automotive industry,0.030434,0.522613,0.030434
+musique,922,1,1,Vat Yotkeo,31,Xe Kaman River,0.333333,0.653266,0.333333
+musique,925,1,1,Ambroise-Marie Carré,14,Sokolniki District,0.113355,0.567839,0.113355
+musique,926,1,1,Leader of Opposition (Uganda),84,Republican Party (United States),0.5,0.919598,0.5
+musique,927,1,1,Indian Rebellion of 1857,6,East India Company,0.148063,0.527638,0.148063
+musique,931,1,1,Carmelo Imbriani,16,Cemaes Bay F.C.,0.003812,0.577889,0.003812
+musique,932,1,1,NBA Sportsmanship Award,24,2009–10 Oklahoma City Thunder season,0.333333,0.61809,0.333333
+musique,932,2,3,List of National Basketball Association annual scoring leaders,8,Kevin Durant,0.300059,0.527638,0.300059
+musique,934,1,1,Pope John XXIII,31,Pope John XXIII,0.04248,0.653266,0.04248
+musique,935,1,2,East Timor,75,Tunisia,0.126901,0.869347,0.126901
+musique,937,1,1,Anti-aircraft warfare,5,Archie Marries Veronica/Archie Marries Betty,9e-06,0.522613,9e-06
+musique,938,1,1,IRS-P2,7,Communications satellite,0.000108,0.532663,0.000108
+musique,939,1,1,Katavi National Park,19,Tanzania,0.246058,0.592965,0.246058
+musique,939,2,2,Ruaha National Park,34,Tanzania,0.120572,0.663317,0.120572
+musique,946,1,1,Dragon Dreams,11,Niels Henrik Abel,0.003006,0.552764,0.003006
+musique,946,2,2,Claus von Stauffenberg,6,Krimulda Castle,2.7e-05,0.522613,2.7e-05
+musique,947,1,1,Sloan Thomas,7,Nashville metropolitan area,0.00049,0.532663,0.00049
+musique,948,1,4,Warsaw Pact,16,Dissolution of the Soviet Union,0.341678,0.562814,0.341678
+musique,948,2,1,Warsaw Pact,94,Soviet Union in World War II,0.097721,0.969849,0.097721
+musique,949,1,2,In Real Life (band),8,Albert Brooks,0.476224,0.532663,0.476224
+musique,950,1,1,The Handmaid's Tale (TV series),38,New England,0.333333,0.688442,0.333333
+musique,953,1,1,Classical music,35,Missouri,0.25,0.673367,0.25
+musique,953,2,2,KAPE,76,Indiana,0.25,0.874372,0.25
+musique,955,1,1,Ichiro Suzuki,12,List of Major League Baseball career on-base percentage leaders,0.333333,0.557789,0.333333
+musique,955,2,2,Batting average,19,Camden Indians,0.333333,0.58794,0.333333
+musique,956,1,1,Saralyn Smith,41,Dissolution of Czechoslovakia,0.045791,0.703518,0.045791
+musique,956,2,3,Czech Republic,8,Police,0.021677,0.527638,0.021677
+musique,957,1,1,FC Barcelona,7,Louis Chedid,0.02628,0.532663,0.02628
+musique,959,1,1,Huguenots,17,Dutch Republic,0.398015,0.582915,0.398015
+musique,959,2,3,New York City,21,Dutch Republic,0.070944,0.592965,0.070944
+musique,960,1,2,Liu Yin (Southern Han),11,Marty McFly,2e-06,0.547739,2e-06
+musique,963,1,2,"Mary, mother of Jesus",5,Joachim,0.5,0.517588,0.5
+musique,965,1,1,Panama Canal Zone,7,Pambula River,0.00095,0.532663,0.00095
+musique,967,1,1,Crystal Kay,20,Let There Be Love (1993 Joni James album),0.5,0.59799,0.5
+musique,969,1,1,"Ernie Watts (footballer, born 1872)",20,Woolhampton,0.5,0.59799,0.5
+musique,970,1,1,Detroit,50,New York City,0.001436,0.748744,0.001436
+musique,971,1,1,United States Navy SEALs,6,O-1 (airship),0.004964,0.527638,0.004964
+musique,972,1,1,New York City,8,Sony Music,0.033056,0.537688,0.033056
+musique,972,2,4,Scratchie Records,13,Sony Music,0.010456,0.547739,0.010456
+musique,973,1,2,Marshall Islands,13,Al-Masjid an-Nabawi,0.333333,0.557789,0.333333
+musique,974,1,1,Nintendo Entertainment System,6,List of Super Bowl halftime shows,0.002985,0.527638,0.002985
+musique,976,1,1,Ohio River,98,Minneapolis BNSF Rail Bridge,0.02415,0.98995,0.02415
+musique,977,1,1,Capital punishment in the United States,58,Oklahoma City,0.004724,0.788945,0.004724
+musique,977,2,2,Detroit,13,Pennsylvania,1e-05,0.557789,1e-05
+musique,978,1,1,1982 European Cup Final,14,Pambula River,0.001213,0.567839,0.001213
+musique,979,1,2,Black people,5,African Americans in the United States Congress,0.25,0.517588,0.25
+musique,979,2,3,Detroit,19,New York City,0.25,0.582915,0.25
+musique,988,1,2,"Charleston, South Carolina",15,Baranya County,0.004651,0.567839,0.004651
+musique,991,1,1,Chemical element,8,James Chadwick,0.5,0.537688,0.5
+musique,992,1,2,Lexa Doig,24,Arnold Schwarzenegger,0.081465,0.613065,0.081465
+musique,992,2,3,Archie Marries Veronica/Archie Marries Betty,23,Arnold Schwarzenegger,0.007457,0.603015,0.007457
+musique,994,1,1,Sant Martí d'Empúries,45,Separation of powers under the United States Constitution,0.198339,0.723618,0.198339
+musique,994,2,2,Real Madrid CF,11,French and Indian War,0.050736,0.547739,0.050736
+musique,996,1,1,Grown Ups (film),16,Sylvia Fine,0.014842,0.577889,0.014842
+musique,997,1,1,1973 oil crisis,11,Acura EL,0.5,0.552764,0.5
+musique,997,2,2,Acura RL,6,Toyota,0.25,0.522613,0.25
+musique,999,1,1,Westworld (TV series),5,Sony Music,0.001784,0.522613,0.001784
+musique,999,2,4,Sony Music,12,Sky UK,1.4e-05,0.542714,1.4e-05

@@ -1,0 +1,3 @@
+[2026-05-06T10:06:24+08:00] [stop_after_nq] Waiting for NQ DAEC+CE outputs before stopping original sequential launcher.
+[2026-05-06T11:06:55+08:00] [stop_after_nq] NQ outputs are present. Stopping original session nq_popqa_bridge100 so PopQA is not duplicated.
+[2026-05-06T11:06:55+08:00] [stop_after_nq] Stopped session nq_popqa_bridge100.

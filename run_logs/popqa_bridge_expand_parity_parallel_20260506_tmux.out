@@ -1,0 +1,6 @@
+[2026-05-06T10:06:24+08:00] [popqa_parallel] PopQA bridge expand parity parallel begin; shared output dir=/mnt/nvme/code/HippoRAG/run_logs/nq_popqa_hippo_bridge_expand_parity_limit100_20260506
+[2026-05-06T10:06:24+08:00] [popqa_parallel] START eval dataset=popqa variant=bridge_daec limit=100 qa_top_k=5 port=8042
+[2026-05-06T11:43:40+08:00] [popqa_parallel] DONE eval dataset=popqa variant=bridge_daec output=/mnt/nvme/code/HippoRAG/run_logs/nq_popqa_hippo_bridge_expand_parity_limit100_20260506/evals/popqa_bridge_daec_qwen8b_legacy_structure_limit100.json
+[2026-05-06T11:43:40+08:00] [popqa_parallel] START eval dataset=popqa variant=bridge_ce limit=100 qa_top_k=5 port=8042
+[2026-05-06T11:47:34+08:00] [popqa_parallel] DONE eval dataset=popqa variant=bridge_ce output=/mnt/nvme/code/HippoRAG/run_logs/nq_popqa_hippo_bridge_expand_parity_limit100_20260506/evals/popqa_bridge_ce_qwen8b_legacy_structure_limit100.json
+[2026-05-06T11:47:34+08:00] [popqa_parallel] PopQA bridge expand parity parallel complete

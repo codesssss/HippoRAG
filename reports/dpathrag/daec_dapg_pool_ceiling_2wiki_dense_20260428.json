@@ -1,0 +1,45 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "dataset": "2wiki_dense",
+  "record_count": 1000,
+  "k_values": [
+    5,
+    20,
+    100
+  ],
+  "summary": {
+    "rows": 3000,
+    "by_hop_k": {
+      "2:k5": {
+        "support_recall": 0.7771,
+        "support_complete": 0.5542,
+        "rows": 765
+      },
+      "2:k20": {
+        "support_recall": 0.8529,
+        "support_complete": 0.7059,
+        "rows": 765
+      },
+      "2:k100": {
+        "support_recall": 0.9209,
+        "support_complete": 0.8418,
+        "rows": 765
+      },
+      "4:k5": {
+        "support_recall": 0.55,
+        "support_complete": 0.0213,
+        "rows": 235
+      },
+      "4:k20": {
+        "support_recall": 0.6234,
+        "support_complete": 0.0766,
+        "rows": 235
+      },
+      "4:k100": {
+        "support_recall": 0.734,
+        "support_complete": 0.2638,
+        "rows": 235
+      }
+    }
+  }
+}

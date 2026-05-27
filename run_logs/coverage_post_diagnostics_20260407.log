@@ -1,0 +1,9 @@
+[2026-04-07 23:49:04] Watcher started poll_seconds=60
+[2026-04-08 00:36:09] Detected queue completion from run_logs/coverage_assembly_matrix_20260407.status
+[2026-04-08 00:36:09] START diagnostics output_json=run_logs/coverage_post_diagnostics_20260407.json
+{
+  "output_json": "run_logs/coverage_post_diagnostics_20260407.json",
+  "output_md": "run_logs/coverage_post_diagnostics_20260407.md"
+}
+[2026-04-08 00:36:11] DONE diagnostics output_json=run_logs/coverage_post_diagnostics_20260407.json output_md=run_logs/coverage_post_diagnostics_20260407.md
+[2026-04-08 00:36:11] Watcher finished

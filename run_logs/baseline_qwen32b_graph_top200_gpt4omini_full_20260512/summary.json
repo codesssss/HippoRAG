@@ -1,0 +1,82 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "hipporag_qwen32b_top200",
+      "count": 1000,
+      "Recall@5": 0.7238,
+      "Recall@20": 0.799,
+      "Recall@100": 0.877,
+      "Recall@200": 0.912,
+      "EM": 0.517,
+      "F1": 0.5619,
+      "reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/reader_qa/hipporag/2wikimultihopqa_hipporag_qwen32b_nothink_top200_gpt4omini_reader_top5.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "hipporag_qwen32b_top200",
+      "count": 1000,
+      "Recall@5": 0.9305,
+      "Recall@20": 0.983,
+      "Recall@100": 0.9925,
+      "Recall@200": 0.9945,
+      "EM": 0.605,
+      "F1": 0.7368,
+      "reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/reader_qa/hipporag/hotpotqa_hipporag_qwen32b_nothink_top200_gpt4omini_reader_top5.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "hipporag_qwen32b_top200",
+      "count": 1000,
+      "Recall@5": 0.6888,
+      "Recall@20": 0.8318,
+      "Recall@100": 0.9091,
+      "Recall@200": 0.9365,
+      "EM": 0.33,
+      "F1": 0.433,
+      "reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/reader_qa/hipporag/musique_hipporag_qwen32b_nothink_top200_gpt4omini_reader_top5.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "proprag_qwen32b_top200",
+      "count": 1000,
+      "Recall@5": 0.909,
+      "Recall@20": 0.9633,
+      "Recall@100": 0.991,
+      "Recall@200": 0.996,
+      "EM": 0.611,
+      "F1": 0.6909,
+      "reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/reader_qa/proprag/2wikimultihopqa_proprag_qwen32b_nothink_top200_gpt4omini_reader_top5.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "proprag_qwen32b_top200",
+      "count": 1000,
+      "Recall@5": 0.951,
+      "Recall@20": 0.9945,
+      "Recall@100": 0.9995,
+      "Recall@200": 0.9995,
+      "EM": 0.618,
+      "F1": 0.751,
+      "reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/reader_qa/proprag/hotpotqa_proprag_qwen32b_nothink_top200_gpt4omini_reader_top5.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "proprag_qwen32b_top200",
+      "count": 1000,
+      "Recall@5": 0.7424,
+      "Recall@20": 0.9037,
+      "Recall@100": 0.9737,
+      "Recall@200": 0.9841,
+      "EM": 0.365,
+      "F1": 0.476,
+      "reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/baseline_qwen32b_graph_top200_gpt4omini_full_20260512/reader_qa/proprag/musique_proprag_qwen32b_nothink_top200_gpt4omini_reader_top5.json"
+    }
+  ]
+}

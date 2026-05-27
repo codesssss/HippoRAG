@@ -1,0 +1,16 @@
+
+[2026-03-31 10:19:40] START 2wiki_set_closure_reweight_baseprior_smoke40
+Traceback (most recent call last):
+  File "/mnt/nvme/code/HippoRAG/scripts/eval_causal_qwen3.py", line 12, in <module>
+    from src.hipporag.HippoRAG import HippoRAG
+ModuleNotFoundError: No module named 'src'
+
+[2026-03-31 10:19:40] END 2wiki_set_closure_reweight_baseprior_smoke40 rc=1
+
+[2026-03-31 10:19:40] START musique_set_closure_reweight_baseprior_smoke40
+Traceback (most recent call last):
+  File "/mnt/nvme/code/HippoRAG/scripts/eval_causal_qwen3.py", line 12, in <module>
+    from src.hipporag.HippoRAG import HippoRAG
+ModuleNotFoundError: No module named 'src'
+
+[2026-03-31 10:19:41] END musique_set_closure_reweight_baseprior_smoke40 rc=1

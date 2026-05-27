@@ -1,0 +1,72 @@
+{
+  "date": "2026-04-29",
+  "decision": "STOP_ENTITY_BRIDGE_CEILING_FAIL",
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "sample": "first_10_musique_4hop_examples_inside_limit100",
+  "gate": {
+    "min_entity_bridge_transition_rate": 0.6,
+    "min_fully_entity_bridge_queries": 6
+  },
+  "summary": {
+    "queries_audited": 10,
+    "estimated_hop_transitions": 30,
+    "entity_bridge_transitions": 14,
+    "entity_bridge_transition_rate": 0.4667,
+    "fully_entity_bridge_queries": 1,
+    "fully_entity_bridge_query_rate": 0.1
+  },
+  "cases": [
+    {
+      "query_idx": 5,
+      "labels": ["relation_selection", "comparison_operator", "attribute_or_event"],
+      "diagnosis": "Saudi/Israel/Kuwait geography and created-date target require region relation selection, not simple shared entities."
+    },
+    {
+      "query_idx": 6,
+      "labels": ["entity_bridge", "entity_bridge", "entity_bridge"],
+      "diagnosis": "Southeast Library -> Ralph Rapson -> Minneapolis -> Mississippi River is mostly bridgeable by explicit entities."
+    },
+    {
+      "query_idx": 7,
+      "labels": ["entity_bridge", "relation_selection", "entity_bridge"],
+      "diagnosis": "Sony/Universal/Santa Monica path is partly entity-bridge, but only-group-larger is relation selection."
+    },
+    {
+      "query_idx": 11,
+      "labels": ["entity_bridge", "relation_selection", "relation_selection"],
+      "diagnosis": "Portuguese/Ottoman/Myanmar/Laos path depends on country-between and historical defeat/expulsion relations."
+    },
+    {
+      "query_idx": 24,
+      "labels": ["relation_selection", "entity_bridge", "entity_bridge"],
+      "diagnosis": "Mexico/North America and John Cabot/Sebastian Cabot path is partially bridgeable but requires continent and child relation selection."
+    },
+    {
+      "query_idx": 30,
+      "labels": ["relation_selection", "relation_selection", "attribute_or_event"],
+      "diagnosis": "Springfield Missouri vs Springfield Illinois requires same-name disambiguation and state-capital relation."
+    },
+    {
+      "query_idx": 33,
+      "labels": ["relation_selection", "comparison_operator", "attribute_or_event"],
+      "diagnosis": "Near East/Shamal/Saudi path is dominated by geography and region interpretation."
+    },
+    {
+      "query_idx": 39,
+      "labels": ["entity_bridge", "relation_selection", "entity_bridge"],
+      "diagnosis": "MLB/World Series/draft path has entity overlap but needs league/competition relation selection."
+    },
+    {
+      "query_idx": 49,
+      "labels": ["entity_bridge", "relation_selection", "entity_bridge"],
+      "diagnosis": "Sony/Universal/Santa Monica path is bridgeable except for only-group-larger relation selection."
+    },
+    {
+      "query_idx": 51,
+      "labels": ["entity_bridge", "relation_selection", "comparison_operator"],
+      "diagnosis": "Mingus/Arizona/Phoenix/IndyCar path requires birth-state and largest-city comparison, not entity co-occurrence alone."
+    }
+  ],
+  "hard_stop": true,
+  "next_action": "return_to_daec_l1_findings_mainline"
+}

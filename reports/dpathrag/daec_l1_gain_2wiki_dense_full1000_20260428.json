@@ -1,0 +1,1397 @@
+{
+  "report_json": "run_logs/daec_noisyor_dense_pool100_2wiki_fixclean_full1000_20260428.json",
+  "dataset": "2wikimultihopqa",
+  "source_name": "dense_pool100",
+  "summary": {
+    "rows": 1000,
+    "overall": {
+      "baseline_em": 0.455,
+      "selector_em": 0.498,
+      "delta_em": 0.043,
+      "baseline_f1": 0.4991,
+      "selector_f1": 0.5541,
+      "delta_f1": 0.0551,
+      "changed_from_baseline": 0.839,
+      "title_jaccard": 0.7353,
+      "doc_jaccard": 0.7354,
+      "same_title_set": 0.395,
+      "same_doc_set": 0.395,
+      "support_recall_delta": 0.0617,
+      "support_complete_delta": 0.115,
+      "noise_delta": -0.0292,
+      "duplicate_delta": 0.0,
+      "rows": 1000
+    },
+    "answer_transitions": {
+      "both_wrong": 450,
+      "both_correct": 403,
+      "wrong_to_correct": 95,
+      "correct_to_wrong": 52
+    },
+    "f1_buckets": {
+      "f1_unchanged": 808,
+      "f1_improved": 128,
+      "f1_regressed": 64
+    },
+    "by_answer_transition": {
+      "both_correct": {
+        "baseline_em": 1.0,
+        "selector_em": 1.0,
+        "delta_em": 0.0,
+        "baseline_f1": 1.0,
+        "selector_f1": 1.0,
+        "delta_f1": 0.0,
+        "changed_from_baseline": 0.7841,
+        "title_jaccard": 0.7433,
+        "doc_jaccard": 0.7434,
+        "same_title_set": 0.4591,
+        "same_doc_set": 0.4591,
+        "support_recall_delta": 0.0143,
+        "support_complete_delta": 0.0099,
+        "noise_delta": -0.0119,
+        "added_gold_count": 0.072,
+        "removed_gold_count": 0.0124,
+        "added_non_gold_count": 0.8065,
+        "removed_non_gold_count": 0.866,
+        "duplicate_delta": 0.0,
+        "rows": 403
+      },
+      "both_wrong": {
+        "baseline_em": 0.0,
+        "selector_em": 0.0,
+        "delta_em": 0.0,
+        "baseline_f1": 0.0901,
+        "selector_f1": 0.1188,
+        "delta_f1": 0.0287,
+        "changed_from_baseline": 0.8356,
+        "title_jaccard": 0.7659,
+        "doc_jaccard": 0.7659,
+        "same_title_set": 0.4267,
+        "same_doc_set": 0.4267,
+        "support_recall_delta": 0.0639,
+        "support_complete_delta": 0.1289,
+        "noise_delta": -0.0276,
+        "added_gold_count": 0.1689,
+        "removed_gold_count": 0.0311,
+        "added_non_gold_count": 0.6022,
+        "removed_non_gold_count": 0.74,
+        "duplicate_delta": 0.0,
+        "rows": 450
+      },
+      "correct_to_wrong": {
+        "baseline_em": 1.0,
+        "selector_em": 0.0,
+        "delta_em": -1.0,
+        "baseline_f1": 1.0,
+        "selector_f1": 0.0513,
+        "delta_f1": -0.9487,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.5652,
+        "doc_jaccard": 0.5652,
+        "same_title_set": 0.2115,
+        "same_doc_set": 0.2115,
+        "support_recall_delta": -0.149,
+        "support_complete_delta": -0.1923,
+        "noise_delta": 0.0654,
+        "added_gold_count": 0.0769,
+        "removed_gold_count": 0.4038,
+        "added_non_gold_count": 1.5385,
+        "removed_non_gold_count": 1.2115,
+        "duplicate_delta": 0.0,
+        "rows": 52
+      },
+      "wrong_to_correct": {
+        "baseline_em": 0.0,
+        "selector_em": 1.0,
+        "delta_em": 1.0,
+        "baseline_f1": 0.037,
+        "selector_f1": 1.0,
+        "delta_f1": 0.963,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6499,
+        "doc_jaccard": 0.6499,
+        "same_title_set": 0.0737,
+        "same_doc_set": 0.0737,
+        "support_recall_delta": 0.3684,
+        "support_complete_delta": 0.6632,
+        "noise_delta": -0.1621,
+        "added_gold_count": 0.8105,
+        "removed_gold_count": 0.0,
+        "added_non_gold_count": 0.2947,
+        "removed_non_gold_count": 1.1053,
+        "duplicate_delta": 0.0,
+        "rows": 95
+      }
+    },
+    "by_f1_bucket": {
+      "f1_improved": {
+        "baseline_em": 0.0,
+        "selector_em": 0.7422,
+        "delta_em": 0.7422,
+        "baseline_f1": 0.0345,
+        "selector_f1": 0.8757,
+        "delta_f1": 0.8412,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6495,
+        "doc_jaccard": 0.6495,
+        "same_title_set": 0.0781,
+        "same_doc_set": 0.0781,
+        "support_recall_delta": 0.3594,
+        "support_complete_delta": 0.6641,
+        "noise_delta": -0.1547,
+        "added_gold_count": 0.7734,
+        "removed_gold_count": 0.0,
+        "added_non_gold_count": 0.3359,
+        "removed_non_gold_count": 1.1094,
+        "duplicate_delta": 0.0,
+        "rows": 128
+      },
+      "f1_regressed": {
+        "baseline_em": 0.8125,
+        "selector_em": 0.0,
+        "delta_em": -0.8125,
+        "baseline_f1": 0.9095,
+        "selector_f1": 0.0875,
+        "delta_f1": -0.822,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6014,
+        "doc_jaccard": 0.6014,
+        "same_title_set": 0.2344,
+        "same_doc_set": 0.2344,
+        "support_recall_delta": -0.1211,
+        "support_complete_delta": -0.1562,
+        "noise_delta": 0.0531,
+        "added_gold_count": 0.0781,
+        "removed_gold_count": 0.3438,
+        "added_non_gold_count": 1.375,
+        "removed_non_gold_count": 1.1094,
+        "duplicate_delta": 0.0,
+        "rows": 64
+      },
+      "f1_unchanged": {
+        "baseline_em": 0.4988,
+        "selector_em": 0.4988,
+        "delta_em": 0.0,
+        "baseline_f1": 0.5402,
+        "selector_f1": 0.5402,
+        "delta_f1": 0.0,
+        "changed_from_baseline": 0.8007,
+        "title_jaccard": 0.7595,
+        "doc_jaccard": 0.7596,
+        "same_title_set": 0.4579,
+        "same_doc_set": 0.4579,
+        "support_recall_delta": 0.0291,
+        "support_complete_delta": 0.0495,
+        "noise_delta": -0.0158,
+        "added_gold_count": 0.1015,
+        "removed_gold_count": 0.0223,
+        "added_non_gold_count": 0.7092,
+        "removed_non_gold_count": 0.7884,
+        "duplicate_delta": 0.0,
+        "rows": 808
+      }
+    },
+    "changed_doc_set": {
+      "baseline_em": 0.4281,
+      "selector_em": 0.5058,
+      "delta_em": 0.0777,
+      "baseline_f1": 0.4601,
+      "selector_f1": 0.5555,
+      "delta_f1": 0.0954,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.5625,
+      "doc_jaccard": 0.5626,
+      "same_title_set": 0.0,
+      "same_doc_set": 0.0,
+      "support_recall_delta": 0.1021,
+      "support_complete_delta": 0.1901,
+      "noise_delta": -0.0483,
+      "duplicate_delta": 0.0,
+      "rows": 605
+    },
+    "unchanged_doc_set": {
+      "baseline_em": 0.4962,
+      "selector_em": 0.4861,
+      "delta_em": -0.0101,
+      "baseline_f1": 0.5589,
+      "selector_f1": 0.5521,
+      "delta_f1": -0.0067,
+      "changed_from_baseline": 0.5924,
+      "title_jaccard": 1.0,
+      "doc_jaccard": 1.0,
+      "same_title_set": 1.0,
+      "same_doc_set": 1.0,
+      "support_recall_delta": 0.0,
+      "support_complete_delta": 0.0,
+      "noise_delta": 0.0,
+      "duplicate_delta": 0.0,
+      "rows": 395
+    },
+    "improved_f1": {
+      "baseline_em": 0.0,
+      "selector_em": 0.7422,
+      "delta_em": 0.7422,
+      "baseline_f1": 0.0345,
+      "selector_f1": 0.8757,
+      "delta_f1": 0.8412,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.6495,
+      "doc_jaccard": 0.6495,
+      "same_title_set": 0.0781,
+      "same_doc_set": 0.0781,
+      "support_recall_delta": 0.3594,
+      "support_complete_delta": 0.6641,
+      "noise_delta": -0.1547,
+      "duplicate_delta": 0.0,
+      "rows": 128
+    },
+    "regressed_f1": {
+      "baseline_em": 0.8125,
+      "selector_em": 0.0,
+      "delta_em": -0.8125,
+      "baseline_f1": 0.9095,
+      "selector_f1": 0.0875,
+      "delta_f1": -0.822,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.6014,
+      "doc_jaccard": 0.6014,
+      "same_title_set": 0.2344,
+      "same_doc_set": 0.2344,
+      "support_recall_delta": -0.1211,
+      "support_complete_delta": -0.1562,
+      "noise_delta": 0.0531,
+      "duplicate_delta": 0.0,
+      "rows": 64
+    }
+  },
+  "examples": {
+    "largest_f1_gains": [
+      {
+        "query_idx": 19,
+        "question": "Where was the director of film The Private Life Of Cinema born?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Montreal, Quebec.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "The Private Life of Cinema",
+          "Peter Greenaway",
+          "Claude Weisz",
+          "Alexander Korda",
+          "Bertrand Tavernier"
+        ],
+        "selector_top_titles": [
+          "The Private Life of Cinema",
+          "Denys Desjardins",
+          "Peter Greenaway",
+          "Claude Weisz",
+          "Alexander Korda"
+        ]
+      },
+      {
+        "query_idx": 39,
+        "question": "Who lived longer, Ludwig Elsbett or Pamela Ann Rymer?",
+        "baseline_answer": "Pamela Ann Rymer.",
+        "selector_answer": "Ludwig Elsbett.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Pamela Ann Rymer",
+          "Ludwig Elsbett",
+          "Lars Eliasson",
+          "Princess Maria Elisabeth of Bavaria",
+          "Hélène Grenier"
+        ],
+        "selector_top_titles": [
+          "Otto of Limburg",
+          "Pamela Ann Rymer",
+          "Ludwig Elsbett",
+          "Lars Eliasson",
+          "Princess Maria Elisabeth of Bavaria"
+        ]
+      },
+      {
+        "query_idx": 49,
+        "question": "Where does the director of film A Nest Of Noblemen work at?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "VGIK.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "A Nest of Noblemen",
+          "G. Marthandan",
+          "Ringo-en no shōjo",
+          "The Last of the Knucklemen",
+          "Ian Barry (director)"
+        ],
+        "selector_top_titles": [
+          "A Nest of Noblemen",
+          "Vladimir Gardin",
+          "G. Marthandan",
+          "Ringo-en no shōjo",
+          "The Last of the Knucklemen"
+        ]
+      },
+      {
+        "query_idx": 53,
+        "question": "Who is the child of the director of film Los Pagares De Mendieta?",
+        "baseline_answer": "Not mentioned.",
+        "selector_answer": "Leopoldo Torre Nilsson.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Los Pagares de Mendieta",
+          "Lars Eliasson",
+          "Steve Cooreman",
+          "Obata Toramori",
+          "Yasuichi Oshima"
+        ],
+        "selector_top_titles": [
+          "Los Pagares de Mendieta",
+          "Leopoldo Torres Ríos",
+          "Lars Eliasson",
+          "Steve Cooreman",
+          "Obata Toramori"
+        ]
+      },
+      {
+        "query_idx": 64,
+        "question": "Where was the husband of Joanna Elisabeth Of Holstein-Gottorp born?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Dornburg.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Joanna Elisabeth of Holstein-Gottorp",
+          "Christian August of Holstein-Gottorp, Prince of Eutin",
+          "Duchess Marie Elisabeth of Saxony",
+          "Augusta Marie of Holstein-Gottorp",
+          "Louise Elisabeth of Courland"
+        ],
+        "selector_top_titles": [
+          "Joanna Elisabeth of Holstein-Gottorp",
+          "Christian August, Prince of Anhalt-Zerbst",
+          "Christian August of Holstein-Gottorp, Prince of Eutin",
+          "Duchess Marie Elisabeth of Saxony",
+          "Augusta Marie of Holstein-Gottorp"
+        ]
+      },
+      {
+        "query_idx": 71,
+        "question": "Where did the director of film Dancing In The Rain (Film) die?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Ljubljana.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Dancing in the Rain",
+          "Dancing in the Rain (film)",
+          "Claude Weisz",
+          "Jean Grémillon",
+          "Ian Barry (director)"
+        ],
+        "selector_top_titles": [
+          "Dancing in the Rain (film)",
+          "Boštjan Hladnik",
+          "Dancing in the Rain",
+          "Claude Weisz",
+          "Jean Grémillon"
+        ]
+      },
+      {
+        "query_idx": 80,
+        "question": "Who is the mother of the director of film Atomised (Film)?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Gisela Elsner.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Atomised (film)",
+          "Claude Weisz",
+          "Steve Cooreman",
+          "Diane Kurys",
+          "Mommy Is at the Hairdresser's"
+        ],
+        "selector_top_titles": [
+          "Oskar Roehler",
+          "Atomised (film)",
+          "Claude Weisz",
+          "Steve Cooreman",
+          "Diane Kurys"
+        ]
+      },
+      {
+        "query_idx": 94,
+        "question": "What nationality is Lamprocles's father?",
+        "baseline_answer": "Greek.",
+        "selector_answer": "Athenian.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Lamprocles",
+          "Obata Toramori",
+          "Lars Eliasson",
+          "Yasuichi Oshima",
+          "Takayama Tomoteru"
+        ],
+        "selector_top_titles": [
+          "Lamprocles",
+          "Socrates",
+          "Obata Toramori",
+          "Lars Eliasson",
+          "Yasuichi Oshima"
+        ]
+      },
+      {
+        "query_idx": 97,
+        "question": "Which film has the director born first, Mord Em'Ly or Ek Hi Bhool (1940 Film)?",
+        "baseline_answer": "Ek Hi Bhool (1940 Film).",
+        "selector_answer": "Mord Em'ly.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Ek Hi Bhool (1940 film)",
+          "Ek Hi Bhool",
+          "Jean Grémillon",
+          "Michael Powell",
+          "Claude Autant-Lara"
+        ],
+        "selector_top_titles": [
+          "Ek Hi Bhool (1940 film)",
+          "Mord Em'ly",
+          "Ek Hi Bhool",
+          "Jean Grémillon",
+          "Michael Powell"
+        ]
+      },
+      {
+        "query_idx": 100,
+        "question": "Who is the paternal grandfather of Margaret Of Bavaria, Marchioness Of Mantua?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "Ernest, Duke of Bavaria.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Margaret of Bavaria, Marchioness of Mantua",
+          "Margaret of Bavaria, Electress Palatine",
+          "Margaret of Cleves, Duchess of Bavaria-Munich",
+          "Margaret Paleologa",
+          "William of Bavaria-Munich"
+        ],
+        "selector_top_titles": [
+          "Albert III, Duke of Bavaria",
+          "Obata Toramori",
+          "Margaret of Bavaria, Marchioness of Mantua",
+          "Margaret of Bavaria, Electress Palatine",
+          "Margaret of Cleves, Duchess of Bavaria-Munich"
+        ]
+      }
+    ],
+    "largest_f1_losses": [
+      {
+        "query_idx": 35,
+        "question": "Who was born later, Gideon Johnson Pillow or Holm Jølsen?",
+        "baseline_answer": "Holm Jølsen.",
+        "selector_answer": "Gideon Johnson Pillow.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Gideon Johnson Pillow",
+          "Holm Jølsen",
+          "Ola Isene",
+          "Victor Janson",
+          "Peter Gravesen"
+        ],
+        "selector_top_titles": [
+          "The Birth of John the Baptist",
+          "Peter Gravesen",
+          "Holm Jølsen",
+          "Gideon Johnson Pillow",
+          "Ola Isene"
+        ]
+      },
+      {
+        "query_idx": 43,
+        "question": "Which film has the director who was born first, Tombstone Rashomon or Waiting For The Clouds?",
+        "baseline_answer": "Tombstone Rashomon.",
+        "selector_answer": "Neither, they were born in the same year.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.19999999999999996,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Tombstone Rashomon",
+          "Waiting for the Clouds",
+          "Bertrand Tavernier",
+          "Sergio Leone",
+          "Werner Herzog"
+        ],
+        "selector_top_titles": [
+          "Tombstone Rashomon",
+          "Waiting for the Clouds",
+          "Yeşim Ustaoğlu",
+          "Bertrand Tavernier",
+          "Sergio Leone"
+        ]
+      },
+      {
+        "query_idx": 66,
+        "question": "Which film has the director who died later, Love, Honor And Oh-Baby! or I Cover The Underworld?",
+        "baseline_answer": "Love, Honor and Oh-Baby!",
+        "selector_answer": "I Cover The Underworld.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "I Cover the Underworld",
+          "Love, Honor and Oh-Baby!",
+          "Love, Honor, and Oh Baby!",
+          "Charles Vidor",
+          "Love, Honor and Obey"
+        ],
+        "selector_top_titles": [
+          "Love, Honor and Oh-Baby!",
+          "I Cover the Underworld",
+          "Love, Honor, and Oh Baby!",
+          "Charles Vidor",
+          "Love, Honor and Obey"
+        ]
+      },
+      {
+        "query_idx": 73,
+        "question": "Did the movies Inside The Room and Crude Set Drama, originate from the same country?",
+        "baseline_answer": "Yes.",
+        "selector_answer": "Unknown.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Crude Set Drama",
+          "The Room (film)",
+          "Inside the Room",
+          "The Room",
+          "In the Room"
+        ],
+        "selector_top_titles": [
+          "A Night at the Movies",
+          "List of Uruguayan films",
+          "At the Movies",
+          "Crude Set Drama",
+          "In the Room"
+        ]
+      },
+      {
+        "query_idx": 74,
+        "question": "Which film has the director who was born earlier, The Marriage Of Princess Demidoff or The Pocket-Knife?",
+        "baseline_answer": "The Marriage of Princess Demidoff.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "The Marriage of Princess Demidoff",
+          "The Pocket-knife",
+          "The Marriage of Krechinsky",
+          "Jonathan Demme",
+          "Mario Bava"
+        ],
+        "selector_top_titles": [
+          "The Marriage of Princess Demidoff",
+          "Éric Rohmer",
+          "The Pocket-knife",
+          "The Marriage of Krechinsky",
+          "Jonathan Demme"
+        ]
+      },
+      {
+        "query_idx": 87,
+        "question": "Which film has the director who was born later, The First Day Of Freedom or Malabimba – The Malicious Whore?",
+        "baseline_answer": "Malabimba – The Malicious Whore.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Malabimba – The Malicious Whore",
+          "The First Day of Freedom",
+          "Mario Bava",
+          "Nunzio Malasomma",
+          "Alberto Lattuada"
+        ],
+        "selector_top_titles": [
+          "The First Day of Freedom",
+          "Malabimba – The Malicious Whore",
+          "Riccardo Freda",
+          "Mario Bava",
+          "Nunzio Malasomma"
+        ]
+      },
+      {
+        "query_idx": 93,
+        "question": "Which film has the director who died later, 45 Calibre Echo or Bons Baisers De Hong Kong?",
+        "baseline_answer": "Bons Baisers de Hong Kong.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Claude Sautet",
+          "Tsui Hark",
+          "A Better Tomorrow"
+        ],
+        "selector_top_titles": [
+          "Claude Sautet",
+          "Alfred Hitchcock",
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Mario Bava"
+        ]
+      },
+      {
+        "query_idx": 137,
+        "question": "Which film was released first, Kalaya Tasmai Namaha or Undercover With The Kkk?",
+        "baseline_answer": "Undercover with the KKK.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -1.0,
+        "noise_delta": 0.4,
+        "added_gold_count": 0,
+        "removed_gold_count": 2,
+        "added_non_gold_count": 4,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Kalaya Tasmai Namaha",
+          "Undercover with the KKK",
+          "Thiruvannamalai (film)",
+          "Rakka (film)",
+          "Kyōen Kobanzame"
+        ],
+        "selector_top_titles": [
+          "Battle in Outer Space",
+          "Rakka (film)",
+          "The Wonderful World of Captain Kuhio",
+          "I Am... Gabriel",
+          "Incident in an Alley"
+        ]
+      },
+      {
+        "query_idx": 140,
+        "question": "Do both Possession (1922 Film) and La Boum films have the directors from the same country?",
+        "baseline_answer": "Yes.",
+        "selector_answer": "No.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.19999999999999996,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Possession (1922 film)",
+          "La Boum",
+          "La Boum 2",
+          "Laurent Tirard",
+          "Claude Sautet"
+        ],
+        "selector_top_titles": [
+          "Gérard Oury",
+          "Louis Mercanton",
+          "Possession (1922 film)",
+          "La Boum",
+          "La Boum 2"
+        ]
+      },
+      {
+        "query_idx": 162,
+        "question": "Do Walfredo Reyes Jr. and Zac Dysert have the same nationality?",
+        "baseline_answer": "Yes.",
+        "selector_answer": "No.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Zac Dysert",
+          "Walfredo de los Reyes",
+          "Walfredo Reyes Jr.",
+          "Efren Reyes Jr.",
+          "Efren Reyes Sr."
+        ],
+        "selector_top_titles": [
+          "Walfredo de los Reyes",
+          "Zac Dysert",
+          "Walfredo Reyes Jr.",
+          "Efren Reyes Jr.",
+          "Efren Reyes Sr."
+        ]
+      }
+    ],
+    "wrong_to_correct": [
+      {
+        "query_idx": 19,
+        "question": "Where was the director of film The Private Life Of Cinema born?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Montreal, Quebec.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "The Private Life of Cinema",
+          "Peter Greenaway",
+          "Claude Weisz",
+          "Alexander Korda",
+          "Bertrand Tavernier"
+        ],
+        "selector_top_titles": [
+          "The Private Life of Cinema",
+          "Denys Desjardins",
+          "Peter Greenaway",
+          "Claude Weisz",
+          "Alexander Korda"
+        ]
+      },
+      {
+        "query_idx": 39,
+        "question": "Who lived longer, Ludwig Elsbett or Pamela Ann Rymer?",
+        "baseline_answer": "Pamela Ann Rymer.",
+        "selector_answer": "Ludwig Elsbett.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Pamela Ann Rymer",
+          "Ludwig Elsbett",
+          "Lars Eliasson",
+          "Princess Maria Elisabeth of Bavaria",
+          "Hélène Grenier"
+        ],
+        "selector_top_titles": [
+          "Otto of Limburg",
+          "Pamela Ann Rymer",
+          "Ludwig Elsbett",
+          "Lars Eliasson",
+          "Princess Maria Elisabeth of Bavaria"
+        ]
+      },
+      {
+        "query_idx": 49,
+        "question": "Where does the director of film A Nest Of Noblemen work at?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "VGIK.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "A Nest of Noblemen",
+          "G. Marthandan",
+          "Ringo-en no shōjo",
+          "The Last of the Knucklemen",
+          "Ian Barry (director)"
+        ],
+        "selector_top_titles": [
+          "A Nest of Noblemen",
+          "Vladimir Gardin",
+          "G. Marthandan",
+          "Ringo-en no shōjo",
+          "The Last of the Knucklemen"
+        ]
+      },
+      {
+        "query_idx": 53,
+        "question": "Who is the child of the director of film Los Pagares De Mendieta?",
+        "baseline_answer": "Not mentioned.",
+        "selector_answer": "Leopoldo Torre Nilsson.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Los Pagares de Mendieta",
+          "Lars Eliasson",
+          "Steve Cooreman",
+          "Obata Toramori",
+          "Yasuichi Oshima"
+        ],
+        "selector_top_titles": [
+          "Los Pagares de Mendieta",
+          "Leopoldo Torres Ríos",
+          "Lars Eliasson",
+          "Steve Cooreman",
+          "Obata Toramori"
+        ]
+      },
+      {
+        "query_idx": 64,
+        "question": "Where was the husband of Joanna Elisabeth Of Holstein-Gottorp born?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Dornburg.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Joanna Elisabeth of Holstein-Gottorp",
+          "Christian August of Holstein-Gottorp, Prince of Eutin",
+          "Duchess Marie Elisabeth of Saxony",
+          "Augusta Marie of Holstein-Gottorp",
+          "Louise Elisabeth of Courland"
+        ],
+        "selector_top_titles": [
+          "Joanna Elisabeth of Holstein-Gottorp",
+          "Christian August, Prince of Anhalt-Zerbst",
+          "Christian August of Holstein-Gottorp, Prince of Eutin",
+          "Duchess Marie Elisabeth of Saxony",
+          "Augusta Marie of Holstein-Gottorp"
+        ]
+      },
+      {
+        "query_idx": 71,
+        "question": "Where did the director of film Dancing In The Rain (Film) die?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Ljubljana.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Dancing in the Rain",
+          "Dancing in the Rain (film)",
+          "Claude Weisz",
+          "Jean Grémillon",
+          "Ian Barry (director)"
+        ],
+        "selector_top_titles": [
+          "Dancing in the Rain (film)",
+          "Boštjan Hladnik",
+          "Dancing in the Rain",
+          "Claude Weisz",
+          "Jean Grémillon"
+        ]
+      },
+      {
+        "query_idx": 80,
+        "question": "Who is the mother of the director of film Atomised (Film)?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Gisela Elsner.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Atomised (film)",
+          "Claude Weisz",
+          "Steve Cooreman",
+          "Diane Kurys",
+          "Mommy Is at the Hairdresser's"
+        ],
+        "selector_top_titles": [
+          "Oskar Roehler",
+          "Atomised (film)",
+          "Claude Weisz",
+          "Steve Cooreman",
+          "Diane Kurys"
+        ]
+      },
+      {
+        "query_idx": 94,
+        "question": "What nationality is Lamprocles's father?",
+        "baseline_answer": "Greek.",
+        "selector_answer": "Athenian.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Lamprocles",
+          "Obata Toramori",
+          "Lars Eliasson",
+          "Yasuichi Oshima",
+          "Takayama Tomoteru"
+        ],
+        "selector_top_titles": [
+          "Lamprocles",
+          "Socrates",
+          "Obata Toramori",
+          "Lars Eliasson",
+          "Yasuichi Oshima"
+        ]
+      },
+      {
+        "query_idx": 97,
+        "question": "Which film has the director born first, Mord Em'Ly or Ek Hi Bhool (1940 Film)?",
+        "baseline_answer": "Ek Hi Bhool (1940 Film).",
+        "selector_answer": "Mord Em'ly.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Ek Hi Bhool (1940 film)",
+          "Ek Hi Bhool",
+          "Jean Grémillon",
+          "Michael Powell",
+          "Claude Autant-Lara"
+        ],
+        "selector_top_titles": [
+          "Ek Hi Bhool (1940 film)",
+          "Mord Em'ly",
+          "Ek Hi Bhool",
+          "Jean Grémillon",
+          "Michael Powell"
+        ]
+      },
+      {
+        "query_idx": 100,
+        "question": "Who is the paternal grandfather of Margaret Of Bavaria, Marchioness Of Mantua?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "Ernest, Duke of Bavaria.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Margaret of Bavaria, Marchioness of Mantua",
+          "Margaret of Bavaria, Electress Palatine",
+          "Margaret of Cleves, Duchess of Bavaria-Munich",
+          "Margaret Paleologa",
+          "William of Bavaria-Munich"
+        ],
+        "selector_top_titles": [
+          "Albert III, Duke of Bavaria",
+          "Obata Toramori",
+          "Margaret of Bavaria, Marchioness of Mantua",
+          "Margaret of Bavaria, Electress Palatine",
+          "Margaret of Cleves, Duchess of Bavaria-Munich"
+        ]
+      }
+    ],
+    "correct_to_wrong": [
+      {
+        "query_idx": 22,
+        "question": "Where was the composer of film Billy Elliot born?",
+        "baseline_answer": "Southampton, Hampshire.",
+        "selector_answer": "Southampton.",
+        "delta_f1": -0.33330000000000004,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Billy Elliot",
+          "Lee Hall (playwright)",
+          "Billy Elliot the Musical Live",
+          "Walter Ulfig",
+          "Stephen Warbeck"
+        ],
+        "selector_top_titles": [
+          "Stephen Warbeck",
+          "Billy Elliot",
+          "Lee Hall (playwright)",
+          "Billy Elliot the Musical Live",
+          "Walter Ulfig"
+        ]
+      },
+      {
+        "query_idx": 35,
+        "question": "Who was born later, Gideon Johnson Pillow or Holm Jølsen?",
+        "baseline_answer": "Holm Jølsen.",
+        "selector_answer": "Gideon Johnson Pillow.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Gideon Johnson Pillow",
+          "Holm Jølsen",
+          "Ola Isene",
+          "Victor Janson",
+          "Peter Gravesen"
+        ],
+        "selector_top_titles": [
+          "The Birth of John the Baptist",
+          "Peter Gravesen",
+          "Holm Jølsen",
+          "Gideon Johnson Pillow",
+          "Ola Isene"
+        ]
+      },
+      {
+        "query_idx": 43,
+        "question": "Which film has the director who was born first, Tombstone Rashomon or Waiting For The Clouds?",
+        "baseline_answer": "Tombstone Rashomon.",
+        "selector_answer": "Neither, they were born in the same year.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.19999999999999996,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Tombstone Rashomon",
+          "Waiting for the Clouds",
+          "Bertrand Tavernier",
+          "Sergio Leone",
+          "Werner Herzog"
+        ],
+        "selector_top_titles": [
+          "Tombstone Rashomon",
+          "Waiting for the Clouds",
+          "Yeşim Ustaoğlu",
+          "Bertrand Tavernier",
+          "Sergio Leone"
+        ]
+      },
+      {
+        "query_idx": 66,
+        "question": "Which film has the director who died later, Love, Honor And Oh-Baby! or I Cover The Underworld?",
+        "baseline_answer": "Love, Honor and Oh-Baby!",
+        "selector_answer": "I Cover The Underworld.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "I Cover the Underworld",
+          "Love, Honor and Oh-Baby!",
+          "Love, Honor, and Oh Baby!",
+          "Charles Vidor",
+          "Love, Honor and Obey"
+        ],
+        "selector_top_titles": [
+          "Love, Honor and Oh-Baby!",
+          "I Cover the Underworld",
+          "Love, Honor, and Oh Baby!",
+          "Charles Vidor",
+          "Love, Honor and Obey"
+        ]
+      },
+      {
+        "query_idx": 73,
+        "question": "Did the movies Inside The Room and Crude Set Drama, originate from the same country?",
+        "baseline_answer": "Yes.",
+        "selector_answer": "Unknown.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Crude Set Drama",
+          "The Room (film)",
+          "Inside the Room",
+          "The Room",
+          "In the Room"
+        ],
+        "selector_top_titles": [
+          "A Night at the Movies",
+          "List of Uruguayan films",
+          "At the Movies",
+          "Crude Set Drama",
+          "In the Room"
+        ]
+      },
+      {
+        "query_idx": 74,
+        "question": "Which film has the director who was born earlier, The Marriage Of Princess Demidoff or The Pocket-Knife?",
+        "baseline_answer": "The Marriage of Princess Demidoff.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "The Marriage of Princess Demidoff",
+          "The Pocket-knife",
+          "The Marriage of Krechinsky",
+          "Jonathan Demme",
+          "Mario Bava"
+        ],
+        "selector_top_titles": [
+          "The Marriage of Princess Demidoff",
+          "Éric Rohmer",
+          "The Pocket-knife",
+          "The Marriage of Krechinsky",
+          "Jonathan Demme"
+        ]
+      },
+      {
+        "query_idx": 87,
+        "question": "Which film has the director who was born later, The First Day Of Freedom or Malabimba – The Malicious Whore?",
+        "baseline_answer": "Malabimba – The Malicious Whore.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Malabimba – The Malicious Whore",
+          "The First Day of Freedom",
+          "Mario Bava",
+          "Nunzio Malasomma",
+          "Alberto Lattuada"
+        ],
+        "selector_top_titles": [
+          "The First Day of Freedom",
+          "Malabimba – The Malicious Whore",
+          "Riccardo Freda",
+          "Mario Bava",
+          "Nunzio Malasomma"
+        ]
+      },
+      {
+        "query_idx": 93,
+        "question": "Which film has the director who died later, 45 Calibre Echo or Bons Baisers De Hong Kong?",
+        "baseline_answer": "Bons Baisers de Hong Kong.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Claude Sautet",
+          "Tsui Hark",
+          "A Better Tomorrow"
+        ],
+        "selector_top_titles": [
+          "Claude Sautet",
+          "Alfred Hitchcock",
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Mario Bava"
+        ]
+      },
+      {
+        "query_idx": 137,
+        "question": "Which film was released first, Kalaya Tasmai Namaha or Undercover With The Kkk?",
+        "baseline_answer": "Undercover with the KKK.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -1.0,
+        "noise_delta": 0.4,
+        "added_gold_count": 0,
+        "removed_gold_count": 2,
+        "added_non_gold_count": 4,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Kalaya Tasmai Namaha",
+          "Undercover with the KKK",
+          "Thiruvannamalai (film)",
+          "Rakka (film)",
+          "Kyōen Kobanzame"
+        ],
+        "selector_top_titles": [
+          "Battle in Outer Space",
+          "Rakka (film)",
+          "The Wonderful World of Captain Kuhio",
+          "I Am... Gabriel",
+          "Incident in an Alley"
+        ]
+      },
+      {
+        "query_idx": 140,
+        "question": "Do both Possession (1922 Film) and La Boum films have the directors from the same country?",
+        "baseline_answer": "Yes.",
+        "selector_answer": "No.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.19999999999999996,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Possession (1922 film)",
+          "La Boum",
+          "La Boum 2",
+          "Laurent Tirard",
+          "Claude Sautet"
+        ],
+        "selector_top_titles": [
+          "Gérard Oury",
+          "Louis Mercanton",
+          "Possession (1922 film)",
+          "La Boum",
+          "La Boum 2"
+        ]
+      }
+    ]
+  }
+}

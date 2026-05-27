@@ -1,0 +1,9 @@
+[2026-04-09 22:56:02] Queue started on CUDA_VISIBLE_DEVICES=6
+[2026-04-09 22:56:02] SKIP existing dataset=musique run=baseline_top5 report=outputs_step0_general_musique/eval_reports/causal_eval_musique_full_qwen3-8b_qatopk5_baseline_20260409fullfix.json
+[2026-04-09 22:56:07] SKIP existing dataset=musique run=width_match_baseline_top10_plus_ce_qatopk5 report=outputs_step0_general_musique/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260409fullfix.json
+[2026-04-09 22:56:11] SKIP existing dataset=musique run=width_match_random3_deep_plus_ce_qatopk5 report=outputs_step0_general_musique/eval_reports/random3_deep_plus_ce_qatopk5_20260409fullfix.json (legacy raw filename)
+[2026-04-09 22:56:15] SKIP existing dataset=musique run=width_match_bridge_append_plus_ce_qatopk5 report=outputs_step0_general_musique/eval_reports/bridge_append_plus_ce_qatopk5_20260409fullfix.json (legacy raw filename)
+[2026-04-09 22:56:19] START dataset=hotpotqa run=baseline_top5
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Loaded graph from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/graph.pickle with 105259 nodes, 2031487 edges
+INFO:src.hipporag.embedding_store:Loaded 9811 records from outputs_step0_general_hotpotqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet

@@ -1,0 +1,1939 @@
+{
+  "datasets": [
+    {
+      "dataset": "2wikimultihopqa",
+      "methods": {
+        "proprag": {
+          "method": "proprag",
+          "metrics": {
+            "ExactMatch": 0.61,
+            "F1": 0.6568,
+            "count": 100,
+            "mean_reader_docs": 5.0,
+            "r5": 0.935
+          },
+          "per_query": [
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "20 March 851"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "20 March 851.",
+              "query_index": 0,
+              "question": "When did Lothair Ii's mother die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c243f22e876fe15945d3efd1ae2523a2",
+                "chunk-5c14ce77d3053e7909d871a494e1305a",
+                "chunk-dc1aae2ecfa1f4703c2190bf0cb3e105",
+                "chunk-0a62e6c19abb4d9175a31d5937650821",
+                "chunk-5e032533c01e97fae70ce7533ecd45fc"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Phoolwari"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Phoolwari.",
+              "query_index": 1,
+              "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-17357b02e2d871fdbd2097104967dcc2",
+                "chunk-8952949b5fac2a2f6934e75b9cc7cc0a",
+                "chunk-25dda9432cf30ec732a4675ecdf56af4",
+                "chunk-02dec1a4bc7c602fcb4d639ff763a4a0",
+                "chunk-03883f131d1b008ed45015437cb2c336"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Port of Spain"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Trinidad.",
+              "query_index": 2,
+              "question": "What is the place of birth of the performer of song Changed It?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-aa6e61975599526c539dcf0c6a65da9e",
+                "chunk-758353eba953774c235fe30de0acec40",
+                "chunk-6adbda9c096f1ea467bd0283e95de55f",
+                "chunk-bcb32a399e8aa9e7d8c6b0f65426353a",
+                "chunk-f90f857cc244e9b8bdf45d6df247f959"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "no"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "No.",
+              "query_index": 3,
+              "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b51260c5e65811bcaad0226d6fe64f30",
+                "chunk-e2e58c494c5fb440ea84ae18a200a069",
+                "chunk-51578c7a4e13a0e188bc12181d7c2950",
+                "chunk-8104b854e93dbe62cce8d8d84eb8646d",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "God'S Gift To Women"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "God's Gift to Women.",
+              "query_index": 4,
+              "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Br\u00e5k?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1735b2d5b137d6e570f6b36a1d525e7b",
+                "chunk-4bab2e45aa93473d1851c44726eea09f",
+                "chunk-9ef99626d5b09971648bd6ebd47d9976",
+                "chunk-b0da4fb6a3f7b81f0d7e95527cab4ccc",
+                "chunk-3f064568e105e718f6cdb5a4be20c902"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Heart Of Doreon"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Heart of Doreon.",
+              "query_index": 5,
+              "question": "Which film whose director was born first, El Tonto or The Heart Of Doreon?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9063c2b0c4b0d185e4f4f1e67b81f73a",
+                "chunk-6645b5c654a727fe2c4250a25b991fd2",
+                "chunk-8b13d8fa838655952a09b58272c87404",
+                "chunk-c08cbdc6acc6de304e4b024c84fcdf90",
+                "chunk-40c9c1487a61b2650f718d315736c2ba"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Andy Summers"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Andy Summers.",
+              "query_index": 6,
+              "question": "Who was born first out of Aivar Kuusmaa and Andy Summers?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1210e402754f222717bb131460e8ea1a",
+                "chunk-e677605dcc91d04b68148f6eca676e69",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-cc54631b0402ccd34badf271c2c0852b",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Ail\u00e9an mac Ruaidhr\u00ed"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Ail\u00e9an mac Ruaidhr\u00ed.",
+              "query_index": 7,
+              "question": "Who is Raghnall Mac Ruaidhr\u00ed's paternal grandfather?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d9c9a288e8ee1e25f26d920e44c1d9ae",
+                "chunk-f4a4c0f3453b5c900ecb4ca65db9591e",
+                "chunk-57109bc4ee838f8eaa09236247381ae7",
+                "chunk-d6c0070791883decbc934b0c5485d7f5",
+                "chunk-e93d278961f8af4155a896fa0fe0fcc2"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 8,
+              "question": "Do both films Interview With A Hitman and The Last Coupon have the directors from the same country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4ce55cad3b486cf4d6a18a5316a5f01f",
+                "chunk-e99dd92688f070b082881865714c7bfd",
+                "chunk-e2d4614340c4dc57c494dabe5d2e6715",
+                "chunk-940a205f74939c14f25903375727ec44",
+                "chunk-6d0462b13de6034c56f151f2fbdc204b"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Chinese"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Chinese American.",
+              "query_index": 9,
+              "question": "What nationality is the director of film Blood Street?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-822996e99f6f09a35362e71eb795f103",
+                "chunk-c8da7fe2d6726c81ef49a71538201ca4",
+                "chunk-ab813f97ca8ca5805d74d7d529dd444e",
+                "chunk-cc2b190b6665331ba0244aed0f8542fe",
+                "chunk-11feb072803d398626f6114415bced09"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Mexico City"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Mexico City.",
+              "query_index": 10,
+              "question": "What is the place of birth of the director of film Gaby: A True Story?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1bcef194d0588a1fde0838b46fa26f9e",
+                "chunk-a2bbb3494ee4e8f17820b6211c617573",
+                "chunk-0e5221776c8c828d0733f88a166eadd5",
+                "chunk-67202666f8bece06ac41b350bb2f4d12",
+                "chunk-0cc8c6e05ef72f17c73b77c45b3d11b7"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 11,
+              "question": "Are Vasilyevsky Island and Preobrazheniya Island located in the same country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6806fc4c7bfac5a44a7fde1a67046cf7",
+                "chunk-a368160586a10780de68f17d508fbbb4",
+                "chunk-5df08bce285dede755933671924ec3af",
+                "chunk-5b69ace72709aa7b42f7dfce3a83b2c7",
+                "chunk-5d1784e6bbfc771fe02717f1d5caa233"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "America"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "American.",
+              "query_index": 12,
+              "question": "What nationality is the performer of song When The Stars Go Blue?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-0147f752c8f7ab11d82c0a6dd3c7b171",
+                "chunk-f7379f068705fd1ec6c0b29a48bd64f3",
+                "chunk-c7117aca21e25e99a539bbc225c48650",
+                "chunk-9828287356b28714193d54350e332d64",
+                "chunk-534b7a36ba3a4f46ae41ade414771c90"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Dean Miller"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "James Joplin and Dorothy Joplin.",
+              "query_index": 13,
+              "question": "Who is the child of the performer of song Me And Bobby Mcgee?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-717c4ba5c3326667ff8a5f5fa18db6bf",
+                "chunk-b92f68cc2b275147b7996282259e34d7",
+                "chunk-e9e7e65474330cb816669add28200cfe",
+                "chunk-8e8a2376d5483bd79a2fbc459fcd4216",
+                "chunk-927f270548579be480803d9f117d39a6"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Delft"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Delft.",
+              "query_index": 14,
+              "question": "Where was the place of death of Maurice, Prince Of Orange's father?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-cb89b505f6d9fdd46f82c5b2995a0a40",
+                "chunk-c8f65b8f800afb5152c0bffa8e6142fb",
+                "chunk-0cc1dbbc83275404c3d8f3e7224d7932",
+                "chunk-dff775ec32ab3fb034eef587b3d63a44",
+                "chunk-771803a4190c929c579f3141a14d0639"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Polish-Lithuanian Commonwealth"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Poland.",
+              "query_index": 15,
+              "question": "Which country Aleksander Koniecpolski (1620\u20131659)'s father is from?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-28a70a370f9c1bc323edda0fbc8b086a",
+                "chunk-0ad63a1d0dd0e7029e39d3c4db4633f0",
+                "chunk-03237d7062a3255199aea8acce84392b",
+                "chunk-18155cf9a3c5e39430d4cc1a8967c8e2",
+                "chunk-4b8ce25ee5f8c6245fac1abab49aad41"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "10 August 1960"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "10 August 1960.",
+              "query_index": 16,
+              "question": "What is the date of death of the director of film Madame La Presidente?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-dfa8479a55d003179a3c9dc9e99fb9d2",
+                "chunk-48247bd0a1f8bf2b218dd29d6f99718c",
+                "chunk-20d66d0a8250711966ce4ffc73b6f438",
+                "chunk-e9727908528957092246b29ba13e192a",
+                "chunk-972c8b6a4b6d300ecd66adc182a1947c"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "no"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "No.",
+              "query_index": 17,
+              "question": "Do both directors of films Wrong Turn 5: Bloodlines and Dark River (2017 Film) have the same nationality?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-795e7e8843c2c1ec1bbe0451bcb1bfa9",
+                "chunk-050a9390253a1a60eb9c560d99769515",
+                "chunk-652777dc8078f3d6a99a62109cf25d17",
+                "chunk-06255d289a551e801724db202138c693",
+                "chunk-4052edb426a0ca34018b44206013e833"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "You Can No Longer Remain Silent"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "You Can No Longer Remain Silent.",
+              "query_index": 18,
+              "question": "Which film has the director who died first, The Goose Woman or You Can No Longer Remain Silent?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a969cf9bdb906133d07a143e3dfb835b",
+                "chunk-2dc402abb93a79d412498caefa469f61",
+                "chunk-4a77f792e139979bfee8a0a4524ebaf4",
+                "chunk-7cb9f11d9c459db3e677f82be841e3a4",
+                "chunk-e66f855697c9bf19e11897d280c2b610"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Montreal, Quebec"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Montreal, Quebec.",
+              "query_index": 19,
+              "question": "Where was the director of film The Private Life Of Cinema born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a62f16e4efb6782c533da9919f65e0b5",
+                "chunk-28889bdf1579f38545f75b1106d3b7d7",
+                "chunk-2f3ca31cef21dffc1cb2a2b1cc962db7",
+                "chunk-b1a61c9472e6727c84cbd47208f7aa8a",
+                "chunk-e788552bdc5fbc966f8d1b197d583c58"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Oxford"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not mentioned.",
+              "query_index": 20,
+              "question": "Where did Coulson Wallop's father study?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-68b4358e816fdbdd7c27969a574eb72b",
+                "chunk-07bda2ea2bbeb2de395652ed40a79160",
+                "chunk-045f4836b4ac3a4dacc73c104ea6cb54",
+                "chunk-3e72e28f527251ddbf82d469986b7ba3",
+                "chunk-e0ed45c81fef0d200817b3111f3d523f"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "tuberculosis"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Extrapulmonary tuberculosis.",
+              "query_index": 21,
+              "question": "Why did John Middleton Murry's wife die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f55a3242cc0d61439e6b17793f0530a3",
+                "chunk-b51cd19f56899ba6be214eaf6fc3cf4d",
+                "chunk-a1b804400a4536681dfdad2da55de4a2",
+                "chunk-a77d6c626a625b46e1c0d848d9a3fe66",
+                "chunk-a0dbe8a482c56a896cb4e55e800d5de8"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Southampton, Hampshire"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Southampton, Hampshire.",
+              "query_index": 22,
+              "question": "Where was the composer of film Billy Elliot born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-09040320472bcd0b67c5b72fffabd49c",
+                "chunk-34b3263a06349f4e65d56071533a4ff2",
+                "chunk-d8577ff1d79eead186070ac83750aad4",
+                "chunk-24701b92676e54717c555ad2098dd616",
+                "chunk-72aaee71b9f5aa8cc14aa18e9f2e87ea"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Stockholm"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "30 January 1927.",
+              "query_index": 23,
+              "question": "What is the place of birth of Lisbeth Palme's husband?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4aa924a53422439b40e706842731e79f",
+                "chunk-cf3dc2c92b812b10029d98ac33050fa7",
+                "chunk-7b8e94efef1f8a7aac3f33d12d332073",
+                "chunk-aa7632908017cb6174745a4ae3fd6212",
+                "chunk-1ce3735ca51311e37578f27d0613f4a2"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Dying God"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Dying God.",
+              "query_index": 24,
+              "question": "Which film came out first, 3 Dots or Dying God?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-bb4ed2b3786946c5fddc7089239504ff",
+                "chunk-818c59f26c6b482deeb188576c3dd45c",
+                "chunk-d5bbadfba9c7793ccaea9928c2c392cc",
+                "chunk-09eed9569aea1678211ed873f607d764",
+                "chunk-f84f68cbbb3464703612ca27c0db963a"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.8,
+              "gold_answers": [
+                "Norodom Sutharot"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Prince Norodom Sutharot.",
+              "query_index": 25,
+              "question": "Who is the father-in-law of Sisowath Kossamak?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-53cf475673977fbe30a572cacba761c7",
+                "chunk-56096b60ecdb72b0bfa9f6696861f459",
+                "chunk-d9965e5ba5882ead6f997b46e6b90d93",
+                "chunk-4f4e8614309d310f16a8c3d383bb6281",
+                "chunk-d6c0070791883decbc934b0c5485d7f5"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Ness"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 26,
+              "question": "Who is Mugain's mother-in-law?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fa4e07ba866f45e9feaf35b1f9eb5fd2",
+                "chunk-8dbe6459fe0a35bba84e3f7742a44983",
+                "chunk-4b182845c9cd25e8b4237f5fb02264a9",
+                "chunk-f7cdfdbee3ce98054a94e28973dcbf5c",
+                "chunk-c3bca290b91dd5ef05b12cac6f5b9038"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "gold_answers": [
+                "Yale College"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yale.",
+              "query_index": 27,
+              "question": "Where did Theodore Salisbury Woolsey's father study?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a3b3009bd9feeabe38fca469fdd09c8c",
+                "chunk-1fb89fde33b8e9becbc36ac7e2e64bb3",
+                "chunk-bdb91dc8e3b0234c57a06266cfdba409",
+                "chunk-6b6c24ab37ab219810d3854ea1e89d5a",
+                "chunk-48a827f66689b333201cb3b70a8796bc"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "gold_answers": [
+                "New York"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Glen Cove, Long Island, New York.",
+              "query_index": 28,
+              "question": "What is the place of birth of the director of film The Return Of Swamp Thing?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7344a19bddd9a92d9abf9ea10b53f366",
+                "chunk-a31aaf520ce47c2f2bf7932eb804ac6f",
+                "chunk-0c22a1d04590c5a98b95ff91a0f0a6b7",
+                "chunk-aa00030c0f0b12ff0bb7a71c4d8020f1",
+                "chunk-5724be56a077d823732a4d396be89cf7"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Detroit"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "2018.",
+              "query_index": 29,
+              "question": "Where was the place of death of the performer of song I Can'T See Myself Leaving You?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-445dbbd8809b51df95e6c1e5521c223c",
+                "chunk-8be2bfb443faf209b9e3239663a33355",
+                "chunk-ac603beeaab17627f53fd3c6f65bef52",
+                "chunk-6791a99bc87bec21feec6ae61ecdbeb4",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "I'Ll Be Going Now"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "I'll Be Going Now.",
+              "query_index": 30,
+              "question": "Which film has the director who was born later, Playing It Wild or I'Ll Be Going Now?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c04d147e330ebc5467df8331440ffbe1",
+                "chunk-2c47e595db7c4c3c36140cba49b6c671",
+                "chunk-d6a6d68fab9f03cd391cb2dedb656ea2",
+                "chunk-d25875cd54752e9ca4deba2779299a15",
+                "chunk-05be075f52f3b75a5182b35fa0635003"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Germany"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "German.",
+              "query_index": 31,
+              "question": "What nationality is Beatrice I, Countess Of Burgundy's husband?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-73a3eed4d4f757260d0ae086e0367331",
+                "chunk-2483033d58a6ad1e7fc07fd6c5a20236",
+                "chunk-96676cf45dcb0ca134368872a3114001",
+                "chunk-e59a439745d43849ea83333bfbd1bb60",
+                "chunk-3d7846ac6c6a17313ecbadde5362d87e"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "45 Fathers"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "45 Fathers.",
+              "query_index": 32,
+              "question": "Which film has the director born later, Christ Walking On The Water or 45 Fathers?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-42ce48a0d7a18b84236f1fd5b11a7d8d",
+                "chunk-847dec19d57aee285853a9860a4c60f7",
+                "chunk-c0f82c5f0988f7267c3c0063bada4b98",
+                "chunk-eaf71ea765658652a8a9ecfa90fc462c",
+                "chunk-b3295e1b70675902229e96fab43f0aea"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Hoboken"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not specified.",
+              "query_index": 33,
+              "question": "Where was the performer of song Come Dance With Me (Song) born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-74c18d93a298d3c01b0ba90f014f82a1",
+                "chunk-7b8e94efef1f8a7aac3f33d12d332073",
+                "chunk-3a3fa3ed45d9489ea20fa4241abd7017",
+                "chunk-88d4d6747ba6ecf9649aceb9713b0d6d",
+                "chunk-d5f9434db10d0c020da534e526d25688"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "UCLA"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 34,
+              "question": "Where does the director of film Talk About A Stranger work at?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fe17e97703d9bb98842f95415ad04b70",
+                "chunk-13ee515d39597405b338922550225060",
+                "chunk-742a9e29a4d04b2216b75a9e8ebf7bea",
+                "chunk-3233f4c167b132fd988ad7d695d1854e",
+                "chunk-9bc4992d7effce4e67104b2dabf1c7a4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Holm J\u00f8lsen"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Holm J\u00f8lsen.",
+              "query_index": 35,
+              "question": "Who was born later, Gideon Johnson Pillow or Holm J\u00f8lsen?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5ab03669818965010714eff0c6aae6bc",
+                "chunk-354f43b1fd47f8a386649aebba935007",
+                "chunk-1da463b9aa745114280d48f506d7a3c9",
+                "chunk-3623e9e082e3be465b7d3e8b552d4513",
+                "chunk-eed8d115cf7c1665c56972e69dfeb5ce"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Oxford"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "England.",
+              "query_index": 36,
+              "question": "What is the place of birth of the composer of film Inherent Vice (Film)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-c473661fcc558b2c33e8445aef638c51",
+                "chunk-cc54631b0402ccd34badf271c2c0852b",
+                "chunk-693bdd93296c892d0293cfda7cfd9f14",
+                "chunk-ad4a6882f761e7478ae6ac616b8ab172",
+                "chunk-bf188224ab225532cd72d010be1d605f"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Salad By The Roots"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Salad By The Roots.",
+              "query_index": 37,
+              "question": "Which film whose director is younger, Dangerously They Live or Salad By The Roots?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-09e02b8f51c2ff3a1063329505e4bf3c",
+                "chunk-e91cd1426ab8bc9948d4820c9d810ab3",
+                "chunk-578da641f97df96ba05175014d5dfcb6",
+                "chunk-5e00b50661936455d885de65260a504b",
+                "chunk-be0f254da6cbfab1bf4d9a234282ee43"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Toronto"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 38,
+              "question": "Where did Sylvia Burka's husband die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-ffdaa8a0ced46cd62b45c5ffe7753cf8",
+                "chunk-75b9a16b46622fa2bda7a7f1d1cbc602",
+                "chunk-4c27e2e77cab892c05305d5f2a8c1bfd",
+                "chunk-e6c6da39f649edf429994dc9f1332cab",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Ludwig Elsbett"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Pamela Ann Rymer.",
+              "query_index": 39,
+              "question": "Who lived longer, Ludwig Elsbett or Pamela Ann Rymer?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b5621ecb5eee26da2adb23bc7d43a57d",
+                "chunk-1d80c2953ba657a057fddc865197011e",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-ef2009b0d0551fe448f4ce283a11e3a1",
+                "chunk-4c16bca7957e57afdff4af9cac8d7448"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Phalitamsha"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Phalitamsha.",
+              "query_index": 40,
+              "question": "Which film whose director is younger, Phalitamsha or Gladiators Seven?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d3a43650cf7fc21970db60f105c40f24",
+                "chunk-94bb37b18cc730930676aa2428104a5b",
+                "chunk-391c73ff8a9c619b07b1cf0f37715a91",
+                "chunk-7e1f3b912af7f01d2dcf507516cc8a50",
+                "chunk-f8eaaf87db0eb1ff1f1cd98a8160d5c8"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Blue Collar Worker And The Hairdresser In A Whirl Of Sex And Politics"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Blue Collar Worker and the Hairdresser in a Whirl of Sex and Politics.",
+              "query_index": 41,
+              "question": "Which film has the director who was born later, Henry Goes Arizona or The Blue Collar Worker And The Hairdresser In A Whirl Of Sex And Politics?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-daec7486af55c68f98137777e1026cfa",
+                "chunk-987df2804c4976deb71d727410b89f8a",
+                "chunk-591f5fa1a75c1aaacc52d44bf3388b76",
+                "chunk-34d1175095756ad8f188718b680985c7",
+                "chunk-ae6703753069f10fa864e0633907080b"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Felix Schuster"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Felix Schuster.",
+              "query_index": 42,
+              "question": "Who was born first, Hywel Teifi Edwards or Felix Schuster?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-17a5a41c79dcdffa1f424e7705e93337",
+                "chunk-6b6c24ab37ab219810d3854ea1e89d5a",
+                "chunk-ba3c214afab9951e74dd9d1dd8823c59",
+                "chunk-5987b80c69ce81a1f2cee4ffcc2f88b7",
+                "chunk-f6fa07876ca69b7072f83ede8c096a97"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Tombstone Rashomon"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Tombstone Rashomon.",
+              "query_index": 43,
+              "question": "Which film has the director who was born first, Tombstone Rashomon or Waiting For The Clouds?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2572de4191916b5221d971c4d44e123d",
+                "chunk-a90d4ed8f25bfa991699eed6176057ce",
+                "chunk-4876b842fd8b0383ee37effdd9c0604f",
+                "chunk-e4364b30aebd6f6602bbfbcb0976397a",
+                "chunk-f8aa8c68802a54b3526a4863f98c8632"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "State Correctional Institution \u2013 Chester"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "State Correctional Institution \u2013 Chester.",
+              "query_index": 44,
+              "question": "Where was the performer of song B Boy (Song) detained?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-54c65a144143c5d15db880dd03c00c6f",
+                "chunk-17362e66da800d82b1365c97eb4419f2",
+                "chunk-445dbbd8809b51df95e6c1e5521c223c",
+                "chunk-d23dc2b9a6ab1ede1a7001168e68a8e6",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "It'S A Wonderful Afterlife"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "It's A Wonderful Afterlife.",
+              "query_index": 45,
+              "question": "Which film has the director who was born later, Illusions (1982 Film) or It'S A Wonderful Afterlife?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4056cb8db92bc6896f6e880b3a11c091",
+                "chunk-af0e535b857efcf61bfd23bdb6f2b230",
+                "chunk-3aa3169d8de7f8fc4098d25caa8f60e9",
+                "chunk-52a55fad4ce5e4eebcba1f1270b339c5",
+                "chunk-925d1e5e4bf757498552ef7540d75ea8"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "No.",
+              "query_index": 46,
+              "question": "Are both movies, Naked Tango and Algiers (Film), from the same country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f89057a8cadd77ee1c39f6820e061feb",
+                "chunk-3ec183b018b5dec07317fbff7da64f04",
+                "chunk-899b09fa4b77b4de0df9ea68612f3da7",
+                "chunk-4639960675e08fc22d741cdd04e0a534",
+                "chunk-03e109a5b10e0de48e7636354ddafa6f"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Sir Thomas Wheate, 1St Baronet"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sir Thomas Wheate, 1st Baronet.",
+              "query_index": 47,
+              "question": "Who lived longer, Sir Thomas Wheate, 1St Baronet or Albert \u00c9douard Le Brethon De Caligny?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f66d402b0803bde464155fddeb39c668",
+                "chunk-89fe7c2926ad37d1b9b28dd41848744c",
+                "chunk-da98d1261c251bc7c65088d82ee7c260",
+                "chunk-d3c4cec570d30b1a66616c2ef87c7cac",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Siversky"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 48,
+              "question": "Where did the composer of film The Straw Hat die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9d39194c61785cc0883557f843a33208",
+                "chunk-7b18343d2c0ab9d855df8ec895675e28",
+                "chunk-c8a7f1c68303c09389e4f8edbcbcfba1",
+                "chunk-987a03ff2786db3e4212f15d4cf525eb",
+                "chunk-44d944388a54178ebc5a8d7728bc8010"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "VGIK"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "VGIK.",
+              "query_index": 49,
+              "question": "Where does the director of film A Nest Of Noblemen work at?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-83d1ad065b7e004f9ba86fdf1ac059cd",
+                "chunk-703867f645875069c1f5b8a11272f016",
+                "chunk-b915ee6f3985cbe6713ece5e69632993",
+                "chunk-6b34ba8465857c92d614c39b8faf85e2",
+                "chunk-801f4c9f11c7db6a8882d997e5bf1e89"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "No.",
+              "query_index": 50,
+              "question": "Were both Pietro Salini and Domenico Ravenna, born in the same place?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b713a3e2d8d420f5946702133ebcf7be",
+                "chunk-8b9239f4af063ee42824ce2494019c35",
+                "chunk-90b5fd4874a487ac4703ff9becf00c8e",
+                "chunk-eba7aac4392f2df29478e5730120aa6a",
+                "chunk-55dd5f9c8a69f17a920fb2d7bf424dd2"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.1818,
+              "gold_answers": [
+                "William IV, Landgrave of Hesse-Kassel"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "John Ernest II, Duke of Saxe-Weimar.",
+              "query_index": 51,
+              "question": "Who is the father-in-law of John Ernest, Duke Of Saxe-Eisenach?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-4fef2a5b924100a4c33be077f500e5fd",
+                "chunk-b5441019943e71f59c63794ef6d288d1",
+                "chunk-4cf27f84d3d5e0c9ff9a38c58cfb4f0b",
+                "chunk-6e79936eaf2a0a18d9e860a4979886c5",
+                "chunk-ab0fae5269ba773b74074189e6ea4bba"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Gian-Carlo Coppola"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Gian-Carlo Coppola.",
+              "query_index": 52,
+              "question": "Who is the father of the director of film Palo Alto (2013 Film)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-611559efe8246e8de4157f05bc761265",
+                "chunk-f3346913c2dc2270bced20abd06e7320",
+                "chunk-911e50329c03cfe4f0f501f0db38be08",
+                "chunk-6df1944082e97216f13bcb4bf390a7fd",
+                "chunk-7a8bd9296a879ec3df9c8670460b46e6"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Leopoldo Torre Nilsson"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Leopoldo Torre Nilsson.",
+              "query_index": 53,
+              "question": "Who is the child of the director of film Los Pagares De Mendieta?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-2cf68ecf000240200dba77027f010fd3",
+                "chunk-cb493d755552e8bfdcb1361dd2c031da",
+                "chunk-e7f87e024523fd986f50b528b8248d36",
+                "chunk-a4233c9bbee1121ab04e9c947bdeb7df",
+                "chunk-6df71da2564f0ccd500c5c921da7c3c4"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Hubert Mordek"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Hubert Mordek.",
+              "query_index": 54,
+              "question": "Who lived longer, Hubert Mordek or Levon Ashotovich Grigorian?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-fabf6e2a4982f7847a39d21c79ce36fa",
+                "chunk-6f15e165e14b65735fdaa656958fa7ab",
+                "chunk-b2885a91e40a110b79b1f6e56bdc14fc",
+                "chunk-07c0361d42f230d9810be6cae91dfb1d",
+                "chunk-ba3c214afab9951e74dd9d1dd8823c59"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Mapy Cort\u00e9s"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Mapy Cort\u00e9s.",
+              "query_index": 55,
+              "question": "Who is the spouse of the director of film My Three Merry Widows?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1b3ec710de5ac4fcc01868240ec60224",
+                "chunk-cfeb2905a5eb75615fbd523812515a8c",
+                "chunk-517234e80946f81da28b40f7f6545f56",
+                "chunk-c422854663746e21ac738952c19a47ab",
+                "chunk-42d03a176597eee67da8a647b6c3cfac"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Austrian"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Austria.",
+              "query_index": 56,
+              "question": "Which country the composer of film Thunder On The Hill is from?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1ed6e7c923dc3c1b56a48d671a8b809c",
+                "chunk-80a322ade77bba9b506a2b7fb66a87da",
+                "chunk-bf188224ab225532cd72d010be1d605f",
+                "chunk-44d944388a54178ebc5a8d7728bc8010",
+                "chunk-fa4078dfb58cd0ed1e42c134bb710466"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Arr\u00eate Ton Cin\u00e9ma"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Arr\u00eate ton cin\u00e9ma.",
+              "query_index": 57,
+              "question": "Which film has the director born later, Arr\u00eate Ton Cin\u00e9ma or Agni (2004 Film)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f34ee9c59bb528aabea0a4fc4e1937a2",
+                "chunk-61aace8dc452eb7bc62c0fb13b7d9916",
+                "chunk-31cf1e03a3184c25cab5aa7f80a86d03",
+                "chunk-b3295e1b70675902229e96fab43f0aea",
+                "chunk-8864bd7584c0021f82d388558d8a0aff"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Werner Mensching"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Werner Mensching.",
+              "query_index": 58,
+              "question": "Who died earlier, Werner Mensching or Karel Zich?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a5e795a9621ba80d33b78eda8c5f9f15",
+                "chunk-b4b348f5b8472d014aed4249407e449b",
+                "chunk-05354402c2c84d2f321731b5fa962176",
+                "chunk-85c6c0245fa2982e2e132d6a46666ad1",
+                "chunk-ce22399b54920d792963ff37560a3a25"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Munich"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 59,
+              "question": "Where did Prince Ferdinand Of Bavaria's mother die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-a69a02410e4a6845cd1d49ad3bfe8176",
+                "chunk-22d8b73f8f26bad16f414d9fc989c366",
+                "chunk-193d4539b6f17d61d2c7aa4d35b18610",
+                "chunk-39ca3f6304ad920237fae77f40ccf417",
+                "chunk-eca6ef40d0f48ec51ef4b224cb9d003a"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Sergio Mimica-Gezzan"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sergio Mimica-Gezzan.",
+              "query_index": 60,
+              "question": "Who is the child of the director of film An Event?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f17d27baf89bd0be46819ee4dc369622",
+                "chunk-a3e67876b5dbc631af62b25278fa125d",
+                "chunk-5170f21e9bd2c3167c1d6b041311be22",
+                "chunk-a4233c9bbee1121ab04e9c947bdeb7df",
+                "chunk-e7f87e024523fd986f50b528b8248d36"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Denmark"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Danish.",
+              "query_index": 61,
+              "question": "What nationality is the director of film Good People (Film)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f19b5d2a7cbe5575936371aa08ff60ed",
+                "chunk-c8da7fe2d6726c81ef49a71538201ca4",
+                "chunk-9f075b6fdb045a1b95d37175d7601f54",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-1617bfa44b76f573e69cad255cb9cc2a"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 62,
+              "question": "Are Gare De La Roche-Sur-Yon and Gare De Namps-Quevauvillers both located in the same country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1010c2239f009552415e5e424ad43701",
+                "chunk-53da08c3047d6d55bbaf01c139aa9d39",
+                "chunk-b85b9e09baf5b7cabb29b5baec448728",
+                "chunk-630afc5e714c9da6b9c5ec8491927048",
+                "chunk-5a97e2bf90d5637b7271497e830c6873"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Neapolitan"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Italy.",
+              "query_index": 63,
+              "question": "What is the place of birth of the director of film Fortunella (Film)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-8a5596a2c8dbfd412448134dbb124e9e",
+                "chunk-57dcee4a7d8c67702e5c46ba8c56eaad",
+                "chunk-d0768f5a0e2717ce7055b46864930cb0",
+                "chunk-e788552bdc5fbc966f8d1b197d583c58",
+                "chunk-2f55903ca60f3365f409badc0dfcc259"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Dornburg"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Dornburg.",
+              "query_index": 64,
+              "question": "Where was the husband of Joanna Elisabeth Of Holstein-Gottorp born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-02ea42570d1889a30b5f3068481a4db0",
+                "chunk-f060ded95f6a90bd0299d81ae73684f4",
+                "chunk-4bdb3c9105dd8a916e2d7b6fca469729",
+                "chunk-e4142807283eedaa26f0a8efbdf0ce9d",
+                "chunk-4c724a779a78d3af59b055e37fc33493"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Diriyah"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 65,
+              "question": "Where was the place of death of Abdul-Aziz Bin Muhammad's father?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1b1c5b3444b4264380f8218a2afd2986",
+                "chunk-cc24c4ecb5ba7429952367835746bee4",
+                "chunk-047015c39bef516acf237a99c8b2762d",
+                "chunk-08b91b7fc52d6cea11c0f27e48917483",
+                "chunk-b0b076dd70e02156c1e8bfe75b71a400"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Love, Honor And Oh-Baby!"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Love, Honor and Oh-Baby!",
+              "query_index": 66,
+              "question": "Which film has the director who died later, Love, Honor And Oh-Baby! or I Cover The Underworld?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5464893b4c91d50cc6f8196e87791583",
+                "chunk-1cd4fe6086fb85859cf2c2a1f7ba3b39",
+                "chunk-82deabe05fc0be6464bcff62aeec8504",
+                "chunk-c3db1236fd00e5fccaaed075065324f9",
+                "chunk-9ec93ac31679a5c2193f8933d9779501"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Oklahoma City, Oklahoma"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 67,
+              "question": "Where was the director of film The Circus Cyclone born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1f2f5f67e08768f0fe2c85329bab4c2b",
+                "chunk-2c2a8a36ef1f669be7195f688e38b218",
+                "chunk-e02b4329d5291c0362f35211b92cc597",
+                "chunk-66b643f69a976245bd9a58d6d3dfcd6f",
+                "chunk-195982580aba12ffe559b60ee4fb9e06"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "no"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "No.",
+              "query_index": 68,
+              "question": "Are the movies Wizards Of The Lost Kingdom and Final Exam (1981 Film), from the same country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-af5a3000d02650376aed6f5afeede78e",
+                "chunk-6019cef594bcf641c463240897f72e85",
+                "chunk-31298744b6c6fcb989ff92d6ec44ccaa",
+                "chunk-13e5bcb5e110d6775060359cd01efc34",
+                "chunk-17080708cdae00b8da817e26dbad227f"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Museum Of Croatian Archaeological Monuments"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Museum of Croatian Archaeological Monuments.",
+              "query_index": 69,
+              "question": "Which museum was established first, Museum Of Croatian Archaeological Monuments or Bayernhof Music Museum?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-1f4443db0c6840cd322fe8a0a15f20cc",
+                "chunk-697bd66a7575b2662b25853aeeb3e5ed",
+                "chunk-63f3a87ac88adab34d39f864d5145630",
+                "chunk-7b3d061e12ef59638a6c21eedb0d67be",
+                "chunk-c18193756797e283e102b9e6cdec4e33"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 70,
+              "question": "Are Christopher Newton (Criminal) and Frances M. Vega of the same nationality?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6579dd735e4edf2b691c4d1268cf1e77",
+                "chunk-8eee7f4b2e756525bc8d4d6deb1e22c6",
+                "chunk-a16fdf5e2434821cc1995a5a51b704fe",
+                "chunk-945b17ca71030309d9a3610769df5313",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Ljubljana"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Ljubljana.",
+              "query_index": 71,
+              "question": "Where did the director of film Dancing In The Rain (Film) die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-3b115a664541d8bd04386006237aba4a",
+                "chunk-f7d660c51e5b5313d046342ab7baeb6f",
+                "chunk-01f43269b439ee23712fafaba4602383",
+                "chunk-e521e87e9a95361fdf9e2595e35d1f85",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Mrauk U"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Unknown.",
+              "query_index": 72,
+              "question": "Where did Saw Thanda's husband die?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-dfb0bfb95509c534513d293e4b05bcde",
+                "chunk-417abf212b66ccc9acf991f03823ec6e",
+                "chunk-84121dabc3c9d43e927e0e6fcfe96ef0",
+                "chunk-37bdc5345979f4b9b7f83fa30d09deb1",
+                "chunk-6ecd7866fb3efb3b867bd5b75562595d"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 73,
+              "question": "Did the movies Inside The Room and Crude Set Drama, originate from the same country?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-99f9d8f1eca3c252b2a685e511bdb6c9",
+                "chunk-d1c8933deb7364be3b08a5ad2bf14be8",
+                "chunk-1329beeec9a9f0903e6a9314d762562b",
+                "chunk-723e6005c26c28ecf554c1f07b549cde",
+                "chunk-407fd376f0dd5b99944f6d159a837461"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Marriage Of Princess Demidoff"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Marriage Of Princess Demidoff.",
+              "query_index": 74,
+              "question": "Which film has the director who was born earlier, The Marriage Of Princess Demidoff or The Pocket-Knife?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-48f982f9b337175c4aea87af7ad9106c",
+                "chunk-1e30b640462bccb8ed5b2707c5b54ea7",
+                "chunk-22120a8ecbc28e7c1387f0980fd6ade2",
+                "chunk-5ebfb188c7ff9a78c9dc763622b58287",
+                "chunk-d03c064929103020f043b0948e506fac"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Return To Cabin By The Lake"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Return to Cabin by the Lake.",
+              "query_index": 75,
+              "question": "Which film has the director who is older than the other, Airheads or Return To Cabin By The Lake?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5dd018d76c7488e953b3b9a6a7fb976f",
+                "chunk-7b93638467141714a4f4725ae38f7100",
+                "chunk-55e54a7ea61de21f53816694c975b130",
+                "chunk-81f0b49f395fe3c09d481237b30dc219",
+                "chunk-dd3b2bc6c7e208095ff459918cba846f"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Pirates Of The Sky"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Pirates of the Sky.",
+              "query_index": 76,
+              "question": "Which film was released first, A Romance Of Seville or Pirates Of The Sky?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-04cfa25c8541e89cf70240d2b7fce865",
+                "chunk-b27dcdff6c12af0f1181ad3859999869",
+                "chunk-727472175b9ef9f48214060f95762dca",
+                "chunk-3a0e314b9832d2cab0797c4dfe95008c",
+                "chunk-b5cb01e5695048dad1e8979e9553548d"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Blind Man'S Eyes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Lost in the Stratosphere.",
+              "query_index": 77,
+              "question": "Which film has the director died later, Lost In The Stratosphere or Blind Man'S Eyes?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6251e4b9d0b3cb3696ee159d4748dc58",
+                "chunk-e9bbcb97b3a351930ac7eeecb11e791b",
+                "chunk-feac95d47462806d536de1a2631f9f03",
+                "chunk-e17ab2a80b041894d47ed11595315efc",
+                "chunk-8d20907504ed9e68ad2eee19d3841a9a"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "France"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "French.",
+              "query_index": 78,
+              "question": "What nationality is the performer of song Am I Wrong (\u00c9tienne De Cr\u00e9cy Song)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-307009922e0bf8b70daded7009d8ea5c",
+                "chunk-696d8e3afc381066e240815d4bda17e7",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-a9276dba28974cb93957cef12f8fcd92"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Bruce Coulter"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Bruce Coulter.",
+              "query_index": 79,
+              "question": "Who was born earlier, Marjatta Raita or Bruce Coulter?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b29f5d263035c8efa19c4dfb6c9ed3c7",
+                "chunk-e72f625e47b3e0def895038f6f7ee5b7",
+                "chunk-3289c6a2f1c0a37b2a014895d8366aaa",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-cc267ad8a1599a2602fe82f016e03acb"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Gisela Elsner"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Not mentioned.",
+              "query_index": 80,
+              "question": "Who is the mother of the director of film Atomised (Film)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-d30b788f2520b0bda1f88fa5d301c6bc",
+                "chunk-69b2172b83f6bc536afcd25026578256",
+                "chunk-ae8b08c63257896f41b4bbdd5261063a",
+                "chunk-136b982fafae43011a399d9671234580",
+                "chunk-198134922a72feeeeea107883395ac14"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Juan Carlos Falc\u00f3n"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Juan Carlos Falc\u00f3n.",
+              "query_index": 81,
+              "question": "Was Angus Wagner or Juan Carlos Falc\u00f3n born first?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-77087371cc877ceb6982ad0d467d314e",
+                "chunk-d858eaad37a51e21a3548afbfb5a9b26",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-e0fe83680c2e66e9a2abedd1fa1e9f4e",
+                "chunk-9ad60b5a5bf662dd3efc9a5804b7d4cd"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.4,
+              "gold_answers": [
+                "1322"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "between 1322 and 1327.",
+              "query_index": 82,
+              "question": "What is the date of birth of Henry I Of Zi\u0119bice's father?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-23f2b5d6ec37349591a2d319ebd5e514",
+                "chunk-a1208eab578a71b80aaf72453814bba7",
+                "chunk-aea70e7f3111b96a7a37bf0e04c9c0bf",
+                "chunk-d0ac6c522d593aa751bd9dfd67e39648",
+                "chunk-d6b25b2525094f47c83f4efa2b798bb5"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Sammy Hagar"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sammy Hagar.",
+              "query_index": 83,
+              "question": "Was Sammy Hagar or Renaud Garcia-Fons born first?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-b3fb7e9f25d27c747f4484f73f463531",
+                "chunk-13e184e5bc04f17ecc0c25dd1a203c8e",
+                "chunk-ce2380595a3dbe8df82e4e48eb67c791",
+                "chunk-f0c08e597d0a9f54cd990306feaa3834",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "yes"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Yes.",
+              "query_index": 84,
+              "question": "Do David Elliot (Illustrator) and Eustace William Ferguson share the same nationality?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-41672978088061d414e5a1a3383000be",
+                "chunk-44acd2f8612362167ca5cd88a537933b",
+                "chunk-45e9f91f87f860b042293248c7324645",
+                "chunk-7a3fd04cd8cbb990827fc45b5b5e83eb",
+                "chunk-69714572c7bc8bdc37f8461f31dbe99a"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "St. Louis, Missouri"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "St. Louis, Missouri.",
+              "query_index": 85,
+              "question": "Where was the composer of song Back In The U.S.A. born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-176073ef100c15284aa82a8ff15a569e",
+                "chunk-ac603beeaab17627f53fd3c6f65bef52",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4",
+                "chunk-5bbd93ec953ffcf2bafbb56e56ca2126",
+                "chunk-290cafa61ee1f466ab0a07f76856075d"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Dmitry Grigorieff"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Dmitry Grigorieff.",
+              "query_index": 86,
+              "question": "Who is older, Cheryl Saban or Dmitry Grigorieff?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-753fa6c648547ce69648825d6e85f4f1",
+                "chunk-2cde23a0ac19d558d45eee971e9c348b",
+                "chunk-cf42ba4aa2a308a311f34837ad73fb47",
+                "chunk-755930e27956b3470e1ac40c3d2900a0",
+                "chunk-2675690488acc28279b375db451a7a68"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Malabimba \u2013 The Malicious Whore"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Malabimba \u2013 The Malicious Whore.",
+              "query_index": 87,
+              "question": "Which film has the director who was born later, The First Day Of Freedom or Malabimba \u2013 The Malicious Whore?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-f1eede91ab4ff1abe367e8093e996d2b",
+                "chunk-942481f61783c3ec85c8da4321ce74ff",
+                "chunk-356e636a8b66b4dda878612382e61805",
+                "chunk-7d1de6023db2802f717722144450e933",
+                "chunk-4b6200f98f0955a42a753dcd5cac3589"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Jorge Ledezma"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Jorge Ledezma.",
+              "query_index": 88,
+              "question": "Was Jorge Ledezma or Yuliya Baraley born first?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-30b22f3e63c49023f3bfba289575b8cd",
+                "chunk-2f96a692306dfe88d70318e7f5914d0b",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-fcc637c8bfe9f46feaa6c73e63cba72d",
+                "chunk-5d1784e6bbfc771fe02717f1d5caa233"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Mary Lawson"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Dudley John Beaumont.",
+              "query_index": 89,
+              "question": "Who is Sibyl Hathaway's child-in-law?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-aff1dd488f1754f71d3311f3f1a35dc8",
+                "chunk-f10cbab16da992171d9c3a757a2f497b",
+                "chunk-34355293885bf38430183b7ad37d6cc1",
+                "chunk-ea25aeed7a1838c0ae18bebfdd6d7025",
+                "chunk-87dcaf39187f4ea031241f8385eaa982"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Sins Of Madeleine"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Sins of Madeleine.",
+              "query_index": 90,
+              "question": "Which film has the director born first, Sins Of Madeleine or Captain Apache?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-10576cc51688f406cdfebcce373eccba",
+                "chunk-55b7c02a8f47b4440f83d9b4bb8e9d57",
+                "chunk-d835b29e2a0ee37103997165350c3b23",
+                "chunk-80a7231ac141d262d6c08f4e78c3d908",
+                "chunk-5464893b4c91d50cc6f8196e87791583"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Caretene"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Duchess Marie of W\u00fcrttemberg.",
+              "query_index": 91,
+              "question": "Who is Godomar Ii's stepmother?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-0fc8c985270bf7efb4afd08360fe91a3",
+                "chunk-1315c74344dd62eaac668f6db2e78f94",
+                "chunk-c9c94b9d88e944e24ba6eeae4e540678",
+                "chunk-659ae84b8ddab11f51d3beab2a1fd37b",
+                "chunk-66e7544b2114e5d7b7dd57a1f0a3ef05"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.8,
+              "gold_answers": [
+                "Santa Rosa"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Santa Rosa, California.",
+              "query_index": 92,
+              "question": "Where was the director of film The Outlaw Express born?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-06c7e5343fe81ce5c222c8dfd11d77c9",
+                "chunk-5041020b806fb5822ebd9bd1e777d9d2",
+                "chunk-0638400ec1c0e2faff8010f5d1d50b86",
+                "chunk-75095df756cba5a65f4b7875acd33871",
+                "chunk-195982580aba12ffe559b60ee4fb9e06"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "Bons Baisers De Hong Kong"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "45 Calibre Echo.",
+              "query_index": 93,
+              "question": "Which film has the director who died later, 45 Calibre Echo or Bons Baisers De Hong Kong?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-7e1d538dfa8c8525c968df8f558a262a",
+                "chunk-4283759769b0da568440613fb45d44a4",
+                "chunk-3852f3e4c76b03c0a2da21b4d1acbf7e",
+                "chunk-c0aa0a93542be25f9f2c0e99df95d1e9",
+                "chunk-6a96b40746eca942e5aae3ae55e25853"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Athenian"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Athenian.",
+              "query_index": 94,
+              "question": "What nationality is Lamprocles's father?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9da676bbed011ca507c4e749aa1771d0",
+                "chunk-1bb619ca634b619a266ed1e211a73cdc",
+                "chunk-375816f1e3052653a8d410b7691352dd",
+                "chunk-0e4bf051119942ad79d350952e1f0790",
+                "chunk-d9965e5ba5882ead6f997b46e6b90d93"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "gold_answers": [
+                "American"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Panama.",
+              "query_index": 95,
+              "question": "Which country the performer of song I Like Control is from?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-6e615c799f16a7116fa20f4604951f58",
+                "chunk-4300e46e0967c140830cdd3d0d592b72",
+                "chunk-47cff113c4fb11f7675cf43dae428fe4",
+                "chunk-a9276dba28974cb93957cef12f8fcd92",
+                "chunk-d2b82c98bc08221f564063de70724849"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "The Palace Of Angels"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "The Palace Of Angels.",
+              "query_index": 96,
+              "question": "Which film has the director born later, Romance On The Run or The Palace Of Angels?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-5da62a1b30537176cbb508f8ef904cba",
+                "chunk-ac41680a086a50e234bc2ede8e12fc8f",
+                "chunk-626227450914df730e2606752c7805c1",
+                "chunk-b8d0ce129601476ef8e40413457d58a1",
+                "chunk-356897b5c656ad2b22bd5f866161b0fa"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Mord Em'Ly"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Mord Em'ly.",
+              "query_index": 97,
+              "question": "Which film has the director born first, Mord Em'Ly or Ek Hi Bhool (1940 Film)?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-606957efce07f55fae93c77bb61f3632",
+                "chunk-dec48a71f1b9d7979da5a33b81d82a2a",
+                "chunk-3c17ff72ff83e6a17d26f41881634146",
+                "chunk-06ebf99f944597c78c1ca7a6b446a9c5",
+                "chunk-8a1fd292887af3f3d4fb0fd4d10fd037"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "True To The Navy"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "True To The Navy.",
+              "query_index": 98,
+              "question": "Which film has the director born earlier, The Korean Wedding Chest or True To The Navy?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-cf7004c4da1f2c8aacf5da4bed01b30f",
+                "chunk-cb546b0f2f07f6995bd5421b6b99775a",
+                "chunk-7d8234d4e0f9994269df71ee12c61138",
+                "chunk-8149a3938e12ee1c4d61052399951b7c",
+                "chunk-047a01eea73b74ae4886b2bab5c95904"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "gold_answers": [
+                "Eleanor of Arborea"
+              ],
+              "num_reader_docs": 5,
+              "predicted_answer": "Eleanor of Arborea.",
+              "query_index": 99,
+              "question": "Who is Marianus V Of Arborea's mother?",
+              "reader_doc_source": "external_pool_topk_docs",
+              "retrieved_doc_ids_top5": [
+                "chunk-9c6c96e5dc03ffb601f25b988f0e4d18",
+                "chunk-29df175f8136083e7fe8bd5b2202f6d7",
+                "chunk-4ce66a7b18657cca9f2f4f8e93577219",
+                "chunk-eeba15d7fad6d2c00abfb09065e10156",
+                "chunk-47cb972df8debaedd3ef8964551d9af4"
+              ]
+            }
+          ]
+        }
+      },
+      "num_queries": 100,
+      "reader": {
+        "llm_base_url": "http://localhost:8041/v1",
+        "llm_name": "qwen3-8b-train",
+        "max_new_tokens": 400,
+        "qa_top_k": 5
+      },
+      "source": {
+        "doc_source": "external_pool_topk_docs",
+        "does_not_modify_retrieval": true,
+        "input_path": "/mnt/nvme/code/HippoRAG/run_logs/prop_neocorr_daec_limit100_20260429/2wikimultihopqa_proprag.json",
+        "retrieval_r5_source": "input_file.overall_recomputed.Recall@5",
+        "uses_exported_pool_topk_docs": true,
+        "uses_saved_reader_docs": false
+      }
+    }
+  ],
+  "format": "saved_docs_reader_only_qa",
+  "max_new_tokens": 400,
+  "qa_top_k": 5
+}

@@ -1,0 +1,117 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/2wikimultihopqa_dense_pool100.json",
+  "daec_report_json": "run_logs/daec_noisyor_dense_pool100_2wiki_fixclean_full1000_20260428.json",
+  "dataset": "2wikimultihopqa",
+  "limit": 1000,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "embedding_backend": "api",
+  "embedding_model": "nvidia/NV-Embed-v2",
+  "embedding_base_url": "http://localhost:8019/v1/embeddings",
+  "phi_transform": "linear_clip",
+  "phi_scales": [
+    1.0
+  ],
+  "variants": [
+    "dense_query_cosine",
+    "query_level_ppr",
+    "dense_demand_union_cosine",
+    "demand_source_union"
+  ],
+  "summary": {
+    "rows": 4000,
+    "by_hop_variant": {
+      "2:scale=1:demand_source_union": {
+        "support_recall": 0.7,
+        "support_complete": 0.417,
+        "noise_rate": 0.72,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 765,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:dense_demand_union_cosine": {
+        "support_recall": 0.7235,
+        "support_complete": 0.4523,
+        "noise_rate": 0.7106,
+        "objective": 2.0508,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 765,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:dense_query_cosine": {
+        "support_recall": 0.7771,
+        "support_complete": 0.5542,
+        "noise_rate": 0.6892,
+        "objective": 1.8091,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 765,
+        "phi_scale": 1.0
+      },
+      "2:scale=1:query_level_ppr": {
+        "support_recall": 0.7346,
+        "support_complete": 0.481,
+        "noise_rate": 0.7061,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 765,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:demand_source_union": {
+        "support_recall": 0.5277,
+        "support_complete": 0.0128,
+        "noise_rate": 0.5779,
+        "objective": 0.0004,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 235,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:dense_demand_union_cosine": {
+        "support_recall": 0.5436,
+        "support_complete": 0.0213,
+        "noise_rate": 0.5651,
+        "objective": 2.1009,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 235,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:dense_query_cosine": {
+        "support_recall": 0.55,
+        "support_complete": 0.0213,
+        "noise_rate": 0.56,
+        "objective": 1.6905,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 235,
+        "phi_scale": 1.0
+      },
+      "4:scale=1:query_level_ppr": {
+        "support_recall": 0.533,
+        "support_complete": 0.0213,
+        "noise_rate": 0.5736,
+        "objective": 0.0003,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 235,
+        "phi_scale": 1.0
+      }
+    },
+    "sum_vs_noisy_or": {}
+  }
+}

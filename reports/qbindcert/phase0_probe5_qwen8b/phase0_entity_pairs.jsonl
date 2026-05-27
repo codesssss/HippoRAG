@@ -1,0 +1,200 @@
+{"left": "Lothair II", "right": "Lothair II", "label": "alias", "expected_merge": true, "source": "evidence_title"}
+{"left": "Ermengarde of Tours", "right": "Ermengarde of Tours", "label": "alias", "expected_merge": true, "source": "evidence_title"}
+{"left": "Ermengarde of Tours", "right": "Ermengarde of Tours", "label": "alias", "expected_merge": true, "source": "evidence_title"}
+{"left": "Lothair II", "right": "Teutberga", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Bertha, daughter of Lothair II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Ermengarde of Tours", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Waldrada of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Theobald of Arles", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Lambert, Margrave of Tuscany", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Kekuʻiapoiwa II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lothair II", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Bertha, daughter of Lothair II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Ermengarde of Tours", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Waldrada of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Theobald of Arles", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Lambert, Margrave of Tuscany", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Kekuʻiapoiwa II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Teutberga", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Ermengarde of Tours", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Waldrada of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Theobald of Arles", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Lambert, Margrave of Tuscany", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Kekuʻiapoiwa II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, daughter of Lothair II", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Waldrada of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Theobald of Arles", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Lambert, Margrave of Tuscany", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Kekuʻiapoiwa II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Tours", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Theobald of Arles", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Lambert, Margrave of Tuscany", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Kekuʻiapoiwa II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Waldrada of Lotharingia", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Lambert, Margrave of Tuscany", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Kekuʻiapoiwa II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Theobald of Arles", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "Kekuʻiapoiwa II", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Lambert, Margrave of Tuscany", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kekuʻiapoiwa II", "right": "Adolf I of Lotharingia", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kekuʻiapoiwa II", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kekuʻiapoiwa II", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kekuʻiapoiwa II", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kekuʻiapoiwa II", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kekuʻiapoiwa II", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kekuʻiapoiwa II", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Adolf I of Lotharingia", "right": "John II, Duke of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Adolf I of Lotharingia", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Adolf I of Lotharingia", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Adolf I of Lotharingia", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Adolf I of Lotharingia", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Adolf I of Lotharingia", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John II, Duke of Lorraine", "right": "Minamoto no Chikako", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John II, Duke of Lorraine", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John II, Duke of Lorraine", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John II, Duke of Lorraine", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John II, Duke of Lorraine", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Minamoto no Chikako", "right": "Bertha, Duchess of Lorraine", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Minamoto no Chikako", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Minamoto no Chikako", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Minamoto no Chikako", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, Duchess of Lorraine", "right": "Ermengarde of Hesbaye", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, Duchess of Lorraine", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Bertha, Duchess of Lorraine", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Hesbaye", "right": "Louis, Count of Verdun", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ermengarde of Hesbaye", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Louis, Count of Verdun", "right": "Anthony II, Count of Ligny", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Aas Ka Panchhi", "label": "alias", "expected_merge": true, "source": "evidence_title"}
+{"left": "Phoolwari", "right": "Phoolwari", "label": "alias", "expected_merge": true, "source": "evidence_title"}
+{"left": "Aas Ka Panchhi", "right": "Phoolwari", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "John Jaffer Janardhanan", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Kishore Sahu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Aansoo Ban Gaye Phool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "The Warriors", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Dugès", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Ek Hi Bhool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aas Ka Panchhi", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "John Jaffer Janardhanan", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Kishore Sahu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Aansoo Ban Gaye Phool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "The Warriors", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Dugès", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Ek Hi Bhool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Phoolwari", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Kishore Sahu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Aansoo Ban Gaye Phool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "The Warriors", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Dugès", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Ek Hi Bhool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "John Jaffer Janardhanan", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "Aansoo Ban Gaye Phool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "The Warriors", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "Dugès", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "Ek Hi Bhool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Kishore Sahu", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "The Warriors", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "Dugès", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "Ek Hi Bhool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Aansoo Ban Gaye Phool", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "Dugès", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "Ek Hi Bhool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "The Warriors", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "Ek Hi Bhool", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Dugès", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ek Hi Bhool", "right": "Where Was I", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ek Hi Bhool", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ek Hi Bhool", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ek Hi Bhool", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ek Hi Bhool", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ek Hi Bhool", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Ek Hi Bhool", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Where Was I", "right": "Killed the Family and Went to the Movies", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Where Was I", "right": "P.S. I Love You", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Where Was I", "right": "Tinnu Anand", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Where Was I", "right": "The Bees", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Where Was I", "right": "Poola Rangadu", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}
+{"left": "Where Was I", "right": "When I Was Young", "label": "different_title", "expected_merge": false, "source": "candidate_negative"}

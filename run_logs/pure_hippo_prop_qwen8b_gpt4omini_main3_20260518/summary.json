@@ -1,0 +1,70 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "hipporag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.8313,
+      "Recall@20": 0.9048,
+      "EM": 0.56,
+      "F1": 0.6264,
+      "mean_reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/pure_hippo_prop_qwen8b_gpt4omini_main3_20260518/reader_qa/hipporag/2wikimultihopqa_hipporag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "hipporag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.923,
+      "Recall@20": 0.9885,
+      "EM": 0.596,
+      "F1": 0.7289,
+      "mean_reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/pure_hippo_prop_qwen8b_gpt4omini_main3_20260518/reader_qa/hipporag/hotpotqa_hipporag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "hipporag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.7011,
+      "Recall@20": 0.8662,
+      "EM": 0.332,
+      "F1": 0.443,
+      "mean_reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/pure_hippo_prop_qwen8b_gpt4omini_main3_20260518/reader_qa/hipporag/musique_hipporag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "proprag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.9028,
+      "Recall@20": 0.9607,
+      "EM": 0.605,
+      "F1": 0.6842,
+      "mean_reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/pure_hippo_prop_qwen8b_gpt4omini_main3_20260518/reader_qa/proprag/2wikimultihopqa_proprag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "proprag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.95,
+      "Recall@20": 0.9925,
+      "EM": 0.607,
+      "F1": 0.7426,
+      "mean_reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/pure_hippo_prop_qwen8b_gpt4omini_main3_20260518/reader_qa/proprag/hotpotqa_proprag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "proprag_qwen8b_no_think_top5",
+      "count": 1000,
+      "Recall@5": 0.7372,
+      "Recall@20": 0.9007,
+      "EM": 0.364,
+      "F1": 0.4743,
+      "mean_reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/pure_hippo_prop_qwen8b_gpt4omini_main3_20260518/reader_qa/proprag/musique_proprag_qwen8b_no_think_gpt4omini_reader_top5_limit1000.json"
+    }
+  ]
+}

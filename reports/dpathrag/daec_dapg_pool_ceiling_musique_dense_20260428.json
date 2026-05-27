@@ -1,0 +1,60 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/musique_dense_pool100.json",
+  "dataset": "musique_dense",
+  "record_count": 1000,
+  "k_values": [
+    5,
+    20,
+    100
+  ],
+  "summary": {
+    "rows": 3000,
+    "by_hop_k": {
+      "2:k5": {
+        "support_recall": 0.7751,
+        "support_complete": 0.5695,
+        "rows": 518
+      },
+      "2:k20": {
+        "support_recall": 0.8803,
+        "support_complete": 0.7625,
+        "rows": 518
+      },
+      "2:k100": {
+        "support_recall": 0.9324,
+        "support_complete": 0.8649,
+        "rows": 518
+      },
+      "3:k5": {
+        "support_recall": 0.6772,
+        "support_complete": 0.2658,
+        "rows": 316
+      },
+      "3:k20": {
+        "support_recall": 0.8407,
+        "support_complete": 0.5886,
+        "rows": 316
+      },
+      "3:k100": {
+        "support_recall": 0.9198,
+        "support_complete": 0.7627,
+        "rows": 316
+      },
+      "4:k5": {
+        "support_recall": 0.4418,
+        "support_complete": 0.0422,
+        "rows": 166
+      },
+      "4:k20": {
+        "support_recall": 0.6637,
+        "support_complete": 0.2229,
+        "rows": 166
+      },
+      "4:k100": {
+        "support_recall": 0.8158,
+        "support_complete": 0.4639,
+        "rows": 166
+      }
+    }
+  }
+}

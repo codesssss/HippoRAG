@@ -1,0 +1,28 @@
+{
+  "date": "2026-04-29",
+  "decision": "PASS_WITH_STRONG_OVERLAP_RISK",
+  "source": "https://arxiv.org/abs/2604.03384",
+  "version_checked": "2604.03384v2",
+  "version_date": "2026-04-28",
+  "bridgerag_method_components": [
+    "top1_dense_bridge",
+    "llm_svo_hop2_query_generation",
+    "llm_e1_e2_entity_extraction",
+    "dual_entity_ann_expansion",
+    "tripartite_llm_judge_q_b_e1_e2_c",
+    "pit_score_fusion",
+    "retrieval_only_r_at_5_evaluation"
+  ],
+  "overlap_risk": "high",
+  "beep_remaining_differentiators": [
+    "no_llm_generated_svo_queries",
+    "no_llm_tripartite_judge",
+    "explicit_document_entity_document_edge_scoring",
+    "multi_hop_chain_posterior",
+    "chain_position_reader_budget_projection",
+    "support_complete_and_reader_em_f1_evaluation"
+  ],
+  "hard_stop": false,
+  "required_followup_if_beep_continues": "run_bridgerag_lite_control"
+}
+

@@ -1,0 +1,22 @@
+[
+  {
+    "dataset": "hotpotqa",
+    "status": "missing"
+  },
+  {
+    "dataset": "2wikimultihopqa",
+    "status": "missing"
+  },
+  {
+    "dataset": "musique",
+    "status": "missing"
+  },
+  {
+    "dataset": "nq_rear",
+    "status": "missing"
+  },
+  {
+    "dataset": "popqa",
+    "status": "missing"
+  }
+]

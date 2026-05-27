@@ -1,0 +1,49 @@
+[2026-05-20T15:24:38+08:00] BEGIN evidencelink_doc_transition_controls_retrieval_full1000_20260520
+[2026-05-20T15:24:38+08:00] Protocol: doc-transition controls, full1000 main3, Qwen32B no-think DBEC/PCEC, retrieval-only, no GPT-4o-mini reader
+[2026-05-20T15:24:38+08:00] Control policies: dense_doc_knn degree_matched_shuffle
+[2026-05-20T15:24:38+08:00] Graph utility model: qwen3-32b-judge; Qwen URLs: http://localhost:8046/v1 http://localhost:8045/v1
+[2026-05-20T15:24:38+08:00] Pool/readout: pool_k=100 prefix_budget_m=4 reader_budget_k=5; dense_seed_k=20 neighbor_k=20 closure_hops=2
+[2026-05-20T15:24:38+08:00] OK endpoint qwen32b:http://localhost:8046/v1: http://localhost:8046/v1/models
+[2026-05-20T15:24:38+08:00] OK endpoint qwen32b:http://localhost:8045/v1: http://localhost:8045/v1/models
+[2026-05-20T15:24:38+08:00] OK endpoint nv_embed: http://localhost:8019/v1/models
+[2026-05-20T15:24:38+08:00] LAUNCHED worker slot=0 pid=3527985 qwen_url=http://localhost:8046/v1
+[2026-05-20T15:24:38+08:00] START worker slot=0/2 qwen_url=http://localhost:8046/v1
+[2026-05-20T15:24:38+08:00] LAUNCHED worker slot=1 pid=3527990 qwen_url=http://localhost:8045/v1
+[2026-05-20T15:24:38+08:00] START worker slot=1/2 qwen_url=http://localhost:8045/v1
+[2026-05-20T15:24:38+08:00] SKIP export policy=dense_doc_knn dataset=2wikimultihopqa
+[2026-05-20T15:24:38+08:00] SKIP export policy=dense_doc_knn dataset=hotpotqa
+[2026-05-20T15:24:38+08:00] START DBEC32 policy=dense_doc_knn dataset=2wikimultihopqa qwen_url=http://localhost:8046/v1
+[2026-05-20T15:24:38+08:00] START DBEC32 policy=dense_doc_knn dataset=hotpotqa qwen_url=http://localhost:8045/v1
+[2026-05-20T16:00:02+08:00] DONE DBEC32 policy=dense_doc_knn dataset=hotpotqa
+[2026-05-20T16:00:02+08:00] START PCEC policy=dense_doc_knn dataset=hotpotqa qwen_url=http://localhost:8045/v1
+[2026-05-20T16:06:44+08:00] DONE PCEC policy=dense_doc_knn dataset=hotpotqa
+[2026-05-20T16:06:44+08:00] START export policy=degree_matched_shuffle dataset=2wikimultihopqa
+[2026-05-20T16:07:10+08:00] DONE export policy=degree_matched_shuffle dataset=2wikimultihopqa
+[2026-05-20T16:07:10+08:00] START DBEC32 policy=degree_matched_shuffle dataset=2wikimultihopqa qwen_url=http://localhost:8045/v1
+[2026-05-20T16:11:53+08:00] DONE DBEC32 policy=dense_doc_knn dataset=2wikimultihopqa
+[2026-05-20T16:11:53+08:00] START PCEC policy=dense_doc_knn dataset=2wikimultihopqa qwen_url=http://localhost:8046/v1
+[2026-05-20T16:17:50+08:00] DONE PCEC policy=dense_doc_knn dataset=2wikimultihopqa
+[2026-05-20T16:17:50+08:00] START export policy=dense_doc_knn dataset=musique
+[2026-05-20T16:18:20+08:00] DONE export policy=dense_doc_knn dataset=musique
+[2026-05-20T16:18:20+08:00] START DBEC32 policy=dense_doc_knn dataset=musique qwen_url=http://localhost:8046/v1
+[2026-05-20T16:33:15+08:00] DONE DBEC32 policy=degree_matched_shuffle dataset=2wikimultihopqa
+[2026-05-20T16:33:15+08:00] START PCEC policy=degree_matched_shuffle dataset=2wikimultihopqa qwen_url=http://localhost:8045/v1
+[2026-05-20T16:38:55+08:00] DONE PCEC policy=degree_matched_shuffle dataset=2wikimultihopqa
+[2026-05-20T16:38:55+08:00] START export policy=degree_matched_shuffle dataset=musique
+[2026-05-20T16:39:23+08:00] DONE export policy=degree_matched_shuffle dataset=musique
+[2026-05-20T16:39:23+08:00] START DBEC32 policy=degree_matched_shuffle dataset=musique qwen_url=http://localhost:8045/v1
+[2026-05-20T17:09:14+08:00] DONE DBEC32 policy=dense_doc_knn dataset=musique
+[2026-05-20T17:09:14+08:00] START PCEC policy=dense_doc_knn dataset=musique qwen_url=http://localhost:8046/v1
+[2026-05-20T17:09:26+08:00] DONE DBEC32 policy=degree_matched_shuffle dataset=musique
+[2026-05-20T17:09:26+08:00] START PCEC policy=degree_matched_shuffle dataset=musique qwen_url=http://localhost:8045/v1
+[2026-05-20T17:16:32+08:00] DONE PCEC policy=degree_matched_shuffle dataset=musique
+[2026-05-20T17:16:32+08:00] DONE worker slot=1/2 qwen_url=http://localhost:8045/v1
+[2026-05-20T17:16:42+08:00] DONE PCEC policy=dense_doc_knn dataset=musique
+[2026-05-20T17:16:42+08:00] START export policy=degree_matched_shuffle dataset=hotpotqa
+[2026-05-20T17:17:07+08:00] DONE export policy=degree_matched_shuffle dataset=hotpotqa
+[2026-05-20T17:17:07+08:00] START DBEC32 policy=degree_matched_shuffle dataset=hotpotqa qwen_url=http://localhost:8046/v1
+[2026-05-20T17:37:36+08:00] DONE DBEC32 policy=degree_matched_shuffle dataset=hotpotqa
+[2026-05-20T17:37:36+08:00] START PCEC policy=degree_matched_shuffle dataset=hotpotqa qwen_url=http://localhost:8046/v1
+[2026-05-20T17:44:05+08:00] DONE PCEC policy=degree_matched_shuffle dataset=hotpotqa
+[2026-05-20T17:44:05+08:00] DONE worker slot=0/2 qwen_url=http://localhost:8046/v1
+[2026-05-20T17:44:05+08:00] DONE evidencelink_doc_transition_controls_retrieval_full1000_20260520

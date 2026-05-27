@@ -1,0 +1,5061 @@
+{
+  "config": {
+    "agsto_closure_hops": 2,
+    "agsto_max_endpoint_degree": 30,
+    "agsto_textual_seed_top_k": 20,
+    "candidate_generator_mode": "dense_seeded_sto",
+    "candidate_pool_k": 200,
+    "candidate_source": "fresh_dense_seeded_sto_query_grounded_sto",
+    "dense_root_count": 20,
+    "embedding_base_url": "http://localhost:8019/v1/embeddings",
+    "embedding_endpoint_model_id": "nvidia/NV-Embed-v2",
+    "index_embedding_name": "VLLM/nvidia/NV-Embed-v2",
+    "llm_base_url": "http://localhost:8041/v1",
+    "llm_name": "qwen3-8b-train",
+    "max_queries": 5,
+    "preserved_dense_count": 200,
+    "top_k": 5,
+    "uses_dataset_routing": false,
+    "uses_legacy_compare_report": false,
+    "uses_sfb_or_support_fusion": false,
+    "uses_v13b_source_report": false,
+    "uses_weighted_score_fusion": false
+  },
+  "dataset": "2wikimultihopqa",
+  "fresh_index": {
+    "chunk_embedding_store_path": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/qwen3-8b-train_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet",
+    "doc_count": 200,
+    "index_execution": "reuse_current_fresh_index",
+    "llm_cache_dir": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/llm_cache",
+    "openie_path": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/openie_results_ner_qwen3-8b-train.json",
+    "reuses_current_fresh_index": true,
+    "reuses_existing_embedding_cache": true,
+    "reuses_existing_openie_cache": true,
+    "reuses_legacy_embedding_cache": false,
+    "reuses_legacy_openie_cache": false,
+    "save_dir": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index",
+    "working_dir": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/qwen3-8b-train_VLLM_nvidia_NV-Embed-v2"
+  },
+  "input_report": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/reports/2wikimultihopqa_minimal_per_query_fresh.json",
+  "method": "evidence_transition_graph_native_retrieval",
+  "metrics": {
+    "all_gold_at5": 1.0,
+    "mean_certified_doc_count_top5": 1.8,
+    "r5": 1.0
+  },
+  "openie_path": "/mnt/nvme/code/HippoRAG/run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/openie_results_ner_qwen3-8b-train.json",
+  "row_count": 5,
+  "rows": [
+    {
+      "gold_doc_indices": [
+        4,
+        5
+      ],
+      "query_grounded_sto_all_gold_at5": true,
+      "query_grounded_sto_recall_at5": 1.0,
+      "query_index": 0,
+      "question": "When did Lothair Ii's mother die?",
+      "retrieved_doc_indices_top5": [
+        0,
+        6,
+        4,
+        8,
+        5
+      ],
+      "route_trace": {
+        "candidate_boundary": "method_owned_candidate_universe",
+        "candidate_universe": {
+          "admissible_doc_indices": [
+            9,
+            2,
+            7,
+            1,
+            188,
+            125,
+            132,
+            126,
+            129,
+            73,
+            75,
+            127,
+            177,
+            130,
+            183,
+            124,
+            173,
+            131,
+            133
+          ],
+          "agsto_admitted_doc_count": 24,
+          "agsto_graph_tail_doc_indices": [
+            9,
+            2,
+            7,
+            1,
+            188,
+            125,
+            132,
+            126,
+            129,
+            73,
+            75,
+            127,
+            177,
+            130,
+            183,
+            124,
+            173,
+            131,
+            133
+          ],
+          "agsto_local_edge_count": 14,
+          "agsto_role_graph_edge_count": 481,
+          "agsto_seed_doc_indices": [
+            4,
+            0,
+            6,
+            8,
+            5,
+            9,
+            2,
+            7,
+            1,
+            188,
+            125,
+            132,
+            126,
+            129,
+            73,
+            75,
+            127,
+            177,
+            130,
+            183
+          ],
+          "agsto_symbolic_seed_doc_indices": [
+            0,
+            4,
+            6,
+            9
+          ],
+          "candidate_boundary": "method_owned_candidate_universe",
+          "candidate_count": 200,
+          "candidate_doc_indices": [
+            4,
+            0,
+            6,
+            8,
+            5,
+            9,
+            2,
+            7,
+            1,
+            188,
+            125,
+            132,
+            126,
+            129,
+            73,
+            75,
+            127,
+            177,
+            130,
+            183,
+            124,
+            173,
+            131,
+            133,
+            36,
+            44,
+            128,
+            143,
+            198,
+            158,
+            72,
+            190,
+            58,
+            28,
+            160,
+            76,
+            162,
+            74,
+            32,
+            138,
+            161,
+            37,
+            103,
+            189,
+            71,
+            148,
+            113,
+            181,
+            66,
+            51,
+            142,
+            144,
+            33,
+            150,
+            108,
+            102,
+            192,
+            145,
+            84,
+            170,
+            196,
+            185,
+            14,
+            101,
+            104,
+            191,
+            59,
+            56,
+            156,
+            3,
+            166,
+            179,
+            199,
+            167,
+            140,
+            111,
+            110,
+            182,
+            48,
+            120,
+            172,
+            52,
+            10,
+            187,
+            176,
+            12,
+            54,
+            60,
+            40,
+            165,
+            135,
+            146,
+            61,
+            77,
+            159,
+            117,
+            115,
+            163,
+            13,
+            31,
+            195,
+            99,
+            68,
+            149,
+            41,
+            70,
+            89,
+            57,
+            193,
+            105,
+            86,
+            171,
+            109,
+            114,
+            137,
+            23,
+            147,
+            141,
+            46,
+            22,
+            26,
+            139,
+            17,
+            169,
+            69,
+            107,
+            151,
+            106,
+            152,
+            155,
+            79,
+            98,
+            38,
+            197,
+            83,
+            63,
+            88,
+            85,
+            35,
+            19,
+            134,
+            122,
+            136,
+            50,
+            96,
+            67,
+            39,
+            154,
+            112,
+            178,
+            47,
+            93,
+            175,
+            123,
+            16,
+            95,
+            34,
+            153,
+            87,
+            21,
+            184,
+            121,
+            25,
+            64,
+            20,
+            29,
+            55,
+            119,
+            65,
+            174,
+            43,
+            116,
+            157,
+            24,
+            180,
+            168,
+            100,
+            97,
+            45,
+            80,
+            90,
+            27,
+            81,
+            62,
+            94,
+            91,
+            49,
+            30,
+            194,
+            15,
+            186,
+            42,
+            82,
+            11,
+            18,
+            78,
+            53,
+            92,
+            118,
+            164
+          ],
+          "candidate_generator": "dense_seeded_agsto_local_graph_candidate_generator",
+          "candidate_order_policy": "dense_head_then_agsto_admitted_tail_then_remaining_dense",
+          "candidate_source": "method_owned_dense_seeded_agsto_local_graph",
+          "dense_seed_count": 20,
+          "dense_topk_is_final_answer_default": false,
+          "dense_trace": {
+            "candidate_boundary": "method_owned_candidate_universe",
+            "candidate_count": 200,
+            "candidate_generator": "dense_embedding_store_candidate_generator",
+            "candidate_source": "method_native_dense_embedding_store",
+            "dense_topk_is_final_answer_default": false,
+            "embedding_doc_count": 200,
+            "embedding_store_path": "run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/qwen3-8b-train_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet",
+            "query_index": 0,
+            "uses_dataset_routing": false,
+            "uses_external_baseline_frontier": false,
+            "uses_weighted_score_fusion": false
+          },
+          "query_index": 0,
+          "source_prior_prefix_count": 5,
+          "source_prior_prefix_doc_indices": [
+            4,
+            0,
+            6,
+            8,
+            5
+          ],
+          "uses_dataset_routing": false,
+          "uses_dense_only_as_graph_entry": true,
+          "uses_external_baseline_frontier": false,
+          "uses_hipporag_v2_runtime_graph_retrieval": false,
+          "uses_replay_candidate_cache": false,
+          "uses_sto_role_graph_admission": true,
+          "uses_weighted_score_fusion": false
+        },
+        "dense_topk_is_final_answer_default": false,
+        "pipeline": "candidate_universe_to_sto_graph_to_reader_evidence",
+        "retrieval": {
+          "candidate_entrance": "agsto_graph_payload",
+          "certified_doc_indices": [
+            6,
+            4,
+            5,
+            0
+          ],
+          "dense_topk_is_final_answer_default": false,
+          "evidence_transition_audit": {
+            "certificate_count": 32,
+            "certificate_type_counts": {
+              "endpoint_title": 17,
+              "source_title_endpoint": 8,
+              "title_alias": 7
+            },
+            "certified_doc_indices": [
+              4,
+              0
+            ],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              0,
+              6,
+              4,
+              8,
+              5
+            ],
+            "source_frontier_doc_indices": [
+              0,
+              6,
+              4,
+              8,
+              5
+            ],
+            "used_certificate_count": 4,
+            "used_certificates": [
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "lothair ii",
+                "source_binding": "teutberga",
+                "source_doc_index": 0,
+                "source_title": "Teutberga",
+                "target_binding": "lothair ii",
+                "target_doc_index": 4,
+                "target_title": "Lothair II"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "lothair ii",
+                "source_binding": "bertha",
+                "source_doc_index": 6,
+                "source_title": "Bertha, daughter of Lothair II",
+                "target_binding": "lothair ii",
+                "target_doc_index": 4,
+                "target_title": "Lothair II"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "teutberga",
+                "source_binding": "lothair ii",
+                "source_doc_index": 4,
+                "source_title": "Lothair II",
+                "target_binding": "teutberga",
+                "target_doc_index": 0,
+                "target_title": "Teutberga"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "lothair ii",
+                "source_binding": "lotharingia",
+                "source_doc_index": 8,
+                "source_title": "Waldrada of Lotharingia",
+                "target_binding": "lothair ii",
+                "target_doc_index": 4,
+                "target_title": "Lothair II"
+              }
+            ],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "evidence_transition_audit_only": true,
+          "local_graph": {
+            "admitted_doc_count": 24,
+            "local_edge_count": 14,
+            "local_edge_preview": [
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "lothair ii",
+                  "lotharingia",
+                  "teutberga"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 0,
+                "right_doc": 4,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 3,
+                    "relation": "married to",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "teutberga",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 81,
+                    "relation": "married to",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 3,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "lotharingia",
+                    "kind": "same_object",
+                    "left_unit_id": 2,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "teutberga",
+                    "kind": "same_subject",
+                    "left_unit_id": 1,
+                    "right_unit_id": 82
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "lothair ii",
+                  "lotharingia"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 0,
+                "right_doc": 6,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_object",
+                    "left_unit_id": 3,
+                    "right_unit_id": 99
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 3,
+                    "right_unit_id": 108
+                  },
+                  {
+                    "endpoint": "lotharingia",
+                    "kind": "same_object",
+                    "left_unit_id": 2,
+                    "right_unit_id": 108
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "hucbert",
+                  "lothair ii"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 0,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "hucbert",
+                    "kind": "same_object",
+                    "left_unit_id": 5,
+                    "right_unit_id": 124
+                  },
+                  {
+                    "endpoint": "hucbert",
+                    "kind": "role_bridge",
+                    "left_unit_id": 124,
+                    "right_unit_id": 6
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_object",
+                    "left_unit_id": 3,
+                    "right_unit_id": 126
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "bertha",
+                  "lucca",
+                  "tuscany"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 2,
+                "right_doc": 6,
+                "samples": [
+                  {
+                    "endpoint": "bertha",
+                    "kind": "role_bridge",
+                    "left_unit_id": 16,
+                    "right_unit_id": 99
+                  },
+                  {
+                    "endpoint": "lucca",
+                    "kind": "same_object",
+                    "left_unit_id": 18,
+                    "right_unit_id": 101
+                  },
+                  {
+                    "endpoint": "tuscany",
+                    "kind": "same_object",
+                    "left_unit_id": 19,
+                    "right_unit_id": 102
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "bertha"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 2,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "bertha",
+                    "kind": "same_object",
+                    "left_unit_id": 16,
+                    "right_unit_id": 125
+                  },
+                  {
+                    "endpoint": "bertha",
+                    "kind": "role_bridge",
+                    "left_unit_id": 16,
+                    "right_unit_id": 126
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "ermengarde of tours"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 4,
+                "right_doc": 5,
+                "samples": [
+                  {
+                    "endpoint": "ermengarde of tours",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 80,
+                    "relation": "is son of",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "ermengarde of tours",
+                    "kind": "role_bridge",
+                    "left_unit_id": 80,
+                    "right_unit_id": 85
+                  },
+                  {
+                    "endpoint": "ermengarde of tours",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "lothair ii",
+                  "lotharingia"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 4,
+                "right_doc": 6,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_subject",
+                    "left_unit_id": 77,
+                    "right_unit_id": 108
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 99,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "lotharingia",
+                    "kind": "same_object",
+                    "left_unit_id": 77,
+                    "right_unit_id": 108
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "lothair ii"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 4,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 126,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "bertha",
+                  "lothair ii"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "same_subject"
+                ],
+                "left_doc": 6,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "bertha",
+                    "kind": "same_subject",
+                    "left_unit_id": 99,
+                    "right_unit_id": 126
+                  },
+                  {
+                    "endpoint": "bertha",
+                    "kind": "role_bridge",
+                    "left_unit_id": 125,
+                    "right_unit_id": 99
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_object",
+                    "left_unit_id": 99,
+                    "right_unit_id": 126
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 126,
+                    "right_unit_id": 108
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "cairist ona",
+                  "clann ruaidhr territories",
+                  "ine",
+                  "ruaidhr mac ruaidhr"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 73,
+                "right_doc": 75,
+                "samples": [
+                  {
+                    "endpoint": "ruaidhr mac ruaidhr",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 857,
+                    "relation": "father",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "cairist ona",
+                    "kind": "same_subject",
+                    "left_unit_id": 838,
+                    "right_unit_id": 861
+                  },
+                  {
+                    "endpoint": "cairist ona",
+                    "kind": "role_bridge",
+                    "left_unit_id": 860,
+                    "right_unit_id": 838
+                  },
+                  {
+                    "endpoint": "clann ruaidhr territories",
+                    "kind": "role_bridge",
+                    "left_unit_id": 838,
+                    "right_unit_id": 872
+                  },
+                  {
+                    "endpoint": "ine",
+                    "kind": "same_object",
+                    "left_unit_id": 836,
+                    "right_unit_id": 872
+                  }
+                ]
+              }
+            ],
+            "method": "query_local_sto_graph_admission",
+            "seed_doc_indices": [
+              0,
+              4,
+              6,
+              9,
+              8,
+              5,
+              2,
+              7,
+              1,
+              188,
+              125,
+              132,
+              126,
+              129,
+              73,
+              75,
+              127,
+              177,
+              130,
+              183
+            ],
+            "seed_order_policy": "query_symbolic_anchors_before_textual_entry",
+            "stats": {
+              "admitted_doc_count": 24,
+              "allowed_edge_kinds": [
+                "role_bridge",
+                "same_subject",
+                "sentence_grounded_transition",
+                "source_endpoint_incidence",
+                "title_role_grounding"
+              ],
+              "allowed_edge_tiers": [
+                "evidence_transition",
+                "weak_connectivity"
+              ],
+              "candidate_limit": 200,
+              "closure_hops": 2,
+              "local_edge_count": 14,
+              "local_edge_tier_counts": {
+                "evidence_transition": 7,
+                "unknown": 0,
+                "weak_connectivity": 7
+              },
+              "role_graph_edge_count": 481,
+              "role_graph_edge_tier_counts": {
+                "evidence_transition": 41,
+                "unknown": 0,
+                "weak_connectivity": 440
+              },
+              "seed_doc_count": 20,
+              "symbolic_anchor_count": 1,
+              "symbolic_seed_doc_count": 4,
+              "textual_seed_count": 20
+            },
+            "symbolic_anchor_endpoints": [
+              "lothair ii"
+            ],
+            "symbolic_seed_doc_indices": [
+              0,
+              4,
+              6,
+              9
+            ],
+            "textual_seed_doc_indices": [
+              4,
+              0,
+              6,
+              8,
+              5,
+              9,
+              2,
+              7,
+              1,
+              188,
+              125,
+              132,
+              126,
+              129,
+              73,
+              75,
+              127,
+              177,
+              130,
+              183
+            ]
+          },
+          "paper_facing_method_name": "evidence_transition_graph_native_retrieval",
+          "pipeline": "query_grounded_sto_graph_to_native_reader_evidence",
+          "ranked_object": "query_local_graph_selected_reader_context",
+          "selected_doc_indices": [
+            0,
+            6,
+            4,
+            8,
+            5
+          ],
+          "selection": {
+            "admitted_doc_count": 24,
+            "delayed_symbolic_entry_doc_indices": [],
+            "graph_order_doc_indices": [
+              0,
+              6,
+              4,
+              8,
+              5
+            ],
+            "local_edge_count": 14,
+            "query_endpoints": [
+              "lothair ii"
+            ],
+            "raw_graph_order_doc_indices": [
+              0,
+              6,
+              4,
+              8,
+              5
+            ],
+            "selected_doc_indices": [
+              0,
+              6,
+              4,
+              8,
+              5
+            ],
+            "selection_policy": "query_anchor_first_admission_preserving_sto_frontier",
+            "selection_rows": [],
+            "set_objective": {}
+          },
+          "source_text_evidence_validation": {
+            "certificate_count": 32,
+            "certificate_type_counts": {
+              "endpoint_title": 17,
+              "source_title_endpoint": 8,
+              "title_alias": 7
+            },
+            "certified_doc_indices": [
+              4,
+              0
+            ],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              0,
+              6,
+              4,
+              8,
+              5
+            ],
+            "source_frontier_doc_indices": [
+              0,
+              6,
+              4,
+              8,
+              5
+            ],
+            "used_certificate_count": 4,
+            "used_certificates": [
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "lothair ii",
+                "source_binding": "teutberga",
+                "source_doc_index": 0,
+                "source_title": "Teutberga",
+                "target_binding": "lothair ii",
+                "target_doc_index": 4,
+                "target_title": "Lothair II"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "lothair ii",
+                "source_binding": "bertha",
+                "source_doc_index": 6,
+                "source_title": "Bertha, daughter of Lothair II",
+                "target_binding": "lothair ii",
+                "target_doc_index": 4,
+                "target_title": "Lothair II"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "teutberga",
+                "source_binding": "lothair ii",
+                "source_doc_index": 4,
+                "source_title": "Lothair II",
+                "target_binding": "teutberga",
+                "target_doc_index": 0,
+                "target_title": "Teutberga"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "lothair ii",
+                "source_binding": "lotharingia",
+                "source_doc_index": 8,
+                "source_title": "Waldrada of Lotharingia",
+                "target_binding": "lothair ii",
+                "target_doc_index": 4,
+                "target_title": "Lothair II"
+              }
+            ],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "source_text_evidence_validation_only": true,
+          "top_k": 5,
+          "uses_agsto_legacy_selector": false,
+          "uses_agsto_proposal_fusion": false,
+          "uses_agsto_query_local_graph": true,
+          "uses_agsto_weighted_evidence_set_scoring": false,
+          "uses_dataset_routing": false,
+          "uses_evidence_transition_audit": true,
+          "uses_external_baseline_frontier": false,
+          "uses_graph_native_selection": true,
+          "uses_llm_query_schema": false,
+          "uses_query_grounded_sto_graph": true,
+          "uses_replacement_policy": false,
+          "uses_source_prior_repair": false,
+          "uses_source_text_evidence_validation": true,
+          "uses_weighted_score_fusion": false
+        },
+        "runner": "query_grounded_sto_graph_native",
+        "uses_dataset_routing": false,
+        "uses_external_baseline_frontier": false,
+        "uses_llm_query_compiler": false,
+        "uses_weighted_score_fusion": false
+      },
+      "source_authorized_vocab_strict_all_gold_at5": true,
+      "source_authorized_vocab_strict_recall_at5": 1.0
+    },
+    {
+      "gold_doc_indices": [
+        17,
+        19
+      ],
+      "query_grounded_sto_all_gold_at5": true,
+      "query_grounded_sto_recall_at5": 1.0,
+      "query_index": 1,
+      "question": "Which film was released first, Aas Ka Panchhi or Phoolwari?",
+      "retrieved_doc_indices_top5": [
+        17,
+        19,
+        164,
+        77,
+        162
+      ],
+      "route_trace": {
+        "candidate_boundary": "method_owned_candidate_universe",
+        "candidate_universe": {
+          "admissible_doc_indices": [
+            161,
+            13,
+            10,
+            21,
+            167,
+            12,
+            103,
+            14,
+            177,
+            44,
+            52,
+            160,
+            15,
+            18,
+            76,
+            165,
+            102,
+            173,
+            41,
+            166,
+            84,
+            40,
+            83
+          ],
+          "agsto_admitted_doc_count": 28,
+          "agsto_graph_tail_doc_indices": [
+            161,
+            13,
+            10,
+            21,
+            167,
+            12,
+            103,
+            14,
+            177,
+            44,
+            52,
+            160,
+            15,
+            18,
+            76,
+            165,
+            102,
+            173,
+            41,
+            166,
+            84,
+            40,
+            83
+          ],
+          "agsto_local_edge_count": 9,
+          "agsto_role_graph_edge_count": 481,
+          "agsto_seed_doc_indices": [
+            17,
+            19,
+            164,
+            77,
+            162,
+            161,
+            13,
+            10,
+            21,
+            167,
+            12,
+            103,
+            14,
+            177,
+            44,
+            52,
+            160,
+            15,
+            18,
+            76
+          ],
+          "agsto_symbolic_seed_doc_indices": [
+            17,
+            19
+          ],
+          "candidate_boundary": "method_owned_candidate_universe",
+          "candidate_count": 200,
+          "candidate_doc_indices": [
+            17,
+            19,
+            164,
+            77,
+            162,
+            161,
+            13,
+            10,
+            21,
+            167,
+            12,
+            103,
+            14,
+            177,
+            44,
+            52,
+            160,
+            15,
+            18,
+            76,
+            165,
+            102,
+            173,
+            41,
+            166,
+            84,
+            40,
+            83,
+            178,
+            47,
+            121,
+            159,
+            46,
+            81,
+            88,
+            39,
+            60,
+            184,
+            51,
+            37,
+            48,
+            33,
+            50,
+            155,
+            172,
+            140,
+            138,
+            92,
+            122,
+            54,
+            143,
+            169,
+            147,
+            32,
+            119,
+            56,
+            151,
+            181,
+            195,
+            127,
+            174,
+            153,
+            24,
+            80,
+            26,
+            148,
+            175,
+            16,
+            55,
+            141,
+            87,
+            99,
+            154,
+            183,
+            64,
+            187,
+            65,
+            137,
+            171,
+            136,
+            132,
+            120,
+            163,
+            45,
+            23,
+            125,
+            36,
+            34,
+            66,
+            135,
+            58,
+            126,
+            89,
+            95,
+            117,
+            150,
+            28,
+            63,
+            25,
+            116,
+            185,
+            193,
+            124,
+            91,
+            158,
+            43,
+            128,
+            78,
+            69,
+            22,
+            156,
+            73,
+            3,
+            134,
+            35,
+            82,
+            53,
+            62,
+            131,
+            111,
+            129,
+            182,
+            133,
+            11,
+            49,
+            199,
+            38,
+            130,
+            4,
+            190,
+            105,
+            71,
+            188,
+            139,
+            42,
+            20,
+            75,
+            90,
+            114,
+            98,
+            85,
+            57,
+            79,
+            194,
+            109,
+            108,
+            142,
+            168,
+            192,
+            144,
+            93,
+            67,
+            180,
+            113,
+            74,
+            6,
+            123,
+            104,
+            70,
+            0,
+            179,
+            110,
+            149,
+            152,
+            145,
+            61,
+            157,
+            198,
+            68,
+            146,
+            170,
+            8,
+            94,
+            107,
+            72,
+            115,
+            197,
+            7,
+            5,
+            100,
+            118,
+            9,
+            59,
+            176,
+            96,
+            101,
+            191,
+            106,
+            2,
+            196,
+            97,
+            189,
+            27,
+            31,
+            86,
+            186,
+            1,
+            29,
+            112,
+            30
+          ],
+          "candidate_generator": "dense_seeded_agsto_local_graph_candidate_generator",
+          "candidate_order_policy": "dense_head_then_agsto_admitted_tail_then_remaining_dense",
+          "candidate_source": "method_owned_dense_seeded_agsto_local_graph",
+          "dense_seed_count": 20,
+          "dense_topk_is_final_answer_default": false,
+          "dense_trace": {
+            "candidate_boundary": "method_owned_candidate_universe",
+            "candidate_count": 200,
+            "candidate_generator": "dense_embedding_store_candidate_generator",
+            "candidate_source": "method_native_dense_embedding_store",
+            "dense_topk_is_final_answer_default": false,
+            "embedding_doc_count": 200,
+            "embedding_store_path": "run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/qwen3-8b-train_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet",
+            "query_index": 1,
+            "uses_dataset_routing": false,
+            "uses_external_baseline_frontier": false,
+            "uses_weighted_score_fusion": false
+          },
+          "query_index": 1,
+          "source_prior_prefix_count": 5,
+          "source_prior_prefix_doc_indices": [
+            17,
+            19,
+            164,
+            77,
+            162
+          ],
+          "uses_dataset_routing": false,
+          "uses_dense_only_as_graph_entry": true,
+          "uses_external_baseline_frontier": false,
+          "uses_hipporag_v2_runtime_graph_retrieval": false,
+          "uses_replay_candidate_cache": false,
+          "uses_sto_role_graph_admission": true,
+          "uses_weighted_score_fusion": false
+        },
+        "dense_topk_is_final_answer_default": false,
+        "pipeline": "candidate_universe_to_sto_graph_to_reader_evidence",
+        "retrieval": {
+          "candidate_entrance": "agsto_graph_payload",
+          "certified_doc_indices": [],
+          "dense_topk_is_final_answer_default": false,
+          "evidence_transition_audit": {
+            "certificate_count": 8,
+            "certificate_type_counts": {
+              "endpoint_title": 4,
+              "source_title_endpoint": 2,
+              "title_alias": 2
+            },
+            "certified_doc_indices": [],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162
+            ],
+            "source_frontier_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162
+            ],
+            "used_certificate_count": 0,
+            "used_certificates": [],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "evidence_transition_audit_only": true,
+          "local_graph": {
+            "admitted_doc_count": 28,
+            "local_edge_count": 9,
+            "local_edge_preview": [
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "aldri annet enn br k",
+                  "altid ballade",
+                  "gabriel axel",
+                  "nothing but trouble"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 40,
+                "right_doc": 41,
+                "samples": [
+                  {
+                    "endpoint": "aldri annet enn br k",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 450,
+                    "relation": "is a remake of",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "aldri annet enn br k",
+                    "kind": "role_bridge",
+                    "left_unit_id": 450,
+                    "right_unit_id": 456
+                  },
+                  {
+                    "endpoint": "altid ballade",
+                    "kind": "same_subject",
+                    "left_unit_id": 446,
+                    "right_unit_id": 462
+                  },
+                  {
+                    "endpoint": "gabriel axel",
+                    "kind": "same_object",
+                    "left_unit_id": 448,
+                    "right_unit_id": 463
+                  },
+                  {
+                    "endpoint": "nothing but trouble",
+                    "kind": "same_object",
+                    "left_unit_id": 447,
+                    "right_unit_id": 460
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "edith carlmar"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "title_role_grounding"
+                ],
+                "left_doc": 41,
+                "right_doc": 44,
+                "samples": [
+                  {
+                    "endpoint": "edith carlmar",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 457,
+                    "relation": "edited by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "edith carlmar",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "frank launder"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 76,
+                "right_doc": 84,
+                "samples": [
+                  {
+                    "endpoint": "frank launder",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 976,
+                    "relation": "directed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "frank launder",
+                    "kind": "same_object",
+                    "left_unit_id": 912,
+                    "right_unit_id": 976
+                  },
+                  {
+                    "endpoint": "frank launder",
+                    "kind": "role_bridge",
+                    "left_unit_id": 976,
+                    "right_unit_id": 882
+                  },
+                  {
+                    "endpoint": "frank launder",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "the last coupon"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 83,
+                "right_doc": 84,
+                "samples": [
+                  {
+                    "endpoint": "the last coupon",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 972,
+                    "relation": "based on",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "the last coupon",
+                    "kind": "same_subject",
+                    "left_unit_id": 973,
+                    "right_unit_id": 975
+                  },
+                  {
+                    "endpoint": "the last coupon",
+                    "kind": "role_bridge",
+                    "left_unit_id": 972,
+                    "right_unit_id": 975
+                  },
+                  {
+                    "endpoint": "the last coupon",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "luis mandoki"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 102,
+                "right_doc": 103,
+                "samples": [
+                  {
+                    "endpoint": "luis mandoki",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1103,
+                    "relation": "directed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "luis mandoki",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1103,
+                    "right_unit_id": 1122
+                  },
+                  {
+                    "endpoint": "luis mandoki",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "robert a stemmle"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 160,
+                "right_doc": 166,
+                "samples": [
+                  {
+                    "endpoint": "robert a stemmle",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1995,
+                    "relation": "director",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "robert a stemmle",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1995,
+                    "right_unit_id": 1931
+                  },
+                  {
+                    "endpoint": "robert a stemmle",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "clarence brown"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "title_role_grounding"
+                ],
+                "left_doc": 162,
+                "right_doc": 165,
+                "samples": [
+                  {
+                    "endpoint": "clarence brown",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1959,
+                    "relation": "directed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "clarence brown",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "hall mills murder case",
+                  "rex beach",
+                  "the goose woman",
+                  "the past of mary holmes"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 162,
+                "right_doc": 167,
+                "samples": [
+                  {
+                    "endpoint": "the past of mary holmes",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1969,
+                    "relation": "remade as",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "the goose woman",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 2010,
+                    "relation": "is a remake of",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "hall mills murder case",
+                    "kind": "same_object",
+                    "left_unit_id": 1964,
+                    "right_unit_id": 2012
+                  },
+                  {
+                    "endpoint": "hall mills murder case",
+                    "kind": "role_bridge",
+                    "left_unit_id": 2012,
+                    "right_unit_id": 1965
+                  },
+                  {
+                    "endpoint": "rex beach",
+                    "kind": "role_bridge",
+                    "left_unit_id": 2011,
+                    "right_unit_id": 1963
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "the private life of henry viii"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 173,
+                "right_doc": 177,
+                "samples": [
+                  {
+                    "endpoint": "the private life of henry viii",
+                    "kind": "same_object",
+                    "left_unit_id": 2076,
+                    "right_unit_id": 2108
+                  },
+                  {
+                    "endpoint": "the private life of henry viii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 2108,
+                    "right_unit_id": 2077
+                  }
+                ]
+              }
+            ],
+            "method": "query_local_sto_graph_admission",
+            "seed_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162,
+              161,
+              13,
+              10,
+              21,
+              167,
+              12,
+              103,
+              14,
+              177,
+              44,
+              52,
+              160,
+              15,
+              18,
+              76
+            ],
+            "seed_order_policy": "query_symbolic_anchors_before_textual_entry",
+            "stats": {
+              "admitted_doc_count": 28,
+              "allowed_edge_kinds": [
+                "role_bridge",
+                "same_subject",
+                "sentence_grounded_transition",
+                "source_endpoint_incidence",
+                "title_role_grounding"
+              ],
+              "allowed_edge_tiers": [
+                "evidence_transition",
+                "weak_connectivity"
+              ],
+              "candidate_limit": 200,
+              "closure_hops": 2,
+              "local_edge_count": 9,
+              "local_edge_tier_counts": {
+                "evidence_transition": 8,
+                "unknown": 0,
+                "weak_connectivity": 1
+              },
+              "role_graph_edge_count": 481,
+              "role_graph_edge_tier_counts": {
+                "evidence_transition": 41,
+                "unknown": 0,
+                "weak_connectivity": 440
+              },
+              "seed_doc_count": 20,
+              "symbolic_anchor_count": 2,
+              "symbolic_seed_doc_count": 2,
+              "textual_seed_count": 20
+            },
+            "symbolic_anchor_endpoints": [
+              "aas ka panchhi",
+              "phoolwari"
+            ],
+            "symbolic_seed_doc_indices": [
+              17,
+              19
+            ],
+            "textual_seed_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162,
+              161,
+              13,
+              10,
+              21,
+              167,
+              12,
+              103,
+              14,
+              177,
+              44,
+              52,
+              160,
+              15,
+              18,
+              76
+            ]
+          },
+          "paper_facing_method_name": "evidence_transition_graph_native_retrieval",
+          "pipeline": "query_grounded_sto_graph_to_native_reader_evidence",
+          "ranked_object": "query_local_graph_selected_reader_context",
+          "selected_doc_indices": [
+            17,
+            19,
+            164,
+            77,
+            162
+          ],
+          "selection": {
+            "admitted_doc_count": 28,
+            "delayed_symbolic_entry_doc_indices": [],
+            "graph_order_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162
+            ],
+            "local_edge_count": 9,
+            "query_endpoints": [
+              "aas ka panchhi",
+              "phoolwari"
+            ],
+            "raw_graph_order_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162
+            ],
+            "selected_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162
+            ],
+            "selection_policy": "query_anchor_first_admission_preserving_sto_frontier",
+            "selection_rows": [],
+            "set_objective": {}
+          },
+          "source_text_evidence_validation": {
+            "certificate_count": 8,
+            "certificate_type_counts": {
+              "endpoint_title": 4,
+              "source_title_endpoint": 2,
+              "title_alias": 2
+            },
+            "certified_doc_indices": [],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162
+            ],
+            "source_frontier_doc_indices": [
+              17,
+              19,
+              164,
+              77,
+              162
+            ],
+            "used_certificate_count": 0,
+            "used_certificates": [],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "source_text_evidence_validation_only": true,
+          "top_k": 5,
+          "uses_agsto_legacy_selector": false,
+          "uses_agsto_proposal_fusion": false,
+          "uses_agsto_query_local_graph": true,
+          "uses_agsto_weighted_evidence_set_scoring": false,
+          "uses_dataset_routing": false,
+          "uses_evidence_transition_audit": true,
+          "uses_external_baseline_frontier": false,
+          "uses_graph_native_selection": true,
+          "uses_llm_query_schema": false,
+          "uses_query_grounded_sto_graph": true,
+          "uses_replacement_policy": false,
+          "uses_source_prior_repair": false,
+          "uses_source_text_evidence_validation": true,
+          "uses_weighted_score_fusion": false
+        },
+        "runner": "query_grounded_sto_graph_native",
+        "uses_dataset_routing": false,
+        "uses_external_baseline_frontier": false,
+        "uses_llm_query_compiler": false,
+        "uses_weighted_score_fusion": false
+      },
+      "source_authorized_vocab_strict_all_gold_at5": true,
+      "source_authorized_vocab_strict_recall_at5": 1.0
+    },
+    {
+      "gold_doc_indices": [
+        22,
+        24
+      ],
+      "query_grounded_sto_all_gold_at5": true,
+      "query_grounded_sto_recall_at5": 1.0,
+      "query_index": 2,
+      "question": "What is the place of birth of the performer of song Changed It?",
+      "retrieved_doc_indices_top5": [
+        22,
+        24,
+        180,
+        122,
+        181
+      ],
+      "route_trace": {
+        "candidate_boundary": "method_owned_candidate_universe",
+        "candidate_universe": {
+          "admissible_doc_indices": [
+            25,
+            28,
+            26,
+            117,
+            120,
+            185,
+            119,
+            29,
+            21,
+            186,
+            114,
+            116,
+            112,
+            62,
+            39,
+            123,
+            118,
+            65,
+            3
+          ],
+          "agsto_admitted_doc_count": 24,
+          "agsto_graph_tail_doc_indices": [
+            25,
+            28,
+            26,
+            117,
+            120,
+            185,
+            119,
+            29,
+            21,
+            186,
+            114,
+            116,
+            112,
+            62,
+            39,
+            123,
+            118,
+            65,
+            3
+          ],
+          "agsto_local_edge_count": 12,
+          "agsto_role_graph_edge_count": 481,
+          "agsto_seed_doc_indices": [
+            22,
+            180,
+            24,
+            122,
+            181,
+            25,
+            28,
+            26,
+            117,
+            120,
+            185,
+            119,
+            29,
+            21,
+            186,
+            114,
+            116,
+            112,
+            62,
+            39
+          ],
+          "agsto_symbolic_seed_doc_indices": [
+            22
+          ],
+          "candidate_boundary": "method_owned_candidate_universe",
+          "candidate_count": 200,
+          "candidate_doc_indices": [
+            22,
+            180,
+            24,
+            122,
+            181,
+            25,
+            28,
+            26,
+            117,
+            120,
+            185,
+            119,
+            29,
+            21,
+            186,
+            114,
+            116,
+            112,
+            62,
+            39,
+            123,
+            118,
+            65,
+            3,
+            136,
+            55,
+            27,
+            20,
+            163,
+            80,
+            134,
+            70,
+            171,
+            105,
+            142,
+            53,
+            189,
+            99,
+            121,
+            23,
+            31,
+            64,
+            108,
+            194,
+            196,
+            104,
+            58,
+            101,
+            192,
+            182,
+            145,
+            113,
+            135,
+            82,
+            90,
+            63,
+            187,
+            81,
+            100,
+            40,
+            98,
+            96,
+            38,
+            97,
+            110,
+            92,
+            11,
+            61,
+            106,
+            16,
+            102,
+            33,
+            199,
+            85,
+            144,
+            115,
+            174,
+            78,
+            30,
+            139,
+            48,
+            36,
+            103,
+            149,
+            41,
+            111,
+            17,
+            35,
+            168,
+            137,
+            107,
+            193,
+            19,
+            155,
+            44,
+            195,
+            126,
+            141,
+            162,
+            138,
+            150,
+            153,
+            57,
+            45,
+            146,
+            46,
+            164,
+            94,
+            42,
+            79,
+            8,
+            66,
+            156,
+            132,
+            89,
+            151,
+            188,
+            56,
+            190,
+            59,
+            60,
+            128,
+            176,
+            86,
+            124,
+            13,
+            2,
+            91,
+            4,
+            50,
+            10,
+            52,
+            175,
+            179,
+            161,
+            88,
+            37,
+            54,
+            148,
+            167,
+            130,
+            95,
+            5,
+            198,
+            191,
+            184,
+            67,
+            166,
+            9,
+            147,
+            127,
+            18,
+            131,
+            76,
+            158,
+            87,
+            170,
+            165,
+            43,
+            183,
+            6,
+            7,
+            197,
+            143,
+            159,
+            0,
+            15,
+            74,
+            178,
+            109,
+            177,
+            125,
+            49,
+            12,
+            129,
+            157,
+            140,
+            69,
+            51,
+            32,
+            169,
+            93,
+            152,
+            72,
+            173,
+            154,
+            83,
+            160,
+            133,
+            34,
+            47,
+            73,
+            75,
+            68,
+            71,
+            172,
+            77,
+            14,
+            84,
+            1
+          ],
+          "candidate_generator": "dense_seeded_agsto_local_graph_candidate_generator",
+          "candidate_order_policy": "dense_head_then_agsto_admitted_tail_then_remaining_dense",
+          "candidate_source": "method_owned_dense_seeded_agsto_local_graph",
+          "dense_seed_count": 20,
+          "dense_topk_is_final_answer_default": false,
+          "dense_trace": {
+            "candidate_boundary": "method_owned_candidate_universe",
+            "candidate_count": 200,
+            "candidate_generator": "dense_embedding_store_candidate_generator",
+            "candidate_source": "method_native_dense_embedding_store",
+            "dense_topk_is_final_answer_default": false,
+            "embedding_doc_count": 200,
+            "embedding_store_path": "run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/qwen3-8b-train_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet",
+            "query_index": 2,
+            "uses_dataset_routing": false,
+            "uses_external_baseline_frontier": false,
+            "uses_weighted_score_fusion": false
+          },
+          "query_index": 2,
+          "source_prior_prefix_count": 5,
+          "source_prior_prefix_doc_indices": [
+            22,
+            180,
+            24,
+            122,
+            181
+          ],
+          "uses_dataset_routing": false,
+          "uses_dense_only_as_graph_entry": true,
+          "uses_external_baseline_frontier": false,
+          "uses_hipporag_v2_runtime_graph_retrieval": false,
+          "uses_replay_candidate_cache": false,
+          "uses_sto_role_graph_admission": true,
+          "uses_weighted_score_fusion": false
+        },
+        "dense_topk_is_final_answer_default": false,
+        "pipeline": "candidate_universe_to_sto_graph_to_reader_evidence",
+        "retrieval": {
+          "candidate_entrance": "agsto_graph_payload",
+          "certified_doc_indices": [
+            24
+          ],
+          "dense_topk_is_final_answer_default": false,
+          "evidence_transition_audit": {
+            "certificate_count": 3,
+            "certificate_type_counts": {
+              "endpoint_title": 1,
+              "source_title_endpoint": 1,
+              "title_alias": 1
+            },
+            "certified_doc_indices": [
+              24
+            ],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              22,
+              24,
+              180,
+              122,
+              181
+            ],
+            "source_frontier_doc_indices": [
+              22,
+              24,
+              180,
+              122,
+              181
+            ],
+            "used_certificate_count": 1,
+            "used_certificates": [
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "nicki minaj",
+                "source_binding": "changed it",
+                "source_doc_index": 22,
+                "source_title": "Changed It",
+                "target_binding": "nicki minaj",
+                "target_doc_index": 24,
+                "target_title": "Nicki Minaj"
+              }
+            ],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "evidence_transition_audit_only": true,
+          "local_graph": {
+            "admitted_doc_count": 24,
+            "local_edge_count": 12,
+            "local_edge_preview": [
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "1989",
+                  "american"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 3,
+                "right_doc": 118,
+                "samples": [
+                  {
+                    "endpoint": "1989",
+                    "kind": "same_object",
+                    "left_unit_id": 41,
+                    "right_unit_id": 1339
+                  },
+                  {
+                    "endpoint": "1989",
+                    "kind": "role_bridge",
+                    "left_unit_id": 41,
+                    "right_unit_id": 1340
+                  },
+                  {
+                    "endpoint": "american",
+                    "kind": "same_object",
+                    "left_unit_id": 38,
+                    "right_unit_id": 1298
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "nicki minaj",
+                  "young money entertainment"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 22,
+                "right_doc": 24,
+                "samples": [
+                  {
+                    "endpoint": "nicki minaj",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 239,
+                    "relation": "is a song by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "nicki minaj",
+                    "kind": "same_object",
+                    "left_unit_id": 239,
+                    "right_unit_id": 275
+                  },
+                  {
+                    "endpoint": "nicki minaj",
+                    "kind": "role_bridge",
+                    "left_unit_id": 239,
+                    "right_unit_id": 275
+                  },
+                  {
+                    "endpoint": "young money entertainment",
+                    "kind": "same_object",
+                    "left_unit_id": 245,
+                    "right_unit_id": 288
+                  },
+                  {
+                    "endpoint": "nicki minaj",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "billboard hot 100",
+                  "recording industry association of america"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 24,
+                "right_doc": 120,
+                "samples": [
+                  {
+                    "endpoint": "billboard hot 100",
+                    "kind": "same_object",
+                    "left_unit_id": 317,
+                    "right_unit_id": 1417
+                  },
+                  {
+                    "endpoint": "recording industry association of america",
+                    "kind": "role_bridge",
+                    "left_unit_id": 294,
+                    "right_unit_id": 1443
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "three albums"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 28,
+                "right_doc": 118,
+                "samples": [
+                  {
+                    "endpoint": "three albums",
+                    "kind": "same_object",
+                    "left_unit_id": 367,
+                    "right_unit_id": 1346
+                  },
+                  {
+                    "endpoint": "three albums",
+                    "kind": "role_bridge",
+                    "left_unit_id": 367,
+                    "right_unit_id": 1347
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "rock and roll hall of fame"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 65,
+                "right_doc": 120,
+                "samples": [
+                  {
+                    "endpoint": "rock and roll hall of fame",
+                    "kind": "same_object",
+                    "left_unit_id": 770,
+                    "right_unit_id": 1435
+                  },
+                  {
+                    "endpoint": "rock and roll hall of fame",
+                    "kind": "role_bridge",
+                    "left_unit_id": 770,
+                    "right_unit_id": 1436
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "bono",
+                  "the corrs",
+                  "when the stars go blue"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 116,
+                "right_doc": 117,
+                "samples": [
+                  {
+                    "endpoint": "bono",
+                    "kind": "same_object",
+                    "left_unit_id": 1246,
+                    "right_unit_id": 1286
+                  },
+                  {
+                    "endpoint": "the corrs",
+                    "kind": "same_subject",
+                    "left_unit_id": 1246,
+                    "right_unit_id": 1285
+                  },
+                  {
+                    "endpoint": "the corrs",
+                    "kind": "same_object",
+                    "left_unit_id": 1245,
+                    "right_unit_id": 1262
+                  },
+                  {
+                    "endpoint": "the corrs",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1245,
+                    "right_unit_id": 1285
+                  },
+                  {
+                    "endpoint": "the corrs",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1262,
+                    "right_unit_id": 1246
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "gold",
+                  "ryan adams",
+                  "whiskeytown"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 116,
+                "right_doc": 118,
+                "samples": [
+                  {
+                    "endpoint": "ryan adams",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1238,
+                    "relation": "composed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "ryan adams",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1239,
+                    "relation": "originally performed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "gold",
+                    "kind": "same_subject",
+                    "left_unit_id": 1243,
+                    "right_unit_id": 1311
+                  },
+                  {
+                    "endpoint": "gold",
+                    "kind": "same_object",
+                    "left_unit_id": 1242,
+                    "right_unit_id": 1310
+                  },
+                  {
+                    "endpoint": "gold",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1242,
+                    "right_unit_id": 1311
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "billboard",
+                  "janis joplin",
+                  "kris kristofferson",
+                  "me and bobby mcgee"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 119,
+                "right_doc": 120,
+                "samples": [
+                  {
+                    "endpoint": "janis joplin",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1373,
+                    "relation": "posthumously released by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "me and bobby mcgee",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1418,
+                    "relation": "covered song",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "billboard",
+                    "kind": "same_object",
+                    "left_unit_id": 1376,
+                    "right_unit_id": 1433
+                  },
+                  {
+                    "endpoint": "janis joplin",
+                    "kind": "same_object",
+                    "left_unit_id": 1373,
+                    "right_unit_id": 1434
+                  },
+                  {
+                    "endpoint": "janis joplin",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1373,
+                    "right_unit_id": 1398
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "roger miller"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 119,
+                "right_doc": 122,
+                "samples": [
+                  {
+                    "endpoint": "roger miller",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1372,
+                    "relation": "originally performed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "roger miller",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1372,
+                    "right_unit_id": 1454
+                  },
+                  {
+                    "endpoint": "roger miller",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "dolly parton",
+                  "fred foster",
+                  "janis joplin",
+                  "kris kristofferson",
+                  "me and bobby mcgee",
+                  "roger miller"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 119,
+                "right_doc": 123,
+                "samples": [
+                  {
+                    "endpoint": "fred foster",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1371,
+                    "relation": "written by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "dolly parton",
+                    "kind": "same_object",
+                    "left_unit_id": 1388,
+                    "right_unit_id": 1494
+                  },
+                  {
+                    "endpoint": "fred foster",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1371,
+                    "right_unit_id": 1488
+                  },
+                  {
+                    "endpoint": "janis joplin",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1373,
+                    "right_unit_id": 1499
+                  },
+                  {
+                    "endpoint": "kris kristofferson",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1370,
+                    "right_unit_id": 1497
+                  }
+                ]
+              }
+            ],
+            "method": "query_local_sto_graph_admission",
+            "seed_doc_indices": [
+              22,
+              180,
+              24,
+              122,
+              181,
+              25,
+              28,
+              26,
+              117,
+              120,
+              185,
+              119,
+              29,
+              21,
+              186,
+              114,
+              116,
+              112,
+              62,
+              39
+            ],
+            "seed_order_policy": "query_symbolic_anchors_before_textual_entry",
+            "stats": {
+              "admitted_doc_count": 24,
+              "allowed_edge_kinds": [
+                "role_bridge",
+                "same_subject",
+                "sentence_grounded_transition",
+                "source_endpoint_incidence",
+                "title_role_grounding"
+              ],
+              "allowed_edge_tiers": [
+                "evidence_transition",
+                "weak_connectivity"
+              ],
+              "candidate_limit": 200,
+              "closure_hops": 2,
+              "local_edge_count": 12,
+              "local_edge_tier_counts": {
+                "evidence_transition": 8,
+                "unknown": 0,
+                "weak_connectivity": 4
+              },
+              "role_graph_edge_count": 481,
+              "role_graph_edge_tier_counts": {
+                "evidence_transition": 41,
+                "unknown": 0,
+                "weak_connectivity": 440
+              },
+              "seed_doc_count": 20,
+              "symbolic_anchor_count": 1,
+              "symbolic_seed_doc_count": 1,
+              "textual_seed_count": 20
+            },
+            "symbolic_anchor_endpoints": [
+              "changed it"
+            ],
+            "symbolic_seed_doc_indices": [
+              22
+            ],
+            "textual_seed_doc_indices": [
+              22,
+              180,
+              24,
+              122,
+              181,
+              25,
+              28,
+              26,
+              117,
+              120,
+              185,
+              119,
+              29,
+              21,
+              186,
+              114,
+              116,
+              112,
+              62,
+              39
+            ]
+          },
+          "paper_facing_method_name": "evidence_transition_graph_native_retrieval",
+          "pipeline": "query_grounded_sto_graph_to_native_reader_evidence",
+          "ranked_object": "query_local_graph_selected_reader_context",
+          "selected_doc_indices": [
+            22,
+            24,
+            180,
+            122,
+            181
+          ],
+          "selection": {
+            "admitted_doc_count": 24,
+            "delayed_symbolic_entry_doc_indices": [],
+            "graph_order_doc_indices": [
+              22,
+              24,
+              180,
+              122,
+              181
+            ],
+            "local_edge_count": 12,
+            "query_endpoints": [
+              "changed it"
+            ],
+            "raw_graph_order_doc_indices": [
+              22,
+              24,
+              180,
+              122,
+              181
+            ],
+            "selected_doc_indices": [
+              22,
+              24,
+              180,
+              122,
+              181
+            ],
+            "selection_policy": "query_anchor_first_admission_preserving_sto_frontier",
+            "selection_rows": [],
+            "set_objective": {}
+          },
+          "source_text_evidence_validation": {
+            "certificate_count": 3,
+            "certificate_type_counts": {
+              "endpoint_title": 1,
+              "source_title_endpoint": 1,
+              "title_alias": 1
+            },
+            "certified_doc_indices": [
+              24
+            ],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              22,
+              24,
+              180,
+              122,
+              181
+            ],
+            "source_frontier_doc_indices": [
+              22,
+              24,
+              180,
+              122,
+              181
+            ],
+            "used_certificate_count": 1,
+            "used_certificates": [
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "nicki minaj",
+                "source_binding": "changed it",
+                "source_doc_index": 22,
+                "source_title": "Changed It",
+                "target_binding": "nicki minaj",
+                "target_doc_index": 24,
+                "target_title": "Nicki Minaj"
+              }
+            ],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "source_text_evidence_validation_only": true,
+          "top_k": 5,
+          "uses_agsto_legacy_selector": false,
+          "uses_agsto_proposal_fusion": false,
+          "uses_agsto_query_local_graph": true,
+          "uses_agsto_weighted_evidence_set_scoring": false,
+          "uses_dataset_routing": false,
+          "uses_evidence_transition_audit": true,
+          "uses_external_baseline_frontier": false,
+          "uses_graph_native_selection": true,
+          "uses_llm_query_schema": false,
+          "uses_query_grounded_sto_graph": true,
+          "uses_replacement_policy": false,
+          "uses_source_prior_repair": false,
+          "uses_source_text_evidence_validation": true,
+          "uses_weighted_score_fusion": false
+        },
+        "runner": "query_grounded_sto_graph_native",
+        "uses_dataset_routing": false,
+        "uses_external_baseline_frontier": false,
+        "uses_llm_query_compiler": false,
+        "uses_weighted_score_fusion": false
+      },
+      "source_authorized_vocab_strict_all_gold_at5": true,
+      "source_authorized_vocab_strict_recall_at5": 1.0
+    },
+    {
+      "gold_doc_indices": [
+        31,
+        39
+      ],
+      "query_grounded_sto_all_gold_at5": true,
+      "query_grounded_sto_recall_at5": 1.0,
+      "query_index": 3,
+      "question": "Are Marufabad and Nasamkhrali both located in the same country?",
+      "retrieved_doc_indices_top5": [
+        31,
+        39,
+        137,
+        72,
+        37
+      ],
+      "route_trace": {
+        "candidate_boundary": "method_owned_candidate_universe",
+        "candidate_universe": {
+          "admissible_doc_indices": [
+            104,
+            36,
+            142,
+            136,
+            33,
+            130,
+            132,
+            113,
+            2,
+            135,
+            127,
+            105,
+            77,
+            107,
+            41,
+            131,
+            6,
+            9,
+            124,
+            40,
+            44,
+            133,
+            0,
+            4
+          ],
+          "agsto_admitted_doc_count": 29,
+          "agsto_graph_tail_doc_indices": [
+            104,
+            36,
+            142,
+            136,
+            33,
+            130,
+            132,
+            113,
+            2,
+            135,
+            127,
+            105,
+            77,
+            107,
+            41,
+            131,
+            6,
+            9,
+            124,
+            40,
+            44,
+            133,
+            0,
+            4
+          ],
+          "agsto_local_edge_count": 15,
+          "agsto_role_graph_edge_count": 481,
+          "agsto_seed_doc_indices": [
+            31,
+            39,
+            137,
+            72,
+            37,
+            104,
+            36,
+            142,
+            136,
+            33,
+            130,
+            132,
+            113,
+            2,
+            135,
+            127,
+            105,
+            77,
+            107,
+            41
+          ],
+          "agsto_symbolic_seed_doc_indices": [
+            31,
+            39
+          ],
+          "candidate_boundary": "method_owned_candidate_universe",
+          "candidate_count": 200,
+          "candidate_doc_indices": [
+            31,
+            39,
+            137,
+            72,
+            37,
+            104,
+            36,
+            142,
+            136,
+            33,
+            130,
+            132,
+            113,
+            2,
+            135,
+            127,
+            105,
+            77,
+            107,
+            41,
+            131,
+            6,
+            9,
+            124,
+            40,
+            44,
+            133,
+            0,
+            4,
+            164,
+            108,
+            38,
+            103,
+            94,
+            126,
+            35,
+            187,
+            109,
+            74,
+            63,
+            66,
+            75,
+            125,
+            138,
+            128,
+            129,
+            19,
+            13,
+            140,
+            55,
+            160,
+            143,
+            179,
+            10,
+            15,
+            25,
+            79,
+            69,
+            163,
+            81,
+            141,
+            32,
+            52,
+            178,
+            67,
+            101,
+            7,
+            161,
+            112,
+            76,
+            21,
+            60,
+            58,
+            194,
+            82,
+            24,
+            134,
+            95,
+            185,
+            139,
+            8,
+            54,
+            62,
+            18,
+            14,
+            3,
+            110,
+            45,
+            73,
+            122,
+            177,
+            153,
+            106,
+            121,
+            148,
+            80,
+            166,
+            167,
+            71,
+            22,
+            29,
+            64,
+            180,
+            181,
+            196,
+            23,
+            168,
+            100,
+            87,
+            155,
+            89,
+            59,
+            90,
+            102,
+            183,
+            20,
+            174,
+            17,
+            114,
+            56,
+            28,
+            68,
+            48,
+            152,
+            16,
+            91,
+            5,
+            99,
+            1,
+            78,
+            165,
+            51,
+            70,
+            86,
+            26,
+            98,
+            53,
+            170,
+            157,
+            92,
+            61,
+            150,
+            147,
+            182,
+            93,
+            154,
+            188,
+            96,
+            42,
+            111,
+            198,
+            156,
+            46,
+            151,
+            186,
+            115,
+            116,
+            192,
+            50,
+            193,
+            43,
+            83,
+            158,
+            197,
+            117,
+            145,
+            162,
+            88,
+            144,
+            27,
+            190,
+            159,
+            195,
+            65,
+            57,
+            149,
+            118,
+            123,
+            176,
+            12,
+            169,
+            97,
+            49,
+            172,
+            189,
+            146,
+            184,
+            175,
+            199,
+            11,
+            173,
+            85,
+            30,
+            47,
+            84,
+            191,
+            171,
+            34,
+            120,
+            119
+          ],
+          "candidate_generator": "dense_seeded_agsto_local_graph_candidate_generator",
+          "candidate_order_policy": "dense_head_then_agsto_admitted_tail_then_remaining_dense",
+          "candidate_source": "method_owned_dense_seeded_agsto_local_graph",
+          "dense_seed_count": 20,
+          "dense_topk_is_final_answer_default": false,
+          "dense_trace": {
+            "candidate_boundary": "method_owned_candidate_universe",
+            "candidate_count": 200,
+            "candidate_generator": "dense_embedding_store_candidate_generator",
+            "candidate_source": "method_native_dense_embedding_store",
+            "dense_topk_is_final_answer_default": false,
+            "embedding_doc_count": 200,
+            "embedding_store_path": "run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/qwen3-8b-train_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet",
+            "query_index": 3,
+            "uses_dataset_routing": false,
+            "uses_external_baseline_frontier": false,
+            "uses_weighted_score_fusion": false
+          },
+          "query_index": 3,
+          "source_prior_prefix_count": 5,
+          "source_prior_prefix_doc_indices": [
+            31,
+            39,
+            137,
+            72,
+            37
+          ],
+          "uses_dataset_routing": false,
+          "uses_dense_only_as_graph_entry": true,
+          "uses_external_baseline_frontier": false,
+          "uses_hipporag_v2_runtime_graph_retrieval": false,
+          "uses_replay_candidate_cache": false,
+          "uses_sto_role_graph_admission": true,
+          "uses_weighted_score_fusion": false
+        },
+        "dense_topk_is_final_answer_default": false,
+        "pipeline": "candidate_universe_to_sto_graph_to_reader_evidence",
+        "retrieval": {
+          "candidate_entrance": "agsto_graph_payload",
+          "certified_doc_indices": [],
+          "dense_topk_is_final_answer_default": false,
+          "evidence_transition_audit": {
+            "certificate_count": 0,
+            "certificate_type_counts": {},
+            "certified_doc_indices": [],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37
+            ],
+            "source_frontier_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37
+            ],
+            "used_certificate_count": 0,
+            "used_certificates": [],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "evidence_transition_audit_only": true,
+          "local_graph": {
+            "admitted_doc_count": 29,
+            "local_edge_count": 15,
+            "local_edge_preview": [
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "lothair ii",
+                  "lotharingia",
+                  "teutberga"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 0,
+                "right_doc": 4,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 3,
+                    "relation": "married to",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "teutberga",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 81,
+                    "relation": "married to",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 3,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "lotharingia",
+                    "kind": "same_object",
+                    "left_unit_id": 2,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "teutberga",
+                    "kind": "same_subject",
+                    "left_unit_id": 1,
+                    "right_unit_id": 82
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "lothair ii",
+                  "lotharingia"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 0,
+                "right_doc": 6,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_object",
+                    "left_unit_id": 3,
+                    "right_unit_id": 99
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 3,
+                    "right_unit_id": 108
+                  },
+                  {
+                    "endpoint": "lotharingia",
+                    "kind": "same_object",
+                    "left_unit_id": 2,
+                    "right_unit_id": 108
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "hucbert",
+                  "lothair ii"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 0,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "hucbert",
+                    "kind": "same_object",
+                    "left_unit_id": 5,
+                    "right_unit_id": 124
+                  },
+                  {
+                    "endpoint": "hucbert",
+                    "kind": "role_bridge",
+                    "left_unit_id": 124,
+                    "right_unit_id": 6
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_object",
+                    "left_unit_id": 3,
+                    "right_unit_id": 126
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "bertha",
+                  "lucca",
+                  "tuscany"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 2,
+                "right_doc": 6,
+                "samples": [
+                  {
+                    "endpoint": "bertha",
+                    "kind": "role_bridge",
+                    "left_unit_id": 16,
+                    "right_unit_id": 99
+                  },
+                  {
+                    "endpoint": "lucca",
+                    "kind": "same_object",
+                    "left_unit_id": 18,
+                    "right_unit_id": 101
+                  },
+                  {
+                    "endpoint": "tuscany",
+                    "kind": "same_object",
+                    "left_unit_id": 19,
+                    "right_unit_id": 102
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "bertha"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 2,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "bertha",
+                    "kind": "same_object",
+                    "left_unit_id": 16,
+                    "right_unit_id": 125
+                  },
+                  {
+                    "endpoint": "bertha",
+                    "kind": "role_bridge",
+                    "left_unit_id": 16,
+                    "right_unit_id": 126
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "lothair ii",
+                  "lotharingia"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 4,
+                "right_doc": 6,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_subject",
+                    "left_unit_id": 77,
+                    "right_unit_id": 108
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 99,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "lotharingia",
+                    "kind": "same_object",
+                    "left_unit_id": 77,
+                    "right_unit_id": 108
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "lothair ii"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 4,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 126,
+                    "right_unit_id": 77
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "bertha",
+                  "lothair ii"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "same_subject"
+                ],
+                "left_doc": 6,
+                "right_doc": 9,
+                "samples": [
+                  {
+                    "endpoint": "bertha",
+                    "kind": "same_subject",
+                    "left_unit_id": 99,
+                    "right_unit_id": 126
+                  },
+                  {
+                    "endpoint": "bertha",
+                    "kind": "role_bridge",
+                    "left_unit_id": 125,
+                    "right_unit_id": 99
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "same_object",
+                    "left_unit_id": 99,
+                    "right_unit_id": 126
+                  },
+                  {
+                    "endpoint": "lothair ii",
+                    "kind": "role_bridge",
+                    "left_unit_id": 126,
+                    "right_unit_id": 108
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "gmina susz",
+                  "i awa county",
+                  "poland",
+                  "warmian masurian voivodeship"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge"
+                ],
+                "left_doc": 33,
+                "right_doc": 37,
+                "samples": [
+                  {
+                    "endpoint": "gmina susz",
+                    "kind": "same_object",
+                    "left_unit_id": 404,
+                    "right_unit_id": 429
+                  },
+                  {
+                    "endpoint": "gmina susz",
+                    "kind": "role_bridge",
+                    "left_unit_id": 429,
+                    "right_unit_id": 405
+                  },
+                  {
+                    "endpoint": "i awa county",
+                    "kind": "same_object",
+                    "left_unit_id": 405,
+                    "right_unit_id": 430
+                  },
+                  {
+                    "endpoint": "i awa county",
+                    "kind": "role_bridge",
+                    "left_unit_id": 430,
+                    "right_unit_id": 406
+                  },
+                  {
+                    "endpoint": "poland",
+                    "kind": "same_object",
+                    "left_unit_id": 407,
+                    "right_unit_id": 432
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "aldri annet enn br k",
+                  "altid ballade",
+                  "gabriel axel",
+                  "nothing but trouble"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 40,
+                "right_doc": 41,
+                "samples": [
+                  {
+                    "endpoint": "aldri annet enn br k",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 450,
+                    "relation": "is a remake of",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "aldri annet enn br k",
+                    "kind": "role_bridge",
+                    "left_unit_id": 450,
+                    "right_unit_id": 456
+                  },
+                  {
+                    "endpoint": "altid ballade",
+                    "kind": "same_subject",
+                    "left_unit_id": 446,
+                    "right_unit_id": 462
+                  },
+                  {
+                    "endpoint": "gabriel axel",
+                    "kind": "same_object",
+                    "left_unit_id": 448,
+                    "right_unit_id": 463
+                  },
+                  {
+                    "endpoint": "nothing but trouble",
+                    "kind": "same_object",
+                    "left_unit_id": 447,
+                    "right_unit_id": 460
+                  }
+                ]
+              }
+            ],
+            "method": "query_local_sto_graph_admission",
+            "seed_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37,
+              104,
+              36,
+              142,
+              136,
+              33,
+              130,
+              132,
+              113,
+              2,
+              135,
+              127,
+              105,
+              77,
+              107,
+              41
+            ],
+            "seed_order_policy": "query_symbolic_anchors_before_textual_entry",
+            "stats": {
+              "admitted_doc_count": 29,
+              "allowed_edge_kinds": [
+                "role_bridge",
+                "same_subject",
+                "sentence_grounded_transition",
+                "source_endpoint_incidence",
+                "title_role_grounding"
+              ],
+              "allowed_edge_tiers": [
+                "evidence_transition",
+                "weak_connectivity"
+              ],
+              "candidate_limit": 200,
+              "closure_hops": 2,
+              "local_edge_count": 15,
+              "local_edge_tier_counts": {
+                "evidence_transition": 7,
+                "unknown": 0,
+                "weak_connectivity": 8
+              },
+              "role_graph_edge_count": 481,
+              "role_graph_edge_tier_counts": {
+                "evidence_transition": 41,
+                "unknown": 0,
+                "weak_connectivity": 440
+              },
+              "seed_doc_count": 20,
+              "symbolic_anchor_count": 2,
+              "symbolic_seed_doc_count": 2,
+              "textual_seed_count": 20
+            },
+            "symbolic_anchor_endpoints": [
+              "marufabad",
+              "nasamkhrali"
+            ],
+            "symbolic_seed_doc_indices": [
+              31,
+              39
+            ],
+            "textual_seed_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37,
+              104,
+              36,
+              142,
+              136,
+              33,
+              130,
+              132,
+              113,
+              2,
+              135,
+              127,
+              105,
+              77,
+              107,
+              41
+            ]
+          },
+          "paper_facing_method_name": "evidence_transition_graph_native_retrieval",
+          "pipeline": "query_grounded_sto_graph_to_native_reader_evidence",
+          "ranked_object": "query_local_graph_selected_reader_context",
+          "selected_doc_indices": [
+            31,
+            39,
+            137,
+            72,
+            37
+          ],
+          "selection": {
+            "admitted_doc_count": 29,
+            "delayed_symbolic_entry_doc_indices": [],
+            "graph_order_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37
+            ],
+            "local_edge_count": 15,
+            "query_endpoints": [
+              "marufabad",
+              "nasamkhrali"
+            ],
+            "raw_graph_order_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37
+            ],
+            "selected_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37
+            ],
+            "selection_policy": "query_anchor_first_admission_preserving_sto_frontier",
+            "selection_rows": [],
+            "set_objective": {}
+          },
+          "source_text_evidence_validation": {
+            "certificate_count": 0,
+            "certificate_type_counts": {},
+            "certified_doc_indices": [],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37
+            ],
+            "source_frontier_doc_indices": [
+              31,
+              39,
+              137,
+              72,
+              37
+            ],
+            "used_certificate_count": 0,
+            "used_certificates": [],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "source_text_evidence_validation_only": true,
+          "top_k": 5,
+          "uses_agsto_legacy_selector": false,
+          "uses_agsto_proposal_fusion": false,
+          "uses_agsto_query_local_graph": true,
+          "uses_agsto_weighted_evidence_set_scoring": false,
+          "uses_dataset_routing": false,
+          "uses_evidence_transition_audit": true,
+          "uses_external_baseline_frontier": false,
+          "uses_graph_native_selection": true,
+          "uses_llm_query_schema": false,
+          "uses_query_grounded_sto_graph": true,
+          "uses_replacement_policy": false,
+          "uses_source_prior_repair": false,
+          "uses_source_text_evidence_validation": true,
+          "uses_weighted_score_fusion": false
+        },
+        "runner": "query_grounded_sto_graph_native",
+        "uses_dataset_routing": false,
+        "uses_external_baseline_frontier": false,
+        "uses_llm_query_compiler": false,
+        "uses_weighted_score_fusion": false
+      },
+      "source_authorized_vocab_strict_all_gold_at5": true,
+      "source_authorized_vocab_strict_recall_at5": 1.0
+    },
+    {
+      "gold_doc_indices": [
+        46,
+        41,
+        47,
+        44
+      ],
+      "query_grounded_sto_all_gold_at5": true,
+      "query_grounded_sto_recall_at5": 1.0,
+      "query_index": 4,
+      "question": "Which film has the director who is older, God'S Gift To Women or Aldri Annet Enn Br\u00e5k?",
+      "retrieved_doc_indices_top5": [
+        46,
+        47,
+        41,
+        44,
+        40
+      ],
+      "route_trace": {
+        "candidate_boundary": "method_owned_candidate_universe",
+        "candidate_universe": {
+          "admissible_doc_indices": [
+            165,
+            103,
+            175,
+            147,
+            48,
+            52,
+            184,
+            89,
+            160,
+            43,
+            47,
+            88,
+            90,
+            45,
+            95,
+            153,
+            162,
+            102,
+            148,
+            166,
+            155,
+            159,
+            167
+          ],
+          "agsto_admitted_doc_count": 28,
+          "agsto_graph_tail_doc_indices": [
+            165,
+            103,
+            175,
+            147,
+            48,
+            52,
+            184,
+            89,
+            160,
+            43,
+            47,
+            88,
+            90,
+            45,
+            95,
+            153,
+            162,
+            102,
+            148,
+            166,
+            155,
+            159,
+            167
+          ],
+          "agsto_local_edge_count": 12,
+          "agsto_role_graph_edge_count": 481,
+          "agsto_seed_doc_indices": [
+            41,
+            46,
+            44,
+            40,
+            151,
+            165,
+            103,
+            175,
+            147,
+            48,
+            52,
+            184,
+            89,
+            160,
+            43,
+            47,
+            88,
+            90,
+            45,
+            95
+          ],
+          "agsto_symbolic_seed_doc_indices": [
+            46,
+            40,
+            41
+          ],
+          "candidate_boundary": "method_owned_candidate_universe",
+          "candidate_count": 200,
+          "candidate_doc_indices": [
+            41,
+            46,
+            44,
+            40,
+            151,
+            165,
+            103,
+            175,
+            147,
+            48,
+            52,
+            184,
+            89,
+            160,
+            43,
+            47,
+            88,
+            90,
+            45,
+            95,
+            153,
+            162,
+            102,
+            148,
+            166,
+            155,
+            159,
+            167,
+            76,
+            174,
+            54,
+            173,
+            14,
+            172,
+            93,
+            81,
+            169,
+            77,
+            178,
+            87,
+            12,
+            49,
+            51,
+            161,
+            157,
+            92,
+            177,
+            13,
+            42,
+            164,
+            74,
+            16,
+            50,
+            11,
+            195,
+            152,
+            154,
+            86,
+            140,
+            171,
+            139,
+            83,
+            78,
+            99,
+            143,
+            94,
+            98,
+            158,
+            150,
+            141,
+            79,
+            84,
+            134,
+            17,
+            163,
+            193,
+            191,
+            68,
+            39,
+            8,
+            104,
+            18,
+            101,
+            130,
+            170,
+            114,
+            91,
+            199,
+            121,
+            113,
+            85,
+            194,
+            146,
+            190,
+            3,
+            32,
+            15,
+            80,
+            19,
+            156,
+            82,
+            117,
+            118,
+            180,
+            138,
+            55,
+            70,
+            75,
+            67,
+            71,
+            65,
+            60,
+            36,
+            116,
+            10,
+            96,
+            64,
+            73,
+            20,
+            62,
+            122,
+            56,
+            63,
+            72,
+            192,
+            181,
+            21,
+            197,
+            135,
+            133,
+            124,
+            107,
+            126,
+            198,
+            108,
+            66,
+            53,
+            196,
+            136,
+            33,
+            0,
+            129,
+            28,
+            137,
+            176,
+            97,
+            187,
+            125,
+            6,
+            131,
+            26,
+            145,
+            24,
+            189,
+            132,
+            182,
+            1,
+            4,
+            2,
+            105,
+            37,
+            149,
+            27,
+            22,
+            179,
+            23,
+            168,
+            142,
+            69,
+            183,
+            128,
+            61,
+            7,
+            109,
+            186,
+            123,
+            100,
+            185,
+            25,
+            57,
+            106,
+            188,
+            115,
+            59,
+            120,
+            144,
+            5,
+            9,
+            119,
+            35,
+            29,
+            111,
+            38,
+            127,
+            112,
+            110,
+            34,
+            58,
+            30,
+            31
+          ],
+          "candidate_generator": "dense_seeded_agsto_local_graph_candidate_generator",
+          "candidate_order_policy": "dense_head_then_agsto_admitted_tail_then_remaining_dense",
+          "candidate_source": "method_owned_dense_seeded_agsto_local_graph",
+          "dense_seed_count": 20,
+          "dense_topk_is_final_answer_default": false,
+          "dense_trace": {
+            "candidate_boundary": "method_owned_candidate_universe",
+            "candidate_count": 200,
+            "candidate_generator": "dense_embedding_store_candidate_generator",
+            "candidate_source": "method_native_dense_embedding_store",
+            "dense_topk_is_final_answer_default": false,
+            "embedding_doc_count": 200,
+            "embedding_store_path": "run_logs/evidence_transition_qwen8b_nv2_smoke_20260509/2wikimultihopqa/index/qwen3-8b-train_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet",
+            "query_index": 4,
+            "uses_dataset_routing": false,
+            "uses_external_baseline_frontier": false,
+            "uses_weighted_score_fusion": false
+          },
+          "query_index": 4,
+          "source_prior_prefix_count": 5,
+          "source_prior_prefix_doc_indices": [
+            41,
+            46,
+            44,
+            40,
+            151
+          ],
+          "uses_dataset_routing": false,
+          "uses_dense_only_as_graph_entry": true,
+          "uses_external_baseline_frontier": false,
+          "uses_hipporag_v2_runtime_graph_retrieval": false,
+          "uses_replay_candidate_cache": false,
+          "uses_sto_role_graph_admission": true,
+          "uses_weighted_score_fusion": false
+        },
+        "dense_topk_is_final_answer_default": false,
+        "pipeline": "candidate_universe_to_sto_graph_to_reader_evidence",
+        "retrieval": {
+          "candidate_entrance": "agsto_graph_payload",
+          "certified_doc_indices": [
+            47,
+            41,
+            44,
+            40
+          ],
+          "dense_topk_is_final_answer_default": false,
+          "evidence_transition_audit": {
+            "certificate_count": 19,
+            "certificate_type_counts": {
+              "endpoint_title": 8,
+              "source_title_endpoint": 5,
+              "title_alias": 6
+            },
+            "certified_doc_indices": [
+              47,
+              44,
+              41
+            ],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              46,
+              47,
+              41,
+              44,
+              40
+            ],
+            "source_frontier_doc_indices": [
+              46,
+              47,
+              41,
+              44,
+              40
+            ],
+            "used_certificate_count": 3,
+            "used_certificates": [
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "michael curtiz",
+                "source_binding": "god s gift to women",
+                "source_doc_index": 46,
+                "source_title": "God's Gift to Women",
+                "target_binding": "michael curtiz",
+                "target_doc_index": 47,
+                "target_title": "Michael Curtiz"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "edith carlmar",
+                "source_binding": "aldri annet enn brak",
+                "source_doc_index": 41,
+                "source_title": "Aldri annet enn br\u00e5k",
+                "target_binding": "edith carlmar",
+                "target_doc_index": 44,
+                "target_title": "Edith Carlmar"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "aldri annet enn brak",
+                "source_binding": "altid ballade",
+                "source_doc_index": 40,
+                "source_title": "Altid ballade",
+                "target_binding": "aldri annet enn brak",
+                "target_doc_index": 41,
+                "target_title": "Aldri annet enn br\u00e5k"
+              }
+            ],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "evidence_transition_audit_only": true,
+          "local_graph": {
+            "admitted_doc_count": 28,
+            "local_edge_count": 12,
+            "local_edge_preview": [
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "aldri annet enn br k",
+                  "altid ballade",
+                  "gabriel axel",
+                  "nothing but trouble"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "same_subject",
+                  "title_role_grounding"
+                ],
+                "left_doc": 40,
+                "right_doc": 41,
+                "samples": [
+                  {
+                    "endpoint": "aldri annet enn br k",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 450,
+                    "relation": "is a remake of",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "aldri annet enn br k",
+                    "kind": "role_bridge",
+                    "left_unit_id": 450,
+                    "right_unit_id": 456
+                  },
+                  {
+                    "endpoint": "altid ballade",
+                    "kind": "same_subject",
+                    "left_unit_id": 446,
+                    "right_unit_id": 462
+                  },
+                  {
+                    "endpoint": "gabriel axel",
+                    "kind": "same_object",
+                    "left_unit_id": 448,
+                    "right_unit_id": 463
+                  },
+                  {
+                    "endpoint": "nothing but trouble",
+                    "kind": "same_object",
+                    "left_unit_id": 447,
+                    "right_unit_id": 460
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "edith carlmar"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "title_role_grounding"
+                ],
+                "left_doc": 41,
+                "right_doc": 44,
+                "samples": [
+                  {
+                    "endpoint": "edith carlmar",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 457,
+                    "relation": "edited by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "edith carlmar",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "michael curtiz"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 46,
+                "right_doc": 47,
+                "samples": [
+                  {
+                    "endpoint": "michael curtiz",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 489,
+                    "relation": "is directed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "michael curtiz",
+                    "kind": "role_bridge",
+                    "left_unit_id": 489,
+                    "right_unit_id": 504
+                  },
+                  {
+                    "endpoint": "michael curtiz",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "luis mandoki"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 102,
+                "right_doc": 103,
+                "samples": [
+                  {
+                    "endpoint": "luis mandoki",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1103,
+                    "relation": "directed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "luis mandoki",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1103,
+                    "right_unit_id": 1122
+                  },
+                  {
+                    "endpoint": "luis mandoki",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "frank lloyd"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 147,
+                "right_doc": 148,
+                "samples": [
+                  {
+                    "endpoint": "frank lloyd",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1817,
+                    "relation": "directed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "frank lloyd",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1817,
+                    "right_unit_id": 1805
+                  },
+                  {
+                    "endpoint": "frank lloyd",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "clio barnard"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 151,
+                "right_doc": 153,
+                "samples": [
+                  {
+                    "endpoint": "clio barnard",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1860,
+                    "relation": "written by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "clio barnard",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1861,
+                    "relation": "directed by",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "clio barnard",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1860,
+                    "right_unit_id": 1840
+                  },
+                  {
+                    "endpoint": "clio barnard",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "dark river"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "same_subject"
+                ],
+                "left_doc": 153,
+                "right_doc": 155,
+                "samples": [
+                  {
+                    "endpoint": "dark river",
+                    "kind": "same_subject",
+                    "left_unit_id": 1858,
+                    "right_unit_id": 1891
+                  },
+                  {
+                    "endpoint": "dark river",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1890,
+                    "right_unit_id": 1858
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "dark river"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "same_subject"
+                ],
+                "left_doc": 153,
+                "right_doc": 159,
+                "samples": [
+                  {
+                    "endpoint": "dark river",
+                    "kind": "same_subject",
+                    "left_unit_id": 1858,
+                    "right_unit_id": 1919
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "weak_connectivity",
+                "endpoints": [
+                  "dark river"
+                ],
+                "evidence_tiers": [
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "role_bridge",
+                  "same_subject"
+                ],
+                "left_doc": 155,
+                "right_doc": 159,
+                "samples": [
+                  {
+                    "endpoint": "dark river",
+                    "kind": "same_subject",
+                    "left_unit_id": 1891,
+                    "right_unit_id": 1919
+                  },
+                  {
+                    "endpoint": "dark river",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1890,
+                    "right_unit_id": 1919
+                  }
+                ]
+              },
+              {
+                "best_evidence_tier": "evidence_transition",
+                "endpoints": [
+                  "robert a stemmle"
+                ],
+                "evidence_tiers": [
+                  "evidence_transition",
+                  "weak_connectivity"
+                ],
+                "kinds": [
+                  "sentence_grounded_transition",
+                  "role_bridge",
+                  "title_role_grounding"
+                ],
+                "left_doc": 160,
+                "right_doc": 166,
+                "samples": [
+                  {
+                    "endpoint": "robert a stemmle",
+                    "kind": "sentence_grounded_transition",
+                    "left_unit_id": 1995,
+                    "relation": "director",
+                    "right_unit_id": null,
+                    "source_side": "subject",
+                    "target_side": "object"
+                  },
+                  {
+                    "endpoint": "robert a stemmle",
+                    "kind": "role_bridge",
+                    "left_unit_id": 1995,
+                    "right_unit_id": 1931
+                  },
+                  {
+                    "endpoint": "robert a stemmle",
+                    "kind": "title_role_grounding",
+                    "left_unit_id": null,
+                    "right_unit_id": null
+                  }
+                ]
+              }
+            ],
+            "method": "query_local_sto_graph_admission",
+            "seed_doc_indices": [
+              46,
+              40,
+              41,
+              44,
+              151,
+              165,
+              103,
+              175,
+              147,
+              48,
+              52,
+              184,
+              89,
+              160,
+              43,
+              47,
+              88,
+              90,
+              45,
+              95
+            ],
+            "seed_order_policy": "query_symbolic_anchors_before_textual_entry",
+            "stats": {
+              "admitted_doc_count": 28,
+              "allowed_edge_kinds": [
+                "role_bridge",
+                "same_subject",
+                "sentence_grounded_transition",
+                "source_endpoint_incidence",
+                "title_role_grounding"
+              ],
+              "allowed_edge_tiers": [
+                "evidence_transition",
+                "weak_connectivity"
+              ],
+              "candidate_limit": 200,
+              "closure_hops": 2,
+              "local_edge_count": 12,
+              "local_edge_tier_counts": {
+                "evidence_transition": 9,
+                "unknown": 0,
+                "weak_connectivity": 3
+              },
+              "role_graph_edge_count": 481,
+              "role_graph_edge_tier_counts": {
+                "evidence_transition": 41,
+                "unknown": 0,
+                "weak_connectivity": 440
+              },
+              "seed_doc_count": 20,
+              "symbolic_anchor_count": 2,
+              "symbolic_seed_doc_count": 3,
+              "textual_seed_count": 20
+            },
+            "symbolic_anchor_endpoints": [
+              "god s gift to women",
+              "aldri annet enn br k"
+            ],
+            "symbolic_seed_doc_indices": [
+              46,
+              40,
+              41
+            ],
+            "textual_seed_doc_indices": [
+              41,
+              46,
+              44,
+              40,
+              151,
+              165,
+              103,
+              175,
+              147,
+              48,
+              52,
+              184,
+              89,
+              160,
+              43,
+              47,
+              88,
+              90,
+              45,
+              95
+            ]
+          },
+          "paper_facing_method_name": "evidence_transition_graph_native_retrieval",
+          "pipeline": "query_grounded_sto_graph_to_native_reader_evidence",
+          "ranked_object": "query_local_graph_selected_reader_context",
+          "selected_doc_indices": [
+            46,
+            47,
+            41,
+            44,
+            40
+          ],
+          "selection": {
+            "admitted_doc_count": 28,
+            "delayed_symbolic_entry_doc_indices": [],
+            "graph_order_doc_indices": [
+              46,
+              47,
+              41,
+              44,
+              40
+            ],
+            "local_edge_count": 12,
+            "query_endpoints": [
+              "god s gift to women",
+              "aldri annet enn br k"
+            ],
+            "raw_graph_order_doc_indices": [
+              46,
+              47,
+              41,
+              44,
+              40
+            ],
+            "selected_doc_indices": [
+              46,
+              47,
+              41,
+              44,
+              40
+            ],
+            "selection_policy": "query_anchor_first_admission_preserving_sto_frontier",
+            "selection_rows": [],
+            "set_objective": {}
+          },
+          "source_text_evidence_validation": {
+            "certificate_count": 19,
+            "certificate_type_counts": {
+              "endpoint_title": 8,
+              "source_title_endpoint": 5,
+              "title_alias": 6
+            },
+            "certified_doc_indices": [
+              47,
+              44,
+              41
+            ],
+            "closure_policy": "validate_agsto_frontier_with_strong_source_text_certificates",
+            "selected_doc_indices": [
+              46,
+              47,
+              41,
+              44,
+              40
+            ],
+            "source_frontier_doc_indices": [
+              46,
+              47,
+              41,
+              44,
+              40
+            ],
+            "used_certificate_count": 3,
+            "used_certificates": [
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "michael curtiz",
+                "source_binding": "god s gift to women",
+                "source_doc_index": 46,
+                "source_title": "God's Gift to Women",
+                "target_binding": "michael curtiz",
+                "target_doc_index": 47,
+                "target_title": "Michael Curtiz"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "edith carlmar",
+                "source_binding": "aldri annet enn brak",
+                "source_doc_index": 41,
+                "source_title": "Aldri annet enn br\u00e5k",
+                "target_binding": "edith carlmar",
+                "target_doc_index": 44,
+                "target_title": "Edith Carlmar"
+              },
+              {
+                "certificate_type": "source_title_endpoint",
+                "direction": "source_subject_to_object",
+                "endpoint": "aldri annet enn brak",
+                "source_binding": "altid ballade",
+                "source_doc_index": 40,
+                "source_title": "Altid ballade",
+                "target_binding": "aldri annet enn brak",
+                "target_doc_index": 41,
+                "target_title": "Aldri annet enn br\u00e5k"
+              }
+            ],
+            "validation_only": true,
+            "validation_policy": "validate_selected_frontier_with_sentence_grounded_evidence_transitions"
+          },
+          "source_text_evidence_validation_only": true,
+          "top_k": 5,
+          "uses_agsto_legacy_selector": false,
+          "uses_agsto_proposal_fusion": false,
+          "uses_agsto_query_local_graph": true,
+          "uses_agsto_weighted_evidence_set_scoring": false,
+          "uses_dataset_routing": false,
+          "uses_evidence_transition_audit": true,
+          "uses_external_baseline_frontier": false,
+          "uses_graph_native_selection": true,
+          "uses_llm_query_schema": false,
+          "uses_query_grounded_sto_graph": true,
+          "uses_replacement_policy": false,
+          "uses_source_prior_repair": false,
+          "uses_source_text_evidence_validation": true,
+          "uses_weighted_score_fusion": false
+        },
+        "runner": "query_grounded_sto_graph_native",
+        "uses_dataset_routing": false,
+        "uses_external_baseline_frontier": false,
+        "uses_llm_query_compiler": false,
+        "uses_weighted_score_fusion": false
+      },
+      "source_authorized_vocab_strict_all_gold_at5": true,
+      "source_authorized_vocab_strict_recall_at5": 1.0
+    }
+  ],
+  "runner": "query_grounded_sto_graph_native",
+  "source_variant": "hipporag_v2"
+}

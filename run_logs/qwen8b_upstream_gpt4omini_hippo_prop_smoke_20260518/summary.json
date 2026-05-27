@@ -1,0 +1,70 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "hipporag_daec8b_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.8313,
+      "Recall@20": 0.9048,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_hippo_prop_smoke_20260518/reader_qa/hipporag_daec8b/2wikimultihopqa_hipporag_daec8b_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "hipporag_daec8b_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.923,
+      "Recall@20": 0.9885,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_hippo_prop_smoke_20260518/reader_qa/hipporag_daec8b/hotpotqa_hipporag_daec8b_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "hipporag_daec8b_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.6775,
+      "Recall@20": 0.8564,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_hippo_prop_smoke_20260518/reader_qa/hipporag_daec8b/musique_hipporag_daec8b_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "proprag_daec8b_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.9028,
+      "Recall@20": 0.9607,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_hippo_prop_smoke_20260518/reader_qa/proprag_daec8b/2wikimultihopqa_proprag_daec8b_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "hotpotqa",
+      "method": "proprag_daec8b_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.95,
+      "Recall@20": 0.9925,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_hippo_prop_smoke_20260518/reader_qa/proprag_daec8b/hotpotqa_proprag_daec8b_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    },
+    {
+      "dataset": "musique",
+      "method": "proprag_daec8b_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.7131,
+      "Recall@20": 0.8942,
+      "ExactMatch": null,
+      "F1": null,
+      "mean_reader_docs": 3.0,
+      "source_json": "/mnt/nvme/code/HippoRAG/run_logs/qwen8b_upstream_gpt4omini_hippo_prop_smoke_20260518/reader_qa/proprag_daec8b/musique_proprag_daec8b_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "pool_json": "run_logs/dense_pool_exports_full1000_20260424/hotpotqa_dense_pool100.json",
+  "dataset": "hotpotqa",
+  "limit": 100,
+  "top_k": 5,
+  "max_docs": 100,
+  "alpha": 0.15,
+  "horizon": 2,
+  "summary": {
+    "rows": 400,
+    "by_hop_variant": {
+      "2:mixed_source_absorption": {
+        "support_recall": 0.615,
+        "support_complete": 0.38,
+        "noise_rate": 0.754,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 100
+      },
+      "2:multi_channel_noisy_or": {
+        "support_recall": 0.705,
+        "support_complete": 0.49,
+        "noise_rate": 0.718,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 100
+      },
+      "2:multi_channel_sum": {
+        "support_recall": 0.705,
+        "support_complete": 0.49,
+        "noise_rate": 0.718,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 100
+      },
+      "2:query_level_ppr": {
+        "support_recall": 0.615,
+        "support_complete": 0.38,
+        "noise_rate": 0.754,
+        "em": 0.0,
+        "f1": 0.0,
+        "latency_ms": 0.0,
+        "rows": 100
+      }
+    }
+  }
+}

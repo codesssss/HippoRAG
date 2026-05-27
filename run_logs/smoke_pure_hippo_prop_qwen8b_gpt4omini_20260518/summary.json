@@ -1,0 +1,15 @@
+{
+  "rows": [
+    {
+      "dataset": "2wikimultihopqa",
+      "method": "hipporag_qwen8b_no_think_top5",
+      "count": 2,
+      "Recall@5": 0.8313,
+      "Recall@20": 0.9048,
+      "EM": 1.0,
+      "F1": 1.0,
+      "mean_reader_docs": 5.0,
+      "report": "/mnt/nvme/code/HippoRAG/run_logs/smoke_pure_hippo_prop_qwen8b_gpt4omini_20260518/reader_qa/hipporag/2wikimultihopqa_hipporag_qwen8b_no_think_gpt4omini_reader_top5_limit2.json"
+    }
+  ]
+}

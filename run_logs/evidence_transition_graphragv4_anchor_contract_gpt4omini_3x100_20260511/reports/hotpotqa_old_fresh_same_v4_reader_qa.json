@@ -1,0 +1,3451 @@
+{
+  "datasets": [
+    {
+      "dataset": "hotpotqa",
+      "methods": {
+        "evidence_transition_graphragv4_fact_witnessed_sto": {
+          "method": "evidence_transition_graphragv4_fact_witnessed_sto",
+          "metrics": {
+            "ExactMatch": 0.62,
+            "F1": 0.7329,
+            "all_gold_at5": 0.9,
+            "answer_string_hit_at5": 0.89,
+            "any_gold_at5": 1.0,
+            "count": 100,
+            "mean_gold_count_at5": 1.9,
+            "r5": 0.95
+          },
+          "per_query": [
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                7,
+                4958,
+                9515,
+                9514,
+                7095
+              ],
+              "gold_answers": [
+                "superhero roles as the Marvel Comics"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                7,
+                1
+              ],
+              "predicted_answer": "Christopher McCoy.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 0,
+              "question": "what is one of the stars of  The Newcomers known for",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "The Newcomers (film)",
+                "Halina Reijn",
+                "Vaniusha The Newcomer",
+                "The Newcomer in The Cabbage",
+                "Rebecca Gibney"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.3636,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                13,
+                2607,
+                18,
+                17,
+                14
+              ],
+              "gold_answers": [
+                "Sir Arthur Conan Doyle"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                13,
+                18
+              ],
+              "predicted_answer": "Adrian Conan Doyle and John Dickson Carr.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 1,
+              "question": "The fictional private detective that appears in \"The Adventure of the Seven Clocks\" what written by whom?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The Adventure of the Seven Clocks",
+                "He Who Whispers",
+                "Sherlock Holmes",
+                "Pepe Carvalho",
+                "Tam Sventon"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                25,
+                29,
+                5326,
+                26,
+                1702
+              ],
+              "gold_answers": [
+                "1945 to 1951"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                25,
+                26
+              ],
+              "predicted_answer": "1945 to 1951.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 2,
+              "question": "The Distribution of Industry act was passed by a man who was prime minister when? ",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Distribution of Industry Act 1950",
+                "Industry Act 1975",
+                "Arthur Balfour",
+                "Clement Attlee",
+                "Robert Gascoyne-Cecil, 3rd Marquess of Salisbury"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                32,
+                39,
+                37,
+                31,
+                35
+              ],
+              "gold_answers": [
+                "the Queen's gaoler"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                39,
+                35
+              ],
+              "predicted_answer": "Her gaoler's family.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 3,
+              "question": "Sparking the Marian civil war, who helped the recently abdicated queen to escape her imprisonment?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Adam Gordon of Auchindoun",
+                "Marian civil war",
+                "Battle of Langside",
+                "Battle of Carberry Hill",
+                "Loch Leven Castle"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                46,
+                49,
+                47,
+                41,
+                43
+              ],
+              "gold_answers": [
+                "Finnmark county,"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                46,
+                49
+              ],
+              "predicted_answer": "Finnmark.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 4,
+              "question": "In which county is the town in which Raymond Robertsen was born ?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Raymond Robertsen",
+                "Hammerfest",
+                "Raymond, Alberta",
+                "Raymond, Wisconsin",
+                "Raymond, Washington"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                53,
+                56,
+                9451,
+                1730,
+                1183
+              ],
+              "gold_answers": [
+                "Julius Caesar"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                53,
+                56
+              ],
+              "predicted_answer": "Julius Caesar.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 5,
+              "question": "What screenplay was worked on by both Edward Carfagno and Miklos Rozsa?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Edward Carfagno",
+                "Julius Caesar (1953 film)",
+                "Emeric Pressburger",
+                "The Beast with Five Fingers",
+                "The Black Shield of Falworth"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                60,
+                63,
+                64,
+                62,
+                69
+              ],
+              "gold_answers": [
+                "The Apple Dumpling Gang"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                64,
+                63
+              ],
+              "predicted_answer": "The Apple Dumpling Gang.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 6,
+              "question": "Which Walt Disney film was produced first, The Apple Dumpling Gang or Something Wicked This Way Comes?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Gun Shy (TV series)",
+                "Something Wicked This Way Comes (film)",
+                "The Apple Dumpling Gang (film)",
+                "The Apple Dumpling Gang Rides Again",
+                "Buddy Baker (composer)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                76,
+                75,
+                74,
+                70,
+                77
+              ],
+              "gold_answers": [
+                "Southern State Parkway"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                76,
+                75
+              ],
+              "predicted_answer": "Southern State Parkway.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 7,
+              "question": "Bethpage State Parkway begins with an interchange at which Long Island-based limited access highway?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Bethpage State Parkway",
+                "Southern State Parkway",
+                "Sagtikos State Parkway",
+                "Heckscher State Parkway",
+                "Sunken Meadow State Parkway"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                82,
+                868,
+                83,
+                80,
+                81
+              ],
+              "gold_answers": [
+                "yes"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                83,
+                82
+              ],
+              "predicted_answer": "Yes.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 8,
+              "question": "Are Colocasia and Coronilla both flowering plants?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Coronilla",
+                "Muwashshah",
+                "Colocasia",
+                "Caladium",
+                "Xanthosoma"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                87,
+                5281,
+                91,
+                85,
+                93
+              ],
+              "gold_answers": [
+                "middle order batsman"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                91,
+                85
+              ],
+              "predicted_answer": "batsman.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 9,
+              "question": "The 2000 ICC KnockOut Trophy was the debut of a Jamaican cricketer who is a right-handed what?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "2000 ICC KnockOut Trophy squads",
+                "Umar Akmal",
+                "2000 ICC KnockOut Trophy",
+                "Marlon Samuels",
+                "Stafanie Taylor"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                101,
+                95,
+                94,
+                96,
+                294
+              ],
+              "gold_answers": [
+                "300"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                101,
+                95
+              ],
+              "predicted_answer": "300.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 10,
+              "question": "Bytham Castle is a castle in the civil parish of how many houses?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Bytham Castle",
+                "Castle Bytham",
+                "Little Bytham",
+                "Castle Ashby",
+                "Listed buildings in Egremont, Cumbria"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                104,
+                106,
+                108,
+                112,
+                111
+              ],
+              "gold_answers": [
+                "The Cathedral of the Blessed Virgin Mary, Truro"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                108,
+                107
+              ],
+              "predicted_answer": "Truro Cathedral.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 11,
+              "question": "Which is located in Cornwall, Southwell Minster or Truro Cathedral?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Truro Cathedral School",
+                "Convent of the Epiphany",
+                "Southwell Minster",
+                "Southwell, Nottinghamshire",
+                "Diocese of Southwell and Nottingham"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                118,
+                120,
+                119,
+                123,
+                122
+              ],
+              "gold_answers": [
+                "his own opinions changed"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                120,
+                119
+              ],
+              "predicted_answer": "One focuses on smuggling and exotic pets, the other on entertainment vs. abuse.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 12,
+              "question": "How do the Peter Laufer books Forbidden Creatures and No Animals Were Harmed differ in their focus on animals?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The Dangerous World of Butterflies",
+                "Forbidden Creatures",
+                "No Animals Were Harmed (book)",
+                "Peter Laufer",
+                "List of films about animals"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                124,
+                132,
+                125,
+                128,
+                130
+              ],
+              "gold_answers": [
+                "BBC Formula One"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                124,
+                132
+              ],
+              "predicted_answer": "BBC Formula One.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 13,
+              "question": "Who is a winner of the 2013 6 Hours of Silverstone a co-commentator for?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "2013 6 Hours of Silverstone",
+                "Allan McNish",
+                "2014 6 Hours of Silverstone",
+                "6 Hours of Silverstone",
+                "2013 6 Hours of Bahrain"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                139,
+                140,
+                142,
+                141,
+                6178
+              ],
+              "gold_answers": [
+                "Summer Wars"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                142,
+                139
+              ],
+              "predicted_answer": "Summer Wars.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 14,
+              "question": "Which 2009 animated film is from Japan, Summer Wars or The Secret of Kells?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The Secret of Kells",
+                "Cartoon Saloon",
+                "Summer Wars",
+                "2009 in anime",
+                "Star Wars: The Clone Wars (film)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                144,
+                1140,
+                146,
+                150,
+                153
+              ],
+              "gold_answers": [
+                "yes"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                150,
+                146
+              ],
+              "predicted_answer": "Yes.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 15,
+              "question": "Are Steve Perry and Leslie West both singers?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "For the Love of Strange Medicine",
+                "Mining in Mongolia",
+                "Leslie West",
+                "Steve Perry (Oregon musician)",
+                "The Leslie West Band"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                162,
+                160,
+                154,
+                163,
+                158
+              ],
+              "gold_answers": [
+                "2015"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                162,
+                160
+              ],
+              "predicted_answer": "2015.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 16,
+              "question": "In what year was the Golden State NBA player, who was part of the Cavaliers-Warriors rivalry, named NBA Finals Most Valuable Player?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Cavaliers\u2013Warriors rivalry",
+                "Andre Iguodala",
+                "2015 NBA Finals",
+                "Kevin Durant",
+                "Stephen Curry"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                164,
+                165,
+                172,
+                171,
+                173
+              ],
+              "gold_answers": [
+                "Anthony Rapp"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                165,
+                164
+              ],
+              "predicted_answer": "Anthony Rapp.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 17,
+              "question": "What is the name of the actor who wrote the memoir Without you: A memoir of love, loss, and the Musical Rent and also stared as Mark Cohen in the Broadway production of \"Rent\"?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Anthony Rapp",
+                "Without You (book)",
+                "Look Around (Anthony Rapp album)",
+                "Adam Pascal",
+                "Rent (albums)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                2522,
+                177,
+                181,
+                183,
+                182
+              ],
+              "gold_answers": [
+                "Hong Kong"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                177,
+                176
+              ],
+              "predicted_answer": "Bank of China Tower.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 18,
+              "question": "One Raffles Place is one of the tallest skyscrapers in the city of Singapore and tallest in the wolrd outside North America until it was succeeded by a Building in city?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Secondary education",
+                "One Raffles Place",
+                "Republic Plaza (Singapore)",
+                "Raffles Place",
+                "One Marina Boulevard"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                185,
+                188,
+                192,
+                191,
+                186
+              ],
+              "gold_answers": [
+                "Boston, Massachusetts"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                188,
+                192
+              ],
+              "predicted_answer": "Boston, Massachusetts.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 19,
+              "question": "Where is the ice hockey team based that Zdeno Ch\u00e1ra currently serving as captain of?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Al Iafrate",
+                "Zdeno Ch\u00e1ra",
+                "Boston Bruins",
+                "Denis Kulyash",
+                "Zach Parise"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                200,
+                198,
+                195,
+                197,
+                202
+              ],
+              "gold_answers": [
+                "eastern North America"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                200,
+                195
+              ],
+              "predicted_answer": "eastern North America.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 20,
+              "question": "Sand Mountainis part of the southern tip of a mountain chain in which part of North America ?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Sand Mountain (Alabama)",
+                "North American Cordillera",
+                "Appalachian Mountains",
+                "Mount Sh\u00ebndelli",
+                "Tijeras Peak"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                205,
+                207,
+                210,
+                211,
+                209
+              ],
+              "gold_answers": [
+                "North Avenue and First Avenue"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                207,
+                213
+              ],
+              "predicted_answer": "Not mentioned.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 21,
+              "question": "At what intersection was the former home of the wooden roller coaster now located at Six Flags Great America in Gurnee, Illinois located?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Key Lime Cove",
+                "Little Dipper (Six Flags Great America)",
+                "Goliath (Six Flags Great America)",
+                "Viper (Six Flags Great America)",
+                "American Eagle (roller coaster)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.4,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                216,
+                217,
+                223,
+                215,
+                214
+              ],
+              "gold_answers": [
+                "Rickie Lee Skaggs"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                216,
+                217
+              ],
+              "predicted_answer": "Ricky Skaggs.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 22,
+              "question": "\"Heartbreak Hurricane\" was recorded by which country artist, that also goes by the name Ricky Skaggs?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Heartbreak Hurricane",
+                "Ricky Skaggs",
+                "Highway 40 Blues",
+                "Country Boy (Ricky Skaggs song)",
+                "Lovin' Only Me"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                225,
+                224,
+                6106,
+                231,
+                941
+              ],
+              "gold_answers": [
+                "My Own Worst Enemy"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                225,
+                224
+              ],
+              "predicted_answer": "My Own Worst Enemy.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 23,
+              "question": "The View from the Bottom is the fifth studio album by an American rock band best known for what hit song?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The View from the Bottom",
+                "Lit (band)",
+                "Puddle of Mudd",
+                "Lynyrd Skynyrd",
+                "The Black Crowes"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                242,
+                235,
+                240,
+                236,
+                237
+              ],
+              "gold_answers": [
+                "13 seasons"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                242,
+                235
+              ],
+              "predicted_answer": "13.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 24,
+              "question": "This Experts Network sports analysts was inducted into the Pro Football Hall of Fame in 2000 and played in the NFL for how many seasons?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The Experts Network",
+                "Howie Long",
+                "Marshall Faulk",
+                "Terry Bradshaw",
+                "LaDainian Tomlinson"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                249,
+                251,
+                247,
+                252,
+                250
+              ],
+              "gold_answers": [
+                "California Polytechnic State University"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                249,
+                251
+              ],
+              "predicted_answer": "California Polytechnic State University.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 25,
+              "question": "In between  Polytechnic University of the Philippines and California Polytechnic State University which was founded as a vocational high school?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Polytechnic University of the Philippines",
+                "California Polytechnic State University",
+                "Julian A. McPhee",
+                "Myron Angel House",
+                "University of Northern Philippines"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                259,
+                260,
+                257,
+                255,
+                263
+              ],
+              "gold_answers": [
+                "yes"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                257,
+                259
+              ],
+              "predicted_answer": "Yes.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 26,
+              "question": "Are Giuseppe Verdi and Ambroise Thomas both Opera composers ?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Ambroise Thomas",
+                "Armand Castelmary",
+                "Giuseppe Verdi",
+                "Giuseppe Verdi (film)",
+                "Verdi, the King of Melody"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                269,
+                273,
+                268,
+                267,
+                271
+              ],
+              "gold_answers": [
+                "Russian Ark"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                268,
+                269
+              ],
+              "predicted_answer": "Russian Ark.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 27,
+              "question": "Which historical drama filmed in the Winter Palace of the Russian State Hermitage Museum stars Sergey Dreyden?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Russian Ark",
+                "Winter Palace",
+                "Sergey Dreyden",
+                "Egyptian Collection of the Hermitage Museum",
+                "Grand Church of the Winter Palace"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                274,
+                275,
+                279,
+                281,
+                9532
+              ],
+              "gold_answers": [
+                "Bruce Chatwin"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                279,
+                274
+              ],
+              "predicted_answer": "Bruce Chatwin.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 28,
+              "question": "Who was born first, Karen Joy Fowler or Bruce Chatwin?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Bruce Chatwin",
+                "We Are All Completely Beside Ourselves",
+                "Karen Joy Fowler",
+                "Always (short story)",
+                "Ian McEwan"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                285,
+                288,
+                291,
+                292,
+                286
+              ],
+              "gold_answers": [
+                "Jeremy Hammond"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                291,
+                292
+              ],
+              "predicted_answer": "Jeremy Hammond.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 29,
+              "question": "What WikiLeaks using whistleblower is notable for having a hacking organization with a user base of over 1,800,000?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Friends of WikiLeaks",
+                "Sigurdur Thordarson",
+                "HackThisSite",
+                "Jeremy Hammond",
+                "Ashley Madison data breach"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                294,
+                298,
+                302,
+                300,
+                96
+              ],
+              "gold_answers": [
+                "Egremont"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                302,
+                298
+              ],
+              "predicted_answer": "Egremont.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 30,
+              "question": "Egremont Castle is located in what market town, civil parish, and two electoral wards in the Borough of Copeland in Cumbria, England?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Listed buildings in Egremont, Cumbria",
+                "Egremont, Cumbria",
+                "Egremont Castle",
+                "Axminster",
+                "Castle Ashby"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5263,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                308,
+                2933,
+                304,
+                305,
+                9449
+              ],
+              "gold_answers": [
+                "La jolie fille de Perth \"(The Fair Maid of Perth)\" is an opera in four acts"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                308,
+                304
+              ],
+              "predicted_answer": "La jolie fille de Perth.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 31,
+              "question": "Which opera has more acts, La jolie fille de Perth or Mitridate, re di Ponto?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "La jolie fille de Perth",
+                "Free (Bonfire album)",
+                "Mitridate, re di Ponto",
+                "La fille de Madame Angot",
+                "La P\u00e9richole"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                321,
+                319,
+                318,
+                315,
+                316
+              ],
+              "gold_answers": [
+                "Mandarin Airlines"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                319,
+                321
+              ],
+              "predicted_answer": "Mandarin Airlines.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 32,
+              "question": "What subsidiary of the largest airline of the Republic of China (Taiwan) has a main hub at Taichung Airport?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Mandarin Airlines",
+                "China Airlines",
+                "Taichung International Airport",
+                "Hawaiian Airlines",
+                "Taichung County"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                329,
+                325,
+                332,
+                324,
+                326
+              ],
+              "gold_answers": [
+                "MGM Grand Garden Arena"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                327,
+                329
+              ],
+              "predicted_answer": "MGM Grand Garden Special Events Center.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 33,
+              "question": "What is the name of the former MGM Grand Garden Special Events Center where the Mayweather-Ortiz fight took place?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "MGM Grand Garden Arena",
+                "Floyd Mayweather Jr. vs. Canelo \u00c1lvarez",
+                "Floyd Mayweather Jr. vs. Manny Pacquiao",
+                "Floyd Mayweather Jr. vs. Marcos Maidana",
+                "Floyd Mayweather Jr. vs. Robert Guerrero"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                334,
+                336,
+                343,
+                3133,
+                2168
+              ],
+              "gold_answers": [
+                "Justin Spitzer"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                334,
+                336
+              ],
+              "predicted_answer": "Justin Spitzer.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 34,
+              "question": "Who created the NBC sitcom that Johnny Pemberton appears in as the character Bo Thompson?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Johnny Pemberton",
+                "Superstore (TV series)",
+                "Son of Zorn",
+                "Jimmy Tatro",
+                "Saturday Night Live Weekend Update Thursday"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                344,
+                347,
+                2865,
+                346,
+                2859
+              ],
+              "gold_answers": [
+                "Pratt & Whitney F100"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                346,
+                347
+              ],
+              "predicted_answer": "Pratt & Whitney F100.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 35,
+              "question": "Which aircraft engine powers a General Dynamics aircraft of which over 4500 have been built?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "General Dynamics Mission Systems",
+                "General Dynamics F-16 Fighting Falcon",
+                "Pratt &amp; Whitney Canada PT6",
+                "Pratt &amp; Whitney F100",
+                "Orenda OE600"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                126,
+                362,
+                355,
+                6192,
+                6191
+              ],
+              "gold_answers": [
+                "Johnny Herbert"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                355,
+                362
+              ],
+              "predicted_answer": "Johnny Herbert.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 36,
+              "question": "Which British racing driver has raced for 7 different teams and won the European Grand Prix in 1999?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "2013 6 Hours of S\u00e3o Paulo",
+                "Johnny Herbert",
+                "Stewart Grand Prix",
+                "Jenson Button",
+                "John Button (racing driver)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                367,
+                372,
+                373,
+                370,
+                371
+              ],
+              "gold_answers": [
+                "Istanbul, Turkey"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                372,
+                367
+              ],
+              "predicted_answer": "Istanbul.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 37,
+              "question": "In what city can a person find both the Nusretiye Clock Tower and the Eski Imaret Mosque be found?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Eski Imaret Mosque",
+                "Nusretiye Clock Tower",
+                "Clock Tower of Murshidabad",
+                "Kumanovo Clock Tower",
+                "Hysen Pasha Mosque"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                376,
+                1096,
+                383,
+                380,
+                2155
+              ],
+              "gold_answers": [
+                "George Harrison"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                376,
+                383
+              ],
+              "predicted_answer": "George Harrison.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 38,
+              "question": "Which English musician is known for both the songs \"See Yourself\" and \"Withing You Without You\"?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "See Yourself",
+                "Putting the Damage On",
+                "Within You Without You",
+                "Who Can See It",
+                "Gerry Marsden"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.8,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                390,
+                393,
+                386,
+                385,
+                387
+              ],
+              "gold_answers": [
+                "Pavel Sergeyevich Alexandrov"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                390,
+                386
+              ],
+              "predicted_answer": "Pavel Alexandrov.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 39,
+              "question": "Who has written more than 300 papers, Semyon Aranovich Gershgorin or Pavel Alexandrov?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Semyon Aranovich Gershgorin",
+                "Gershgorin circle theorem",
+                "Pavel Alexandrov",
+                "Pavel Urysohn",
+                "Alexandroff extension"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                395,
+                6460,
+                397,
+                400,
+                4776
+              ],
+              "gold_answers": [
+                "DeskMate"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                400,
+                395
+              ],
+              "predicted_answer": "DeskMate.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 40,
+              "question": "Which software application was originally made for the company that acquired RadioShack in 1963?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Tandy Corporation",
+                "1950 British Columbia B-36 crash",
+                "Tandy-12",
+                "DeskMate",
+                "Proginet"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                406,
+                409,
+                407,
+                2150,
+                3153
+              ],
+              "gold_answers": [
+                "Bring Me Sunshine (1994) was originally a three-part retrospective in tribute to Eric Morecambe"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                406,
+                413
+              ],
+              "predicted_answer": "Sylvia Dee.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 41,
+              "question": "Who wrote Bring Me Sunshine and where did they write it?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Bring Me Sunshine (1994)",
+                "Sylvia Dee",
+                "Bring Me Sunshine (1984)",
+                "Don't Let the Sun Catch You Crying",
+                "A Perfect Day (song)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                416,
+                423,
+                420,
+                414,
+                421
+              ],
+              "gold_answers": [
+                "John John Florence"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                423,
+                416
+              ],
+              "predicted_answer": "John John Florence.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 42,
+              "question": "What American professional Hawaiian surfer born 18 October 1992 won the Rip Curl Pro Portugal?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "John John Florence",
+                "MEO Rip Curl Pro Portugal",
+                "Andy Irons",
+                "Coco Ho",
+                "MEO Rip Curl Pro Portugal 2016"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                7729,
+                430,
+                431,
+                424,
+                425
+              ],
+              "gold_answers": [
+                "1981"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                431,
+                428
+              ],
+              "predicted_answer": "1986.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 43,
+              "question": "Bill Nelson flew as a Payload Specialist on a Space Shuttle launched for the first time in what year?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Patricia S. Cowings",
+                "Martin J. Fettman",
+                "Bill Nelson",
+                "Payload specialist",
+                "STS-61-C"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                434,
+                436,
+                441,
+                438,
+                442
+              ],
+              "gold_answers": [
+                "Glee"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                438,
+                441
+              ],
+              "predicted_answer": "Glee.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 44,
+              "question": "The actress and singer Heather Morris is best known for her role in which series, becoming a regular character in the second season?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Rory Flanagan",
+                "Santana Lopez",
+                "Heather Morris",
+                "Brittany Pierce",
+                "Britney/Brittany"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                447,
+                448,
+                2542,
+                3610,
+                2946
+              ],
+              "gold_answers": [
+                "ten"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                447,
+                448
+              ],
+              "predicted_answer": "10.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 45,
+              "question": "What age was Georgia Middleman when she started singing in the seventh-most populated city in the United States?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Georgia Middleman",
+                "San Antonio",
+                "Aaliyah",
+                "Laura Turner (singer)",
+                "Norman, Oklahoma"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                5389,
+                460,
+                459,
+                458,
+                600
+              ],
+              "gold_answers": [
+                "Gracie Mansion"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                460,
+                459
+              ],
+              "predicted_answer": "Gracie Mansion.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 46,
+              "question": "Stockely Webster has paintings hanging in what home (that serves as the residence for the Mayor of New York)?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Conch Republic",
+                "Stokely Webster",
+                "Gracie Mansion",
+                "Archibald Gracie",
+                "Michael Ponce de Leon"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.8,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                469,
+                470,
+                257,
+                304,
+                262
+              ],
+              "gold_answers": [
+                "Antonio Lucio Vivaldi"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                470,
+                469
+              ],
+              "predicted_answer": "Antonio Vivaldi.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 47,
+              "question": "What composer with an Italian libretto was born 4 March 1678?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Antonio Vivaldi",
+                "Dorilla in Tempe",
+                "Giuseppe Verdi",
+                "Mitridate, re di Ponto",
+                "List of major opera composers"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                481,
+                483,
+                478,
+                1315,
+                479
+              ],
+              "gold_answers": [
+                "For Love Alone"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                481,
+                483
+              ],
+              "predicted_answer": "For Love Alone.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 48,
+              "question": "Ellie Parker is a 2005 American drama-comedy film whose title character is played by an English actress who made her screen debut in what Australian drama film?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Ellie Parker",
+                "Naomi Watts",
+                "Rebecca Rigg",
+                "Melissa George",
+                "Claire Foy"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                485,
+                491,
+                484,
+                5003,
+                1438
+              ],
+              "gold_answers": [
+                "Compliance"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                484,
+                485
+              ],
+              "predicted_answer": "Compliance.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 49,
+              "question": "A scam involving a male calling small town fast-food restaurants and pretending to be a police officer to have them strip search employees was turned into a movie of what name?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Strip search phone call scam",
+                "Part-time job terrorism",
+                "Compliance (film)",
+                "Weekend at Bernie's",
+                "Radio tekee murron"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                501,
+                496,
+                502,
+                5098,
+                3404
+              ],
+              "gold_answers": [
+                "The Daily Stormer"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                501,
+                496
+              ],
+              "predicted_answer": "The Daily Stormer.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 50,
+              "question": "Faith Goldy got fired after an interview she gave on what production site edited by Andrew Anglin?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Faith Goldy",
+                "The Daily Stormer",
+                "Henrik Palmgren",
+                "Vox Day",
+                "Jared Taylor"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                1182,
+                505,
+                7174,
+                513,
+                8756
+              ],
+              "gold_answers": [
+                "PPG Paints Arena"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                505,
+                513
+              ],
+              "predicted_answer": "PPG Paints Arena.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 51,
+              "question": "What is the current home arena of the NHL team Chris Summers plays for?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Broadway (San Francisco)",
+                "Chris Summers (ice hockey)",
+                "San Antonio Rampage",
+                "Pittsburgh Penguins",
+                "Toronto Maple Leafs"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.4,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                521,
+                519,
+                517,
+                3431,
+                9558
+              ],
+              "gold_answers": [
+                "Broadcasting House in London"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                521,
+                519
+              ],
+              "predicted_answer": "London.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 52,
+              "question": "Where is the headquarters for the service broadcaster the show Tenko is on?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Tenko (TV series)",
+                "BBC",
+                "Solomon Islands Broadcasting Corporation",
+                "KMXT (FM)",
+                "ABS-CBN (TV network)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                529,
+                527,
+                531,
+                6589,
+                5193
+              ],
+              "gold_answers": [
+                "Sofia the First"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                529,
+                527
+              ],
+              "predicted_answer": "Sofia the First.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 53,
+              "question": "Meghan Strange is an American actress and voice actress, known for her role as Robin on what American animated television series produced for Disney Channel?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Meghan Strange",
+                "Sofia the First",
+                "Star vs. the Forces of Evil",
+                "Tinker Bell (film series)",
+                "The Emperor's New School"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                536,
+                539,
+                543,
+                541,
+                538
+              ],
+              "gold_answers": [
+                "filmmaker."
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                543,
+                539
+              ],
+              "predicted_answer": "Film director.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 54,
+              "question": "Sam Mendes and Ruby Yang share what profession?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The Warriors of Qiugang",
+                "Ruby Yang",
+                "Sam Mendes",
+                "My Voice, My Life",
+                "The Blood of Yingzhou District"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                5161,
+                549,
+                548,
+                1455,
+                5167
+              ],
+              "gold_answers": [
+                "spiritual"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                548,
+                549
+              ],
+              "predicted_answer": "spiritual.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 55,
+              "question": "The fourth episode The Simpsons' seventh season has what kind of theme?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Two Bad Neighbors",
+                "Bart Sells His Soul",
+                "Religion in The Simpsons",
+                "Homer Goes to College",
+                "Homer's Odyssey (The Simpsons)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5714,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                9387,
+                560,
+                558,
+                555,
+                557
+              ],
+              "gold_answers": [
+                "Jean Maurice Eug\u00e8ne Cl\u00e9ment Cocteau"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                558,
+                560
+              ],
+              "predicted_answer": "Jean Cocteau.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 56,
+              "question": "La Machine a ecirire was written by what French writer, designer, playright, artist, and filmmaker, who is known for his novel, \"Les Enfants Terribles\"?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "England in the High Middle Ages",
+                "Jean Cocteau",
+                "La Machine \u00e0 \u00e9crire",
+                "Les Enfants Terribles (film)",
+                "Les Enfants Terribles"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                566,
+                567,
+                569,
+                571,
+                570
+              ],
+              "gold_answers": [
+                "alcoholic drinks"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                566,
+                569
+              ],
+              "predicted_answer": "alcoholic drinks.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 57,
+              "question": "Gleannt\u00e1in Ghlas' Ghaoth Dobhair is a song that can be heard in pubs licensed to serve what?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Gleannt\u00e1in Ghlas' Ghaoth Dobhair",
+                "Pobalscoil Ghaoth Dobhair",
+                "Irish pub",
+                "C.L.G. Ghaoth Dobhair",
+                "Amharclann Ghaoth Dobhair"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                574,
+                583,
+                1657,
+                9616,
+                1696
+              ],
+              "gold_answers": [
+                "1943"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                574,
+                583
+              ],
+              "predicted_answer": "1943.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 58,
+              "question": "In what year was the composer of \"Anthem\" born?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Anthem (The 2002 FIFA World Cup Official Anthem)",
+                "Vangelis",
+                "Benjamin Britten",
+                "Ralph Vaughan Williams",
+                "Anthem (Chess song)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                589,
+                587,
+                585,
+                586,
+                584
+              ],
+              "gold_answers": [
+                "director"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                587,
+                589
+              ],
+              "predicted_answer": "Film director.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 59,
+              "question": "What profession do Raj Kapoor and Mike Cahill share?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Mike Cahill (director)",
+                "Raj Kapoor",
+                "Karan Kapoor",
+                "Ram Teri Ganga Maili",
+                "Aag (1948 film)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                601,
+                5798,
+                596,
+                597,
+                598
+              ],
+              "gold_answers": [
+                "other individuals, teams, or entire organizations"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                601,
+                596
+              ],
+              "predicted_answer": "others.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 60,
+              "question": "Wexner Graduate Fellowships are given to students who show an ability of an individual to \"lead\" or guide who?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Wexner Graduate Fellowship",
+                "English Language Proficiency Test",
+                "Leadership",
+                "Computational Science Graduate Fellowship",
+                "J. Paul Getty Award for Conservation Leadership"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                607,
+                612,
+                613,
+                609,
+                604
+              ],
+              "gold_answers": [
+                "17 December 1998"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                612,
+                607
+              ],
+              "predicted_answer": "17 December 1998.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 61,
+              "question": "What is the birthdate of this Norwegian professional footballer who plays as an attacking midfielder and who broke the record for the youngest player that has ever played in the Norwegian top league?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Martin \u00d8degaard",
+                "Zymer Bytyqi",
+                "Markus Henriksen",
+                "Christian Eriksen",
+                "Christian Pulisic"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                621,
+                622,
+                5988,
+                3278,
+                1664
+              ],
+              "gold_answers": [
+                "drawings"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                621,
+                622
+              ],
+              "predicted_answer": "drawings.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 62,
+              "question": "Works by Hanna Leena Kristiina Varis are part of a collection in a museum that houses approximately 65,000 what?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Hanna Varis",
+                "Albertina",
+                "Hood Museum of Art",
+                "Hong Kong Museum of Art",
+                "Van Gogh Museum"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                632,
+                631,
+                8273,
+                629,
+                941
+              ],
+              "gold_answers": [
+                "various names"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                632,
+                631
+              ],
+              "predicted_answer": "the Supersuckers.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 63,
+              "question": "Devil's Food is a singles compilation by an American rock and roll band that has also been known to play country shows under what?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Devil's Food",
+                "Supersuckers",
+                "The History of Rock",
+                "Bill Haley &amp; His Comets",
+                "The Black Crowes"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                639,
+                641,
+                1726,
+                1690,
+                1447
+              ],
+              "gold_answers": [
+                "The Sound of Music"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                639,
+                641
+              ],
+              "predicted_answer": "The Sound of Music.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 64,
+              "question": "What musical was inspired by the films that included Ruth Leuwerik's best known role?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Ruth Leuwerik",
+                "Maria von Trapp",
+                "Gentlemen Prefer Blondes (musical)",
+                "Chess (musical)",
+                "Annie Get Your Gun (musical)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                644,
+                650,
+                653,
+                651,
+                647
+              ],
+              "gold_answers": [
+                "Geet or The Song"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                647,
+                653
+              ],
+              "predicted_answer": "Geet.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 65,
+              "question": "What 1944 Bollywood film was the mother of Bollywood actor Govinda in?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Raunaq",
+                "Dost (1944 film)",
+                "Nirmala Devi",
+                "Naach Govinda Naach",
+                "Geet (1944 film)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                654,
+                656,
+                661,
+                657,
+                655
+              ],
+              "gold_answers": [
+                "94"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                654,
+                661
+              ],
+              "predicted_answer": "94.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 66,
+              "question": "How many episodes were in the original run of the HBO show that Kristin Davis played the character Charlotte York Goldenblatt?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Kristin Davis",
+                "Charlotte York Goldenblatt",
+                "Sex and the City",
+                "Sex and the City (season 6)",
+                "Sex and the City (season 4)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                673,
+                671,
+                672,
+                670,
+                669
+              ],
+              "gold_answers": [
+                "GE Appliances"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                673,
+                671
+              ],
+              "predicted_answer": "GE Appliances.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 67,
+              "question": "Haier has North American rights to which appliance company headquartered in Louisville, Kentucky?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Hotpoint",
+                "GE Appliances",
+                "Danby (appliances)",
+                "Heaven Hill",
+                "Maytag (disambiguation)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                677,
+                676,
+                682,
+                675,
+                3603
+              ],
+              "gold_answers": [
+                "16 March 1987"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                677,
+                676
+              ],
+              "predicted_answer": "1985.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 68,
+              "question": "When was the track from which a sample was featured in \"Take Me to the Clouds Above\" released? ",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "LMC (British band)",
+                "With or Without You",
+                "Far Above the Clouds",
+                "Amber (Amber album)",
+                "Give It to Me Right"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                684,
+                8312,
+                9521,
+                1945,
+                8683
+              ],
+              "gold_answers": [
+                "Christopher Nolan"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                684,
+                686
+              ],
+              "predicted_answer": "Christopher Nolan.",
+              "qa_bucket": "qa_exact_partial_gold_top5",
+              "query_index": 69,
+              "question": "Who directed a 2006 film where Ron Perkins character plays the manager of a hotel?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Ron Perkins",
+                "Spider-Man 2",
+                "Aquamarine (film)",
+                "Little Children (film)",
+                "Opal Dream"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                696,
+                701,
+                697,
+                699,
+                703
+              ],
+              "gold_answers": [
+                "The Interview"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                696,
+                701
+              ],
+              "predicted_answer": "The Interview.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 70,
+              "question": "What movie did Chris Duesterdiek work on that was directed by Seth Rogen and Evan Goldberg?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Chris Duesterdiek",
+                "The Interview",
+                "This Is the End",
+                "Pineapple Express (film)",
+                "Superbad (film)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                711,
+                705,
+                709,
+                712,
+                3132
+              ],
+              "gold_answers": [
+                "Josh"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                711,
+                705
+              ],
+              "predicted_answer": "Josh.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 71,
+              "question": "The producer of \"Live By NIght\" began his film career playing what role in \"Critters 3\"?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Benny Ciaramello",
+                "Leonardo DiCaprio",
+                "Critters 3",
+                "Aimee Brooks",
+                "Nicolas Cage"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                722,
+                723,
+                716,
+                1375,
+                5940
+              ],
+              "gold_answers": [
+                "Shawnee"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                722,
+                723
+              ],
+              "predicted_answer": "Shawnee.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 72,
+              "question": "What is the county seat of the county in which Keokuk Falls, Oklahoma is loated?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Keokuk Falls, Oklahoma",
+                "Shawnee, Oklahoma",
+                "McIntosh County Seat War",
+                "Seminole County, Oklahoma",
+                "Blaine County, Oklahoma"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                728,
+                4685,
+                733,
+                730,
+                724
+              ],
+              "gold_answers": [
+                "Robert A. Iger"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                733,
+                728
+              ],
+              "predicted_answer": "Bob Iger.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 73,
+              "question": "What former president of ABC television is a high ranking officer in the same company as Christine Mccarthy?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Bob Iger",
+                "Capital Cities/ABC Inc.",
+                "Christine McCarthy",
+                "Jay Rasulo",
+                "Disney\u2013ABC Television Group"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                742,
+                737,
+                736,
+                741,
+                739
+              ],
+              "gold_answers": [
+                "Ufa, Russia"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                742,
+                737
+              ],
+              "predicted_answer": "Ufa, Russia.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 74,
+              "question": "Where was the second World Junior Ice Hockey Championship in which Miroslav P\u0159erost coached the men's national junior ice hockey team hosted?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Miroslav P\u0159erost",
+                "2013 World Junior Ice Hockey Championships",
+                "France men's national junior ice hockey team",
+                "Norway men's national junior ice hockey team",
+                "Ukraine men's national junior ice hockey team"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                753,
+                750,
+                9262,
+                8949,
+                5574
+              ],
+              "gold_answers": [
+                "Bodyjar"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                753,
+                750
+              ],
+              "predicted_answer": "Bodyjar.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 75,
+              "question": "Between two bands Audioslave and Bodyjar, which group formed earlier?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Audioslave",
+                "Bodyjar",
+                "Tool (band)",
+                "System of a Down",
+                "Midnight Oil"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                763,
+                759,
+                755,
+                4466,
+                4000
+              ],
+              "gold_answers": [
+                "Berklee College of Music"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                763,
+                759
+              ],
+              "predicted_answer": "Berklee College of Music.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 76,
+              "question": "What music school did the singer of The Search for Everything: Wave One attend?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The Search for Everything: Wave One",
+                "John Mayer",
+                "The Search for Everything: Wave Two",
+                "David Huntsinger",
+                "Billy Joel"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.6667,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                767,
+                4162,
+                773,
+                768,
+                769
+              ],
+              "gold_answers": [
+                "International Watch Co."
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                767,
+                773
+              ],
+              "predicted_answer": "International Watch Company.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 77,
+              "question": "G\u00e9rald Genta, a Swiss jewelllery designer, worked with what luxury Swiss watch manufacturer which was founded by American Watch,aker Florentine Ariosts Jones?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "G\u00e9rald Genta",
+                "Laurent Touil-Tartour",
+                "International Watch Company",
+                "Patek Philippe &amp; Co.",
+                "Lemania"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                774,
+                783,
+                775,
+                7299,
+                779
+              ],
+              "gold_answers": [
+                "Chicago, IL"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                780,
+                779
+              ],
+              "predicted_answer": "Scotland.",
+              "qa_bucket": "partial_gold_top5_qa_wrong",
+              "query_index": 78,
+              "question": "What city did the musician whose debut album shares its title with the 1959 Alfred Hitchcock hail from?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Alfred Hitchcock filmography",
+                "George Tomasini",
+                "Cindy Bernard",
+                "Bert Jansch (album)",
+                "North by Northwest"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                789,
+                785,
+                786,
+                792,
+                791
+              ],
+              "gold_answers": [
+                "1998"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                789,
+                785
+              ],
+              "predicted_answer": "1998.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 79,
+              "question": "The 53rd National Hockey League All-Star Game took place at the indoor arena that was completed in what year?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "53rd National Hockey League All-Star Game",
+                "BB&amp;T Center (Sunrise, Florida)",
+                "63rd National Hockey League All-Star Game",
+                "47th National Hockey League All-Star Game",
+                "58th National Hockey League All-Star Game"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                794,
+                796,
+                800,
+                801,
+                797
+              ],
+              "gold_answers": [
+                "Terrence Jones"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                794,
+                796
+              ],
+              "predicted_answer": "Terrence Jones.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 80,
+              "question": "Which of Damon Stoudamire's cousins once played college basketball for the University of Kentucky?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Damon Stoudamire",
+                "Terrence Jones",
+                "DeMarcus Cousins",
+                "Pacific Tigers men's basketball",
+                "2016\u201317 Pacific Tigers men's basketball team"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                808,
+                813,
+                805,
+                804,
+                809
+              ],
+              "gold_answers": [
+                "1935"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                813,
+                805
+              ],
+              "predicted_answer": "1935.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 81,
+              "question": "The player who defeated Johnny Majors for the Heisman Trophy in 1956 was born in what year?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "1976 NCAA Division I football season",
+                "Johnny Majors",
+                "Paul Hornung",
+                "Heisman curse",
+                "Heisman Trophy"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                818,
+                823,
+                819,
+                821,
+                822
+              ],
+              "gold_answers": [
+                "2002"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                818,
+                823
+              ],
+              "predicted_answer": "2002.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 82,
+              "question": "In which election did Norm Coleman won to become the last republican elected as of 2017?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Norm Coleman",
+                "United States Senate election in Minnesota, 2002",
+                "Jim Cohen",
+                "Political positions of Norm Coleman",
+                "Al Franken"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                826,
+                827,
+                829,
+                832,
+                830
+              ],
+              "gold_answers": [
+                "Queen Margrethe II"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                826,
+                827
+              ],
+              "predicted_answer": "Queen Margrethe II.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 83,
+              "question": "Who is the mother of Mary, Crown Princess of Denmark's husband?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Mary, Crown Princess of Denmark",
+                "Frederik, Crown Prince of Denmark",
+                "John Dalgleish Donaldson",
+                "Princess Josephine of Denmark",
+                "Prince Christian of Denmark"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                834,
+                839,
+                842,
+                840,
+                2849
+              ],
+              "gold_answers": [
+                "Krakatau"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                842,
+                834
+              ],
+              "predicted_answer": "Universal's Volcano Bay.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 84,
+              "question": "What park replaced American's first waterpark designed by the creator of seaworld?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Wet 'n Wild Orlando",
+                "SeaWorld Ohio",
+                "Volcano Bay",
+                "Wave Breaker: The Rescue Coaster",
+                "Fun Pier"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": false,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                844,
+                5329,
+                850,
+                845,
+                852
+              ],
+              "gold_answers": [
+                "2011"
+              ],
+              "gold_count_at5": 1,
+              "gold_doc_indices": [
+                849,
+                845
+              ],
+              "predicted_answer": "2011.",
+              "qa_bucket": "qa_exact_partial_gold_top5",
+              "query_index": 85,
+              "question": "What year did Fifty Shades of Grey release?",
+              "recall_at5": 0.5,
+              "titles_top5": [
+                "Fifty Shades Darker",
+                "Robinne Lee",
+                "Fifty Shades of Grey",
+                "Fifty Shades (novel series)",
+                "Grey: Fifty Shades of Grey as Told by Christian"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                856,
+                859,
+                863,
+                3070,
+                861
+              ],
+              "gold_answers": [
+                "29,000"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                856,
+                859
+              ],
+              "predicted_answer": "29,000.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 86,
+              "question": "The ghetto that George Kadish documented held how many people at its peak?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "George Kadish",
+                "Kovno Ghetto",
+                "Cz\u0119stochowa Ghetto",
+                "Kashubian diaspora",
+                "Au\u00dfenarbeitslager Gerdauen"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                865,
+                864,
+                870,
+                867,
+                873
+              ],
+              "gold_answers": [
+                "the villanelle poetic form"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                865,
+                870
+              ],
+              "predicted_answer": "villanelle.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 87,
+              "question": "In which poetic form is Mad Girl's Love Song written and appears in the novel The Bell Jar by Sylvia Plath?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Mad Girl's Love Song",
+                "Letters Home: Correspondence 1950\u20131963",
+                "The Bell Jar",
+                "Hypoxia (Kathryn Williams album)",
+                "The Bell Jar (film)"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                882,
+                7461,
+                881,
+                883,
+                879
+              ],
+              "gold_answers": [
+                "Walt Disney Productions"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                882,
+                881
+              ],
+              "predicted_answer": "None.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 88,
+              "question": "Which production company was involved with both of the movies A Kid in King Arthur's Court and The Great Locomotive Chase?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "A Kid in King Arthur's Court",
+                "Bath Club",
+                "The Great Locomotive Chase",
+                "Unidentified Flying Oddball",
+                "The General (1926 film)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                889,
+                892,
+                888,
+                885,
+                886
+              ],
+              "gold_answers": [
+                "Royal Air Force"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                889,
+                892
+              ],
+              "predicted_answer": "Royal Air Force.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 89,
+              "question": "What where both Hawker Hurricane and No. 1455 Flight apart of?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "No. 1455 Flight RAF",
+                "Hawker Hurricane",
+                "No. 1300 Flight RAF",
+                "Flying Legend Hawker Hurricane Replica",
+                "Hawker Typhoon"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                895,
+                894,
+                4569,
+                5355,
+                4287
+              ],
+              "gold_answers": [
+                "eight"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                895,
+                894
+              ],
+              "predicted_answer": "8.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 90,
+              "question": "Kadeem Jack is a player in a league that started with how many teams?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Kadeem Jack",
+                "NBA G League",
+                "Big 12 Conference men's basketball",
+                "Kemba Walker",
+                "Nike Hoop Summit"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                904,
+                912,
+                909,
+                906,
+                910
+              ],
+              "gold_answers": [
+                "Jamnagar"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                909,
+                912
+              ],
+              "predicted_answer": "India.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 91,
+              "question": "What country is the member of Gujarat Legislative Assembly and parliament representing?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Vaja Babubhai",
+                "Gujarat Legislative Assembly election, 2012",
+                "Poonamben Maadam",
+                "Ramanlal Vora",
+                "Jaydrathsinh Parmar"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                922,
+                917,
+                6849,
+                915,
+                1387
+              ],
+              "gold_answers": [
+                "Fred M. Vinson"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                917,
+                922
+              ],
+              "predicted_answer": "Fred M. Vinson.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 92,
+              "question": "Of four Harry S. Truman Supreme Court candidates, who was the 53rd United States Secretary of the Treasury and the 13th Chief Justice of the United States?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Fred M. Vinson",
+                "Harry S. Truman Supreme Court candidates",
+                "Richard Nixon Supreme Court candidates",
+                "Enrique Fernando",
+                "John Marshall Harlan"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                855,
+                8246,
+                927,
+                926,
+                932
+              ],
+              "gold_answers": [
+                "February"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                926,
+                927
+              ],
+              "predicted_answer": "February.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 93,
+              "question": "In what month was the relief first officer of the flight that crashed on its way to Cairo with a stop in New York Born?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "2002 El Ayyat railway accident",
+                "Criss Angel",
+                "EgyptAir Flight 990",
+                "Gameel Al-Batouti",
+                "Third officer (aeronautics)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": false,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                938,
+                2296,
+                941,
+                5818,
+                935
+              ],
+              "gold_answers": [
+                "yes"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                938,
+                941
+              ],
+              "predicted_answer": "Yes.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 94,
+              "question": "Are The Datsuns and The Black Crowes both rock bands?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "The Datsuns",
+                "24-7 Spyz",
+                "The Black Crowes",
+                "The Darkness (band)",
+                "Marc Ford"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                947,
+                948,
+                7692,
+                6095,
+                952
+              ],
+              "gold_answers": [
+                "James Harrison"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                948,
+                947
+              ],
+              "predicted_answer": "Jim Harrison.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 95,
+              "question": " Legends of the Fall was based on a novella by what poetry and fiction writer?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Jim Harrison",
+                "Legends of the Fall",
+                "Robert Penn Warren",
+                "Oscar Wilde",
+                "Mary O'Donoghue"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.5,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                956,
+                958,
+                955,
+                962,
+                963
+              ],
+              "gold_answers": [
+                "Karakoram mountain range"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                955,
+                956
+              ],
+              "predicted_answer": "Karakoram.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 96,
+              "question": "Rimo I and Passu Sar are both part of which mountain range?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Passu Sar",
+                "Mingli Sar",
+                "Rimo I",
+                "Yutmaru Sar",
+                "Kanjut Sar"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                969,
+                966,
+                7268,
+                967,
+                498
+              ],
+              "gold_answers": [
+                "Czech Republic"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                966,
+                969
+              ],
+              "predicted_answer": "Czech Republic.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 97,
+              "question": "What was the country which has border with the village where an Austrian forest caretaker, naturalist, pseudoscientistref>Ronald Engert: \"Die Forellenturbine als Prinzip der kostenlosen Energiegewinnung born?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Viktor Schauberger",
+                "Holzschlag, Austria",
+                "Todtnauberg",
+                "Bruckneudorf",
+                "Egger (company)"
+              ]
+            },
+            {
+              "ExactMatch": 1.0,
+              "F1": 1.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                974,
+                976,
+                979,
+                983,
+                982
+              ],
+              "gold_answers": [
+                "St. Louis Cardinals"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                974,
+                979
+              ],
+              "predicted_answer": "St. Louis Cardinals.",
+              "qa_bucket": "qa_exact_all_gold_top5",
+              "query_index": 98,
+              "question": "Which team did Joe Buck's father broadcast for?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Bob Buck",
+                "2009 Major League Baseball All-Star Game",
+                "Joe Buck",
+                "J. Buck's",
+                "Joe Buck Live"
+              ]
+            },
+            {
+              "ExactMatch": 0.0,
+              "F1": 0.0,
+              "all_gold_at5": true,
+              "answer_string_hit_at5": true,
+              "any_gold_at5": true,
+              "doc_indices_top5": [
+                5020,
+                5027,
+                988,
+                985,
+                984
+              ],
+              "gold_answers": [
+                "Mary"
+              ],
+              "gold_count_at5": 2,
+              "gold_doc_indices": [
+                985,
+                988
+              ],
+              "predicted_answer": "Merv.",
+              "qa_bucket": "all_gold_top5_qa_wrong",
+              "query_index": 99,
+              "question": "What is the name of the city located near the historical region known as Margian\u1e17 in Greek?",
+              "recall_at5": 1.0,
+              "titles_top5": [
+                "Calabria",
+                "History of the Jews in Calabria",
+                "Margiana",
+                "Merv",
+                "Attica"
+              ]
+            }
+          ],
+          "qa_buckets": {
+            "all_gold_top5_qa_wrong": 30,
+            "partial_gold_top5_qa_wrong": 8,
+            "qa_exact_all_gold_top5": 60,
+            "qa_exact_partial_gold_top5": 2
+          }
+        }
+      },
+      "num_queries": 100,
+      "reader": {
+        "llm_base_url": "http://localhost:8042/v1",
+        "llm_name": "qwen3-8b-train",
+        "qa_top_k": 5
+      },
+      "source": {
+        "doc_key": "retrieved_doc_indices_top5",
+        "metadata_report_path": "/mnt/nvme/zly/HippoRAG/run_logs/fresh_query_grounded_sto_gpt4omini_limit100_20260508/hotpotqa/reports/hotpotqa_minimal_per_query_fresh.json",
+        "metadata_variant": "hipporag_v2",
+        "openie_path": "/mnt/nvme/zly/HippoRAG/run_logs/fresh_query_grounded_sto_gpt4omini_limit100_20260508/hotpotqa/index/openie_results_ner_gpt-4o-mini.json",
+        "retrieval_report_path": "/mnt/nvme/zly/HippoRAG/run_logs/fresh_query_grounded_sto_gpt4omini_limit100_20260508/hotpotqa/reports/hotpotqa_fresh_query_grounded_sto_retrieval.json",
+        "uses_legacy_transition_qa_runner": false,
+        "uses_sfb_variant": false
+      }
+    }
+  ],
+  "format": "etv3_reader_only_qa",
+  "metadata_variant": "hipporag_v2",
+  "method": "evidence_transition_graphragv4_fact_witnessed_sto",
+  "qa_doc_key": "retrieved_doc_indices_top5",
+  "uses_legacy_transition_qa_runner": false,
+  "uses_sfb_variant": false
+}

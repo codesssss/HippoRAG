@@ -1,0 +1,18 @@
+[START] aligned_full1000_20260429 2026-04-30T09:02:52+08:00
+[2026-04-30T09:02:52+08:00] Preflight: Prop+DAEC existing full1000 rows
+[SKIP] dataset=2wikimultihopqa variant=prop_daec existing=/mnt/nvme/code/HippoRAG/run_logs/layer1_proprag_pool_eval_fixed_20260424/2wikimultihopqa_proprag_pool_daec_oracle.json
+[SKIP] dataset=hotpotqa variant=prop_daec existing=/mnt/nvme/code/HippoRAG/run_logs/layer1_proprag_pool_eval_fixed_20260424/hotpotqa_proprag_pool_daec_oracle.json
+[SKIP] dataset=musique variant=prop_daec existing=/mnt/nvme/code/HippoRAG/run_logs/layer1_proprag_pool_eval_fixed_20260424/musique_proprag_pool_daec_oracle.json
+[2026-04-30T09:02:53+08:00] Stage 1: Prop+DAEC-L1 missing rows plus HGRAG 2Wiki in parallel
+[SKIP] dataset=2wikimultihopqa variant=hgrag existing=/mnt/nvme/code/HippoRAG/run_logs/hgrag_aligned_full1000_20260429/2wikimultihopqa_hgrag.json
+[SKIP] dataset=2wikimultihopqa variant=daec_l1 existing=/mnt/nvme/code/HippoRAG/run_logs/daec_noisyor_proprag_pool100_2wiki_fixclean_full1000_20260428.json
+[SKIP] dataset=hotpotqa variant=daec_l1 existing=/mnt/nvme/code/HippoRAG/run_logs/daec_noisyor_proprag_pool100_full1000_20260429/hotpotqa_daec_l1.json
+[SKIP] dataset=musique variant=daec_l1 existing=/mnt/nvme/code/HippoRAG/run_logs/daec_noisyor_proprag_pool100_full1000_20260429/musique_daec_l1.json
+[2026-04-30T09:02:55+08:00] Stage 2: remaining HGRAG native-shaped full1000 rows
+[SKIP] dataset=2wikimultihopqa variant=hgrag existing=/mnt/nvme/code/HippoRAG/run_logs/hgrag_aligned_full1000_20260429/2wikimultihopqa_hgrag.json
+[SKIP] dataset=hotpotqa variant=hgrag existing=/mnt/nvme/code/HippoRAG/run_logs/hgrag_aligned_full1000_20260429/hotpotqa_hgrag.json
+[SKIP] dataset=musique variant=hgrag existing=/mnt/nvme/code/HippoRAG/run_logs/hgrag_aligned_full1000_20260429/musique_hgrag.json
+[2026-04-30T09:02:55+08:00] Stage 3: NEOCORRAG native full1000 rows
+[START] dataset=2wikimultihopqa variant=neocorrag port=8041 cuda=4 start=2026-04-30T09:02:55+08:00
+[FAILED] dataset=2wikimultihopqa variant=neocorrag code=1 end=2026-04-30T09:53:33+08:00 log=/mnt/nvme/code/HippoRAG/run_logs/neocorrag_aligned_full1000_20260429/2wikimultihopqa_neocorrag.log
+[FAILED] aligned_full1000_20260429 rc=1 2026-04-30T09:53:33+08:00

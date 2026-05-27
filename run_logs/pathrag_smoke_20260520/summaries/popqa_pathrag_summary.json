@@ -1,0 +1,72 @@
+{
+  "dataset": "popqa",
+  "method": "PathRAG",
+  "limit": 1,
+  "config": {
+    "llm_name": "qwen3-32b-judge",
+    "llm_base_url": "http://localhost:8045/v1",
+    "llm_no_think": true,
+    "embedding_name": "nvidia/NV-Embed-v2",
+    "embedding_base_url": "http://localhost:8019/v1",
+    "pathrag_top_k": 40,
+    "chunk_token_size": 1200,
+    "chunk_overlap_token_size": 100,
+    "entity_extract_max_gleaning": 0
+  },
+  "retrieval": {
+    "recomputed_title_recall": {
+      "count": 1,
+      "Recall@5": 1.0,
+      "Recall@20": 1.0,
+      "Recall@100": 1.0,
+      "Recall@200": 1.0,
+      "All@5": 1.0,
+      "mean_docs": 5.0
+    },
+    "mapping": "PathRAG source chunks normalized to local corpus passages"
+  },
+  "usage": {
+    "path": "/mnt/nvme/code/HippoRAG/run_logs/pathrag_smoke_20260520/usage/popqa_usage.jsonl",
+    "rows": 58,
+    "by_phase": {
+      "offline_index": {
+        "calls": 52,
+        "chat_calls": 5,
+        "embedding_calls": 47,
+        "prompt_tokens": 18864,
+        "completion_tokens": 7009,
+        "total_tokens": 25873,
+        "elapsed_s": 124.4121081829071,
+        "by_kind": {
+          "embedding": {
+            "calls": 47,
+            "total_tokens": 7005
+          },
+          "chat_completion": {
+            "calls": 5,
+            "total_tokens": 18868
+          }
+        }
+      },
+      "online_retrieval": {
+        "calls": 6,
+        "chat_calls": 2,
+        "embedding_calls": 4,
+        "prompt_tokens": 816,
+        "completion_tokens": 78,
+        "total_tokens": 894,
+        "elapsed_s": 1.8563563823699951,
+        "by_kind": {
+          "chat_completion": {
+            "calls": 2,
+            "total_tokens": 856
+          },
+          "embedding": {
+            "calls": 4,
+            "total_tokens": 38
+          }
+        }
+      }
+    }
+  }
+}

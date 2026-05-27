@@ -1,0 +1,7 @@
+# Evidence Transition GraphRAG v3 Variable-Flow Summary
+
+| dataset | rows | R@5 | EM | F1 | candidate source | fresh OpenIE | fresh embeddings |
+| --- | ---: | ---: | ---: | ---: | --- | --- | --- |
+| 2wikimultihopqa | 1000 | 0.9055 |  |  | fresh_dense_seeded_sto_query_local_sto_graph | /mnt/nvme/code/HippoRAG/run_logs/evidence_transition_graphragv3_variable_flow_qwen32b_nv2_full1000_20260511/2wikimultihopqa/index/openie_results_ner_qwen3-32b-judge.json | /mnt/nvme/code/HippoRAG/run_logs/evidence_transition_graphragv3_variable_flow_qwen32b_nv2_full1000_20260511/2wikimultihopqa/index/qwen3-32b-judge_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet |
+| hotpotqa | 1000 | 0.9530 |  |  | fresh_dense_seeded_sto_query_local_sto_graph | /mnt/nvme/code/HippoRAG/run_logs/evidence_transition_graphragv3_variable_flow_qwen32b_nv2_full1000_20260511/hotpotqa/index/openie_results_ner_qwen3-32b-judge.json | /mnt/nvme/code/HippoRAG/run_logs/evidence_transition_graphragv3_variable_flow_qwen32b_nv2_full1000_20260511/hotpotqa/index/qwen3-32b-judge_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet |
+| musique | 1000 | 0.7167 |  |  | fresh_dense_seeded_sto_query_local_sto_graph | /mnt/nvme/code/HippoRAG/run_logs/evidence_transition_graphragv3_variable_flow_qwen32b_nv2_full1000_20260511/musique/index/openie_results_ner_qwen3-32b-judge.json | /mnt/nvme/code/HippoRAG/run_logs/evidence_transition_graphragv3_variable_flow_qwen32b_nv2_full1000_20260511/musique/index/qwen3-32b-judge_VLLM_nvidia_NV-Embed-v2/chunk_embeddings/vdb_chunk.parquet |

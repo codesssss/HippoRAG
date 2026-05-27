@@ -1,0 +1,6 @@
+[2026-04-09 16:05:59] Watcher started poll_seconds=30
+[2026-04-09 17:28:01] Detected baseline_top10 JSON with num_queries=1000
+[2026-04-09 17:28:02] Stopping long queue pid=1001793 pgid=1001793
+[2026-04-09 17:28:04] Launching remaining queue script=run_logs/fullscale_width_matched_control_musique_top5_remaining_20260409.sh
+[2026-04-09 17:28:04] Remaining queue launched pid=2520722
+[2026-04-09 17:28:04] Watcher finished

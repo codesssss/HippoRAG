@@ -1,0 +1,1397 @@
+{
+  "report_json": "run_logs/daec_noisyor_proprag_pool100_2wiki_fixclean_full1000_20260428.json",
+  "dataset": "2wikimultihopqa",
+  "source_name": "proprag_pool100",
+  "summary": {
+    "rows": 1000,
+    "overall": {
+      "baseline_em": 0.579,
+      "selector_em": 0.613,
+      "delta_em": 0.034,
+      "baseline_f1": 0.6503,
+      "selector_f1": 0.6828,
+      "delta_f1": 0.0325,
+      "changed_from_baseline": 0.826,
+      "title_jaccard": 0.7959,
+      "doc_jaccard": 0.796,
+      "same_title_set": 0.547,
+      "same_doc_set": 0.547,
+      "support_recall_delta": 0.0187,
+      "support_complete_delta": 0.038,
+      "noise_delta": -0.0071,
+      "duplicate_delta": 0.0,
+      "rows": 1000
+    },
+    "answer_transitions": {
+      "both_correct": 545,
+      "both_wrong": 353,
+      "wrong_to_correct": 68,
+      "correct_to_wrong": 34
+    },
+    "f1_buckets": {
+      "f1_unchanged": 867,
+      "f1_improved": 84,
+      "f1_regressed": 49
+    },
+    "by_answer_transition": {
+      "both_correct": {
+        "baseline_em": 1.0,
+        "selector_em": 1.0,
+        "delta_em": 0.0,
+        "baseline_f1": 1.0,
+        "selector_f1": 1.0,
+        "delta_f1": 0.0,
+        "changed_from_baseline": 0.8202,
+        "title_jaccard": 0.8132,
+        "doc_jaccard": 0.8134,
+        "same_title_set": 0.5835,
+        "same_doc_set": 0.5835,
+        "support_recall_delta": 0.0023,
+        "support_complete_delta": 0.0,
+        "noise_delta": -0.0005,
+        "added_gold_count": 0.0385,
+        "removed_gold_count": 0.0367,
+        "added_non_gold_count": 0.5908,
+        "removed_non_gold_count": 0.5927,
+        "duplicate_delta": 0.0,
+        "rows": 545
+      },
+      "both_wrong": {
+        "baseline_em": 0.0,
+        "selector_em": 0.0,
+        "delta_em": 0.0,
+        "baseline_f1": 0.1819,
+        "selector_f1": 0.1825,
+        "delta_f1": 0.0006,
+        "changed_from_baseline": 0.7847,
+        "title_jaccard": 0.806,
+        "doc_jaccard": 0.806,
+        "same_title_set": 0.5637,
+        "same_doc_set": 0.5637,
+        "support_recall_delta": 0.0205,
+        "support_complete_delta": 0.0482,
+        "noise_delta": -0.0074,
+        "added_gold_count": 0.0992,
+        "removed_gold_count": 0.0623,
+        "added_non_gold_count": 0.5666,
+        "removed_non_gold_count": 0.6034,
+        "duplicate_delta": 0.0,
+        "rows": 353
+      },
+      "correct_to_wrong": {
+        "baseline_em": 1.0,
+        "selector_em": 0.0,
+        "delta_em": -1.0,
+        "baseline_f1": 1.0,
+        "selector_f1": 0.1568,
+        "delta_f1": -0.8432,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6682,
+        "doc_jaccard": 0.6682,
+        "same_title_set": 0.3529,
+        "same_doc_set": 0.3529,
+        "support_recall_delta": -0.125,
+        "support_complete_delta": -0.2647,
+        "noise_delta": 0.0706,
+        "added_gold_count": 0.0294,
+        "removed_gold_count": 0.3824,
+        "added_non_gold_count": 1.1471,
+        "removed_non_gold_count": 0.7941,
+        "duplicate_delta": 0.0,
+        "rows": 34
+      },
+      "wrong_to_correct": {
+        "baseline_em": 0.0,
+        "selector_em": 1.0,
+        "delta_em": 1.0,
+        "baseline_f1": 0.1034,
+        "selector_f1": 1.0,
+        "delta_f1": 0.8966,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6691,
+        "doc_jaccard": 0.6691,
+        "same_title_set": 0.2647,
+        "same_doc_set": 0.2647,
+        "support_recall_delta": 0.2132,
+        "support_complete_delta": 0.4412,
+        "noise_delta": -0.0971,
+        "added_gold_count": 0.5147,
+        "removed_gold_count": 0.0294,
+        "added_non_gold_count": 0.6324,
+        "removed_non_gold_count": 1.1176,
+        "duplicate_delta": 0.0,
+        "rows": 68
+      }
+    },
+    "by_f1_bucket": {
+      "f1_improved": {
+        "baseline_em": 0.0,
+        "selector_em": 0.8095,
+        "delta_em": 0.8095,
+        "baseline_f1": 0.1093,
+        "selector_f1": 0.9154,
+        "delta_f1": 0.8061,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6588,
+        "doc_jaccard": 0.6588,
+        "same_title_set": 0.25,
+        "same_doc_set": 0.25,
+        "support_recall_delta": 0.2143,
+        "support_complete_delta": 0.4405,
+        "noise_delta": -0.0952,
+        "added_gold_count": 0.5119,
+        "removed_gold_count": 0.0357,
+        "added_non_gold_count": 0.6786,
+        "removed_non_gold_count": 1.1548,
+        "duplicate_delta": 0.0,
+        "rows": 84
+      },
+      "f1_regressed": {
+        "baseline_em": 0.6939,
+        "selector_em": 0.0,
+        "delta_em": -0.6939,
+        "baseline_f1": 0.8462,
+        "selector_f1": 0.1276,
+        "delta_f1": -0.7186,
+        "changed_from_baseline": 1.0,
+        "title_jaccard": 0.6502,
+        "doc_jaccard": 0.6502,
+        "same_title_set": 0.2653,
+        "same_doc_set": 0.2653,
+        "support_recall_delta": -0.1378,
+        "support_complete_delta": -0.2857,
+        "noise_delta": 0.0694,
+        "added_gold_count": 0.0204,
+        "removed_gold_count": 0.3673,
+        "added_non_gold_count": 1.1837,
+        "removed_non_gold_count": 0.8367,
+        "duplicate_delta": 0.0,
+        "rows": 49
+      },
+      "f1_unchanged": {
+        "baseline_em": 0.6286,
+        "selector_em": 0.6286,
+        "delta_em": 0.0,
+        "baseline_f1": 0.6916,
+        "selector_f1": 0.6916,
+        "delta_f1": 0.0,
+        "changed_from_baseline": 0.7993,
+        "title_jaccard": 0.8175,
+        "doc_jaccard": 0.8176,
+        "same_title_set": 0.5917,
+        "same_doc_set": 0.5917,
+        "support_recall_delta": 0.0087,
+        "support_complete_delta": 0.0173,
+        "noise_delta": -0.0028,
+        "added_gold_count": 0.0554,
+        "removed_gold_count": 0.0415,
+        "added_non_gold_count": 0.564,
+        "removed_non_gold_count": 0.5779,
+        "duplicate_delta": 0.0,
+        "rows": 867
+      }
+    },
+    "changed_doc_set": {
+      "baseline_em": 0.5497,
+      "selector_em": 0.6115,
+      "delta_em": 0.0618,
+      "baseline_f1": 0.6129,
+      "selector_f1": 0.6755,
+      "delta_f1": 0.0625,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.5495,
+      "doc_jaccard": 0.5498,
+      "same_title_set": 0.0,
+      "same_doc_set": 0.0,
+      "support_recall_delta": 0.0414,
+      "support_complete_delta": 0.0839,
+      "noise_delta": -0.0156,
+      "duplicate_delta": 0.0,
+      "rows": 453
+    },
+    "unchanged_doc_set": {
+      "baseline_em": 0.6033,
+      "selector_em": 0.6143,
+      "delta_em": 0.011,
+      "baseline_f1": 0.6812,
+      "selector_f1": 0.6888,
+      "delta_f1": 0.0076,
+      "changed_from_baseline": 0.6819,
+      "title_jaccard": 1.0,
+      "doc_jaccard": 1.0,
+      "same_title_set": 1.0,
+      "same_doc_set": 1.0,
+      "support_recall_delta": 0.0,
+      "support_complete_delta": 0.0,
+      "noise_delta": 0.0,
+      "duplicate_delta": 0.0,
+      "rows": 547
+    },
+    "improved_f1": {
+      "baseline_em": 0.0,
+      "selector_em": 0.8095,
+      "delta_em": 0.8095,
+      "baseline_f1": 0.1093,
+      "selector_f1": 0.9154,
+      "delta_f1": 0.8061,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.6588,
+      "doc_jaccard": 0.6588,
+      "same_title_set": 0.25,
+      "same_doc_set": 0.25,
+      "support_recall_delta": 0.2143,
+      "support_complete_delta": 0.4405,
+      "noise_delta": -0.0952,
+      "duplicate_delta": 0.0,
+      "rows": 84
+    },
+    "regressed_f1": {
+      "baseline_em": 0.6939,
+      "selector_em": 0.0,
+      "delta_em": -0.6939,
+      "baseline_f1": 0.8462,
+      "selector_f1": 0.1276,
+      "delta_f1": -0.7186,
+      "changed_from_baseline": 1.0,
+      "title_jaccard": 0.6502,
+      "doc_jaccard": 0.6502,
+      "same_title_set": 0.2653,
+      "same_doc_set": 0.2653,
+      "support_recall_delta": -0.1378,
+      "support_complete_delta": -0.2857,
+      "noise_delta": 0.0694,
+      "duplicate_delta": 0.0,
+      "rows": 49
+    }
+  },
+  "examples": {
+    "largest_f1_gains": [
+      {
+        "query_idx": 67,
+        "question": "Where was the director of film The Circus Cyclone born?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Oklahoma City, Oklahoma.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "The Circus Cyclone",
+          "Albert S. Rogell",
+          "The Knockout Kid",
+          "Bury Me Not on the Lone Prairie (film)",
+          "Sidney Olcott"
+        ],
+        "selector_top_titles": [
+          "Albert S. Rogell",
+          "The Circus Cyclone",
+          "The Knockout Kid",
+          "Bury Me Not on the Lone Prairie (film)",
+          "Sidney Olcott"
+        ]
+      },
+      {
+        "query_idx": 72,
+        "question": "Where did Saw Thanda's husband die?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Mrauk U.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Saw Thanda",
+          "Salin Mibaya",
+          "Min Dikkha",
+          "Gytha Thorkelsdóttir",
+          "Ealdgyth (daughter of Ælfgar, Earl of Mercia)"
+        ],
+        "selector_top_titles": [
+          "Where Was I",
+          "Saw Thanda",
+          "Salin Mibaya",
+          "Min Dikkha",
+          "Gytha Thorkelsdóttir"
+        ]
+      },
+      {
+        "query_idx": 93,
+        "question": "Which film has the director who died later, 45 Calibre Echo or Bons Baisers De Hong Kong?",
+        "baseline_answer": "45 Calibre Echo.",
+        "selector_answer": "Bons Baisers de Hong Kong.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Bruce M. Mitchell",
+          "Jeane Manson",
+          "Lino Brocka"
+        ],
+        "selector_top_titles": [
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Yvan Chiffre",
+          "Bruce M. Mitchell",
+          "Jeane Manson"
+        ]
+      },
+      {
+        "query_idx": 115,
+        "question": "What is the date of death of Hermann Ii, Landgrave Of Hesse's father?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "2 February 1345.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Hermann II, Landgrave of Hesse",
+          "Louis I, Landgrave of Hesse",
+          "Louis, Count of Verdun",
+          "Melchior of Brunswick-Grubenhagen",
+          "Moritz, Landgrave of Hesse"
+        ],
+        "selector_top_titles": [
+          "Louis the Junker",
+          "Hermann II, Landgrave of Hesse",
+          "Louis I, Landgrave of Hesse",
+          "Louis, Count of Verdun",
+          "Melchior of Brunswick-Grubenhagen"
+        ]
+      },
+      {
+        "query_idx": 118,
+        "question": "Which film has the director who is older, Amira & Sam or Fat Man And Little Boy?",
+        "baseline_answer": "Cannot be determined.",
+        "selector_answer": "Fat Man and Little Boy.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.4,
+        "added_gold_count": 2,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Fat Man and Little Boy",
+          "Roland Joffé",
+          "Bruce Robinson",
+          "James Goldstone",
+          "Gerald Hiken"
+        ],
+        "selector_top_titles": [
+          "Fat Man and Little Boy",
+          "Amira & Sam",
+          "Sean Mullin",
+          "Roland Joffé",
+          "Bruce Robinson"
+        ]
+      },
+      {
+        "query_idx": 119,
+        "question": "What is the place of birth of the director of film Peter'S Friends?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "Belfast.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Peter Greenaway",
+          "Peter's Friends",
+          "Thor: The Dark World",
+          "Alphonsia Emmanuel",
+          "Nightwatching"
+        ],
+        "selector_top_titles": [
+          "Peter Greenaway",
+          "Peter's Friends",
+          "Claude Weisz",
+          "Thor: The Dark World",
+          "Alphonsia Emmanuel"
+        ]
+      },
+      {
+        "query_idx": 128,
+        "question": "Who is the maternal grandmother of Louis, Dauphin Of France (Son Of Louis Xv)?",
+        "baseline_answer": "Marie Leszczyńska.",
+        "selector_answer": "Catherine Opalińska.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Maria Teresa Rafaela of Spain",
+          "Louis, Dauphin of France (son of Louis XV)",
+          "Marie Leszczyńska",
+          "Marie Adélaïde of Savoy",
+          "Louis, Duke of Burgundy"
+        ],
+        "selector_top_titles": [
+          "Marie Leszczyńska",
+          "Lars Eliasson",
+          "Louis, Dauphin of France (son of Louis XV)",
+          "Maria Teresa Rafaela of Spain",
+          "Marie Adélaïde of Savoy"
+        ]
+      },
+      {
+        "query_idx": 131,
+        "question": "Who is Princess Mafalda Of Savoy's maternal grandmother?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "Milena Vukotić.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Princess Mafalda of Savoy",
+          "Mafalda von Hessen",
+          "Elena of Montenegro",
+          "Maria Carolina Zamoyska",
+          "Archduchess Maria Isabella of Austria"
+        ],
+        "selector_top_titles": [
+          "Maria Beatrice of Savoy",
+          "List of people named O'Grady",
+          "Princess Mafalda of Savoy",
+          "Mafalda von Hessen",
+          "Elena of Montenegro"
+        ]
+      },
+      {
+        "query_idx": 139,
+        "question": "Who is younger, Isaac P. Walker or Nakkhatra Mangala?",
+        "baseline_answer": "Isaac P. Walker.",
+        "selector_answer": "Nakkhatra Mangala.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Nakkhatra Mangala",
+          "Busba Kitiyakara",
+          "Isaac P. Walker",
+          "Ranginui Walker",
+          "Dugès"
+        ],
+        "selector_top_titles": [
+          "Nakkhatra Mangala",
+          "Isaac P. Walker",
+          "Sirikit",
+          "Busba Kitiyakara",
+          "Ranginui Walker"
+        ]
+      },
+      {
+        "query_idx": 144,
+        "question": "Where was the place of death of Sancha Of Castile, Queen Of Navarre's mother?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Palencia.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Sancha of Castile, Queen of Navarre",
+          "Eleanor of Castile, Queen of Navarre",
+          "Blanche of Navarre, Countess of Champagne",
+          "Margaret of L'Aigle",
+          "Isabella of France, Queen of Navarre"
+        ],
+        "selector_top_titles": [
+          "Berengaria of Barcelona",
+          "Sancha of Castile, Queen of Navarre",
+          "Eleanor of Castile, Queen of Navarre",
+          "Blanche of Navarre, Countess of Champagne",
+          "Margaret of L'Aigle"
+        ]
+      }
+    ],
+    "largest_f1_losses": [
+      {
+        "query_idx": 35,
+        "question": "Who was born later, Gideon Johnson Pillow or Holm Jølsen?",
+        "baseline_answer": "Holm Jølsen.",
+        "selector_answer": "Gideon Johnson Pillow.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 3,
+        "baseline_top_titles": [
+          "Gideon Johnson Pillow",
+          "Holm Jølsen",
+          "J. Neely Johnson",
+          "Thaddeus P. Mott",
+          "Ola Isene"
+        ],
+        "selector_top_titles": [
+          "Dugès",
+          "John Kelly",
+          "Holm Jølsen",
+          "Gideon Johnson Pillow",
+          "Peter Gravesen"
+        ]
+      },
+      {
+        "query_idx": 40,
+        "question": "Which film whose director is younger, Phalitamsha or Gladiators Seven?",
+        "baseline_answer": "Phalitamsha.",
+        "selector_answer": "Gladiators Seven.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Gladiators Seven",
+          "Phalitamsha",
+          "Alberto De Martino",
+          "The Warriors",
+          "Puttanna Kanagal"
+        ],
+        "selector_top_titles": [
+          "Phalitamsha",
+          "Now Where Did the 7th Company Get to?",
+          "Puttanna Kanagal",
+          "Gladiators Seven",
+          "Vijaya Bhaskar"
+        ]
+      },
+      {
+        "query_idx": 77,
+        "question": "Which film has the director died later, Lost In The Stratosphere or Blind Man'S Eyes?",
+        "baseline_answer": "Blind Man's Eyes.",
+        "selector_answer": "Lost in the Stratosphere.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Blind Man's Eyes",
+          "Lost in the Stratosphere",
+          "Blind Man (film)",
+          "Dead Man's Eyes",
+          "Melville W. Brown"
+        ],
+        "selector_top_titles": [
+          "Lost in the Stratosphere",
+          "Blind Man's Eyes",
+          "Blind Man (film)",
+          "Dead Man's Eyes",
+          "Melville W. Brown"
+        ]
+      },
+      {
+        "query_idx": 87,
+        "question": "Which film has the director who was born later, The First Day Of Freedom or Malabimba – The Malicious Whore?",
+        "baseline_answer": "Malabimba – The Malicious Whore.",
+        "selector_answer": "The First Day of Freedom.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Malabimba – The Malicious Whore",
+          "The First Day of Freedom",
+          "Andrea Bianchi",
+          "Alain Jessua",
+          "Fernando Di Leo"
+        ],
+        "selector_top_titles": [
+          "The First Day of Freedom",
+          "Malabimba – The Malicious Whore",
+          "Andrea Bianchi",
+          "Alain Jessua",
+          "Fernando Di Leo"
+        ]
+      },
+      {
+        "query_idx": 90,
+        "question": "Which film has the director born first, Sins Of Madeleine or Captain Apache?",
+        "baseline_answer": "Sins of Madeleine.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Sins of Madeleine",
+          "Captain Apache",
+          "Alexander Singer",
+          "Henri Lepage (director)",
+          "I Cover the Underworld"
+        ],
+        "selector_top_titles": [
+          "The Capture of Bigfoot",
+          "Sins of Madeleine",
+          "Monster a Go-Go",
+          "Captain Apache",
+          "Alexander Singer"
+        ]
+      },
+      {
+        "query_idx": 210,
+        "question": "Who lived longer, Ludovico Sabbatini or Marcelino Manuel Da Graça?",
+        "baseline_answer": "Marcelino Manuel Da Graça.",
+        "selector_answer": "Ludovico Sabbatini.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Marcelino Manuel da Graça",
+          "Ludovico Sabbatini",
+          "Lorenzo Sabbatini",
+          "Vincenzo Lapuma",
+          "Dugès"
+        ],
+        "selector_top_titles": [
+          "Dugès",
+          "Lorenzo Sabbatini",
+          "Silva Marques",
+          "Ludovico Sabbatini",
+          "Maria da Graça Carvalho"
+        ]
+      },
+      {
+        "query_idx": 258,
+        "question": "What is the place of birth of Louis Of Nassau, Lord Of De Lek And Beverweerd's mother?",
+        "baseline_answer": "Lier.",
+        "selector_answer": "Not specified.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Louis of Nassau, Lord of De Lek and Beverweerd",
+          "John II, Lord of Polanen",
+          "William of Nassau (1620–1679)",
+          "William of Nassau (1601–1627)",
+          "Margaretha van Mechelen"
+        ],
+        "selector_top_titles": [
+          "Countess Anna of Nassau",
+          "William the Silent",
+          "Louis of Nassau, Lord of De Lek and Beverweerd",
+          "John II, Lord of Polanen",
+          "William of Nassau (1620–1679)"
+        ]
+      },
+      {
+        "query_idx": 332,
+        "question": "Which film was released more recently, Nearly A Deserter or Face À L'Océan?",
+        "baseline_answer": "Face à l'Océan.",
+        "selector_answer": "Nearly A Deserter.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Face à l'Océan",
+          "Nearly a Deserter",
+          "Éric Rohmer",
+          "A Face in the Fog",
+          "Who Would You Take to a Deserted Island?"
+        ],
+        "selector_top_titles": [
+          "A House of Sand",
+          "Face à l'Océan",
+          "Nearly a Deserter",
+          "Éric Rohmer",
+          "A Face in the Fog"
+        ]
+      },
+      {
+        "query_idx": 437,
+        "question": "Which film whose director is younger, College Lovers or The Dixie Flyer?",
+        "baseline_answer": "College Lovers.",
+        "selector_answer": "The Dixie Flyer.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "The Dixie Flyer",
+          "College Lovers",
+          "The Fatal Mistake",
+          "Charles J. Hunt",
+          "John G. Adolfi"
+        ],
+        "selector_top_titles": [
+          "College Lovers",
+          "The Dixie Flyer",
+          "Charles J. Hunt",
+          "The Fatal Mistake",
+          "John G. Adolfi"
+        ]
+      },
+      {
+        "query_idx": 467,
+        "question": "Which film has the director died earlier, John Jaffer Janardhanan or Kamakalawa?",
+        "baseline_answer": "Kamakalawa.",
+        "selector_answer": "John Jaffer Janardhanan.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "John Jaffer Janardhanan",
+          "Kamakalawa",
+          "I. V. Sasi",
+          "Lino Brocka",
+          "J. Sasikumar"
+        ],
+        "selector_top_titles": [
+          "John Jaffer Janardhanan",
+          "Eddie Romero",
+          "I. V. Sasi",
+          "Kamakalawa",
+          "Lino Brocka"
+        ]
+      }
+    ],
+    "wrong_to_correct": [
+      {
+        "query_idx": 25,
+        "question": "Who is the father-in-law of Sisowath Kossamak?",
+        "baseline_answer": "Prince Norodom Sutharot.",
+        "selector_answer": "Norodom Sutharot.",
+        "delta_f1": 0.19999999999999996,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Sisowath Kossamak",
+          "Norodom Suramarit",
+          "Obata Toramori",
+          "Anacyndaraxes",
+          "Takayama Tomoteru"
+        ],
+        "selector_top_titles": [
+          "Norodom Suramarit",
+          "Sisowath Kossamak",
+          "Obata Toramori",
+          "Anacyndaraxes",
+          "Takayama Tomoteru"
+        ]
+      },
+      {
+        "query_idx": 67,
+        "question": "Where was the director of film The Circus Cyclone born?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Oklahoma City, Oklahoma.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "The Circus Cyclone",
+          "Albert S. Rogell",
+          "The Knockout Kid",
+          "Bury Me Not on the Lone Prairie (film)",
+          "Sidney Olcott"
+        ],
+        "selector_top_titles": [
+          "Albert S. Rogell",
+          "The Circus Cyclone",
+          "The Knockout Kid",
+          "Bury Me Not on the Lone Prairie (film)",
+          "Sidney Olcott"
+        ]
+      },
+      {
+        "query_idx": 72,
+        "question": "Where did Saw Thanda's husband die?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "Mrauk U.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Saw Thanda",
+          "Salin Mibaya",
+          "Min Dikkha",
+          "Gytha Thorkelsdóttir",
+          "Ealdgyth (daughter of Ælfgar, Earl of Mercia)"
+        ],
+        "selector_top_titles": [
+          "Where Was I",
+          "Saw Thanda",
+          "Salin Mibaya",
+          "Min Dikkha",
+          "Gytha Thorkelsdóttir"
+        ]
+      },
+      {
+        "query_idx": 93,
+        "question": "Which film has the director who died later, 45 Calibre Echo or Bons Baisers De Hong Kong?",
+        "baseline_answer": "45 Calibre Echo.",
+        "selector_answer": "Bons Baisers de Hong Kong.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.25,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Bruce M. Mitchell",
+          "Jeane Manson",
+          "Lino Brocka"
+        ],
+        "selector_top_titles": [
+          "45 Calibre Echo",
+          "Bons Baisers de Hong Kong",
+          "Yvan Chiffre",
+          "Bruce M. Mitchell",
+          "Jeane Manson"
+        ]
+      },
+      {
+        "query_idx": 115,
+        "question": "What is the date of death of Hermann Ii, Landgrave Of Hesse's father?",
+        "baseline_answer": "Unknown.",
+        "selector_answer": "2 February 1345.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.20000000000000007,
+        "added_gold_count": 1,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Hermann II, Landgrave of Hesse",
+          "Louis I, Landgrave of Hesse",
+          "Louis, Count of Verdun",
+          "Melchior of Brunswick-Grubenhagen",
+          "Moritz, Landgrave of Hesse"
+        ],
+        "selector_top_titles": [
+          "Louis the Junker",
+          "Hermann II, Landgrave of Hesse",
+          "Louis I, Landgrave of Hesse",
+          "Louis, Count of Verdun",
+          "Melchior of Brunswick-Grubenhagen"
+        ]
+      },
+      {
+        "query_idx": 118,
+        "question": "Which film has the director who is older, Amira & Sam or Fat Man And Little Boy?",
+        "baseline_answer": "Cannot be determined.",
+        "selector_answer": "Fat Man and Little Boy.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.5,
+        "noise_delta": -0.4,
+        "added_gold_count": 2,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Fat Man and Little Boy",
+          "Roland Joffé",
+          "Bruce Robinson",
+          "James Goldstone",
+          "Gerald Hiken"
+        ],
+        "selector_top_titles": [
+          "Fat Man and Little Boy",
+          "Amira & Sam",
+          "Sean Mullin",
+          "Roland Joffé",
+          "Bruce Robinson"
+        ]
+      },
+      {
+        "query_idx": 119,
+        "question": "What is the place of birth of the director of film Peter'S Friends?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "Belfast.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Peter Greenaway",
+          "Peter's Friends",
+          "Thor: The Dark World",
+          "Alphonsia Emmanuel",
+          "Nightwatching"
+        ],
+        "selector_top_titles": [
+          "Peter Greenaway",
+          "Peter's Friends",
+          "Claude Weisz",
+          "Thor: The Dark World",
+          "Alphonsia Emmanuel"
+        ]
+      },
+      {
+        "query_idx": 128,
+        "question": "Who is the maternal grandmother of Louis, Dauphin Of France (Son Of Louis Xv)?",
+        "baseline_answer": "Marie Leszczyńska.",
+        "selector_answer": "Catherine Opalińska.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Maria Teresa Rafaela of Spain",
+          "Louis, Dauphin of France (son of Louis XV)",
+          "Marie Leszczyńska",
+          "Marie Adélaïde of Savoy",
+          "Louis, Duke of Burgundy"
+        ],
+        "selector_top_titles": [
+          "Marie Leszczyńska",
+          "Lars Eliasson",
+          "Louis, Dauphin of France (son of Louis XV)",
+          "Maria Teresa Rafaela of Spain",
+          "Marie Adélaïde of Savoy"
+        ]
+      },
+      {
+        "query_idx": 131,
+        "question": "Who is Princess Mafalda Of Savoy's maternal grandmother?",
+        "baseline_answer": "Not specified.",
+        "selector_answer": "Milena Vukotić.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Princess Mafalda of Savoy",
+          "Mafalda von Hessen",
+          "Elena of Montenegro",
+          "Maria Carolina Zamoyska",
+          "Archduchess Maria Isabella of Austria"
+        ],
+        "selector_top_titles": [
+          "Maria Beatrice of Savoy",
+          "List of people named O'Grady",
+          "Princess Mafalda of Savoy",
+          "Mafalda von Hessen",
+          "Elena of Montenegro"
+        ]
+      },
+      {
+        "query_idx": 139,
+        "question": "Who is younger, Isaac P. Walker or Nakkhatra Mangala?",
+        "baseline_answer": "Isaac P. Walker.",
+        "selector_answer": "Nakkhatra Mangala.",
+        "delta_f1": 1.0,
+        "delta_em": 1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Nakkhatra Mangala",
+          "Busba Kitiyakara",
+          "Isaac P. Walker",
+          "Ranginui Walker",
+          "Dugès"
+        ],
+        "selector_top_titles": [
+          "Nakkhatra Mangala",
+          "Isaac P. Walker",
+          "Sirikit",
+          "Busba Kitiyakara",
+          "Ranginui Walker"
+        ]
+      }
+    ],
+    "correct_to_wrong": [
+      {
+        "query_idx": 35,
+        "question": "Who was born later, Gideon Johnson Pillow or Holm Jølsen?",
+        "baseline_answer": "Holm Jølsen.",
+        "selector_answer": "Gideon Johnson Pillow.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 3,
+        "removed_non_gold_count": 3,
+        "baseline_top_titles": [
+          "Gideon Johnson Pillow",
+          "Holm Jølsen",
+          "J. Neely Johnson",
+          "Thaddeus P. Mott",
+          "Ola Isene"
+        ],
+        "selector_top_titles": [
+          "Dugès",
+          "John Kelly",
+          "Holm Jølsen",
+          "Gideon Johnson Pillow",
+          "Peter Gravesen"
+        ]
+      },
+      {
+        "query_idx": 40,
+        "question": "Which film whose director is younger, Phalitamsha or Gladiators Seven?",
+        "baseline_answer": "Phalitamsha.",
+        "selector_answer": "Gladiators Seven.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Gladiators Seven",
+          "Phalitamsha",
+          "Alberto De Martino",
+          "The Warriors",
+          "Puttanna Kanagal"
+        ],
+        "selector_top_titles": [
+          "Phalitamsha",
+          "Now Where Did the 7th Company Get to?",
+          "Puttanna Kanagal",
+          "Gladiators Seven",
+          "Vijaya Bhaskar"
+        ]
+      },
+      {
+        "query_idx": 77,
+        "question": "Which film has the director died later, Lost In The Stratosphere or Blind Man'S Eyes?",
+        "baseline_answer": "Blind Man's Eyes.",
+        "selector_answer": "Lost in the Stratosphere.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Blind Man's Eyes",
+          "Lost in the Stratosphere",
+          "Blind Man (film)",
+          "Dead Man's Eyes",
+          "Melville W. Brown"
+        ],
+        "selector_top_titles": [
+          "Lost in the Stratosphere",
+          "Blind Man's Eyes",
+          "Blind Man (film)",
+          "Dead Man's Eyes",
+          "Melville W. Brown"
+        ]
+      },
+      {
+        "query_idx": 87,
+        "question": "Which film has the director who was born later, The First Day Of Freedom or Malabimba – The Malicious Whore?",
+        "baseline_answer": "Malabimba – The Malicious Whore.",
+        "selector_answer": "The First Day of Freedom.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 0,
+        "removed_non_gold_count": 0,
+        "baseline_top_titles": [
+          "Malabimba – The Malicious Whore",
+          "The First Day of Freedom",
+          "Andrea Bianchi",
+          "Alain Jessua",
+          "Fernando Di Leo"
+        ],
+        "selector_top_titles": [
+          "The First Day of Freedom",
+          "Malabimba – The Malicious Whore",
+          "Andrea Bianchi",
+          "Alain Jessua",
+          "Fernando Di Leo"
+        ]
+      },
+      {
+        "query_idx": 90,
+        "question": "Which film has the director born first, Sins Of Madeleine or Captain Apache?",
+        "baseline_answer": "Sins of Madeleine.",
+        "selector_answer": "Cannot be determined.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.25,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Sins of Madeleine",
+          "Captain Apache",
+          "Alexander Singer",
+          "Henri Lepage (director)",
+          "I Cover the Underworld"
+        ],
+        "selector_top_titles": [
+          "The Capture of Bigfoot",
+          "Sins of Madeleine",
+          "Monster a Go-Go",
+          "Captain Apache",
+          "Alexander Singer"
+        ]
+      },
+      {
+        "query_idx": 100,
+        "question": "Who is the paternal grandfather of Margaret Of Bavaria, Marchioness Of Mantua?",
+        "baseline_answer": "Ernest, Duke of Bavaria.",
+        "selector_answer": "Ludwig III of Bavaria.",
+        "delta_f1": -0.5,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Margaret of Bavaria, Marchioness of Mantua",
+          "Albrecht, Duke of Bavaria",
+          "Albert III, Duke of Bavaria",
+          "Princess Maria Elisabeth of Bavaria",
+          "Princess Irmingard of Bavaria"
+        ],
+        "selector_top_titles": [
+          "Albert III, Duke of Bavaria",
+          "Obata Toramori",
+          "Margaret of Bavaria, Marchioness of Mantua",
+          "Albrecht, Duke of Bavaria",
+          "Princess Maria Elisabeth of Bavaria"
+        ]
+      },
+      {
+        "query_idx": 210,
+        "question": "Who lived longer, Ludovico Sabbatini or Marcelino Manuel Da Graça?",
+        "baseline_answer": "Marcelino Manuel Da Graça.",
+        "selector_answer": "Ludovico Sabbatini.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Marcelino Manuel da Graça",
+          "Ludovico Sabbatini",
+          "Lorenzo Sabbatini",
+          "Vincenzo Lapuma",
+          "Dugès"
+        ],
+        "selector_top_titles": [
+          "Dugès",
+          "Lorenzo Sabbatini",
+          "Silva Marques",
+          "Ludovico Sabbatini",
+          "Maria da Graça Carvalho"
+        ]
+      },
+      {
+        "query_idx": 221,
+        "question": "Who is Abd Al-Aziz Ibn Al-Walid's paternal grandfather?",
+        "baseline_answer": "Abd al-Malik ibn Marwan.",
+        "selector_answer": "Abd al-Aziz ibn Marwan.",
+        "delta_f1": -0.25,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 1,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Abd al-Aziz ibn al-Walid",
+          "Umar II",
+          "Abd al-Aziz ibn Marwan",
+          "Hasan ibn Ali",
+          "Kuthayyir"
+        ],
+        "selector_top_titles": [
+          "Abd al-Muttalib",
+          "Abd al-Aziz ibn al-Walid",
+          "Umar II",
+          "Abd al-Aziz ibn Marwan",
+          "Hasan ibn Ali"
+        ]
+      },
+      {
+        "query_idx": 234,
+        "question": "Who is the paternal grandfather of Hamad Bin Isa Al Khalifa?",
+        "baseline_answer": "Salman bin Hamad Al Khalifa.",
+        "selector_answer": "Isa bin Salman Al Khalifa.",
+        "delta_f1": -0.19999999999999996,
+        "delta_em": -1.0,
+        "support_recall_delta": 0.0,
+        "noise_delta": 0.0,
+        "added_gold_count": 0,
+        "removed_gold_count": 0,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 2,
+        "baseline_top_titles": [
+          "Khalifa bin Salman Al Khalifa",
+          "Hamad bin Isa Al Khalifa",
+          "Isa bin Salman Al Khalifa",
+          "Mohammed ibn Salman Al Khalifa",
+          "Abdullah bin Hamad bin Isa Al Khalifa"
+        ],
+        "selector_top_titles": [
+          "Isa bin Salman Al Khalifa",
+          "Archibald Hamilton",
+          "Hamad bin Isa Al Khalifa",
+          "List of people named O'Grady",
+          "Khalifa bin Salman Al Khalifa"
+        ]
+      },
+      {
+        "query_idx": 258,
+        "question": "What is the place of birth of Louis Of Nassau, Lord Of De Lek And Beverweerd's mother?",
+        "baseline_answer": "Lier.",
+        "selector_answer": "Not specified.",
+        "delta_f1": -1.0,
+        "delta_em": -1.0,
+        "support_recall_delta": -0.5,
+        "noise_delta": 0.20000000000000007,
+        "added_gold_count": 0,
+        "removed_gold_count": 1,
+        "added_non_gold_count": 2,
+        "removed_non_gold_count": 1,
+        "baseline_top_titles": [
+          "Louis of Nassau, Lord of De Lek and Beverweerd",
+          "John II, Lord of Polanen",
+          "William of Nassau (1620–1679)",
+          "William of Nassau (1601–1627)",
+          "Margaretha van Mechelen"
+        ],
+        "selector_top_titles": [
+          "Countess Anna of Nassau",
+          "William the Silent",
+          "Louis of Nassau, Lord of De Lek and Beverweerd",
+          "John II, Lord of Polanen",
+          "William of Nassau (1620–1679)"
+        ]
+      }
+    ]
+  }
+}

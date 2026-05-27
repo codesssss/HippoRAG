@@ -1,0 +1,700 @@
+[2026-04-10 12:59:38] NQ+PopQA smoke queue started on CUDA_VISIBLE_DEVICES=6
+[2026-04-10 12:59:38] START dataset=nq run=width_match_baseline_top10_plus_ce_qatopk5 append_policy=bridge append_max_docs=0 seed=0
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 9633 new records, 0 records already exist.
+Batch Encoding:   0%|          | 0/302 [00:00<?, ?it/s]Batch Encoding:   0%|          | 1/302 [00:00<01:59,  2.52it/s]Batch Encoding:   1%|          | 2/302 [00:00<01:51,  2.70it/s]Batch Encoding:   1%|          | 3/302 [00:01<01:48,  2.76it/s]Batch Encoding:   1%|▏         | 4/302 [00:01<01:45,  2.84it/s]Batch Encoding:   2%|▏         | 5/302 [00:01<01:47,  2.76it/s]Batch Encoding:   2%|▏         | 6/302 [00:02<01:46,  2.78it/s]Batch Encoding:   2%|▏         | 7/302 [00:02<01:46,  2.77it/s]Batch Encoding:   3%|▎         | 8/302 [00:02<01:46,  2.77it/s]Batch Encoding:   3%|▎         | 9/302 [00:03<01:44,  2.79it/s]Batch Encoding:   3%|▎         | 10/302 [00:03<01:46,  2.75it/s]Batch Encoding:   4%|▎         | 11/302 [00:03<01:45,  2.77it/s]Batch Encoding:   4%|▍         | 12/302 [00:04<01:43,  2.81it/s]Batch Encoding:   4%|▍         | 13/302 [00:04<01:41,  2.85it/s]Batch Encoding:   5%|▍         | 14/302 [00:05<01:40,  2.86it/s]Batch Encoding:   5%|▍         | 15/302 [00:05<01:40,  2.87it/s]Batch Encoding:   5%|▌         | 16/302 [00:05<01:40,  2.85it/s]Batch Encoding:   6%|▌         | 17/302 [00:06<01:40,  2.83it/s]Batch Encoding:   6%|▌         | 18/302 [00:06<01:40,  2.81it/s]Batch Encoding:   6%|▋         | 19/302 [00:06<01:42,  2.76it/s]Batch Encoding:   7%|▋         | 20/302 [00:07<01:40,  2.81it/s]Batch Encoding:   7%|▋         | 21/302 [00:07<01:38,  2.85it/s]Batch Encoding:   7%|▋         | 22/302 [00:07<01:37,  2.87it/s]Batch Encoding:   8%|▊         | 23/302 [00:08<01:37,  2.85it/s]Batch Encoding:   8%|▊         | 24/302 [00:08<01:36,  2.88it/s]Batch Encoding:   8%|▊         | 25/302 [00:08<01:35,  2.90it/s]Batch Encoding:   9%|▊         | 26/302 [00:09<01:36,  2.87it/s]Batch Encoding:   9%|▉         | 27/302 [00:09<01:36,  2.86it/s]Batch Encoding:   9%|▉         | 28/302 [00:09<01:36,  2.84it/s]Batch Encoding:  10%|▉         | 29/302 [00:10<01:35,  2.84it/s]Batch Encoding:  10%|▉         | 30/302 [00:10<01:35,  2.86it/s]Batch Encoding:  10%|█         | 31/302 [00:10<01:35,  2.83it/s]Batch Encoding:  11%|█         | 32/302 [00:11<01:34,  2.85it/s]Batch Encoding:  11%|█         | 33/302 [00:11<01:37,  2.75it/s]Batch Encoding:  11%|█▏        | 34/302 [00:12<01:36,  2.77it/s]Batch Encoding:  12%|█▏        | 35/302 [00:12<01:34,  2.81it/s]Batch Encoding:  12%|█▏        | 36/302 [00:12<01:34,  2.83it/s]Batch Encoding:  12%|█▏        | 37/302 [00:13<01:33,  2.84it/s]Batch Encoding:  13%|█▎        | 38/302 [00:13<01:33,  2.83it/s]Batch Encoding:  13%|█▎        | 39/302 [00:13<01:32,  2.85it/s]Batch Encoding:  13%|█▎        | 40/302 [00:14<01:34,  2.76it/s]Batch Encoding:  14%|█▎        | 41/302 [00:14<01:33,  2.79it/s]Batch Encoding:  14%|█▍        | 42/302 [00:14<01:33,  2.79it/s]Batch Encoding:  14%|█▍        | 43/302 [00:15<01:32,  2.79it/s]Batch Encoding:  15%|█▍        | 44/302 [00:15<01:32,  2.80it/s]Batch Encoding:  15%|█▍        | 45/302 [00:15<01:31,  2.81it/s]Batch Encoding:  15%|█▌        | 46/302 [00:16<01:29,  2.85it/s]Batch Encoding:  16%|█▌        | 47/302 [00:16<01:30,  2.81it/s]Batch Encoding:  16%|█▌        | 48/302 [00:17<01:32,  2.73it/s]Batch Encoding:  16%|█▌        | 49/302 [00:17<01:33,  2.70it/s]Batch Encoding:  17%|█▋        | 50/302 [00:17<01:31,  2.77it/s]Batch Encoding:  17%|█▋        | 51/302 [00:18<01:31,  2.75it/s]Batch Encoding:  17%|█▋        | 52/302 [00:18<01:30,  2.76it/s]Batch Encoding:  18%|█▊        | 53/302 [00:18<01:30,  2.76it/s]Batch Encoding:  18%|█▊        | 54/302 [00:19<01:31,  2.71it/s]Batch Encoding:  18%|█▊        | 55/302 [00:19<01:31,  2.71it/s]Batch Encoding:  19%|█▊        | 56/302 [00:20<01:31,  2.70it/s]Batch Encoding:  19%|█▉        | 57/302 [00:20<01:29,  2.73it/s]Batch Encoding:  19%|█▉        | 58/302 [00:20<01:29,  2.74it/s]Batch Encoding:  20%|█▉        | 59/302 [00:21<01:28,  2.74it/s]Batch Encoding:  20%|█▉        | 60/302 [00:21<01:29,  2.71it/s]Batch Encoding:  20%|██        | 61/302 [00:21<01:27,  2.74it/s]Batch Encoding:  21%|██        | 62/302 [00:22<01:28,  2.72it/s]Batch Encoding:  21%|██        | 63/302 [00:22<01:27,  2.74it/s]Batch Encoding:  21%|██        | 64/302 [00:22<01:25,  2.78it/s]Batch Encoding:  22%|██▏       | 65/302 [00:23<01:24,  2.82it/s]Batch Encoding:  22%|██▏       | 66/302 [00:23<01:26,  2.71it/s]Batch Encoding:  22%|██▏       | 67/302 [00:24<01:24,  2.77it/s]Batch Encoding:  23%|██▎       | 68/302 [00:24<01:25,  2.75it/s]Batch Encoding:  23%|██▎       | 69/302 [00:24<01:23,  2.81it/s]Batch Encoding:  23%|██▎       | 70/302 [00:25<01:26,  2.69it/s]Batch Encoding:  24%|██▎       | 71/302 [00:25<01:24,  2.74it/s]Batch Encoding:  24%|██▍       | 72/302 [00:25<01:21,  2.81it/s]Batch Encoding:  24%|██▍       | 73/302 [00:26<01:20,  2.86it/s]Batch Encoding:  25%|██▍       | 74/302 [00:26<01:19,  2.89it/s]Batch Encoding:  25%|██▍       | 75/302 [00:26<01:19,  2.85it/s]Batch Encoding:  25%|██▌       | 76/302 [00:27<01:17,  2.90it/s]Batch Encoding:  25%|██▌       | 77/302 [00:27<01:16,  2.93it/s]Batch Encoding:  26%|██▌       | 78/302 [00:27<01:17,  2.90it/s]Batch Encoding:  26%|██▌       | 79/302 [00:28<01:16,  2.92it/s]Batch Encoding:  26%|██▋       | 80/302 [00:28<01:15,  2.92it/s]Batch Encoding:  27%|██▋       | 81/302 [00:28<01:15,  2.92it/s]Batch Encoding:  27%|██▋       | 82/302 [00:29<01:15,  2.90it/s]Batch Encoding:  27%|██▋       | 83/302 [00:29<01:15,  2.90it/s]Batch Encoding:  28%|██▊       | 84/302 [00:29<01:15,  2.89it/s]Batch Encoding:  28%|██▊       | 85/302 [00:30<01:15,  2.89it/s]Batch Encoding:  28%|██▊       | 86/302 [00:30<01:16,  2.83it/s]Batch Encoding:  29%|██▉       | 87/302 [00:30<01:15,  2.85it/s]Batch Encoding:  29%|██▉       | 88/302 [00:31<01:14,  2.86it/s]Batch Encoding:  29%|██▉       | 89/302 [00:31<01:14,  2.86it/s]Batch Encoding:  30%|██▉       | 90/302 [00:32<01:14,  2.85it/s]Batch Encoding:  30%|███       | 91/302 [00:32<01:14,  2.85it/s]Batch Encoding:  30%|███       | 92/302 [00:32<01:14,  2.81it/s]Batch Encoding:  31%|███       | 93/302 [00:33<01:14,  2.82it/s]Batch Encoding:  31%|███       | 94/302 [00:33<01:13,  2.83it/s]Batch Encoding:  31%|███▏      | 95/302 [00:33<01:13,  2.83it/s]Batch Encoding:  32%|███▏      | 96/302 [00:34<01:12,  2.82it/s]Batch Encoding:  32%|███▏      | 97/302 [00:34<01:11,  2.85it/s]Batch Encoding:  32%|███▏      | 98/302 [00:34<01:11,  2.85it/s]Batch Encoding:  33%|███▎      | 99/302 [00:35<01:11,  2.84it/s]Batch Encoding:  33%|███▎      | 100/302 [00:35<01:11,  2.83it/s]Batch Encoding:  33%|███▎      | 101/302 [00:35<01:10,  2.84it/s]Batch Encoding:  34%|███▍      | 102/302 [00:36<01:09,  2.86it/s]Batch Encoding:  34%|███▍      | 103/302 [00:36<01:10,  2.82it/s]Batch Encoding:  34%|███▍      | 104/302 [00:36<01:09,  2.85it/s]Batch Encoding:  35%|███▍      | 105/302 [00:37<01:08,  2.87it/s]Batch Encoding:  35%|███▌      | 106/302 [00:37<01:08,  2.84it/s]Batch Encoding:  35%|███▌      | 107/302 [00:38<01:07,  2.90it/s]Batch Encoding:  36%|███▌      | 108/302 [00:38<01:07,  2.88it/s]Batch Encoding:  36%|███▌      | 109/302 [00:38<01:06,  2.92it/s]Batch Encoding:  36%|███▋      | 110/302 [00:39<01:07,  2.86it/s]Batch Encoding:  37%|███▋      | 111/302 [00:39<01:06,  2.86it/s]Batch Encoding:  37%|███▋      | 112/302 [00:39<01:06,  2.85it/s]Batch Encoding:  37%|███▋      | 113/302 [00:40<01:06,  2.85it/s]Batch Encoding:  38%|███▊      | 114/302 [00:40<01:05,  2.88it/s]Batch Encoding:  38%|███▊      | 115/302 [00:40<01:03,  2.93it/s]Batch Encoding:  38%|███▊      | 116/302 [00:41<01:03,  2.95it/s]Batch Encoding:  39%|███▊      | 117/302 [00:41<01:03,  2.92it/s]Batch Encoding:  39%|███▉      | 118/302 [00:41<01:03,  2.92it/s]Batch Encoding:  39%|███▉      | 119/302 [00:42<01:02,  2.91it/s]Batch Encoding:  40%|███▉      | 120/302 [00:42<01:03,  2.89it/s]Batch Encoding:  40%|████      | 121/302 [00:42<01:03,  2.86it/s]Batch Encoding:  40%|████      | 122/302 [00:43<01:04,  2.81it/s]Batch Encoding:  41%|████      | 123/302 [00:43<01:03,  2.83it/s]Batch Encoding:  41%|████      | 124/302 [00:43<01:02,  2.83it/s]Batch Encoding:  41%|████▏     | 125/302 [00:44<01:02,  2.83it/s]Batch Encoding:  42%|████▏     | 126/302 [00:44<01:02,  2.82it/s]Batch Encoding:  42%|████▏     | 127/302 [00:44<01:01,  2.86it/s]Batch Encoding:  42%|████▏     | 128/302 [00:45<01:01,  2.83it/s]Batch Encoding:  43%|████▎     | 129/302 [00:45<01:01,  2.83it/s]Batch Encoding:  43%|████▎     | 130/302 [00:46<01:03,  2.70it/s]Batch Encoding:  43%|████▎     | 131/302 [00:46<01:02,  2.72it/s]Batch Encoding:  44%|████▎     | 132/302 [00:46<01:01,  2.77it/s]Batch Encoding:  44%|████▍     | 133/302 [00:47<00:59,  2.82it/s]Batch Encoding:  44%|████▍     | 134/302 [00:47<01:01,  2.74it/s]Batch Encoding:  45%|████▍     | 135/302 [00:47<01:00,  2.77it/s]Batch Encoding:  45%|████▌     | 136/302 [00:48<01:00,  2.77it/s]Batch Encoding:  45%|████▌     | 137/302 [00:48<00:59,  2.76it/s]Batch Encoding:  46%|████▌     | 138/302 [00:48<00:58,  2.82it/s]Batch Encoding:  46%|████▌     | 139/302 [00:49<00:56,  2.91it/s]Batch Encoding:  46%|████▋     | 140/302 [00:49<00:55,  2.92it/s]Batch Encoding:  47%|████▋     | 141/302 [00:49<00:55,  2.92it/s]Batch Encoding:  47%|████▋     | 142/302 [00:50<00:54,  2.93it/s]Batch Encoding:  47%|████▋     | 143/302 [00:50<00:54,  2.93it/s]Batch Encoding:  48%|████▊     | 144/302 [00:50<00:54,  2.92it/s]Batch Encoding:  48%|████▊     | 145/302 [00:51<00:53,  2.92it/s]Batch Encoding:  48%|████▊     | 146/302 [00:51<00:53,  2.91it/s]Batch Encoding:  49%|████▊     | 147/302 [00:52<00:53,  2.91it/s]Batch Encoding:  49%|████▉     | 148/302 [00:52<00:53,  2.88it/s]Batch Encoding:  49%|████▉     | 149/302 [00:52<00:52,  2.90it/s]Batch Encoding:  50%|████▉     | 150/302 [00:53<00:53,  2.86it/s]Batch Encoding:  50%|█████     | 151/302 [00:53<00:53,  2.83it/s]Batch Encoding:  50%|█████     | 152/302 [00:53<00:53,  2.82it/s]Batch Encoding:  51%|█████     | 153/302 [00:54<00:53,  2.78it/s]Batch Encoding:  51%|█████     | 154/302 [00:54<00:52,  2.81it/s]Batch Encoding:  51%|█████▏    | 155/302 [00:54<00:51,  2.84it/s]Batch Encoding:  52%|█████▏    | 156/302 [00:55<00:51,  2.85it/s]Batch Encoding:  52%|█████▏    | 157/302 [00:55<00:50,  2.87it/s]Batch Encoding:  52%|█████▏    | 158/302 [00:55<00:50,  2.86it/s]Batch Encoding:  53%|█████▎    | 159/302 [00:56<00:50,  2.85it/s]Batch Encoding:  53%|█████▎    | 160/302 [00:56<00:49,  2.86it/s]Batch Encoding:  53%|█████▎    | 161/302 [00:56<00:49,  2.87it/s]Batch Encoding:  54%|█████▎    | 162/302 [00:57<00:49,  2.85it/s]Batch Encoding:  54%|█████▍    | 163/302 [00:57<00:48,  2.85it/s]Batch Encoding:  54%|█████▍    | 164/302 [00:58<00:48,  2.86it/s]Batch Encoding:  55%|█████▍    | 165/302 [00:58<00:47,  2.87it/s]Batch Encoding:  55%|█████▍    | 166/302 [00:58<00:47,  2.85it/s]Batch Encoding:  55%|█████▌    | 167/302 [00:59<00:47,  2.85it/s]Batch Encoding:  56%|█████▌    | 168/302 [00:59<00:47,  2.85it/s]Batch Encoding:  56%|█████▌    | 169/302 [00:59<00:46,  2.84it/s]Batch Encoding:  56%|█████▋    | 170/302 [01:00<00:46,  2.85it/s]Batch Encoding:  57%|█████▋    | 171/302 [01:00<00:46,  2.84it/s]Batch Encoding:  57%|█████▋    | 172/302 [01:00<00:45,  2.83it/s]Batch Encoding:  57%|█████▋    | 173/302 [01:01<00:46,  2.78it/s]Batch Encoding:  58%|█████▊    | 174/302 [01:01<00:46,  2.78it/s]Batch Encoding:  58%|█████▊    | 175/302 [01:01<00:45,  2.80it/s]Batch Encoding:  58%|█████▊    | 176/302 [01:02<00:45,  2.79it/s]Batch Encoding:  59%|█████▊    | 177/302 [01:02<00:45,  2.76it/s]Batch Encoding:  59%|█████▉    | 178/302 [01:03<00:46,  2.69it/s]Batch Encoding:  59%|█████▉    | 179/302 [01:03<00:44,  2.78it/s]Batch Encoding:  60%|█████▉    | 180/302 [01:03<00:43,  2.77it/s]Batch Encoding:  60%|█████▉    | 181/302 [01:04<00:43,  2.81it/s]Batch Encoding:  60%|██████    | 182/302 [01:04<00:42,  2.82it/s]Batch Encoding:  61%|██████    | 183/302 [01:04<00:42,  2.83it/s]Batch Encoding:  61%|██████    | 184/302 [01:05<00:41,  2.85it/s]Batch Encoding:  61%|██████▏   | 185/302 [01:05<00:41,  2.84it/s]Batch Encoding:  62%|██████▏   | 186/302 [01:05<00:40,  2.86it/s]Batch Encoding:  62%|██████▏   | 187/302 [01:06<00:39,  2.89it/s]Batch Encoding:  62%|██████▏   | 188/302 [01:06<00:39,  2.88it/s]Batch Encoding:  63%|██████▎   | 189/302 [01:06<00:39,  2.87it/s]Batch Encoding:  63%|██████▎   | 190/302 [01:07<00:39,  2.86it/s]Batch Encoding:  63%|██████▎   | 191/302 [01:07<00:39,  2.84it/s]Batch Encoding:  64%|██████▎   | 192/302 [01:07<00:38,  2.85it/s]Batch Encoding:  64%|██████▍   | 193/302 [01:08<00:37,  2.91it/s]Batch Encoding:  64%|██████▍   | 194/302 [01:08<00:37,  2.90it/s]Batch Encoding:  65%|██████▍   | 195/302 [01:08<00:36,  2.90it/s]Batch Encoding:  65%|██████▍   | 196/302 [01:09<00:36,  2.88it/s]Batch Encoding:  65%|██████▌   | 197/302 [01:09<00:36,  2.86it/s]Batch Encoding:  66%|██████▌   | 198/302 [01:09<00:36,  2.88it/s]Batch Encoding:  66%|██████▌   | 199/302 [01:10<00:35,  2.87it/s]Batch Encoding:  66%|██████▌   | 200/302 [01:10<00:35,  2.84it/s]Batch Encoding:  67%|██████▋   | 201/302 [01:11<00:36,  2.78it/s]Batch Encoding:  67%|██████▋   | 202/302 [01:11<00:36,  2.77it/s]Batch Encoding:  67%|██████▋   | 203/302 [01:11<00:35,  2.77it/s]Batch Encoding:  68%|██████▊   | 204/302 [01:12<00:34,  2.82it/s]Batch Encoding:  68%|██████▊   | 205/302 [01:12<00:33,  2.86it/s]Batch Encoding:  68%|██████▊   | 206/302 [01:12<00:34,  2.80it/s]Batch Encoding:  69%|██████▊   | 207/302 [01:13<00:33,  2.83it/s]Batch Encoding:  69%|██████▉   | 208/302 [01:13<00:33,  2.84it/s]Batch Encoding:  69%|██████▉   | 209/302 [01:13<00:32,  2.87it/s]Batch Encoding:  70%|██████▉   | 210/302 [01:14<00:32,  2.83it/s]Batch Encoding:  70%|██████▉   | 211/302 [01:14<00:31,  2.87it/s]Batch Encoding:  70%|███████   | 212/302 [01:14<00:30,  2.90it/s]Batch Encoding:  71%|███████   | 213/302 [01:15<00:30,  2.92it/s]Batch Encoding:  71%|███████   | 214/302 [01:15<00:29,  2.94it/s]Batch Encoding:  71%|███████   | 215/302 [01:15<00:29,  2.96it/s]Batch Encoding:  72%|███████▏  | 216/302 [01:16<00:29,  2.93it/s]Batch Encoding:  72%|███████▏  | 217/302 [01:16<00:29,  2.91it/s]Batch Encoding:  72%|███████▏  | 218/302 [01:16<00:28,  2.92it/s]Batch Encoding:  73%|███████▎  | 219/302 [01:17<00:28,  2.90it/s]Batch Encoding:  73%|███████▎  | 220/302 [01:17<00:28,  2.88it/s]Batch Encoding:  73%|███████▎  | 221/302 [01:18<00:28,  2.84it/s]Batch Encoding:  74%|███████▎  | 222/302 [01:18<00:28,  2.86it/s]Batch Encoding:  74%|███████▍  | 223/302 [01:18<00:27,  2.87it/s]Batch Encoding:  74%|███████▍  | 224/302 [01:19<00:27,  2.85it/s]Batch Encoding:  75%|███████▍  | 225/302 [01:19<00:27,  2.82it/s]Batch Encoding:  75%|███████▍  | 226/302 [01:19<00:26,  2.84it/s]Batch Encoding:  75%|███████▌  | 227/302 [01:20<00:26,  2.82it/s]Batch Encoding:  75%|███████▌  | 228/302 [01:20<00:26,  2.81it/s]Batch Encoding:  76%|███████▌  | 229/302 [01:20<00:26,  2.80it/s]Batch Encoding:  76%|███████▌  | 230/302 [01:21<00:25,  2.82it/s]Batch Encoding:  76%|███████▋  | 231/302 [01:21<00:25,  2.83it/s]Batch Encoding:  77%|███████▋  | 232/302 [01:21<00:25,  2.80it/s]Batch Encoding:  77%|███████▋  | 233/302 [01:22<00:24,  2.80it/s]Batch Encoding:  77%|███████▋  | 234/302 [01:22<00:24,  2.80it/s]Batch Encoding:  78%|███████▊  | 235/302 [01:22<00:23,  2.83it/s]Batch Encoding:  78%|███████▊  | 236/302 [01:23<00:23,  2.86it/s]Batch Encoding:  78%|███████▊  | 237/302 [01:23<00:22,  2.88it/s]Batch Encoding:  79%|███████▉  | 238/302 [01:24<00:22,  2.81it/s]Batch Encoding:  79%|███████▉  | 239/302 [01:24<00:22,  2.86it/s]Batch Encoding:  79%|███████▉  | 240/302 [01:24<00:21,  2.85it/s]Batch Encoding:  80%|███████▉  | 241/302 [01:25<00:21,  2.86it/s]Batch Encoding:  80%|████████  | 242/302 [01:25<00:21,  2.83it/s]Batch Encoding:  80%|████████  | 243/302 [01:25<00:20,  2.87it/s]Batch Encoding:  81%|████████  | 244/302 [01:26<00:20,  2.87it/s]Batch Encoding:  81%|████████  | 245/302 [01:26<00:19,  2.86it/s]Batch Encoding:  81%|████████▏ | 246/302 [01:26<00:19,  2.90it/s]Batch Encoding:  82%|████████▏ | 247/302 [01:27<00:19,  2.86it/s]Batch Encoding:  82%|████████▏ | 248/302 [01:27<00:19,  2.81it/s]Batch Encoding:  82%|████████▏ | 249/302 [01:27<00:18,  2.83it/s]Batch Encoding:  83%|████████▎ | 250/302 [01:28<00:18,  2.82it/s]Batch Encoding:  83%|████████▎ | 251/302 [01:28<00:17,  2.84it/s]Batch Encoding:  83%|████████▎ | 252/302 [01:28<00:17,  2.83it/s]Batch Encoding:  84%|████████▍ | 253/302 [01:29<00:17,  2.83it/s]Batch Encoding:  84%|████████▍ | 254/302 [01:29<00:16,  2.84it/s]Batch Encoding:  84%|████████▍ | 255/302 [01:30<00:16,  2.83it/s]Batch Encoding:  85%|████████▍ | 256/302 [01:30<00:16,  2.83it/s]Batch Encoding:  85%|████████▌ | 257/302 [01:30<00:15,  2.86it/s]Batch Encoding:  85%|████████▌ | 258/302 [01:31<00:15,  2.84it/s]Batch Encoding:  86%|████████▌ | 259/302 [01:31<00:15,  2.83it/s]Batch Encoding:  86%|████████▌ | 260/302 [01:31<00:14,  2.83it/s]Batch Encoding:  86%|████████▋ | 261/302 [01:32<00:14,  2.85it/s]Batch Encoding:  87%|████████▋ | 262/302 [01:32<00:14,  2.85it/s]Batch Encoding:  87%|████████▋ | 263/302 [01:32<00:13,  2.79it/s]Batch Encoding:  87%|████████▋ | 264/302 [01:33<00:13,  2.77it/s]Batch Encoding:  88%|████████▊ | 265/302 [01:33<00:13,  2.79it/s]Batch Encoding:  88%|████████▊ | 266/302 [01:33<00:12,  2.79it/s]Batch Encoding:  88%|████████▊ | 267/302 [01:34<00:12,  2.80it/s]Batch Encoding:  89%|████████▊ | 268/302 [01:34<00:12,  2.78it/s]Batch Encoding:  89%|████████▉ | 269/302 [01:35<00:11,  2.76it/s]Batch Encoding:  89%|████████▉ | 270/302 [01:35<00:11,  2.80it/s]Batch Encoding:  90%|████████▉ | 271/302 [01:35<00:10,  2.87it/s]Batch Encoding:  90%|█████████ | 272/302 [01:36<00:10,  2.91it/s]Batch Encoding:  90%|█████████ | 273/302 [01:36<00:09,  2.93it/s]Batch Encoding:  91%|█████████ | 274/302 [01:36<00:09,  2.92it/s]Batch Encoding:  91%|█████████ | 275/302 [01:37<00:09,  2.91it/s]Batch Encoding:  91%|█████████▏| 276/302 [01:37<00:08,  2.92it/s]Batch Encoding:  92%|█████████▏| 277/302 [01:37<00:08,  2.92it/s]Batch Encoding:  92%|█████████▏| 278/302 [01:38<00:08,  2.91it/s]Batch Encoding:  92%|█████████▏| 279/302 [01:38<00:07,  2.92it/s]Batch Encoding:  93%|█████████▎| 280/302 [01:38<00:07,  2.95it/s]Batch Encoding:  93%|█████████▎| 281/302 [01:39<00:07,  2.99it/s]Batch Encoding:  93%|█████████▎| 282/302 [01:39<00:06,  2.97it/s]Batch Encoding:  94%|█████████▎| 283/302 [01:39<00:06,  2.95it/s]Batch Encoding:  94%|█████████▍| 284/302 [01:40<00:06,  2.96it/s]Batch Encoding:  94%|█████████▍| 285/302 [01:40<00:05,  2.98it/s]Batch Encoding:  95%|█████████▍| 286/302 [01:40<00:05,  2.99it/s]Batch Encoding:  95%|█████████▌| 287/302 [01:41<00:04,  3.01it/s]Batch Encoding:  95%|█████████▌| 288/302 [01:41<00:04,  2.97it/s]Batch Encoding:  96%|█████████▌| 289/302 [01:41<00:04,  2.95it/s]Batch Encoding:  96%|█████████▌| 290/302 [01:42<00:04,  2.89it/s]Batch Encoding:  96%|█████████▋| 291/302 [01:42<00:03,  2.91it/s]Batch Encoding:  97%|█████████▋| 292/302 [01:42<00:03,  2.91it/s]Batch Encoding:  97%|█████████▋| 293/302 [01:43<00:03,  2.92it/s]Batch Encoding:  97%|█████████▋| 294/302 [01:43<00:02,  2.89it/s]Batch Encoding:  98%|█████████▊| 295/302 [01:43<00:02,  2.90it/s]Batch Encoding:  98%|█████████▊| 296/302 [01:44<00:02,  2.91it/s]Batch Encoding:  98%|█████████▊| 297/302 [01:44<00:01,  2.85it/s]Batch Encoding:  99%|█████████▊| 298/302 [01:44<00:01,  2.87it/s]Batch Encoding:  99%|█████████▉| 299/302 [01:45<00:01,  2.87it/s]Batch Encoding:  99%|█████████▉| 300/302 [01:45<00:00,  2.86it/s]Batch Encoding: 100%|█████████▉| 301/302 [01:45<00:00,  2.84it/s]Batch Encoding: 100%|██████████| 302/302 [01:46<00:00,  2.85it/s]
+INFO:src.hipporag.embedding_store:Saving new records.
+INFO:src.hipporag.embedding_store:Saved 9633 records to outputs_step0_general_nq/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:src.hipporag.HippoRAG:Encoding 5 queries for query_to_passage.
+Retrieving:   0%|          | 0/5 [00:00<?, ?it/s]Retrieving:  20%|██        | 1/5 [00:00<00:00,  4.73it/s]Retrieving:  40%|████      | 2/5 [00:00<00:00,  6.48it/s]Retrieving:  60%|██████    | 3/5 [00:00<00:00,  7.59it/s]Retrieving:  80%|████████  | 4/5 [00:00<00:00,  8.24it/s]Retrieving: 100%|██████████| 5/5 [00:00<00:00,  8.69it/s]Retrieving: 100%|██████████| 5/5 [00:00<00:00,  7.81it/s]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 0.91s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.1619, 'Recall@2': 0.2238, 'Recall@5': 0.481, 'Recall@10': 0.9714, 'Recall@20': 1.0, 'Recall@30': 1.0, 'Recall@50': 1.0, 'Recall@100': 1.0, 'Recall@150': 1.0, 'Recall@200': 1.0}
+Collecting QA prompts:   0%|          | 0/5 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 5/5 [00:00<00:00, 8563.30it/s]
+QA Reading:   0%|          | 0/5 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  20%|██        | 1/5 [00:10<00:42, 10.51s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  40%|████      | 2/5 [00:12<00:17,  5.71s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  60%|██████    | 3/5 [00:14<00:07,  3.85s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  80%|████████  | 4/5 [00:16<00:03,  3.10s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading: 100%|██████████| 5/5 [00:17<00:00,  2.31s/it]QA Reading: 100%|██████████| 5/5 [00:17<00:00,  3.47s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 5it [00:00, 1433.46it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.6, 'F1': 0.68}
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cuda:0
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 5 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/5 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 5/5 [00:00<00:00, 11434.85it/s]
+QA Reading:   0%|          | 0/5 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  20%|██        | 1/5 [00:12<00:51, 12.92s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  40%|████      | 2/5 [00:14<00:18,  6.20s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  60%|██████    | 3/5 [00:16<00:08,  4.25s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  80%|████████  | 4/5 [00:21<00:04,  4.58s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading: 100%|██████████| 5/5 [00:22<00:00,  3.25s/it]QA Reading: 100%|██████████| 5/5 [00:22<00:00,  4.46s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 5it [00:00, 1320.79it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.6, 'F1': 0.68}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.6000 (delta=+0.0000), F1=0.6800
+{
+  "output_json": "outputs_step0_general_nq/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa_lightsmoke.json",
+  "overall_recomputed": {
+    "Recall@1": 0.1619,
+    "Recall@2": 0.2238,
+    "Recall@5": 0.481,
+    "Recall@10": 0.9714,
+    "Recall@20": 1.0,
+    "Recall@30": 1.0,
+    "Recall@50": 1.0,
+    "Recall@100": 1.0,
+    "Recall@150": 1.0,
+    "Recall@200": 1.0,
+    "ExactMatch": 0.6,
+    "F1": 0.6799999999999999,
+    "num_queries": 5
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 5
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 5
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 5
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 5
+    },
+    "base_retrieval_dense_fallback_count": 5,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 0,
+    "append_policy": "bridge",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.35,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cuda:0",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "method_EM": 0.6,
+    "method_F1": 0.68,
+    "baseline_EM": 0.6,
+    "baseline_F1": 0.68,
+    "EM_delta": 0.0,
+    "F1_delta": 0.0,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.1619,
+      "Recall@2": 0.2571,
+      "Recall@5": 0.5429,
+      "Recall@10": 0.9714,
+      "Recall@20": 1.0,
+      "Recall@100": 1.0
+    },
+    "per_bucket": {
+      "1_doc": {
+        "count": 1,
+        "baseline_EM": 0.0,
+        "method_EM": 0.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.0,
+        "method_F1": 0.0,
+        "F1_delta": 0.0
+      },
+      "3_doc": {
+        "count": 1,
+        "baseline_EM": 1.0,
+        "method_EM": 1.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 1.0,
+        "method_F1": 1.0,
+        "F1_delta": 0.0
+      },
+      "6_doc": {
+        "count": 2,
+        "baseline_EM": 0.5,
+        "method_EM": 0.5,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.7,
+        "method_F1": 0.7,
+        "F1_delta": 0.0
+      },
+      "7_doc": {
+        "count": 1,
+        "baseline_EM": 1.0,
+        "method_EM": 1.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 1.0,
+        "method_F1": 1.0,
+        "F1_delta": 0.0
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "who has the oldest team in the nba",
+          "selected_titles": [
+            "Philadelphia 76ers",
+            "National Basketball Association",
+            "Boston Celtics",
+            "National Basketball Association",
+            "History of the Boston Celtics"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "an influential religion to enter china along the silk route during the han dynasty was",
+          "selected_titles": [
+            "Religion in China",
+            "Han dynasty",
+            "Religion in China",
+            "Silk Road",
+            "Silk Road"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "who pays medical bills in great britain where does the money come from to pay these bills",
+          "selected_titles": [
+            "Single-payer healthcare",
+            "Universal health care",
+            "National Health Service",
+            "United Kingdom enterprise law",
+            "National Insurance Fund"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "who is the captain of richmond football club",
+          "selected_titles": [
+            "Richmond Football Club",
+            "Richmond Football Club",
+            "Trent Cotchin",
+            "2018 Richmond Football Club season",
+            "2018 Richmond Football Club season"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        },
+        {
+          "question": "how many hoops are used in a game of croquet",
+          "selected_titles": [
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet",
+            "Croquet"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [],
+          "query_entities_preview": [],
+          "selection_steps": []
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 0,
+      "append_policy": "bridge",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.35,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cuda:0",
+      "avg_appended_doc_count": 0.0,
+      "avg_candidate_set_size": 10.0,
+      "append_count_histogram": {
+        "0": 5
+      },
+      "append_stop_reason_counts": {
+        "append_cap_zero": 5
+      }
+    }
+  }
+}
+[2026-04-10 13:02:30] DONE dataset=nq run=width_match_baseline_top10_plus_ce_qatopk5 report=outputs_step0_general_nq/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa_lightsmoke.json
+[2026-04-10 13:02:30] START dataset=popqa run=width_match_baseline_top10_plus_ce_qatopk5 append_policy=bridge append_max_docs=0 seed=0
+INFO:src.hipporag.HippoRAG:Creating working directory: outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Creating working directory: outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings
+INFO:src.hipporag.embedding_store:Creating working directory: outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/entity_embeddings
+INFO:src.hipporag.embedding_store:Creating working directory: outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/fact_embeddings
+INFO:src.hipporag.prompts.prompt_template_manager:Loading templates from directory: /mnt/nvme/code/HippoRAG/src/hipporag/prompts/templates
+INFO:src.hipporag.embedding_store:Creating working directory: outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/causal_v2/event_embeddings
+INFO:src.hipporag.HippoRAG:Indexing Documents
+INFO:src.hipporag.HippoRAG:Using causal engine V2 indexing path.
+INFO:src.hipporag.embedding_store:Inserting 8676 new records, 0 records already exist.
+Batch Encoding:   0%|          | 0/272 [00:00<?, ?it/s]Batch Encoding:   0%|          | 1/272 [00:00<01:39,  2.72it/s]Batch Encoding:   1%|          | 2/272 [00:00<01:37,  2.76it/s]Batch Encoding:   1%|          | 3/272 [00:01<01:38,  2.73it/s]Batch Encoding:   1%|▏         | 4/272 [00:01<01:36,  2.77it/s]Batch Encoding:   2%|▏         | 5/272 [00:01<01:36,  2.77it/s]Batch Encoding:   2%|▏         | 6/272 [00:02<01:36,  2.77it/s]Batch Encoding:   3%|▎         | 7/272 [00:02<01:34,  2.82it/s]Batch Encoding:   3%|▎         | 8/272 [00:02<01:34,  2.79it/s]Batch Encoding:   3%|▎         | 9/272 [00:03<01:30,  2.91it/s]Batch Encoding:   4%|▎         | 10/272 [00:03<01:28,  2.95it/s]Batch Encoding:   4%|▍         | 11/272 [00:03<01:26,  3.01it/s]Batch Encoding:   4%|▍         | 12/272 [00:04<01:27,  2.98it/s]Batch Encoding:   5%|▍         | 13/272 [00:04<01:26,  3.00it/s]Batch Encoding:   5%|▌         | 14/272 [00:04<01:28,  2.90it/s]Batch Encoding:   6%|▌         | 15/272 [00:05<01:30,  2.85it/s]Batch Encoding:   6%|▌         | 16/272 [00:05<01:29,  2.86it/s]Batch Encoding:   6%|▋         | 17/272 [00:05<01:28,  2.89it/s]Batch Encoding:   7%|▋         | 18/272 [00:06<01:25,  2.97it/s]Batch Encoding:   7%|▋         | 19/272 [00:06<01:25,  2.95it/s]Batch Encoding:   7%|▋         | 20/272 [00:06<01:26,  2.92it/s]Batch Encoding:   8%|▊         | 21/272 [00:07<01:24,  2.97it/s]Batch Encoding:   8%|▊         | 22/272 [00:07<01:23,  2.99it/s]Batch Encoding:   8%|▊         | 23/272 [00:07<01:23,  2.97it/s]Batch Encoding:   9%|▉         | 24/272 [00:08<01:27,  2.84it/s]Batch Encoding:   9%|▉         | 25/272 [00:08<01:27,  2.83it/s]Batch Encoding:  10%|▉         | 26/272 [00:09<01:24,  2.90it/s]Batch Encoding:  10%|▉         | 27/272 [00:09<01:22,  2.96it/s]Batch Encoding:  10%|█         | 28/272 [00:09<01:23,  2.92it/s]Batch Encoding:  11%|█         | 29/272 [00:10<01:23,  2.91it/s]Batch Encoding:  11%|█         | 30/272 [00:10<01:23,  2.89it/s]Batch Encoding:  11%|█▏        | 31/272 [00:10<01:24,  2.84it/s]Batch Encoding:  12%|█▏        | 32/272 [00:11<01:21,  2.94it/s]Batch Encoding:  12%|█▏        | 33/272 [00:11<01:20,  2.99it/s]Batch Encoding:  12%|█▎        | 34/272 [00:11<01:21,  2.94it/s]Batch Encoding:  13%|█▎        | 35/272 [00:12<01:21,  2.91it/s]Batch Encoding:  13%|█▎        | 36/272 [00:12<01:18,  3.02it/s]Batch Encoding:  14%|█▎        | 37/272 [00:12<01:21,  2.89it/s]Batch Encoding:  14%|█▍        | 38/272 [00:13<01:21,  2.88it/s]Batch Encoding:  14%|█▍        | 39/272 [00:13<01:21,  2.85it/s]Batch Encoding:  15%|█▍        | 40/272 [00:13<01:23,  2.79it/s]Batch Encoding:  15%|█▌        | 41/272 [00:14<01:24,  2.74it/s]Batch Encoding:  15%|█▌        | 42/272 [00:14<01:20,  2.84it/s]Batch Encoding:  16%|█▌        | 43/272 [00:14<01:21,  2.80it/s]Batch Encoding:  16%|█▌        | 44/272 [00:15<01:19,  2.86it/s]Batch Encoding:  17%|█▋        | 45/272 [00:15<01:17,  2.92it/s]Batch Encoding:  17%|█▋        | 46/272 [00:15<01:18,  2.88it/s]Batch Encoding:  17%|█▋        | 47/272 [00:16<01:18,  2.87it/s]Batch Encoding:  18%|█▊        | 48/272 [00:16<01:18,  2.86it/s]Batch Encoding:  18%|█▊        | 49/272 [00:16<01:17,  2.88it/s]Batch Encoding:  18%|█▊        | 50/272 [00:17<01:15,  2.93it/s]Batch Encoding:  19%|█▉        | 51/272 [00:17<01:13,  3.00it/s]Batch Encoding:  19%|█▉        | 52/272 [00:17<01:14,  2.95it/s]Batch Encoding:  19%|█▉        | 53/272 [00:18<01:14,  2.96it/s]Batch Encoding:  20%|█▉        | 54/272 [00:18<01:15,  2.87it/s]Batch Encoding:  20%|██        | 55/272 [00:19<01:15,  2.89it/s]Batch Encoding:  21%|██        | 56/272 [00:19<01:13,  2.94it/s]Batch Encoding:  21%|██        | 57/272 [00:19<01:14,  2.90it/s]Batch Encoding:  21%|██▏       | 58/272 [00:20<01:13,  2.91it/s]Batch Encoding:  22%|██▏       | 59/272 [00:20<01:13,  2.91it/s]Batch Encoding:  22%|██▏       | 60/272 [00:20<01:15,  2.80it/s]Batch Encoding:  22%|██▏       | 61/272 [00:21<01:13,  2.88it/s]Batch Encoding:  23%|██▎       | 62/272 [00:21<01:15,  2.80it/s]Batch Encoding:  23%|██▎       | 63/272 [00:21<01:17,  2.70it/s]Batch Encoding:  24%|██▎       | 64/272 [00:22<01:15,  2.75it/s]Batch Encoding:  24%|██▍       | 65/272 [00:22<01:14,  2.79it/s]Batch Encoding:  24%|██▍       | 66/272 [00:22<01:12,  2.85it/s]Batch Encoding:  25%|██▍       | 67/272 [00:23<01:09,  2.93it/s]Batch Encoding:  25%|██▌       | 68/272 [00:23<01:11,  2.87it/s]Batch Encoding:  25%|██▌       | 69/272 [00:23<01:11,  2.85it/s]Batch Encoding:  26%|██▌       | 70/272 [00:24<01:10,  2.85it/s]Batch Encoding:  26%|██▌       | 71/272 [00:24<01:10,  2.83it/s]Batch Encoding:  26%|██▋       | 72/272 [00:25<01:11,  2.81it/s]Batch Encoding:  27%|██▋       | 73/272 [00:25<01:10,  2.83it/s]Batch Encoding:  27%|██▋       | 74/272 [00:25<01:13,  2.69it/s]Batch Encoding:  28%|██▊       | 75/272 [00:26<01:12,  2.72it/s]Batch Encoding:  28%|██▊       | 76/272 [00:26<01:12,  2.71it/s]Batch Encoding:  28%|██▊       | 77/272 [00:26<01:11,  2.74it/s]Batch Encoding:  29%|██▊       | 78/272 [00:27<01:10,  2.75it/s]Batch Encoding:  29%|██▉       | 79/272 [00:27<01:08,  2.80it/s]Batch Encoding:  29%|██▉       | 80/272 [00:27<01:08,  2.81it/s]Batch Encoding:  30%|██▉       | 81/272 [00:28<01:07,  2.85it/s]Batch Encoding:  30%|███       | 82/272 [00:28<01:05,  2.90it/s]Batch Encoding:  31%|███       | 83/272 [00:28<01:03,  2.97it/s]Batch Encoding:  31%|███       | 84/272 [00:29<01:04,  2.91it/s]Batch Encoding:  31%|███▏      | 85/272 [00:29<01:04,  2.89it/s]Batch Encoding:  32%|███▏      | 86/272 [00:29<01:02,  2.97it/s]Batch Encoding:  32%|███▏      | 87/272 [00:30<01:04,  2.89it/s]Batch Encoding:  32%|███▏      | 88/272 [00:30<01:03,  2.88it/s]Batch Encoding:  33%|███▎      | 89/272 [00:30<01:02,  2.92it/s]Batch Encoding:  33%|███▎      | 90/272 [00:31<01:03,  2.86it/s]Batch Encoding:  33%|███▎      | 91/272 [00:31<01:03,  2.86it/s]Batch Encoding:  34%|███▍      | 92/272 [00:32<01:02,  2.89it/s]Batch Encoding:  34%|███▍      | 93/272 [00:32<01:01,  2.92it/s]Batch Encoding:  35%|███▍      | 94/272 [00:32<01:02,  2.85it/s]Batch Encoding:  35%|███▍      | 95/272 [00:33<01:02,  2.83it/s]Batch Encoding:  35%|███▌      | 96/272 [00:33<01:00,  2.91it/s]Batch Encoding:  36%|███▌      | 97/272 [00:33<00:58,  3.00it/s]Batch Encoding:  36%|███▌      | 98/272 [00:34<00:59,  2.91it/s]Batch Encoding:  36%|███▋      | 99/272 [00:34<01:00,  2.87it/s]Batch Encoding:  37%|███▋      | 100/272 [00:34<00:59,  2.88it/s]Batch Encoding:  37%|███▋      | 101/272 [00:35<01:00,  2.82it/s]Batch Encoding:  38%|███▊      | 102/272 [00:35<01:00,  2.81it/s]Batch Encoding:  38%|███▊      | 103/272 [00:35<01:00,  2.79it/s]Batch Encoding:  38%|███▊      | 104/272 [00:36<01:02,  2.69it/s]Batch Encoding:  39%|███▊      | 105/272 [00:36<01:05,  2.56it/s]Batch Encoding:  39%|███▉      | 106/272 [00:37<01:01,  2.70it/s]Batch Encoding:  39%|███▉      | 107/272 [00:37<01:01,  2.68it/s]Batch Encoding:  40%|███▉      | 108/272 [00:37<01:00,  2.71it/s]Batch Encoding:  40%|████      | 109/272 [00:38<01:02,  2.61it/s]Batch Encoding:  40%|████      | 110/272 [00:38<00:59,  2.71it/s]Batch Encoding:  41%|████      | 111/272 [00:38<00:57,  2.79it/s]Batch Encoding:  41%|████      | 112/272 [00:39<00:54,  2.93it/s]Batch Encoding:  42%|████▏     | 113/272 [00:39<00:54,  2.92it/s]Batch Encoding:  42%|████▏     | 114/272 [00:39<00:57,  2.77it/s]Batch Encoding:  42%|████▏     | 115/272 [00:40<01:00,  2.59it/s]Batch Encoding:  43%|████▎     | 116/272 [00:40<00:59,  2.60it/s]Batch Encoding:  43%|████▎     | 117/272 [00:41<01:00,  2.56it/s]Batch Encoding:  43%|████▎     | 118/272 [00:41<00:59,  2.59it/s]Batch Encoding:  44%|████▍     | 119/272 [00:41<00:58,  2.62it/s]Batch Encoding:  44%|████▍     | 120/272 [00:42<00:59,  2.55it/s]Batch Encoding:  44%|████▍     | 121/272 [00:42<01:02,  2.42it/s]Batch Encoding:  45%|████▍     | 122/272 [00:43<01:01,  2.44it/s]Batch Encoding:  45%|████▌     | 123/272 [00:43<00:57,  2.57it/s]Batch Encoding:  46%|████▌     | 124/272 [00:43<00:55,  2.69it/s]Batch Encoding:  46%|████▌     | 125/272 [00:44<00:53,  2.77it/s]Batch Encoding:  46%|████▋     | 126/272 [00:44<00:51,  2.81it/s]Batch Encoding:  47%|████▋     | 127/272 [00:44<00:50,  2.86it/s]Batch Encoding:  47%|████▋     | 128/272 [00:45<00:51,  2.79it/s]Batch Encoding:  47%|████▋     | 129/272 [00:45<00:50,  2.82it/s]Batch Encoding:  48%|████▊     | 130/272 [00:45<00:49,  2.87it/s]Batch Encoding:  48%|████▊     | 131/272 [00:46<00:49,  2.82it/s]Batch Encoding:  49%|████▊     | 132/272 [00:46<00:49,  2.83it/s]Batch Encoding:  49%|████▉     | 133/272 [00:47<00:49,  2.84it/s]Batch Encoding:  49%|████▉     | 134/272 [00:47<00:49,  2.78it/s]Batch Encoding:  50%|████▉     | 135/272 [00:47<00:49,  2.79it/s]Batch Encoding:  50%|█████     | 136/272 [00:48<00:47,  2.88it/s]Batch Encoding:  50%|█████     | 137/272 [00:48<00:46,  2.89it/s]Batch Encoding:  51%|█████     | 138/272 [00:48<00:46,  2.89it/s]Batch Encoding:  51%|█████     | 139/272 [00:49<00:46,  2.88it/s]Batch Encoding:  51%|█████▏    | 140/272 [00:49<00:45,  2.92it/s]Batch Encoding:  52%|█████▏    | 141/272 [00:49<00:46,  2.81it/s]Batch Encoding:  52%|█████▏    | 142/272 [00:50<00:47,  2.75it/s]Batch Encoding:  53%|█████▎    | 143/272 [00:50<00:45,  2.82it/s]Batch Encoding:  53%|█████▎    | 144/272 [00:50<00:44,  2.85it/s]Batch Encoding:  53%|█████▎    | 145/272 [00:51<00:44,  2.87it/s]Batch Encoding:  54%|█████▎    | 146/272 [00:51<00:43,  2.91it/s]Batch Encoding:  54%|█████▍    | 147/272 [00:51<00:43,  2.89it/s]Batch Encoding:  54%|█████▍    | 148/272 [00:52<00:42,  2.90it/s]Batch Encoding:  55%|█████▍    | 149/272 [00:52<00:41,  2.95it/s]Batch Encoding:  55%|█████▌    | 150/272 [00:52<00:41,  2.94it/s]Batch Encoding:  56%|█████▌    | 151/272 [00:53<00:40,  2.96it/s]Batch Encoding:  56%|█████▌    | 152/272 [00:53<00:41,  2.89it/s]Batch Encoding:  56%|█████▋    | 153/272 [00:54<00:43,  2.76it/s]Batch Encoding:  57%|█████▋    | 154/272 [00:54<00:42,  2.77it/s]Batch Encoding:  57%|█████▋    | 155/272 [00:54<00:41,  2.83it/s]Batch Encoding:  57%|█████▋    | 156/272 [00:55<00:40,  2.85it/s]Batch Encoding:  58%|█████▊    | 157/272 [00:55<00:39,  2.93it/s]Batch Encoding:  58%|█████▊    | 158/272 [00:55<00:39,  2.89it/s]Batch Encoding:  58%|█████▊    | 159/272 [00:56<00:38,  2.93it/s]Batch Encoding:  59%|█████▉    | 160/272 [00:56<00:38,  2.94it/s]Batch Encoding:  59%|█████▉    | 161/272 [00:56<00:36,  3.02it/s]Batch Encoding:  60%|█████▉    | 162/272 [00:57<00:37,  2.97it/s]Batch Encoding:  60%|█████▉    | 163/272 [00:57<00:37,  2.91it/s]Batch Encoding:  60%|██████    | 164/272 [00:57<00:38,  2.81it/s]Batch Encoding:  61%|██████    | 165/272 [00:58<00:37,  2.83it/s]Batch Encoding:  61%|██████    | 166/272 [00:58<00:37,  2.82it/s]Batch Encoding:  61%|██████▏   | 167/272 [00:58<00:36,  2.87it/s]Batch Encoding:  62%|██████▏   | 168/272 [00:59<00:35,  2.90it/s]Batch Encoding:  62%|██████▏   | 169/272 [00:59<00:35,  2.87it/s]Batch Encoding:  62%|██████▎   | 170/272 [00:59<00:35,  2.88it/s]Batch Encoding:  63%|██████▎   | 171/272 [01:00<00:34,  2.91it/s]Batch Encoding:  63%|██████▎   | 172/272 [01:00<00:34,  2.91it/s]Batch Encoding:  64%|██████▎   | 173/272 [01:00<00:33,  2.98it/s]Batch Encoding:  64%|██████▍   | 174/272 [01:01<00:32,  3.02it/s]Batch Encoding:  64%|██████▍   | 175/272 [01:01<00:32,  3.02it/s]Batch Encoding:  65%|██████▍   | 176/272 [01:01<00:32,  2.94it/s]Batch Encoding:  65%|██████▌   | 177/272 [01:02<00:33,  2.86it/s]Batch Encoding:  65%|██████▌   | 178/272 [01:02<00:32,  2.85it/s]Batch Encoding:  66%|██████▌   | 179/272 [01:02<00:32,  2.89it/s]Batch Encoding:  66%|██████▌   | 180/272 [01:03<00:32,  2.81it/s]Batch Encoding:  67%|██████▋   | 181/272 [01:03<00:32,  2.79it/s]Batch Encoding:  67%|██████▋   | 182/272 [01:04<00:32,  2.81it/s]Batch Encoding:  67%|██████▋   | 183/272 [01:04<00:31,  2.87it/s]Batch Encoding:  68%|██████▊   | 184/272 [01:04<00:30,  2.90it/s]Batch Encoding:  68%|██████▊   | 185/272 [01:05<00:29,  2.90it/s]Batch Encoding:  68%|██████▊   | 186/272 [01:05<00:30,  2.85it/s]Batch Encoding:  69%|██████▉   | 187/272 [01:05<00:29,  2.90it/s]Batch Encoding:  69%|██████▉   | 188/272 [01:06<00:29,  2.89it/s]Batch Encoding:  69%|██████▉   | 189/272 [01:06<00:28,  2.91it/s]Batch Encoding:  70%|██████▉   | 190/272 [01:06<00:28,  2.87it/s]Batch Encoding:  70%|███████   | 191/272 [01:07<00:28,  2.89it/s]Batch Encoding:  71%|███████   | 192/272 [01:07<00:27,  2.87it/s]Batch Encoding:  71%|███████   | 193/272 [01:07<00:27,  2.91it/s]Batch Encoding:  71%|███████▏  | 194/272 [01:08<00:26,  2.97it/s]Batch Encoding:  72%|███████▏  | 195/272 [01:08<00:25,  2.99it/s]Batch Encoding:  72%|███████▏  | 196/272 [01:08<00:26,  2.87it/s]Batch Encoding:  72%|███████▏  | 197/272 [01:09<00:26,  2.88it/s]Batch Encoding:  73%|███████▎  | 198/272 [01:09<00:25,  2.88it/s]Batch Encoding:  73%|███████▎  | 199/272 [01:09<00:25,  2.92it/s]Batch Encoding:  74%|███████▎  | 200/272 [01:10<00:24,  2.91it/s]Batch Encoding:  74%|███████▍  | 201/272 [01:10<00:24,  2.94it/s]Batch Encoding:  74%|███████▍  | 202/272 [01:10<00:23,  2.98it/s]Batch Encoding:  75%|███████▍  | 203/272 [01:11<00:23,  2.91it/s]Batch Encoding:  75%|███████▌  | 204/272 [01:11<00:24,  2.78it/s]Batch Encoding:  75%|███████▌  | 205/272 [01:12<00:24,  2.78it/s]Batch Encoding:  76%|███████▌  | 206/272 [01:12<00:24,  2.73it/s]Batch Encoding:  76%|███████▌  | 207/272 [01:12<00:23,  2.72it/s]Batch Encoding:  76%|███████▋  | 208/272 [01:13<00:23,  2.76it/s]Batch Encoding:  77%|███████▋  | 209/272 [01:13<00:22,  2.76it/s]Batch Encoding:  77%|███████▋  | 210/272 [01:13<00:21,  2.87it/s]Batch Encoding:  78%|███████▊  | 211/272 [01:14<00:21,  2.81it/s]Batch Encoding:  78%|███████▊  | 212/272 [01:14<00:21,  2.75it/s]Batch Encoding:  78%|███████▊  | 213/272 [01:14<00:20,  2.83it/s]Batch Encoding:  79%|███████▊  | 214/272 [01:15<00:20,  2.89it/s]Batch Encoding:  79%|███████▉  | 215/272 [01:15<00:19,  2.89it/s]Batch Encoding:  79%|███████▉  | 216/272 [01:15<00:19,  2.90it/s]Batch Encoding:  80%|███████▉  | 217/272 [01:16<00:19,  2.85it/s]Batch Encoding:  80%|████████  | 218/272 [01:16<00:18,  2.90it/s]Batch Encoding:  81%|████████  | 219/272 [01:16<00:18,  2.84it/s]Batch Encoding:  81%|████████  | 220/272 [01:17<00:18,  2.81it/s]Batch Encoding:  81%|████████▏ | 221/272 [01:17<00:17,  2.84it/s]Batch Encoding:  82%|████████▏ | 222/272 [01:17<00:17,  2.87it/s]Batch Encoding:  82%|████████▏ | 223/272 [01:18<00:16,  2.90it/s]Batch Encoding:  82%|████████▏ | 224/272 [01:18<00:17,  2.77it/s]Batch Encoding:  83%|████████▎ | 225/272 [01:19<00:16,  2.87it/s]Batch Encoding:  83%|████████▎ | 226/272 [01:19<00:15,  2.90it/s]Batch Encoding:  83%|████████▎ | 227/272 [01:19<00:15,  2.86it/s]Batch Encoding:  84%|████████▍ | 228/272 [01:20<00:15,  2.83it/s]Batch Encoding:  84%|████████▍ | 229/272 [01:20<00:14,  2.90it/s]Batch Encoding:  85%|████████▍ | 230/272 [01:20<00:14,  2.96it/s]Batch Encoding:  85%|████████▍ | 231/272 [01:21<00:13,  3.02it/s]Batch Encoding:  85%|████████▌ | 232/272 [01:21<00:13,  2.94it/s]Batch Encoding:  86%|████████▌ | 233/272 [01:21<00:13,  2.96it/s]Batch Encoding:  86%|████████▌ | 234/272 [01:22<00:12,  2.99it/s]Batch Encoding:  86%|████████▋ | 235/272 [01:22<00:12,  2.98it/s]Batch Encoding:  87%|████████▋ | 236/272 [01:22<00:12,  2.86it/s]Batch Encoding:  87%|████████▋ | 237/272 [01:23<00:12,  2.78it/s]Batch Encoding:  88%|████████▊ | 238/272 [01:23<00:12,  2.78it/s]Batch Encoding:  88%|████████▊ | 239/272 [01:23<00:11,  2.87it/s]Batch Encoding:  88%|████████▊ | 240/272 [01:24<00:11,  2.91it/s]Batch Encoding:  89%|████████▊ | 241/272 [01:24<00:10,  2.89it/s]Batch Encoding:  89%|████████▉ | 242/272 [01:24<00:10,  2.74it/s]Batch Encoding:  89%|████████▉ | 243/272 [01:25<00:10,  2.71it/s]Batch Encoding:  90%|████████▉ | 244/272 [01:25<00:10,  2.80it/s]Batch Encoding:  90%|█████████ | 245/272 [01:26<00:09,  2.77it/s]Batch Encoding:  90%|█████████ | 246/272 [01:26<00:09,  2.84it/s]Batch Encoding:  91%|█████████ | 247/272 [01:26<00:08,  2.89it/s]Batch Encoding:  91%|█████████ | 248/272 [01:27<00:08,  2.88it/s]Batch Encoding:  92%|█████████▏| 249/272 [01:27<00:08,  2.81it/s]Batch Encoding:  92%|█████████▏| 250/272 [01:27<00:08,  2.73it/s]Batch Encoding:  92%|█████████▏| 251/272 [01:28<00:07,  2.66it/s]Batch Encoding:  93%|█████████▎| 252/272 [01:28<00:07,  2.64it/s]Batch Encoding:  93%|█████████▎| 253/272 [01:28<00:06,  2.72it/s]Batch Encoding:  93%|█████████▎| 254/272 [01:29<00:06,  2.76it/s]Batch Encoding:  94%|█████████▍| 255/272 [01:29<00:06,  2.80it/s]Batch Encoding:  94%|█████████▍| 256/272 [01:29<00:05,  2.83it/s]Batch Encoding:  94%|█████████▍| 257/272 [01:30<00:05,  2.74it/s]Batch Encoding:  95%|█████████▍| 258/272 [01:30<00:05,  2.74it/s]Batch Encoding:  95%|█████████▌| 259/272 [01:31<00:04,  2.82it/s]Batch Encoding:  96%|█████████▌| 260/272 [01:31<00:04,  2.87it/s]Batch Encoding:  96%|█████████▌| 261/272 [01:31<00:03,  2.89it/s]Batch Encoding:  96%|█████████▋| 262/272 [01:32<00:03,  2.81it/s]Batch Encoding:  97%|█████████▋| 263/272 [01:32<00:03,  2.67it/s]Batch Encoding:  97%|█████████▋| 264/272 [01:32<00:02,  2.73it/s]Batch Encoding:  97%|█████████▋| 265/272 [01:33<00:02,  2.66it/s]Batch Encoding:  98%|█████████▊| 266/272 [01:33<00:02,  2.75it/s]Batch Encoding:  98%|█████████▊| 267/272 [01:33<00:01,  2.93it/s]Batch Encoding:  99%|█████████▊| 268/272 [01:34<00:01,  2.84it/s]Batch Encoding:  99%|█████████▉| 269/272 [01:34<00:01,  2.82it/s]Batch Encoding:  99%|█████████▉| 270/272 [01:35<00:00,  2.75it/s]Batch Encoding: 100%|█████████▉| 271/272 [01:35<00:00,  2.84it/s]Batch Encoding: 100%|██████████| 272/272 [01:35<00:00,  2.85it/s]
+INFO:src.hipporag.embedding_store:Saving new records.
+INFO:src.hipporag.embedding_store:Saved 8676 records to outputs_step0_general_popqa/qwen3-8b_VLLM__mnt_nvme_Qwen3-Embedding-8B/chunk_embeddings/vdb_chunk.parquet
+INFO:src.hipporag.HippoRAG:Skipping causal V2 graph indexing because causal features are disabled.
+INFO:src.hipporag.HippoRAG:Preparing for fast retrieval with causal engine V2.
+INFO:src.hipporag.HippoRAG:Preparing legacy fact-graph base retrieval objects for V2.
+WARNING:src.hipporag.HippoRAG:V2 legacy fact-graph base retrieval requested, but no OpenIE results were found. Falling back to dense ranking.
+INFO:src.hipporag.HippoRAG:Encoding 5 queries for query_to_passage.
+Retrieving:   0%|          | 0/5 [00:00<?, ?it/s]Retrieving:  40%|████      | 2/5 [00:00<00:00, 11.15it/s]Retrieving:  80%|████████  | 4/5 [00:00<00:00, 11.07it/s]Retrieving: 100%|██████████| 5/5 [00:00<00:00, 11.09it/s]
+INFO:src.hipporag.HippoRAG:Total Retrieval Time 0.70s
+INFO:src.hipporag.HippoRAG:Evaluation results for retrieval: {'Recall@1': 0.3, 'Recall@2': 0.4, 'Recall@5': 0.5, 'Recall@10': 0.5, 'Recall@20': 0.6, 'Recall@30': 0.6, 'Recall@50': 0.6, 'Recall@100': 0.6, 'Recall@150': 0.6, 'Recall@200': 0.6}
+Collecting QA prompts:   0%|          | 0/5 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 5/5 [00:00<00:00, 9086.45it/s]
+QA Reading:   0%|          | 0/5 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  20%|██        | 1/5 [00:02<00:08,  2.13s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  40%|████      | 2/5 [00:03<00:04,  1.63s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  60%|██████    | 3/5 [00:05<00:03,  1.64s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  80%|████████  | 4/5 [00:06<00:01,  1.52s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading: 100%|██████████| 5/5 [00:07<00:00,  1.30s/it]QA Reading: 100%|██████████| 5/5 [00:07<00:00,  1.46s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 5it [00:00, 2050.40it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.0, 'F1': 0.5333}
+INFO:__main__:Loading assemble cross-encoder model: /mnt/nvme/bge-reranker-v2-m3 on cuda:0
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+You're using a XLMRobertaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+WARNING:src.hipporag.HippoRAG:No facts available for scoring. Returning empty array.
+WARNING:src.hipporag.HippoRAG:No facts available for reranking. Returning empty lists.
+INFO:__main__:Applied bridge_append selector over pool@100 for 5 queries (avg mapped pool docs=100.00, avg seed entities=0.00)
+Collecting QA prompts:   0%|          | 0/5 [00:00<?, ?it/s]Collecting QA prompts: 100%|██████████| 5/5 [00:00<00:00, 12024.95it/s]
+QA Reading:   0%|          | 0/5 [00:00<?, ?it/s]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  20%|██        | 1/5 [00:02<00:08,  2.02s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  40%|████      | 2/5 [00:05<00:08,  2.89s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  60%|██████    | 3/5 [00:07<00:04,  2.39s/it]INFO:httpx:HTTP Request: POST http://localhost:8043/v1/chat/completions "HTTP/1.1 200 OK"
+QA Reading:  80%|████████  | 4/5 [00:08<00:01,  1.96s/it]QA Reading: 100%|██████████| 5/5 [00:08<00:00,  1.73s/it]
+Extraction Answers from LLM Response: 0it [00:00, ?it/s]Extraction Answers from LLM Response: 5it [00:00, 1978.26it/s]
+INFO:src.hipporag.HippoRAG:Evaluation results for QA: {'ExactMatch': 0.0, 'F1': 0.4152}
+INFO:__main__:Expand-assemble bridge_append[bridge/cross_encoder]@100: EM=0.0000 (delta=+0.0000), F1=0.4152
+{
+  "output_json": "outputs_step0_general_popqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa_lightsmoke.json",
+  "overall_recomputed": {
+    "Recall@1": 0.3,
+    "Recall@2": 0.4,
+    "Recall@5": 0.5,
+    "Recall@10": 0.5,
+    "Recall@20": 0.6,
+    "Recall@30": 0.6,
+    "Recall@50": 0.6,
+    "Recall@100": 0.6,
+    "Recall@150": 0.6,
+    "Recall@200": 0.6,
+    "ExactMatch": 0.0,
+    "F1": 0.5333333333333333,
+    "num_queries": 5
+  },
+  "causal_slice": {
+    "num_queries": 0
+  },
+  "nonempty_subgraph_slice": {
+    "num_queries": 0
+  },
+  "v2_metrics": {
+    "index_manifest": {},
+    "router_label_counts": {
+      "standard": 5
+    },
+    "base_retrieval_mode_counts": {
+      "legacy_fact_graph": 5
+    },
+    "base_retrieval_status_counts": {
+      "missing_openie_results": 5
+    },
+    "base_retrieval_route_counts": {
+      "dense_passage_v2_fallback": 5
+    },
+    "base_retrieval_dense_fallback_count": 5,
+    "base_retrieval_dense_fallback_rate": 1.0,
+    "avg_base_retrieval_fact_count": 0.0,
+    "use_causal_path_count": 0,
+    "use_causal_path_rate": 0.0,
+    "probe_attempted_count": 0,
+    "probe_attempted_rate": 0.0,
+    "forced_probe_count": 0,
+    "forced_probe_rate": 0.0,
+    "subgraph_nonempty_count": 0,
+    "subgraph_nonempty_rate": 0.0,
+    "causal_v2_used_count": 0,
+    "causal_v2_used_rate": 0.0,
+    "generator_used_causal_context_count": 0,
+    "generator_used_causal_context_rate": 0.0,
+    "avg_subgraph_chain_count": 0.0,
+    "avg_selected_chain_count": 0.0,
+    "max_subgraph_chain_count": 0,
+    "avg_seed_event_count": 0.0,
+    "avg_query_entity_count": 0.0,
+    "avg_serialized_context_count": 0.0,
+    "avg_causal_doc_count": 0.0,
+    "causal_examples_preview": []
+  },
+  "expand_assemble_qa": {
+    "selector": "bridge_append",
+    "score_mode": "bridge",
+    "pool_k": 100,
+    "expand_base_k": 10,
+    "append_max_docs": 0,
+    "append_policy": "bridge",
+    "append_random_seed": 0,
+    "expand_min_structure_score": 0.35,
+    "assemble_mode": "cross_encoder",
+    "coverage_score_variant": "qe_ce",
+    "coverage_atom_source": "candidate_pool",
+    "coverage_admissibility_mode": "off",
+    "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+    "assemble_ce_device": "cuda:0",
+    "structure_max_hops": 2,
+    "base_weight": 0.25,
+    "structure_weight": 0.6,
+    "novelty_weight": 0.15,
+    "non_anchor_title_dedup": true,
+    "query_entity_source": "seed",
+    "method_EM": 0.0,
+    "method_F1": 0.4152,
+    "baseline_EM": 0.0,
+    "baseline_F1": 0.5333,
+    "EM_delta": 0.0,
+    "F1_delta": -0.1181,
+    "method_retrieval_metrics": {
+      "Recall@1": 0.4,
+      "Recall@2": 0.5,
+      "Recall@5": 0.5,
+      "Recall@10": 0.5,
+      "Recall@20": 0.6,
+      "Recall@100": 0.6
+    },
+    "per_bucket": {
+      "2_doc": {
+        "count": 5,
+        "baseline_EM": 0.0,
+        "method_EM": 0.0,
+        "EM_delta": 0.0,
+        "baseline_F1": 0.5333,
+        "method_F1": 0.4152,
+        "F1_delta": -0.1182
+      }
+    },
+    "method_summary": {
+      "selector": "bridge_append",
+      "score_mode": "bridge",
+      "avg_mapped_pool_doc_count": 100.0,
+      "avg_seed_entity_count": 0.0,
+      "avg_selected_structured_doc_count": 0.0,
+      "reserve_top_m": 2,
+      "max_bridge_slots": 0,
+      "non_anchor_title_dedup": true,
+      "query_entity_source": "seed",
+      "gate_mode": "none",
+      "gate_min_structure_score": 0.15,
+      "gate_min_combined_margin": 0.0,
+      "gate_min_closure_score": 0.0,
+      "gate_min_novelty_score": 0.0,
+      "gate_min_frontier_gain": 0.0,
+      "gate_min_path_coherence": 0.0,
+      "gate_max_avg_local_structure": 0.95,
+      "gate_min_suffix_base_mean": 0.15,
+      "reader_order_probe_mode": "none",
+      "reader_order_probe_apply_count": 0,
+      "reader_order_probe_skip_count": 0,
+      "reader_order_probe_reason_counts": {},
+      "gate_apply_count": 0,
+      "gate_skip_count": 0,
+      "gate_reason_counts": {},
+      "saturation_guard_apply_count": 0,
+      "saturation_guard_skip_count": 0,
+      "late_rerank_enabled": false,
+      "late_rerank_apply_count": 0,
+      "late_rerank_override_count": 0,
+      "late_rerank_block_count": 0,
+      "late_rerank_parse_failure_count": 0,
+      "late_rerank_error_count": 0,
+      "late_rerank_policy": "always",
+      "late_rerank_max_state_score_gap": 0.0,
+      "beam_width": 4,
+      "beam_expand_per_state": 4,
+      "beam_projected_shortlist_factor": 1,
+      "beam_projection_eval_count": 0,
+      "beam_projection_extra_eval_count": 0,
+      "beam_projection_rescue_count": 0,
+      "beam_projection_changed_query_count": 0,
+      "beam_projection_max_selected_rank": 0,
+      "examples_preview": [
+        {
+          "question": "What is George Rankin's occupation?",
+          "selected_titles": [
+            "George Rankin",
+            "George Rankin -",
+            "George Rankine -",
+            "Rankin (name) - People with the last name",
+            "George Rankine - Family"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "query_entities_preview": [
+            "george",
+            "george rankin",
+            "rankin"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is John Mayne's occupation?",
+          "selected_titles": [
+            "John Mayne",
+            "John D. Mayne -",
+            "John D. Mayne - Family",
+            "Edward Mayne - Family",
+            "Kenny Mayne - NBC"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "query_entities_preview": [
+            "john mayne",
+            "mayne"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is Henry Feilden's occupation?",
+          "selected_titles": [
+            "Henry Wemyss Feilden -",
+            "Henry Feilden (Conservative politician)",
+            "Feilden - People",
+            "Feilden baronets - Feilden baronets, of Feniscowles (1846)",
+            "Randle Feilden - Biography"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "query_entities_preview": [
+            "feilden",
+            "henry",
+            "henry feilden"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is Kathy Saltzman's occupation?",
+          "selected_titles": [
+            "Kathy Saltzman",
+            "Kathy Saltzman -",
+            "Salzmann - Saltzman",
+            "Harry Saltzman - Life and career",
+            "W. Mark Saltzman - Research"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "query_entities_preview": [
+            "kathy",
+            "kathy saltzman",
+            "saltzman"
+          ],
+          "selection_steps": []
+        },
+        {
+          "question": "What is Eleanor Davis's occupation?",
+          "selected_titles": [
+            "Eleanor Davis",
+            "Eleanor Davies (poet) -",
+            "Eleanor Davies (poet) - Further reading",
+            "Rob Davis (gridiron football) - Early years",
+            "Eleanor Trehawke Davies - Early life"
+          ],
+          "seed_entities_preview": [],
+          "question_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "grounded_question_entities_preview": [],
+          "proposal_query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "query_entities_preview": [
+            "davis",
+            "eleanor",
+            "eleanor davis"
+          ],
+          "selection_steps": []
+        }
+      ],
+      "expand_base_k": 10,
+      "append_max_docs": 0,
+      "append_policy": "bridge",
+      "append_random_seed": 0,
+      "expand_min_structure_score": 0.35,
+      "assemble_mode": "cross_encoder",
+      "coverage_score_variant": "qe_ce",
+      "coverage_atom_source": "candidate_pool",
+      "coverage_admissibility_mode": "off",
+      "assemble_ce_model": "/mnt/nvme/bge-reranker-v2-m3",
+      "assemble_ce_device": "cuda:0",
+      "avg_appended_doc_count": 0.0,
+      "avg_candidate_set_size": 10.0,
+      "append_count_histogram": {
+        "0": 5
+      },
+      "append_stop_reason_counts": {
+        "append_cap_zero": 5
+      }
+    }
+  }
+}
+[2026-04-10 13:04:47] DONE dataset=popqa run=width_match_baseline_top10_plus_ce_qatopk5 report=outputs_step0_general_popqa/eval_reports/width_match_baseline_top10_plus_ce_qatopk5_20260410nqpopqa_lightsmoke.json
+[2026-04-10 13:04:47] NQ+PopQA smoke queue finished
